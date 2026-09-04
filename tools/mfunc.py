@@ -1,0 +1,371 @@
+"""Per-function matching harness.
+
+Assembles the original function on its own, compiles a C candidate with the
+Psy-Q cc1, and hands both objects to objdiff. objdiff understands relocations
+and is what decomp-permuter scores against, so its percentage is the verdict -
+no hand-rolled linking or byte comparison in the loop.
+
+    tools/mfunc.py <target> <symbol>                 # show the target function
+    tools/mfunc.py <target> <symbol> cand.c          # score a C candidate
+    tools/mfunc.py <target> <symbol> cand.c --diff   # ...and show the diff
+    tools/mfunc.py <target> <symbol> cand.c --diff --all   # include matching rows
+
+Artifacts stay in build/match/<target>/<symbol>/ so objdiff can be re-run by hand.
+"""
+import bisect
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GAME = "p1-jp"
+VENV = os.path.join(ROOT, ".venv/bin/python3")
+CC1 = os.path.join(ROOT, "bin/cc1-psx-26/cc1-psx-26")
+MASPSX = os.path.join(ROOT, "tools/maspsx/maspsx.py")
+OBJDIFF = os.path.join(ROOT, "bin/objdiff-cli")
+CROSS = "mipsel-linux-gnu-"
+AS = CROSS + "as"
+NM = CROSS + "nm"
+GCC = CROSS + "gcc"
+
+CC1FLAGS = ("-quiet -O2 -G0 -mcpu=3000 -msoft-float -mgas -gcoff -fgnu-linker "
+            "-funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return "
+            "-fcommon -fverbose-asm -w").split()
+ASFLAGS = ["-EL", "-march=r3000", "-mtune=r3000", "-no-pad-sections",
+           "-I", os.path.join(ROOT, "include")]
+
+LINE = re.compile(r"^\s*/\* ([0-9A-Fa-f]+) ([0-9A-Fa-f]{8}) ([0-9A-Fa-f]{8}) \*/")
+
+FUNC_HDR = ('.include "macro.inc"\n'
+            '.set noat\n'
+            '.set noreorder\n'
+            '.section .text, "ax"\n')
+
+# When a %hi/%lo pair lands inside a large data run, spimdisasm renders it as
+# "D_8009FB00 + 0x28" because it has no symbol for that exact address, while the
+# C source declares D_8009FB28. Fold the offset into the name so the two objects
+# agree - objdiff and decomp-permuter both compare symbols. Only data symbols
+# are folded; func_/jtbl_ offsets are real intra-function references.
+OFFREF = re.compile(r"D_([0-9A-Fa-f]{8})\s*\+\s*(0x[0-9A-Fa-f]+)")
+
+
+def run(cmd, **kw):
+    r = subprocess.run(cmd, capture_output=True, text=True, **kw)
+    if r.returncode != 0:
+        sys.exit("command failed: %s\n%s\n%s"
+                 % (" ".join(map(str, cmd)), r.stdout, r.stderr))
+    return r
+
+
+def split_asm_path(target):
+    return os.path.join(ROOT, "asm", GAME, target, target + ".s")
+
+
+def load_target(target, symbol):
+    """Original bytes + asm lines for `symbol`, from splat's output."""
+    words = []
+    lines = []
+    vram = None
+    inside = False
+    for line in open(split_asm_path(target)):
+        s = line.strip()
+        if s.startswith("glabel ") or s.startswith("dlabel "):
+            if inside:
+                break
+            inside = s.split()[1] == symbol
+            continue
+        if s.startswith("endlabel ") and inside:
+            break
+        if not inside or s.startswith("nonmatching"):
+            continue
+        lines.append(line.rstrip())
+        m = LINE.match(line)
+        if m:
+            if vram is None:
+                vram = int(m.group(2), 16)
+            words.append(bytes.fromhex(m.group(3)))
+    if not words:
+        sys.exit("symbol %r not found in %s" % (symbol, split_asm_path(target)))
+    return vram, b"".join(words), lines
+
+
+NAMED = re.compile(r"\b(?:func|D)_([0-9A-F]{8})\b")
+PROVIDE = re.compile(r"PROVIDE\(([A-Za-z_]\w*) = 0x([0-9A-Fa-f]{8})\);")
+# %hi(D_7FFFFF) / %lo(D_7FFFFF) - a constant spimdisasm mistook for an address.
+CONSTREF = re.compile(r"%(hi|lo)\(\s*D_([0-9A-Fa-f]+)\s*\)")
+
+
+def load_names(target):
+    """address -> real name, from the generated symbol map."""
+    path = os.path.join(ROOT, "config", GAME, "%s.names.ld" % target)
+    out = {}
+    if os.path.exists(path):
+        for line in open(path):
+            m = PROVIDE.search(line)
+            if m:
+                out.setdefault(int(m.group(2), 16), m.group(1))
+    return out
+
+
+def gp_base(target):
+    """Runtime $gp for a target, if known (see config/<game>/gp.txt)."""
+    path = os.path.join(ROOT, "config", GAME, "gp.txt")
+    if not os.path.exists(path):
+        return None
+    for line in open(path):
+        line = line.split("//")[0].split()
+        if len(line) == 2 and line[0] == target:
+            return int(line[1], 16)
+    return None
+
+
+GPREF = re.compile(r"(-?(?:0x)?[0-9A-Fa-f]+)\(\$gp\)")
+
+
+def normalize_asm(lines, names=None, gp=None):
+    """Make the target asm agree with the C on symbol names.
+
+    Three mismatches otherwise show up as permanent objdiff penalties even when
+    the code is identical:
+      - spimdisasm's "D_8009FB00 + 0x28" offset form vs the C's D_8009FB28
+      - address-derived names where the C uses the real one
+        (func_80012B2C vs CdSearchFileLoc)
+      - a lui/addiu pair building a large *constant*, which spimdisasm
+        mis-reads as an address and invents a symbol for (0x800000-1 becomes
+        %hi(D_7FFFFF)/%lo(D_7FFFFF)). Anything below the 0x80000000 RAM base
+        cannot be an address, so fold those back to literals.
+    """
+    def fold(m):
+        return "D_%08X" % (int(m.group(1), 16) + int(m.group(2), 16))
+
+    # Sorted named addresses, for rebasing references into the middle of a
+    # named object.
+    based = sorted(names) if names else []
+
+    def rename(m):
+        addr = int(m.group(1), 16)
+        hit = (names or {}).get(addr)
+        if hit:
+            return hit
+        # A reference into the middle of a named array or struct: spimdisasm
+        # invents its own symbol (D_800622FC) where the C says g_cd_queue+0xc.
+        # Rebase onto the nearest named symbol below it.
+        if based and m.group(0).startswith("D_"):
+            i = bisect.bisect_right(based, addr) - 1
+            if i >= 0 and 0 < addr - based[i] <= 0x400:
+                return "%s+0x%X" % (names[based[i]], addr - based[i])
+        return m.group(0)
+
+    def unconst(m):
+        value = int(m.group(2), 16)
+        if value >= 0x80000000:
+            return m.group(0)
+        if m.group(1) == "hi":
+            return "0x%X" % (((value + 0x8000) >> 16) & 0xFFFF)
+        low = value & 0xFFFF
+        return "%d" % (low - 0x10000 if low >= 0x8000 else low)
+
+    def gprel(m):
+        raw = m.group(1)
+        off = int(raw, 16) if raw.lower().startswith(("0x", "-0x")) else int(raw, 0)
+        sym = (names or {}).get(gp + off)
+        return "%%gp_rel(%s)($gp)" % sym if sym else m.group(0)
+
+    out = []
+    for ln in lines:
+        ln = OFFREF.sub(fold, ln)
+        ln = CONSTREF.sub(unconst, ln)
+        if names:
+            ln = NAMED.sub(rename, ln)
+        # splat disassembles the *linked* binary, so a small-data access shows
+        # up as a bare "0($gp)". A compiled candidate emits a %gp_rel
+        # relocation instead; resolve the target's form once $gp is known.
+        if gp is not None and names:
+            ln = GPREF.sub(gprel, ln)
+        out.append(ln)
+    return out
+
+
+FLAGS_DIRECTIVE = re.compile(r"/\*\s*cc1flags:\s*(.*?)\s*\*/")
+
+
+def cc1flags_for(cfile):
+    """Per-file compiler flags.
+
+    Not every translation unit was built the same way - parts of the sub-EXEs
+    use -O0 and a non-zero -G (frame pointers and $gp-relative accesses give it
+    away), so a source can override the defaults with:
+
+        /* cc1flags: -O0 -G8 */
+    """
+    text = open(cfile, encoding="utf-8", errors="replace").read(4096)
+    m = FLAGS_DIRECTIVE.search(text)
+    if not m:
+        return CC1FLAGS
+    override = m.group(1).split()
+    base = [f for f in CC1FLAGS
+            if not any(f.startswith(o.split("=")[0][:2]) for o in override
+                       if o.startswith("-O") or o.startswith("-G"))]
+    return base + override
+
+
+def compile_c(cfile, outdir):
+    """cc1 is the compiler proper, so cpp must run first. maspsx reads stdin."""
+    i_path = os.path.join(outdir, "cand.i")
+    s_path = os.path.join(outdir, "cand.s")
+    o_path = os.path.join(outdir, "cand.o")
+    run([GCC, "-E", "-nostdinc", "-undef", "-D__GNUC__=2",
+         "-I", os.path.join(ROOT, "include"),
+         "-I", os.path.join(ROOT, "include", "psyq"),
+         "-I", os.path.dirname(cfile),
+         cfile, "-o", i_path])
+    run([CC1] + cc1flags_for(cfile) + [i_path, "-o", s_path])
+    piped = subprocess.run(
+        [VENV, MASPSX, "--expand-div", "--aspsx-version=2.34"],
+        input=open(s_path).read(), capture_output=True, text=True)
+    if piped.returncode != 0:
+        sys.exit("maspsx failed:\n" + piped.stderr)
+    run([AS] + ASFLAGS + ["-o", o_path, "-"], input=piped.stdout)
+    return o_path
+
+
+def c_symbol(o_path, prefer=None):
+    """Global text symbol defined by the candidate.
+
+    `prefer` lets a source hold several functions: pass the real name of the one
+    being matched and it wins over whichever happens to come first.
+    """
+    found = []
+    for line in run([NM, "--defined-only", o_path]).stdout.splitlines():
+        p = line.split()
+        if len(p) == 3 and p[1] == "T":
+            found.append(p[2])
+    if prefer and prefer in found:
+        return prefer
+    return found[0] if found else None
+
+
+def build_target_obj(lines, sym, outdir, names=None, gp=None):
+    """Assemble the original function alone, under the candidate's symbol name."""
+    s_path = os.path.join(outdir, "target.s")
+    o_path = os.path.join(outdir, "target.o")
+    with open(s_path, "w") as f:
+        f.write(FUNC_HDR)
+        f.write(".global %s\n%s:\n" % (sym, sym))
+        f.write("\n".join(normalize_asm(lines, names, gp)) + "\n")
+    run([AS] + ASFLAGS + ["-o", o_path, s_path])
+    return o_path
+
+
+def objdiff_json(target_o, cand_o, sym):
+    r = subprocess.run(
+        [OBJDIFF, "diff", "-1", target_o, "-2", cand_o,
+         "--format", "json", "-o", "-", sym],
+        capture_output=True, text=True, cwd=ROOT)
+    if r.returncode != 0:
+        print("  objdiff failed: " + (r.stderr or r.stdout).strip()[:400])
+        return None
+    try:
+        return json.loads(r.stdout)
+    except ValueError:
+        print("  objdiff produced unparseable output")
+        return None
+
+
+def pick_symbol(side, sym):
+    """objdiff puts per-instruction diffs on <side>.symbols[].instructions."""
+    best = None
+    for s in (side or {}).get("symbols", []):
+        if s.get("kind") != "SYMBOL_FUNCTION":
+            continue
+        if s.get("name") == sym:
+            return s
+        if best is None and s.get("instructions"):
+            best = s
+    return best
+
+
+def insn_text(ins):
+    if not isinstance(ins, dict):
+        return ""
+    return (ins.get("instruction") or {}).get("formatted", "")
+
+
+MARK = {"DIFF_NONE": " ", "DIFF_REPLACE": "~", "DIFF_DELETE": "<",
+        "DIFF_INSERT": ">", "DIFF_OP_MISMATCH": "~", "DIFF_ARG_MISMATCH": "~"}
+
+W = 44
+
+
+def render(d, sym, show_all=False):
+    left = pick_symbol(d.get("left"), sym)
+    right = pick_symbol(d.get("right"), sym)
+    if not left or not left.get("instructions"):
+        print("  objdiff returned no instructions for %s" % sym)
+        return
+    li = left.get("instructions") or []
+    ri = (right or {}).get("instructions") or []
+
+    print("    %-6s %-*s %s" % ("", W, "target", "current"))
+    print("    " + "-" * (W + 48))
+    for i in range(max(len(li), len(ri))):
+        a = li[i] if i < len(li) else None
+        b = ri[i] if i < len(ri) else None
+        kind = (a or b or {}).get("diff_kind", "") or ""
+        mark = MARK.get(kind, " ")
+        if mark == " " and not show_all:
+            continue
+        addr = (a or {}).get("instruction", {}).get("address", 0)
+        try:
+            addr = int(addr)
+        except (TypeError, ValueError):
+            addr = 0
+        print("  %s %04X   %-*s %s" % (mark, addr, W,
+                                       insn_text(a)[:W], insn_text(b)[:W]))
+
+
+def main():
+    if len(sys.argv) < 3:
+        sys.exit(__doc__)
+    target = sys.argv[1]
+    symbol = sys.argv[2]
+    vram, orig, lines = load_target(target, symbol)
+    print("%s:%s  vram=0x%08X  %d bytes (%d instructions)"
+          % (target, symbol, vram, len(orig), len(orig) // 4))
+    if len(sys.argv) == 3 or sys.argv[3].startswith("--"):
+        return 0
+
+    cfile = os.path.abspath(sys.argv[3])
+    outdir = os.path.join(ROOT, "build", "match", target, symbol)
+    shutil.rmtree(outdir, ignore_errors=True)
+    os.makedirs(outdir)
+
+    names = load_names(target)
+    cand_o = compile_c(cfile, outdir)
+    sym = c_symbol(cand_o, names.get(vram)) or symbol
+    target_o = build_target_obj(lines, sym, outdir, names, gp_base(target))
+
+    d = objdiff_json(target_o, cand_o, sym)
+    if d is None:
+        return 1
+    left = pick_symbol(d.get("left"), sym)
+    pct = (left or {}).get("match_percent")
+    print()
+    if pct is None:
+        print("  RESULT : objdiff could not compare")
+        return 1
+    if pct >= 100.0:
+        print("  objdiff: %.2f%%   EXACT MATCH" % pct)
+        return 0
+    print("  objdiff: %.2f%%   mismatch" % pct)
+    if "--diff" in sys.argv:
+        print()
+        render(d, sym, show_all="--all" in sys.argv)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

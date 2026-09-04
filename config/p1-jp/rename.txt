@@ -1,0 +1,123 @@
+// space   address   name                    # evidence
+//
+// Applied by ghidra/ApplyNames.py. See README "Naming" for the full flow.
+// Addresses are per-binary: every overlay loads at 0x800643A0, so the same
+// address means different things in different spaces.
+
+// ---- shared RAM, above the overlay region ---------------------------------
+SLPS_005.00 ram        800DC004  g_pad                   # live controller state; 35 readers, few writers
+SLPS_005.00 ram        801F2A88  g_input_accept_a        # button mask the active context accepts (group A)
+SLPS_005.00 ram        801F2A8C  g_input_accept_b        # button mask the active context accepts (group B)
+
+// ---- DNG overlay ----------------------------------------------------------
+SLPS_005.00 OVL_DNG    80075D88  SndSeqPlay              # SsSetNck/SsSeqOpen/SsSeqSetVol/SsSeqPlay over the OPEN.BIN bank at 0x80180000
+SLPS_005.00 OVL_DNG    80077538  InputBuildAcceptMasks   # builds Triangle/Circle/Cross/Square masks from the menu flag word at +0xE
+SLPS_005.00 OVL_DNG    80092B80  InputCheckAcceptA       # (g_input_accept_a & g_pad); plays a UI sequence, reports whether it fired
+SLPS_005.00 OVL_DNG    80092BFC  InputCheckAcceptB       # same against g_input_accept_b
+SLPS_005.00 OVL_DNG    80087BEC  DngUpdateMenuSprites    # resets 5 sprite scales to 0x100 and wobbles positions via rsin
+SLPS_005.00 OVL_DNG    8008B46C  DngDrawStatusHud        # formats two stats into digit sprites, dims below 0x1E
+SLPS_005.00 OVL_DNG    80078EE8  DngPollInput            # rebuilds accept masks, polls both groups, updates the selection
+SLPS_005.00 OVL_DNG    8009FB28  g_dng_menu              # active menu descriptor; first u16 is the base index, flags at +0xE
+SLPS_005.00 OVL_DNG    8009FB14  g_dng_menu_blink        # 0, or 0x1F when a new selection is taken
+SLPS_005.00 OVL_DNG    8009FAF0  g_dng_menu_allow_hold   # gate letting a held button keep the selection alive
+SLPS_005.00 OVL_DNG    8009A4CC  g_dng_menu_sel          # selection index; 0xFF means none
+SLPS_005.00 OVL_DNG    8009A4CE  g_dng_menu_subsel       # cleared whenever a new selection is taken
+
+// ---- S2D overlay (same routines, own globals) -----------------------------
+SLPS_005.00 OVL_S2D    80067560  InputBuildAcceptMasks
+SLPS_005.00 OVL_S2D    80078028  S2dUpdateMenuSprites
+SLPS_005.00 OVL_S2D    80083094  InputCheckAcceptA
+SLPS_005.00 OVL_S2D    80083110  InputCheckAcceptB
+SLPS_005.00 OVL_S2D    8007B8D4  S2dDrawStatusHud
+SLPS_005.00 OVL_S2D    80068EA0  S2dPollInput
+SLPS_005.00 OVL_S2D    800B85B8  g_s2d_menu
+SLPS_005.00 OVL_S2D    800B85AC  g_s2d_menu_blink
+SLPS_005.00 OVL_S2D    800B853C  g_s2d_menu_allow_hold
+SLPS_005.00 OVL_S2D    8009D1D8  g_s2d_menu_sel
+SLPS_005.00 OVL_S2D    8009D1DA  g_s2d_menu_subsel
+
+// ---- ADV overlay (same routines, own globals) -----------------------------
+SLPS_005.00 OVL_ADV    80067D70  InputBuildAcceptMasks
+SLPS_005.00 OVL_ADV    80079070  AdvUpdateMenuSprites
+SLPS_005.00 OVL_ADV    8008EAE0  InputCheckAcceptA
+SLPS_005.00 OVL_ADV    8008EB5C  InputCheckAcceptB
+SLPS_005.00 OVL_ADV    8007CED4  AdvDrawStatusHud
+SLPS_005.00 OVL_ADV    80069914  AdvPollInput
+SLPS_005.00 OVL_ADV    800BB940  g_adv_menu
+SLPS_005.00 OVL_ADV    800BB934  g_adv_menu_blink
+SLPS_005.00 OVL_ADV    800BB824  g_adv_menu_allow_hold
+SLPS_005.00 OVL_ADV    800B1788  g_adv_menu_sel
+SLPS_005.00 OVL_ADV    800B178A  g_adv_menu_subsel
+
+// ---- BTLP overlay ---------------------------------------------------------
+SLPS_005.00 OVL_BTLP   800803D4  BtlDrawFrame            # ClearOTag + the whole per-frame draw chain
+SLPS_005.00 OVL_BTLP   8006C028  BtlUpdateVoices         # allocates an SPU voice and polls its ADSR status bits
+SLPS_005.00 OVL_BTLP   80079FE0  BtlRunFrames            # runs BtlDrawFrame n times
+SLPS_005.00 OVL_BTLP   8007C53C  BtlSeqIsActive          # returns g_btl_seq_active
+SLPS_005.00 OVL_BTLP   8007BF00  BtlSeqSetState          # writes g_btl_seq_active and g_btl_seq_mode
+SLPS_005.00 OVL_BTLP   8007EF38  BtlBgmClearPending      # clears g_btl_bgm_pending
+SLPS_005.00 OVL_BTLP   8007BE24  BtlSeqWaitDone          # drains the sequence, then runs 5 frames
+SLPS_005.00 OVL_BTLP   80066E50  BtlWaitBgmEnd           # spins until SsIsEos reports the BGM sequence finished
+SLPS_005.00 OVL_BTLP   800E9246  g_btl_seq_active
+SLPS_005.00 OVL_BTLP   800E9258  g_btl_seq_mode
+SLPS_005.00 OVL_BTLP   800CC9BA  g_btl_bgm_pending
+SLPS_005.00 OVL_BTLP   800E8D00  g_btl_bgm_state         # 1 while a BGM sequence is owned
+SLPS_005.00 OVL_BTLP   800E8D04  g_btl_bgm_seq           # SsIsEos offset argument; negative when none
+SLPS_005.00 OVL_BTLP   800F5C10  g_btl_seq_handle        # SsIsEos access number
+
+// ---- CASINO overlay -------------------------------------------------------
+SLPS_005.00 OVL_CASINO 8006B4B8  CasinoStartAnim         # starts one animation from a 0x78-byte definition
+SLPS_005.00 OVL_CASINO 8007F3F8  CasinoAnimStep0         # the three step handlers differ only by which pair of defs they start
+SLPS_005.00 OVL_CASINO 8007F478  CasinoAnimStep1
+SLPS_005.00 OVL_CASINO 8007F4F8  CasinoAnimStep2
+SLPS_005.00 OVL_CASINO 8007F2B0  CasinoPlayStepAnim      # picks a step handler; dir 1 runs the same three in reverse
+
+// ---- NAME overlay ---------------------------------------------------------
+SLPS_005.00 OVL_NAME   80067A34  NameUploadImageRows     # LoadImage per row, advancing the source by one row each time
+
+// ---- FMV decode, shared by MOVIE.EXE and END.EXE --------------------------
+END.EXE     ram  80082B24  StrDecodeNextFrame  # pulls a ring frame, flips the double buffer, DecDCTvlc, frees the slot
+END.EXE     ram  80082BAC  StrGetReadyFrame    # spins on StGetNext until a frame is ready
+MOVIE.EXE   ram  800814B4  StrDecodeNextFrame
+MOVIE.EXE   ram  8008153C  StrGetReadyFrame
+
+// ---- ATLUS.EXE ------------------------------------------------------------
+// The entry point at 0x80081640 sets $gp = 0x800A4DEC + 0x7AC = 0x800A5598,
+// so the `sw v0, 0(gp)` in StrWaitFrame targets exactly this word.
+ATLUS.EXE   ram  80081238  StrWaitFrame        # spins on StGetNext, flags an oversized frame header
+ATLUS.EXE   ram  800A5598  g_str_overrun       # set when a frame header reports size >= 0xC4
+
+// ---- OPEN.EXE -------------------------------------------------------------
+// Entry point at 0x80089838 sets $gp = 0x800B38E4 + 0x7AC = 0x800B4090.
+OPEN.EXE    ram  80089430  StrWaitFrame        # same routine as the ATLUS.EXE one
+OPEN.EXE    ram  800B4090  g_str_overrun
+
+// ---- SLPS_005.00 boot path ------------------------------------------------
+// SDK routines Ghidra flagged as "Possible" but did not apply. Named, not
+// decompiled - they come from the real Psy-Q libraries.
+SLPS_005.00 ram        8001BAA4  SsInit                # ResetCallback + SsUtReverbOff + _SsInit
+SLPS_005.00 ram        8001BAF4  SsQuit                # thin wrapper over SpuQuit
+SLPS_005.00 ram        8001BB14  SpuQuit               # matches S_Q.OBJ/SpuQuit
+SLPS_005.00 ram        80041524  EnterCriticalSection  # syscall(0)
+// Prebuilt CD file index, loaded by main at boot from FNAME/FSECT/FSIZE.DAT.
+// CdSearchFileLoc walks the name list for an index, then reads the parallel
+// LBA and size arrays - the game never does an ISO9660 directory search.
+SLPS_005.00 ram        8005FFC0  g_cd_filenames        # FNAME.DAT: packed NUL-terminated names
+SLPS_005.00 ram        80062BA4  g_cd_file_lba         # FSECT.DAT: start sector per file
+SLPS_005.00 ram        800633B4  g_cd_file_size        # FSIZE.DAT: byte size per file
+SLPS_005.00 ram        80011B78  LoadFileToAddrAsync   # like LoadFileToAddr but non-blocking: CdReadSync(1) + a completion callback
+SLPS_005.00 ram        800125E8  CdReadDoneCallback    # CdlComplete -> idle (-1); CdlDiskError -> -3
+SLPS_005.00 ram        80011EDC  CdReadFileToAddrAsync # async CdReadFileToAddr: CdReadSync(1) + CdReadDoneCallback
+SLPS_005.00 ram        80012D28  CdReadPolled          # issues one read, then polls to completion pumping VSync
+
+// CD request queue. Entries are 0x24 bytes: name, dest, mode (bit 7 selects the
+// streaming path), CdlLOC at +0xC, byte size at +0x10.
+SLPS_005.00 ram        800622F0  g_cd_queue
+SLPS_005.00 ram        80012794  CdQueueDispatch       # starts the request at g_cd_queue_index, normal or streaming
+SLPS_005.00 ram        800126B8  CdQueueNextCallback   # read-done callback for the normal path
+SLPS_005.00 ram        80012754  CdQueueReadyCallback  # data-ready callback for the streaming path
+SLPS_005.00 ram        80055C2C  g_cd_queue_index      # (was g_cd_async_flag: it indexes g_cd_queue)
+SLPS_005.00 ram        80055C14  g_cd_queue_count      # (was g_cd_read_pending)
+SLPS_005.00 ram        80011CFC  CdQueueSubmit         # resolves every queued name, then dispatches
+SLPS_005.00 ram        80011DD0  CdQueueSubmitResolved # same, for entries whose CdlLOC is already filled in
+SLPS_005.00 ram        80012974  CdQueueClearCallback  # clears whichever callback the current request installed

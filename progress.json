@@ -1,0 +1,66 @@
+[
+ {
+  "date": "2026-09-05T00:31:32",
+  "matched_bytes": 912,
+  "total_bytes": 1536604,
+  "percent": 0.0594,
+  "matched_funcs": 5,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T00:37:38",
+  "matched_bytes": 912,
+  "total_bytes": 1536604,
+  "percent": 0.0594,
+  "matched_funcs": 5,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T00:55:01",
+  "matched_bytes": 1088,
+  "total_bytes": 1536604,
+  "percent": 0.0708,
+  "matched_funcs": 6,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T00:59:27",
+  "matched_bytes": 1532,
+  "total_bytes": 1536604,
+  "percent": 0.0997,
+  "matched_funcs": 9,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T01:01:21",
+  "matched_bytes": 1892,
+  "total_bytes": 1536604,
+  "percent": 0.1231,
+  "matched_funcs": 11,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T01:12:36",
+  "matched_bytes": 2692,
+  "total_bytes": 1536604,
+  "percent": 0.1752,
+  "matched_funcs": 16,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T01:21:45",
+  "matched_bytes": 3556,
+  "total_bytes": 1536604,
+  "percent": 0.2314,
+  "matched_funcs": 22,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T01:29:05",
+  "matched_bytes": 3556,
+  "total_bytes": 1536604,
+  "percent": 0.2314,
+  "matched_funcs": 22,
+  "total_funcs": 6347
+ }
+]

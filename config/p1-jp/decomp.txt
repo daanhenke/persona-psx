@@ -1,0 +1,24 @@
+// target  symbol           source
+// Every entry is re-checked by tools/progress.py; only 100% objdiff counts.
+main      func_800119DC    src/p1-jp/main/overlay.c
+dng       func_80078EE8    src/p1-jp/dng/step.c
+s2d       func_80068EA0    src/p1-jp/s2d/step.c
+adv       func_80069914    src/p1-jp/adv/step.c
+btlp      func_80066E50    src/p1-jp/btlp/seq.c
+casino    func_8007F2B0    src/p1-jp/casino/dispatch.c
+name      func_80067A34    src/p1-jp/name/image.c
+atlus     func_80081238    src/p1-jp/atlus/str.c
+end       func_80082B24    src/p1-jp/end/str.c
+movie     func_800814B4    src/p1-jp/movie/str.c
+open      func_80089430    src/p1-jp/open/str.c
+main      func_80011864    src/p1-jp/main/boot.c
+main      func_80011E3C    src/p1-jp/main/cdfile.c
+main      func_80012144    src/p1-jp/main/cdfile.c
+main      func_80012090    src/p1-jp/main/cdfile.c
+main      func_80012B2C    src/p1-jp/main/cdfile.c
+main      func_80011B78    src/p1-jp/main/cdfile.c
+main      func_800125E8    src/p1-jp/main/cdfile.c
+main      func_80011EDC    src/p1-jp/main/cdfile.c
+main      func_80012D28    src/p1-jp/main/cdfile.c
+main      func_80011CFC    src/p1-jp/main/cdqueue.c
+main      func_80011DD0    src/p1-jp/main/cdqueue.c

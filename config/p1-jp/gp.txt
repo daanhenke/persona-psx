@@ -1,0 +1,5 @@
+// Runtime $gp base per target, read out of each binary's entry point.
+// Needed to turn splat's linked "N($gp)" back into %gp_rel(symbol)($gp) so the
+// target object and a compiled candidate agree.
+atlus  800A5598
+open   800B4090

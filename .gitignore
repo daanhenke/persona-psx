@@ -1,0 +1,25 @@
+# Disc images and extracted game data - huge, and not ours to distribute
+/scratch/
+
+# Downloaded toolchain (see bin/*.sha256 for what to fetch)
+/bin/*.tar.gz
+/bin/cc1-psx-26/
+/bin/cygnus-2.7-96Q3-bin/
+/bin/objdiff
+/bin/objdiff-cli
+/bin/objdiff.exe
+
+# Build output
+/build/
+/expected/
+*.o
+*.elf
+*.map
+
+# Python
+/.venv/
+__pycache__/
+*.pyc
+
+# splat regenerates these; keep the yaml, not the output
+/asm/
