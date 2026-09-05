@@ -26,3 +26,4 @@ __pycache__/
 
 # Work in progress, not tracked by decomp.txt
 /wip/
+permuter/*/*/output-*/
