@@ -243,3 +243,9 @@ s2d       func_80080F7C    src/p1-jp/s2d/game/formation.c
 s2d       func_8008192C    src/p1-jp/s2d/game/formation.c
 adv       func_800B0708    src/p1-jp/adv/game/stats.c
 adv       func_800B078C    src/p1-jp/adv/game/stats.c
+adv       func_80076574    src/p1-jp/common/ui/config.c
+dng       func_800850F8    src/p1-jp/common/ui/config.c
+s2d       func_8007552C    src/p1-jp/common/ui/config.c
+adv       func_80067FBC    src/p1-jp/common/ui/menuscroll.c
+dng       func_80077714    src/p1-jp/common/ui/menuscroll.c
+s2d       func_8006773C    src/p1-jp/common/ui/menuscroll.c
