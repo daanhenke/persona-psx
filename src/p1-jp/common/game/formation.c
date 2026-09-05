@@ -22,6 +22,7 @@
  * src/p1-jp/s2d/game/formation.c.
  */
 #include <types.h>
+#include <persona/common/slot.h>
 
 #define g_formation        ((u_char *)0x800EB34C)
 #define g_formation_cell   ((u_char *)0x800EB380)
@@ -166,4 +167,33 @@ int FormationPresetFits(u_char preset)
         return -1;
     }
     return n == g_party_last;
+}
+
+/* First cell a member may stand on. Runs off the end when the grid has no room
+   left, which the callers do not check for. */
+u_char FormationFirstFree(void)
+{
+    u_char cell;
+
+    for (cell = 0; cell < GRID_CELLS; cell++) {
+        if (FormationCellFree(cell)) {
+            return cell;
+        }
+    }
+}
+
+/* Both marker sets the formation screen puts on screen: one sprite per party
+   member in slots 2..6, and the five that sit on the grid itself. */
+void FormationClearMarkers(void)
+{
+    SlotClear(2);
+    SlotClear(3);
+    SlotClear(4);
+    SlotClear(5);
+    SlotClear(6);
+    SlotClear(0x1B);
+    SlotClear(0x1C);
+    SlotClear(0x1D);
+    SlotClear(0x1E);
+    SlotClear(0x1F);
 }

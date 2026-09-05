@@ -208,3 +208,18 @@ void ItemsMergePending(void)
         }
     }
 }
+
+/* Empties the staging list. The item menus refill it with the subset of
+   g_items they are about to page through, so it doubles as the working list
+   for a menu as well as the pending-merge buffer. */
+void ItemsClearPending(void)
+{
+    u_short *p;
+    int      i;
+
+    i = ITEM_COUNT - 1;
+    p = &g_items_pending[ITEM_COUNT - 1];
+    for (; i >= 0; i--) {
+        *p-- = 0;
+    }
+}

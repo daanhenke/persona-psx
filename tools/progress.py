@@ -23,7 +23,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfunc import (ROOT, GAME, load_target, compile_c, c_symbol,
                    build_target_obj, objdiff_json, pick_symbol, load_names,
-                   gp_base)
+                   gp_base, tables_agree)
 
 MANIFEST = os.path.join(ROOT, "config", GAME, "decomp.txt")
 HISTORY = os.path.join(ROOT, "progress.json")
@@ -102,9 +102,12 @@ def check(target, symbol, src, cand_o):
     try:
         names = load_names(target)
         sym = c_symbol(cand_o, names.get(vram)) or symbol
-        target_o = build_target_obj(lines, sym, outdir, names, gp_base(target))
+        target_o = build_target_obj(lines, sym, outdir, names, gp_base(target),
+                                   target, cand_o)
         d = objdiff_json(target_o, cand_o, sym)
         pct = (pick_symbol((d or {}).get("left"), sym) or {}).get("match_percent")
+        if pct is not None and pct >= 100.0 and not tables_agree(target_o, cand_o):
+            pct = 0.0
     except SystemExit as e:
         print("  ! %s/%s failed to build: %s" % (target, symbol, e))
         pct = None

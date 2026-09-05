@@ -88,3 +88,15 @@ void ItemsMergePending(void)
         }
     }
 }
+
+void ItemsClearPending(void)
+{
+    u_short *p;
+    int      i;
+
+    i = ITEM_COUNT - 1;
+    p = &g_items_pending[ITEM_COUNT - 1];
+    for (; i >= 0; i--) {
+        *p-- = 0;
+    }
+}

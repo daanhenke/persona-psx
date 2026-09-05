@@ -7,20 +7,9 @@
  * which holds a record index per party slot.
  */
 #include <types.h>
+#include <persona/common/char.h>
 
-typedef struct {
-    /* 0x00 */ u_char pad00[0x3E];
-    /* 0x3E */ u_char key;        /* identifies the record; 0 while unused */
-    /* 0x3F */ u_char pad3F[0x19];
-    /* 0x58 */ u_char list[3];    /* 0xFF marks an empty entry */
-    /* 0x5B */ u_char pad5B[5];
-} Char;                           /* 0x60 bytes */
-
-#define g_chars ((Char *)0x801F1BCC)
 #define g_party ((u_char *)0x801F256C)
-
-#define CHAR_COUNT  5
-#define CHAR_LIST_N 3
 
 extern u_char PartyFindSlot(u_char chr);
 

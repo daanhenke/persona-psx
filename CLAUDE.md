@@ -213,3 +213,19 @@ candidates are verified standalone through `tools/mfunc.py`. Moving a source is
 `git mv` plus the path in `config/p1-jp/decomp.txt`, and `tools/progress.py` is
 the check that you got every row. Do the move as its own commit; mixing it with
 a match makes both harder to read.
+
+### Switch tables
+
+A `switch` with more than a handful of dense cases compiles to a bounds test and
+a jump through a table of case addresses. splat leaves that table sitting in the
+overlay's data run, where it is reached through whichever symbol happens to
+precede it, while a candidate emits its own into `.rodata` - so the dispatch
+relocation could never agree and every such function capped just below 100%.
+
+`rebuild_jump_tables` in `tools/mfunc.py` re-emits the original table as a local
+`.rodata` label on the target side, padded to sit at the same offset the
+candidate's does, and `tables_agree` compares the two tables afterwards. The
+case addresses still come from the original, so a candidate whose cases are in
+the wrong order is reported as `mismatch - the switch table differs` rather than
+passing on identical code. `tools/pick_candidates.py` still filters these out;
+they are matchable now, so that filter is conservative rather than correct.

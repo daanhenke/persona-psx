@@ -30,6 +30,7 @@ CROSS = "mipsel-linux-gnu-"
 AS = CROSS + "as"
 NM = CROSS + "nm"
 GCC = CROSS + "gcc"
+READELF = CROSS + "readelf"
 
 CC1FLAGS = ("-quiet -O2 -G0 -mcpu=3000 -msoft-float -mgas -gcoff -fgnu-linker "
             "-funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return "
@@ -378,14 +379,233 @@ def c_symbol(o_path, prefer=None):
     return found[0] if found else None
 
 
-def build_target_obj(lines, sym, outdir, names=None, gp=None):
+# A switch compiles to a bounds test, an indexed load out of .rodata and a jump
+# through the loaded register.
+JRREG = re.compile(r"\bjr\s+\$(?!ra\b)(\w+)\b")
+SWLOAD = re.compile(r"\blw\s+\$(\w+),\s*%lo\(\s*([^)]+?)\s*\)\(\$at\)")
+SWHI = re.compile(r"\blui\s+\$at,\s*%hi\(\s*([^)]+?)\s*\)")
+SWBOUND = re.compile(r"\bsltiu?\s+\$\w+,\s*\$\w+,\s*(0x[0-9A-Fa-f]+|\d+)\b")
+SYMADDR = re.compile(r"^(?:D_([0-9A-Fa-f]{8})|\w+)\s*(?:\+\s*(0x[0-9A-Fa-f]+))?$")
+
+
+def data_words(target, addr, count):
+    """`count` words starting at `addr`, read out of splat's data lines."""
+    out = {}
+    want = set(range(addr, addr + count * 4, 4))
+    for line in open(split_asm_path(target)):
+        m = LINE.match(line)
+        if not m or ".word" not in line:
+            continue
+        vram = int(m.group(2), 16)
+        if vram in want:
+            raw = m.group(3)
+            out[vram] = int.from_bytes(bytes.fromhex(raw), "little")
+            if len(out) == count:
+                break
+    return [out.get(addr + i * 4) for i in range(count)]
+
+
+def rebuild_jump_tables(lines, target, cand_o=None):
+    """Give the target's switch tables back to the function that owns them.
+
+    splat leaves a jump table sitting in the overlay's data run, so the dispatch
+    reads it through whatever symbol happens to precede it. A compiled candidate
+    emits its own table into .rodata, and the two relocations can never agree.
+    Re-emitting the table as a local .rodata label here puts both sides on the
+    same footing: the case addresses still come from the original, so a
+    candidate whose cases land in a different order still fails.
+    """
+    if target is None:
+        return lines, []
+
+    body = list(lines)
+    rodata = []
+    vram_at = {}
+    for i, ln in enumerate(body):
+        m = LINE.match(ln)
+        if m:
+            vram_at[int(m.group(2), 16)] = i
+    if not vram_at:
+        return body, []
+    lo_vram, hi_vram = min(vram_at), max(vram_at)
+
+    inserts = {}
+    tables = []
+    for i, ln in enumerate(body):
+        m = JRREG.search(ln)
+        if not m:
+            continue
+        reg = m.group(1)
+        load = table = None
+        for j in range(i - 1, max(i - 8, -1), -1):
+            mm = SWLOAD.search(body[j])
+            if mm and mm.group(1) == reg:
+                load, table = j, mm.group(2)
+                break
+        if load is None:
+            continue
+        hi = None
+        for j in range(load - 1, max(load - 8, -1), -1):
+            mm = SWHI.search(body[j])
+            if mm and mm.group(1) == table:
+                hi = j
+                break
+        if hi is None:
+            continue
+        ma = SYMADDR.match(table)
+        if not ma or not ma.group(1):
+            continue
+        addr = int(ma.group(1), 16) + (int(ma.group(2), 16) if ma.group(2) else 0)
+        count = None
+        for j in range(hi - 1, max(hi - 12, -1), -1):
+            mm = SWBOUND.search(body[j])
+            if mm:
+                count = int(mm.group(1), 0)
+                break
+        if not count or count > 256:
+            continue
+        entries = data_words(target, addr, count)
+        if any(e is None or not lo_vram <= e <= hi_vram for e in entries):
+            continue
+
+        k = len(tables)
+        for e in entries:
+            label = "$Ljt%dc%X" % (k, e)
+            at = vram_at[e]
+            if label + ":" not in inserts.setdefault(at, []):
+                inserts[at].append(label + ":")
+        tables.append((k, entries))
+        body[hi] = SWHI.sub("lui $at, %%hi($Ljt%d)" % k, body[hi], count=1)
+        body[load] = SWLOAD.sub(
+            "lw $%s, %%lo($Ljt%d)($at)" % (reg, k), body[load], count=1)
+
+    if not tables:
+        return body, []
+
+    out = []
+    for i, ln in enumerate(body):
+        for lbl in inserts.get(i, []):
+            out.append("  " + lbl)
+        out.append(ln)
+
+    # A candidate holding several switches puts this function's table wherever
+    # the ones before it left off, and the dispatch relocation carries that
+    # offset. Find the run whose case spacing matches and pad to sit at the
+    # same place; a table that is not in the candidate at all gets no padding,
+    # and the relocation then disagrees, which is the answer we want.
+    rodata = ['.section .rodata', '.align 2']
+    placed = 0
+    theirs = rodata_runs(cand_o) if cand_o else []
+    for k, entries in tables:
+        shape = [e - entries[0] for e in entries]
+        for i, (off, cases) in enumerate(theirs):
+            if len(cases) == len(entries) and \
+                    [c - cases[0] for c in cases] == shape and off >= placed:
+                if off > placed:
+                    rodata.append("    .space %d" % (off - placed))
+                    placed = off
+                theirs.pop(i)
+                break
+        rodata.append("$Ljt%d:" % k)
+        for e in entries:
+            rodata.append("    .word $Ljt%dc%X" % (k, e))
+        placed += 4 * len(entries)
+    return out, rodata
+
+
+HEXDUMP = re.compile(r"^\s*0x[0-9a-f]+((?:\s+[0-9a-f]{2,8})+)\s")
+RELROW = re.compile(
+    r"^([0-9a-f]{8})\s+[0-9a-f]{8}\s+\S+\s+[0-9a-f]{8}\s+(\S+)")
+
+
+def rodata_image(o_path):
+    """(.rodata words, {offset: relocated symbol}) for one object.
+
+    o32 relocations carry no addend, so a jump table's case addresses live in
+    the section words themselves.
+    """
+    data, rels, section = [], {}, None
+    r = subprocess.run([READELF, "-x", ".rodata", "-r", o_path],
+                       capture_output=True, text=True)
+    for line in r.stdout.splitlines():
+        if line.startswith("Hex dump of section"):
+            section = "hex"
+            continue
+        if line.startswith("Relocation section"):
+            section = "rel" if ".rel.rodata" in line else None
+            continue
+        if section == "hex":
+            m = HEXDUMP.match(line)
+            if m:
+                data.append(m.group(1).replace(" ", ""))
+        elif section == "rel":
+            m = RELROW.match(line)
+            if m:
+                rels[int(m.group(1), 16)] = m.group(2)
+    raw = bytes.fromhex("".join(data))
+    words = [int.from_bytes(raw[i:i + 4], "little")
+             for i in range(0, len(raw) - 3, 4)]
+    return words, rels
+
+
+def rodata_runs(o_path):
+    """The object's switch tables, as (byte offset, [case .text offsets]).
+
+    A table is a run of consecutive words each relocated against .text, which
+    is what a jump table looks like and what a string or float literal does
+    not.
+    """
+    words, rels = rodata_image(o_path)
+    runs, cur, start = [], [], 0
+    for i, w in enumerate(words):
+        if rels.get(i * 4) == ".text":
+            if not cur:
+                start = i * 4
+            cur.append(w)
+            continue
+        if cur:
+            runs.append((start, cur))
+            cur = []
+    if cur:
+        runs.append((start, cur))
+    return runs
+
+
+def tables_agree(target_o, cand_o):
+    """Do both objects dispatch through the same switch table?
+
+    Only meaningful when the target has one - build_target_obj puts nothing but
+    tables in .rodata, so an empty section means there was no switch to check.
+    The two objects place the function at different offsets in .text, so the
+    case addresses differ by a constant; what has to agree is their order and
+    spacing.
+    """
+    want = rodata_runs(target_o)
+    if not want:
+        return True
+    got = {off: cases for off, cases in rodata_runs(cand_o)}
+    for off, cases in want:
+        theirs = got.get(off)
+        if theirs is None or len(theirs) != len(cases):
+            return False
+        bias = theirs[0] - cases[0]
+        if any(b - a != bias for a, b in zip(cases, theirs)):
+            return False
+    return True
+
+
+def build_target_obj(lines, sym, outdir, names=None, gp=None, target=None,
+                     cand_o=None):
     """Assemble the original function alone, under the candidate's symbol name."""
     s_path = os.path.join(outdir, "target.s")
     o_path = os.path.join(outdir, "target.o")
+    body, rodata = rebuild_jump_tables(lines, target, cand_o)
     with open(s_path, "w") as f:
         f.write(FUNC_HDR)
         f.write(".global %s\n%s:\n" % (sym, sym))
-        f.write("\n".join(normalize_asm(lines, names, gp)) + "\n")
+        f.write("\n".join(normalize_asm(body, names, gp)) + "\n")
+        if rodata:
+            f.write("\n".join(rodata) + "\n")
     run([AS] + ASFLAGS + ["-o", o_path, s_path])
     return o_path
 
@@ -480,7 +700,8 @@ def main():
     names = load_names(target)
     cand_o = compile_c(cfile, outdir)
     sym = c_symbol(cand_o, names.get(vram)) or symbol
-    target_o = build_target_obj(lines, sym, outdir, names, gp_base(target))
+    target_o = build_target_obj(lines, sym, outdir, names, gp_base(target),
+                               target, cand_o)
 
     d = objdiff_json(target_o, cand_o, sym)
     if d is None:
@@ -490,6 +711,9 @@ def main():
     print()
     if pct is None:
         print("  RESULT : objdiff could not compare")
+        return 1
+    if pct >= 100.0 and not tables_agree(target_o, cand_o):
+        print("  objdiff: %.2f%%   mismatch - the switch table differs" % pct)
         return 1
     if pct >= 100.0:
         print("  objdiff: %.2f%%   EXACT MATCH" % pct)
