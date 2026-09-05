@@ -352,3 +352,7 @@ dng       func_80097290    src/p1-jp/common/game/automap.c
 s2d       func_80087730    src/p1-jp/common/game/automap.c
 adv       func_80096AB0    src/p1-jp/common/game/automap.c
 adv       func_800858DC    src/p1-jp/adv/audio/sound.c
+adv       func_800959F8    src/p1-jp/common/gfx/compass.c
+dng       func_80096374    src/p1-jp/common/gfx/compass.c
+s2d       func_80086808    src/p1-jp/common/gfx/compass.c
+adv       func_80088734    src/p1-jp/adv/audio/bank.c

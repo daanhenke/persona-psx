@@ -43,6 +43,9 @@ extern short SsVabOpenHead(u_char *addr, short vabid);
 extern short SsVabTransBody(u_char *addr, short vabid);
 extern short SsVabTransCompleted(short immediateFlag);
 extern short SsSeqOpen(u_long *addr, short vabid);
+extern void  SsSeqStop(short seq);
+extern void  SsSetNck(short seq);
+extern void  SsVabClose(short vabid);
 extern void  SsSeqSetVol(short seq, short voll, short volr);
 
 /* AdvSelectFile leaves the resolved path here and puts the read length in
@@ -92,5 +95,24 @@ void AdvResetBanks(void)
         bank->file_id = 0xFFFF;
         bank->vab_id = 0xFFFF;
         g_bank_seq[i] = -1;
+    }
+}
+
+/* Stops whatever each slot is playing and gives its VAB back, without
+   clearing the slot. */
+void AdvCloseBanks(void)
+{
+    AdvBank *bank;
+    int      i;
+
+    for (i = 0; i < 6; i++) {
+        bank = g_adv_banks[i];
+        if (bank->file_id != 0xFFFF) {
+            SsSeqStop(g_bank_seq[i]);
+            SsSetNck(g_bank_seq[i]);
+        }
+        if (bank->vab_id != 0xFFFF) {
+            SsVabClose(bank->vab_id);
+        }
     }
 }
