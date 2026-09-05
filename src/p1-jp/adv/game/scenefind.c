@@ -2,6 +2,7 @@
  *   0x800803A8 SceneFindTrigger
  *   0x80082F6C SceneTileAt
  *   0x80082F98 SceneTileToward
+ *   0x800804F8 SceneTriggerArmed
  *
  * The callers step the player and then ask what is under them; a trigger hit
  * gives them the record's script pointer to run.
@@ -11,6 +12,14 @@
 
 #define TRIGGER_NONE 0xFF
 #define ROOM_STRIDE  32
+
+/* Which way round a trigger's event flag arms it. */
+#define TRIGGER_WHEN_SET   1
+#define TRIGGER_WHEN_CLEAR 2
+
+/* Declared u_char here, so the caller narrows what the flag banks
+   return as an int. */
+extern u_char EventFlagGet(short id);
 
 /* One step per facing: up, down, left, right. Both are added to an
    unsigned coordinate, so the 0xFF entries are the -1s. */
@@ -50,4 +59,14 @@ u_char SceneTileToward(u_char x, u_char y, u_char dir)
     nx = x + g_dir_x[dir];
     i = (u_char)(y + g_dir_y[dir]) * ROOM_STRIDE + (u_char)nx;
     return g_adv_scene->tiles[i];
+}
+
+/* Whether a trigger fires: a record can be armed for the flag being set or for
+   it being clear, and one that names neither is inert. */
+u_char SceneTriggerArmed(u_char trigger)
+{
+    if (EventFlagGet(g_adv_scene->triggers[trigger].flag)) {
+        return g_adv_scene->triggers[trigger].mode & TRIGGER_WHEN_SET;
+    }
+    return g_adv_scene->triggers[trigger].mode & TRIGGER_WHEN_CLEAR;
 }
