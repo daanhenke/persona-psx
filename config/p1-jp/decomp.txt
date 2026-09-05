@@ -451,3 +451,7 @@ adv       func_8007AC34    src/p1-jp/common/gfx/tilemapbar.c
 dng       func_800897B0    src/p1-jp/common/gfx/tilemapbar.c
 s2d       func_80079BEC    src/p1-jp/common/gfx/tilemapbar.c
 adv       func_8008305C    src/p1-jp/adv/game/actors.c
+btlp      func_8008178C    src/p1-jp/btlp/soundbank.c
+btlp      func_80066C7C    src/p1-jp/btlp/seqvol.c
+btlp      func_80075D80    src/p1-jp/btlp/highlight.c
+btlp      func_80075E48    src/p1-jp/btlp/highlight.c

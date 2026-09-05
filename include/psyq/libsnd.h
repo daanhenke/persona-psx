@@ -21,6 +21,11 @@
 #define SS_IMMEDIATE 0
 #define SS_WAIT_COMPLETED 1
 
+/* play_mode and l_count for SsSeqPlay / SsSepPlay. */
+#define SSPLAY_PAUSE 0
+#define SSPLAY_PLAY 1
+#define SSPLAY_INFINITY 0
+
 #define SS_REV_TYPE_OFF 0
 #define SS_REV_TYPE_ROOM 1
 #define SS_REV_TYPE_STUDIO_A 2
