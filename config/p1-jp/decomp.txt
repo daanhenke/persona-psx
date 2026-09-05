@@ -143,3 +143,8 @@ s2d       func_80083044    src/p1-jp/common/game/items.c
 adv       func_8008EA34    src/p1-jp/common/game/party.c
 dng       func_80092AD4    src/p1-jp/common/game/party.c
 s2d       func_80082FE8    src/p1-jp/common/game/party.c
+adv       func_80081FF4    src/p1-jp/common/game/flags.c
+adv       func_8008202C    src/p1-jp/common/game/flags.c
+adv       func_8008206C    src/p1-jp/common/game/flags.c
+adv       func_800820A4    src/p1-jp/common/game/flags.c
+adv       func_800820E4    src/p1-jp/common/game/flags.c

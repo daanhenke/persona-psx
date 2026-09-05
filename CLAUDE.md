@@ -84,6 +84,21 @@ xrefs come up empty. Ghidra resolves `lui`/`%lo` pairs only inside `ram` and
 drops the `lui at,%hi(X) / addu at,at,idx / lw r,%lo(X)(at)` indexing idiom
 entirely, so array members and overlay-side readers look unreferenced.
 
+## Comments in src/
+
+Comment the **game**: what a structure holds, what a routine does, what a
+constant means, which file on the disc the data came from. That is what the
+sources are for, and it is the part nobody can reconstruct later.
+
+Do not write up the matching process. Which spelling of a loop gcc reproduced,
+what the permuter found, what percentage the wrong shape scored - none of that
+belongs beside the code. It is scaffolding, it stops being true the moment the
+function is matched, and it buries the few lines that say what the code does.
+
+The one exception is a spelling that looks redundant and would get "tidied"
+back: leave a single sentence saying not to, not a paragraph explaining gcc.
+General compiler behaviour goes in the gotchas section below, once.
+
 ## Editing
 
 Use the Edit/Write tools for file changes. Patching files with Python embedded in

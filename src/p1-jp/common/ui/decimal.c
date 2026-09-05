@@ -9,11 +9,9 @@
  */
 #include <types.h>
 
-/* 1, 10, ... 1000000000. Indexed from one entry *before* the array: digit i
-   uses g_pow10[i - 1], and gcc folds the -1 into the base rather than the
-   index, so the linked binary builds &g_pow10[-1] and the disassembler blames
-   whatever object precedes the table. normalize_asm in tools/mfunc.py knows
-   about that case. */
+/* The ten powers of ten, 1 through 1000000000: digit i of a `width`-digit
+   field is g_pow10[i - 1], so the table is indexed one entry below the digit
+   number. */
 extern const u_int g_pow10[];
 
 /* Writes `width` digit bytes, least significant first, and returns how many of
@@ -22,10 +20,9 @@ extern const u_int g_pow10[];
    cells backwards while reading these forwards, which puts the units digit in
    the rightmost column.
  *
- * The scan at the end advances the pointer *before* testing, which is what
-   lets the second loop leave it one short of the buffer and never correct
-   afterwards - writing it as a trailing `dst--` costs the match.
- */
+ * The final scan walks the buffer again to find the highest non-zero digit,
+ * which is what the caller uses to suppress the leading zeroes. A value of 0
+ * still counts as one digit. */
 short FormatDecimal(u_int value, u_char *dst, u_short width)
 {
     u_short i;

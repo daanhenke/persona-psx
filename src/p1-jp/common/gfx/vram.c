@@ -13,12 +13,9 @@
 #include <libgpu.h>
 #include <libetc.h>
 
-/* The do/while(0) is not decoration and not a permuter artefact that can be
-   tidied away: it puts the body in its own basic block, which is what gets the
-   RECT stores scheduled around the first VSync the way the original has them.
-   A plain brace block does not do it - that scores 83.8%. The most likely
-   reason the original looks like this is that the body was a multi-statement
-   macro, which is exactly where this idiom comes from. */
+/* Clears the rectangle to black. The do/while (0) wrapper - most likely a
+   multi-statement macro in the original - has to stay; unwrapping it breaks
+   the match. */
 void VramClearRect(short x, short y, short w, short h)
 {
     RECT r;

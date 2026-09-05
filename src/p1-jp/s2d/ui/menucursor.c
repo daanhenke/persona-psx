@@ -4,11 +4,6 @@
  * which is the only difference. ADV's copy at 0x80067D70 is a different
  * function: it has the click sound inlined rather than calling SoundPlaySeq,
  * which makes it 28 instructions longer.
- *
- * Reading m->flags fresh at each test rather than caching it in a local is
- * load-bearing. gcc 2.6 has no global CSE, so the read at the join after the
- * first if/else is a real reload in the original; hoisting it into a local
- * deletes that instruction and caps the match at 97.7%.
  */
 #include <types.h>
 #include <persona/common/menulist.h>
@@ -18,10 +13,15 @@
 extern int  g_pad_held_s2d[];
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
 
-/* Returns 1 while a direction is held, whether or not the cursor actually
-   moved, and 0 when none is. The two early exits sit at the bottom because
-   that is where the original puts them: writing them as guard clauses at the
-   top inverts every branch in the function. */
+/* Steps one menu list from the d-pad, once a frame. `inc` and `dec` collect
+   the pad bits that move the cursor forwards and backwards - 0x1000 Up,
+   0x2000 Right, 0x4000 Down, 0x8000 Left - from the MENU_*_IS_NEXT flags, so a
+   list can be driven vertically, horizontally or both at once. The first move
+   of a hold waits 0x20 frames and every repeat after it 2, and the cursor
+   either clamps at lo/hi or wraps to the far end depending on MENU_WRAP.
+
+   Returns 1 while a direction is held, whether or not the cursor actually
+   moved, and 0 when none is. */
 int MenuStepCursor(MenuList *m)
 {
     u_int inc, dec;
@@ -77,9 +77,9 @@ int MenuStepCursor(MenuList *m)
                 }
             }
         moved:
-            /* Two call sites, not one call with a variable argument: the
-               original sets up both argument lists separately and gcc's
-               cross-jumping merges the jal and the return that follows it. */
+            /* The step click, into sound slot 0x18: MENU_CLICK_A picks
+               sequence 1, MENU_CLICK_B sequence 3. A list with neither flag
+               moves silently. */
             if (m->flags & MENU_CLICK_A) {
                 SoundPlaySeq(0x18, 1, 1);
             } else if (m->flags & MENU_CLICK_B) {

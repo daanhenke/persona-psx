@@ -16,7 +16,8 @@ typedef struct {
     /* 0x08 */ u_char      mode;      /* bit 7 selects the streaming path */
     /* 0x09 */ u_char      pad[3];
     /* 0x0C */ CdlLOC      loc;
-    /* 0x10 */ u_long      size;      /* unsigned: the sector round-up is srl */
+    /* 0x10 */ u_long      size;      /* byte size, rounded up to 2048-byte
+                                         sectors before the read */
     /* 0x14 */ u_char      reserved[0x10];
 } CdRequest;                          /* 0x24 bytes */
 

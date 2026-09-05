@@ -7,11 +7,8 @@
  *
  * DNG has the same routine at 0x80078EE8, but two instructions shorter - it was
  * built against a prototype returning int where these two return u_char, so the
- * result masking is absent. It keeps its own source, src/p1-jp/dng/menupoll.c.
- *
- * `tmp` is load-bearing. Reusing one int for the call result and then for 0x1F
- * is what puts the constant in a register before the pointer load, matching how
- * the original schedules it. Found by decomp-permuter; do not "simplify".
+ * result masking is absent. It keeps its own source,
+ * src/p1-jp/dng/ui/menupoll.c.
  */
 #include <types.h>
 #include <persona/common/menu.h>
@@ -21,6 +18,14 @@
 extern u_char InputCheckAcceptA(int arg);
 extern u_char InputCheckAcceptB(int arg);
 
+/* One frame of the open menu. Moving the cursor stops the blink and redraws
+   the sprites; accept publishes the highlighted entry as `index + 1` in
+   g_menu_sel, restarts the blink for 0x1F frames and
+   drops the phase back to 0 so MenuTick rebuilds the screen; cancel publishes
+   0xFF instead. The status HUD is redrawn either way.
+ *
+ * Reusing `tmp` for both the call result and 0x1F looks pointless but has to
+ * stay; splitting it into two locals breaks the match. */
 void MenuPollInput(void)
 {
     int   tmp;

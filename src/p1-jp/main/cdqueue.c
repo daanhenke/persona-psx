@@ -9,10 +9,9 @@
 
 /* Only ever written, by CdQueueDispatch. Nothing on the disc reads either one -
    not the overlays, not any of the four sub-EXEs - so they are a record of the
-   streaming request in flight and nothing more. Being volatile is what kept
-   the stores from being optimised out of a build that never reads them back.
-   Nothing outside this source touches them, so they are not in
-   persona/main/cd.h. */
+   streaming request in flight and nothing more; volatile is what keeps the
+   stores in a build that never reads them back. Nothing outside this source
+   touches them, so they are not in persona/main/cd.h. */
 extern volatile u_short g_cd_stream_mode;    /* mode, streaming flag stripped */
 extern volatile int     g_cd_stream_sectors; /* size rounded up to sectors    */
 
@@ -20,10 +19,9 @@ extern volatile int     g_cd_stream_sectors; /* size rounded up to sectors    */
    completion starts the next. */
 void CdQueueDispatch(void);
 
-/* Clears whichever callback the current request installed.
-   Written as a switch, not an if/else: gcc 2.6 expands the two-case chain into
-   `beqz .plain / beqz .out / j .stream`, keeping the second test that an
-   if/else collapses away. */
+/* Clears whichever callback the current request installed - the read-done one
+   for a plain request, the data-ready one for a streaming request. `unused`
+   reserves stack the original reserves; deleting it breaks the match. */
 void CdQueueClearCallback(void)
 {
     CdlFILE unused;
@@ -42,8 +40,8 @@ void CdQueueClearCallback(void)
 
 /* Data-ready callback for the streaming path. Only a disk error is acted on;
    a normal completion reports whatever state the drive is already in.
-   The duplicated `return -3` is deliberate: it lets gcc keep the stored value
-   in $v0 and fall straight into the epilogue instead of rematerialising it. */
+   The duplicated `return -3` has to stay; collapsing the two breaks the
+   match. */
 int CdQueueReadyCallback(u_char status)
 {
     CdlLOC unused[3];
@@ -80,9 +78,8 @@ void CdQueueNextCallback(u_char status)
 
 /* Starts request g_cd_queue_index. A plain read is issued and polled here, then
    handed to CdQueueNextCallback; a streaming request only arms CdlReadN and
-   lets the per-sector ready interrupt drive it.
-   The switch is what keeps gcc from folding the second mode test away - see
-   CdQueueClearCallback. */
+   lets the per-sector ready interrupt drive it, after recording the mode with
+   the streaming flag stripped and the size rounded up to sectors. */
 void CdQueueDispatch(void)
 {
     u_char mode[4];
@@ -140,8 +137,8 @@ void CdQueueSubmit(int count)
 }
 
 /* Same, for entries whose CdlLOC the caller has already filled in.
-   `unused` is not dead weight by accident: the original reserves the same
-   0x30 frame as CdQueueSubmit, and gcc 2.6 still allocates declared locals. */
+   `unused` reserves the same stack frame CdQueueSubmit has; deleting it breaks
+   the match. */
 void CdQueueSubmitResolved(int count)
 {
     CdlFILE unused;

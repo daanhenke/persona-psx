@@ -4,13 +4,13 @@
 /* Persona 1 (JP) - display slot records.
  *
  * The slot routines are compiled into more than one overlay rather than called
- * across the boundary, so DNG and ADV share src/p1-jp/common/slot.c while S2D,
- * which indexes a table at a different address, keeps src/p1-jp/s2d/slot.c.
- * The record layout is the same in both, which is why it lives here.
+ * across the boundary, so DNG and ADV share src/p1-jp/common/gfx/slot.c while
+ * S2D, which indexes a table at a different address, keeps
+ * src/p1-jp/s2d/gfx/slot.c. The record layout is the same in both, which is why
+ * it lives here.
  *
  * The table base is deliberately *not* declared here: which table an overlay
- * uses is a per-overlay fact, so each source defines its own g_slots, together
- * with the evidence for reaching it as a literal rather than a linker symbol.
+ * uses is a per-overlay fact, so each source defines its own g_slots.
  *
  * A slot is one animated sprite. Every frame the renderer (ADV 0x80065730)
  * walks all SLOT_COUNT of them, steps each one's animation script, and emits

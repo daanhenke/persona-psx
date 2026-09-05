@@ -4,7 +4,8 @@ Reads config/<game>/decomp.txt (target / symbol / source), re-checks each entry
 with the same objdiff comparison tools/mfunc.py uses, and measures it against
 the total code size taken from the generated symbol files.
 
-    tools/progress.py            # table + totals
+    tools/progress.py            # table + totals (uses every core)
+    tools/progress.py -j1        # serial, for debugging a build failure
     tools/progress.py --record   # also append a timestamped row to progress.json
     tools/progress.py --history  # show recorded history
 
@@ -13,6 +14,7 @@ non-matching function is listed separately so it cannot be mistaken for done.
 """
 import datetime
 import json
+from concurrent import futures
 import os
 import re
 import shutil
@@ -60,15 +62,45 @@ def read_manifest():
     return entries
 
 
-def check(target, symbol, src):
+def compile_candidates(sources, jobs):
+    """Compile each distinct source once, in parallel.
+
+    A source that covers several targets appears once per entry in the
+    manifest - tilemap.c alone is twelve - and the object it produces does not
+    depend on the target, only on the file and its cc1flags. Compiling per
+    entry did that work over and over.
+    """
+    out = {}
+
+    def one(src):
+        outdir = os.path.join(ROOT, "build", "progress", "_cand",
+                              re.sub(r"[^A-Za-z0-9]+", "_", src))
+        shutil.rmtree(outdir, ignore_errors=True)
+        os.makedirs(outdir)
+        return compile_c(os.path.join(ROOT, src), outdir)
+
+    with futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+        pending = {pool.submit(one, s): s for s in sources}
+        for fut in futures.as_completed(pending):
+            src = pending[fut]
+            try:
+                out[src] = fut.result()
+            except SystemExit as e:
+                print("  ! %s failed to build: %s" % (src, e))
+                out[src] = None
+    return out
+
+
+def check(target, symbol, src, cand_o):
     """Returns (size_bytes, match_percent) for one manifest entry."""
     vram, orig, lines = load_target(target, symbol)
+    if cand_o is None:
+        return len(orig), None
     outdir = os.path.join(ROOT, "build", "progress", target, symbol)
     shutil.rmtree(outdir, ignore_errors=True)
     os.makedirs(outdir)
     try:
         names = load_names(target)
-        cand_o = compile_c(os.path.join(ROOT, src), outdir)
         sym = c_symbol(cand_o, names.get(vram)) or symbol
         target_o = build_target_obj(lines, sym, outdir, names, gp_base(target))
         d = objdiff_json(target_o, cand_o, sym)
@@ -87,12 +119,28 @@ def main():
         print("no entries in %s" % os.path.relpath(MANIFEST, ROOT))
         return 0
 
+    jobs = 0
+    for a in sys.argv[1:]:
+        if a.startswith("-j"):
+            jobs = int(a[2:] or 0)
+    if jobs <= 0:
+        jobs = os.cpu_count() or 4
+
+    cand = compile_candidates(sorted({e[2] for e in entries}), jobs)
+
     per_target = {}
-    rows = []
-    for target, symbol, src in entries:
-        size, pct = check(target, symbol, src)
-        matched = pct is not None and pct >= 100.0
-        rows.append((target, symbol, size, pct, matched, src))
+    rows = [None] * len(entries)
+
+    def one(i):
+        target, symbol, src = entries[i]
+        size, pct = check(target, symbol, src, cand.get(src))
+        rows[i] = (target, symbol, size, pct,
+                   pct is not None and pct >= 100.0, src)
+
+    with futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+        list(pool.map(one, range(len(entries))))
+
+    for target, symbol, size, pct, matched, _ in rows:
         t = per_target.setdefault(target, {"bytes": 0, "funcs": 0})
         if matched:
             t["bytes"] += size

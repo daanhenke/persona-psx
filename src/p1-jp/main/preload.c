@@ -54,10 +54,9 @@ extern u_char  D_8004DA14[];
 extern u_char  g_dng_third_gate[];
 extern u_char  g_dng_third_flags[];
 
-/* Copied into locals as struct assignments, not strcpy: the original inlines
-   the copy with lwl/lwr, which is what gcc emits for a byte-aligned struct
-   assignment from a named object. A local array initialiser would emit the
-   same shape but against a template gcc invents, which can never match. */
+/* The three DNG filename templates, wrapped in structs so PreloadDng can take
+   a fresh copy of one with a plain assignment: "\Dxx\Dyy.BIN;1" is 15 bytes
+   with its terminator, the S and M variants 16. */
 typedef struct { char c[15]; } DngName15;
 typedef struct { char c[16]; } DngName16;
 extern const DngName15 str_dng_tmpl;
@@ -102,8 +101,9 @@ void PreloadName(void)
 }
 
 /* State 0 (DNG): three filenames of the form \Dxx\Dyy[SM].BIN;1, where yy is
-   the floor in hex and xx the floor group (floor >> 3). The templates are local
-   arrays so each call starts from a clean copy. */
+   the floor in hex and xx the floor group (floor >> 3). Each template is
+   copied into a local first, so every call starts from a clean one. The third
+   file is skipped when entering from ADV with the gate flags clear. */
 void PreloadDng(void)
 {
     DngName15 name;
@@ -163,8 +163,8 @@ void PreloadDng(void)
    builds both 2D filenames by patching a digit into a template in place and
    copying the result into a scratch buffer the queue entry points at.
  *
- * g_map_id and g_map_pos_y are reached through literal base registers here,
- * which is why they go through pointer locals rather than the named symbols. */
+ * The area id at 0x801F5350 and the y position at 0x801F5353 are reached by
+ * hardcoded address here rather than through their named symbols. */
 void PreloadS2d(void)
 {
     u_short *map;
@@ -175,8 +175,8 @@ void PreloadS2d(void)
     map = (u_short *)0x801F5350;
     posy = (u_char *)0x801F5353;
 
-    /* A switch, not an if/else chain: gcc lays the two case bodies out after
-       both tests, which is how the original branches. */
+    /* Area 0 advances to 1 once event flag 0x14 is set and to 2 at 0x27; area
+       3 advances to 5 at 0x67 and to 6 at 0x6E. Every other area is fixed. */
     switch (*map) {
     case 0:
         flag = 0x14;
@@ -258,10 +258,8 @@ void FormatHexDigits(int value, char *end, short digits)
  * kind 0 indexes one of four scene packs by the high byte of `index`: the pack
  * has a u16 start-sector table, and the difference between entry i and i+1 is
  * the scene's length. Kinds 3, 4 and 5 are flat files with a fixed stride,
- * where entry i starts one sector in plus i * stride.
- *
- * Both dispatches are switches, not if/else chains - gcc builds the same
- * balanced compare tree the original has.
+ * where entry i starts one sector in plus i * stride: 9 sectors an entry for
+ * ADV_DVL.BIN, 8 for ADV_PER.BIN, 5 for ADV_BST.BIN.
  *
  * The size slot is left holding a *sector count*, not bytes; PreloadAdv is
  * what shifts it left by 11. */

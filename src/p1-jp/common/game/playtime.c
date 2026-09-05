@@ -9,12 +9,8 @@
 #include <types.h>
 
 /* Four bytes: hours, minutes, seconds, frames. Everything but the hours rolls
-   over at 60, and the clock stops at 99:59:59:59.
- *
- * Reached through a pointer local holding the literal address, not as a linker
- * symbol: the original builds the base once with lui/ori and then indexes
- * 0..3 off it. Folding the address into each access instead costs the match.
- */
+   over at 60, and the clock stops at 99:59:59:59. Reached by hardcoded address
+   rather than through a linker symbol. */
 #define PLAYTIME_ADDR 0x801F29BC
 
 void PlayTimeTick(void)

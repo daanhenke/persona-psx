@@ -32,9 +32,9 @@ CdlFILE *CdSearchFileLoc(CdlFILE *file, const char *name)
     return file;
 }
 
-/* Rounds a byte count up to whole 2048-byte sectors and reads them, retrying
-   until the drive accepts the request. `size` is signed, so the division
-   carries gcc's negative-value fixup. */
+/* Rounds a byte count up to whole 2048-byte sectors and reads them from
+   wherever the drive was last positioned, retrying until it accepts the
+   request. Mode 0x80 is CdlModeSpeed - double speed. */
 void CdReadToAddr(int size, u_long *dest)
 {
     int sectors;

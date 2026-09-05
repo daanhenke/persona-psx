@@ -16,12 +16,11 @@
  * a setter but no clear, bank 2 only a getter, and that getter lives in a
  * different translation unit (0x80098A08).
  *
- * Note these return the *masked bit*, not 0 or 1 - unlike EventFlagTest in
- * eventflag.c, which shifts the bit down. Callers only ever test for zero.
+ * These return the masked bit, not 0 or 1 - unlike EventFlagTest in
+ * eventflag.c, which shifts the bit down. Callers only test for zero.
  *
- * The index is `id / 8`, not `id >> 3`: the id is signed, and division rounds
- * toward zero, which is where the `if (i < 0) i += 7` before the shift comes
- * from. Writing it as a shift drops that adjustment and the match with it.
+ * The id is signed and the index is id / 8, so a negative id reads backwards
+ * off the front of the bank rather than wrapping.
  */
 #include <types.h>
 
@@ -30,40 +29,55 @@
 
 int FlagBank1Get(short id)
 {
-    u_char *bank;
+    u_char *p;
+    int     v;
 
-    bank = g_flags_bank1;
-    return bank[id / 8] & (1 << (id & 7));
+    p = g_flags_bank1;
+    v = p[id / 8];
+    v = v & (1 << (id & 7));
+    return v;
 }
 
 void FlagBank1Set(short id)
 {
-    u_char *bank;
+    u_char *p;
+    int     v;
 
-    bank = g_flags_bank1;
-    bank[id / 8] = bank[id / 8] | (1 << (id & 7));
+    p = g_flags_bank1;
+    v = p[id / 8];
+    v = v | (1 << (id & 7));
+    p[id / 8] = v;
 }
 
 int EventFlagGet(short id)
 {
-    u_char *bank;
+    u_char *p;
+    int     v;
 
-    bank = g_event_flags;
-    return bank[id / 8] & (1 << (id & 7));
+    p = g_event_flags;
+    v = p[id / 8];
+    v = v & (1 << (id & 7));
+    return v;
 }
 
 void EventFlagSet(short id)
 {
-    u_char *bank;
+    u_char *p;
+    int     v;
 
-    bank = g_event_flags;
-    bank[id / 8] = bank[id / 8] | (1 << (id & 7));
+    p = g_event_flags;
+    v = p[id / 8];
+    v = v | (1 << (id & 7));
+    p[id / 8] = v;
 }
 
 void EventFlagClear(short id)
 {
-    u_char *bank;
+    u_char *p;
+    int     v;
 
-    bank = g_event_flags;
-    bank[id / 8] &= ~(1 << (id & 7));
+    p = g_event_flags;
+    v = p[id / 8];
+    v = v & ~(1 << (id & 7));
+    p[id / 8] = v;
 }

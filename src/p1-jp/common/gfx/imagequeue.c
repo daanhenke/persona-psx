@@ -22,9 +22,8 @@ typedef struct {
 extern int         g_image_queue_count;
 extern ImageUpload g_image_queue[];
 
-/* The rectangle is copied a short at a time rather than by struct assignment:
-   the original reads four u16s out of the caller's RECT and stores them
-   individually, which is what a `short *` source produces. */
+/* Appends one upload to the queue. The destination rectangle arrives as four
+   u16s - x, y, w, h - and is copied field by field into the entry. */
 void QueueImageUpload(u_short *rect, u_long *data)
 {
     int n;
@@ -38,14 +37,10 @@ void QueueImageUpload(u_short *rect, u_long *data)
     g_image_queue[n].rect.h = rect[3];
 }
 
-/* Drains back to front. The count is written back before the upload, not
-   after, so an entry queued from underneath one of these calls would still be
-   picked up by the same pass.
- *
- * A plain `while` on the count, not a hoisted counter: gcc rotates it into a
- * guard test plus a peeled first `n = count - 1`, which is why the original
- * loads the count twice before the loop and once at the bottom. Caching it in
- * a local collapses those to one load and caps the match at 89.5%. */
+/* Uploads the whole queue and empties it, most recently queued entry first,
+   with a DrawSync after each one. The count is written back before the upload
+   rather than after, so an entry queued from underneath one of these calls
+   would still be picked up by the same pass. */
 void FlushImageUploads(void)
 {
     int n;

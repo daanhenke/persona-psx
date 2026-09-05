@@ -12,12 +12,13 @@
 
 extern void MenuBuild(void);
 
-/* g_menu_subsel doubles as the phase. MenuPollInput sets it back to 0 when
-   accept is pressed, which is what makes the screen rebuild on the next tick.
- *
- * Written as a switch rather than an if/else chain: gcc 2.6 expands the two
- * cases into `beqz .build / beq 1 .poll / j .out`, keeping the second compare
- * that an if/else collapses. */
+/* One frame of the menu, called from the overlay's main loop. Phase 0 lays the
+   screen out and arms the cursor blink for 0x20 frames; phase 1 is the steady
+   state that polls input. Any other value does nothing, so the caller can park
+   the menu by writing one.
+
+   g_menu_subsel doubles as that phase: MenuPollInput sets it back to 0 when
+   accept is pressed, which is what makes the screen rebuild on the next tick. */
 void MenuTick(void)
 {
     switch (g_menu_subsel) {

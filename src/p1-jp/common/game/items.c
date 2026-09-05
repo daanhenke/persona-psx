@@ -17,14 +17,16 @@
  */
 #include <types.h>
 
-/* Literal addresses: the originals build both bases with lui/ori into a
-   register rather than through a linker symbol. */
+/* Both lists are reached by hardcoded address rather than through a linker
+   symbol. */
 #define g_items         ((u_short *)0x801F267C)
 #define g_items_pending ((u_short *)0x800EAE4C)
 
 #define ITEM_COUNT 0x17F
 #define ITEM_ID    0x1FF
 
+/* Returns the index of the first entry naming `id`, or -1 if the item is not
+   held. Only the id half is compared, so a count of zero still matches. */
 short ItemsFind(u_short id)
 {
     u_short *list;
@@ -39,6 +41,8 @@ short ItemsFind(u_short id)
     return -1;
 }
 
+/* The same search against the staging list, so a pickup can be added to an
+   entry that is already waiting to be merged. */
 short ItemsFindPending(u_short id)
 {
     u_short *list;
@@ -53,8 +57,8 @@ short ItemsFindPending(u_short id)
     return -1;
 }
 
-/* Drops any half-filled slot. Walking a pointer while counting separately is
-   how the original does it - the count is a plain int, the cursor a u_short *. */
+/* Zeroes any half-filled slot in the persistent list - an entry with a count
+   but no id, or an id but no count - so the whole word reads as free. */
 void ItemsCompact(void)
 {
     u_short *p;

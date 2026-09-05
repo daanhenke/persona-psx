@@ -24,10 +24,7 @@ int CdLoadPsExe(const char *name, struct EXEC *exec)
     int     tries;
     int     mode;
 
-    /* Held in a variable, not written inline at both call sites: gcc 2.6 keeps
-       it in a callee-saved register across the loop instead of rematerialising
-       0x80 for each call, which is what the original does. */
-    mode = CdlModeSpeed;
+    mode = CdlModeSpeed;        /* double speed, for both reads */
 
     for (tries = 0; tries < PSEXE_TRIES; tries++) {
         if (CdSearchFileLoc(&file, name) == (CdlFILE *)0) {

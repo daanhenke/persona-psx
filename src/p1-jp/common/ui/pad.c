@@ -12,19 +12,16 @@
  * MenuStepCursor tests the held word because it times its own auto-repeat;
  * InputCheckAcceptA/B test the edge so a press fires once.
  *
- * All three are reached as literals here rather than through their linker
- * symbols: the original builds two of them with lui/ori into saved registers
- * across the PadRead call, and normalize_asm folds the third to a literal too
- * because the same function builds the neighbouring addresses raw.
+ * All three are reached by hardcoded address rather than through their linker
+ * symbols.
  */
 #include <types.h>
 
 extern u_long PadRead(int n);
 
-/* Reading the old value into a local before storing the new one is what puts
-   the AND operands in the original's order. Both spellings compute the same
-   thing, but with the load left inline after `*held = now` gcc numbers the
-   pseudos the other way round and emits `and v1, v0, v1`. */
+/* Reads controller 1 once a frame: last frame's held word is rolled into the
+   previous slot, the new one takes its place, and `(old & now) ^ now` -
+   i.e. now & ~old - leaves the newly-pressed edge in the middle word. */
 void PadPoll(void)
 {
     int *prev;

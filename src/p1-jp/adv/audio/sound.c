@@ -15,20 +15,15 @@ extern short SsSeqOpen(u_long *addr, short vabid);
 extern void  SsSeqSetVol(short seq, short voll, short volr);
 extern void  SsSeqPlay(short seq, short mode, short loop);
 
-/* Literal addresses: the indexed accesses assemble to `addu $at,rX,$at`, the
-   numeric-base form. */
+/* All reached by hardcoded address rather than through a linker symbol. */
 #define g_seq_handle ((short *)0x801F537C)   /* one open handle per slot */
 #define g_vab_id     ((short *)0x801F535C)   /* VAB ids, by bank         */
 #define g_seq_offset ((u_long *)0x80118020)  /* offsets into the blob    */
 #define SEQ_DATA     0x80118000
 
 /* Replaces whatever is in `slot` and starts the new sequence looping at full
-   volume.
- *
- * Both pointer locals are computed before the SsSetNck call on purpose: the
- * original keeps them in saved registers across it, and the assignment order
- * decides which of the two literals is materialised first. Indexing the macros
- * at each use instead rebuilds the second address after the call. */
+   volume (0x7F on both channels). SsSetNck on the outgoing handle stops the
+   old sequence before the new one is opened over it. */
 void SoundPlaySeq(u_short slot, u_short seq, short vab)
 {
     short  *handle;

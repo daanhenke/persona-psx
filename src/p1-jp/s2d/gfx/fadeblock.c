@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - fades that run to completion before returning.
  *
- * S2D's copy of src/p1-jp/common/fadeblock.c; its fade-state flag sits
+ * S2D's copy of src/p1-jp/common/gfx/fadeblock.c; its fade-state flag sits
  * 0x20000 higher, which is the only difference.
  *   S2D @ 0x8007FE54 / 0x8007FEDC
  *
@@ -12,21 +12,21 @@
 
 extern u_char g_fade_state_s2d[];
 
-/* FadeStepUp/Down are defined in fade.c against u_char parameters. This
-   translation unit was built against short ones - the target passes the same
-   sign-extended registers to them as to FadeSpritesStep, with none of the
-   `andi 0xff` masking a u_char prototype would produce. */
+/* fade.c defines FadeStepUp/Down with u_char parameters; this translation unit
+   was built against short ones, so the prototypes disagree on purpose. */
 extern int  FadeSpritesStep(short step, short limit);
 extern int  FadeSpritesStepDown(short step, short floor);
 extern int  FadeStepUp(short step, short limit);
 extern int  FadeStepDown(short step, short floor);
 extern void RunFrame(void);
 
-/* The final step is written out a second time rather than folded into the
-   loop: the loop exits the moment FadeSpritesStep reports it has reached the
-   limit, and that last step still has to be applied to the global level and
-   drawn. Restructuring it into one copy inside the loop changes the branch
-   shape - the original really does have the tail twice. */
+/* Brightens by `step` a frame until the sprites reach `limit`, drawing a frame
+   between each step, and does not return until the fade has finished. Fade
+   state 2 marks a fade-up in progress; the loop leaves it at 0.
+ *
+ * The tail is spelled out a second time because the loop exits the moment the
+ * sprite step reports it has reached the limit, and that final step still has
+ * to be applied to the global level and drawn. */
 void FadeUpBlocking(short step, short limit)
 {
     g_fade_state_s2d[0] = 2;
@@ -42,6 +42,7 @@ void FadeUpBlocking(short step, short limit)
     g_fade_state_s2d[0] = 0;
 }
 
+/* The same, darkening to `floor`. Fade state 1 marks a fade-down. */
 void FadeDownBlocking(short step, short floor)
 {
     g_fade_state_s2d[0] = 1;

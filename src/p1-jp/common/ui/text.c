@@ -12,10 +12,8 @@
    destination ended, so the caller can keep appending.
  *
  * 0xFF is an escape byte, not a terminator: 0xFF followed by anything other
- * than 0x01 is copied through unchanged. That is why the test is a nested if
- * rather than `src[0] == 0xFF && src[1] == 1` - the && form makes gcc lay the
- * loop out with the test at the bottom and a jump into it, where the original
- * tests at the top and jumps back. */
+ * than 0x01 is copied through unchanged, so only the exact {0xFF, 0x01} pair
+ * ends the string. The marker itself is not copied. */
 u_char *TextCopyUntilEnd(u_char *dst, u_char *src)
 {
     while (1) {

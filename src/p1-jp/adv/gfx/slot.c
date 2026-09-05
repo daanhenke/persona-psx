@@ -16,9 +16,8 @@
 #include <types.h>
 #include <persona/common/slot.h>
 
-/* 0x44-byte records at 0x800DC10C, indexed by a u8 slot. A literal address,
-   not a linker symbol: the indexed store assembles to `addu $at,rX,$at`, which
-   is the form the assembler uses for a numeric base. */
+/* 0x44-byte records at 0x800DC10C, indexed by a u8 slot. Reached by hardcoded
+   address rather than through a linker symbol. */
 #define g_slots ((Slot *)0x800DC10C)
 
 /* 0 is black, 0x80 is full - the same scale as the global fade level, which
@@ -48,12 +47,9 @@ void SlotFadeOut(u_char slot, u_char step)
     g_slots[slot].fade_step = step;
 }
 
-/* Forwarded straight into GsSPRITE.attribute by the renderer, which passes
-   bit 30 through untouched.
- *
- * Same shape as SlotSetFlicker and for the same reason: the pointer local
- * gets the scaled index computed once ahead of the branch, and the compound
- * assignment in both arms lets cross-jumping merge the store into one tail. */
+/* Turns 50% semi-transparency on or off for the slot. The renderer forwards
+   the bit straight into GsSPRITE.attribute, where bit 30 has the same
+   meaning. */
 void SlotSetSemiTrans(u_char slot, u_char on)
 {
     Slot *s;

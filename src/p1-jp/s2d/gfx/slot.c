@@ -1,24 +1,22 @@
 /* Persona 1 (JP) - slot record initialisers, S2D's copy.
  *
- * The same three as src/p1-jp/common/slot.c (which covers DNG and ADV); S2D's
- * table lives at a different address, which is the only difference.
+ * The same routines as src/p1-jp/common/gfx/slot.c (which covers DNG and ADV);
+ * S2D's table lives at a different address, which is the only difference.
  *   S2D @ 0x80065850 / 0x80065978 / 0x80065AA4
  */
 #include <types.h>
 #include <persona/common/slot.h>
 
-/* The 0x44-byte records live at 0x800FC10C. A literal address, not a linker
-   symbol: the indexed store assembles to `addu $at,rX,$at`, which is the form
-   the assembler uses for a numeric base. */
+/* The 80 0x44-byte records live at 0x800FC10C, reached by hardcoded address
+   rather than through a linker symbol. */
 #define g_slots ((Slot *)0x800FC10C)
 
-/* Fills in one slot: identity scale, cleared everything else, marked active.
+/* Starts a slot on animation script `def` at (x, y): identity scale (0x1000 =
+   1.0), full brightness (0x80), every offset cleared, marked active. `attr`
+   keeps only its low 12 bits, which are the sort depth.
  *
- * The three constant stores sit at the end on purpose. gcc hoists them up to
- * where the original has them (right after the y argument is loaded); writing
- * them in their apparent position instead pulls them above the script store
- * and drags `active` along with them. Do not "tidy" this back into field
- * order - it drops the match to 70%.
+ * The trailing scale/brightness/active stores have to stay at the end of the
+ * function; putting them back in field order breaks the match.
  */
 void SlotInit(void *def, u_char slot, int attr, short x, short y)
 {
@@ -122,14 +120,7 @@ void SlotClearAll(void)
 
 /* Turns the flicker bit on or off. While it is set the renderer ignores the
    slot's own brightness and takes it from a 32-entry table indexed by the
-   phase counter at +0x31, which it advances every frame.
- *
- * The pointer local is load-bearing twice over: it gets the scaled index
- * computed once ahead of the branch instead of rebuilt in all three basic
- * blocks, and writing the update as a compound assignment in both arms lets
- * gcc's cross-jumping merge the two stores into the shared tail the original
- * has. Spelling this as `k = ...; g_slots[i].attr = k;` costs 60%.
- */
+   phase counter at +0x31, which it advances every frame. */
 void SlotSetFlicker(u_char slot, u_char on)
 {
     Slot *s;

@@ -4,9 +4,9 @@
 /* Persona 1 (JP) - menu input poll.
  *
  * The routine is compiled into DNG, S2D and ADV rather than called across the
- * boundary. S2D and ADV share src/p1-jp/common/menupoll.c; DNG's copy is two
- * instructions shorter and keeps src/p1-jp/dng/menupoll.c. Everything below is
- * identical between the two sources, which is why it lives here.
+ * boundary. S2D and ADV share src/p1-jp/common/ui/menupoll.c; DNG's copy is two
+ * instructions shorter and keeps src/p1-jp/dng/ui/menupoll.c. Everything below
+ * is identical between the two sources, which is why it lives here.
  */
 #include <types.h>
 
@@ -22,9 +22,7 @@ extern void DrawStatusHud(void);
 
 /* InputCheckAcceptA and InputCheckAcceptB are deliberately absent. S2D and ADV
    were built against prototypes returning u_char and DNG against ones returning
-   int; the two instructions of result masking that difference produces are the
-   only thing separating the two sources, so each declares its own pair. Giving
-   them one shared prototype here would cost one of the two matches. */
+   int, so each source declares its own pair rather than sharing one here. */
 
 extern void MenuPollInput(void);
 

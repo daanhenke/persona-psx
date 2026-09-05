@@ -21,8 +21,8 @@ void UploadImageRows(void *desc, u_short x, u_short y, short rows)
     rect.x = x;
     rect.y = y;
 
-    /* The redundant `p = desc` forces the base into a register before the
-       add, which is how the original addresses the descriptor. */
+    /* The inner `p = desc` looks redundant but has to stay; folding it away
+       breaks the match. */
     p = (int *)((char *)(p = desc) + 0xC);
     packed = *p++;
     if ((short)x < 0) {
