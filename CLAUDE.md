@@ -301,6 +301,24 @@ the wrong order is reported as `mismatch - the switch table differs` rather than
 passing on identical code. `tools/pick_candidates.py` still filters these out;
 they are matchable now, so that filter is conservative rather than correct.
 
+### A local array with an initialiser
+
+`short rows[5] = { ... };` inside a function is not built in place. gcc keeps
+the constant in `.rodata` and copies it onto the stack on every call, with a
+`lui/addiu %hi/%lo` pair for its address and `lwl/lwr` + `swl/swr` for the copy
+- the unaligned opcodes are what tell you the array's alignment is under 4, so
+a `short[]` copies as two of those plus an `lh/sh` for the last two bytes.
+
+That constant lands in the overlay's data run, exactly like a jump table, so
+`rebuild_jump_tables` handles it the same way: it finds the pair, locates the
+same bytes in the candidate's `.rodata`, and re-points the target at a label
+there. Matching on content is the check - a candidate whose initialiser holds
+different values is simply not found, and its relocation then disagrees.
+
+133 functions across the eleven targets copy a constant onto the stack this
+way, so it is worth recognising on sight: an `lui/addiu` pair naming a data
+address, followed by `lwl`/`swl` traffic against `$sp`.
+
 ### Reading the game's text
 
 `tools/glyphs.py` decodes the packed bytes `TileMapWriteRow` expands into

@@ -393,6 +393,12 @@ SWHI = re.compile(r"\blui\s+\$at,\s*%hi\(\s*([^)]+?)\s*\)")
 SWBOUND = re.compile(r"\bsltiu?\s+\$\w+,\s*\$\w+,\s*(0x[0-9A-Fa-f]+|\d+)\b")
 SYMADDR = re.compile(r"^(?:D_([0-9A-Fa-f]{8})|(\w+))\s*(?:\+\s*(0x[0-9A-Fa-f]+))?$")
 
+# A local array or struct with an initialiser is not built in place: gcc keeps
+# the constant in .rodata and copies it onto the stack on every call, taking
+# its address with a lui/addiu %hi/%lo pair.
+BLOBHI = re.compile(r"\blui\s+\$(\w+),\s*%hi\(\s*([^)]+?)\s*\)")
+BLOBLO = re.compile(r"\baddiu\s+\$(\w+),\s*\$(\w+),\s*%lo\(\s*([^)]+?)\s*\)")
+
 
 def name_addrs(target):
     """real name -> address, the other direction from load_names.
@@ -401,6 +407,28 @@ def name_addrs(target):
     `thatname + 0xNN`, so resolving the dispatch needs the map this way round.
     """
     return {name: addr for addr, name in load_names(target).items()}
+
+
+def data_bytes(target, addr, count):
+    """`count` bytes starting at `addr`, read out of splat's data lines."""
+    lo = addr & ~3
+    hi = addr + count
+    got = {}
+    for line in open(split_asm_path(target)):
+        m = LINE.match(line)
+        if not m or ".word" not in line:
+            continue
+        vram = int(m.group(2), 16)
+        if lo <= vram < hi:
+            got[vram] = bytes.fromhex(m.group(3))
+        elif got and vram >= hi:
+            break
+    out = bytearray()
+    v = lo
+    while v in got:
+        out += got[v]
+        v += 4
+    return bytes(out[addr - lo:addr - lo + count])
 
 
 def data_words(target, addr, count):
@@ -518,7 +546,46 @@ def rebuild_jump_tables(lines, target, cand_o=None, sym=None):
         body[load] = SWLOAD.sub(
             "lw $%s, %%lo($Ljt%d)($at)" % (reg, k), body[load], count=1)
 
-    if not tables:
+    # The other thing splat leaves behind in the data run is the constant a
+    # local aggregate initialiser is copied from. The candidate emits its own
+    # into .rodata, so the same trick applies: find where the candidate put it
+    # and point the target's lui/addiu pair at a label there.
+    cand_raw = rodata_bytes(cand_o) if cand_o else b""
+    blobs = []
+    for i, ln in enumerate(body):
+        mh = BLOBHI.search(ln)
+        if not mh:
+            continue
+        reg, text = mh.group(1), mh.group(2)
+        lo = None
+        for j in range(i + 1, min(i + 6, len(body))):
+            ml = BLOBLO.search(body[j])
+            if (ml and ml.group(1) == reg and ml.group(2) == reg
+                    and ml.group(3) == text):
+                lo = j
+                break
+        if lo is None:
+            continue
+        ma = SYMADDR.match(text)
+        if not ma:
+            continue
+        base = int(ma.group(1), 16) if ma.group(1) else by_name.get(ma.group(2))
+        if base is None:
+            continue
+        addr = base + (int(ma.group(3), 16) if ma.group(3) else 0)
+        if lo_vram <= addr <= hi_vram:
+            continue
+        off, n = cand_blob_offset(cand_raw, data_bytes(target, addr, 256))
+        if off is None:
+            continue
+        k = len(blobs)
+        blobs.append((k, off, cand_raw[off:off + n]))
+        body[i] = BLOBHI.sub("lui $%s, %%hi($Lrd%d)" % (reg, k), body[i],
+                             count=1)
+        body[lo] = BLOBLO.sub("addiu $%s, $%s, %%lo($Lrd%d)" % (reg, reg, k),
+                              body[lo], count=1)
+
+    if not tables and not blobs:
         return body, []
 
     out = []
@@ -538,21 +605,72 @@ def rebuild_jump_tables(lines, target, cand_o=None, sym=None):
     # so this searches word by word rather than run by run - and checks the
     # cases land inside the function being compared, which is what tells two
     # switches of the same shape apart.
-    rodata = ['.section .rodata', '.align 2']
-    placed = 0
     words, rels = rodata_image(cand_o) if cand_o else ([], {})
     span = text_span(cand_o, sym) if cand_o and sym else None
+    placements = []
+    placed = 0
     for k, entries in tables:
         shape = [e - entries[0] for e in entries]
         off = cand_table_offset(words, rels, span, shape, placed)
-        if off is not None and off > placed:
-            rodata.append("    .space %d" % (off - placed))
-            placed = off
-        rodata.append("$Ljt%d:" % k)
-        for e in entries:
-            rodata.append("    .word $Ljt%dc%X" % (k, e))
-        placed += 4 * len(entries)
+        if off is None:
+            off = placed
+        placements.append((off, 4 * len(entries), "$Ljt%d" % k,
+                           ["    .word $Ljt%dc%X" % (k, e) for e in entries]))
+        placed = off + 4 * len(entries)
+    for k, off, data in blobs:
+        placements.append((off, len(data), "$Lrd%d" % k,
+                           ["    .byte " + ", ".join("0x%02X" % b
+                                                     for b in data)]))
+
+    # Emit in offset order, padding the gaps, so a source holding a switch and
+    # an initialiser puts both where the candidate has them.
+    rodata = ['.section .rodata', '.align 2']
+    at = 0
+    for off, size, label, body_lines in sorted(placements):
+        if off > at:
+            rodata.append("    .space %d" % (off - at))
+            at = off
+        rodata.append("%s:" % label)
+        rodata.extend(body_lines)
+        at = max(at, off + size)
     return out, rodata
+
+
+def rodata_bytes(o_path):
+    """The object's whole .rodata section as bytes."""
+    data, section = [], None
+    r = subprocess.run([READELF, "-x", ".rodata", o_path],
+                       capture_output=True, text=True)
+    for line in r.stdout.splitlines():
+        if line.startswith("Hex dump of section"):
+            section = "hex"
+            continue
+        if section == "hex":
+            m = HEXDUMP.match(line)
+            if m:
+                data.append(m.group(1).replace(" ", ""))
+    return bytes.fromhex("".join(data))
+
+
+def cand_blob_offset(raw, blob):
+    """Where the candidate's .rodata holds the constant the target copies.
+
+    Matching on content is what makes this safe: a candidate whose initialiser
+    holds different values is not found here, so its lui/addiu pair keeps
+    pointing at its own .rodata and the relocation disagrees, which is the
+    answer we want. The blob's length is not knowable from the target - splat's
+    data run holds every constant in the overlay end to end - so it is taken to
+    be however far the two agree, and four bytes is the shortest run worth
+    believing.
+    """
+    best_off, best_n = None, 0
+    for off in range(0, len(raw), 4):
+        n = 0
+        while n < len(blob) and off + n < len(raw) and raw[off + n] == blob[n]:
+            n += 1
+        if n >= 4 and n > best_n:
+            best_off, best_n = off, n
+    return best_off, best_n
 
 
 def cand_table_offset(words, rels, span, shape, floor):
