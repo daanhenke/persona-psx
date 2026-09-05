@@ -241,3 +241,5 @@ dng       func_80090A68    src/p1-jp/common/game/formation.c
 dng       func_80091418    src/p1-jp/common/game/formation.c
 s2d       func_80080F7C    src/p1-jp/s2d/game/formation.c
 s2d       func_8008192C    src/p1-jp/s2d/game/formation.c
+adv       func_800B0708    src/p1-jp/adv/game/stats.c
+adv       func_800B078C    src/p1-jp/adv/game/stats.c
