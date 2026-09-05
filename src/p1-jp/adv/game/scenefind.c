@@ -1,5 +1,6 @@
 /* Persona 1 (JP) - asking the scene what is on a tile.
  *   0x8007FA78 SceneApplyEntry
+ *   0x8007FB90 SceneDrawEntryLabel
  *   0x80080318 SceneFindStep
  *   0x800803A8 SceneFindTrigger
  *   0x80080440 SceneFindApproach
@@ -15,11 +16,35 @@
  * trigger, which is the only one of the three that carries an event flag.
  */
 #include <types.h>
+#include <libgs.h>
 #include <persona/adv/actor.h>
 #include <persona/adv/scene.h>
+#include <persona/common/slot.h>
 
 #define TRIGGER_NONE 0xFF
 #define ROOM_STRIDE  32
+
+/* Reached by hardcoded address rather than through the linker symbol. */
+#define g_slots ((Slot *)0x800DC10C)
+
+extern Slot *g_slot_cur;
+
+/* The entry label's sprite, and the three 9-byte {length, eight glyphs}
+   records it draws from. */
+#define LABEL_SLOT  0x28
+#define LABEL_Z     0x10
+#define LABEL_X     0x10
+#define LABEL_Y     0x10
+#define LABEL_SIZE  9
+#define LABEL_CELLS 8
+
+extern void          g_entry_label_def;
+extern GsCELL        g_entry_label_cells[];
+extern short         g_entry_label_x;
+extern const u_char  g_entry_labels[];
+
+extern void CellsWriteRow(GsCELL *dst, const u_char *src, u_char page,
+                          u_short count);
 
 /* Which way round a trigger's event flag arms it. */
 #define TRIGGER_WHEN_SET   1
@@ -63,6 +88,31 @@ void SceneApplyEntry(u_char entry)
     g_map_pos_y = g_adv_scene->entries[entry].map_y;
     g_map_unk4 = g_adv_scene->entries[entry].unk4;
     g_map_room = g_adv_scene->entries[entry].room;
+}
+
+/* Names the way out that the player is standing on. Each label is a 9-byte
+   record - a length, then eight glyph bytes - and the three read EXIT, FIELD
+   and DUNGEON. The sprite's cells are always eight wide, so the length only
+   decides where it starts: (8 - len) * 4 centres it in the field.
+
+   The entry's kind is read twice rather than kept, and the length is reached
+   backwards off the text pointer, which is what gcc does with the `+ 1` when
+   both expressions share it. */
+void SceneDrawEntryLabel(void)
+{
+    u_char entry;
+
+    g_slot_cur = &g_slots[LABEL_SLOT];
+    entry = SceneFindEntry(g_adv_actors);
+    SlotInitTagged(&g_entry_label_def, LABEL_SLOT, LABEL_Z, LABEL_X, LABEL_Y);
+    CellsWriteRow(g_entry_label_cells,
+                  &g_entry_labels[g_adv_scene->entries[entry].mode * LABEL_SIZE
+                                  + 1],
+                  0, LABEL_CELLS);
+    g_entry_label_x =
+        (LABEL_CELLS
+         - g_entry_labels[g_adv_scene->entries[entry].mode * LABEL_SIZE]) * 4
+        + 10;
 }
 
 /* The unconditional script for the tile the player has just stepped onto. */
@@ -141,12 +191,16 @@ u_char SceneTileToward(int x, int y, u_char dir)
 u_char SceneFindEntry(const AdvActor *a)
 {
     const AdvEntry *entries;
-    u_short tile;
+    u_long tile;
     u_char n;
     u_char i;
 
+    /* The counter is zeroed before the count is read and the guard compares
+       the two, which is what puts the zero in the register the original uses.
+       Writing `n != 0` and dropping the first assignment costs the match. */
+    i = 0;
     n = *g_adv_scene->entry_count;
-    if (n != 0) {
+    if (n != i) {
         i = 0;
         tile = *(u_short *)&a->x;
         entries = g_adv_scene->entries;
