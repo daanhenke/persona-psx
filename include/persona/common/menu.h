@@ -16,7 +16,7 @@ extern u_char   g_menu_allow_hold;
 extern short    g_menu_subsel;
 extern short    g_menu_sel;
 
-extern int  InputBuildAcceptMasks(u_short *p);
+extern int  MenuStepCursor(u_short *m);   /* really a MenuList *, see menulist.c */
 extern void UpdateMenuSprites(int arg);
 extern void DrawStatusHud(void);
 

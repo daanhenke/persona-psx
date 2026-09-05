@@ -23,7 +23,7 @@ void MenuPollInput(void)
     int   tmp;
     short val;
 
-    if (InputBuildAcceptMasks(g_menu) != 0) {
+    if (MenuStepCursor(g_menu) != 0) {
         tmp = 0;
         UpdateMenuSprites(tmp);
         g_menu_blink = 0;

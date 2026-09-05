@@ -266,8 +266,25 @@ def normalize_asm(lines, names=None, gp=None):
         # Rebase onto the nearest named symbol below it.
         if based and m.group(0).startswith("D_"):
             i = bisect.bisect_right(based, addr) - 1
-            if i >= 0 and 0 < addr - based[i] <= 0x400:
-                return "%s+0x%X" % (names[based[i]], addr - based[i])
+            below = addr - based[i] if i >= 0 else None
+            j = i + 1
+            above = based[j] - addr if j < len(based) else None
+            # A reference can legitimately sit just *below* a named object:
+            # gcc reaches arr[i-1] by building &arr[-1] and indexing that, so
+            # the base it materialises is one element before the array.
+            # spimdisasm has no symbol there and blames whatever precedes it,
+            # which is usually an unrelated object.
+            #
+            # Only take that reading when the address is clearly not a member
+            # of the object below - deep inside it, but flush against the one
+            # above, and aligned as an array base would be. Without the
+            # below-distance guard this misreads an ordinary byte reference
+            # into a string that happens to sit just before another symbol.
+            if (above is not None and above <= 0x10 and addr % 4 == 0
+                    and (below is None or below > 0x10)):
+                return "%s-0x%X" % (names[based[j]], above)
+            if below is not None and 0 < below <= 0x400:
+                return "%s+0x%X" % (names[based[i]], below)
         return m.group(0)
 
     def unconst(m):
@@ -452,7 +469,11 @@ def main():
         return 0
 
     cfile = os.path.abspath(sys.argv[3])
-    outdir = os.path.join(ROOT, "build", "match", target, symbol)
+    # MFUNC_TAG keeps concurrent runs of the same target/symbol from sharing a
+    # scratch directory, which is what tools/tryv.py needs to score several
+    # candidate spellings of one function at once.
+    outdir = os.path.join(ROOT, "build", "match", target,
+                          symbol + os.environ.get("MFUNC_TAG", ""))
     shutil.rmtree(outdir, ignore_errors=True)
     os.makedirs(outdir)
 
