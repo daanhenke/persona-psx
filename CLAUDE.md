@@ -229,3 +229,17 @@ case addresses still come from the original, so a candidate whose cases are in
 the wrong order is reported as `mismatch - the switch table differs` rather than
 passing on identical code. `tools/pick_candidates.py` still filters these out;
 they are matchable now, so that filter is conservative rather than correct.
+
+### Reading the game's text
+
+`tools/glyphs.py` decodes the packed bytes `TileMapWriteRow` expands into
+character-map cells. The font puts A-Z at 0xA6..0xBF and 0-9 at 0xC0..0xC9, so
+the Latin parts of the data read straight out:
+
+    tools/glyphs.py adv 800B18A8 12    # one label
+    tools/glyphs.py adv --scan         # every label in the target
+
+Most of the text is Japanese and outside that range, but the tables that are
+not - the arcana names, the elements, the status ailments, the name-entry
+keyboard - are enough to identify the tables around them, and a string constant
+with a readable name beats one called after its address.

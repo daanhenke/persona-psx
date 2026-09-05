@@ -276,3 +276,6 @@ adv       func_800746C0    src/p1-jp/common/game/formationload.c
 s2d       func_80073678    src/p1-jp/common/game/formationload.c
 adv       func_80074160    src/p1-jp/adv/game/formationsave.c
 s2d       func_80073118    src/p1-jp/s2d/game/formationsave.c
+adv       func_800757B4    src/p1-jp/common/ui/placelabel.c
+dng       func_80084398    src/p1-jp/common/ui/placelabel.c
+s2d       func_8007476C    src/p1-jp/s2d/ui/placelabel.c
