@@ -462,5 +462,26 @@
   "percent": 4.3772,
   "matched_funcs": 392,
   "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T20:08:27",
+  "matched_bytes": 67308,
+  "total_bytes": 1537688,
+  "percent": 4.3772,
+  "matched_funcs": 392,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 17832,
+   "btlp": 168,
+   "s2d": 17864,
+   "adv": 25780,
+   "casino": 184,
+   "name": 1148
+  }
  }
 ]

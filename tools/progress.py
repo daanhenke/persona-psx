@@ -7,6 +7,7 @@ the total code size taken from the generated symbol files.
     tools/progress.py            # table + totals (uses every core)
     tools/progress.py -j1        # serial, for debugging a build failure
     tools/progress.py --record   # also append a timestamped row to progress.json
+                                 # and redraw docs/progress.svg from it
     tools/progress.py --history  # show recorded history
 
 Only functions that actually match count towards progress; a decompiled but
@@ -21,12 +22,14 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import progress_chart
 from mfunc import (ROOT, GAME, load_target, compile_c, c_symbol,
                    build_target_obj, objdiff_json, pick_symbol, load_names,
                    gp_base, tables_agree)
 
 MANIFEST = os.path.join(ROOT, "config", GAME, "decomp.txt")
 HISTORY = os.path.join(ROOT, "progress.json")
+CHART = os.path.join(ROOT, "docs", "progress.svg")
 FUNCSIZE = re.compile(r"type:func size:0x([0-9A-Fa-f]+)")
 
 TARGETS = ["main", "atlus", "open", "movie", "end",
@@ -190,11 +193,18 @@ def main():
             "percent": round(pct, 4),
             "matched_funcs": g_funcs,
             "total_funcs": g_tfuncs,
+            "targets": {t: per_target[t]["bytes"] for t in TARGETS
+                        if per_target.get(t, {}).get("bytes")},
         })
         with open(HISTORY, "w", newline="\n") as f:
             json.dump(hist, f, indent=1)
         print("\nrecorded to %s (%d entries)"
               % (os.path.relpath(HISTORY, ROOT), len(hist)))
+
+        svg = progress_chart.build(hist, ROOT, GAME)
+        with open(CHART, "w", newline="\n") as f:
+            f.write(svg)
+        print("drew %s" % os.path.relpath(CHART, ROOT))
 
     if "--history" in sys.argv and os.path.exists(HISTORY):
         print()
