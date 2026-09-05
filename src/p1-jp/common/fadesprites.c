@@ -37,3 +37,24 @@ int FadeSpritesStep(short step, short limit)
     }
     return done;
 }
+
+/* The downward counterpart, stopping at `floor`. */
+int FadeSpritesStepDown(short step, short floor)
+{
+    int level;
+    int done;
+    int i;
+
+    level = g_fade_sprites[0].r - step;
+    done = 0;
+    if (level < floor) {
+        level = floor;
+        done = 1;
+    }
+    for (i = 0; i < 6; i++) {
+        g_fade_sprites[i].r = level;
+        g_fade_sprites[i].g = level;
+        g_fade_sprites[i].b = level;
+    }
+    return done;
+}

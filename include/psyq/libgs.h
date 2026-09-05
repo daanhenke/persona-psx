@@ -36,6 +36,24 @@ typedef struct {
     /* 0x20 */ long   rotate;
 } GsSPRITE;                     /* 0x24 bytes */
 
+/* Tiled background. A GsMAP is cellw x cellh pixels per cell, ncellw x ncellh
+   cells, `base` the cell definitions and `index` the map of which cell goes
+   where. The game keeps one 15x4 map of 16x16 cells per overlay. */
+typedef struct {
+    /* 0x00 */ u_char  u, v;
+    /* 0x02 */ u_short cba;
+    /* 0x04 */ u_short flag;
+    /* 0x06 */ u_short tpage;
+} GsCELL;                       /* 8 bytes */
+
+typedef struct {
+    /* 0x00 */ u_char   cellw, cellh;
+    /* 0x02 */ u_short  ncellw;
+    /* 0x04 */ u_short  ncellh;
+    /* 0x08 */ GsCELL  *base;
+    /* 0x0C */ u_short *index;
+} GsMAP;                        /* 0x10 bytes */
+
 void GsClearVcount(void);
 long GsGetVcount();
 void GsInitVcount();
