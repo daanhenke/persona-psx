@@ -3049,6 +3049,7 @@ PROVIDE(g_bg_cells = 0x800E224C);
 PROVIDE(g_bg_cells_s2d = 0x8010224C);
 PROVIDE(g_bg_state = 0x800E1E4C);
 PROVIDE(g_bg_state_s2d = 0x80101E4C);
+PROVIDE(g_bgm_seq = 0x801F537C);
 PROVIDE(g_btl_bgm_pending = 0x800CC9BA);
 PROVIDE(g_btl_bgm_seq = 0x800E8D04);
 PROVIDE(g_btl_bgm_state = 0x800E8D00);

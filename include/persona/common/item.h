@@ -17,7 +17,9 @@
 
 typedef struct {
     /* 0x00 */ int    price;
-    /* 0x04 */ u_char pad04[0xF];
+    /* 0x04 */ u_char pad04[4];
+    /* 0x08 */ u_char name[10];   /* packed glyph bytes, ten cells wide */
+    /* 0x12 */ u_char pad12[1];
     /* 0x13 */ u_char bonus01;  /* high nibble stat[0], low nibble stat[1] */
     /* 0x14 */ u_char bonus23;  /* high nibble stat[2], low nibble stat[3] */
     /* 0x15 */ u_char bonus4;   /* high nibble stat[4]                     */

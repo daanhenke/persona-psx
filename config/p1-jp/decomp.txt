@@ -412,3 +412,11 @@ adv       func_800AEDF0    src/p1-jp/adv/game/scrollcam.c
 adv       func_80093F08    src/p1-jp/common/gfx/gauge.c
 dng       func_8008E7DC    src/p1-jp/common/gfx/gauge.c
 s2d       func_8007ECEC    src/p1-jp/s2d/gfx/gauge.c
+adv       func_8007B754    src/p1-jp/common/ui/personaname.c
+s2d       func_8007A5D4    src/p1-jp/common/ui/personaname.c
+adv       func_80075DB0    src/p1-jp/common/ui/configchoice.c
+adv       func_80075E94    src/p1-jp/common/ui/configchoice.c
+s2d       func_80074D68    src/p1-jp/s2d/ui/configchoice.c
+s2d       func_80074E4C    src/p1-jp/s2d/ui/configchoice.c
+adv       func_800AF568    src/p1-jp/adv/gfx/shrinkslot.c
+adv       func_8007E5A4    src/p1-jp/adv/audio/silencebgm.c

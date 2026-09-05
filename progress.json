@@ -630,5 +630,89 @@
    "casino": 184,
    "name": 1148
   }
+ },
+ {
+  "date": "2026-09-05T22:03:51",
+  "matched_bytes": 76604,
+  "total_bytes": 1537688,
+  "percent": 4.9818,
+  "matched_funcs": 418,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19108,
+   "btlp": 168,
+   "s2d": 20396,
+   "adv": 31268,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-05T22:09:26",
+  "matched_bytes": 76816,
+  "total_bytes": 1537688,
+  "percent": 4.9956,
+  "matched_funcs": 419,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19108,
+   "btlp": 168,
+   "s2d": 20396,
+   "adv": 31480,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-05T22:21:58",
+  "matched_bytes": 76352,
+  "total_bytes": 1537688,
+  "percent": 4.9654,
+  "matched_funcs": 418,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3528,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19108,
+   "btlp": 168,
+   "s2d": 20396,
+   "adv": 31188,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-05T22:24:24",
+  "matched_bytes": 76932,
+  "total_bytes": 1537688,
+  "percent": 5.0031,
+  "matched_funcs": 420,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19108,
+   "btlp": 168,
+   "s2d": 20396,
+   "adv": 31596,
+   "casino": 184,
+   "name": 1148
+  }
  }
 ]
