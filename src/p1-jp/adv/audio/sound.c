@@ -1,4 +1,5 @@
-/* Persona 1 (JP) - sequence playback wrappers.  ADV @ 0x800662FC / 0x800663B0.
+/* Persona 1 (JP) - sequence playback wrappers.
+ *   ADV @ 0x800662FC / 0x800663B0 / 0x800858DC.
  *
  * DNG (0x80075D88) and S2D (0x80065DEC) carry their own SoundPlaySeq against
  * their own work areas; only ADV has SoundOpenSeq.
@@ -14,6 +15,8 @@ extern void  SsSetNck(short seq);
 extern short SsSeqOpen(u_long *addr, short vabid);
 extern void  SsSeqSetVol(short seq, short voll, short volr);
 extern void  SsSeqPlay(short seq, short mode, short loop);
+extern void  SsSeqSetDecrescendo(short seq, short vol, short time);
+extern void  AdvRunFrame(void);
 
 /* All reached by hardcoded address rather than through a linker symbol. */
 #define g_seq_handle ((short *)0x801F537C)   /* one open handle per slot */
@@ -45,4 +48,15 @@ void SoundOpenSeq(u_short slot, u_short seq, short vab)
 {
     g_seq_handle[slot] =
         SsSeqOpen((u_long *)(g_seq_offset[seq] + SEQ_DATA), g_vab_id[vab]);
+}
+
+/* Fades a sequence out and spins the frame loop while it happens, so the
+   screen keeps updating through the fade rather than freezing on it. */
+void SoundFadeOutSeq(u_char slot, u_char vol, short time, short frames)
+{
+    SsSeqSetDecrescendo(g_seq_handle[slot], vol, time);
+    while (frames != 0) {
+        AdvRunFrame();
+        frames--;
+    }
 }

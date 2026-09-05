@@ -346,3 +346,9 @@ adv       func_80083150    src/p1-jp/adv/game/actors.c
 name      func_80066134    src/p1-jp/name/ui/entry.c
 name      func_800679CC    src/p1-jp/common/gfx/image.c
 name      func_80067F20    src/p1-jp/name/ui/keyboard.c
+adv       func_80083310    src/p1-jp/adv/game/actors.c
+adv       func_80096A38    src/p1-jp/common/game/automap.c
+dng       func_80097290    src/p1-jp/common/game/automap.c
+s2d       func_80087730    src/p1-jp/common/game/automap.c
+adv       func_80096AB0    src/p1-jp/common/game/automap.c
+adv       func_800858DC    src/p1-jp/adv/audio/sound.c
