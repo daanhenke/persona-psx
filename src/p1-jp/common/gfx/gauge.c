@@ -15,8 +15,8 @@
  */
 #include <types.h>
 
-#define g_tilemap0 ((short *)0x800EE180)
-#define g_tilemap1 ((short *)0x800EF580)
+#define g_tilemap0 ((short *)(0x800EE180 + WORK_BIAS))
+#define g_tilemap1 ((short *)(0x800EF580 + WORK_BIAS))
 
 #define MAP_W 40
 #define RUN   12

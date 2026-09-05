@@ -372,13 +372,35 @@ def strip_line_markers(text):
                    if not LINEMARK.match(ln))
 
 
-def compile_c(cfile, outdir):
+# S2D's work area sits 0x20000 above the one every other overlay shares, and
+# for most shared routines that offset is the *only* difference - which is why
+# S2D used to keep a byte-for-byte copy of a dozen sources with one constant
+# changed. Defining the bias per target lets one source serve all of them:
+#
+#     #define g_slots ((Slot *)(0x800DC10C + WORK_BIAS))
+#
+# TARGET_<NAME> is there for the handful of cases where the difference is not
+# an offset - a differently named symbol, say - and an #ifdef is the only way
+# to say it.
+WORK_BIAS = {"s2d": 0x20000}
+
+
+def target_defines(target):
+    """Preprocessor defines that say which target a shared source is for."""
+    if target is None:
+        return ["-DWORK_BIAS=0"]
+    return ["-DWORK_BIAS=0x%X" % WORK_BIAS.get(target, 0),
+            "-DTARGET_%s=1" % target.upper()]
+
+
+def compile_c(cfile, outdir, target=None):
     """cc1 is the compiler proper, so cpp must run first. maspsx reads stdin."""
     i_path = os.path.join(outdir, "cand.i")
     s_path = os.path.join(outdir, "cand.s")
     o_path = os.path.join(outdir, "cand.o")
-    run([GCC, "-E", "-nostdinc", "-undef", "-D__GNUC__=2",
-         "-I", os.path.join(ROOT, "include"),
+    run([GCC, "-E", "-nostdinc", "-undef", "-D__GNUC__=2"]
+        + target_defines(target) +
+        ["-I", os.path.join(ROOT, "include"),
          "-I", os.path.join(ROOT, "include", "psyq"),
          "-I", os.path.dirname(cfile),
          cfile, "-o", i_path])
@@ -909,7 +931,7 @@ def main():
     os.makedirs(outdir)
 
     names = load_names(target)
-    cand_o = compile_c(cfile, outdir)
+    cand_o = compile_c(cfile, outdir, target)
     sym = c_symbol(cand_o, names.get(vram)) or symbol
     target_o = build_target_obj(lines, sym, outdir, names, gp_base(target),
                                target, cand_o)

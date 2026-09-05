@@ -11,7 +11,13 @@
 #include <types.h>
 #include <persona/common/menuctx.h>
 
+/* S2D reads its own held-buttons word, at its own name. */
+#ifdef TARGET_S2D
+extern int  g_pad_held_s2d[];
+#define g_pad_held g_pad_held_s2d
+#else
 extern int  g_pad_held[];
+#endif
 extern void SoundPlaySeq(int seq, int a, int b);
 
 #define PAD_LEFT   0x8000

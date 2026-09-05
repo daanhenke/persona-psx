@@ -7,13 +7,13 @@
  * checkerboard. Only the index array is built here; the cells themselves come
  * from the map's own definition.
  *
- * S2D keeps its own copy against an index array 0x20000 higher; see
- * src/p1-jp/s2d/gfx/checkermap.c.
+ * S2D builds this same source against an index array 0x20000 higher, which is
+ * what WORK_BIAS says.
  */
 #include <types.h>
 
 /* Reached by hardcoded address; the GsMAP at 0x800B8350 points at it. */
-#define g_checker_index ((short *)0x800F1D80)
+#define g_checker_index ((short *)(0x800F1D80 + WORK_BIAS))
 
 #define CHECKER_W 10
 #define CHECKER_H 8

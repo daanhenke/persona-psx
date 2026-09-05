@@ -20,7 +20,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfunc import (ROOT, GAME, VENV, ASFLAGS, AS, FUNC_HDR, load_target, run,
-                   compile_c, c_symbol, normalize_asm, load_names, gp_base)
+                   compile_c, c_symbol, normalize_asm, load_names, gp_base,
+                   target_defines)
 
 COMPILE_SH = """#!/bin/bash
 # Invoked by decomp-permuter as: ./compile.sh input.c -o output.o
@@ -37,7 +38,7 @@ done
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-mipsel-linux-gnu-gcc -E -nostdinc -undef -D__GNUC__=2 \\
+mipsel-linux-gnu-gcc -E -nostdinc -undef -D__GNUC__=2 {defines} \\
     -I "$ROOT/include" -I "$ROOT/include/psyq" "$INPUT" -o "$TMP/x.i"
 "$ROOT/bin/cc1-psx-26/cc1-psx-26" {cc1flags} "$TMP/x.i" -o "$TMP/x.s"
 "$ROOT/.venv/bin/python3" "$ROOT/tools/maspsx/maspsx.py" \\
@@ -64,7 +65,7 @@ def setup(target, symbol, cfile):
     tmp = os.path.join(outdir, "_probe")
     os.makedirs(tmp)
     names = load_names(target)
-    sym = c_symbol(compile_c(os.path.abspath(cfile), tmp),
+    sym = c_symbol(compile_c(os.path.abspath(cfile), tmp, target),
                    names.get(vram)) or symbol
     shutil.rmtree(tmp)
 
@@ -87,6 +88,7 @@ def setup(target, symbol, cfile):
     sh = os.path.join(outdir, "compile.sh")
     with open(sh, "w", newline="\n") as f:
         f.write(COMPILE_SH.format(root=ROOT, cc1flags=CC1FLAGS,
+                                  defines=" ".join(target_defines(target)),
                                   asflags=" ".join(ASFLAGS)))
     os.chmod(sh, 0o755)
 

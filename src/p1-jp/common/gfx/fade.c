@@ -3,8 +3,8 @@
  * Compiled into more than one overlay rather than called across the boundary:
  *   DNG @ 0x80075A98 / 0x80075AD0 / 0x80075B08
  *   ADV @ 0x8006600C / 0x80066044 / 0x8006607C
- * S2D has the same three against its own copy of the work area, so it keeps
- * src/p1-jp/s2d/fade.c.
+ *   S2D @ 0x80065AFC / 0x80065B34 / 0x80065B6C
+ * S2D's work area sits 0x20000 higher, which is what WORK_BIAS says.
  *
  * One byte, 0 (black) to 0x80 (full). The slot renderer reads it every frame
  * and clamps each slot's own brightness against it before writing the result
@@ -19,7 +19,7 @@
 /* Literal addresses, not linker symbols - the whole work area is reached by
    hardcoded address here. Both are held in pointer locals below rather than
    folded into each access, which is how the original addresses them. */
-#define g_sprites ((GsSPRITE *)0x800DD64C)
+#define g_sprites ((GsSPRITE *)(0x800DD64C + WORK_BIAS))
 
 /* The 512 sprites the renderer fills in each frame. Blacking out their colour
    as well as the level itself is what makes this a hard cut rather than the
@@ -31,7 +31,7 @@ void FadeBlackout(void)
     u_char *fade_level;
     int     i;
 
-    fade_level = (u_char *)0x800DC00C;
+    fade_level = (u_char *)(0x800DC00C + WORK_BIAS);
     for (i = 0; i < 512; i++) {
         g_sprites[i].r = 0;
         g_sprites[i].g = 0;
@@ -48,12 +48,12 @@ int FadeStepUp(u_char step, u_char limit)
     int level;
 
     hit = 0;
-    level = *(u_char *)0x800DC00C + step;
+    level = *(u_char *)(0x800DC00C + WORK_BIAS) + step;
     if (level > limit) {
         level = limit;
         hit = 1;
     }
-    *(u_char *)0x800DC00C = level;
+    *(u_char *)(0x800DC00C + WORK_BIAS) = level;
     return hit;
 }
 
@@ -65,11 +65,11 @@ int FadeStepDown(u_char step, u_char floor)
     int level;
 
     hit = 0;
-    level = *(u_char *)0x800DC00C - step;
+    level = *(u_char *)(0x800DC00C + WORK_BIAS) - step;
     if (level < floor) {
         level = floor;
         hit = 1;
     }
-    *(u_char *)0x800DC00C = level;
+    *(u_char *)(0x800DC00C + WORK_BIAS) = level;
     return hit;
 }

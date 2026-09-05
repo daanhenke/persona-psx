@@ -12,14 +12,14 @@
  * sprite - so the whole backdrop comes up and goes down with a screen fade
  * rather than being drawn and then covered.
  *
- * S2D keeps its own copy against a line buffer 0x20000 higher; see
- * src/p1-jp/s2d/gfx/backdrop.c.
+ * S2D builds this same source against a line buffer 0x20000 higher, which is
+ * what WORK_BIAS says.
  */
 #include <types.h>
 #include <libgs.h>
 
 /* Reached by hardcoded address. 155 GsLINEs. */
-#define g_backdrop_lines ((GsLINE *)0x800ED180)
+#define g_backdrop_lines ((GsLINE *)(0x800ED180 + WORK_BIAS))
 
 extern GsSPRITE g_fade_sprites[];
 extern GsOT     g_ot[];

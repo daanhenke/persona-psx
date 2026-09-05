@@ -29,11 +29,11 @@ void PadPoll(void)
     int  now;
     int  old;
 
-    prev = (int *)0x800DC008;
-    held = (int *)0x800DC000;
+    prev = (int *)(0x800DC008 + WORK_BIAS);
+    held = (int *)(0x800DC000 + WORK_BIAS);
     *prev = *held;
     now = PadRead(1);
     old = *prev;
-    *(int *)0x800DC004 = (old & now) ^ now;
+    *(int *)(0x800DC004 + WORK_BIAS) = (old & now) ^ now;
     *held = now;
 }

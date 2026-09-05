@@ -21,12 +21,12 @@
  * open pages of their own rather than holding a value - which is why only two
  * of them are drawn. src/p1-jp/common/ui/config.c arms and marks them.
  *
- * S2D keeps its own copy against a layer 0x20000 higher; see
- * src/p1-jp/s2d/ui/configlabels.c.
+ * S2D builds this same source against a layer 0x20000 higher, which is what
+ * WORK_BIAS says.
  */
 #include <types.h>
 
-#define g_tilemap1 ((short *)0x800EF580)
+#define g_tilemap1 ((short *)(0x800EF580 + WORK_BIAS))
 
 #define MAP_W 40
 

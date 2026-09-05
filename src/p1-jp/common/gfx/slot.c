@@ -1,17 +1,17 @@
 /* Persona 1 (JP) - slot record initialisers.
  *
- * Compiled into more than one overlay rather than called across the boundary:
+ * Compiled into three overlays rather than called across the boundary:
  *   DNG @ 0x800757EC / 0x80075914 / 0x80075A40
  *   ADV @ 0x80065D60 / 0x80065E88 / 0x80065FB4
- * S2D has the same routines at 0x80065850 / 0x80065978 / 0x80065AA4 but against
- * its own table, so it keeps its own copy in src/p1-jp/s2d/gfx/slot.c.
+ *   S2D @ 0x80065850 / 0x80065978 / 0x80065AA4
  */
 #include <types.h>
 #include <persona/common/slot.h>
 
 /* The 80 0x44-byte records live at 0x800DC10C, reached by hardcoded address
-   rather than through a linker symbol. */
-#define g_slots ((Slot *)0x800DC10C)
+   rather than through a linker symbol. S2D's table sits 0x20000 higher, which
+   is the only thing that differs between its build of this and the others'. */
+#define g_slots ((Slot *)(0x800DC10C + WORK_BIAS))
 
 /* Starts a slot on animation script `def` at (x, y): identity scale (0x1000 =
    1.0), full brightness (0x80), every offset cleared, marked active. `attr`

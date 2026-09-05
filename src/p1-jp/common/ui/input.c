@@ -3,7 +3,9 @@
  * Compiled into DNG and ADV rather than called across the boundary:
  *   DNG @ 0x80092B80 / 0x80092BFC
  *   ADV @ 0x8008EAE0 / 0x8008EB5C
- * S2D's copy reads its own pad mask, so it keeps src/p1-jp/s2d/input.c.
+ *   S2D @ 0x80083094 / 0x80083110
+ * S2D reads its own pad mask, which has a name of its own rather than sitting
+ * at a fixed offset, so the TARGET_S2D guard below picks it.
  *
  * MenuPollInput calls both: A is the "confirm" edge and B the "repeat while
  * held" one. The `kind` argument only selects which click to play - the return
@@ -14,7 +16,13 @@
 
 /* Which buttons count as accept this frame, ANDed against the live pad state.
    Both are slots of the binding table PadLoadBindings fills. */
-extern int     g_pad_pressed[];  /* newly-pressed edge; see PadPoll */
+/* newly-pressed edge; see PadPoll. S2D reads its own, at its own name. */
+#ifdef TARGET_S2D
+extern int     g_pad_pressed_s2d[];
+#define g_pad_pressed g_pad_pressed_s2d
+#else
+extern int     g_pad_pressed[];
+#endif
 
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
 

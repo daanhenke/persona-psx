@@ -13,15 +13,15 @@
  * n + 1 is glyph n and cell 0 is the blank at the far corner of the page. That
  * offset by one is why an index array cleared to zero draws as empty space.
  *
- * S2D keeps its own copy against a work area 0x20000 higher; see
- * src/p1-jp/s2d/gfx/mapcells.c.
+ * S2D builds this same source against a work area 0x20000 higher, which is
+ * what WORK_BIAS says.
  */
 #include <types.h>
 #include <libgs.h>
 
 /* Reached by hardcoded address; the blank is the cell before the atlas. */
-#define g_font_blank ((GsCELL *)0x800E864C)
-#define g_font_cells ((GsCELL *)0x800E8654)
+#define g_font_blank ((GsCELL *)(0x800E864C + WORK_BIAS))
+#define g_font_cells ((GsCELL *)(0x800E8654 + WORK_BIAS))
 
 #define GLYPH_W    8
 #define GLYPH_H    12

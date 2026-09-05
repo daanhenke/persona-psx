@@ -16,8 +16,16 @@
 #define PAD_L1 0x0004
 #define PAD_R1 0x0008
 
+/* S2D keeps its own pair, at its own names. */
+#ifdef TARGET_S2D
+extern u_short g_btn_page_back_s2d;
+extern u_short g_btn_page_fwd_s2d;
+#define g_btn_page_back g_btn_page_back_s2d
+#define g_btn_page_fwd  g_btn_page_fwd_s2d
+#else
 extern u_short g_btn_page_back;
 extern u_short g_btn_page_fwd;
+#endif
 
 /* Layout 0 pages with the two left shoulders against the two right ones;
    layout 1 puts both on the right hand. Any other value leaves the current

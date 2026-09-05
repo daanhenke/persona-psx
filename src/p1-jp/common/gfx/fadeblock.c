@@ -3,8 +3,8 @@
  * Compiled into DNG and ADV rather than called across the boundary:
  *   DNG @ 0x8008F944 / 0x8008F9CC
  *   ADV @ 0x8008B71C / 0x8008B7A4
- * S2D's fade-state flag is 0x20000 higher, so it keeps
- * src/p1-jp/s2d/gfx/fadeblock.c.
+ * S2D's fade-state flag is 0x20000 higher and carries a name of its own, which
+ * is what the TARGET_S2D guard below picks.
  *
  * Two levels move together: the overlay's own six sprites (FadeSpritesStep)
  * and the global level the slot renderer clamps against (FadeStepUp). The
@@ -12,7 +12,13 @@
  */
 #include <types.h>
 
+/* S2D's copy of this lives at its own address and carries its own name. */
+#ifdef TARGET_S2D
+extern u_char g_fade_state_s2d[];
+#define g_fade_state g_fade_state_s2d
+#else
 extern u_char g_fade_state[];
+#endif
 
 /* fade.c defines FadeStepUp/Down with u_char parameters; this translation unit
    was built against short ones, so the prototypes disagree on purpose. */

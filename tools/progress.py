@@ -65,32 +65,36 @@ def read_manifest():
     return entries
 
 
-def compile_candidates(sources, jobs):
-    """Compile each distinct source once, in parallel.
+def compile_candidates(pairs, jobs):
+    """Compile each distinct (source, target) once, in parallel.
 
     A source that covers several targets appears once per entry in the
-    manifest - tilemap.c alone is twelve - and the object it produces does not
-    depend on the target, only on the file and its cc1flags. Compiling per
-    entry did that work over and over.
+    manifest - tilemap.c alone is twelve - so compiling per entry did the same
+    work over and over. The object does depend on the target, though: a shared
+    source picks its work area out of the WORK_BIAS define, which is how one
+    file serves both the overlay pair and S2D. Most sources ignore it and
+    produce the same object for every target; compiling them again per target
+    costs a moment and keeps the ones that do not honest.
     """
     out = {}
 
-    def one(src):
+    def one(key):
+        src, target = key
         outdir = os.path.join(ROOT, "build", "progress", "_cand",
-                              re.sub(r"[^A-Za-z0-9]+", "_", src))
+                              re.sub(r"[^A-Za-z0-9]+", "_", src) + "_" + target)
         shutil.rmtree(outdir, ignore_errors=True)
         os.makedirs(outdir)
-        return compile_c(os.path.join(ROOT, src), outdir)
+        return compile_c(os.path.join(ROOT, src), outdir, target)
 
     with futures.ThreadPoolExecutor(max_workers=jobs) as pool:
-        pending = {pool.submit(one, s): s for s in sources}
+        pending = {pool.submit(one, k): k for k in pairs}
         for fut in futures.as_completed(pending):
-            src = pending[fut]
+            key = pending[fut]
             try:
-                out[src] = fut.result()
+                out[key] = fut.result()
             except SystemExit as e:
-                print("  ! %s failed to build: %s" % (src, e))
-                out[src] = None
+                print("  ! %s (%s) failed to build: %s" % (key[0], key[1], e))
+                out[key] = None
     return out
 
 
@@ -132,14 +136,14 @@ def main():
     if jobs <= 0:
         jobs = os.cpu_count() or 4
 
-    cand = compile_candidates(sorted({e[2] for e in entries}), jobs)
+    cand = compile_candidates(sorted({(e[2], e[0]) for e in entries}), jobs)
 
     per_target = {}
     rows = [None] * len(entries)
 
     def one(i):
         target, symbol, src = entries[i]
-        size, pct = check(target, symbol, src, cand.get(src))
+        size, pct = check(target, symbol, src, cand.get((src, target)))
         rows[i] = (target, symbol, size, pct,
                    pct is not None and pct >= 100.0, src)
 

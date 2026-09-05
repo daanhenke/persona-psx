@@ -18,15 +18,15 @@
  *   FormationCellFree      0x80090AC0  0x8008C964
  *   FormationPresetFits    0x80090D1C  0x8008CBB8
  *
- * S2D carries its own copy against a work area 0x20000 higher; see
- * src/p1-jp/s2d/game/formation.c.
+ * S2D builds this same source against a work area 0x20000 higher, which is
+ * what WORK_BIAS says.
  */
 #include <types.h>
 #include <persona/common/slot.h>
 
-#define g_formation        ((u_char *)0x800EB34C)
-#define g_formation_cell   ((u_char *)0x800EB380)
-#define g_formation_scratch ((u_char *)0x800EB365)
+#define g_formation        ((u_char *)(0x800EB34C + WORK_BIAS))
+#define g_formation_cell   ((u_char *)(0x800EB380 + WORK_BIAS))
+#define g_formation_scratch ((u_char *)(0x800EB365 + WORK_BIAS))
 #define g_formation_preset ((u_char *)0x801F2584)
 
 #define GRID_W     5

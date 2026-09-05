@@ -5,10 +5,10 @@
  *   Init       0x80076138  0x800666B4  0x8006614C
  *   ClearRow   0x800761FC  0x80066778  0x80066210
  *   SetCell    0x80077064  0x8006789C  0x8006708C
- * ClearRow reaches its index through the linker symbol, so all three overlays
- * use the copy here. SetCell reaches the cell definitions and the tick by
- * hardcoded address, and S2D's work area sits 0x20000 higher, so that one has
- * its own copy in src/p1-jp/s2d/gfx/bgmap.c.
+ * ClearRow reaches its index through the linker symbol, so it is the same code
+ * everywhere. SetCell reaches the cell definitions and the tick by hardcoded
+ * address, and S2D's work area sits 0x20000 higher - which is what WORK_BIAS
+ * says.
  *
  * One GsMAP of 16x16-pixel cells, 15 across and 4 down. g_bg_index says which
  * cell goes where and g_bg_cells holds the cell definitions; libgs walks both
@@ -22,8 +22,16 @@ extern u_short g_bg_index[];
 
 /* The cell definitions the map points at, and the background tick whose low
    bits pick a palette. Both are work-area addresses. */
-#define g_bg_cells ((GsCELL *)0x800E224C)
-extern u_int   g_bg_state[];      /* [0] is the animation tick */
+#define g_bg_cells ((GsCELL *)(0x800E224C + WORK_BIAS))
+
+/* [0] is the animation tick. S2D's sits 0x20000 higher like everything else
+   here, but it has a name of its own rather than being reached by address. */
+#ifdef TARGET_S2D
+extern u_int   g_bg_state_s2d[];
+#define g_bg_state g_bg_state_s2d
+#else
+extern u_int   g_bg_state[];
+#endif
 
 /* Blanks one row. The row stride is the map's own ncellw, so this and the
    `15` in BgMapInit have to stay in step. */

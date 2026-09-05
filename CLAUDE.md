@@ -269,12 +269,28 @@ not merely the size.
 Sources are grouped by subsystem once a directory outgrows a single listing -
 roughly ten files. The groups in use are `gfx/`, `ui/`, `game/` and `audio/`.
 
-The important rule is that **a source and its per-target copies live at the same
-relative path**: `common/gfx/slot.c` and `s2d/gfx/slot.c`, `common/ui/input.c`
-and `s2d/ui/input.c`. Those pairs exist only because one overlay reaches a
-different address, so they have to be easy to spot and to diff. Introducing a
-subdirectory in `common/` therefore means creating it in every target directory
-that overrides one of the files in it.
+### One source, several targets
+
+A routine compiled into more than one overlay lives once, in `common/`, even
+when the overlays reach different addresses. `tools/mfunc.py` preprocesses the
+candidate once per target and defines two things:
+
+- **`WORK_BIAS`** - how far that target's work area sits above the one the
+  others share. It is `0x20000` for S2D and zero everywhere else, so a
+  hardcoded address is written `((Slot *)(0x800DC10C + WORK_BIAS))` and the
+  same file serves all three overlays.
+- **`TARGET_<NAME>`** - for the handful of cases where the difference is not an
+  offset. S2D's pad mask and fade flag have names of their own rather than
+  fixed displacements, so those pick between two `extern`s with an `#ifdef`.
+
+S2D used to keep a byte-for-byte copy of fifteen sources with one constant
+changed in each; that is what this replaced. Reach for a genuine second file
+only when the two builds differ in something a define cannot express - a
+different set of functions, say, as `s2d/game/items.c` still does.
+
+`tools/progress.py` compiles per (source, target) rather than per source
+because of this. If you add a target whose work area is offset, put it in
+`WORK_BIAS` in `tools/mfunc.py` and nothing else needs to change.
 
 Nothing in the build walks `src/` - the Makefile compiles from `asm/`, and
 candidates are verified standalone through `tools/mfunc.py`. Moving a source is

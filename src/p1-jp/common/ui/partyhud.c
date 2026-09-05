@@ -18,15 +18,15 @@
  * Each number is right-aligned into its three cells, and switches to the
  * warning bank once it has fallen to a quarter of its maximum.
  *
- * S2D keeps its own copy against a layer 0x20000 higher; see
- * src/p1-jp/s2d/ui/partyhud.c.
+ * S2D builds this same source against a layer 0x20000 higher, which is what
+ * WORK_BIAS says.
  */
 #include <types.h>
 #include <persona/common/char.h>
 
 /* Reached by hardcoded address; the second of the three layers cleared at
    0x80069824, 40 cells wide. */
-#define g_tilemap1   ((short *)0x800EF580)
+#define g_tilemap1   ((short *)(0x800EF580 + WORK_BIAS))
 #define g_party      ((u_char *)0x801F256C)
 #define g_chars      ((Char *)0x801F1BCC)
 

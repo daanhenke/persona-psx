@@ -8,8 +8,8 @@
  */
 #include <types.h>
 
-#define LABEL_ROW0  ((short *)0x800EF71C)
-#define LABEL_ROW1  ((short *)0x800EF736)
+#define LABEL_ROW0  ((short *)(0x800EF71C + WORK_BIAS))
+#define LABEL_ROW1  ((short *)(0x800EF736 + WORK_BIAS))
 #define LABEL_BASE  0x1AE
 #define LABEL_CELLS 11
 

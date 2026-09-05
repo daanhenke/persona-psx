@@ -16,14 +16,14 @@
  * nothing here has to know which value is selected. ConfigPlaceMarkers puts
  * the markers on the right columns afterwards.
  *
- * S2D keeps its own copy against a work area 0x20000 higher; see
- * src/p1-jp/s2d/ui/configbattle.c.
+ * S2D builds this same source against a work area 0x20000 higher, which is
+ * what WORK_BIAS says.
  */
 #include <types.h>
 #include <persona/common/menuctx.h>
 
-#define g_tilemap0 ((short *)0x800EE180)
-#define g_tilemap1 ((short *)0x800EF580)
+#define g_tilemap0 ((short *)(0x800EE180 + WORK_BIAS))
+#define g_tilemap1 ((short *)(0x800EF580 + WORK_BIAS))
 #define MAP_W 40
 
 extern const u_char str_cfg_battle[];
