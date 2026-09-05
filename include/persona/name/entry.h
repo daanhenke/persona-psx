@@ -16,7 +16,7 @@ typedef struct {
     /* 0x03 */ u_char  field;                  /* which field is being edited */
     /* 0x04 */ u_char  pad04[4];
     /* 0x08 */ u_short text[NAME_FIELDS][NAME_CELLS];
-    /* 0x38 */ char    cursor[NAME_FIELDS];    /* cell the caret sits on */
+    /* 0x38 */ signed char cursor[NAME_FIELDS]; /* cell the caret sits on */
     /* 0x3B */ u_char  pad3B[9];
     /* 0x44 */ u_char  x[NAME_FIELDS];         /* where each field draws */
     /* 0x47 */ u_char  pad47[1];

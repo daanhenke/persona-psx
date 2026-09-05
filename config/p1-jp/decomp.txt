@@ -345,3 +345,4 @@ adv       func_80082FE8    src/p1-jp/adv/game/actors.c
 adv       func_80083150    src/p1-jp/adv/game/actors.c
 name      func_80066134    src/p1-jp/name/ui/entry.c
 name      func_800679CC    src/p1-jp/common/gfx/image.c
+name      func_80067F20    src/p1-jp/name/ui/keyboard.c
