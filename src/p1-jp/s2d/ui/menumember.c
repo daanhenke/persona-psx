@@ -24,11 +24,11 @@ short MenuStepMember(int *sel, u_char last)
 
     moved = 0;
     dir = 0;
-    if (MenuStepCursor(&g_menu->sel.list[1])) {
+    if (MenuStepCursor(&g_menu->list[2])) {
         dir = 1;
         moved = 1;
     }
-    if (MenuStepCursor(&g_menu->sel.list[2])) {
+    if (MenuStepCursor(&g_menu->list[3])) {
         dir = 2;
         moved = 1;
     }

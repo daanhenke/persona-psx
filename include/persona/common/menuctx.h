@@ -16,12 +16,8 @@ typedef struct {
     /* 0x1C0 */ int      slot_base;
     /* 0x1C4 */ u_char   pad1C4[0xC];
     /* 0x1D0 */ int      row;
-    /* 0x1D4 */ u_char   pad1D4[0x1FC];
-    /* 0x3D0 */ union {
-        MenuList list[3];
-        u_char   value;   /* the low byte of list[0].cur, which is all an
-                             option value ever needs */
-    } sel;
+    /* 0x1D4 */ u_char   pad1D4[0x1EC];
+    /* 0x3C0 */ MenuList list[4];
 } MenuCtx;
 
 extern MenuCtx *g_menu;

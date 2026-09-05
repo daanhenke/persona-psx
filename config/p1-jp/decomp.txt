@@ -272,3 +272,7 @@ dng       func_8006FB08    src/p1-jp/common/gfx/tim.c
 name      func_80067AD8    src/p1-jp/common/gfx/tim.c
 dng       func_8006FD84    src/p1-jp/common/gfx/tim.c
 name      func_800678EC    src/p1-jp/name/gfx/upload.c
+adv       func_800746C0    src/p1-jp/common/game/formationload.c
+s2d       func_80073678    src/p1-jp/common/game/formationload.c
+adv       func_80074160    src/p1-jp/adv/game/formationsave.c
+s2d       func_80073118    src/p1-jp/s2d/game/formationsave.c

@@ -29,6 +29,9 @@ extern void SlotSetPos(int slot, int attr, int x, int y);
    and every step clicks. */
 #define OPT_FLAGS (MENU_WRAP | MENU_RIGHT_IS_NEXT | MENU_CLICK_A)
 
+/* An option value never needs more than the low byte of the list index. */
+#define OPT_VALUE (*(u_char *)&g_menu->list[1].cur)
+
 /* Stops both markers blinking, arms the one the context points at, then moves
    each to the column its option value selects. */
 void ConfigPlaceMarkers(void)
@@ -46,16 +49,16 @@ void ConfigBeginEdit(void)
 {
     switch (g_menu->row) {
     case 0:
-        MenuListInit(&g_menu->sel.list[0], g_options[1], 0, 1, OPT_FLAGS);
+        MenuListInit(&g_menu->list[1], g_options[1], 0, 1, OPT_FLAGS);
         break;
     case 1:
-        MenuListInit(&g_menu->sel.list[0], g_options[2], 0, 2, OPT_FLAGS);
+        MenuListInit(&g_menu->list[1], g_options[2], 0, 2, OPT_FLAGS);
         break;
     case 2:
-        MenuListInit(&g_menu->sel.list[0], g_options[0x23], 0, 1, OPT_FLAGS);
+        MenuListInit(&g_menu->list[1], g_options[0x23], 0, 1, OPT_FLAGS);
         break;
     case 3:
-        MenuListInit(&g_menu->sel.list[0], 0, 0, 0, 0);
+        MenuListInit(&g_menu->list[1], 0, 0, 0, 0);
         break;
     }
 }
@@ -66,15 +69,15 @@ void ConfigSoundBeginEdit(void)
 {
     switch (g_menu->slot_base) {
     case 0:
-        MenuListInit(&g_menu->sel.list[0], g_options[3], 0, 1, OPT_FLAGS);
+        MenuListInit(&g_menu->list[1], g_options[3], 0, 1, OPT_FLAGS);
         break;
     case 1:
-        MenuListInit(&g_menu->sel.list[0], g_options[0], 0, 1, OPT_FLAGS);
+        MenuListInit(&g_menu->list[1], g_options[0], 0, 1, OPT_FLAGS);
         break;
     case 2:
     case 3:
     case 4:
-        MenuListInit(&g_menu->sel.list[0], 0, 0, 0, 0);
+        MenuListInit(&g_menu->list[1], 0, 0, 0, 0);
         break;
     }
 }
@@ -84,13 +87,13 @@ void ConfigApplyOption(void)
 {
     switch (g_menu->row) {
     case 0:
-        g_options[1] = g_menu->sel.value;
+        g_options[1] = OPT_VALUE;
         break;
     case 1:
-        g_options[2] = g_menu->sel.value;
+        g_options[2] = OPT_VALUE;
         break;
     case 2:
-        g_options[0x23] = g_menu->sel.value;
+        g_options[0x23] = OPT_VALUE;
         break;
     }
 }
