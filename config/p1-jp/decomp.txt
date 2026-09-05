@@ -191,3 +191,7 @@ dng       func_80084C4C    src/p1-jp/common/ui/config.c
 dng       func_800851D0    src/p1-jp/common/ui/config.c
 s2d       func_80075078    src/p1-jp/common/ui/config.c
 s2d       func_80075604    src/p1-jp/common/ui/config.c
+adv       func_800680E8    src/p1-jp/common/ui/menulist.c
+adv       func_8008E584    src/p1-jp/common/game/items.c
+dng       func_80092654    src/p1-jp/common/game/items.c
+s2d       func_80082B68    src/p1-jp/s2d/game/items.c

@@ -18,6 +18,11 @@
 extern GsMAP   g_bg_map;
 extern u_short g_bg_index[];
 
+/* The cell definitions the map points at, and the background tick whose low
+   bits pick a palette. Both are work-area addresses. */
+#define g_bg_cells ((GsCELL *)0x800E224C)
+extern u_int   g_bg_state[];      /* [0] is the animation tick */
+
 /* Blanks one row. The row stride is the map's own ncellw, so this and the
    `15` in BgMapInit have to stay in step. */
 void BgMapClearRow(u_short row)
@@ -27,4 +32,23 @@ void BgMapClearRow(u_short row)
     for (i = 0; i < 15; i++) {
         g_bg_index[row * 15 + i] = 0;
     }
+}
+
+/* Points one map cell at its own tile and fills in that tile's GsCELL.
+ *
+ * The tile number splits into nibbles to address a 16x16 atlas: the low
+ * nibble scaled by 16 gives u, the high nibble is already v. The CLUT keeps
+ * its top bits and takes a palette from the background tick, which is what
+ * animates the water and fire tiles. */
+void BgMapSetCell(u_short idx)
+{
+    GsCELL  *cell;
+    u_short  tile;
+
+    tile = idx + 1;
+    g_bg_index[idx] = tile;
+    cell = g_bg_cells + 1;
+    cell[idx].u = (tile & 0xF) << 4;
+    cell[idx].v = tile & 0xF0;
+    cell[idx].cba = (cell[idx].cba & 0xFFC0) + 0x3C + ((g_bg_state[0] >> 4) & 7);
 }

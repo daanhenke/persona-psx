@@ -121,3 +121,90 @@ void ItemsRemovePending(u_short id, short n)
     count = (*p >> 9) - n;
     *p = (id & ITEM_ID) + count * 0x200;
 }
+
+/* Merges the staging list into g_items: same id if it is already there, first
+   slot with an empty half otherwise. Both searches are written out rather than
+   calling ItemsFind, which is how the original has it. */
+void ItemsCommitPending(void)
+{
+    u_short *src;
+    u_short *dst;
+    short    i;
+    short    j;
+
+    i = 0;
+    do {
+        src = &g_items_pending[i];
+        if (*src != 0) {
+            j = 0;
+            do {
+                if ((g_items[j] & ITEM_ID) == (*src & ITEM_ID)) {
+                    goto found;
+                }
+                j = j + 1;
+            } while (j < ITEM_COUNT);
+            j = -1;
+        found:
+            if (j < 0) {
+                do {
+                    j = j + 1;
+                    dst = &g_items[j];
+                    if ((*dst & ITEM_ID) == 0) {
+                        break;
+                    }
+                } while ((*dst >> 9) != 0);
+                *dst = *src;
+            } else {
+                g_items[j] = *src;
+            }
+        }
+        i = i + 1;
+    } while (i < ITEM_COUNT);
+}
+
+/* Tidies the staging list in three passes: fold entries that share an id into
+   the earlier slot (counts still stop at 99), drop anything with an empty half,
+   then slide the survivors down so the used entries are contiguous. */
+void ItemsMergePending(void)
+{
+    u_short *list;
+    u_short  i;
+    u_short  j;
+    u_int    count;
+
+    list = g_items_pending;
+
+    for (i = 0; i < ITEM_COUNT; i++) {
+        for (j = i + 1; j < ITEM_COUNT; j++) {
+            if ((list[i] & ITEM_ID) ==
+                (list[j] & ITEM_ID)) {
+                count = (list[i] >> 9) + (list[j] >> 9);
+                if (count > ITEM_MAX) {
+                    count = ITEM_MAX;
+                }
+                list[i] = (count << 9) +
+                                     (list[i] & ITEM_ID);
+                list[j] = 0;
+            }
+        }
+    }
+
+    for (i = 0; i < ITEM_COUNT; i++) {
+        if ((list[i] >> 9) == 0 ||
+            (list[i] & ITEM_ID) == 0) {
+            list[i] = 0;
+        }
+    }
+
+    for (i = 0; i < ITEM_COUNT; i++) {
+        if (list[i] == 0) {
+            for (j = i + 1; j < ITEM_COUNT; j++) {
+                if (list[j] != 0) {
+                    list[i] = list[j];
+                    list[j] = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
