@@ -281,7 +281,13 @@ def normalize_asm(lines, names=None, gp=None):
             # above, and aligned as an array base would be. Without the
             # below-distance guard this misreads an ordinary byte reference
             # into a string that happens to sit just before another symbol.
-            if (above is not None and above <= 0x10 and addr % 4 == 0
+            # The gap has to be one element wide for that reading to hold, so
+            # only a power of two counts. An odd gap - the byte three before a
+            # configuration flag, say - means the address is a member of the
+            # object below and the flag just happens to sit close after it.
+            one_element = (above is not None and above <= 0x10
+                           and (above & (above - 1)) == 0)
+            if (one_element and addr % 4 == 0
                     and (below is None or below > 0x10)):
                 return "%s-0x%X" % (names[based[j]], above)
             if below is not None and 0 < below <= 0x400:

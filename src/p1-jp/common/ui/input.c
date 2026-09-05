@@ -10,10 +10,10 @@
  * value is 1 whenever the button is down, sound or no sound.
  */
 #include <types.h>
+#include <persona/common/pad.h>
 
 /* Which buttons count as accept this frame, ANDed against the live pad state.
-   Both are set up by InputBuildAcceptMasks. */
-extern u_short g_input_accept_a[];
+   Both are slots of the binding table PadLoadBindings fills. */
 extern int     g_pad_pressed[];  /* newly-pressed edge; see PadPoll */
 
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
@@ -26,7 +26,7 @@ u_char InputCheckAcceptA(u_char kind)
     int pressed;
 
     pressed = 0;
-    if (g_input_accept_a[0] & g_pad_pressed[0]) {
+    if (g_pad_bindings[BIND_ACCEPT_A].mask & g_pad_pressed[0]) {
         switch (kind) {
         case 1:
             SoundPlaySeq(0x18, 2, 1);
@@ -41,14 +41,12 @@ u_char InputCheckAcceptA(u_char kind)
 }
 
 /* The second mask, with its own pair of clicks. */
-extern u_short g_input_accept_b[];
-
 u_char InputCheckAcceptB(u_char kind)
 {
     int pressed;
 
     pressed = 0;
-    if (g_input_accept_b[0] & g_pad_pressed[0]) {
+    if (g_pad_bindings[BIND_ACCEPT_B].mask & g_pad_pressed[0]) {
         switch (kind) {
         case 1:
             SoundPlaySeq(0x18, 0, 1);
