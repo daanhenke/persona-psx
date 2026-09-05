@@ -109,37 +109,46 @@ void FormationLoadPreset(u_char preset)
     FormationPlaceMarkers();
 }
 
-#define ROW(cell) ((u_char)((cell) / GRID_W))
-#define COL(cell) ((u_char)((cell) % GRID_W))
-
 /* A member may only stand on an empty cell whose four orthogonal neighbours are
-   also empty. Each edge test is written with both bounds even though one half is
-   always true, which is why the row and column come out recomputed per test. */
+   also empty. Each edge test carries both bounds even though one half of it is
+   always true, and `last` holds a constant - leave both alone. */
 u_char FormationCellFree(u_char cell)
 {
     u_char *grid;
+    int     ok;
+    int     last;
 
+    ok = 1;
     grid = g_formation;
     if (grid[cell] != CELL_EMPTY) {
         return 0;
     }
-    if (ROW(cell) < GRID_H && ROW(cell) != 0 &&
-        grid[cell - GRID_W] != CELL_EMPTY) {
-        return 0;
+    {
+        int row = (cell / GRID_W) & 0xFF;
+        if (row < GRID_H && row != 0 && grid[cell - GRID_W] != CELL_EMPTY) {
+            return 0;
+        }
     }
-    if (ROW(cell) < GRID_H - 1 && ROW(cell) >= 0 &&
-        grid[cell + GRID_W] != CELL_EMPTY) {
-        return 0;
+    last = GRID_H - 1;
+    {
+        int row = (cell / GRID_W) & 0xFF;
+        if (row < last && row >= 0 && grid[cell + GRID_W] != CELL_EMPTY) {
+            return 0;
+        }
     }
-    if (COL(cell) < GRID_W && COL(cell) != 0 &&
-        grid[cell - 1] != CELL_EMPTY) {
-        return 0;
+    {
+        int col = (cell % GRID_W) & 0xFF;
+        if (col < GRID_W && col != 0 && grid[cell - 1] != CELL_EMPTY) {
+            return 0;
+        }
     }
-    if (COL(cell) < GRID_W - 1 && COL(cell) >= 0 &&
-        grid[cell + 1] != CELL_EMPTY) {
-        return 0;
+    {
+        int col = (cell % GRID_W) & 0xFF;
+        if (col < last && col >= 0 && grid[cell + 1] != CELL_EMPTY) {
+            return 0;
+        }
     }
-    return 1;
+    return ok;
 }
 
 /* -1 when the preset was never saved, 1 when it places exactly the party we
