@@ -342,5 +342,13 @@
   "percent": 3.2917,
   "matched_funcs": 342,
   "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T16:58:36",
+  "matched_bytes": 53848,
+  "total_bytes": 1537688,
+  "percent": 3.5019,
+  "matched_funcs": 359,
+  "total_funcs": 6347
  }
 ]
