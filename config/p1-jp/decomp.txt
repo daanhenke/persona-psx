@@ -408,3 +408,7 @@ s2d       func_800868F0    src/p1-jp/common/gfx/mapmarker.c
 adv       func_8008695C    src/p1-jp/adv/gfx/screenfade.c
 adv       func_80086AD4    src/p1-jp/adv/gfx/screenfade.c
 adv       func_80086C4C    src/p1-jp/adv/gfx/screenfade.c
+adv       func_800AEDF0    src/p1-jp/adv/game/scrollcam.c
+adv       func_80093F08    src/p1-jp/common/gfx/gauge.c
+dng       func_8008E7DC    src/p1-jp/common/gfx/gauge.c
+s2d       func_8007ECEC    src/p1-jp/s2d/gfx/gauge.c

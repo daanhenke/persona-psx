@@ -44,6 +44,7 @@ PROVIDE(AdvPickSceneByFlags = 0x8008514C);
 PROVIDE(AdvResetBanks = 0x800886EC);
 PROVIDE(AdvResolveSceneLoc = 0x8001593C);
 PROVIDE(AdvRunFrame = 0x80086250);
+PROVIDE(AdvScrollCamera = 0x800AEDF0);
 PROVIDE(AdvSelectFile = 0x80086464);
 PROVIDE(AdvSoundCommand = 0x800882FC);
 PROVIDE(AdvUnpack = 0x800B0ACC);
