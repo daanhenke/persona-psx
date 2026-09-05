@@ -282,3 +282,4 @@ s2d       func_8007476C    src/p1-jp/s2d/ui/placelabel.c
 adv       func_800803A8    src/p1-jp/adv/game/scenefind.c
 adv       func_8007B9BC    src/p1-jp/adv/gfx/statusframes.c
 adv       func_80082F6C    src/p1-jp/adv/game/scenefind.c
+adv       func_800804F8    src/p1-jp/adv/game/scenefind.c
