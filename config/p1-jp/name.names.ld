@@ -3126,6 +3126,7 @@ PROVIDE(g_state_cur = 0x80055C04);
 PROVIDE(g_state_next = 0x80055C38);
 PROVIDE(g_state_prev = 0x80055C30);
 PROVIDE(g_state_req = 0x801F15C4);
+PROVIDE(g_tilemap1 = 0x800EF580);
 PROVIDE(g_title_choice = 0x801F15B8);
 PROVIDE(get_alarm = 0x8002F214);
 PROVIDE(get_ce = 0x8002DDF4);

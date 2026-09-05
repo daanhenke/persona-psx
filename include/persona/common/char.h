@@ -37,7 +37,8 @@ typedef struct {
                                      enough to name the pair.             */
     /* 0x3C */ u_short unk3C;
     /* 0x3E */ u_char  key;       /* identifies the record; 0 while unused  */
-    /* 0x3F */ u_char  pad3F[0xA];
+    /* 0x3F */ u_char  name[10];  /* packed glyph bytes; the status HUD draws
+                                     eight of them, 0xFF ending the row   */
     /* 0x49 */ u_char  status;    /* ailment code, 0 for none. Event scripts
                                      set and clear it; recovery items ask
                                      CharHasStatus for the one they cure. */
