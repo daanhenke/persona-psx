@@ -255,7 +255,9 @@ not merely the size.
     bin/              downloaded toolchain (gitignored; see bin/*.sha256)
     config/p1-jp/     splat configs, symbol maps, rename.txt, gp.txt, ghidra/*.json
     docs/             memory map and program structure
-    ghidra/           scripts run inside Ghidra via ReVa
+    ghidra/           reusable scripts run inside Ghidra via ReVa
+    ghidra/tmp/       one-shot rename scripts (untracked - what they apply
+                      lives in the Ghidra project, exported to config/)
     include/psyq/     Psy-Q SDK headers
     include/persona/  our own headers, mirroring src/ (<target>/<name>.h)
     src/p1-jp/        decompiled C, one directory per target, plus common/
