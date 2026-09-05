@@ -267,3 +267,8 @@ s2d       func_80075114    src/p1-jp/common/ui/config.c
 adv       func_80076DE8    src/p1-jp/common/game/charentry.c
 dng       func_80085964    src/p1-jp/common/game/charentry.c
 s2d       func_80075DA0    src/p1-jp/common/game/charentry.c
+name      func_80067928    src/p1-jp/common/gfx/tim.c
+dng       func_8006FB08    src/p1-jp/common/gfx/tim.c
+name      func_80067AD8    src/p1-jp/common/gfx/tim.c
+dng       func_8006FD84    src/p1-jp/common/gfx/tim.c
+name      func_800678EC    src/p1-jp/name/gfx/upload.c

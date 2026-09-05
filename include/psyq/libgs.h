@@ -70,6 +70,29 @@ typedef struct {
     /* 0x0C */ u_short *index;
 } GsMAP;                        /* 0x10 bytes */
 
+/* One TIM as GsGetTimInfo unpacks it. */
+typedef struct {
+    /* 0x00 */ u_long  pmode;   /* bit 3 says the TIM carries a CLUT */
+    /* 0x04 */ short   px, py;
+    /* 0x08 */ short   pw, ph;
+    /* 0x0C */ u_long *pixel;
+    /* 0x10 */ short   cx, cy;
+    /* 0x14 */ short   cw, ch;
+    /* 0x18 */ u_long *clut;
+} GsIMAGE;                      /* 0x1C bytes */
+
+typedef struct {
+    /* 0x00 */ u_long  attribute;
+    /* 0x04 */ short   x, y;
+    /* 0x08 */ short   w, h;
+    /* 0x0C */ short   scrollx, scrolly;
+    /* 0x10 */ u_char  r, g, b, pad;
+    /* 0x14 */ GsMAP  *map;
+    /* 0x18 */ short   mx, my;
+    /* 0x1C */ short   scalex, scaley;
+    /* 0x20 */ long    rotate;
+} GsBG;                         /* 0x24 bytes */
+
 void GsClearVcount(void);
 long GsGetVcount();
 void GsInitVcount();
