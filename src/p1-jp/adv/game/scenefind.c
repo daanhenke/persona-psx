@@ -1,12 +1,15 @@
-/* Persona 1 (JP) - finding the trigger on a tile.  ADV @ 0x800803A8.
+/* Persona 1 (JP) - asking the scene what is on a tile.
+ *   0x800803A8 SceneFindTrigger
+ *   0x80082F6C SceneTileAt
  *
- * The callers step the player and then ask what is under them; a hit gives
- * them the record's script pointer to run.
+ * The callers step the player and then ask what is under them; a trigger hit
+ * gives them the record's script pointer to run.
  */
 #include <types.h>
 #include <persona/adv/scene.h>
 
 #define TRIGGER_NONE 0xFF
+#define ROOM_STRIDE  32
 
 u_char SceneFindTrigger(u_char x, u_char y)
 {
@@ -20,4 +23,13 @@ u_char SceneFindTrigger(u_char x, u_char y)
         }
     }
     return TRIGGER_NONE;
+}
+
+/* The room grid itself, which is what the walking code tests before it moves. */
+u_char SceneTileAt(u_char x, u_char y)
+{
+    int i;
+
+    i = y * ROOM_STRIDE + x;
+    return g_adv_scene->tiles[i];
 }

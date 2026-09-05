@@ -28,6 +28,11 @@ typedef struct {
     /* 0x14 */ u_char     *table14;
     /* 0x18 */ u_char     *count18;   /* 14-byte records keyed by a u16     */
     /* 0x1C */ u_char     *table1C;
+    /* 0x20 */ u_char     *tiles;     /* the room grid, 32 bytes to a row;
+                                        RoomRotatePoint puts the far edge
+                                        at 23, so the stride is the power
+                                        of two above the room, not its
+                                        width */
 } AdvScene;
 
 extern AdvScene *g_adv_scene;
