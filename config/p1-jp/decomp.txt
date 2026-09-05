@@ -399,3 +399,6 @@ adv       func_8007FFD0    src/p1-jp/adv/game/diagstep.c
 adv       func_8007D0F8    src/p1-jp/common/gfx/backdrop.c
 dng       func_8008B688    src/p1-jp/common/gfx/backdrop.c
 s2d       func_8007BAF8    src/p1-jp/s2d/gfx/backdrop.c
+adv       func_8008BC1C    src/p1-jp/common/ui/configlabels.c
+dng       func_8008FE44    src/p1-jp/common/ui/configlabels.c
+s2d       func_80080354    src/p1-jp/s2d/ui/configlabels.c
