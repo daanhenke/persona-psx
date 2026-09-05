@@ -257,3 +257,13 @@ dng       func_800961D0    src/p1-jp/common/game/roomrotate.c
 s2d       func_80086664    src/p1-jp/common/game/roomrotate.c
 adv       func_8008AFA8    src/p1-jp/common/gfx/coord.c
 dng       func_8006F9D8    src/p1-jp/common/gfx/coord.c
+adv       func_8008F0E8    src/p1-jp/common/gfx/cells.c
+dng       func_80093188    src/p1-jp/common/gfx/cells.c
+s2d       func_8008369C    src/p1-jp/common/gfx/cells.c
+adv       func_8008F084    src/p1-jp/adv/gfx/cellsdigits.c
+adv       func_8007615C    src/p1-jp/common/ui/config.c
+dng       func_80084CE8    src/p1-jp/common/ui/config.c
+s2d       func_80075114    src/p1-jp/common/ui/config.c
+adv       func_80076DE8    src/p1-jp/common/game/charentry.c
+dng       func_80085964    src/p1-jp/common/game/charentry.c
+s2d       func_80075DA0    src/p1-jp/common/game/charentry.c

@@ -60,6 +60,25 @@ void ConfigBeginEdit(void)
     }
 }
 
+/* The sound page has its own two settings and picks the row from slot_base,
+   the field ConfigPlaceMarkers uses to decide which marker to arm. */
+void ConfigSoundBeginEdit(void)
+{
+    switch (g_menu->slot_base) {
+    case 0:
+        MenuListInit(&g_menu->sel.list[0], g_options[3], 0, 1, OPT_FLAGS);
+        break;
+    case 1:
+        MenuListInit(&g_menu->sel.list[0], g_options[0], 0, 1, OPT_FLAGS);
+        break;
+    case 2:
+    case 3:
+    case 4:
+        MenuListInit(&g_menu->sel.list[0], 0, 0, 0, 0);
+        break;
+    }
+}
+
 /* Stores the edited value into whichever option the selected row names. */
 void ConfigApplyOption(void)
 {
