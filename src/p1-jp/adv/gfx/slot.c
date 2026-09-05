@@ -61,3 +61,23 @@ void SlotSetSemiTrans(u_char slot, u_char on)
         s->attr &= ~SLOT_ATTR_SEMITRANS;
     }
 }
+
+/* Gives the first eight slots an x scale of one unit under full when their
+   SLOT_ATTR_XSCALE bit is set - enough to change how the GPU rounds the
+   sprite - and exactly 1.0 when it is not. The scene setup runs it once a
+   room. g_slot_cur is pointed at each slot on the way past. */
+extern Slot *g_slot_cur;
+
+void SlotsApplyXScale(void)
+{
+    u_char i;
+
+    for (i = 0; i < 8; i++) {
+        g_slot_cur = &g_slots[i];
+        if (g_slots[i].attr & SLOT_ATTR_XSCALE) {
+            g_slots[i].scale_x = 0xFFF;
+        } else {
+            g_slots[i].scale_x = 0x1000;
+        }
+    }
+}

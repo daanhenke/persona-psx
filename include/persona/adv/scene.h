@@ -20,19 +20,59 @@ typedef struct {
     /* 0x08 */ u_long *script;  /* what running the trigger executes */
 } AdvTrigger;                   /* 12 bytes */
 
+/* A script that runs because the player is standing on the tile. Unlike a
+   trigger it carries no flag, so finding one is enough to run it. */
 typedef struct {
-    /* 0x00 */ u_char      pad00[8];
-    /* 0x08 */ u_char     *trigger_count;
-    /* 0x0C */ AdvTrigger *triggers;
-    /* 0x10 */ u_char     *count10;   /* 8-byte records keyed by three bytes */
-    /* 0x14 */ u_char     *table14;
-    /* 0x18 */ u_char     *count18;   /* 14-byte records keyed by a u16     */
-    /* 0x1C */ u_char     *table1C;
-    /* 0x20 */ u_char     *tiles;     /* the room grid, 32 bytes to a row;
+    /* 0x00 */ u_char  x, y;
+    /* 0x02 */ u_char  pad02[2];
+    /* 0x04 */ u_long *script;
+} AdvStep;                      /* 8 bytes */
+
+/* A script that runs instead of a step onto its tile, and only from the sides
+   `dirs` allows - bit 0 is a step up, 1 down, 2 left, 3 right, matching
+   g_dir_x/g_dir_y. `kind` is matched against the walking actor's own. */
+typedef struct {
+    /* 0x00 */ u_char  x, y;
+    /* 0x02 */ u_char  dirs;
+    /* 0x03 */ u_char  kind;
+    /* 0x04 */ u_long *script;
+} AdvApproach;                  /* 8 bytes */
+
+/* Where the player may arrive in this room, keyed by the tile as one u_short
+   - the two bytes of an actor's x and y read together. */
+typedef struct {
+    /* 0x00 */ u_short tile;
+    /* 0x02 */ u_char  pad02;
+    /* 0x03 */ u_char  map_x;   /* where the party lands on the world map */
+    /* 0x04 */ u_char  map_y;
+    /* 0x05 */ u_char  mode;    /* how the destination is entered; remapped
+                                   into g_adv_enter_mode                  */
+    /* 0x06 */ u_short map_id;
+    /* 0x08 */ u_char  room;    /* which room of that map                 */
+    /* 0x09 */ u_char  unk4;
+    /* 0x0A */ u_char  pad0A[4];
+} AdvEntry;                     /* 14 bytes */
+
+typedef struct {
+    /* 0x00 */ u_char      *step_count;
+    /* 0x04 */ AdvStep     *steps;
+    /* 0x08 */ u_char      *trigger_count;
+    /* 0x0C */ AdvTrigger  *triggers;
+    /* 0x10 */ u_char      *approach_count;
+    /* 0x14 */ AdvApproach *approaches;
+    /* 0x18 */ u_char      *entry_count;
+    /* 0x1C */ AdvEntry    *entries;
+    /* 0x20 */ u_char      *tiles;    /* the room grid, 32 bytes to a row;
                                         RoomRotatePoint puts the far edge
                                         at 23, so the stride is the power
                                         of two above the room, not its
                                         width */
+    /* 0x24 */ u_char       kind;    /* 0..4; picks where the camera starts */
+    /* 0x25 */ u_char       pad25;
+    /* 0x26 */ u_char       w, h;    /* the room in tiles. The camera only
+                                        scrolls while the followed actor is
+                                        at least four tiles from either edge,
+                                        which is what these bound. */
 } AdvScene;
 
 extern AdvScene *g_adv_scene;

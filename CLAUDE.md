@@ -150,6 +150,72 @@ than the original has it, move those statements to the **end** of the function
 and let gcc hoist them into place - writing them in their apparent position is
 what puts them too early. This is what took `SlotInit` from 70% to 100%.
 
+Inside a loop the same thing decides whether the constant is *materialised*
+outside it. `ImageCellsInit` fills the same five fields in three loops; writing
+the two constant fields in a different position in one of them was enough for
+gcc to lift the `ori` for the constant into that loop's preheader, and the
+function stuck at 96.8% until all three loops listed the fields in the same
+order. If several loops fill one record type, keep the field order identical
+across them unless the original really differs.
+
+### Reaching a record in a loop
+
+Two spellings of the same array walk, and they are not interchangeable:
+
+- `table[i].field = ...` per field folds the table's address into every access
+  (`lui`/`addu at`/`%lo` each time) and never materialises a base.
+- `c = &table[i]; c->field = ...` computes the record address once into a
+  register and stores at small offsets from it.
+
+Read which one the target uses off the diff - a repeated `addu at, ...` per
+field is the first, `sb ..., 0xNN(reg)` the second - and match it. This took
+`ImageCellsInit` from 90.1% to 96.8% and is what the four `GsCELL` table
+builders all wanted.
+
+The same choice applies to a *global table indexed many times in one function*.
+Where the original keeps the table base in a saved register for the whole
+function, assign it to a pointer local at the very top:
+`ItemDef *items = g_item_defs;`. `CharEquip` reads two tables that way and went
+from 72.6% to 80.2% once both pointers were hoisted; assigning them later, or
+only one of them, is worse.
+
+### Setting a loop up
+
+A short fill loop usually has three pieces of setup - the counter, the pointer
+or destination, and the first value - and gcc emits them in source order. When
+the diff shows two `ori`s or an `ori` and a `lui/ori` swapped at the top of a
+loop, it is this and nothing subtler. The original writes the **counter first**
+in every one found so far, which means lifting it out of the `for` header:
+
+    i = 11;
+    p = &dst[11];
+    cell = 0x56;
+    for (; i >= 0; i--) { ... }
+
+`TileMapWriteRun12` went from 96.8% to exact on that alone, and `CheckerMapInit`
+from 89.4% to 98.5%.
+
+Whether the destination is a pointer walked with `p++` or an index into a
+literal (`g_checker_index[i]`) decides where the base is materialised, and the
+two are not interchangeable: the literal form took `CheckerMapInit` the rest of
+the way to exact.
+
+### Which way a sum associates
+
+`a + b + c + d` is left-associative in C, so gcc emits `((a+b)+c)+d` - but the
+original's chain often comes out the other way round, innermost pair first.
+When the diff shows the operands combining in reverse (the last term of your
+expression being added first), write the terms in the opposite order. Reversing
+the six sums in `CharRecalcStats` took it from 52.4% to 74.2% in one step.
+
+Ghidra's decompiler normalises addition order, so do not take its rendering as
+the source order - check the `addu` sequence in the asm. It is worth reading
+first anyway on anything long and repetitive, and its `get-decompilation` is far
+quicker than working the asm by hand; just re-check three things against the
+asm afterwards, because it gets all of them wrong often enough to matter: the
+order of terms in a sum, which way round an `if`/`else` is written, and whether
+a `switch` arm shares a tail with another.
+
 ### Bit setters with a shared store tail
 
 A function that sets or clears one bit usually compiles to *two* loads and
@@ -224,7 +290,10 @@ relocation could never agree and every such function capped just below 100%.
 
 `rebuild_jump_tables` in `tools/mfunc.py` re-emits the original table as a local
 `.rodata` label on the target side, padded to sit at the same offset the
-candidate's does, and `tables_agree` compares the two tables afterwards. The
+candidate's does, and `tables_agree` compares the two tables afterwards. Both
+search the candidate's `.rodata` word by word rather than by run: two tables
+that end up adjacent are one unbroken run of relocated words, so a source
+holding two switch functions would otherwise fail to place either. The
 case addresses still come from the original, so a candidate whose cases are in
 the wrong order is reported as `mismatch - the switch table differs` rather than
 passing on identical code. `tools/pick_candidates.py` still filters these out;
@@ -243,6 +312,12 @@ Most of the text is Japanese and outside that range, but the tables that are
 not - the arcana names, the elements, the status ailments, the name-entry
 keyboard - are enough to identify the tables around them, and a string constant
 with a readable name beats one called after its address.
+
+It settles struct fields too, not just the strings. A three-entry label table
+decoded as EXIT / FIELD / DUNGEON, and since the byte at +5 of a scene's entry
+record is what indexes it, that byte is the destination kind - which in turn
+named the rest of the record. When a field's meaning will not come out of the
+arithmetic, look for a label the code draws from it.
 
 ### A pointer end-test that comes out signed
 

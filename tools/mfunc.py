@@ -529,34 +529,51 @@ def rebuild_jump_tables(lines, target, cand_o=None, sym=None):
 
     # A candidate holding several switches puts this function's table wherever
     # the ones before it left off, and the dispatch relocation carries that
-    # offset. Find the run whose case spacing matches and pad to sit at the
-    # same place; a table that is not in the candidate at all gets no padding,
-    # and the relocation then disagrees, which is the answer we want.
+    # offset. Find where the candidate's .rodata holds a table of this shape
+    # and pad to sit at the same place; a table that is not in the candidate at
+    # all gets no padding, and the relocation then disagrees, which is the
+    # answer we want.
+    #
+    # Two tables that end up adjacent are one unbroken run of relocated words,
+    # so this searches word by word rather than run by run - and checks the
+    # cases land inside the function being compared, which is what tells two
+    # switches of the same shape apart.
     rodata = ['.section .rodata', '.align 2']
     placed = 0
-    theirs = rodata_runs(cand_o) if cand_o else []
-    # Two switches of the same shape in one file - the same bar drawn from two
-    # tables, say - are told apart by which function their cases point into.
+    words, rels = rodata_image(cand_o) if cand_o else ([], {})
     span = text_span(cand_o, sym) if cand_o and sym else None
-    if span:
-        lo, size = span
-        theirs = [(off, cases) for off, cases in theirs
-                  if all(lo <= c < lo + size for c in cases)]
     for k, entries in tables:
         shape = [e - entries[0] for e in entries]
-        for i, (off, cases) in enumerate(theirs):
-            if len(cases) == len(entries) and \
-                    [c - cases[0] for c in cases] == shape and off >= placed:
-                if off > placed:
-                    rodata.append("    .space %d" % (off - placed))
-                    placed = off
-                theirs.pop(i)
-                break
+        off = cand_table_offset(words, rels, span, shape, placed)
+        if off is not None and off > placed:
+            rodata.append("    .space %d" % (off - placed))
+            placed = off
         rodata.append("$Ljt%d:" % k)
         for e in entries:
             rodata.append("    .word $Ljt%dc%X" % (k, e))
         placed += 4 * len(entries)
     return out, rodata
+
+
+def cand_table_offset(words, rels, span, shape, floor):
+    """Byte offset of the candidate's table matching `shape`, at or past `floor`."""
+    n = len(shape)
+    for off in range(floor, max(floor, len(words) * 4 - 4 * n) + 4, 4):
+        win = []
+        for j in range(n):
+            i = off // 4 + j
+            if i >= len(words) or rels.get(off + 4 * j) != ".text":
+                win = None
+                break
+            win.append(words[i])
+        if win is None:
+            continue
+        if [c - win[0] for c in win] != shape:
+            continue
+        if span and not all(span[0] <= c < span[0] + span[1] for c in win):
+            continue
+        return off
+    return None
 
 
 HEXDUMP = re.compile(r"^\s*0x[0-9a-f]+((?:\s+[0-9a-f]{2,8})+)\s")
@@ -629,11 +646,17 @@ def tables_agree(target_o, cand_o):
     want = rodata_runs(target_o)
     if not want:
         return True
-    got = {off: cases for off, cases in rodata_runs(cand_o)}
+    # Read the candidate at the offset rather than matching run boundaries:
+    # two of its tables sitting next to each other are one run, and the target
+    # only ever holds the tables of the function being compared.
+    words, rels = rodata_image(cand_o)
     for off, cases in want:
-        theirs = got.get(off)
-        if theirs is None or len(theirs) != len(cases):
-            return False
+        theirs = []
+        for j in range(len(cases)):
+            i = off // 4 + j
+            if i >= len(words) or rels.get(off + 4 * j) != ".text":
+                return False
+            theirs.append(words[i])
         bias = theirs[0] - cases[0]
         if any(b - a != bias for a, b in zip(cases, theirs)):
             return False

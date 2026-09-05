@@ -86,7 +86,7 @@ void ActorSetTile(short x, short y, AdvActor *a)
     a->y = y;
     a->z = d;
     a->x = x;
-    a->flags = 0;
+    a->phase = 0;
     a->world_x = ox + y * TILE_X + y / 2;
     a->world_y = oy + y * TILE_Y - x * TILE_Y;
 }
@@ -107,5 +107,48 @@ void ActorsSetDepth(u_short actor)
         } else {
             a->depth = 0;
         }
+    }
+}
+
+/* Sixteen frames of walk animation carry an actor exactly one tile: the
+   per-frame steps sum to TILE_Y and TILE_X over a full cycle. This adds up
+   `steps` frames from `phase` and applies the total to a screen position with
+   the signs the facing calls for - the same projection ActorSetTile uses, so
+   a walk in progress lands on the tile ActorSetTile would have given it. */
+extern const u_char g_walk_dy[];
+extern const u_char g_walk_dx[];
+
+void WalkAdvance(u_short *wy, u_short *wx, u_char dir, int phase, u_char steps)
+{
+    u_short sy;
+    u_short sx;
+    int     i;
+
+    sy = 0;
+    sx = 0;
+    while (steps != 0) {
+        steps--;
+        i = phase & 0xF;
+        phase = i + 1;
+        sy = g_walk_dy[i] + sy;
+        sx = g_walk_dx[i] + sx;
+    }
+    switch (dir) {
+    case 0:
+        *wy = *wy - sy;
+        *wx = *wx - sx;
+        break;
+    case 1:
+        *wy = sy + *wy;
+        *wx = sx + *wx;
+        break;
+    case 2:
+        *wy = sy + *wy;
+        *wx = *wx - sx;
+        break;
+    case 3:
+        *wy = *wy - sy;
+        *wx = sx + *wx;
+        break;
     }
 }

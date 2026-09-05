@@ -14,7 +14,12 @@
 #define PERSONA_STATS 5
 
 typedef struct {
-    /* 0x00 */ u_char pad00[0x18];
+    /* 0x00 */ u_char  pad00[0x10];
+    /* 0x10 */ u_short unk10;     /* CharRecalcStats copies this pair into the
+                                     carrier's Char+0x3A and +0x3C, or writes
+                                     1 into both when no Persona is equipped */
+    /* 0x12 */ u_short unk12;
+    /* 0x14 */ u_char pad14[4];
     /* 0x18 */ u_char key;        /* identifies the record; 0 while unused */
     /* 0x19 */ u_char pad19[0xD];
     /* 0x26 */ u_char stat[PERSONA_STATS];

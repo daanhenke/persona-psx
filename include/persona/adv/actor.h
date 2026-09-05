@@ -18,11 +18,15 @@ typedef struct {
     /* 0x12 */ short   z;               /* base sort depth                  */
     /* 0x14 */ short   depth;           /* added to z: 0, or 0x20 for an
                                            actor standing behind another    */
-    /* 0x16 */ u_char  pad16[3];
-    /* 0x19 */ u_char  flags;           /* bit 0 is tested by the walking code
-                                           at 0x8007E964; ActorSetTile clears
-                                           the whole byte                   */
-    /* 0x1A */ u_char  pad1A[2];
+    /* 0x16 */ u_char  pad16;
+    /* 0x17 */ u_char  dir;             /* facing: 0 up, 1 down, 2 left,
+                                           3 right, indexing g_dir_x/g_dir_y */
+    /* 0x18 */ u_char  next_dir;        /* AdvBuildActors sets both from the
+                                           same two bits of the definition   */
+    /* 0x19 */ u_char  phase;           /* frame of the sixteen-step walk
+                                           cycle, indexing g_walk_dx/dy      */
+    /* 0x1A */ signed char steps;       /* frames left in the step under way */
+    /* 0x1B */ u_char  pad1B;
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
     /* 0x20 */ u_char  pad20[0xC];

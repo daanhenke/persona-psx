@@ -48,7 +48,7 @@ extern u_char  g_save_unk5_idx[];
 extern u_char  g_map_pos_x[];
 extern u_char  g_map_pos_y[];
 extern u_char  g_map_unk4[];
-extern u_char  g_map_unk5[];
+extern u_char  g_map_room[];
 extern u_char  D_8004D9E4[];
 extern u_char  D_8004DA14[];
 extern u_char  g_dng_third_gate[];
@@ -121,7 +121,7 @@ void PreloadDng(void)
         g_save_unk4[0] = g_map_unk4[0];
         g_save_pos_x[0] = g_map_pos_x[0];
         g_save_pos_y[0] = g_map_pos_y[0];
-        g_save_unk5_idx[0] = D_8004DA14[g_map_unk5[0] * 4];
+        g_save_unk5_idx[0] = D_8004DA14[g_map_room[0] * 4];
     }
     if (D_8004D9E4[g_save_map_id[0]] == 0 || D_8004D9E4[g_save_map_id[0]] > 0x24) {
         g_save_map_id[0] = 0;

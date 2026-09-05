@@ -15,14 +15,36 @@ typedef struct {
     /* 0x08 */ int     sp;
     /* 0x0C */ int     sp_max;  /* both maxima cap at 999 */
     /* 0x10 */ u_char  pad10[0x10];
-    /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot */
-    /* 0x2E */ u_char  pad2E[0x10];
+    /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot.
+                                     [0] is the weapon, [1] the gun and [2]
+                                     its ammunition - the gun's two numbers
+                                     are zero unless both are filled - and
+                                     [3]..[6] the four armour slots.       */
+    /* 0x2E */ u_short melee_atk; /* the six values CharRecalcStats derives
+                                     from the equipment and the stats; the
+                                     status screen prints them as three
+                                     digits each                          */
+    /* 0x30 */ u_short melee_hit;
+    /* 0x32 */ u_short gun_atk;
+    /* 0x34 */ u_short gun_hit;
+    /* 0x36 */ u_short defence;
+    /* 0x38 */ u_short evade;
+    /* 0x3A */ u_short unk3A;     /* copied out of the equipped Persona's
+                                     +0x10 and +0x12, or 1 when no Persona
+                                     is equipped. ItemUse adds unk3A to
+                                     rand() % 16 for a heal and 0x800AFEE4
+                                     takes a fifth of it, which is not
+                                     enough to name the pair.             */
+    /* 0x3C */ u_short unk3C;
     /* 0x3E */ u_char  key;       /* identifies the record; 0 while unused  */
     /* 0x3F */ u_char  pad3F[0xA];
     /* 0x49 */ u_char  status;    /* ailment code, 0 for none. Event scripts
                                      set and clear it; recovery items ask
                                      CharHasStatus for the one they cure. */
-    /* 0x4A */ u_char  pad4A[2];
+    /* 0x4A */ u_char  pad4A;
+    /* 0x4B */ u_char  level;     /* a fifth of it goes into melee_atk and
+                                     defence; the script interpreter tests
+                                     it against an opcode operand         */
     /* 0x4C */ u_char  stat[5];
     /* 0x51 */ u_char  stat_base[5];
                                   /* The status screen draws stat_base as the

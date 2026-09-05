@@ -63,6 +63,8 @@ typedef struct {
    slot is never handed to libgs marked "do not display". */
 #define SLOT_ATTR_Z        0x00000FFF
 #define SLOT_ATTR_FLICKER  0x00001000  /* brightness cycles through a table   */
+#define SLOT_ATTR_XSCALE   0x00004000  /* SlotsApplyXScale gives the slot an
+                                          x scale of 0xFFF rather than 0x1000 */
 #define SLOT_ATTR_HIDE     0x00008000  /* skip without clearing the slot      */
 #define SLOT_ATTR_FADE_IN  0x00010000  /* ramp brightness up to g_fade_level  */
 #define SLOT_ATTR_FADE_OUT 0x00020000  /* ramp brightness down to zero        */

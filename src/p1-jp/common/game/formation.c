@@ -26,6 +26,7 @@
 
 #define g_formation        ((u_char *)0x800EB34C)
 #define g_formation_cell   ((u_char *)0x800EB380)
+#define g_formation_scratch ((u_char *)0x800EB365)
 #define g_formation_preset ((u_char *)0x801F2584)
 
 #define GRID_W     5
@@ -188,6 +189,49 @@ u_char FormationFirstFree(void)
     for (cell = 0; cell < GRID_CELLS; cell++) {
         if (FormationCellFree(cell)) {
             return cell;
+        }
+    }
+}
+
+/* Slides the party forward over any empty rows at the front of the grid, so a
+   formation loaded from a preset does not leave the party standing at the
+   back. Whole rows only: the leading empty cells are counted and rounded down
+   to a row. The 25 bytes above the grid are scratch, used by nothing else.
+   Each member's cell index is then adjusted by the row count. */
+void FormationCompact(void)
+{
+    u_char *grid;
+    u_char *packed;
+    u_char *cells;
+    u_char  empty;
+    u_char  rows;
+    u_char  i;
+    u_char  j;
+
+    grid = g_formation;
+    packed = g_formation_scratch;
+    cells = g_formation_cell;
+    empty = 0;
+    while (grid[empty] == CELL_EMPTY) {
+        empty++;
+    }
+    rows = empty / GRID_W;
+    if (rows == 0) {
+        return;
+    }
+    for (i = 0; i < GRID_CELLS; i++) {
+        packed[i] = CELL_EMPTY;
+    }
+    j = 0;
+    for (i = rows * GRID_W; i < GRID_CELLS; i++, j++) {
+        packed[j] = grid[i];
+    }
+    for (i = 0; i < GRID_CELLS; i++) {
+        grid[i] = packed[i];
+    }
+    for (i = 0; i < PARTY_MAX; i++) {
+        if (cells[i] != CELL_EMPTY) {
+            cells[i] = cells[i] - rows;
         }
     }
 }

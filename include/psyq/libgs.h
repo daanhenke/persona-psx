@@ -93,9 +93,17 @@ typedef struct {
     /* 0x20 */ long    rotate;
 } GsBG;                         /* 0x24 bytes */
 
+typedef struct {
+    /* 0x00 */ u_long attribute;
+    /* 0x04 */ short  x0, y0;
+    /* 0x08 */ short  x1, y1;
+    /* 0x0C */ u_char r, g, b, pad;
+} GsLINE;                       /* 0x10 bytes */
+
 void GsClearVcount(void);
 long GsGetVcount();
 void GsInitVcount();
 void GsSortSprite(GsSPRITE *sp, GsOT *ot, u_short pri);
+void GsSortLine(GsLINE *line, GsOT *ot, u_short pri);
 
 #endif
