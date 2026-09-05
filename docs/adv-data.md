@@ -57,7 +57,9 @@ The pack is read to `0x80100000`. What is known of the layout:
 | `+0x0C` | scene id when both flags are set |
 | `+0x0E` | scene id when A is clear and B is set |
 | `+0x1F0` | actor definitions, `g_adv_actor_defs` |
-| `+0xB00`, `+0xC00` | two further sections, not yet identified |
+| `+0xAF0` | second object table |
+| `+0xBD0` | third object table |
+| `+0xC20` | fourth object table |
 
 `AdvPickSceneByFlags` reads the header as a truth table over its two flag
 conditions and loads the `MES.BIN` for whichever branch wins, so the branch
@@ -75,3 +77,22 @@ once the story has moved past a point.
 `AdvBuildActors` expands the current room's eight records into `g_adv_actors`,
 a `0x2C`-per-entry runtime array. That array lives in the save-game work area
 rather than in the scene buffer, so it outlives the buffer being reused.
+
+### Four object tables, not one
+
+The same routine builds four groups, each eight entries, each producing
+`0x2C`-byte runtime records in the save-game work area. They differ in the size
+of the packed record they come from:
+
+| scene offset | record | runtime array | conditional |
+|---|---|---|---|
+| `+0x1F0` | `0x24` | `0x801F15D8` | yes, two variants |
+| `+0xAF0` | `0x1C` | `0x801F1898` | yes, two variants |
+| `+0xBD0` | `0x0A` | `0x801F1754` | no |
+| `+0xC20` | `0x04` | `0x801F1A40` | no |
+
+Only the first two carry an event-flag id and alternative descriptions; the
+last two are read straight through. All four end up in the same `0x2C` runtime
+shape and feed the display slots, so they are four kinds of scene object rather
+than four unrelated tables - but which kind each is has not been established,
+and the group names above are positions, not claims.
