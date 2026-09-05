@@ -349,6 +349,24 @@ def cc1flags_for(cfile):
     return base + override
 
 
+LINEMARK = re.compile(r"^LM\d+:\s*$")
+
+
+def strip_line_markers(text):
+    """Drop cc1's -gcoff line-number labels before assembling.
+
+    `-gcoff` emits an `LM<n>:` label per source line, and those land in the
+    object's symbol table. Nothing references them - the debug directives around
+    them do not - but objdiff names a jump's destination after the nearest
+    symbol at or below it, so a `j` inside the function reads as `LM54` on the
+    candidate and `Func+0x2fc` on the target, and the two never agree. Removing
+    the labels cannot move a byte of code; the retail binary has no debug
+    information in it either.
+    """
+    return "".join(ln for ln in text.splitlines(True)
+                   if not LINEMARK.match(ln))
+
+
 def compile_c(cfile, outdir):
     """cc1 is the compiler proper, so cpp must run first. maspsx reads stdin."""
     i_path = os.path.join(outdir, "cand.i")
@@ -362,7 +380,8 @@ def compile_c(cfile, outdir):
     run([CC1] + cc1flags_for(cfile) + [i_path, "-o", s_path])
     piped = subprocess.run(
         [VENV, MASPSX, "--expand-div", "--aspsx-version=2.34"],
-        input=open(s_path).read(), capture_output=True, text=True)
+        input=strip_line_markers(open(s_path).read()),
+        capture_output=True, text=True)
     if piped.returncode != 0:
         sys.exit("maspsx failed:\n" + piped.stderr)
     run([AS] + ASFLAGS + ["-o", o_path, "-"], input=piped.stdout)

@@ -29,7 +29,11 @@ typedef struct {
     /* 0x1B */ u_char  pad1B;
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
-    /* 0x20 */ u_char  pad20[0xC];
+    /* 0x20 */ u_char  pad20[6];
+    /* 0x26 */ u_char  unk26;          /* gates the second leg of a diagonal
+                                          step the way the tile under the
+                                          actor gates the first            */
+    /* 0x27 */ u_char  pad27[5];
 } AdvActor;                             /* 0x2C bytes */
 
 /* Reached by hardcoded address rather than through the linker symbol.
