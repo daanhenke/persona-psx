@@ -1,0 +1,12 @@
+# Everything in this repo is text, and all of it is stored and checked out
+# with LF endings whatever core.autocrlf is set to locally.
+#
+# Without this, an editor that saves CRLF turns a file git already has into a
+# whole-file diff: five sources once showed up as 709 lines changed with not a
+# character different in any of them, which is a real hazard here because the
+# generated symbol maps and linker fragments are large and rewritten often.
+* text=auto eol=lf
+
+# The generated ones are still text, just noisy; nothing special is needed for
+# them beyond the rule above. Disc images and extracted game data live under
+# scratch/ and are gitignored, so nothing binary is tracked at all.

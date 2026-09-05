@@ -4,6 +4,7 @@
  *   0x800803A8 SceneFindTrigger
  *   0x80080440 SceneFindApproach
  *   0x800804F8 SceneTriggerArmed
+ *   0x80080598 SceneFindEntry
  *   0x80082F6C SceneTileAt
  *   0x80082F98 SceneTileToward
  *
@@ -14,6 +15,7 @@
  * trigger, which is the only one of the three that carries an event flag.
  */
 #include <types.h>
+#include <persona/adv/actor.h>
 #include <persona/adv/scene.h>
 
 #define TRIGGER_NONE 0xFF
@@ -119,8 +121,10 @@ u_char SceneTileAt(u_char x, u_char y)
 }
 
 /* What is one step along a facing - the test the walking code makes before it
-   commits to a move. */
-u_char SceneTileToward(u_char x, u_char y, u_char dir)
+   commits to a move. The coordinates arrive as ints and are only narrowed
+   after the step is added, which is how a step off the left or top edge wraps
+   round to the far side of the grid rather than reading behind it. */
+u_char SceneTileToward(int x, int y, u_char dir)
 {
     int nx;
     int i;
@@ -128,6 +132,32 @@ u_char SceneTileToward(u_char x, u_char y, u_char dir)
     nx = x + g_dir_x[dir];
     i = (u_char)(y + g_dir_y[dir]) * ROOM_STRIDE + (u_char)nx;
     return g_adv_scene->tiles[i];
+}
+
+/* The entry an actor is standing on, or 0xFF. An entry is a place the player
+   can leave the room from, keyed by its tile; since an actor's x and y are
+   adjacent bytes, the pair reads as one u_short and compares against the
+   record's key directly rather than a coordinate at a time. */
+u_char SceneFindEntry(const AdvActor *a)
+{
+    const AdvEntry *entries;
+    u_short tile;
+    u_char n;
+    u_char i;
+
+    n = *g_adv_scene->entry_count;
+    if (n != 0) {
+        i = 0;
+        tile = *(u_short *)&a->x;
+        entries = g_adv_scene->entries;
+        do {
+            if (tile == entries[i].tile) {
+                return i;
+            }
+            i++;
+        } while (i < n);
+    }
+    return TRIGGER_NONE;
 }
 
 /* Whether a trigger fires: a record can be armed for the flag being set or for
