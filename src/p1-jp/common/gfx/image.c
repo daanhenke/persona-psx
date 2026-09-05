@@ -43,3 +43,27 @@ void UploadImageRows(void *desc, u_short x, u_short y, short rows)
         rect.y++;
     }
 }
+
+/* The same descriptor, uploaded once rather than a row at a time. The caller's
+   pointer is what walks it, which is why there is no separate cursor.
+   NAME only. */
+void UploadImageOne(int *p, u_short x, u_short y)
+{
+    RECT rect;
+    int  packed;
+
+    p += 3;
+    rect.x = x;
+    rect.y = y;
+    packed = *p++;
+    if ((short)x < 0) {
+        rect.x = (short)packed;
+    }
+    if ((short)y < 0) {
+        rect.y = (short)((u_int)packed >> 16);
+    }
+    packed = *p++;
+    rect.w = (short)packed;
+    rect.h = (short)((u_int)packed >> 16);
+    LoadImage(&rect, (u_long *)p);
+}
