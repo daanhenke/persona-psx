@@ -258,3 +258,17 @@ saying it is load-bearing.
 Its score and objdiff's percentage do not track each other closely - a
 permuter score of 425 measured 93% and one of 480 measured 95.8% - so re-score
 every output it keeps with `tools/mfunc.py` rather than trusting the ranking.
+
+Two of its findings generalise, and both spell out as ordinary C:
+
+- **Basic-block boundaries move registers.** What the `do { } while (0)` above
+  really did was give a block its own boundary. `PartyLastSlot` wanted the same
+  thing from the other end - `for (;;) { ...; if (found) return i; }` instead of
+  a `do/while` with the return after it - and that alone took it from 96.8% to
+  exact.
+- **Re-materialising a base inside a loop flips the address add.** An indexed
+  access through a pointer local assembles as `addu dst, base, index`; assigning
+  the same literal to that local again at the top of the loop makes it
+  `addu dst, index, base`, which is what `ItemsAddPending` needed. gcc 2.6 has no
+  global CSE, so the redundant assignment survives - say so in a comment, because
+  it reads like something to delete.
