@@ -446,3 +446,7 @@ adv       func_80098938    src/p1-jp/common/game/flags2.c
 dng       func_80099100    src/p1-jp/common/game/flags2.c
 s2d       func_800895B0    src/p1-jp/common/game/flags2.c
 adv       func_8007FB90    src/p1-jp/adv/game/scenefind.c
+adv       func_800AAFD4    src/p1-jp/adv/game/money.c
+adv       func_8007AC34    src/p1-jp/common/gfx/tilemapbar.c
+dng       func_800897B0    src/p1-jp/common/gfx/tilemapbar.c
+s2d       func_80079BEC    src/p1-jp/common/gfx/tilemapbar.c

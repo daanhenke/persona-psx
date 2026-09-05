@@ -3098,6 +3098,7 @@ PROVIDE(g_map_room = 0x801F5355);
 PROVIDE(g_map_seen = 0x801F2B38);
 PROVIDE(g_map_state_lut = 0x8004175C);
 PROVIDE(g_map_unk4 = 0x801F5354);
+PROVIDE(g_money = 0x801F2674);
 PROVIDE(g_name_entry = 0x80067FFC);
 PROVIDE(g_options = 0x801F2AC8);
 PROVIDE(g_overlay_base = 0x800643A0);
