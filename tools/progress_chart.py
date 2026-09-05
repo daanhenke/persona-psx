@@ -34,8 +34,8 @@ COLOURS = {
     "name":   "#86bcb6",
 }
 
-W, H = 1000, 520
-L, R, T, B = 70, 210, 58, 52          # margins: left, right, top, bottom
+W, H = 1080, 520
+L, R, T, B = 70, 290, 58, 52          # margins: left, right, top, bottom
 PW, PH = W - L - R, H - T - B
 
 

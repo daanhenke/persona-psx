@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520" font-family="Segoe UI, Helvetica, Arial, sans-serif">
-<rect width="1000" height="520" fill="#fbfaf7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="520" viewBox="0 0 1080 520" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect width="1080" height="520" fill="#fbfaf7"/>
 <text x="70" y="28" font-size="17" font-weight="600" fill="#2b2b2b">Persona 1 (JP) - matching decompilation</text>
 <text x="70" y="46" font-size="12" fill="#6b6b6b">70,508 of 1,537,688 bytes matched (4.585%) in 396 of 6347 functions</text>
 <line x1="70" y1="468.0" x2="790" y2="468.0" stroke="#e3e0d8" stroke-width="1"/>
