@@ -25,3 +25,18 @@ short ItemsFindPending(u_short id)
     }
     return -1;
 }
+
+extern short ItemsFindPending(u_short id);
+
+/* Subtracts n from an item's count. Nothing checks the entry exists first. */
+void ItemsRemovePending(u_short id, short n)
+{
+    u_short *list;
+    u_short *p;
+    short    count;
+
+    list = g_items_pending;
+    p = &list[ItemsFindPending(id)];
+    count = (*p >> 9) - n;
+    *p = (id & ITEM_ID) + count * 0x200;
+}

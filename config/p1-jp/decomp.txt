@@ -182,3 +182,12 @@ s2d       func_80079C24    src/p1-jp/common/gfx/box.c
 adv       func_800886EC    src/p1-jp/adv/audio/bank.c
 adv       func_800ADCB8    src/p1-jp/common/game/party.c
 adv       func_800B0A60    src/p1-jp/common/game/flags2.c
+adv       func_8008E7D4    src/p1-jp/common/game/items.c
+dng       func_800928A4    src/p1-jp/common/game/items.c
+s2d       func_80082DB8    src/p1-jp/s2d/game/items.c
+adv       func_800760C0    src/p1-jp/common/ui/config.c
+adv       func_8007664C    src/p1-jp/common/ui/config.c
+dng       func_80084C4C    src/p1-jp/common/ui/config.c
+dng       func_800851D0    src/p1-jp/common/ui/config.c
+s2d       func_80075078    src/p1-jp/common/ui/config.c
+s2d       func_80075604    src/p1-jp/common/ui/config.c

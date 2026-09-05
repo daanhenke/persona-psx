@@ -71,3 +71,53 @@ void ItemsCompact(void)
         p++;
     }
 }
+
+extern short ItemsFindPending(u_short id);
+
+#define ITEM_MAX 99
+
+/* Adds n of an item to the staging list, taking the first slot with an empty
+   half if the item is not there yet. Counts stop at 99. */
+void ItemsAddPending(u_short id, short n)
+{
+    u_short *list;
+    u_short *p;
+    short    i;
+    short    count;
+
+    list = g_items_pending;
+    i = ItemsFindPending(id);
+    if (i < 0) {
+        i = i + 1;
+        for (;;) {
+            p = &list[i];
+            if ((*p >> 9) == 0) {
+                break;
+            }
+            if ((*p & ITEM_ID) == 0) {
+                break;
+            }
+            i = i + 1;
+        }
+        *p = 0;
+    }
+    p = &list[i];
+    count = n + (*p >> 9);
+    if (count > ITEM_MAX) {
+        count = ITEM_MAX;
+    }
+    *p = (id & ITEM_ID) + count * 0x200;
+}
+
+/* Subtracts n. Nothing checks that the entry exists first. */
+void ItemsRemovePending(u_short id, short n)
+{
+    u_short *list;
+    u_short *p;
+    short    count;
+
+    list = g_items_pending;
+    p = &list[ItemsFindPending(id)];
+    count = (*p >> 9) - n;
+    *p = (id & ITEM_ID) + count * 0x200;
+}

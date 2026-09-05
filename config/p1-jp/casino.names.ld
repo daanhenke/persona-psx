@@ -3077,6 +3077,7 @@ PROVIDE(g_map_pos_y = 0x801F5353);
 PROVIDE(g_map_state_lut = 0x8004175C);
 PROVIDE(g_map_unk4 = 0x801F5354);
 PROVIDE(g_map_unk5 = 0x801F5355);
+PROVIDE(g_options = 0x801F2AC8);
 PROVIDE(g_overlay_base = 0x800643A0);
 PROVIDE(g_overlay_dest = 0x8001014C);
 PROVIDE(g_overlay_table = 0x8001004C);
