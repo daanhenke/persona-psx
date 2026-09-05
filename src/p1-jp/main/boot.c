@@ -10,11 +10,10 @@
 #include <libetc.h>
 #include <libgpu.h>
 #include <libsnd.h>
+#include <persona/main/psexe.h>
 
 /* The sub-EXE runs on its own stack, just below the top of RAM. */
 #define SUBEXE_STACK 0x801FBFF0
-
-extern int  CdLoadPsExe(const char *name, struct EXEC *exec);
 
 void LoadAndExecPsExe(const char *name)
 {

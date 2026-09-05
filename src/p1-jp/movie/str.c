@@ -1,16 +1,6 @@
 /* Persona 1 (JP) - MOVIE.EXE - streamed video decode @ 0x800814B4 */
 #include <types.h>
-
-/* Double-buffered MDEC target: `buf[index]` is the one currently being
-   decoded into, and index flips on every frame. */
-typedef struct {
-    u_long *buf[2];
-    int     index;
-} StrDecodeTarget;
-
-extern u_long *StrGetReadyFrame(void);
-extern void    DecDCTvlc(u_long *bs, u_long *out);
-extern void    StFreeRing(u_long *bs);
+#include <persona/common/str.h>
 
 /* Decodes one streamed frame into the back buffer and releases the ring slot.
    Gives up after 0x800000 polls so a stalled stream cannot hang the loop. */

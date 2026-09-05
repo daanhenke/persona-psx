@@ -1,7 +1,6 @@
 /* Persona 1 (JP) - CD file loading.  SLPS_005.00 @ 0x80011E3C */
 #include <libcd.h>
-
-extern volatile int g_cd_busy;
+#include <persona/main/cd.h>
 
 /* Prebuilt CD index shipped as FNAME/FSECT/FSIZE.DAT and loaded at boot, so the
    game never pays for an ISO9660 directory search. */

@@ -5,13 +5,10 @@
  * naming the file and its entry point.
  */
 #include <libcd.h>
+#include <persona/main/cd.h>
 
-/* Resident game globals. */
-extern volatile int g_cd_busy;      /* 0x80055C10 - spun on before every CD op */
-extern u_long      *g_overlay_dest; /* 0x8001014C - points at g_overlay_base   */
-
-/* Game wrapper around CdSearchFile that retries until the file resolves. */
-extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
+/* Resident game global. */
+extern u_long *g_overlay_dest;      /* 0x8001014C - points at g_overlay_base   */
 
 typedef struct {
     const char *name;

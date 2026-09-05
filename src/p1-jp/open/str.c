@@ -6,16 +6,7 @@
  * -O2 -G0 would emit.
  */
 #include <types.h>
-
-/* Only the third word matters here: the decoded size of the frame. */
-typedef struct {
-    u_long unused[2];
-    u_long size;
-} StrFrameHeader;
-
-extern int  StGetNext(u_long **frame, StrFrameHeader **header);
-
-extern int g_str_overrun;
+#include <persona/common/str.h>
 
 /* Spins until the stream hands back a frame, then flags any header whose
    third word has run past the expected size. */

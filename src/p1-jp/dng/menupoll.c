@@ -11,18 +11,12 @@
  * the original schedules it. Found by decomp-permuter; do not "simplify".
  */
 #include <types.h>
+#include <persona/common/menu.h>
 
-extern u_short *g_menu;   /* -> object whose first u16 feeds the store */
-extern u_char   g_menu_blink;
-extern u_char   g_menu_allow_hold;
-extern short    g_menu_subsel;
-extern short    g_menu_sel;
-
-extern int  InputBuildAcceptMasks(u_short *p);
-extern void UpdateMenuSprites(int arg);
-extern int  InputCheckAcceptA(int arg);
-extern int  InputCheckAcceptB(int arg);
-extern void DrawStatusHud(void);
+/* The int return is this source's half of the difference described above, so
+   these two stay here rather than in persona/common/menu.h. */
+extern int InputCheckAcceptA(int arg);
+extern int InputCheckAcceptB(int arg);
 
 void MenuPollInput(void)
 {

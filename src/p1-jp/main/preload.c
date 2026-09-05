@@ -5,18 +5,8 @@
  * confirmed twice over: by the state main then sets, and by the file queued.
  */
 #include <libcd.h>
-
-typedef struct {
-    /* 0x00 */ const char *name;
-    /* 0x04 */ void       *dest;
-    /* 0x08 */ u_char      mode;
-    /* 0x09 */ u_char      pad[3];
-    /* 0x0C */ CdlLOC      loc;
-    /* 0x10 */ u_long      size;
-    /* 0x14 */ u_char      reserved[0x10];
-} CdRequest;
-
-extern volatile CdRequest g_cd_queue[];
+#include <persona/common/eventflag.h>
+#include <persona/main/cd.h>
 
 /* Scratch CdlFILE for the ADV scene. Its size slot holds a *sector count*,
    which is why PreloadAdv shifts it left by 11 to get the byte size. */
@@ -48,8 +38,6 @@ extern u_short g_adv_e3_offsets[];
 extern const char str_namedt_bin[];
 
 extern char *strcpy(char *dst, const char *src);
-extern void  CdQueueSubmit(int count);
-extern int   EventFlagTest(u_short *id);
 extern void  FormatHexDigits(int value, char *end, short digits);
 
 extern u_short g_save_map_id[];
@@ -80,10 +68,7 @@ extern const DngName16 str_dngm_tmpl;
 #define DNG_M_DEST ((void *)0x801CA000)
 #define DNG_S_DEST ((void *)0x801CD000)
 
-extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
-extern void     CdQueueSubmitResolved(int count);
-extern void     LoadFileToAddrAsync(const char *name, void *dest);
-extern void     AdvResolveSceneLoc(short kind, short index, void *unused);
+extern void AdvResolveSceneLoc(short kind, short index, void *unused);
 
 #define ADV_DEST  ((void *)0x80180000)
 #define ADV_SCENE_DEST ((void *)0x801B8000)

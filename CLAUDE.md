@@ -135,6 +135,40 @@ than the original has it, move those statements to the **end** of the function
 and let gcc hoist them into place - writing them in their apparent position is
 what puts them too early. This is what took `SlotInit` from 70% to 100%.
 
+### Bit setters with a shared store tail
+
+A function that sets or clears one bit usually compiles to *two* loads and
+*one* store, both arms jumping to a common tail. Writing that as
+
+    if (on) k = p->attr | BIT; else k = p->attr & ~BIT;
+    p->attr = k;
+
+gets the tail right but recomputes the scaled index in all three basic blocks,
+because gcc 2.6 has no global CSE. Two things together fix it:
+
+- reach the record through a **pointer local** (`Slot *s = g_slots + slot;`).
+  That forces the index to be scaled once, ahead of the branch - even though
+  gcc then goes back to `lui/%hi + addu` addressing for each access and never
+  materialises the pointer.
+- write the update as a **compound assignment in both arms**
+  (`s->attr |= BIT;` / `s->attr &= ~BIT;`). gcc's cross-jumping merges the two
+  identical stores into the shared tail by itself.
+
+Either alone lands around 40-65%; together they are exact. This took
+`SlotSetFlicker`, `SlotSetSemiTrans` and the two per-slot fades to 100%.
+
+### Declare the real SDK struct
+
+If a table turns out to be an array of a Psy-Q type, declare the genuine type
+rather than a placeholder with the right size. `include/psyq/libgs.h` shipped
+here as a three-function stub, and a hand-rolled 0x24-byte struct with the
+cleared bytes at offsets 0..2 left `FadeBlackout` stuck at 99.7%: gcc biased
+the induction variable to the *first* field. Writing `GsSPRITE` properly -
+where those bytes are `r`, `g`, `b` at 0x14..0x16 of the record - put the base
+where the original has it and the function matched. Field offsets inside the
+struct decide induction-variable placement, so the layout has to be right,
+not merely the size.
+
 ## Layout
 
     bin/            downloaded toolchain (gitignored; see bin/*.sha256)

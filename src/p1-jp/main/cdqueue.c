@@ -5,34 +5,16 @@
  * bit 7 set, as a streaming read.
  */
 #include <libcd.h>
-
-typedef struct {
-    /* 0x00 */ const char *name;
-    /* 0x04 */ void       *dest;
-    /* 0x08 */ u_char      mode;      /* bit 7 selects the streaming path */
-    /* 0x09 */ u_char      pad[3];
-    /* 0x0C */ CdlLOC      loc;
-    /* 0x10 */ u_long      size;      /* unsigned: the sector round-up is srl */
-    /* 0x14 */ u_char      reserved[0x10];
-} CdRequest;                          /* 0x24 bytes */
-
-/* All of these cross the callback boundary, so reads must not be cached: the
-   queue is filled by the caller and consumed from CD interrupt context, and the
-   three counters are written from both sides. */
-extern volatile int       g_cd_busy;
-extern volatile int       g_cd_queue_index;
-extern volatile int       g_cd_queue_count;
-extern volatile CdRequest g_cd_queue[];
+#include <persona/main/cd.h>
 
 /* Only ever written, by CdQueueDispatch. Nothing on the disc reads either one -
    not the overlays, not any of the four sub-EXEs - so they are a record of the
    streaming request in flight and nothing more. Being volatile is what kept
-   the stores from being optimised out of a build that never reads them back. */
+   the stores from being optimised out of a build that never reads them back.
+   Nothing outside this source touches them, so they are not in
+   persona/main/cd.h. */
 extern volatile u_short g_cd_stream_mode;    /* mode, streaming flag stripped */
 extern volatile int     g_cd_stream_sectors; /* size rounded up to sectors    */
-
-extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
-extern void     CdReadToAddr(int size, u_long *dest);
 
 /* CdQueueDispatch and CdQueueNextCallback call each other: one request's
    completion starts the next. */

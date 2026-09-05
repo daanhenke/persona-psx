@@ -9,6 +9,7 @@
  * these gate map and event content.
  */
 #include <types.h>
+#include <persona/common/eventflag.h>
 
 /* A literal address, not an extern symbol - and that is not a shortcut. An
    indexed load through a linker symbol assembles to `addu $at,$at,rX`, through
@@ -17,8 +18,6 @@
    linked image. */
 #define g_event_flags ((u_char *)0x801F29C8)
 
-/* The id arrives by pointer, not by value - the callers keep it in a local and
-   pass its address. */
 int EventFlagTest(u_short *id)
 {
     return (g_event_flags[*id >> 3] >> (*id & 7)) & 1;

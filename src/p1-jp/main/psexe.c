@@ -8,12 +8,11 @@
 #include <types.h>
 #include <libapi.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
+#include <persona/main/psexe.h>
 
 #define PSEXE_HEADER_OFF 0x10   /* struct EXEC's position inside sector 0 */
 #define PSEXE_TRIES      10
-
-extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
-extern int      CdReadPolled(int size, u_long *dest, int mode);
 
 /* Fills in *exec and loads the text image. Returns 0 once a pass gets all the
    way through, -1 after ten failed attempts - the caller spins on it, so a
