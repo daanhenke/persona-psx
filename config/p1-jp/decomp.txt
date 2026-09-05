@@ -455,3 +455,9 @@ btlp      func_8008178C    src/p1-jp/btlp/soundbank.c
 btlp      func_80066C7C    src/p1-jp/btlp/seqvol.c
 btlp      func_80075D80    src/p1-jp/btlp/highlight.c
 btlp      func_80075E48    src/p1-jp/btlp/highlight.c
+adv       func_8008CAB8    src/p1-jp/common/game/formation.c
+s2d       func_80081128    src/p1-jp/common/game/formation.c
+adv       func_8008C630    src/p1-jp/common/game/formation.c
+adv       func_8008D064    src/p1-jp/common/game/formation.c
+dng       func_8009113C    src/p1-jp/common/game/formation.c
+s2d       func_80081648    src/p1-jp/common/game/formation.c

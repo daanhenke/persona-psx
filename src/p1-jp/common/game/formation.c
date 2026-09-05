@@ -22,6 +22,7 @@
  * what WORK_BIAS says.
  */
 #include <types.h>
+#include <persona/common/char.h>
 #include <persona/common/slot.h>
 
 #define g_formation        ((u_char *)(0x800EB34C + WORK_BIAS))
@@ -35,11 +36,46 @@
 #define PARTY_MAX  5
 #define CELL_EMPTY 0xFF
 
+/* The five grid markers live in slots 27..31, laid out sixteen pixels apart
+   across and eight down from the grid's top left. The slot record is reached
+   from the first marker's address rather than through g_slots, which is what
+   the rematerialised base in the loop says the original did. */
+#define g_marker_slot ((Slot *)(0x800DC838 + WORK_BIAS))
+#define MARKER_SLOT   0x1B
+#define MARKER_Z      6
+#define MARKER_X0     0xD8
+#define MARKER_Y0     0x10
+#define MARKER_XPITCH 16
+#define MARKER_YPITCH 8
+
 /* Highest occupied party index, so the party holds g_party_last + 1 members. */
 extern u_char g_party_last;
 
-/* Moves each member's marker sprite onto its cell, hiding the unplaced ones. */
-extern void FormationPlaceMarkers(void);
+extern Slot *g_slot_cur;
+/* One sprite definition per party member. */
+extern void *g_formation_marker_def[];
+
+/* The party's own markers, in slots 2..6, are drawn on the grid isometrically
+   rather than on the flat layout the position markers use: eleven pixels of x
+   per column against nine per row, four of y per column against three per row.
+   The sort depth counts down from 0x18 so a nearer row draws in front. */
+#define g_member_slot ((Slot *)(0x800DC194 + WORK_BIAS))
+#define MEMBER_SLOT   2
+#define MEMBER_X0     0x84
+#define MEMBER_Y0     0x35
+#define MEMBER_Z0     0x18
+#define MEMBER_COL_X  11
+#define MEMBER_ROW_X  9
+#define MEMBER_COL_Y  4
+#define MEMBER_ROW_Y  3
+
+/* One texture holds every face; the slot's u offset picks one. */
+#define MEMBER_PORTRAIT_W 16
+
+extern void g_formation_member_def;
+
+/* Reached by hardcoded address here rather than through the linker symbol. */
+#define g_party_at ((u_char *)0x801F256C)
 
 /* Which cell `member` stands on, or 0xFF if it is off the grid. */
 u_char FormationCellOf(u_char member)
@@ -234,6 +270,100 @@ void FormationCompact(void)
             cells[i] = cells[i] - rows;
         }
     }
+}
+
+/* Moves each member's marker sprite onto its cell. A member who is not on the
+   grid still gets a sprite - placed from cell 0xFF, so off the right-hand side
+   - and is hidden instead. */
+void FormationPlaceMarkers(void)
+{
+    u_char *cells;
+    u_char  member;
+    u_char  cell;
+    u_char  col;
+    u_char  row;
+
+    cells = g_formation_cell;
+    for (member = 0; member < PARTY_MAX; member++) {
+        g_slot_cur = &g_marker_slot[member];
+        cell = cells[member];
+        row = cell / GRID_W;
+        col = cell % GRID_W;
+        SlotInitTagged(g_formation_marker_def[member], MARKER_SLOT + member,
+                       MARKER_Z, col * MARKER_XPITCH + MARKER_X0,
+                       row * MARKER_YPITCH + MARKER_Y0);
+        if (cells[member] == CELL_EMPTY) {
+            g_slot_cur->attr |= SLOT_ATTR_HIDE;
+        }
+    }
+}
+
+/* Places one member's marker on its cell, or clears the slot when the member
+   is off the grid. */
+void FormationSetMemberSprite(u_char member, u_char portrait)
+{
+    u_char cell;
+    u_char col;
+    u_char row;
+    int    dx;
+
+    cell = g_formation_cell[member];
+    if (cell != CELL_EMPTY) {
+        row = cell / GRID_W;
+        col = cell % GRID_W;
+        g_slot_cur = &g_member_slot[member];
+        dx = row * MEMBER_ROW_X - MEMBER_X0;
+        SlotInitTagged(&g_formation_member_def, MEMBER_SLOT + member,
+                       MEMBER_Z0 - (row * GRID_W + col),
+                       col * MEMBER_COL_X - dx,
+                       row * MEMBER_ROW_Y + col * MEMBER_COL_Y + MEMBER_Y0);
+        g_slot_cur->u_add = portrait * MEMBER_PORTRAIT_W;
+    } else {
+        SlotClear(MEMBER_SLOT + member);
+    }
+}
+
+/* The character's key doubles as its portrait number, counting from one.
+
+   The member counter is an int: the party bound is compared signed, which is
+   what puts the always-false `g_party_last < 0` guard ahead of the loop. */
+void FormationDrawMembers(void)
+{
+    Char *chars;
+    int   member;
+
+    chars = g_chars;
+    for (member = 0; member <= g_party_last; member++) {
+        FormationSetMemberSprite(member, chars[g_party_at[member]].key - 1);
+    }
+}
+
+/* Drops anyone past the end of the party off the grid, then gives every member
+   left without a cell the first one the placement rule allows. */
+void FormationRepair(void)
+{
+    u_char *grid;
+    u_char  i;
+    u_char  free;
+
+    /* One counter serves both loops - it is the same register in the original,
+       which only happens if it is the same variable. */
+    grid = g_formation;
+    for (i = 0; i < GRID_CELLS; i++) {
+        if (grid[i] != CELL_EMPTY && g_party_last < grid[i]) {
+            grid[i] = CELL_EMPTY;
+        }
+    }
+    for (i = 0; i <= g_party_last; i++) {
+        if (FormationCellOf(i) == CELL_EMPTY) {
+            for (free = 0; FormationCellFree(free) == 0; free++) {
+            }
+            grid[free] = i;
+        }
+    }
+    FormationSyncCells();
+    FormationPlaceMarkers();
+    FormationDrawMembers();
 }
 
 /* Both marker sets the formation screen puts on screen: one sprite per party

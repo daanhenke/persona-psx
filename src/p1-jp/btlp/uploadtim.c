@@ -60,9 +60,13 @@ u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, short y,
         } else {
             t.crect->x = 0;
         }
-        t.crect->y = (slot & 0x1F) + CLUT_ROW0;
-        LoadImage(t.crect, t.caddr);
-        i = 0;
+        /* The do/while(0) gives this its own basic block, which is what puts
+           the loop's counter and pointer in the registers the original uses. */
+        do {
+            t.crect->y = (slot & 0x1F) + CLUT_ROW0;
+            LoadImage(t.crect, t.caddr);
+            i = 0;
+        } while (0);
         if (nclut > 0) {
             c = &g_btl_clut[slot];
             do {
