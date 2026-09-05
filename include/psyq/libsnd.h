@@ -206,4 +206,66 @@ void SsSepSetVol(short sep_access_num, short seq_num, short voll, short volr);
 void SsSepSetCrescendo(short sep_access_num, short seq_num, short vol,
                        short v_time);
 
+/* One program in a VAB header, and one tone within a program. SsUtGetVagAtr
+   copies a tone's record out; the game reads and writes them to retune the
+   battle sound bank. */
+typedef struct {
+    /* 0x00 */ u_char tones;    /* effective tones in this program */
+    /* 0x01 */ u_char mvol;
+    /* 0x02 */ u_char mpan;
+    /* 0x03 */ u_char attr;
+    /* 0x04 */ u_long reserved0;
+} ProgAtr;                      /* 8 bytes */
+
+typedef struct {
+    /* 0x00 */ u_char  prior;
+    /* 0x01 */ u_char  mode;    /* 0 normal, 4 reverb */
+    /* 0x02 */ u_char  vol;
+    /* 0x03 */ u_char  pan;
+    /* 0x04 */ u_char  center; /* centre note */
+    /* 0x05 */ u_char  shift;  /* and its fine tune */
+    /* 0x06 */ u_char  min, max;    /* note range this tone covers */
+    /* 0x08 */ u_char  vibW, vibT;  /* vibrato width and cycle */
+    /* 0x0A */ u_char  porW, porT;  /* portamento width and cycle */
+    /* 0x0C */ u_char  pbmin, pbmax;
+    /* 0x0E */ u_char  reserved1, reserved2;
+    /* 0x10 */ u_short adsr1, adsr2;
+    /* 0x14 */ short   prog;    /* the program this tone belongs to */
+    /* 0x16 */ short   vag;     /* the waveform it plays */
+    /* 0x18 */ short   reserved3[4];
+} VagAtr;                       /* 32 bytes */
+
+typedef void (*SsMarkCallbackProc)(short access_num, short seq_num,
+                                   short mark);
+
+void  SsInit(void);
+void  SsStart2(void);
+void  SsEnd(void);
+void  SsQuit(void);
+void  SsSetNck(short n_clock);
+void  SsSetRVol(short voll, short volr);
+void  SsSetTempo(short access_num, short seq_num, short tempo);
+void  SsSetMarkCallback(short access_num, short seq_num,
+                        SsMarkCallbackProc proc);
+
+short SsSeqOpen(u_long* addr, short vab_id);
+void  SsSeqPlay(short seq_access_num, char play_mode, short l_count);
+void  SsSeqPause(short seq_access_num);
+void  SsSeqReplay(short seq_access_num);
+void  SsSeqSetVol(short seq_access_num, short voll, short volr);
+void  SsSeqGetVol(short access_num, short seq_num, short* voll, short* volr);
+void  SsSeqSetCrescendo(short seq_access_num, short vol, long v_time);
+void  SsSeqSetDecrescendo(short seq_access_num, short vol, long v_time);
+void  SsSeqSetRitardando(short seq_access_num, long tempo, long v_time);
+void  SsSepSetDecrescendo(short sep_access_num, short seq_num, short vol,
+                          long v_time);
+void  SsPlayBack(short access_num, short seq_num, short l_count);
+
+short SsUtGetProgAtr(short vabId, short progNum, ProgAtr* progatrptr);
+short SsUtGetVagAtr(short vabId, short progNum, short toneNum,
+                    VagAtr* vagatrptr);
+short SsUtSetVagAtr(short vabId, short progNum, short toneNum,
+                    VagAtr* vagatrptr);
+void  SsUtReverbOff(void);
+
 #endif

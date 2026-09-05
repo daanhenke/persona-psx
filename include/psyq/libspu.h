@@ -130,4 +130,20 @@ extern long SpuMallocWithStartAddr(unsigned long addr, long size);
 
 extern SpuIRQCallbackProc SpuSetIRQCallback(SpuIRQCallbackProc);
 
+extern void SpuStart(void);
+extern void SpuQuit(void);
+extern long SpuInitMalloc(long num, char* top);
+extern long SpuMalloc(long size);
+extern void SpuFree(unsigned long addr);
+extern long SpuSetReverb(long on_off);
+extern long SpuSetReverbDepth(SpuReverbAttr* attr);
+extern long SpuClearReverbWorkArea(long rev_mode);
+extern void SpuSetCommonAttr(SpuCommonAttr* attr);
+extern unsigned long SpuSetNoiseVoice(long on_off, unsigned long voice_bit);
+extern unsigned long SpuSetTransferStartAddr(unsigned long addr);
+extern unsigned long SpuWrite0(unsigned long size);
+extern unsigned long SpuWritePartly(unsigned char* addr, unsigned long size);
+extern unsigned long SpuRead(unsigned char* addr, unsigned long size);
+extern long SpuIsTransferCompleted(long flag);
+
 #endif

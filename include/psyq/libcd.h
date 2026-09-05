@@ -163,4 +163,7 @@ int StGetBackloc(CdlLOC* loc);
 void StSetRing(u_long* ring_addr, u_long ring_size1);
 void StUnSetRing(void);
 
+CdlLOC* CdLastPos(void);
+int CdDataSync(int mode);
+
 #endif // LIBCD_H

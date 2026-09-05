@@ -28,27 +28,52 @@ from mfunc import (ROOT, GAME, load_target, compile_c, c_symbol,
                    gp_base, tables_agree)
 
 MANIFEST = os.path.join(ROOT, "config", GAME, "decomp.txt")
+SDK = os.path.join(ROOT, "config", GAME, "sdk.txt")
 HISTORY = os.path.join(ROOT, "progress.json")
 CHART = os.path.join(ROOT, "docs", "progress.svg")
-FUNCSIZE = re.compile(r"type:func size:0x([0-9A-Fa-f]+)")
+FUNCSIZE = re.compile(r"^(\S+) = 0x([0-9A-Fa-f]+); // type:func size:0x([0-9A-Fa-f]+)")
 
 TARGETS = ["main", "atlus", "open", "movie", "end",
            "dng", "btlp", "s2d", "adv", "casino", "name"]
 
 
-def total_code(target):
-    """Bytes of code in a target, from the generated symbol file."""
+def sdk_addrs():
+    """target -> {address} of the Psy-Q functions, from tools/gen_sdk.py.
+
+    The libraries are linked into every EXE and are not ours to decompile, so
+    counting them as work left to do buries the real figure: `open` is 123KB
+    of which 91KB is libgs and libspu. They are reported on their own line
+    instead.
+    """
+    out = {}
+    if not os.path.exists(SDK):
+        return out
+    for line in open(SDK):
+        line = line.split("//")[0].split()
+        if len(line) >= 2:
+            out.setdefault(line[0], set()).add(int(line[1], 16))
+    return out
+
+
+def total_code(target, sdk):
+    """(game bytes, game funcs, sdk bytes, sdk funcs) for one target."""
     path = os.path.join(ROOT, "config", GAME, "%s.symbols.txt" % target)
     if not os.path.exists(path):
-        return 0, 0
-    total = 0
-    count = 0
+        return 0, 0, 0, 0
+    skip = sdk.get(target, set())
+    total = count = sdkb = sdkn = 0
     for line in open(path):
-        m = FUNCSIZE.search(line)
-        if m:
-            total += int(m.group(1), 16)
+        m = FUNCSIZE.match(line.strip())
+        if not m:
+            continue
+        size = int(m.group(3), 16)
+        if int(m.group(2), 16) in skip:
+            sdkb += size
+            sdkn += 1
+        else:
+            total += size
             count += 1
-    return total, count
+    return total, count, sdkb, sdkn
 
 
 def read_manifest():
@@ -163,25 +188,35 @@ def main():
         pcts = "%.2f%%" % pct if pct is not None else "  error"
         print("%-8s %-18s %7d  %8s  %s" % (target, symbol, size, pcts, state))
 
+    sdk = sdk_addrs()
     print()
-    print("%-8s %10s %10s %8s  %s" % ("target", "matched", "total", "pct", "funcs"))
-    print("-" * 60)
+    print("%-8s %10s %10s %8s  %-11s %s"
+          % ("target", "matched", "game", "pct", "funcs", "psy-q"))
+    print("-" * 72)
     g_matched = g_total = g_funcs = g_tfuncs = 0
+    g_sdkb = g_sdkn = 0
     for target in TARGETS:
-        total, nfuncs = total_code(target)
+        total, nfuncs, sdkb, sdkn = total_code(target, sdk)
         got = per_target.get(target, {"bytes": 0, "funcs": 0})
         g_matched += got["bytes"]
         g_total += total
         g_funcs += got["funcs"]
         g_tfuncs += nfuncs
+        g_sdkb += sdkb
+        g_sdkn += sdkn
         if total:
-            print("%-8s %10d %10d %7.3f%%  %d/%d"
+            print("%-8s %10d %10d %7.3f%%  %-11s %s"
                   % (target, got["bytes"], total,
-                     100.0 * got["bytes"] / total, got["funcs"], nfuncs))
-    print("-" * 60)
+                     100.0 * got["bytes"] / total,
+                     "%d/%d" % (got["funcs"], nfuncs),
+                     "%d (%d)" % (sdkb, sdkn) if sdkn else "-"))
+    print("-" * 72)
     pct = 100.0 * g_matched / g_total if g_total else 0.0
-    print("%-8s %10d %10d %7.3f%%  %d/%d"
-          % ("TOTAL", g_matched, g_total, pct, g_funcs, g_tfuncs))
+    print("%-8s %10d %10d %7.3f%%  %-11s %s"
+          % ("TOTAL", g_matched, g_total, pct,
+             "%d/%d" % (g_funcs, g_tfuncs), "%d (%d)" % (g_sdkb, g_sdkn)))
+    print("\npsy-q is linked-in SDK, left out of the totals "
+          "(config/%s/sdk.txt)" % GAME)
 
     if "--record" in sys.argv:
         hist = []
@@ -197,6 +232,11 @@ def main():
             "percent": round(pct, 4),
             "matched_funcs": g_funcs,
             "total_funcs": g_tfuncs,
+            # Recorded so the step in the graph is readable later: the day the
+            # Psy-Q libraries came out of the denominator, the percentage rose
+            # without a single function being matched.
+            "sdk_bytes": g_sdkb,
+            "sdk_funcs": g_sdkn,
             "targets": {t: per_target[t]["bytes"] for t in TARGETS
                         if per_target.get(t, {}).get("bytes")},
         })

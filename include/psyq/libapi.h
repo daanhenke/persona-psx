@@ -85,4 +85,13 @@ extern long GetRCnt(unsigned long);
 extern long StopRCnt(unsigned long);
 extern long ResetRCnt(unsigned long);
 
+extern long CloseEvent(unsigned long event);
+extern long DisableEvent(unsigned long event);
+extern long WaitEvent(unsigned long event);
+extern void ReturnFromException(void);
+extern long SetIntrMask(long mask);
+extern long GetIntrMask(void);
+extern void ResetEntryInt(void);
+extern void HookEntryInt(long addr);
+
 #endif

@@ -78,6 +78,16 @@ int rcos(int a);
 int rsin(int a);
 long ratan2(long y, long x);
 
+void PushMatrix(void);
+void PopMatrix(void);
+void ApplyMatrix(MATRIX* m, SVECTOR* v0, VECTOR* v1);
+void ReadGeomOffset(int* ofx, int* ofy);
+long RotTransPers3(SVECTOR* v0, SVECTOR* v1, SVECTOR* v2, long* sxy0,
+                   long* sxy1, long* sxy2, long* p, long* flag);
+long RotNclip4(SVECTOR* v0, SVECTOR* v1, SVECTOR* v2, SVECTOR* v3, long* sxy0,
+               long* sxy1, long* sxy2, long* sxy3, long* p, long* otz,
+               long* flag);
+
 #if !defined(VERSION_PC) && !defined(M2CTX) && !defined(PERMUTER) &&           \
     !defined(VERSION_PSP)
 #define gte_ldv0(r0)                                                           \

@@ -98,6 +98,23 @@ def done():
     return out
 
 
+def sdk(target):
+    """Addresses of the Psy-Q functions in this target (tools/gen_sdk.py).
+
+    Without this the listing for main and the sub-EXEs is nothing but library
+    code, which is neither ours to write nor useful to rank.
+    """
+    path = os.path.join(ROOT, "config", GAME, "sdk.txt")
+    out = set()
+    if not os.path.exists(path):
+        return out
+    for line in open(path):
+        f = line.split("//")[0].split()
+        if len(f) >= 2 and f[0] == target:
+            out.add(int(f[1], 16))
+    return out
+
+
 def main(argv):
     target = argv[0]
     lo, hi, floor = 0, 1 << 30, 0.0
@@ -113,6 +130,7 @@ def main(argv):
 
     name, ours = names(target)
     have = done()
+    skip = sdk(target)
     rows = []
     for sym, (size, callees) in calls(target).items():
         if (target, sym) in have or not (lo <= size <= hi):
@@ -121,6 +139,8 @@ def main(argv):
         if not m:
             continue
         addr = int(m.group(1), 16)
+        if addr in skip:
+            continue
         resolved = []
         for c in callees:
             cm = ADDR.match(c)

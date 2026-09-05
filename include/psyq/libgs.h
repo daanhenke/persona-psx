@@ -113,11 +113,92 @@ typedef struct {
     /* 0x12 */ u_char code, pad;
 } GsGLINE;                      /* 0x14 bytes */
 
+/* A filled box, sorted straight into the ordering table. */
+typedef struct {
+    /* 0x00 */ u_long attribute;
+    /* 0x04 */ short  x, y;
+    /* 0x08 */ short  w, h;
+    /* 0x0C */ u_char r, g, b, pad;
+} GsBOXF;                       /* 0x10 bytes */
+
+/* The 3D side of libgs. The game barely uses it - GsSortObject4 is called
+   from nine places and GsLinkObject4 from one - so these layouts are the
+   documented Psy-Q ones rather than anything read back out of this binary.
+   Check the field offsets against the asm before relying on one. */
+typedef struct {
+    /* 0x00 */ VECTOR  scale;
+    /* 0x10 */ SVECTOR rotate;
+    /* 0x18 */ VECTOR  trans;
+} GsCOORD2PARAM;
+
+typedef struct {
+    /* 0x00 */ u_long         attribute;
+    /* 0x04 */ GsCOORDINATE2 *coord2;
+    /* 0x08 */ u_long        *tmd;
+    /* 0x0C */ u_long         id;
+} GsDOBJ2;                      /* 0x10 bytes */
+
+/* A parallel light source: a direction and a colour. */
+typedef struct {
+    /* 0x00 */ long   vx, vy, vz;
+    /* 0x0C */ u_char r, g, b, pad;
+} GsF_LIGHT;                    /* 0x10 bytes */
+
+typedef struct {
+    /* 0x00 */ long   dqa;
+    /* 0x04 */ long   dqb;
+    /* 0x08 */ u_char rfc, gfc, bfc, pad;
+} GsFOGPARAM;                   /* 0x0C bytes */
+
+/* Viewpoint, reference point and twist, in the coordinate system `super`. */
+typedef struct {
+    /* 0x00 */ long           vpx, vpy, vpz;
+    /* 0x0C */ long           vrx, vry, vrz;
+    /* 0x18 */ long           rz;
+    /* 0x1C */ GsCOORDINATE2 *super;
+} GsRVIEW2;                     /* 0x20 bytes */
+
 void GsClearVcount(void);
 long GsGetVcount();
 void GsInitVcount();
+
+void GsInitGraph(u_short x, u_short y, u_short intmode, u_short dith,
+                 u_short varmmode);
+void GsInitGraph2(u_short x, u_short y, u_short intmode, u_short dith,
+                  u_short varmmode);
+void GsInit3D(void);
+void GsSwapDispBuff(void);
+int  GsGetActiveBuff(void);
+
+void GsClearOt(u_short offset, u_short point, GsOT *otp);
+void GsSortClear(u_char r, u_char g, u_char b, GsOT *otp);
+void GsDrawOt(GsOT *otp);
+void GsSortOt(GsOT *ot_src, GsOT *ot_dest);
+
 void GsSortSprite(GsSPRITE *sp, GsOT *ot, u_short pri);
+void GsSortFastSprite(GsSPRITE *sp, GsOT *ot, u_short pri);
 void GsSortLine(GsLINE *line, GsOT *ot, u_short pri);
 void GsSortGLine(GsGLINE *line, GsOT *ot, u_short pri);
+void GsSortBg(GsBG *bg, GsOT *otp);
+void GsSortFastBg(GsBG *bg, GsOT *otp);
+void GsSortBoxFill(GsBOXF *boxf, GsOT *otp);
+void GsSortObject4(GsDOBJ2 *objp, GsOT *otp);
+void GsLinkObject4(u_long objnum, u_long *base, GsDOBJ2 *objp);
+u_long *GsMapModelingData(u_long *base);
+
+void GsSetAmbient(long r, long g, long b);
+void GsSetLightMode(int mode);
+void GsSetFlatLight(int id, GsF_LIGHT *light);
+void GsSetFogParam(GsFOGPARAM *fogp);
+void GsSetLightMatrix(MATRIX *mp);
+void GsSetLightMatrix2(MATRIX *mp);
+void GsSetLsMatrix(MATRIX *mp);
+void GsSetRefView2(GsRVIEW2 *pv);
+
+void GsInitCoordinate2(GsCOORDINATE2 *super, GsCOORDINATE2 *coord);
+void GsGetLs(GsCOORDINATE2 *coord, MATRIX *m);
+void GsGetLw(GsCOORDINATE2 *coord, MATRIX *m);
+void GsGetLws(GsCOORDINATE2 *coord, MATRIX *lw, MATRIX *ls);
+void GsGetTimInfo(u_long *tim, GsIMAGE *img);
 
 #endif

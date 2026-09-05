@@ -659,4 +659,42 @@ typedef struct {
 extern int OpenTIM(u_long* addr);
 extern int ReadTIM(TIM_IMAGE* timimg);
 
+typedef struct {
+    O_TAG;
+    u_long code[5];
+} DR_MOVE; // Frame-buffer to frame-buffer copy
+
+extern void SetPolyF3(POLY_F3* p);
+extern void SetPolyF4(POLY_F4* p);
+extern void SetPolyFT3(POLY_FT3* p);
+extern void SetPolyFT4(POLY_FT4* p);
+extern void SetPolyG3(POLY_G3* p);
+extern void SetLineF2(LINE_F2* p);
+extern void SetLineF3(LINE_F3* p);
+extern void SetLineF4(LINE_F4* p);
+extern void SetLineG3(LINE_G3* p);
+extern void SetLineG4(LINE_G4* p);
+extern void SetTile1(TILE_1* p);
+extern void SetTile8(TILE_8* p);
+extern void SetTile16(TILE_16* p);
+extern void SetBlockFill(BLK_FILL* p);
+
+extern void SetDrawArea(DR_AREA* p, RECT* r);
+extern void SetDrawOffset(DR_OFFSET* p, u_short* ofs);
+extern void SetDrawMove(DR_MOVE* p, RECT* rect, int x, int y);
+extern void SetTexWindow(DR_TWIN* p, RECT* tw);
+
+extern void AddPrims(void* ot, void* p0, void* p1);
+extern void CatPrim(void* p0, void* p1);
+extern void TermPrim(void* p);
+extern void* NextPrim(void* p);
+extern int IsEndPrim(void* p);
+extern void DrawPrim(void* p);
+extern void DrawOTagEnv(OT_TYPE* p, DRAWENV* env);
+
+extern int GetGraphType(void);
+extern int GetODE(void);
+extern void DumpDrawEnv(DRAWENV* env);
+extern void DumpDispEnv(DISPENV* env);
+
 #endif
