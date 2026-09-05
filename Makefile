@@ -93,6 +93,11 @@ progress:
 refs:
 	@$(PYTHON) tools/gen_refs.py
 
+# Deliberately not `symbols: refs`. gen_refs reads the asm the last split
+# produced, and a reference it harvests stops looking like `SYM + 0xNN` once
+# the cut it asks for exists - so running it on every split makes the symbol
+# map oscillate between two states rather than settle. It accumulates, and is
+# run by hand when a new offset reference turns up.
 symbols:
 	@$(PYTHON) tools/gen_symbols.py
 

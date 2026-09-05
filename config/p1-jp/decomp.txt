@@ -432,3 +432,6 @@ dng       func_80084FD0    src/p1-jp/common/ui/configmarkers.c
 s2d       func_80075404    src/p1-jp/common/ui/configmarkers.c
 adv       func_80081D34    src/p1-jp/adv/game/effectspin.c
 adv       func_80081E94    src/p1-jp/adv/game/effectspin.c
+btlp      func_8008168C    src/p1-jp/btlp/soundbank.c
+adv       func_80081864    src/p1-jp/adv/game/chestresult.c
+adv       func_80081BB0    src/p1-jp/adv/game/chestresult.c

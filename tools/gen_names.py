@@ -55,7 +55,7 @@ def gen(target):
     if space.startswith("OVL_"):
         spaces.append(doc["spaces"]["ram"])
 
-    def collect(entries, source, blo, bhi):
+    def collect(entries, source, blo, bhi, clashes):
         for src in (source.get("names", {}), source.get("symbols", {})):
             for hexaddr, name in src.items():
                 addr = int(hexaddr, 16)
@@ -65,19 +65,35 @@ def gen(target):
                     continue      # skip anything not a C identifier
                 if name.startswith(("FUN_", "thunk_FUN_")):
                     continue      # unnamed - the address form is used instead
+                # One name can only mean one address. Two labels sharing a name
+                # is a mistake in Ghidra, not something to resolve here - the
+                # loser would vanish from the linker fragment and every source
+                # using it would silently point at the wrong object.
+                if entries.get(name, addr) != addr:
+                    clashes.setdefault(name, set()).update(
+                        (entries[name], addr))
                 entries.setdefault(name, addr)
 
     # Function names first, then data/label names; a name already taken wins.
     # Symbols are accepted across every block of the space, not just the
     # initialized one - globals live in uninitialized RAM.
     entries = {}
+    clashes = {}
     for source in spaces:
         ranges = source.get("sym_ranges")
         if not ranges:
             b = source["blocks"][0]
             ranges = [[b["start"], b["end"]]]
         for blo, bhi in ranges:
-            collect(entries, source, blo, bhi)
+            collect(entries, source, blo, bhi, clashes)
+
+    for name in sorted(clashes):
+        where = sorted(clashes[name])
+        shown = " ".join("0x%08X" % a for a in where[:4])
+        if len(where) > 4:
+            shown += " and %d more" % (len(where) - 4)
+        print("  %-8s WARNING %s names %s - rename one in Ghidra"
+              % (target, name, shown))
 
     out = os.path.join(ROOT, "config", GAME, "%s.names.ld" % target)
     with open(out, "w", newline="\n") as fh:

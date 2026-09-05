@@ -96,6 +96,12 @@ while si.hasNext():
     if nm.startswith(DEFAULT_PREFIXES):
         continue
     d.setdefault("symbols", {})["%08X" % a.getOffset()] = nm
+    # As with functions: a USER_DEFINED label is one we applied, so it names a
+    # real object. The PsyQ signature import also drops labels in the middle of
+    # SDK code Ghidra never turned into functions (MTX_00_OBJ_5A0 and friends),
+    # and those must not be mistaken for the start of a data object.
+    if str(sym.getSource()) == "USER_DEFINED":
+        d.setdefault("user_symbols", []).append("%08X" % a.getOffset())
     nsym += 1
 
 try:

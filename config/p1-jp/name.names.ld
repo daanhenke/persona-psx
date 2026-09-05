@@ -3037,6 +3037,7 @@ PROVIDE(firstfile = 0x800415A4);
 PROVIDE(format = 0x80041594);
 PROVIDE(g_adv_actor_defs = 0x801001F0);
 PROVIDE(g_adv_actors = 0x801F15D8);
+PROVIDE(g_adv_chest_item = 0x800F586C);
 PROVIDE(g_adv_e0_offsets = 0x8004DA4C);
 PROVIDE(g_adv_e1_offsets = 0x8004DC10);
 PROVIDE(g_adv_e2_offsets = 0x8004DDD4);

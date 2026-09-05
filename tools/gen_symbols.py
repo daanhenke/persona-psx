@@ -136,6 +136,23 @@ def gen(target):
                 if lo <= a <= hi and a % 4 == 0:
                     refs.add(a)
 
+    # Anything *we* have named is its own object by definition, so cut there
+    # too. Without this, naming one string inside a run leaves everything after
+    # it rendered as  that_name + 0xNN , and a C source saying the later name
+    # can never agree on the relocation. Taking the addresses from the export
+    # rather than from the last split's asm keeps the result stable: it does
+    # not depend on what the previous cut made spimdisasm print.
+    #
+    # Only our own labels count. The PsyQ signature import leaves names in the
+    # middle of SDK code that Ghidra never defined as functions, so those
+    # addresses sit in what this treats as a data gap; cutting there splits a
+    # run of instructions in half and spimdisasm starts reading the pieces as
+    # pointers.
+    for hexaddr in sp.get("user_symbols", []):
+        a = int(hexaddr, 16)
+        if lo <= a <= hi and a % 4 == 0:
+            refs.add(a)
+
     nsplit = 0
     for g_lo, g_hi in gaps:
         cuts = sorted(a for a in refs if g_lo < a <= g_hi)

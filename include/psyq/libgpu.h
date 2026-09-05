@@ -644,4 +644,19 @@ extern void SetDrawEnv(DR_ENV* dr_env, DRAWENV* env);
 extern DRAWENV* GetDrawEnv(DRAWENV* env);
 extern DISPENV* GetDispEnv(DISPENV* env);
 
+/* A TIM opened out of main memory. OpenTIM points the reader at the file and
+   ReadTIM fills one of these in: where the pixels go and where they are, and
+   the same for the CLUT. Either pointer is null when the file has no such
+   part. */
+typedef struct {
+    /* 0x00 */ u_long  mode;    /* pixel mode in the bottom two bits */
+    /* 0x04 */ RECT*   crect;   /* CLUT's place in the frame buffer  */
+    /* 0x08 */ u_long* caddr;   /* CLUT data                         */
+    /* 0x0C */ RECT*   prect;   /* pixels' place in the frame buffer */
+    /* 0x10 */ u_long* paddr;   /* pixel data                        */
+} TIM_IMAGE;                    /* 0x14 bytes */
+
+extern int OpenTIM(u_long* addr);
+extern int ReadTIM(TIM_IMAGE* timimg);
+
 #endif
