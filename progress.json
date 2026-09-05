@@ -62,5 +62,109 @@
   "percent": 0.2314,
   "matched_funcs": 22,
   "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T01:55:38",
+  "matched_bytes": 4684,
+  "total_bytes": 1536604,
+  "percent": 0.3048,
+  "matched_funcs": 27,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:08:42",
+  "matched_bytes": 4724,
+  "total_bytes": 1536604,
+  "percent": 0.3074,
+  "matched_funcs": 28,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:14:21",
+  "matched_bytes": 4928,
+  "total_bytes": 1536604,
+  "percent": 0.3207,
+  "matched_funcs": 30,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:18:54",
+  "matched_bytes": 4396,
+  "total_bytes": 1536604,
+  "percent": 0.2861,
+  "matched_funcs": 27,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:19:45",
+  "matched_bytes": 4928,
+  "total_bytes": 1536604,
+  "percent": 0.3207,
+  "matched_funcs": 30,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:37:26",
+  "matched_bytes": 4928,
+  "total_bytes": 1537664,
+  "percent": 0.3205,
+  "matched_funcs": 30,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T02:58:23",
+  "matched_bytes": 6716,
+  "total_bytes": 1537664,
+  "percent": 0.4368,
+  "matched_funcs": 36,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:03:53",
+  "matched_bytes": 6980,
+  "total_bytes": 1537664,
+  "percent": 0.4539,
+  "matched_funcs": 39,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:09:49",
+  "matched_bytes": 7580,
+  "total_bytes": 1537664,
+  "percent": 0.493,
+  "matched_funcs": 42,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:14:14",
+  "matched_bytes": 8264,
+  "total_bytes": 1537664,
+  "percent": 0.5374,
+  "matched_funcs": 48,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:25:56",
+  "matched_bytes": 8264,
+  "total_bytes": 1537688,
+  "percent": 0.5374,
+  "matched_funcs": 48,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:41:58",
+  "matched_bytes": 8920,
+  "total_bytes": 1537688,
+  "percent": 0.5801,
+  "matched_funcs": 51,
+  "total_funcs": 6347
+ },
+ {
+  "date": "2026-09-05T03:47:02",
+  "matched_bytes": 8920,
+  "total_bytes": 1537688,
+  "percent": 0.5801,
+  "matched_funcs": 51,
+  "total_funcs": 6347
  }
 ]

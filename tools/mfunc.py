@@ -96,6 +96,17 @@ NAMED = re.compile(r"\b(?:func|D)_([0-9A-F]{8})\b")
 PROVIDE = re.compile(r"PROVIDE\(([A-Za-z_]\w*) = 0x([0-9A-Fa-f]{8})\);")
 # %hi(D_7FFFFF) / %lo(D_7FFFFF) - a constant spimdisasm mistook for an address.
 CONSTREF = re.compile(r"%(hi|lo)\(\s*D_([0-9A-Fa-f]+)\s*\)")
+# The $at expansion of an indexed load, in its two forms. Which one the
+# assembler picked says whether the source named a symbol or wrote the address
+# out as a literal - see fold_literal_at_refs.
+ATIDX = re.compile(r"\baddu\s+\$at,\s*\$(?!at\b)(\w+),\s*\$at\b")
+HIREF = re.compile(r"%hi\(\s*([A-Za-z_]\w*)\s*\)")
+LOREF = re.compile(r"%lo\(\s*([A-Za-z_]\w*)\s*\)\(\$at\)")
+# splat writes an address it did NOT symbolise in this explicit form, so a
+# function that builds one is proof that region is reached by literal.
+RAWADDR = re.compile(r"\(\s*0x([0-9A-Fa-f]{8})\s*>>\s*16\s*\)")
+ANYHI = re.compile(r"%hi\(\s*([A-Za-z_]\w*)\s*\)")
+ANYLO = re.compile(r"%lo\(\s*([A-Za-z_]\w*)\s*\)\((\$\w+)\)")
 
 
 def load_names(target):
@@ -123,6 +134,106 @@ def gp_base(target):
 
 
 GPREF = re.compile(r"(-?(?:0x)?[0-9A-Fa-f]+)\(\$gp\)")
+
+
+def _hi(value):
+    return "0x%X" % (((value + 0x8000) >> 16) & 0xFFFF)
+
+
+def _lo(value):
+    low = value & 0xFFFF
+    return "%d" % (low - 0x10000 if low >= 0x8000 else low)
+
+
+def fold_literal_at_refs(lines, names=None):
+    """Undo spimdisasm's invented symbol where the source wrote an address out.
+
+    An indexed load reaches memory through $at, and the assembler expands it two
+    different ways:
+
+        lbu $2,sym($2)     -> lui $at,%hi(sym) / addu $at,$at,$2  / lbu ...
+        lbu $2,0x801F29C8($2) -> lui $at,%hi   / addu $at,$2,$at  / lbu ...
+
+    The operand order of that `addu` is therefore a byte-level record of which
+    one the original source used. spimdisasm renders both as %hi/%lo of a
+    symbol it invented, so a candidate that correctly writes the literal scores
+    below 100% forever. Fold the literal ones back.
+
+    This is not cosmetic: the game reaches its 0x801Dxxxx-0x801Fxxxx work area
+    by hardcoded address (main bzeros 0x801F0000 without naming anything in
+    it), and that is thousands of instructions across the disc.
+
+    Keyed on the address, not on the symbol still carrying a default D_ name -
+    the `addu` operand order says the source used a literal no matter what we
+    have since called that address, so giving it a name must not silently break
+    every function that reaches it.
+    """
+    addr_of = {n: a for a, n in (names or {}).items()}
+    out = list(lines)
+    for i, ln in enumerate(out):
+        if not ATIDX.search(ln):
+            continue
+        # The lui and the load sit either side of the addu, but scheduling can
+        # put an unrelated instruction between them.
+        hi_at = sym = None
+        for j in range(i - 1, max(i - 5, -1), -1):
+            m = HIREF.search(out[j])
+            if m and "lui" in out[j]:
+                hi_at, sym = j, m.group(1)
+                break
+        if sym is None:
+            continue
+        lo_at = None
+        for k in range(i + 1, min(i + 5, len(out))):
+            m = LOREF.search(out[k])
+            if m and m.group(1) == sym:
+                lo_at = k
+                break
+        if lo_at is None:
+            continue
+        if sym.startswith("D_") and len(sym) == 10:
+            value = int(sym[2:], 16)
+        elif sym in addr_of:
+            value = addr_of[sym]
+        else:
+            continue
+        out[hi_at] = HIREF.sub(_hi(value), out[hi_at], count=1)
+        out[lo_at] = LOREF.sub("%s($at)" % _lo(value), out[lo_at], count=1)
+
+    # Second pass. spimdisasm symbolises some `lui/lo` pairs and leaves others
+    # as raw addresses, so one function can reach the same object both ways -
+    # the play-time counter builds 0x801F29BC with lui/ori and then loads
+    # +1/+2/+3 through invented symbols. A raw address in the function is proof
+    # that its neighbourhood is literal here, so fold the invented ones to
+    # match; otherwise a correct candidate can never agree on the relocation.
+    literals = set()
+    for ln in out:
+        for m in RAWADDR.finditer(ln):
+            literals.add(int(m.group(1), 16))
+    if not literals:
+        return out
+
+    def addr_of_sym(name):
+        if name.startswith("D_") and len(name) == 10:
+            try:
+                return int(name[2:], 16)
+            except ValueError:
+                return None
+        return addr_of.get(name)
+
+    def near_literal(a):
+        return a is not None and any(abs(a - lit) <= 0x400 for lit in literals)
+
+    for i, ln in enumerate(out):
+        m = ANYHI.search(ln)
+        if m and near_literal(addr_of_sym(m.group(1))):
+            out[i] = ANYHI.sub(_hi(addr_of_sym(m.group(1))), ln, count=1)
+            continue
+        m = ANYLO.search(ln)
+        if m and near_literal(addr_of_sym(m.group(1))):
+            a = addr_of_sym(m.group(1))
+            out[i] = ANYLO.sub("%s(%s)" % (_lo(a), m.group(2)), ln, count=1)
+    return out
 
 
 def normalize_asm(lines, names=None, gp=None):
@@ -175,7 +286,9 @@ def normalize_asm(lines, names=None, gp=None):
         return "%%gp_rel(%s)($gp)" % sym if sym else m.group(0)
 
     out = []
-    for ln in lines:
+    # Runs first: once an invented symbol is folded to a literal, `rename` must
+    # not turn it back into a name the candidate cannot use.
+    for ln in fold_literal_at_refs(lines, names):
         ln = OFFREF.sub(fold, ln)
         ln = CONSTREF.sub(unconst, ln)
         if names:

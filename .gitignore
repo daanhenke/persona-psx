@@ -23,3 +23,6 @@ __pycache__/
 
 # splat regenerates these; keep the yaml, not the output
 /asm/
+
+# Work in progress, not tracked by decomp.txt
+/wip/

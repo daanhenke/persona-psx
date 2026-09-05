@@ -120,24 +120,48 @@ Compiler behaviours worth knowing, each of which cost a match until fixed:
 
 ## Naming
 
-Names live in Ghidra and flow outwards. After editing `config/p1-jp/rename.txt`:
+Names live in Ghidra and flow outwards. Rename by running a pyghidra script
+through ReVa against the program that owns the address, then:
 
-1. run `ghidra/ApplyNames.py` in Ghidra — names the symbols
-2. run `ghidra/ExportCodeMap.py` in Ghidra — re-exports the map
-3. `tools/gen_names.py` — rebuilds the per-target linker symbol maps
-4. update the affected `src/` files by hand
-5. `tools/progress.py` — re-verify every match still holds
+1. run `ghidra/ExportCodeMap.py` in Ghidra — re-exports the map
+2. `tools/gen_names.py` — rebuilds the per-target linker symbol maps
+3. update the affected `src/` files by hand
+4. `tools/progress.py` — re-verify every match still holds
 
-`rename.txt` rows are `<program> <space> <address> <name> # evidence`. The
-program and space columns both matter: every overlay loads at `0x800643A0` and
-every sub-EXE at `0x80080000`, so the same address means different things in
-different binaries. An earlier global symbol map renamed a DNG symbol to
-`CatPrim`, a name harvested from `END.EXE`.
+Skipping step 1 is the easy mistake: the rename lands in Ghidra, `gen_names.py`
+re-reads the *stale* export, and every function touching the renamed symbol
+quietly drops to ~98%.
+
+Address the right binary. Every overlay loads at `0x800643A0` and every sub-EXE
+at `0x80080000`, so the same address means different things in different
+binaries — Ghidra keeps the overlays in their own address spaces (`OVL_DNG`,
+`OVL_S2D`, …) for exactly this reason. An earlier global symbol map renamed a
+DNG symbol to `CatPrim`, a name harvested from `END.EXE`.
 
 Nothing in `src/` uses an address-derived name. Where a name is asserted it is
-backed by evidence recorded in `rename.txt` — for example `SndSeqPlay` calls
-`SsSetNck`/`SsSeqOpen`/`SsSeqSetVol`/`SsSeqPlay` over data at `0x80180000`,
-which is where `main` loads `OPEN.BIN`, making **OPEN.BIN the sequence bank**.
+backed by evidence, recorded as a plate comment on the symbol in Ghidra — for
+example `SndSeqPlay` calls `SsSetNck`/`SsSeqOpen`/`SsSeqSetVol`/`SsSeqPlay` over
+data at `0x80180000`, which is where `main` loads `OPEN.BIN`, making
+**OPEN.BIN the sequence bank**.
+
+(`config/p1-jp/rename.txt` and `ghidra/ApplyNames.py` are the retired version of
+this flow, kept only as a record of names already applied.)
+
+## Shared code
+
+`SLPS_005.00` stays resident, so the overlays call its helpers rather than
+carrying copies. The four sub-EXEs are linked standalone and the overlays each
+compile in their own copy of a handful of routines, so the *same* function shows
+up at several addresses. `tools/find_dups.py` finds those — it masks `j`/`jal`
+targets and address immediates, which is everything the linker moves, and groups
+what is left:
+
+    tools/find_dups.py                    # every cross-target group
+    tools/find_dups.py main func_80012B2C # twins of one function
+
+There are 276 such groups, 164 KB of code beyond the first copy. One matching
+source covers every copy, so `src/p1-jp/common/` holds the sources known to be
+shared and `config/p1-jp/decomp.txt` points several targets at them.
 
 ## How the split is driven
 

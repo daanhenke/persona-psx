@@ -32,6 +32,7 @@ Python lives in `.venv`. Disc images and extracted game data are in `scratch/`
 
     tools/mfunc.py <target> <symbol> [cand.c] [--diff] [--all]
     tools/pick_candidates.py [per] [min_insn] [max_insn]
+    tools/find_dups.py [minbytes] | <target> <symbol>
     tools/setup_permuter.py <target> <symbol> <cand.c>
 
 Targets: `main atlus open movie end dng btlp s2d adv casino name`.
@@ -47,30 +48,41 @@ Targets: `main atlus open movie end dng btlp s2d adv casino name`.
   that sounds confident, and do not leave the address form in place.
 - **Never decompile the Psy-Q SDK.** It is already in the binaries and will be
   linked from the real libraries. `tools/pick_candidates.py` filters anything
-  Ghidra has named for exactly this reason.
+  Ghidra has named for exactly this reason. (`tools/find_dups.py` is finer: it
+  filters only names the PsyQ signature analyser applied, so functions *we*
+  named still show up — those are the ones worth finding twins for.)
+- **Check for twins before writing a source.** The overlays and sub-EXEs each
+  compile in their own copy of a shared routine, so one source often covers
+  several targets. `tools/find_dups.py <target> <symbol>` says which; shared
+  sources live in `src/p1-jp/common/` with target-neutral names.
 
 ## Naming
 
-Ghidra is the source of truth. Add rows to `config/p1-jp/rename.txt`:
+Ghidra is the source of truth, and the only copy. Rename by running a pyghidra
+script through ReVa `run-script` against the program that owns the address —
+every overlay loads at `0x800643A0` and every sub-EXE at `0x80080000`, so one
+address means different things in different binaries. Then:
 
-    <program> <space> <address> <name>   # evidence for the name
+1. run `ghidra/ExportCodeMap.py` in Ghidra
+2. `tools/gen_names.py`
+3. update the affected `src/` files **by hand**
+4. `tools/progress.py` to confirm nothing regressed
 
-Both the program and space columns matter — every overlay loads at `0x800643A0`
-and every sub-EXE at `0x80080000`, so one address means different things in
-different binaries. Then:
-
-1. run `ghidra/ApplyNames.py` in Ghidra (via ReVa `run-script`)
-2. run `ghidra/ExportCodeMap.py` in Ghidra
-3. `tools/gen_names.py`
-4. update the affected `src/` files **by hand**
-5. `tools/progress.py` to confirm nothing regressed
-
-Renaming an already-named symbol will not propagate itself; step 4 is manual and
+Renaming an already-named symbol will not propagate itself; step 3 is manual and
 skipping it silently desynchronises the source from the target.
 
-The `# evidence` column is not decoration. Every asserted name should be
-traceable to something observed — an SDK call it wraps, a constant it writes, a
-sentinel value, a caller's behaviour.
+Record the evidence for a name as a **plate comment on the symbol**, set in the
+same script. It is not decoration: every asserted name should be traceable to
+something observed — an SDK call it wraps, a constant it writes, a sentinel
+value, a caller's behaviour.
+
+`config/p1-jp/rename.txt` and `ghidra/ApplyNames.py` are the retired version of
+this flow. Do not add rows to it.
+
+`ghidra/FindHiLoRefs.py` answers "who touches this address" when Ghidra's own
+xrefs come up empty. Ghidra resolves `lui`/`%lo` pairs only inside `ram` and
+drops the `lui at,%hi(X) / addu at,at,idx / lw r,%lo(X)(at)` indexing idiom
+entirely, so array members and overlay-side readers look unreferenced.
 
 ## Editing
 
@@ -87,10 +99,41 @@ debugging detour.
   at a non-16-aligned address shifts and every absolute `j` resolves wrong.
 - Target and candidate must agree on **symbol names** or identical code scores
   below 100%. `normalize_asm` in `tools/mfunc.py` handles the known cases.
-- Not every translation unit uses the same flags. `ATLUS.EXE` and `OPEN.EXE` are
-  mostly SDK plus `-O0` code with a small-data area; use
-  `/* cc1flags: -O0 -G8 */` and record the binary's `$gp` in
-  `config/p1-jp/gp.txt` (it is set at the entry point, not in the PS-EXE header).
+- Not every translation unit uses the same flags. `ATLUS.EXE`, `OPEN.EXE` and
+  `main` itself are built with a small-data area; use `/* cc1flags: -O2 -G8 */`
+  (`-O0` for the sub-EXEs, which also keep a frame pointer) and record the
+  binary's `$gp` in `config/p1-jp/gp.txt` (it is set at the entry point, not in
+  the PS-EXE header).
+
+### Literal address or linker symbol?
+
+The game reaches most of its work area (`0x801Dxxxx`-`0x801Fxxxx`,
+`0x800Dxxxx`-`0x800Fxxxx`) by **hardcoded address**, not through a symbol. Which
+one the source used is visible in the encoding, and getting it wrong caps a
+function well below 100%:
+
+- An indexed access through a symbol assembles to `addu $at,$at,rX`; through a
+  literal to `addu $at,rX,$at`. `normalize_asm` folds the literal form back,
+  keyed on the address so naming the symbol later cannot break it.
+- A symbol is **rematerialised** (`lui`/`%hi` + `lw`/`%lo`) at every access. A
+  literal gets CSE'd into a register once, so a stray `la`/`ori` base register in
+  your output means you wrote a literal where the original had a symbol.
+- spimdisasm symbolises *some* `lui`/load pairs and leaves others raw. If a
+  function builds an address explicitly (splat writes `(0xADDR >> 16)`), the
+  invented symbols nearby are literals too - `normalize_asm` folds those.
+- Under `-G8`, a plain `extern int x;` becomes `%gp_rel`. For a work-area global
+  that is wrong; declare it as an **incomplete array** (`extern int x[];`) so gcc
+  cannot assume it is small enough for `.sdata`.
+- Indexing a literal base (`((T *)0xADDR)[i].f`) folds the constant into each
+  access. If the original keeps one base register with small offsets, use a
+  pointer local instead: `T *p = (T *)0xADDR;`.
+
+### Store order
+
+gcc hoists constant stores. If a run of constant assignments comes out earlier
+than the original has it, move those statements to the **end** of the function
+and let gcc hoist them into place - writing them in their apparent position is
+what puts them too early. This is what took `SlotInit` from 70% to 100%.
 
 ## Layout
 
@@ -99,5 +142,6 @@ debugging detour.
     docs/           memory map and program structure
     ghidra/         scripts run inside Ghidra via ReVa
     include/psyq/   Psy-Q SDK headers
-    src/p1-jp/      decompiled C, one directory per target
+    src/p1-jp/      decompiled C, one directory per target, plus common/
+                    for sources that match in more than one target
     tools/          the pipeline, plus vendored maspsx / m2c / asm-differ / permuter

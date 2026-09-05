@@ -3,3 +3,4 @@
 // target object and a compiled candidate agree.
 atlus  800A5598
 open   800B4090
+main   80055BD0   // crt0 at 0x80011944: lui/addiu gp, D_800559E8+0x1E8; gp+0x34/0x60/0x68 land on g_state_cur/prev/next and gp+0x40 on g_cd_busy

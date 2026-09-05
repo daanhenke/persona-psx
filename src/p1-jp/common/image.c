@@ -1,4 +1,10 @@
-/* Persona 1 (JP) - NAME overlay @ 0x80067A34 */
+/* Persona 1 (JP) - shared VRAM upload helper.
+ *
+ * Compiled into more than one overlay rather than called across the boundary:
+ *   NAME @ 0x80067A34
+ *   DNG  @ 0x8006FC14
+ * Byte-identical once call targets and global addresses are masked out.
+ */
 #include <types.h>
 #include <libgpu.h>
 
@@ -6,7 +12,7 @@
    The descriptor packs two shorts per word: position at +0xC, size at +0x10,
    pixel data from +0x14. A negative x or y means "take it from the descriptor
    instead of the argument". */
-void NameUploadImageRows(void *desc, u_short x, u_short y, short rows)
+void UploadImageRows(void *desc, u_short x, u_short y, short rows)
 {
     RECT rect;
     int *p;

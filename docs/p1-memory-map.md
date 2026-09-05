@@ -88,6 +88,13 @@ have an offset-table header (entry counts `0x2c` and `0x54`) rather than an id d
 | `0x80011864` | `LoadAndExecPsExe` |
 | `0x80012bec` | `CdLoadPsExe` |
 | `0x80011e3c` | `LoadFileToAddr` |
+| `0x800622f0` | `g_cd_queue` (0x24-byte entries) |
+| `0x80011cfc` / `0x80011dd0` | `CdQueueSubmit` / `CdQueueSubmitResolved` |
+| `0x80012794` | `CdQueueDispatch` |
+| `0x800126b8` | `CdQueueNextCallback` |
+| `0x80012754` | `CdQueueReadyCallback` |
+| `0x80012974` | `CdQueueClearCallback` |
+| `0x80055c1c` / `0x80055c20` | `g_cd_stream_sectors` / `g_cd_stream_mode` (write-only) |
 | `0x80012090` | `CdReadFileToAddr` |
 | `0x80012144` | `CdReadToAddr` |
 | `0x80012b2c` | `CdSearchFileLoc` |
