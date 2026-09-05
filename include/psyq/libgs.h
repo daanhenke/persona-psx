@@ -100,10 +100,24 @@ typedef struct {
     /* 0x0C */ u_char r, g, b, pad;
 } GsLINE;                       /* 0x10 bytes */
 
+/* The gouraud line carries a colour at each end. The three per-channel screen
+   fades in ADV are what fix the layout: they write the same value to 0x0C and
+   0x0F, 0x0D and 0x10, or 0x0E and 0x11, one pair each, so the two ends' three
+   channels are 0x0C..0x0E and 0x0F..0x11 with nothing in between. */
+typedef struct {
+    /* 0x00 */ u_long attribute;
+    /* 0x04 */ short  x0, y0;
+    /* 0x08 */ short  x1, y1;
+    /* 0x0C */ u_char r0, g0, b0;
+    /* 0x0F */ u_char r1, g1, b1;
+    /* 0x12 */ u_char code, pad;
+} GsGLINE;                      /* 0x14 bytes */
+
 void GsClearVcount(void);
 long GsGetVcount();
 void GsInitVcount();
 void GsSortSprite(GsSPRITE *sp, GsOT *ot, u_short pri);
 void GsSortLine(GsLINE *line, GsOT *ot, u_short pri);
+void GsSortGLine(GsGLINE *line, GsOT *ot, u_short pri);
 
 #endif
