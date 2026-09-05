@@ -77,3 +77,26 @@ u_char PartyFindSlot(u_char chr)
     }
     return 0xFF;
 }
+
+/* Slides the slots down over the empty ones, so the members the menus draw are
+   contiguous. PersonaStockCompact is the same routine over the Persona stock.
+   ADV only. */
+void PartyCompact(void)
+{
+    u_char *party;
+    u_char  i;
+    u_char  j;
+
+    party = g_party;
+    for (i = 0; i < CHAR_COUNT; i++) {
+        if (party[i] == PARTY_EMPTY) {
+            for (j = i + 1; j < CHAR_COUNT; j++) {
+                if (party[j] != PARTY_EMPTY) {
+                    party[i] = party[j];
+                    party[j] = PARTY_EMPTY;
+                    break;
+                }
+            }
+        }
+    }
+}

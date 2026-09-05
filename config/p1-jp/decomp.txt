@@ -337,3 +337,4 @@ adv       func_800B03F8    src/p1-jp/adv/game/chars.c
 adv       func_800B049C    src/p1-jp/adv/game/chars.c
 adv       func_800B08F4    src/p1-jp/common/game/items.c
 adv       func_800B09E0    src/p1-jp/common/game/items.c
+adv       func_800ADC30    src/p1-jp/common/game/party.c
