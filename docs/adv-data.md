@@ -96,3 +96,39 @@ last two are read straight through. All four end up in the same `0x2C` runtime
 shape and feed the display slots, so they are four kinds of scene object rather
 than four unrelated tables - but which kind each is has not been established,
 and the group names above are positions, not claims.
+
+## The scene at run time
+
+`g_adv_scene` (0x800BBB28) is set to 0x80100034 - 0x34 into the pack - and what
+the overlay reaches through it are (count, table) pairs pointing back into the
+pack:
+
+| offset | record | key |
+|---|---|---|
+| `+0x08` / `+0x0C` | 12 bytes | a tile x and y |
+| `+0x10` / `+0x14` | 8 bytes | three bytes |
+| `+0x18` / `+0x1C` | 14 bytes | a u16 |
+| `+0x20` | the room grid, one byte a tile | rows 32 bytes apart |
+
+A tile record carries an event flag at `+0x04` that makes the trigger
+conditional, mode bits at `+0x06`, and at `+0x08` the script pointer a caller
+runs when the player steps on it. The room grid's stride is 32 while
+`RoomRotatePoint` puts the far edge at 23, so it is the power of two above the
+room rather than its width.
+
+`g_dir_x` and `g_dir_y` are {0, 0, -1, 1} and {-1, 1, 0, 0}, which fixes the
+four facings as up, down, left and right. Both are stored as bytes and added to
+an unsigned coordinate, so the 0xFF entries are the -1s.
+
+### Actor records
+
+`g_adv_actors` (0x801F15D8) is 0x2C bytes an entry. `ActorsSetDepth` walks 25
+of them, more than the eight a room's actor definitions expand to, so the array
+runs on past them. What is pinned down so far:
+
+| offset | contents |
+|---|---|
+| `+0x0C` | id, 0xFFFF while the slot is unused |
+| `+0x14` | draw-order bias, 0 or 0x20 by whether the actor is behind |
+| `+0x1C` | tile x, y |
+| `+0x1E` | where the step in progress is taking it |
