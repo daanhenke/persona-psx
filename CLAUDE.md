@@ -171,11 +171,30 @@ not merely the size.
 
 ## Layout
 
-    bin/            downloaded toolchain (gitignored; see bin/*.sha256)
-    config/p1-jp/   splat configs, symbol maps, rename.txt, gp.txt, ghidra/*.json
-    docs/           memory map and program structure
-    ghidra/         scripts run inside Ghidra via ReVa
-    include/psyq/   Psy-Q SDK headers
-    src/p1-jp/      decompiled C, one directory per target, plus common/
-                    for sources that match in more than one target
-    tools/          the pipeline, plus vendored maspsx / m2c / asm-differ / permuter
+    bin/              downloaded toolchain (gitignored; see bin/*.sha256)
+    config/p1-jp/     splat configs, symbol maps, rename.txt, gp.txt, ghidra/*.json
+    docs/             memory map and program structure
+    ghidra/           scripts run inside Ghidra via ReVa
+    include/psyq/     Psy-Q SDK headers
+    include/persona/  our own headers, mirroring src/ (<target>/<name>.h)
+    src/p1-jp/        decompiled C, one directory per target, plus common/
+                      for sources that match in more than one target
+    tools/            the pipeline, plus vendored maspsx / m2c / asm-differ / permuter
+
+### Keeping the tree navigable
+
+Sources are grouped by subsystem once a directory outgrows a single listing -
+roughly ten files. The groups in use are `gfx/`, `ui/`, `game/` and `audio/`.
+
+The important rule is that **a source and its per-target copies live at the same
+relative path**: `common/gfx/slot.c` and `s2d/gfx/slot.c`, `common/ui/input.c`
+and `s2d/ui/input.c`. Those pairs exist only because one overlay reaches a
+different address, so they have to be easy to spot and to diff. Introducing a
+subdirectory in `common/` therefore means creating it in every target directory
+that overrides one of the files in it.
+
+Nothing in the build walks `src/` - the Makefile compiles from `asm/`, and
+candidates are verified standalone through `tools/mfunc.py`. Moving a source is
+`git mv` plus the path in `config/p1-jp/decomp.txt`, and `tools/progress.py` is
+the check that you got every row. Do the move as its own commit; mixing it with
+a match makes both harder to read.
