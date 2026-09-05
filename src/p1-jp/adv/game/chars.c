@@ -1,13 +1,16 @@
-/* Persona 1 (JP) - lookups over the character records.  ADV only.
- *   0x800ADBC0 PartyAdd          0x800AFA34 CharFindFree
+/* Persona 1 (JP) - lookups over the character and Persona records.  ADV only.
+ *   0x800ADBC0 PartyAdd          0x800B03F8 PersonaFind
  *   0x800AFA80 CharFind          0x800B0440 CharEntryFind
- *   0x800AF9D4 CharFind2         0x800B04E0 CharEntryFindFree
+ *   0x800AF9D4 CharFind2         0x800B049C PersonaFindFree
+ *   0x800AFA34 CharFindFree      0x800B04E0 CharEntryFindFree
  *
- * Five 0x60-byte records in the save-game work area, reached through g_party,
- * which holds a record index per party slot.
+ * Five 0x60-byte character records in the save-game work area, reached through
+ * g_party, which holds a record index per party slot; thirty-one 0x40-byte
+ * Persona records directly after them.
  */
 #include <types.h>
 #include <persona/common/char.h>
+#include <persona/common/persona.h>
 
 #define g_party ((u_char *)0x801F256C)
 
@@ -58,6 +61,20 @@ u_char CharFindFree(void)
     return 0xFF;
 }
 
+/* The same search over the Persona records, which use the byte at +0x18 to
+   identify themselves and answer -1 rather than 0xFF. */
+short PersonaFind(u_char key)
+{
+    u_char i;
+
+    for (i = 0; i < PERSONA_COUNT; i++) {
+        if (g_personas[i].key == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 u_char CharEntryFind(u_char chr, u_char v)
 {
     Char   *rec;
@@ -70,6 +87,18 @@ u_char CharEntryFind(u_char chr, u_char v)
         }
     }
     return 0xFF;
+}
+
+short PersonaFindFree(void)
+{
+    u_char i;
+
+    for (i = 0; i < PERSONA_COUNT; i++) {
+        if (g_personas[i].key == 0) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 u_char CharEntryFindFree(u_char chr)

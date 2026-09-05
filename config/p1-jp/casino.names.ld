@@ -3096,6 +3096,7 @@ PROVIDE(g_pad_prev = 0x800DC008);
 PROVIDE(g_pad_prev_s2d = 0x800FC008);
 PROVIDE(g_party = 0x801F256C);
 PROVIDE(g_persona_data = 0x80041760);
+PROVIDE(g_persona_stock = 0x801F297C);
 PROVIDE(g_personas = 0x801F1DAC);
 PROVIDE(g_playtime = 0x801F29BC);
 PROVIDE(g_save_map_id = 0x801F15A0);

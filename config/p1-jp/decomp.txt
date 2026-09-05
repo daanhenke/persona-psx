@@ -327,3 +327,13 @@ s2d       func_80082CDC    src/p1-jp/s2d/game/items.c
 adv       func_8007D2DC    src/p1-jp/common/game/party.c
 dng       func_8008B86C    src/p1-jp/common/game/party.c
 s2d       func_8007BCDC    src/p1-jp/common/game/party.c
+adv       func_80076C24    src/p1-jp/common/game/personastock.c
+dng       func_800857A0    src/p1-jp/common/game/personastock.c
+s2d       func_80075BDC    src/p1-jp/common/game/personastock.c
+adv       func_800AF800    src/p1-jp/common/game/personastock.c
+adv       func_800AF914    src/p1-jp/common/game/personastock.c
+adv       func_800AF848    src/p1-jp/common/game/personastock.c
+adv       func_800B03F8    src/p1-jp/adv/game/chars.c
+adv       func_800B049C    src/p1-jp/adv/game/chars.c
+adv       func_800B08F4    src/p1-jp/common/game/items.c
+adv       func_800B09E0    src/p1-jp/common/game/items.c

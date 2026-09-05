@@ -9,11 +9,14 @@
 #include <types.h>
 
 #define PERSONA_SPELLS 7
+#define PERSONA_COUNT  31
 
 #define PERSONA_STATS 5
 
 typedef struct {
-    /* 0x00 */ u_char pad00[0x26];
+    /* 0x00 */ u_char pad00[0x18];
+    /* 0x18 */ u_char key;        /* identifies the record; 0 while unused */
+    /* 0x19 */ u_char pad19[0xD];
     /* 0x26 */ u_char stat[PERSONA_STATS];
                                   /* the same five the character has, drawn as
                                      bars on the status screen and clamped at
