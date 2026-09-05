@@ -187,4 +187,23 @@ void SsUtSetReverbDelay(short delay);
    header set. */
 short SsIsEos(short access_num, short offset);
 
+/* Opening a VAB is two steps: the header goes to main memory, then the body
+   is pushed to SPU local memory a chunk at a time until it reports done. */
+short SsVabOpenHead(u_char* addr, short vabid);
+short SsVabTransBody(u_char* addr, short vabid);
+void SsVabClose(short vabid);
+
+/* A SEQ played against an open VAB. `nsep` is how many sub-sequences the file
+   holds; each is stopped and started by its index. */
+short SsSepOpen(u_long* addr, short vabid, short nsep);
+void SsSepClose(short sep_access_num);
+void SsSepPlay(short sep_access_num, short seq_num, short play_mode,
+               short l_count);
+void SsSepStop(short sep_access_num, short seq_num);
+void SsSepPause(short sep_access_num, short seq_num);
+void SsSepReplay(short sep_access_num, short seq_num);
+void SsSepSetVol(short sep_access_num, short seq_num, short voll, short volr);
+void SsSepSetCrescendo(short sep_access_num, short seq_num, short vol,
+                       short v_time);
+
 #endif

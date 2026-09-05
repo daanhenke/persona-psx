@@ -310,10 +310,15 @@ def normalize_asm(lines, names=None, gp=None):
         return "%%gp_rel(%s)($gp)" % sym if sym else m.group(0)
 
     out = []
+    # `SYM + 0xNN` has to become a single name before anything else looks at
+    # it: fold_literal_at_refs matches on the symbol, and the offset form slips
+    # straight past it. That is how a field two bytes into an object the source
+    # reached by literal - g_slots[62].scale_y, written as D_800DD1AC + 0x2 -
+    # kept its invented symbol while its neighbours were folded.
+    lines = [OFFREF.sub(fold, ln) for ln in lines]
     # Runs first: once an invented symbol is folded to a literal, `rename` must
     # not turn it back into a name the candidate cannot use.
     for ln in fold_literal_at_refs(lines, names):
-        ln = OFFREF.sub(fold, ln)
         ln = CONSTREF.sub(unconst, ln)
         if names:
             ln = NAMED.sub(rename, ln)

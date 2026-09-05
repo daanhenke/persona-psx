@@ -641,5 +641,7 @@ extern DISPENV* PutDispEnv(DISPENV* env);
 extern DISPENV* SetDefDispEnv(DISPENV* env, int x, int y, int w, int h);
 extern DRAWENV* SetDefDrawEnv(DRAWENV* env, int x, int y, int w, int h);
 extern void SetDrawEnv(DR_ENV* dr_env, DRAWENV* env);
+extern DRAWENV* GetDrawEnv(DRAWENV* env);
+extern DISPENV* GetDispEnv(DISPENV* env);
 
 #endif

@@ -420,3 +420,15 @@ s2d       func_80074D68    src/p1-jp/s2d/ui/configchoice.c
 s2d       func_80074E4C    src/p1-jp/s2d/ui/configchoice.c
 adv       func_800AF568    src/p1-jp/adv/gfx/shrinkslot.c
 adv       func_8007E5A4    src/p1-jp/adv/audio/silencebgm.c
+btlp      func_8007BF00    src/p1-jp/btlp/seqstate.c
+btlp      func_8007C53C    src/p1-jp/btlp/seqstate.c
+btlp      func_80079FE0    src/p1-jp/btlp/seqstate.c
+btlp      func_8007BE24    src/p1-jp/btlp/seqstate.c
+btlp      func_8007EF38    src/p1-jp/btlp/bgmpending.c
+btlp      func_80066760    src/p1-jp/btlp/vramqueue.c
+btlp      func_800678F8    src/p1-jp/btlp/loadscratch.c
+adv       func_8007644C    src/p1-jp/common/ui/configmarkers.c
+dng       func_80084FD0    src/p1-jp/common/ui/configmarkers.c
+s2d       func_80075404    src/p1-jp/common/ui/configmarkers.c
+adv       func_80081D34    src/p1-jp/adv/game/effectspin.c
+adv       func_80081E94    src/p1-jp/adv/game/effectspin.c

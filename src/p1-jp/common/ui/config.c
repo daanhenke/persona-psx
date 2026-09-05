@@ -2,7 +2,8 @@
  *
  * Compiled into three overlays rather than called across the boundary:
  *                      DNG         ADV         S2D
- *   ConfigPlaceMarkers 0x80084C4C  0x800760C0  0x80075078
+ *   ConfigSoundPlaceMarkers
+ *                      0x80084C4C  0x800760C0  0x80075078
  *   ConfigBeginEdit    0x800850F8  0x80076574  0x8007552C
  *   ConfigApplyOption  0x800851D0  0x8007664C  0x80075604
  *
@@ -32,9 +33,11 @@ extern void SlotSetPos(int slot, int attr, int x, int y);
 /* An option value never needs more than the low byte of the list index. */
 #define OPT_VALUE (*(u_char *)&g_menu->list[1].cur)
 
-/* Stops both markers blinking, arms the one the context points at, then moves
-   each to the column its option value selects. */
-void ConfigPlaceMarkers(void)
+/* The sound page's own pair of markers: stops both blinking, arms the one the
+   context points at, then moves each to the column its option value selects.
+   The config screen proper has three rows and its own routine; see
+   src/p1-jp/common/ui/configmarkers.c. */
+void ConfigSoundPlaceMarkers(void)
 {
     SlotSetFlicker(2, 0);
     SlotSetFlicker(3, 0);
@@ -64,7 +67,7 @@ void ConfigBeginEdit(void)
 }
 
 /* The sound page has its own two settings and picks the row from slot_base,
-   the field ConfigPlaceMarkers uses to decide which marker to arm. */
+   the field ConfigSoundPlaceMarkers uses to decide which marker to arm. */
 void ConfigSoundBeginEdit(void)
 {
     switch (g_menu->slot_base) {
