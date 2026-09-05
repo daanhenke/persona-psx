@@ -111,7 +111,8 @@ void FormationLoadPreset(u_char preset)
 
 /* A member may only stand on an empty cell whose four orthogonal neighbours are
    also empty. Each edge test carries both bounds even though one half of it is
-   always true, and `last` holds a constant - leave both alone. */
+   always true; `last` holds a constant, and the casts on the neighbour indices
+   decide which way round the address addition comes out. Leave all three. */
 u_char FormationCellFree(u_char cell)
 {
     u_char *grid;
@@ -132,19 +133,19 @@ u_char FormationCellFree(u_char cell)
     last = GRID_H - 1;
     {
         int row = (cell / GRID_W) & 0xFF;
-        if (row < last && row >= 0 && grid[cell + GRID_W] != CELL_EMPTY) {
+        if (row < last && row >= 0 && grid[(long)(cell + GRID_W)] != CELL_EMPTY) {
             return 0;
         }
     }
     {
         int col = (cell % GRID_W) & 0xFF;
-        if (col < GRID_W && col != 0 && grid[cell - 1] != CELL_EMPTY) {
+        if (col < GRID_W && col != 0 && grid[(long)(cell - 1)] != CELL_EMPTY) {
             return 0;
         }
     }
     {
         int col = (cell % GRID_W) & 0xFF;
-        if (col < last && col >= 0 && grid[cell + 1] != CELL_EMPTY) {
+        if (col < last && col >= 0 && grid[(long)(cell + 1)] != CELL_EMPTY) {
             return 0;
         }
     }
