@@ -47,50 +47,61 @@
 <line x1="742.0" y1="468" x2="742.0" y2="472" stroke="#b9b3a7"/>
 <text x="742.0" y="485" font-size="10" fill="#8a857c" text-anchor="middle">19:50</text>
 <text x="430.0" y="504" font-size="10" fill="#8a857c" text-anchor="middle">2026-09-05</text>
-<text x="836" y="64" font-size="10" fill="#8a857c" letter-spacing="0.5">TARGET      MATCHED     OF ITSELF</text>
+<text x="836" y="64" font-size="10" fill="#8a857c" letter-spacing="0.5">TARGET   MATCHED  OF IT  FUNCTIONS</text>
 <rect x="836" y="71" width="11" height="11" fill="#4e79a7" rx="2"/>
 <text x="853" y="80" font-size="11" fill="#3d3a35">main</text>
-<text x="942" y="80" font-size="11" fill="#3d3a35" text-anchor="end">3,700</text>
-<text x="986" y="80" font-size="11" fill="#8a857c" text-anchor="end">2.01%</text>
+<text x="927" y="80" font-size="11" fill="#3d3a35" text-anchor="end">3,700</text>
+<text x="970" y="80" font-size="11" fill="#8a857c" text-anchor="end">2.01%</text>
+<text x="1040" y="80" font-size="11" fill="#8a857c" text-anchor="end">21/1221</text>
 <rect x="836" y="88" width="11" height="11" fill="#f28e2b" rx="2"/>
 <text x="853" y="97" font-size="11" fill="#3d3a35">atlus</text>
-<text x="942" y="97" font-size="11" fill="#3d3a35" text-anchor="end">180</text>
-<text x="986" y="97" font-size="11" fill="#8a857c" text-anchor="end">0.26%</text>
+<text x="927" y="97" font-size="11" fill="#3d3a35" text-anchor="end">180</text>
+<text x="970" y="97" font-size="11" fill="#8a857c" text-anchor="end">0.26%</text>
+<text x="1040" y="97" font-size="11" fill="#8a857c" text-anchor="end">1/608</text>
 <rect x="836" y="105" width="11" height="11" fill="#e15759" rx="2"/>
 <text x="853" y="114" font-size="11" fill="#3d3a35">open</text>
-<text x="942" y="114" font-size="11" fill="#3d3a35" text-anchor="end">180</text>
-<text x="986" y="114" font-size="11" fill="#8a857c" text-anchor="end">0.15%</text>
+<text x="927" y="114" font-size="11" fill="#3d3a35" text-anchor="end">180</text>
+<text x="970" y="114" font-size="11" fill="#8a857c" text-anchor="end">0.15%</text>
+<text x="1040" y="114" font-size="11" fill="#8a857c" text-anchor="end">1/882</text>
 <rect x="836" y="122" width="11" height="11" fill="#76b7b2" rx="2"/>
 <text x="853" y="131" font-size="11" fill="#3d3a35">movie</text>
-<text x="942" y="131" font-size="11" fill="#3d3a35" text-anchor="end">136</text>
-<text x="986" y="131" font-size="11" fill="#8a857c" text-anchor="end">0.16%</text>
+<text x="927" y="131" font-size="11" fill="#3d3a35" text-anchor="end">136</text>
+<text x="970" y="131" font-size="11" fill="#8a857c" text-anchor="end">0.16%</text>
+<text x="1040" y="131" font-size="11" fill="#8a857c" text-anchor="end">1/764</text>
 <rect x="836" y="139" width="11" height="11" fill="#59a14f" rx="2"/>
 <text x="853" y="148" font-size="11" fill="#3d3a35">end</text>
-<text x="942" y="148" font-size="11" fill="#3d3a35" text-anchor="end">136</text>
-<text x="986" y="148" font-size="11" fill="#8a857c" text-anchor="end">0.14%</text>
+<text x="927" y="148" font-size="11" fill="#3d3a35" text-anchor="end">136</text>
+<text x="970" y="148" font-size="11" fill="#8a857c" text-anchor="end">0.14%</text>
+<text x="1040" y="148" font-size="11" fill="#8a857c" text-anchor="end">1/843</text>
 <rect x="836" y="156" width="11" height="11" fill="#edc948" rx="2"/>
 <text x="853" y="165" font-size="11" fill="#3d3a35">dng</text>
-<text x="942" y="165" font-size="11" fill="#3d3a35" text-anchor="end">17,832</text>
-<text x="986" y="165" font-size="11" fill="#8a857c" text-anchor="end">8.97%</text>
+<text x="927" y="165" font-size="11" fill="#3d3a35" text-anchor="end">17,832</text>
+<text x="970" y="165" font-size="11" fill="#8a857c" text-anchor="end">8.97%</text>
+<text x="1040" y="165" font-size="11" fill="#8a857c" text-anchor="end">103/376</text>
 <rect x="836" y="173" width="11" height="11" fill="#b07aa1" rx="2"/>
 <text x="853" y="182" font-size="11" fill="#3d3a35">btlp</text>
-<text x="942" y="182" font-size="11" fill="#3d3a35" text-anchor="end">168</text>
-<text x="986" y="182" font-size="11" fill="#8a857c" text-anchor="end">0.12%</text>
+<text x="927" y="182" font-size="11" fill="#3d3a35" text-anchor="end">168</text>
+<text x="970" y="182" font-size="11" fill="#8a857c" text-anchor="end">0.12%</text>
+<text x="1040" y="182" font-size="11" fill="#8a857c" text-anchor="end">1/315</text>
 <rect x="836" y="190" width="11" height="11" fill="#ff9da7" rx="2"/>
 <text x="853" y="199" font-size="11" fill="#3d3a35">s2d</text>
-<text x="942" y="199" font-size="11" fill="#3d3a35" text-anchor="end">18,624</text>
-<text x="986" y="199" font-size="11" fill="#8a857c" text-anchor="end">8.90%</text>
+<text x="927" y="199" font-size="11" fill="#3d3a35" text-anchor="end">18,624</text>
+<text x="970" y="199" font-size="11" fill="#8a857c" text-anchor="end">8.90%</text>
+<text x="1040" y="199" font-size="11" fill="#8a857c" text-anchor="end">102/449</text>
 <rect x="836" y="207" width="11" height="11" fill="#9c755f" rx="2"/>
 <text x="853" y="216" font-size="11" fill="#3d3a35">adv</text>
-<text x="942" y="216" font-size="11" fill="#3d3a35" text-anchor="end">28,220</text>
-<text x="986" y="216" font-size="11" fill="#8a857c" text-anchor="end">12.69%</text>
+<text x="927" y="216" font-size="11" fill="#3d3a35" text-anchor="end">28,220</text>
+<text x="970" y="216" font-size="11" fill="#8a857c" text-anchor="end">12.69%</text>
+<text x="1040" y="216" font-size="11" fill="#8a857c" text-anchor="end">157/410</text>
 <rect x="836" y="224" width="11" height="11" fill="#8cd17d" rx="2"/>
 <text x="853" y="233" font-size="11" fill="#3d3a35">casino</text>
-<text x="942" y="233" font-size="11" fill="#3d3a35" text-anchor="end">184</text>
-<text x="986" y="233" font-size="11" fill="#8a857c" text-anchor="end">0.10%</text>
+<text x="927" y="233" font-size="11" fill="#3d3a35" text-anchor="end">184</text>
+<text x="970" y="233" font-size="11" fill="#8a857c" text-anchor="end">0.10%</text>
+<text x="1040" y="233" font-size="11" fill="#8a857c" text-anchor="end">1/453</text>
 <rect x="836" y="241" width="11" height="11" fill="#86bcb6" rx="2"/>
 <text x="853" y="250" font-size="11" fill="#3d3a35">name</text>
-<text x="942" y="250" font-size="11" fill="#3d3a35" text-anchor="end">1,148</text>
-<text x="986" y="250" font-size="11" fill="#8a857c" text-anchor="end">7.43%</text>
+<text x="927" y="250" font-size="11" fill="#3d3a35" text-anchor="end">1,148</text>
+<text x="970" y="250" font-size="11" fill="#8a857c" text-anchor="end">7.43%</text>
+<text x="1040" y="250" font-size="11" fill="#8a857c" text-anchor="end">7/26</text>
 <text x="70" y="512" font-size="9.5" fill="#a49e93">The first 58 samples predate per-target recording and are reconstructed from the order functions were added; their grand totals are as measured.</text>
 </svg>

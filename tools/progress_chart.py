@@ -195,10 +195,11 @@ def build(hist, root, game):
            _esc(stamps[0].strftime("%Y-%m-%d")) if same_day else "date"))
 
     # Legend, in load order, with each target's own share of its own code.
-    totals = target_totals(root, game)
+    totals, counts = target_totals(root, game)
+    matched_counts = manifest_counts(root, game)
     ly = T + 6
     add('<text x="%d" y="%d" font-size="10" fill="#8a857c" '
-        'letter-spacing="0.5">TARGET      MATCHED     OF ITSELF</text>'
+        'letter-spacing="0.5">TARGET   MATCHED  OF IT  FUNCTIONS</text>'
         % (L + PW + 46, ly))
     ly += 16
     for t in live:
@@ -210,10 +211,13 @@ def build(hist, root, game):
             % (L + PW + 63, ly, _esc(t)))
         add('<text x="%d" y="%d" font-size="11" fill="#3d3a35" '
             'text-anchor="end">%s</text>'
-            % (L + PW + 152, ly, "{:,}".format(got)))
+            % (L + PW + 137, ly, "{:,}".format(got)))
         add('<text x="%d" y="%d" font-size="11" fill="#8a857c" '
             'text-anchor="end">%.2f%%</text>'
-            % (L + PW + 196, ly, 100.0 * got / own if own else 0.0))
+            % (L + PW + 180, ly, 100.0 * got / own if own else 0.0))
+        add('<text x="%d" y="%d" font-size="11" fill="#8a857c" '
+            'text-anchor="end">%d/%d</text>'
+            % (L + PW + 250, ly, matched_counts.get(t, 0), counts.get(t, 0)))
         ly += 17
 
     if n_recon:
@@ -226,12 +230,26 @@ def build(hist, root, game):
 
 
 def target_totals(root, game):
-    """Total bytes of code in each target."""
-    out = {}
+    """(bytes of code, number of functions) in each target."""
+    size, count = {}, {}
     for t in TARGETS:
         path = os.path.join(root, "config", game, "%s.symbols.txt" % t)
         if not os.path.exists(path):
             continue
-        out[t] = sum(int(m.group(1), 16)
-                     for m in (FUNCSIZE.search(l) for l in open(path)) if m)
+        found = [m for m in (FUNCSIZE.search(l) for l in open(path)) if m]
+        size[t] = sum(int(m.group(1), 16) for m in found)
+        count[t] = len(found)
+    return size, count
+
+
+def manifest_counts(root, game):
+    """How many functions each target has matched, from the manifest.
+
+    Every row in decomp.txt is a function tools/progress.py has re-verified at
+    100%, so counting rows per target says the same thing the run that drew the
+    chart printed - no extra bookkeeping in the history for it.
+    """
+    out = {}
+    for target, _ in manifest_order(root, game):
+        out[target] = out.get(target, 0) + 1
     return out
