@@ -243,3 +243,18 @@ Most of the text is Japanese and outside that range, but the tables that are
 not - the arcana names, the elements, the status ailments, the name-entry
 keyboard - are enough to identify the tables around them, and a string constant
 with a readable name beats one called after its address.
+
+### When only the registers differ
+
+A candidate that reaches 96-99% with the same instruction sequence and a
+different register assignment is what `tools/decomp-permuter` is for, and it is
+worth the wall-clock on anything sizeable - run it in the background and carry
+on. `DrawStatusFrames` sat at 99.49% through a dozen hand variations and the
+permuter found the answer in one run: a `do { } while (0)` around one of three
+otherwise identical loop bodies, which puts that body in its own basic block and
+flips the two registers. Fold the finding back into readable C and leave a line
+saying it is load-bearing.
+
+Its score and objdiff's percentage do not track each other closely - a
+permuter score of 425 measured 93% and one of 480 measured 95.8% - so re-score
+every output it keeps with `tools/mfunc.py` rather than trusting the ranking.
