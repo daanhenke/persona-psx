@@ -435,3 +435,5 @@ adv       func_80081E94    src/p1-jp/adv/game/effectspin.c
 btlp      func_8008168C    src/p1-jp/btlp/soundbank.c
 adv       func_80081864    src/p1-jp/adv/game/chestresult.c
 adv       func_80081BB0    src/p1-jp/adv/game/chestresult.c
+adv       func_8007629C    src/p1-jp/adv/ui/configbattle.c
+s2d       func_80075254    src/p1-jp/s2d/ui/configbattle.c

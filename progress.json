@@ -756,5 +756,47 @@
    "casino": 184,
    "name": 1148
   }
+ },
+ {
+  "date": "2026-09-05T23:45:53",
+  "matched_bytes": 80164,
+  "total_bytes": 1537688,
+  "percent": 5.2133,
+  "matched_funcs": 431,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19064,
+   "btlp": 1132,
+   "s2d": 20784,
+   "adv": 33520,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-05T23:46:57",
+  "matched_bytes": 81184,
+  "total_bytes": 1537688,
+  "percent": 5.2796,
+  "matched_funcs": 437,
+  "total_funcs": 6347,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19404,
+   "btlp": 1132,
+   "s2d": 21124,
+   "adv": 33860,
+   "casino": 184,
+   "name": 1148
+  }
  }
 ]

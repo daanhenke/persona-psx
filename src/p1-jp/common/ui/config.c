@@ -1,20 +1,44 @@
 /* Persona 1 (JP) - the config screen.
  *
  * Compiled into three overlays rather than called across the boundary:
- *                      DNG         ADV         S2D
- *   ConfigSoundPlaceMarkers
- *                      0x80084C4C  0x800760C0  0x80075078
- *   ConfigBeginEdit    0x800850F8  0x80076574  0x8007552C
- *   ConfigApplyOption  0x800851D0  0x8007664C  0x80075604
+ *                          DNG         ADV         S2D
+ *   ConfigListPlaceMarkers 0x80084C4C  0x800760C0  0x80075078
+ *   ConfigListBeginEdit    0x80084CE8  0x8007615C  0x80075114
+ *   ConfigBeginEdit        0x800850F8  0x80076574  0x8007552C
+ *   ConfigApplyOption      0x800851D0  0x8007664C  0x80075604
  *
  * Each setting is a row of evenly spaced choices with a marker sprite sitting
- * on the current one, so a value is really a column index.
+ * on the current one, so a value is really a column index. The choices are not
+ * drawn one at a time: a whole row of them is one string, spaced so a marker
+ * parked on any of them lines up, which is why nothing here has to know what
+ * the alternatives are.
+ *
+ * The screen is two pages. The list page offers five entries and shows a value
+ * beside the first two:
+ *
+ *   0  AUTO MAP            FREE / FIXED         g_options[3]
+ *   1  SOUND               MONO / STEREO        g_options[0]
+ *   2  CONTROLLER SETTINGS (opens a page)
+ *   3  WINDOW SETTINGS     (opens a page)
+ *   4  BATTLE SETTINGS     (opens a page)
+ *
+ * and the battle page - src/p1-jp/adv/ui/configbattle.c draws it - offers
+ * three settings and a fourth entry that opens yet another:
+ *
+ *   0  COMMAND CONFIRM     DO / DO NOT          g_options[1]
+ *   1  MESSAGE SPEED       NORMAL / FAST / OFF  g_options[2]
+ *   2  WINDOW ANIMATION    DO / DO NOT          g_options[0x23]
+ *   3  AUTO BATTLE SETTINGS (opens a page)
+ *
+ * The list page picks its row from slot_base and the battle page from row,
+ * which is the only structural difference between the two halves below.
  */
 #include <types.h>
 #include <persona/common/menuctx.h>
 
-/* Saved option bytes. Index 0 is the one AdvLoadBgm reads to choose between
-   the two libsnd output-mode calls. */
+/* Saved option bytes, read all over the game: index 0 is the one AdvLoadBgm
+   reads to choose between the two libsnd output-mode calls, which is the same
+   MONO / STEREO setting the list page shows. */
 extern u_char g_options[];
 
 /* This unit was built against int-taking prototypes, so the slot argument is
@@ -33,11 +57,11 @@ extern void SlotSetPos(int slot, int attr, int x, int y);
 /* An option value never needs more than the low byte of the list index. */
 #define OPT_VALUE (*(u_char *)&g_menu->list[1].cur)
 
-/* The sound page's own pair of markers: stops both blinking, arms the one the
-   context points at, then moves each to the column its option value selects.
-   The config screen proper has three rows and its own routine; see
+/* The list page's two markers: stops both blinking, arms the one the context
+   points at, then moves each to the column its option value selects. The
+   battle page has three and its own routine; see
    src/p1-jp/common/ui/configmarkers.c. */
-void ConfigSoundPlaceMarkers(void)
+void ConfigListPlaceMarkers(void)
 {
     SlotSetFlicker(2, 0);
     SlotSetFlicker(3, 0);
@@ -46,8 +70,9 @@ void ConfigSoundPlaceMarkers(void)
     SlotSetPos(3, 0x42, g_options[0] * OPT_STEP + OPT_X0, 0x60);
 }
 
-/* Arms the value list for the row the cursor is on, starting it at that
-   option's saved value. Row 3 is the way out and has nothing to edit. */
+/* Arms the value list for the battle page's selected row, starting it at that
+   option's saved value. Row 3 opens a page of its own and has nothing to
+   edit; the count passed with each is one less than the number of choices. */
 void ConfigBeginEdit(void)
 {
     switch (g_menu->row) {
@@ -66,9 +91,10 @@ void ConfigBeginEdit(void)
     }
 }
 
-/* The sound page has its own two settings and picks the row from slot_base,
-   the field ConfigSoundPlaceMarkers uses to decide which marker to arm. */
-void ConfigSoundBeginEdit(void)
+/* The same for the list page, which picks its row from slot_base - the field
+   ConfigListPlaceMarkers uses to decide which marker to arm. Its last three
+   rows open pages rather than holding a value. */
+void ConfigListBeginEdit(void)
 {
     switch (g_menu->slot_base) {
     case 0:

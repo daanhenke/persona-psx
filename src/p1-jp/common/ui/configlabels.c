@@ -9,8 +9,17 @@
  * 0xFF-terminated, which is why the two columns do not collide even though
  * both are written sixteen cells wide.
  *
- * The text is Japanese and outside the range tools/glyphs.py decodes, so the
- * names say where the strings go rather than what they read.
+ * It is the settings-items list, headed SETTING ITEMS:
+ *
+ *   0  AUTO MAP            FREE / FIXED
+ *   1  SOUND               MONO / STEREO
+ *   2  CONTROLLER SETTINGS
+ *   3  WINDOW SETTINGS
+ *   4  BATTLE SETTINGS
+ *
+ * The two value labels are the right-column strings, and the last three rows
+ * open pages of their own rather than holding a value - which is why only two
+ * of them are drawn. src/p1-jp/common/ui/config.c arms and marks them.
  *
  * S2D keeps its own copy against a layer 0x20000 higher; see
  * src/p1-jp/s2d/ui/configlabels.c.
