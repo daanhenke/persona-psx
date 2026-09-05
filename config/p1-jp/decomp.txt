@@ -396,3 +396,6 @@ adv       func_8007C094    src/p1-jp/common/ui/partyhud.c
 s2d       func_8007AAF0    src/p1-jp/s2d/ui/partyhud.c
 adv       func_8007FC88    src/p1-jp/adv/game/diagstep.c
 adv       func_8007FFD0    src/p1-jp/adv/game/diagstep.c
+adv       func_8007D0F8    src/p1-jp/common/gfx/backdrop.c
+dng       func_8008B688    src/p1-jp/common/gfx/backdrop.c
+s2d       func_8007BAF8    src/p1-jp/s2d/gfx/backdrop.c
