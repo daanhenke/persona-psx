@@ -3033,6 +3033,7 @@ PROVIDE(g_adv_e3_offsets = 0x8004DFB8);
 PROVIDE(g_adv_scene = 0x80100000);
 PROVIDE(g_adv_scene_arg = 0x8005E714);
 PROVIDE(g_adv_scene_file = 0x8005E654);
+PROVIDE(g_bank_seq = 0x801F539E);
 PROVIDE(g_bg_cells = 0x800E224C);
 PROVIDE(g_bg_cells_s2d = 0x8010224C);
 PROVIDE(g_bg_state = 0x800E1E4C);

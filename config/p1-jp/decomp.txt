@@ -148,3 +148,4 @@ adv       func_8008202C    src/p1-jp/common/game/flags.c
 adv       func_8008206C    src/p1-jp/common/game/flags.c
 adv       func_800820A4    src/p1-jp/common/game/flags.c
 adv       func_800820E4    src/p1-jp/common/game/flags.c
+adv       func_80088554    src/p1-jp/adv/audio/bank.c
