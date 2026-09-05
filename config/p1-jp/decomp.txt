@@ -98,3 +98,15 @@ dng       func_80077518    src/p1-jp/common/menulist.c
 s2d       func_80067540    src/p1-jp/common/menulist.c
 dng       func_80077538    src/p1-jp/dng/menucursor.c
 s2d       func_80067560    src/p1-jp/s2d/menucursor.c
+adv       func_8006839C    src/p1-jp/common/imagequeue.c
+dng       func_80077AFC    src/p1-jp/common/imagequeue.c
+s2d       func_80067B24    src/p1-jp/common/imagequeue.c
+adv       func_80068414    src/p1-jp/common/imagequeue.c
+dng       func_80077B74    src/p1-jp/common/imagequeue.c
+s2d       func_80067B9C    src/p1-jp/common/imagequeue.c
+adv       func_8008B6BC    src/p1-jp/common/pad.c
+dng       func_8008F8E4    src/p1-jp/common/pad.c
+s2d       func_8007FDF4    src/p1-jp/s2d/pad.c
+adv       func_8008B82C    src/p1-jp/common/fadesprites.c
+dng       func_8008FA54    src/p1-jp/common/fadesprites.c
+s2d       func_8007FF64    src/p1-jp/common/fadesprites.c
