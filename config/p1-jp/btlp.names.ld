@@ -3094,6 +3094,7 @@ PROVIDE(g_cd_stream_mode = 0x80055C20);
 PROVIDE(g_cd_stream_sectors = 0x80055C1C);
 PROVIDE(g_chars = 0x801F1BCC);
 PROVIDE(g_checker_index = 0x800F1D80);
+PROVIDE(g_chest_defs = 0x80100BD0);
 PROVIDE(g_cutscene_hi = 0x801F15C3);
 PROVIDE(g_cutscene_id = 0x801F15C2);
 PROVIDE(g_dng_third_flags = 0x801F15B9);

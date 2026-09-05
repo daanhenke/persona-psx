@@ -450,3 +450,4 @@ adv       func_800AAFD4    src/p1-jp/adv/game/money.c
 adv       func_8007AC34    src/p1-jp/common/gfx/tilemapbar.c
 dng       func_800897B0    src/p1-jp/common/gfx/tilemapbar.c
 s2d       func_80079BEC    src/p1-jp/common/gfx/tilemapbar.c
+adv       func_8008305C    src/p1-jp/adv/game/actors.c

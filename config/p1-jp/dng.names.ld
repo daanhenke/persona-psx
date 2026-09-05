@@ -3184,6 +3184,7 @@ PROVIDE(g_cd_stream_mode = 0x80055C20);
 PROVIDE(g_cd_stream_sectors = 0x80055C1C);
 PROVIDE(g_chars = 0x801F1BCC);
 PROVIDE(g_checker_index = 0x800F1D80);
+PROVIDE(g_chest_defs = 0x80100BD0);
 PROVIDE(g_compass_cels = 0x8009C8B0);
 PROVIDE(g_config_labels_left = 0x8009C124);
 PROVIDE(g_config_labels_right = 0x8009C154);

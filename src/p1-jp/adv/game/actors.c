@@ -48,10 +48,14 @@ u_char ActorFindAt(u_char x, u_char y)
 {
     u_char i;
 
+    /* The test needs a basic block of its own for the index to end up in the
+       register the original returns; the do/while(0) is what gives it one. */
     for (i = 0; ; i++) {
-        if (x == g_adv_actors[i].x && y == g_adv_actors[i].y) {
-            return i;
-        }
+        do {
+            if (x == g_adv_actors[i].x && y == g_adv_actors[i].y) {
+                return i;
+            }
+        } while (0);
     }
 }
 
