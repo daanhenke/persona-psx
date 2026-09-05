@@ -2,6 +2,22 @@
 #define LIBGS_H
 
 #include <types.h>
+#include <libgte.h>
+
+/* A coordinate system. GsInitCoordinate2 starts one at GsIDMATRIX, and the
+   routines that place an object write its rotation and translation into
+   `coord` and clear `flg` so libgs recomputes the composed matrix. */
+typedef struct GsCOORDINATE2 {
+    /* 0x00 */ u_long                flg;
+    /* 0x04 */ MATRIX                coord;
+    /* 0x24 */ MATRIX                workm;
+    /* 0x44 */ SVECTOR              *rotate;
+    /* 0x48 */ struct GsCOORDINATE2 *super;
+    /* 0x4C */ struct GsCOORDINATE2 *sub;
+} GsCOORDINATE2;                    /* 0x50 bytes */
+
+extern MATRIX GsIDMATRIX;
+
 
 /* Ordering table. GsSortSprite takes the entry for the frame being built; the
    overlays keep a two-element array and index it with the buffer number, which

@@ -249,3 +249,11 @@ s2d       func_8007552C    src/p1-jp/common/ui/config.c
 adv       func_80067FBC    src/p1-jp/common/ui/menuscroll.c
 dng       func_80077714    src/p1-jp/common/ui/menuscroll.c
 s2d       func_8006773C    src/p1-jp/common/ui/menuscroll.c
+adv       func_8007D308    src/p1-jp/common/ui/menumember.c
+dng       func_8008B898    src/p1-jp/common/ui/menumember.c
+s2d       func_8007BD08    src/p1-jp/s2d/ui/menumember.c
+adv       func_80095854    src/p1-jp/common/game/roomrotate.c
+dng       func_800961D0    src/p1-jp/common/game/roomrotate.c
+s2d       func_80086664    src/p1-jp/common/game/roomrotate.c
+adv       func_8008AFA8    src/p1-jp/common/gfx/coord.c
+dng       func_8006F9D8    src/p1-jp/common/gfx/coord.c
