@@ -8,7 +8,13 @@
 #include <types.h>
 
 typedef struct {
-    /* 0x00 */ u_char  pad00[0x20];
+    /* 0x00 */ int     hp;      /* the status HUD draws the danger colour once
+                                 hp drops to hp_max / 4, which is what tells
+                                 the pair apart */
+    /* 0x04 */ int     hp_max;
+    /* 0x08 */ int     sp;
+    /* 0x0C */ int     sp_max;  /* both maxima cap at 999 */
+    /* 0x10 */ u_char  pad10[0x10];
     /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot */
     /* 0x2E */ u_char  pad2E[0x10];
     /* 0x3E */ u_char  key;       /* identifies the record; 0 while unused  */
