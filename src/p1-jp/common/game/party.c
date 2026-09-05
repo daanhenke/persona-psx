@@ -43,3 +43,17 @@ void CopyShorts(u_short *src, u_short *dst, u_short count)
         dst++;
     }
 }
+
+/* The slot holding a given character, or 0xFF if they are not in the party.
+   ADV only. */
+u_char PartyFindSlot(u_char chr)
+{
+    u_char i;
+
+    for (i = 0; i < 5; i++) {
+        if (g_party[i] == chr) {
+            return i;
+        }
+    }
+    return 0xFF;
+}

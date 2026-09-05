@@ -3075,6 +3075,7 @@ PROVIDE(g_fade_state = 0x800DC010);
 PROVIDE(g_fade_state_s2d = 0x800FC010);
 PROVIDE(g_flags_bank1 = 0x801F2A08);
 PROVIDE(g_flags_bank2 = 0x801F2A48);
+PROVIDE(g_flags_bank3 = 0x801F2A68);
 PROVIDE(g_input_accept_a = 0x801F2A88);
 PROVIDE(g_input_accept_b = 0x801F2A8C);
 PROVIDE(g_items = 0x801F267C);

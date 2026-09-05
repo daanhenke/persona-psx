@@ -13,6 +13,7 @@
 
 #define g_event_flags ((u_char *)0x801F29C8)
 #define g_flags_bank2 ((u_char *)0x801F2A48)
+#define g_flags_bank3 ((u_char *)0x801F2A68)
 
 int FlagBank2Get(short id)
 {
@@ -36,4 +37,17 @@ int EventFlagGet2(short id)
     v = p[id / 8];
     v = v & (1 << (id & 7));
     return v;
+}
+
+/* Bank 3 takes a u_char id, so the index is an unsigned shift rather than the
+   signed division the other banks use. ADV only. */
+void FlagBank3Set(u_char id)
+{
+    u_char *p;
+    int     v;
+
+    p = g_flags_bank3;
+    v = p[id >> 3];
+    v = v | (1 << (id & 7));
+    p[id >> 3] = v;
 }

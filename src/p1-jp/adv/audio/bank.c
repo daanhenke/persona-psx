@@ -17,8 +17,8 @@
 #include <libcd.h>
 
 typedef struct {
-    /* 0x00 */ short  file_id;    /* which SE set is in this slot           */
-    /* 0x02 */ short  vab_id;     /* from SsVabOpenHead                     */
+    /* 0x00 */ u_short file_id;    /* which SE set is in this slot           */
+    /* 0x02 */ u_short vab_id;     /* from SsVabOpenHead                     */
     /* 0x04 */ short  seq;        /* from SsSeqOpen                         */
     /* 0x06 */ short  pad06;
     /* 0x08 */ int    unk08;      /* the file is read in from here on       */
@@ -79,4 +79,18 @@ void AdvLoadSe(short id, short slot)
     bank->seq = g_bank_seq[slot];
     SsSeqSetVol(g_bank_seq[slot], 0x7F, 0x7F);
     bank->file_id = id;
+}
+
+/* Marks every slot empty. Six is the slot count. */
+void AdvResetBanks(void)
+{
+    AdvBank *bank;
+    int      i;
+
+    for (i = 0; i < 6; i++) {
+        bank = g_adv_banks[i];
+        bank->file_id = 0xFFFF;
+        bank->vab_id = 0xFFFF;
+        g_bank_seq[i] = -1;
+    }
 }

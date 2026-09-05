@@ -3117,6 +3117,7 @@ PROVIDE(g_fade_state = 0x800DC010);
 PROVIDE(g_fade_state_s2d = 0x800FC010);
 PROVIDE(g_flags_bank1 = 0x801F2A08);
 PROVIDE(g_flags_bank2 = 0x801F2A48);
+PROVIDE(g_flags_bank3 = 0x801F2A68);
 PROVIDE(g_flicker_ramp = 0x8009C750);
 PROVIDE(g_image_queue = 0x800B8BD8);
 PROVIDE(g_image_queue_count = 0x800B8BA4);
