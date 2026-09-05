@@ -392,3 +392,5 @@ adv       func_8008EF14    src/p1-jp/common/gfx/checkermap.c
 dng       func_80092FB4    src/p1-jp/common/gfx/checkermap.c
 s2d       func_800834C8    src/p1-jp/s2d/gfx/checkermap.c
 adv       func_80082674    src/p1-jp/adv/gfx/slot.c
+adv       func_8007C094    src/p1-jp/common/ui/partyhud.c
+s2d       func_8007AAF0    src/p1-jp/s2d/ui/partyhud.c

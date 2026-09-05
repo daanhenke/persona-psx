@@ -1,42 +1,35 @@
 # Persona 1 (JP, SLPS-00500) — matching decompilation
 
-Target: the PlayStation release, JP as the base. The 1999 JP PC port is kept as a
-*reference oracle* only — it flattens the overlay set and duplicates functions per
-overlay, and shares almost nothing with Persona 2, which is PSX-only.
+*Megami Ibunroku Persona* for the PlayStation, decompiled to C that compiles
+back to the original bytes. JP is the base. Persona 2 (Innocent Sin / Eternal
+Punishment) is a later goal and shares this engine, which is why the PSX release
+was chosen over the 1999 JP PC port — the port flattens the overlay set,
+duplicates functions per overlay, and shares almost nothing with P2. It is kept
+as a reference oracle, nothing more.
+
+![progress](docs/progress.svg)
 
 ## Status
 
-All 11 targets rebuild **byte-identically** from split asm (`make check`), and
-each has at least one function decompiled to matching C.
+All 11 targets rebuild **byte-identically** from split asm (`make check`), which
+is the ground truth that the split is lossless.
 
-| target | binary | vram | asm rebuild |
-|---|---|---|---|
-| `main` | `SLPS_005.00` | `0x80010000` | MATCH |
-| `atlus` `open` `movie` `end` | `EXE/*.EXE` | `0x80080000` | MATCH |
-| `dng` `btlp` `s2d` `adv` `casino` `name` | `*.BIN` overlays | `0x800643a0` | MATCH |
-
-6,347 functions are split out. `tools/progress.py` reports **11 matching,
-1,892 / 1,536,604 bytes (0.123%)**; `--record` appends a timestamped row to
-`progress.json`.
-
-### Decompiled to C
-
-| target | function | bytes |
+| target | binary | vram |
 |---|---|---|
-| `main` | `LoadOverlay` | 212 |
-| `dng` | `DngPollInput` | 172 |
-| `s2d` | `S2dPollInput` | 180 |
-| `adv` | `AdvPollInput` | 180 |
-| `btlp` | `BtlWaitBgmEnd` | 168 |
-| `casino` | `CasinoPlayStepAnim` | 184 |
-| `name` | `NameUploadImageRows` | 164 |
-| `atlus` | `StrWaitFrame` | 180 |
-| `open` | `StrWaitFrame` | 180 |
-| `movie` | `StrDecodeNextFrame` | 136 |
-| `end` | `StrDecodeNextFrame` | 136 |
+| `main` | `SLPS_005.00` | `0x80010000` |
+| `atlus` `open` `movie` `end` | `EXE/*.EXE` | `0x80080000` |
+| `dng` `btlp` `s2d` `adv` `casino` `name` | `*.BIN` overlays | `0x800643a0` |
+
+6,347 functions are split out. `tools/progress.py` re-verifies every one that
+has been decompiled and counts only a 100% objdiff as matched; `--record`
+appends a row to `progress.json` and redraws the chart above.
+
+The work so far is concentrated in the three big overlays — `adv` (the field and
+event scenes), `dng` (the first-person dungeon) and `s2d` — because they share
+most of their code with each other and, eventually, with Persona 2.
 
 A decompiled function only joins the build once its splat subsegment is flipped
-from `asm` to `c`; until then candidates live in `src/` and are verified
+from `asm` to `c`. Until then candidates live in `src/` and are verified
 standalone, so `make check` stays a true asm-rebuild test.
 
 ## Toolchain
@@ -57,111 +50,27 @@ Everything runs natively on Linux; no Wine or DOSBox is needed.
     make check     # byte-compare every target against the disc original
     make progress  # re-verify every decompiled function
 
-## Matching a function
-
-    tools/mfunc.py <target> <symbol>                       # show the target
-    tools/mfunc.py <target> <symbol> cand.c                # score a candidate
-    tools/mfunc.py <target> <symbol> cand.c --diff         # ...with a diff
-    tools/mfunc.py <target> <symbol> cand.c --diff --all   # include matching rows
-
-It assembles the original function on its own, compiles the candidate, and hands
-both objects to **objdiff** — which understands relocations and is what
-decomp-permuter scores against, so its percentage is the verdict. There is no
-hand-rolled linking or byte comparison in the loop: an earlier version had one,
-and `ld` aligning `.text` to 16 silently *understated* every function at a
-non-16-aligned address.
-
-For the target and the candidate to be comparable they must agree on symbol
-names, so `normalize_asm` rewrites the target asm three ways:
-
-- spimdisasm's `D_8009FB00 + 0x28` offset form becomes `D_8009FB28`
-- address-derived names become the real ones (`func_80012B2C` → `CdSearchFileLoc`)
-- a `lui`/`addiu` pair building a large *constant* that spimdisasm mistook for an
-  address (`%hi(D_7FFFFF)`) folds back to a literal
-- a linked `0($gp)` small-data access becomes `%gp_rel(symbol)($gp)`, once the
-  target's `$gp` is known (see `config/p1-jp/gp.txt`)
-
-### Per-file compiler flags
-
-Not every translation unit was built the same way. `ATLUS.EXE` and `OPEN.EXE` are
-almost entirely SDK plus **`-O0` game code with a small-data area** — frame
-pointers and `$gp`-relative accesses give it away. A source can override the
-defaults:
-
-    /* cc1flags: -O0 -G8 */
-
-`$gp` itself is not in the PS-EXE header; each binary sets it at its entry point
-(`ATLUS.EXE` does `$gp = 0x800A4DEC + 0x7AC`), and those values live in
-`config/p1-jp/gp.txt`.
-
-### When the structure is right but registers are not
-
-    tools/setup_permuter.py <target> <symbol> <candidate.c>
-    tools/decomp-permuter/permuter.py permuter/<target>/<symbol> -j12 --stop-on-zero
-
-That is how `DngPollInput` landed: reusing one `int` for a call result and then
-for `0x1F` puts the constant in a register before the pointer load. It took 873
-iterations. `NameUploadImageRows` needed a similar trick — a redundant
-`p = desc` to force the base into a register before the add.
-
-Compiler behaviours worth knowing, each of which cost a match until fixed:
-
-- **Values live across a call want a saved register.** `LoadOverlay` only matched
-  once the sector count was a local computed before the retry loop.
-- **Load/store order is visible.** MIPS1 needs a slot after a load; storing
-  before loading lets gcc fill it with a store instead of the original's `nop`.
-- **Return width shows up.** Two stray `andi v0, v0, 0xff` meant the callee
-  returned `u_char`, not `int`.
-- **Loop layout follows the source.** The FMV decoder only matched as an explicit
-  `goto` chain; `do/while` and `for(;;)` both put the backward branch in the
-  wrong place.
-- **Struct access beats array indexing at `-O0`.** `header->size` emits
-  `lw v1, 8(v0)`; `header[2]` computed the address first.
-
-## Naming
-
-Names live in Ghidra and flow outwards. Rename by running a pyghidra script
-through ReVa against the program that owns the address, then:
-
-1. run `ghidra/ExportCodeMap.py` in Ghidra — re-exports the map
-2. `tools/gen_names.py` — rebuilds the per-target linker symbol maps
-3. update the affected `src/` files by hand
-4. `tools/progress.py` — re-verify every match still holds
-
-Skipping step 1 is the easy mistake: the rename lands in Ghidra, `gen_names.py`
-re-reads the *stale* export, and every function touching the renamed symbol
-quietly drops to ~98%.
-
-Address the right binary. Every overlay loads at `0x800643A0` and every sub-EXE
-at `0x80080000`, so the same address means different things in different
-binaries — Ghidra keeps the overlays in their own address spaces (`OVL_DNG`,
-`OVL_S2D`, …) for exactly this reason. An earlier global symbol map renamed a
-DNG symbol to `CatPrim`, a name harvested from `END.EXE`.
-
-Nothing in `src/` uses an address-derived name. Where a name is asserted it is
-backed by evidence, recorded as a plate comment on the symbol in Ghidra — for
-example `SndSeqPlay` calls `SsSetNck`/`SsSeqOpen`/`SsSeqSetVol`/`SsSeqPlay` over
-data at `0x80180000`, which is where `main` loads `OPEN.BIN`, making
-**OPEN.BIN the sequence bank**.
-
-(`config/p1-jp/rename.txt` and `ghidra/ApplyNames.py` are the retired version of
-this flow, kept only as a record of names already applied.)
+`CLAUDE.md` is the operating manual: how to pick a function, score a candidate,
+name what it touches, and the compiler behaviours that have already cost time
+here. It is worth reading before the first match.
 
 ## Shared code
 
 `SLPS_005.00` stays resident, so the overlays call its helpers rather than
-carrying copies. The four sub-EXEs are linked standalone and the overlays each
-compile in their own copy of a handful of routines, so the *same* function shows
-up at several addresses. `tools/find_dups.py` finds those — it masks `j`/`jal`
-targets and address immediates, which is everything the linker moves, and groups
-what is left:
+carrying copies. The four sub-EXEs are linked standalone, though, and the
+overlays each compile in their own copy of a handful of routines — so the *same*
+function shows up at several addresses. `tools/find_dups.py` finds those: it
+masks `j`/`jal` targets and address immediates, which is everything the linker
+moves, and groups what is left.
 
     tools/find_dups.py                    # every cross-target group
     tools/find_dups.py main func_80012B2C # twins of one function
 
 There are 276 such groups, 164 KB of code beyond the first copy. One matching
 source covers every copy, so `src/p1-jp/common/` holds the sources known to be
-shared and `config/p1-jp/decomp.txt` points several targets at them.
+shared and `config/p1-jp/decomp.txt` points several targets at them. Where one
+overlay reaches a different address, it keeps its own copy at the same relative
+path under its own target directory.
 
 ## How the split is driven
 
@@ -193,6 +102,19 @@ Overlays additionally need `.data` ordered *first* (their id dword is at file
 offset 0), `subalign: 4`, and `ld_align_section_vram_end: False` — otherwise
 splat pads each section to 16 and the file comes out 12–24 bytes too long.
 
+## Names
+
+Names live in Ghidra, which is the only copy, and flow outwards into
+`config/p1-jp/*.names.ld`. Every asserted name is backed by something observed —
+an SDK call it wraps, a constant it writes, a sentinel value, how a caller uses
+the result — and that evidence is recorded as a plate comment on the symbol.
+`SndSeqPlay`, for instance, calls `SsSetNck`/`SsSeqOpen`/`SsSeqSetVol`/
+`SsSeqPlay` over data at `0x80180000`, which is where `main` loads `OPEN.BIN`:
+**OPEN.BIN is the sequence bank**.
+
+Nothing in `src/` uses an address-derived name. If a name cannot be justified,
+the function waits.
+
 ## Notes
 
 - The PSX SDK should **not** be decompiled. Link the real Psy-Q libraries via
@@ -202,3 +124,4 @@ splat pads each section to 16 and the file comes out 12–24 bytes too long.
   after an early near-miss where `PRNT_OBJ_594` (Psy-Q `printf` internals) came
   top of the list.
 - See `docs/p1-memory-map.md` for the overlay mechanism and program structure.
+- Disc images and extracted game data live in `scratch/`, which is not tracked.

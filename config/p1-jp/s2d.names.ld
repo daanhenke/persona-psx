@@ -3467,6 +3467,7 @@ PROVIDE(str_cell_run = 0x8009D208);
 PROVIDE(str_dng_tmpl = 0x80010164);
 PROVIDE(str_dngm_tmpl = 0x80010184);
 PROVIDE(str_dngs_tmpl = 0x80010174);
+PROVIDE(str_empty = 0x8009D224);
 PROVIDE(str_end_exe = 0x80010104);
 PROVIDE(str_exmap_tmpl = 0x8004DA38);
 PROVIDE(str_fname_dat = 0x80010084);
