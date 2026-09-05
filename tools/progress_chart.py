@@ -11,8 +11,12 @@ each stack still sums to the total that was actually measured at the time.
 import datetime
 import os
 import re
+import sys
 
-FUNCSIZE = re.compile(r"type:func size:0x([0-9A-Fa-f]+)")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gen_sdk
+
+FUNCSIZE = re.compile(r"^(\S+) = 0x([0-9A-Fa-f]+); // type:func size:0x([0-9A-Fa-f]+)")
 
 # Load order of the game: the two boot screens, the movie player, then the
 # three big overlays, then the minigames. Keeping the legend in this order
@@ -47,9 +51,9 @@ def func_sizes(root, game):
         if not os.path.exists(path):
             continue
         for line in open(path):
-            m = FUNCSIZE.search(line)
+            m = FUNCSIZE.match(line.strip())
             if m:
-                sizes[(t, line.split("=")[0].strip())] = int(m.group(1), 16)
+                sizes[(t, m.group(1))] = int(m.group(3), 16)
     return sizes
 
 
@@ -230,15 +234,25 @@ def build(hist, root, game):
 
 
 def target_totals(root, game):
-    """(bytes of code, number of functions) in each target."""
+    """(bytes of game code, number of game functions) in each target.
+
+    The linked-in Psy-Q libraries are left out, exactly as tools/progress.py
+    leaves them out of the table - otherwise the legend says main is 2% done
+    when the game's own half of it is past 40.
+    """
+    sdk = gen_sdk.load()
     size, count = {}, {}
     for t in TARGETS:
         path = os.path.join(root, "config", game, "%s.symbols.txt" % t)
         if not os.path.exists(path):
             continue
-        found = [m for m in (FUNCSIZE.search(l) for l in open(path)) if m]
-        size[t] = sum(int(m.group(1), 16) for m in found)
-        count[t] = len(found)
+        skip = sdk.get(t, set())
+        size[t] = count[t] = 0
+        for line in open(path):
+            m = FUNCSIZE.match(line.strip())
+            if m and int(m.group(2), 16) not in skip:
+                size[t] += int(m.group(3), 16)
+                count[t] += 1
     return size, count
 
 

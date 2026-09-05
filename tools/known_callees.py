@@ -104,15 +104,9 @@ def sdk(target):
     Without this the listing for main and the sub-EXEs is nothing but library
     code, which is neither ours to write nor useful to rank.
     """
-    path = os.path.join(ROOT, "config", GAME, "sdk.txt")
-    out = set()
-    if not os.path.exists(path):
-        return out
-    for line in open(path):
-        f = line.split("//")[0].split()
-        if len(f) >= 2 and f[0] == target:
-            out.add(int(f[1], 16))
-    return out
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import gen_sdk
+    return gen_sdk.load().get(target, set())
 
 
 def main(argv):

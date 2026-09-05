@@ -22,6 +22,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gen_sdk
 import progress_chart
 from mfunc import (ROOT, GAME, load_target, compile_c, c_symbol,
                    build_target_obj, objdiff_json, pick_symbol, load_names,
@@ -35,24 +36,6 @@ FUNCSIZE = re.compile(r"^(\S+) = 0x([0-9A-Fa-f]+); // type:func size:0x([0-9A-Fa
 
 TARGETS = ["main", "atlus", "open", "movie", "end",
            "dng", "btlp", "s2d", "adv", "casino", "name"]
-
-
-def sdk_addrs():
-    """target -> {address} of the Psy-Q functions, from tools/gen_sdk.py.
-
-    The libraries are linked into every EXE and are not ours to decompile, so
-    counting them as work left to do buries the real figure: `open` is 123KB
-    of which 91KB is libgs and libspu. They are reported on their own line
-    instead.
-    """
-    out = {}
-    if not os.path.exists(SDK):
-        return out
-    for line in open(SDK):
-        line = line.split("//")[0].split()
-        if len(line) >= 2:
-            out.setdefault(line[0], set()).add(int(line[1], 16))
-    return out
 
 
 def total_code(target, sdk):
@@ -188,7 +171,7 @@ def main():
         pcts = "%.2f%%" % pct if pct is not None else "  error"
         print("%-8s %-18s %7d  %8s  %s" % (target, symbol, size, pcts, state))
 
-    sdk = sdk_addrs()
+    sdk = gen_sdk.load()
     print()
     print("%-8s %10s %10s %8s  %-11s %s"
           % ("target", "matched", "game", "pct", "funcs", "psy-q"))

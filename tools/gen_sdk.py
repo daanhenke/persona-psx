@@ -96,6 +96,23 @@ NOT_A_NAME = {"if", "while", "for", "switch", "return", "sizeof", "defined",
               "extern", "typedef", "register"}
 
 
+def load():
+    """target -> {address} of the Psy-Q functions, from config/<game>/sdk.txt.
+
+    The readers - progress.py, progress_chart.py, known_callees.py - all want
+    the same answer, and it has to be the same answer in the table, the graph
+    and the queue.
+    """
+    out = {}
+    if not os.path.exists(OUT):
+        return out
+    for line in open(OUT):
+        f = line.split("//")[0].split()
+        if len(f) >= 2:
+            out.setdefault(f[0], set()).add(int(f[1], 16))
+    return out
+
+
 def psyq_names():
     """Every function name declared by the vendored Psy-Q headers.
 
