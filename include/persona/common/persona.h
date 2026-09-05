@@ -27,4 +27,18 @@ typedef struct {
 
 #define g_personas ((Persona *)0x801F1DAC)
 
+/* The reference data every Persona is built from, in main's rodata rather than
+   the save-game area. The stock list shows an entry this way before it belongs
+   to anybody. */
+typedef struct {
+    /* 0x00 */ u_char pad00[0x1C];
+    /* 0x1C */ u_char name[10];   /* tile bytes, terminated by 0xFF */
+    /* 0x26 */ u_char level;
+    /* 0x27 */ u_char arcana;     /* 1-based, into a table of six-cell labels */
+    /* 0x28 */ u_char stat[PERSONA_STATS];
+    /* 0x2D */ u_char pad2D[0xB];
+} PersonaData;                    /* 0x38 bytes */
+
+extern PersonaData g_persona_data[];
+
 #endif

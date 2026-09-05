@@ -385,7 +385,16 @@ JRREG = re.compile(r"\bjr\s+\$(?!ra\b)(\w+)\b")
 SWLOAD = re.compile(r"\blw\s+\$(\w+),\s*%lo\(\s*([^)]+?)\s*\)\(\$at\)")
 SWHI = re.compile(r"\blui\s+\$at,\s*%hi\(\s*([^)]+?)\s*\)")
 SWBOUND = re.compile(r"\bsltiu?\s+\$\w+,\s*\$\w+,\s*(0x[0-9A-Fa-f]+|\d+)\b")
-SYMADDR = re.compile(r"^(?:D_([0-9A-Fa-f]{8})|\w+)\s*(?:\+\s*(0x[0-9A-Fa-f]+))?$")
+SYMADDR = re.compile(r"^(?:D_([0-9A-Fa-f]{8})|(\w+))\s*(?:\+\s*(0x[0-9A-Fa-f]+))?$")
+
+
+def name_addrs(target):
+    """real name -> address, the other direction from load_names.
+
+    A jump table that falls inside an object we have already named is written
+    `thatname + 0xNN`, so resolving the dispatch needs the map this way round.
+    """
+    return {name: addr for addr, name in load_names(target).items()}
 
 
 def data_words(target, addr, count):
@@ -405,7 +414,17 @@ def data_words(target, addr, count):
     return [out.get(addr + i * 4) for i in range(count)]
 
 
-def rebuild_jump_tables(lines, target, cand_o=None):
+def text_span(o_path, sym):
+    """(offset, size) of one function inside its object's .text."""
+    r = subprocess.run([READELF, "-sW", o_path], capture_output=True, text=True)
+    for line in r.stdout.splitlines():
+        f = line.split()
+        if len(f) >= 8 and f[3] == "FUNC" and f[7] == sym:
+            return int(f[1], 16), int(f[2])
+    return None
+
+
+def rebuild_jump_tables(lines, target, cand_o=None, sym=None):
     """Give the target's switch tables back to the function that owns them.
 
     splat leaves a jump table sitting in the overlay's data run, so the dispatch
@@ -420,6 +439,7 @@ def rebuild_jump_tables(lines, target, cand_o=None):
 
     body = list(lines)
     rodata = []
+    by_name = name_addrs(target)
     vram_at = {}
     for i, ln in enumerate(body):
         m = LINE.match(ln)
@@ -453,19 +473,32 @@ def rebuild_jump_tables(lines, target, cand_o=None):
         if hi is None:
             continue
         ma = SYMADDR.match(table)
-        if not ma or not ma.group(1):
+        if not ma:
             continue
-        addr = int(ma.group(1), 16) + (int(ma.group(2), 16) if ma.group(2) else 0)
-        count = None
+        if ma.group(1):
+            base = int(ma.group(1), 16)
+        else:
+            base = by_name.get(ma.group(2))
+        if base is None:
+            continue
+        addr = base + (int(ma.group(3), 16) if ma.group(3) else 0)
+        # The bounds test is the nearest compare above the dispatch, but an
+        # unrelated one can be sitting in a delay slot between them, so try
+        # every candidate and keep the first whose table reads back as case
+        # addresses inside this function.
+        entries = None
         for j in range(hi - 1, max(hi - 12, -1), -1):
             mm = SWBOUND.search(body[j])
-            if mm:
-                count = int(mm.group(1), 0)
+            if not mm:
+                continue
+            count = int(mm.group(1), 0)
+            if not count or count > 256:
+                continue
+            got = data_words(target, addr, count)
+            if all(e is not None and lo_vram <= e <= hi_vram for e in got):
+                entries = got
                 break
-        if not count or count > 256:
-            continue
-        entries = data_words(target, addr, count)
-        if any(e is None or not lo_vram <= e <= hi_vram for e in entries):
+        if entries is None:
             continue
 
         k = len(tables)
@@ -496,6 +529,13 @@ def rebuild_jump_tables(lines, target, cand_o=None):
     rodata = ['.section .rodata', '.align 2']
     placed = 0
     theirs = rodata_runs(cand_o) if cand_o else []
+    # Two switches of the same shape in one file - the same bar drawn from two
+    # tables, say - are told apart by which function their cases point into.
+    span = text_span(cand_o, sym) if cand_o and sym else None
+    if span:
+        lo, size = span
+        theirs = [(off, cases) for off, cases in theirs
+                  if all(lo <= c < lo + size for c in cases)]
     for k, entries in tables:
         shape = [e - entries[0] for e in entries]
         for i, (off, cases) in enumerate(theirs):
@@ -599,7 +639,7 @@ def build_target_obj(lines, sym, outdir, names=None, gp=None, target=None,
     """Assemble the original function alone, under the candidate's symbol name."""
     s_path = os.path.join(outdir, "target.s")
     o_path = os.path.join(outdir, "target.o")
-    body, rodata = rebuild_jump_tables(lines, target, cand_o)
+    body, rodata = rebuild_jump_tables(lines, target, cand_o, sym)
     with open(s_path, "w") as f:
         f.write(FUNC_HDR)
         f.write(".global %s\n%s:\n" % (sym, sym))

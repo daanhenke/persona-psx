@@ -315,3 +315,9 @@ s2d       func_80081D8C    src/p1-jp/common/gfx/statbars.c
 adv       func_8008DA44    src/p1-jp/common/gfx/statbars.c
 dng       func_80091B14    src/p1-jp/common/gfx/statbars.c
 s2d       func_80082028    src/p1-jp/common/gfx/statbars.c
+adv       func_8008D804    src/p1-jp/common/gfx/statbars.c
+dng       func_800918D4    src/p1-jp/common/gfx/statbars.c
+s2d       func_80081DE8    src/p1-jp/common/gfx/statbars.c
+adv       func_8008DAA8    src/p1-jp/common/gfx/statbars.c
+dng       func_80091B78    src/p1-jp/common/gfx/statbars.c
+s2d       func_8008208C    src/p1-jp/common/gfx/statbars.c
