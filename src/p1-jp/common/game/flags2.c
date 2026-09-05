@@ -32,15 +32,13 @@ extern const u_char g_flag_groups[];
    here has no prototype and the result is narrowed by the char it lands in. */
 u_char FlagsCollectGroup(u_char group)
 {
-    const u_char *count;
     u_char flag;
     u_char n;
     char set;
 
-    count = &g_flag_groups[group * 2 + 1];
     n = 0;
     flag = g_flag_groups[group * 2];
-    if (flag < g_flag_groups[group * 2] + *count) {
+    if (flag < g_flag_groups[group * 2] + g_flag_groups[group * 2 + 1]) {
         do {
             set = FlagBank2Get(flag);
             if (set) {
@@ -48,7 +46,8 @@ u_char FlagsCollectGroup(u_char group)
                 n++;
             }
             flag++;
-        } while (flag < g_flag_groups[group * 2] + *count);
+        } while (flag
+                 < g_flag_groups[group * 2] + g_flag_groups[group * 2 + 1]);
     }
     return n;
 }

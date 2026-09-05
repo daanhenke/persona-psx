@@ -442,3 +442,7 @@ dng       func_80077064    src/p1-jp/common/gfx/bgmap.c
 s2d       func_8006708C    src/p1-jp/common/gfx/bgmap.c
 adv       func_80080598    src/p1-jp/adv/game/scenefind.c
 adv       func_80082F98    src/p1-jp/adv/game/scenefind.c
+adv       func_80098938    src/p1-jp/common/game/flags2.c
+dng       func_80099100    src/p1-jp/common/game/flags2.c
+s2d       func_800895B0    src/p1-jp/common/game/flags2.c
+adv       func_8007FB90    src/p1-jp/adv/game/scenefind.c

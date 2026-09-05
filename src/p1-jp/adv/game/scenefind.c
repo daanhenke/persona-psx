@@ -101,17 +101,22 @@ void SceneApplyEntry(u_char entry)
 void SceneDrawEntryLabel(void)
 {
     u_char entry;
+    u_int idx;
 
     g_slot_cur = &g_slots[LABEL_SLOT];
     entry = SceneFindEntry(g_adv_actors);
+    /* The index is copied into a second local before the call. That is what
+       narrows it where the original does; indexing with `entry` throughout
+       moves the mask past SlotInitTagged and costs the match. */
+    idx = entry;
     SlotInitTagged(&g_entry_label_def, LABEL_SLOT, LABEL_Z, LABEL_X, LABEL_Y);
     CellsWriteRow(g_entry_label_cells,
-                  &g_entry_labels[g_adv_scene->entries[entry].mode * LABEL_SIZE
+                  &g_entry_labels[g_adv_scene->entries[idx].mode * LABEL_SIZE
                                   + 1],
                   0, LABEL_CELLS);
     g_entry_label_x =
         (LABEL_CELLS
-         - g_entry_labels[g_adv_scene->entries[entry].mode * LABEL_SIZE]) * 4
+         - g_entry_labels[g_adv_scene->entries[idx].mode * LABEL_SIZE]) * 4
         + 10;
 }
 
