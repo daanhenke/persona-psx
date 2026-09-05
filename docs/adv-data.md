@@ -128,7 +128,12 @@ runs on past them. What is pinned down so far:
 
 | offset | contents |
 |---|---|
+| `+0x08` | the animation in play, from the pack's table at `+0xF0` |
 | `+0x0C` | id, 0xFFFF while the slot is unused |
-| `+0x14` | draw-order bias, 0 or 0x20 by whether the actor is behind |
+| `+0x0E` | world x and y; the renderer subtracts the camera from them |
+| `+0x12` | base sort depth |
+| `+0x14` | added to it: 0, or 0x20 for an actor standing behind another |
+| `+0x16` | the previous value of `+0x17` |
+| `+0x17` | a state the dispatchers switch on, values 0 to 3 |
 | `+0x1C` | tile x, y |
 | `+0x1E` | where the step in progress is taking it |

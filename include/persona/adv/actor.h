@@ -12,8 +12,12 @@
 typedef struct {
     /* 0x00 */ u_char  pad00[0xC];
     /* 0x0C */ u_short id;              /* 0xFFFF while the slot is unused  */
-    /* 0x0E */ u_char  pad0E[6];
-    /* 0x14 */ short   depth;           /* draw-order bias, 0 or 0x20       */
+    /* 0x0E */ u_short world_x;         /* the renderer subtracts the camera
+                                           from these to get a screen position */
+    /* 0x10 */ u_short world_y;
+    /* 0x12 */ short   z;               /* base sort depth                  */
+    /* 0x14 */ short   depth;           /* added to z: 0, or 0x20 for an
+                                           actor standing behind another    */
     /* 0x16 */ u_char  pad16[6];
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
