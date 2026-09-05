@@ -303,3 +303,15 @@ adv       func_80076E6C    src/p1-jp/common/game/persona.c
 dng       func_800859E8    src/p1-jp/common/game/persona.c
 s2d       func_80075E24    src/p1-jp/common/game/persona.c
 adv       func_800AF958    src/p1-jp/common/game/party.c
+adv       func_8008EF6C    src/p1-jp/common/gfx/cells.c
+dng       func_8009300C    src/p1-jp/common/gfx/cells.c
+s2d       func_80083520    src/p1-jp/common/gfx/cells.c
+adv       func_8008D420    src/p1-jp/common/gfx/statbars.c
+dng       func_800914F0    src/p1-jp/common/gfx/statbars.c
+s2d       func_80081A04    src/p1-jp/common/gfx/statbars.c
+adv       func_8008D7A8    src/p1-jp/common/gfx/statbars.c
+dng       func_80091878    src/p1-jp/common/gfx/statbars.c
+s2d       func_80081D8C    src/p1-jp/common/gfx/statbars.c
+adv       func_8008DA44    src/p1-jp/common/gfx/statbars.c
+dng       func_80091B14    src/p1-jp/common/gfx/statbars.c
+s2d       func_80082028    src/p1-jp/common/gfx/statbars.c

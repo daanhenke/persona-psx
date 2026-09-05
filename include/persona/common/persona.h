@@ -10,8 +10,15 @@
 
 #define PERSONA_SPELLS 7
 
+#define PERSONA_STATS 5
+
 typedef struct {
-    /* 0x00 */ u_char pad00[0x2D];
+    /* 0x00 */ u_char pad00[0x26];
+    /* 0x26 */ u_char stat[PERSONA_STATS];
+                                  /* the same five the character has, drawn as
+                                     bars on the status screen and clamped at
+                                     99 there */
+    /* 0x2B */ u_char pad2B[2];
     /* 0x2D */ u_char spell[PERSONA_SPELLS];
                                   /* learned in order; 0 for a slot the
                                      Persona has not reached yet */
