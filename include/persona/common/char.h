@@ -28,7 +28,9 @@ typedef struct {
                                   /* The status screen draws stat_base as the
                                      bar and highlights stat - stat_base on top
                                      of it, and clamps both at 99. */
-    /* 0x56 */ u_char  pad56[2];
+    /* 0x56 */ u_char  pad56[1];
+    /* 0x57 */ u_char  entry;     /* which list slot is active, 0xFF for none;
+                                     CharRecalcStats reads list[entry] */
     /* 0x58 */ u_char  list[3];   /* 0xFF marks an empty entry              */
     /* 0x5B */ u_char  pad5B[3];
     /* 0x5E */ u_char  blocked; /* while set the entry list reads as empty   */
