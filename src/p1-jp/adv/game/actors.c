@@ -44,6 +44,8 @@ u_char ActorFindAt(u_char x, u_char y)
     }
 }
 
+/* The y step is spelled out in two statements on purpose - do not fold it
+   back into one. */
 void ActorStepToward(u_char actor, u_char dir)
 {
     AdvActor *a;
@@ -52,7 +54,8 @@ void ActorStepToward(u_char actor, u_char dir)
 
     a = &g_adv_actors[actor];
     nx = g_dir_x[dir] + a->x;
-    ny = g_dir_y[dir] + a->y;
+    ny = g_dir_y[dir];
+    ny = ny + a->y;
     a->next_x = nx;
     a->next_y = ny;
 }
