@@ -22,15 +22,17 @@
  * every caller reaches it with at least one member present. */
 u_char PartyLastSlot(void)
 {
-    int    slot;
-    u_char i;
+    int slot;
+    int i;
 
-    slot = 4;
-    do {
-        i = slot;
+    slot = CHAR_COUNT - 1;
+    for (;;) {
+        i = (u_char)slot;
         slot--;
-    } while (g_party[i] == 0xFF);
-    return i;
+        if (g_party[i] != PARTY_EMPTY) {
+            return i;
+        }
+    }
 }
 
 /* Count is in entries, and compared signed - a zero or negative count copies

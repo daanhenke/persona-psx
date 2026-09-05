@@ -321,3 +321,9 @@ s2d       func_80081DE8    src/p1-jp/common/gfx/statbars.c
 adv       func_8008DAA8    src/p1-jp/common/gfx/statbars.c
 dng       func_80091B78    src/p1-jp/common/gfx/statbars.c
 s2d       func_8008208C    src/p1-jp/common/gfx/statbars.c
+adv       func_8008E6F8    src/p1-jp/common/game/items.c
+dng       func_800927C8    src/p1-jp/common/game/items.c
+s2d       func_80082CDC    src/p1-jp/s2d/game/items.c
+adv       func_8007D2DC    src/p1-jp/common/game/party.c
+dng       func_8008B86C    src/p1-jp/common/game/party.c
+s2d       func_8007BCDC    src/p1-jp/common/game/party.c

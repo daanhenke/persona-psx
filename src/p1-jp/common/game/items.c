@@ -5,6 +5,7 @@
  *   Find       0x80092918  0x8008E848  0x80082E2C
  *   FindPend   0x80092978  0x8008E8A8  0x80082E8C
  *   Compact    0x80092B30  0x8008EA90  0x80083044
+ *   AddPend    0x800927C8  0x8008E6F8  0x80082CDC
  *
  * An entry packs both halves into one u16: the low 9 bits are the item id and
  * the top 7 the count, so a slot counts as in use only when neither half is
@@ -76,37 +77,43 @@ extern short ItemsFindPending(u_short id);
 
 #define ITEM_MAX 99
 
-/* Adds n of an item to the staging list, taking the first slot with an empty
-   half if the item is not there yet. Counts stop at 99. */
-void ItemsAddPending(u_short id, short n)
+/* Adds to the staging list, taking the first slot with an empty half if the
+   item is not there yet. Counts stop at 99.
+   The base is spelled out again inside the loop on purpose - do not tidy it
+   away. */
+void ItemsAddPending(u_short id, short count)
 {
     u_short *list;
-    u_short *p;
+    u_short *slot;
     short    i;
-    short    count;
+    short    n;
+    int      packed;
 
     list = g_items_pending;
     i = ItemsFindPending(id);
     if (i < 0) {
-        i = i + 1;
         for (;;) {
-            p = &list[i];
-            if ((*p >> 9) == 0) {
+            short j;
+
+            i++;
+            list = g_items_pending;
+            j = i;
+            slot = &list[j];
+            if ((*slot >> 9) == 0) {
                 break;
             }
-            if ((*p & ITEM_ID) == 0) {
+            if ((*slot & ITEM_ID) == 0) {
                 break;
             }
-            i = i + 1;
         }
-        *p = 0;
+        *slot = 0;
     }
-    p = &list[i];
-    count = n + (*p >> 9);
-    if (count > ITEM_MAX) {
-        count = ITEM_MAX;
+    n = count + (list[i] >> 9);
+    packed = id & ITEM_ID;
+    if (n > ITEM_MAX) {
+        n = ITEM_MAX;
     }
-    *p = (id & ITEM_ID) + count * 0x200;
+    list[i] = packed + n * 0x200;
 }
 
 /* Subtracts n. Nothing checks that the entry exists first. */

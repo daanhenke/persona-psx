@@ -29,6 +29,45 @@ short ItemsFindPending(u_short id)
 
 extern short ItemsFindPending(u_short id);
 
+/* Adds to the staging list, taking the first slot with an empty half if the
+   item is not there yet. Counts stop at 99.
+   The base is spelled out again inside the loop on purpose - do not tidy it
+   away. */
+void ItemsAddPending(u_short id, short count)
+{
+    u_short *list;
+    u_short *slot;
+    short    i;
+    short    n;
+    int      packed;
+
+    list = g_items_pending;
+    i = ItemsFindPending(id);
+    if (i < 0) {
+        for (;;) {
+            short j;
+
+            i++;
+            list = g_items_pending;
+            j = i;
+            slot = &list[j];
+            if ((*slot >> 9) == 0) {
+                break;
+            }
+            if ((*slot & ITEM_ID) == 0) {
+                break;
+            }
+        }
+        *slot = 0;
+    }
+    n = count + (list[i] >> 9);
+    packed = id & ITEM_ID;
+    if (n > ITEM_MAX) {
+        n = ITEM_MAX;
+    }
+    list[i] = packed + n * 0x200;
+}
+
 /* Subtracts n from an item's count. Nothing checks the entry exists first. */
 void ItemsRemovePending(u_short id, short n)
 {

@@ -13,8 +13,8 @@
 
 #define ITEM_ID 0x1FF
 
-extern void ItemsAddPending(u_short id, u_short count);
-extern void ItemsRemovePending(u_short id, u_short count);
+extern void ItemsAddPending(u_short id, short count);
+extern void ItemsRemovePending(u_short id, short count);
 
 void CharEquip(u_char chr, u_char slot, u_short item)
 {
