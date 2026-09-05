@@ -5,7 +5,8 @@
  * The portraits sit two, two and one, so the vertical cursor swaps 0 with 2 and
  * 1 with 3 while the horizontal one walks 0-1, 2-3 and 3-4. Callers pass
  * g_party_last, which is what keeps the cursor off members the party does not
- * have; holding Square jumps straight to that last member.
+ * have. The horizontal list steps on either direction, so Left is read back
+ * to tell which way the step went.
  */
 #include <types.h>
 #include <persona/common/menuctx.h>
@@ -13,7 +14,7 @@
 extern int  g_pad_held[];
 extern void SoundPlaySeq(int seq, int a, int b);
 
-#define PAD_SQUARE 0x8000
+#define PAD_LEFT   0x8000
 #define MOVE_SEQ   0x18
 
 short MenuStepMember(int *sel, u_char last)
@@ -68,7 +69,7 @@ short MenuStepMember(int *sel, u_char last)
             *sel = 0;
             break;
         case 2:
-            if (g_pad_held[0] & PAD_SQUARE) {
+            if (g_pad_held[0] & PAD_LEFT) {
                 *sel = last;
                 break;
             }
@@ -78,7 +79,7 @@ short MenuStepMember(int *sel, u_char last)
             *sel = 3;
             break;
         case 3:
-            if (g_pad_held[0] & PAD_SQUARE) {
+            if (g_pad_held[0] & PAD_LEFT) {
                 *sel = 2;
                 break;
             }
@@ -89,7 +90,7 @@ short MenuStepMember(int *sel, u_char last)
             *sel = 4;
             break;
         case 4:
-            if (g_pad_held[0] & PAD_SQUARE) {
+            if (g_pad_held[0] & PAD_LEFT) {
                 *sel = 3;
                 break;
             }

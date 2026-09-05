@@ -7,10 +7,12 @@
  * Both live in the shared save-game work area, so one source covers all three.
  */
 #include <types.h>
+#include <persona/common/char.h>
 
 /* Five slots, one byte each, 0xFF for empty. The byte indexes the 0x60-byte
    character records at 0x801F1BCC rather than being the character itself. */
 #define g_party ((u_char *)0x801F256C)
+#define PARTY_EMPTY 0xFF
 
 /* Index of the last occupied slot.
  *
@@ -42,6 +44,22 @@ void CopyShorts(u_short *src, u_short *dst, u_short count)
         src++;
         dst++;
     }
+}
+
+/* The slot holding the character with this key byte, or -1. Event scripts name
+   a character by key and need the slot to reach the record. ADV only. */
+short PartyFindByKey(u_char key)
+{
+    short  i;
+    u_char chr;
+
+    for (i = 0; i < CHAR_COUNT; i++) {
+        chr = g_party[i];
+        if (chr != PARTY_EMPTY && g_chars[chr].key == key) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 /* The slot holding a given character, or 0xFF if they are not in the party.

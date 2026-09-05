@@ -18,7 +18,11 @@ typedef struct {
     /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot */
     /* 0x2E */ u_char  pad2E[0x10];
     /* 0x3E */ u_char  key;       /* identifies the record; 0 while unused  */
-    /* 0x3F */ u_char  pad3F[0xD];
+    /* 0x3F */ u_char  pad3F[0xA];
+    /* 0x49 */ u_char  status;    /* ailment code, 0 for none. Event scripts
+                                     set and clear it; recovery items ask
+                                     CharHasStatus for the one they cure. */
+    /* 0x4A */ u_char  pad4A[2];
     /* 0x4C */ u_char  stat[5];
     /* 0x51 */ u_char  stat_base[5];
                                   /* The status screen draws stat_base as the
