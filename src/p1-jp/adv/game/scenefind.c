@@ -177,10 +177,15 @@ u_char SceneTileAt(u_char x, u_char y)
 u_char SceneTileToward(int x, int y, u_char dir)
 {
     int nx;
+    u_char cx;
     int i;
 
-    nx = x + g_dir_x[dir];
-    i = (u_char)(y + g_dir_y[dir]) * ROOM_STRIDE + (u_char)nx;
+    /* The step is loaded before it is added, and the wrapped column gets a
+       local of its own. Writing either as one expression costs the match. */
+    nx = g_dir_x[dir];
+    nx = x + nx;
+    cx = nx;
+    i = (u_char)(y + g_dir_y[dir]) * ROOM_STRIDE + cx;
     return g_adv_scene->tiles[i];
 }
 

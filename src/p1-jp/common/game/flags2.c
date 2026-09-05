@@ -15,6 +15,44 @@
 #define g_flags_bank2 ((u_char *)0x801F2A48)
 #define g_flags_bank3 ((u_char *)0x801F2A68)
 
+/* Where the collected flags are left. Reached by hardcoded address, and S2D's
+   copy sits 0x20000 higher like the rest of its work area. */
+#define g_items_pending ((u_char *)(0x800EAE4C + WORK_BIAS))
+
+/* Two bytes per group: the first flag of the run and how many follow. This one
+   is in each overlay's own data, so it goes through the linker symbol. */
+extern const u_char g_flag_groups[];
+
+/* Every set flag of one bank-2 group, gathered into g_items_pending, and how
+   many there were.
+
+   The two range bytes are held as separate pointers and re-read on every pass
+   rather than being summed once into a local, which is what the reload in the
+   loop tail is. FlagBank2Get is defined further down this file, so the call
+   here has no prototype and the result is narrowed by the char it lands in. */
+u_char FlagsCollectGroup(u_char group)
+{
+    const u_char *count;
+    u_char flag;
+    u_char n;
+    char set;
+
+    count = &g_flag_groups[group * 2 + 1];
+    n = 0;
+    flag = g_flag_groups[group * 2];
+    if (flag < g_flag_groups[group * 2] + *count) {
+        do {
+            set = FlagBank2Get(flag);
+            if (set) {
+                g_items_pending[n] = flag;
+                n++;
+            }
+            flag++;
+        } while (flag < g_flag_groups[group * 2] + *count);
+    }
+    return n;
+}
+
 int FlagBank2Get(short id)
 {
     u_char *p;

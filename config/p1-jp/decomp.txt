@@ -441,3 +441,4 @@ adv       func_8006789C    src/p1-jp/common/gfx/bgmap.c
 dng       func_80077064    src/p1-jp/common/gfx/bgmap.c
 s2d       func_8006708C    src/p1-jp/common/gfx/bgmap.c
 adv       func_80080598    src/p1-jp/adv/game/scenefind.c
+adv       func_80082F98    src/p1-jp/adv/game/scenefind.c
