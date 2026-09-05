@@ -342,3 +342,4 @@ adv       func_8008BFF8    src/p1-jp/common/ui/padbindings.c
 dng       func_80090220    src/p1-jp/common/ui/padbindings.c
 s2d       func_80080730    src/p1-jp/common/ui/padbindings.c
 adv       func_80082FE8    src/p1-jp/adv/game/actors.c
+adv       func_80083150    src/p1-jp/adv/game/actors.c

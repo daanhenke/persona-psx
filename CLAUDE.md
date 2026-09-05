@@ -244,6 +244,15 @@ not - the arcana names, the elements, the status ailments, the name-entry
 keyboard - are enough to identify the tables around them, and a string constant
 with a readable name beats one called after its address.
 
+### A pointer end-test that comes out signed
+
+`a < &arr[N]` is a comparison of two pointers and assembles as `sltu`. Some of
+the original's loops use `slt` instead, against an end address one element
+higher than the unsigned form's - `ActorsSetDepth` is one. Casting both sides to
+a signed integer type reproduces it exactly; rewriting the loop with an `int`
+counter does not, because gcc then keeps the counter instead of turning it into
+the pointer test. Leave the casts and a line saying why.
+
 ### When only the registers differ
 
 A candidate that reaches 96-99% with the same instruction sequence and a

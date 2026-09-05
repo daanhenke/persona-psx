@@ -67,7 +67,8 @@ void ActorsSetDepth(u_short actor)
     int       y;
 
     y = g_adv_actors[actor].y;
-    for (a = g_adv_actors; a < &g_adv_actors[ACTOR_COUNT]; a++) {
+    /* The end test is a signed comparison in the original, hence the casts. */
+    for (a = g_adv_actors; (long)a < (long)&g_adv_actors[ACTOR_COUNT]; a++) {
         if (a->id == ACTOR_NONE) {
             a->depth = 0;
         } else if (y >= a->y) {
