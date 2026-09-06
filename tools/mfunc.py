@@ -302,9 +302,12 @@ def normalize_asm(lines, names=None, gp=None):
             # the last fields of the battle's message window are 0x26C into it
             # and eight bytes short of the global that follows, and read as
             # &that[-1] until the two forms were told apart.
+            # The gap is the element width, so that is what the base has to be
+            # aligned to - a byte array's is aligned to nothing at all, which a
+            # flat `% 4` reads as a member of the object below.
             one_element = (above is not None and above <= 0x10
                            and (above & (above - 1)) == 0)
-            if (one_element and addr % 4 == 0 and addr not in loaded
+            if (one_element and addr % above == 0 and addr not in loaded
                     and (below is None or below > 0x10)):
                 return "%s-0x%X" % (names[based[j]], above)
             if below is not None and 0 < below <= 0x400:
@@ -333,8 +336,15 @@ def normalize_asm(lines, names=None, gp=None):
     # reached by literal - g_slots[62].scale_y, written as D_800DD1AC + 0x2 -
     # kept its invented symbol while its neighbours were folded.
     lines = [OFFREF.sub(fold, ln) for ln in lines]
+    # An indexed load expands to `lui $at,%hi(X)` / `addu $at,...` /
+    # `lbu r,%lo(X)($at)`. There the symbol is the base an index is added to,
+    # not an address the function reads on its own, so it does not count as
+    # loaded - which is what lets arr[i-1] keep its &arr[-1] reading.
+    prev = ""
     for ln in lines:
-        loaded.update(int(m, 16) for m in LOADED_LO.findall(ln))
+        if not ("($at)" in ln and re.search(r"\baddu\s+\$at\b", prev)):
+            loaded.update(int(m, 16) for m in LOADED_LO.findall(ln))
+        prev = ln
     # Runs first: once an invented symbol is folded to a literal, `rename` must
     # not turn it back into a name the candidate cannot use.
     for ln in fold_literal_at_refs(lines, names):
