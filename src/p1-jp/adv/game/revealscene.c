@@ -19,21 +19,20 @@ extern void MapMarkTile(short base, short room, short x, short y);
 
 void MapRevealScene(void)
 {
-    AdvScene *sc;
-    int       row;
-    int       col;
+    int row;
+    int col;
 
-    sc = g_adv_scene;
-    if (sc->map_at == MAP_NONE) {
+    if (g_adv_scene->map_at == MAP_NONE) {
         return;
     }
     row = 0;
-    while (row < sc->seen_h) {
+    while (row < g_adv_scene->seen_h) {
         col = 0;
-        while (col < sc->seen_w) {
-            MapMarkTile(sc->map_at >> 8, *(u_char *)&sc->map_at,
-                        sc->seen_x + col, sc->seen_y + row);
-            sc = g_adv_scene;
+        while (col < g_adv_scene->seen_w) {
+            MapMarkTile(g_adv_scene->map_at >> 8,
+                        *(u_char *)&g_adv_scene->map_at,
+                        g_adv_scene->seen_x + col,
+                        row + g_adv_scene->seen_y);
             col++;
         }
         row++;
