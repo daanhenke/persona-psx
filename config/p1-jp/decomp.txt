@@ -473,3 +473,6 @@ btlp      func_80066CCC    src/p1-jp/btlp/discread.c
 btlp      func_80067898    src/p1-jp/btlp/discread.c
 btlp      func_8008DB78    src/p1-jp/btlp/btlinit.c
 btlp      func_80066EF8    src/p1-jp/btlp/bgm.c
+btlp      func_80081A94    src/p1-jp/btlp/soundinit.c
+btlp      func_80091DF4    src/p1-jp/btlp/soundload.c
+btlp      func_80091EC4    src/p1-jp/btlp/soundload.c

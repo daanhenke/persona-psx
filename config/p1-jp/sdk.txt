@@ -305,8 +305,8 @@ main     8001D928    208  _SsSndSetDecres
 main     8001D9F8    112  VOL_OBJ_348
 main     8001DA68     52  SsSeqSetDecrescendo
 main     8001DA9C     52  SsSepSetDecrescendo
-main     8001DAD0     20  FUN_8001dad0
-main     8001DAE4     16  FUN_8001dae4
+main     8001DAD0     20  SsSetMono
+main     8001DAE4     16  SsSetStereo
 main     8001DAF4    132  SsVabClose
 main     8001DB78     88  SsVabOpen
 main     8001DBD0    100  SpuFree
