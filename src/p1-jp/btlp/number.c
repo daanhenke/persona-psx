@@ -77,7 +77,7 @@ void BtlFormatRight(signed char *dst, int value, int width)
         value = -value;
         neg = 1;
     }
-    (width + dst)[-1] = value % 10;
+    dst[width - 1] = value % 10;
     rest = value / 10;
     if (width >= 2) {
         width -= 2;

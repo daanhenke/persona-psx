@@ -487,3 +487,7 @@ btlp      func_8007EF24    src/p1-jp/btlp/indicator.c
 btlp      func_80072F70    src/p1-jp/btlp/drop.c
 btlp      func_80072FA0    src/p1-jp/btlp/drop.c
 btlp      func_80073018    src/p1-jp/btlp/drop.c
+btlp      func_80074F0C    src/p1-jp/btlp/panel.c
+btlp      func_80074FE4    src/p1-jp/btlp/panel.c
+btlp      func_80075D40    src/p1-jp/btlp/panel.c
+btlp      func_80075D54    src/p1-jp/btlp/panel.c

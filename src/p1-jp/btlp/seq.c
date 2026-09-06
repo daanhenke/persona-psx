@@ -11,7 +11,7 @@ extern int   g_btl_bgm_state;
 extern int   g_btl_bgm_seq;
 extern short g_btl_seq_handle;
 
-extern int  BtlSeqIsActive(void);
+extern int  BtlSeqState(void);
 extern void BtlSeqSetState(int a, int b);
 extern void BtlIndicatorClear(void);
 extern void BtlRunFrames(int arg);
@@ -22,7 +22,7 @@ extern void BtlSeqWaitDone(void);
 void BtlWaitBgmEnd(void)
 {
     if (g_btl_bgm_state == 1 && g_btl_bgm_seq < 0) {
-        while (BtlSeqIsActive() != 0) {
+        while (BtlSeqState() != 0) {
             if (SsIsEos(g_btl_seq_handle, (short)g_btl_bgm_seq) == 0) {
                 BtlSeqSetState(0, 4);
                 BtlIndicatorClear();
