@@ -134,6 +134,9 @@ s2d       func_8007C220    src/p1-jp/common/ui/text.c
 adv       func_8008E848    src/p1-jp/common/game/items.c
 dng       func_80092918    src/p1-jp/common/game/items.c
 s2d       func_80082E2C    src/p1-jp/common/game/items.c
+adv       func_8007D90C    src/p1-jp/common/game/explevel.c
+dng       func_8008BEA8    src/p1-jp/common/game/explevel.c
+s2d       func_8007C30C    src/p1-jp/common/game/explevel.c
 adv       func_8008E8A8    src/p1-jp/common/game/items.c
 dng       func_80092978    src/p1-jp/common/game/items.c
 s2d       func_80082E8C    src/p1-jp/s2d/game/items.c
