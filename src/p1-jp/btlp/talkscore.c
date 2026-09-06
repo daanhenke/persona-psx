@@ -30,6 +30,8 @@ extern short g_btl_talk_result;
 
 u_short BtlTalkScoreLine(short said, short weight)
 {
+    short result;
+
     if (g_btl_talk_said == said) {
         if (weight >= TALK_COUNTS) {
             if (weight < TALK_STRONG) {
@@ -37,7 +39,10 @@ u_short BtlTalkScoreLine(short said, short weight)
             }
             g_btl_talk_result |= TALK_REPEATED;
             g_btl_talk_step = TALK_STEP_REPEATED;
-            return g_btl_talk_result;
+            /* Through a local rather than returned straight; that is what
+               keeps the read in the same register the update left it in. */
+            result = g_btl_talk_result;
+            return result;
         }
     } else if (weight >= TALK_COUNTS) {
         goto fresh;

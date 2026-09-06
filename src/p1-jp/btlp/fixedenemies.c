@@ -13,6 +13,7 @@
  */
 #include <types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 
 /* The encounter that gets the first roster; the other one gets the second. */
@@ -21,16 +22,10 @@
 /* Six species to a roster, in rows of eight. */
 #define BTL_FIXED_SLOTS 6
 
-typedef struct {
-    /* 0x00 */ u_char script;   /* which of the object's scripts to arm */
-    /* 0x01 */ u_char pad01[0x2F];
-} BtlModel;                     /* 48 bytes */
-
 /* Two separate objects rather than a table of two rows, which is how the
    original reaches them: both addresses are built in full. */
 extern const u_char g_btl_fixed_enemies[];
 extern const u_char g_btl_fixed_enemies_alt[];
-extern BtlModel     g_btl_models[];
 extern short        g_btl_encounter;
 extern BtlActor    *g_btl_combatants;
 
@@ -56,7 +51,7 @@ void BtlSpawnFixedEnemies(void)
         BtlLoadEnemyStats(i, *species);
         BtlObjSetScript(g_btl_combatants[i].obj,
                         g_btl_combatants[i].obj->scripts
-                            [g_btl_models[*species].script]);
+                            [g_btl_models[*species].spawn]);
         species++;
         i++;
     } while (i < BTL_FIXED_SLOTS);

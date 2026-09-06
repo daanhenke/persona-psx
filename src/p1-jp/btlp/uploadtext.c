@@ -50,7 +50,6 @@ void BtlUploadText(const BtlTalkCell *cell, const u_char *text)
         x = BTL_TEXT_X;
         while (n < BTL_TEXT_MAX && text[1] != STR_FIELD) {
             text = BtlSeqReadValue(text, value);
-            n++;
             BtlExpandGlyph(value[0],
                            (u_int *)&g_btl_glyph_cells[g_btl_glyph_next *
                                                        BTL_GLYPH_STRIDE],
@@ -60,12 +59,13 @@ void BtlUploadText(const BtlTalkCell *cell, const u_char *text)
                              cell->x * 2 + x, cell->y + BTL_TEXT_Y,
                              BTL_GLYPH_W, BTL_GLYPH_H);
             g_btl_glyph_next++;
+            n++;
             x += BTL_GLYPH_W;
             if (*text == STR_END) {
-                return;
+                break;
             }
             if (*text == STR_FIELD) {
-                return;
+                break;
             }
         }
     }
