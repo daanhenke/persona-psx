@@ -44,7 +44,7 @@ extern void ImageAnimStart();
 void AdvSceneStartImages(void)
 {
     u_short flags;
-    int     flag;
+    int     one;
     u_char  i;
 
     i = 0;
@@ -53,8 +53,10 @@ void AdvSceneStartImages(void)
             flags = g_scene_images[i].flags;
             if ((flags & IMG_SHOWN) != 0) {
                 if ((flags & IMG_CONDITIONAL) != 0) {
-                    flag = flags & IMG_FLAG;
-                    if ((g_event_flags[flag / 8] & (1 << (flags & 7))) == 0) {
+                    /* The 1 is assigned where it is shifted, not before the
+                       test - lifting it out costs a saved register. */
+                    if ((g_event_flags[(flags & IMG_FLAG) / 8] &
+                         ((one = 1) << (flags & 7))) == 0) {
                         goto next;
                     }
                 }
