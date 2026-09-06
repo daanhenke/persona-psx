@@ -4,10 +4,13 @@
  *   ADV 0x800933E4   S2D 0x8007E1C8
  *
  * Five slots stand ready and only one is ever on screen: the weapon has its
- * own, and the other six groups share a second that moves down the list a row
- * at a time. Every screen that previews a change hides all five and shows the
- * one the selected group needs, so the cursor follows the value list rather
- * than being moved when the list is stepped.
+ * own, and the other groups share a second that moves down the list a row at a
+ * time. Every screen that previews a change hides all five and shows the one
+ * the selected group needs, so the cursor follows the value list rather than
+ * being moved when the list is stepped.
+ *
+ * g_slot_cur is set to whichever slot is about to be touched, here as
+ * everywhere else the slots are reached directly.
  */
 #include <types.h>
 #include <persona/common/menuctx.h>
@@ -22,9 +25,9 @@
 #define CURSOR_TOP   5
 
 /* Where the row cursor sits, and how far apart the rows are. */
-#define CURSOR_Z 0x42
-#define CURSOR_X 0x28
-#define CURSOR_Y 0x84
+#define CURSOR_Z     0x42
+#define CURSOR_X     0x28
+#define CURSOR_Y     0x84
 #define CURSOR_PITCH 12
 
 /* The groups the row cursor covers. */
@@ -47,10 +50,13 @@ void EquipPlaceCursor(void)
     g_slot_cur = &g_slots[4];
     g_slots[4].attr |= SLOT_ATTR_HIDE;
     g_slot_cur = &g_slots[CURSOR_LAST];
-    g_slots[CURSOR_TOP].attr |= SLOT_ATTR_HIDE;
+    g_slots[CURSOR_LAST].attr |= SLOT_ATTR_HIDE;
 
+    /* A second pointer to the menu block; one for both tests is not the same
+       code. */
     menu = g_menu;
     if (g_menu->list[1].cur == 0) {
+        g_slot_cur = &g_slots[CURSOR_TOP];
         g_slots[CURSOR_TOP].attr &= ~SLOT_ATTR_HIDE;
     } else if (g_menu->list[1].cur >= 0 &&
                menu->list[1].cur < CURSOR_ROW_MAX) {
