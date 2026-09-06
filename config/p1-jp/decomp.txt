@@ -476,3 +476,5 @@ btlp      func_80066EF8    src/p1-jp/btlp/bgm.c
 btlp      func_80081A94    src/p1-jp/btlp/soundinit.c
 btlp      func_80091DF4    src/p1-jp/btlp/soundload.c
 btlp      func_80091EC4    src/p1-jp/btlp/soundload.c
+btlp      func_80080E7C    src/p1-jp/btlp/object.c
+btlp      func_80079E8C    src/p1-jp/btlp/seqvalue.c

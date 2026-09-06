@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - the battle overlay's display objects.  BTLP only.
- *   0x80080820 BtlInitObjects
- *   0x80080D54 BtlObjFree   0x80080DAC BtlObjMoveBefore
+ *   0x80080820 BtlInitObjects   0x80080E7C BtlObjSetScript
+ *   0x80080D54 BtlObjFree       0x80080DAC BtlObjMoveBefore
  *
  * Everything the battle draws - a character, a spell effect, a floating number
  * - is one 0xD8-byte record out of a single pool. The pool is cut into six
@@ -21,14 +21,29 @@
 #include <types.h>
 #include <libgpu.h>
 
+/* One step of an animation script. The high byte of `flags` is set on every
+   step but the last, which is how the end is found. */
+typedef struct {
+    /* 0x0 */ u_long  value;
+    /* 0x4 */ u_short flags;
+    /* 0x6 */ u_short pad;
+} BtlSeqStep;                          /* 8 bytes */
+
+#define BTL_SEQ_MORE 0xFF00
+
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free */
     /* 0x04 */ u_char         pad04[0x40];
     /* 0x44 */ struct BtlObj *prev;
     /* 0x48 */ struct BtlObj *next;
-    /* 0x4C */ u_char         pad4C[0x66];
+    /* 0x4C */ u_char         pad4C[0x18];
+    /* 0x64 */ BtlSeqStep    *script; /* animation script                 */
+    /* 0x68 */ u_long         last;    /* first word of the script's last step */
+    /* 0x6C */ u_char         pad6C[0x46];
     /* 0xB2 */ u_short        kind;    /* BTL_OBJ_HEAD marks a list head   */
-    /* 0xB4 */ u_char         padB4[0x1B];
+    /* 0xB4 */ u_char         padB4[2];
+    /* 0xB6 */ short          step;    /* how far into the script it is    */
+    /* 0xB8 */ u_char         padB8[0x17];
     /* 0xCF */ u_char         group;   /* which list the record belongs to */
     /* 0xD0 */ u_char         padD0[8];
 } BtlObj;                              /* 0xD8 bytes */
@@ -40,6 +55,13 @@ typedef struct BtlObj {
    stands at the head of a group's list. BtlObjAlloc starts one record past it
    and stops at the next one, so a head doubles as the previous group's end. */
 #define BTL_OBJ_HEAD   0x8000
+
+/* Two more attribute bits, always changed together. BtlObjSetScript sets the
+   first and clears the second when it arms a script, and BtlObjAlloc turns the
+   first on for a record whose template has the second clear - so the pair says
+   whether the object is running a script or standing still. */
+#define BTL_OBJ_ANIMATING 0x10000000
+#define BTL_OBJ_STATIC    0x20000000
 
 /* Two frame buffers of primitives, laid out end to end from g_btl_prim_pool
    and pre-initialised so nothing has to issue SetSprt mid-frame. */
@@ -154,6 +176,24 @@ int BtlInitObjects(void)
         }
         frame += BTL_FRAME_STRIDE;
     } while (frame < BTL_FRAME_END);
+    return 1;
+}
+
+/* Points an object at an animation script and arms it. The script is walked
+   once here to find its last step, whose first word is kept so the player can
+   tell when it has finished without walking it again. A null script leaves the
+   object alone, which is what lets callers pass one they have not checked. */
+int BtlObjSetScript(BtlObj *obj, BtlSeqStep *script)
+{
+    if (script != 0) {
+        obj->script = script;
+        while ((script->flags & BTL_SEQ_MORE) != 0) {
+            script++;
+        }
+        obj->last = script->value;
+        obj->step = 0;
+        obj->attr = (obj->attr | BTL_OBJ_ANIMATING) & ~BTL_OBJ_STATIC;
+    }
     return 1;
 }
 
