@@ -35,6 +35,14 @@ typedef struct {
 
 #define BTL_SEQ_MORE 0xFF00
 
+/* What a record is made from. The two fields are the first two of BtlObj, so
+   a template is the head of the object it becomes: the attribute word it
+   starts with and the model's table of scripts. */
+typedef struct {
+    /* 0x0 */ u_long         attr;
+    /* 0x4 */ const u_long **scripts;
+} BtlObjDef;                           /* 8 bytes */
+
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free     */
     /* 0x04 */ const u_long **scripts; /* the model's table of scripts, the

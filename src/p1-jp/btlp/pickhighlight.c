@@ -1,15 +1,18 @@
 /* Persona 1 (JP) - showing which of the six slots is chosen.  BTLP only.
  *   0x800A9D24 BtlPickHighlight
  *
- * The picker is six objects in a row, each carrying a second one on its
- * attached link. The object is the item and the attached piece is the
- * highlight behind it, which is why the two are coloured separately: setting
- * the item's colour walks the chain and reaches the highlight as well, so the
- * highlight is written again afterwards.
+ * Each slot is two objects. BtlPickSpawn builds them the other way round from
+ * how they read here: the one in g_btl_pick_objs comes from a single template
+ * shared by all six, and what hangs off its attached link is the per-slot
+ * piece. So the shared one is the frame and the attached one is the item.
  *
- * A slot that cannot be chosen is drawn dark and its highlight is left where
- * it was; the rest are drawn at full and their highlights sit at 0x60, with
- * the chosen one at 0xFF.
+ * They have to be coloured separately because setting the frame's colour walks
+ * the chain and reaches the item too, which is why the item is written again
+ * afterwards.
+ *
+ * A slot that cannot be chosen is drawn dark and its item is left where it
+ * was; the rest are drawn at full with their items at 0x60, and the chosen
+ * one's item at 0xFF.
  */
 #include <types.h>
 #include <persona/btlp/object.h>
