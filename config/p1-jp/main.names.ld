@@ -3129,6 +3129,7 @@ PROVIDE(g_save_unk4 = 0x801F15A2);
 PROVIDE(g_save_unk5_idx = 0x801F15A7);
 PROVIDE(g_slots = 0x800DC10C);
 PROVIDE(g_slots_s2d = 0x800FC10C);
+PROVIDE(g_spell_data = 0x80047D20);
 PROVIDE(g_start_map_id = 0x801F29B8);
 PROVIDE(g_state_cur = 0x80055C04);
 PROVIDE(g_state_next = 0x80055C38);

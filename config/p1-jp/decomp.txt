@@ -645,3 +645,5 @@ adv       func_80093B24    src/p1-jp/common/game/equipauto.c
 s2d       func_8007E908    src/p1-jp/common/game/equipauto.c
 adv       func_800933E4    src/p1-jp/common/ui/equipcursor.c
 s2d       func_8007E1C8    src/p1-jp/common/ui/equipcursor.c
+adv       func_8007B7E0    src/p1-jp/common/ui/spellname.c
+s2d       func_8007A660    src/p1-jp/common/ui/spellname.c
