@@ -567,3 +567,8 @@ btlp      func_8007C54C    src/p1-jp/btlp/seqstate.c
 btlp      func_8007C5BC    src/p1-jp/btlp/seqstate.c
 btlp      func_80092DD8    src/p1-jp/btlp/bgm.c
 btlp      func_800767DC    src/p1-jp/btlp/face.c
+btlp      func_80073CC0    src/p1-jp/btlp/talkers.c
+btlp      func_80073DEC    src/p1-jp/btlp/talkers.c
+btlp      func_80073C64    src/p1-jp/btlp/talkers.c
+btlp      func_80076768    src/p1-jp/btlp/face.c
+btlp      func_80069258    src/p1-jp/btlp/member.c

@@ -13,8 +13,15 @@
 
 typedef struct {
     /* 0x00 */ u_long kinds;    /* the lowest set bit ranks the offer */
-    /* 0x04 */ u_char pad04[0x18];
-    /* 0x1C */ u_short used;    /* zero while the slot is free        */
+    /* 0x04 */ u_char pad04[3];
+    /* 0x07 */ u_char pad07[9]; /* a byte per enemy slot; BtlOfferPickTalkers
+                                   reads both of these and throws the values
+                                   away, so what they hold is still open   */
+    /* 0x10 */ u_char pad10[9];
+    /* 0x19 */ u_char pad19;
+    /* 0x1A */ u_short talkers; /* of those, the ones with no ailment  */
+    /* 0x1C */ u_short used;    /* enemies this offer involves; zero
+                                   while the slot is free              */
     /* 0x1E */ u_char pad1E[0x12];
     /* 0x30 */ u_char persona;  /* what it would hand over            */
     /* 0x31 */ u_char pad31[0xB];

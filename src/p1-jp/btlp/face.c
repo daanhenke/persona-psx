@@ -35,13 +35,14 @@ extern short  g_btl_face_x;
 extern short  g_btl_face_y;
 extern short  g_btl_face_scale_to;
 
-/* Both steps reach the vertical component through an index held in a variable
-   rather than writing s[1], and both wrap the body in a test of it. That looks
-   redundant and is not: with a constant index gcc folds the whole address into
-   each store and never uses the base register it just built. Leave it. */
+/* Both steps reach the scale through indices held in variables
+   rather than writing s[0] and s[1], and both wrap the body in a test of one.
+   That looks redundant and is not: with constant indices gcc folds the whole
+   address into each store and never uses the base it just built. Leave it. */
 int BtlFaceGrow(void)
 {
     long   *s;
+    u_char  x;
     int     y;
     int     to;
     int     n;
@@ -52,19 +53,20 @@ int BtlFaceGrow(void)
     }
     s = g_btl_face_scale;
     n = s[0] + BTL_FACE_STEP;
+    x = 0;
     to = g_btl_face_scale_to;
     y = 1;
     if (y) {
-        s[0] = n;
+        s[x] = n;
         s[y] = n;
         if (n < to) {
             return y;
         }
-        s[0] = to;
+        s[x] = to;
     }
     s[y] = to;
     g_btl_face_scale[2] = to;
-    return 0;
+    return x;
 }
 
 int BtlFaceShrink(void)
