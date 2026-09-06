@@ -3286,6 +3286,7 @@ PROVIDE(g_bg_state = 0x800E1E4C);
 PROVIDE(g_bg_state_s2d = 0x80101E4C);
 PROVIDE(g_bgm_offsets = 0x800B7E60);
 PROVIDE(g_bgm_seq = 0x801F537C);
+PROVIDE(g_btl_grid = 0x8005E674);
 PROVIDE(g_btl_map_id = 0x801F15D4);
 PROVIDE(g_btl_pos_y = 0x801F15D7);
 PROVIDE(g_btn_page_back = 0x800EB680);

@@ -46,13 +46,15 @@ void BtlPadRepeat(void)
     }
 
     if (g_btl_hold_frames == 1 || g_btl_hold_frames == BTL_HOLD_MAX) {
-        int delay = g_btl_repeat_delay;
-        g_btl_repeat_delay = delay - 1;
+        int delay;
+
+        delay = g_btl_repeat_delay;
         if (delay == 0) {
             g_btl_input = g_btl_pad1;
             g_btl_repeat_delay = BTL_REPEAT_DELAY;
             return;
         }
+        g_btl_repeat_delay = delay - 1;
     }
     g_btl_input = g_btl_pad1_edge & ~BTL_ACTION_KEYS;
 }
