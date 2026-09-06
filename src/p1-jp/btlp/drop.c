@@ -249,3 +249,38 @@ void BtlRollDrop(void)
         BtlRollCommon();
     }
 }
+
+/* The candidates, sixteen consecutive item ids split across the four tiers.
+   Each row is eight wide however many it uses, and the count beside it says
+   how far in the row is filled, so the two are read together. */
+#define TIERS    4
+#define TIER_MAX 8
+
+/* Walks the named tier and every commoner one after it, taking the first item
+   the party can still hold. Returning zero means every tier from here down was
+   refused, which is what makes a rare roll fall through to a common item
+   rather than to nothing. A tier past the last is not a drop at all. */
+int BtlPickItemFrom(unsigned int tier)
+{
+    u_char   counts[TIERS] = { 2, 3, 3, 8 };
+    u_short  ids[TIERS][TIER_MAX] = {
+        { 0x56, 0x57 },
+        { 0x58, 0x59, 0x5A },
+        { 0x5B, 0x5C, 0x5D },
+        { 0x5E, 0x5F, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65 },
+    };
+    int i;
+    int id;
+
+    i = (u_char)tier;
+    if (i < TIERS) {
+        do {
+            id = BtlPickHoldable(counts[i], ids[i]);
+            if (id != 0) {
+                return id;
+            }
+            i++;
+        } while (i < TIERS);
+    }
+    return 0;
+}

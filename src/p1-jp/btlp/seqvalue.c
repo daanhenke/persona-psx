@@ -16,14 +16,19 @@
 
 const u_char *BtlSeqReadValue(const u_char *p, u_short *out)
 {
-    u_char hi;
+    u_char  hi;
+    u_short value;
 
+    /* The value goes through a halfword of its own before it is handed back;
+       storing straight through the pointer in each arm is a byte short. */
     if (*p < SEQ_LONG_VALUE) {
-        *out = *p;
+        value = *p;
+        *out = value;
     } else {
         hi = *p;
         p++;
-        *out = *p | (hi & 0x7F) << 8;
+        value = *p | (hi & 0x7F) << 8;
+        *out = value;
     }
     return p + 1;
 }

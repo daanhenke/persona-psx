@@ -1,5 +1,6 @@
 /* Persona 1 (JP) - the battle's message box.  BTLP only.
  *   0x8007A964 BtlBoxOpen   0x8007AA5C BtlBoxClose
+ *   0x8007F3C8 BtlCloseMessage  0x8007AAB4 BtlBoxTick
  *
  * The framed panel the battle's text appears in. It is drawn as a row of
  * textured quads through the GTE, so opening and closing it is entirely a
@@ -43,6 +44,12 @@
 #define BTL_BOX_START_Y 0x40
 #define BTL_BOX_DIST    100
 
+/* Full size on an axis, how far a ramp step moves, and the sliver the
+   collapse stops the height at. */
+#define BTL_BOX_FULL 0x1000
+#define BTL_BOX_RAMP 0x180
+#define BTL_BOX_THIN 0x40
+
 extern u_char  g_btl_fast_anim;
 extern int     g_btl_text_page;
 extern u_char *g_btl_box_pack;
@@ -50,7 +57,12 @@ extern VECTOR  g_btl_box_pos;
 extern SVECTOR g_btl_box_rot;
 extern VECTOR  g_btl_box_scale;
 
+extern u_char  g_btl_box_step;
+extern u_char  g_btl_box_hold;
+extern u_short g_btl_box_flags;
+
 extern void BtlUnpack(u_char *dst, const u_char *src);
+extern void BtlTextReset(void);
 /* No prototype: this file hands it plain ints and lets the callee narrow. */
 extern void BtlQueueVramLoad();
 
@@ -118,4 +130,103 @@ void BtlBoxClose(void)
     if (g_btl_fast_anim != 0) {
         g_btl_box_step = BTL_BOX_CLOSE_NOW;
     }
+}
+
+/* The counterpart to BtlOpenMessage, and nothing but a call to BtlBoxClose.
+   The cursor code uses it where it would otherwise have opened a help line, so
+   the box goes away when the help is turned off. */
+void BtlCloseMessage(void)
+{
+    BtlBoxClose();
+}
+
+/* One frame of the box's open or close. Every step ends with the scale at one
+   of the two extremes, and the ones that finish drop the step back to zero at
+   the shared tail - the ones that are still going return from inside. */
+void BtlBoxTick(void)
+{
+    u_char *hold;
+
+    switch (g_btl_box_step) {
+    case BTL_BOX_HOLD:
+        hold = &g_btl_box_hold;
+        (*hold)--;
+        if (*hold != 0) {
+            return;
+        }
+        break;
+    case BTL_BOX_OPEN_NOW:
+        g_btl_box_scale.vx = BTL_BOX_FULL;
+        g_btl_box_scale.vy = BTL_BOX_FULL;
+        g_btl_box_scale.vz = BTL_BOX_FULL;
+        break;
+    case BTL_BOX_CLOSE_NOW:
+        g_btl_box_scale.vx = 0;
+        g_btl_box_scale.vy = 0;
+        g_btl_box_scale.vz = 0;
+        g_btl_box_flags = 0;
+        g_btl_box_step = 0;
+        g_btl_text_page = 1;
+        BtlTextReset();
+        return;
+    case BTL_BOX_OPEN:
+        g_btl_box_scale.vx = BTL_BOX_FULL;
+        g_btl_box_scale.vy += BTL_BOX_RAMP;
+        if (g_btl_box_scale.vy < BTL_BOX_FULL) {
+            return;
+        }
+        /* Written again from the branch; the first store is in the original. */
+        g_btl_box_scale.vx = BTL_BOX_FULL;
+        g_btl_box_scale.vy = BTL_BOX_FULL;
+        g_btl_box_scale.vz = BTL_BOX_FULL;
+        break;
+    case BTL_BOX_CLOSE:
+        g_btl_box_scale.vy -= BTL_BOX_RAMP;
+        if (g_btl_box_scale.vy >= 0) {
+            return;
+        }
+        g_btl_text_page = 1;
+        g_btl_box_scale.vx = 0;
+        g_btl_box_scale.vy = 0;
+        g_btl_box_scale.vz = 0;
+        g_btl_box_flags = 0;
+        g_btl_box_step = 0;
+        BtlTextReset();
+        return;
+    case BTL_BOX_ZOOM:
+        g_btl_box_scale.vx = g_btl_box_scale.vx / 2 + g_btl_box_scale.vx;
+        if (g_btl_box_scale.vx < BTL_BOX_FULL + 1) {
+            return;
+        }
+        g_btl_box_scale.vx = BTL_BOX_FULL;
+        g_btl_box_scale.vy = g_btl_box_scale.vy / 2 + g_btl_box_scale.vy;
+        if (g_btl_box_scale.vy < BTL_BOX_FULL + 1) {
+            g_btl_box_scale.vx = BTL_BOX_FULL;
+            return;
+        }
+        g_btl_box_scale.vy = BTL_BOX_FULL;
+        break;
+    case BTL_BOX_COLLAPSE_STEP:
+        g_btl_box_scale.vy = g_btl_box_scale.vy - g_btl_box_scale.vy / 2;
+        if (g_btl_box_scale.vy > BTL_BOX_THIN - 1) {
+            return;
+        }
+        g_btl_box_scale.vy = BTL_BOX_THIN;
+        g_btl_box_scale.vx = g_btl_box_scale.vx - g_btl_box_scale.vx / 2;
+        if (g_btl_box_scale.vx > 3) {
+            g_btl_box_scale.vy = BTL_BOX_THIN;
+            return;
+        }
+        BtlTextReset();
+        g_btl_text_page = 1;
+        g_btl_box_scale.vx = 0;
+        g_btl_box_scale.vy = 0;
+        g_btl_box_scale.vz = 0;
+        g_btl_box_flags = 0;
+        break;
+    case 0:
+    default:
+        return;
+    }
+    g_btl_box_step = 0;
 }

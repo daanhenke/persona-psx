@@ -66,7 +66,10 @@ typedef struct {
     /* 0x57 */ u_char  entry;     /* which list slot is active, 0xFF for none;
                                      CharRecalcStats reads list[entry] */
     /* 0x58 */ u_char  list[3];   /* 0xFF marks an empty entry              */
-    /* 0x5B */ u_char  pad5B[3];
+    /* 0x5B */ u_char  pad5B[2];
+    /* 0x5D */ u_char  unk5D;     /* the battle clears its low nibble when it
+                                     holds 3 and the character has no gun or
+                                     no ammunition for one                  */
     /* 0x5E */ u_char  blocked; /* while set the entry list reads as empty   */
     /* 0x5F */ u_char  pad5F[1];
 } Char;                           /* 0x60 bytes */

@@ -2921,5 +2921,28 @@
    "casino": 184,
    "name": 1148
   }
+ },
+ {
+  "date": "2026-09-06T20:22:52",
+  "matched_bytes": 117404,
+  "total_bytes": 1026168,
+  "percent": 11.441,
+  "matched_funcs": 676,
+  "total_funcs": 2132,
+  "sdk_bytes": 511520,
+  "sdk_funcs": 4215,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 20952,
+   "btlp": 25008,
+   "s2d": 24788,
+   "adv": 40992,
+   "casino": 184,
+   "name": 1148
+  }
  }
 ]

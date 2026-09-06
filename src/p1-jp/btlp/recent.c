@@ -26,6 +26,7 @@ void BtlPushRecent(int value)
     int  none;
     int  i;
     int  end;
+    int  one;
 
     n = 0;
     none = BTL_RECENT_NONE;
@@ -41,8 +42,11 @@ void BtlPushRecent(int value)
     end = BTL_RECENT_NONE;
     if (i > 0) {
         base = g_btl_recent;
+        /* The step back through a variable rather than a literal 1 is what
+           puts the two walking pointers in the registers the original uses. */
+        one = 1;
         dst = &base[i];
-        src = &(base - 1)[i];
+        src = &(base - one)[i];
         do {
             *dst = *src;
             src--;

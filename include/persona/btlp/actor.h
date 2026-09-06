@@ -20,17 +20,23 @@
 #include <persona/common/char.h>
 #include <persona/btlp/object.h>
 
-typedef struct {
+typedef struct BtlActor {
     /* 0x00 */ Char    c;
     /* 0x60 */ BtlObj *obj;       /* what is drawn for this actor */
     /* 0x64 */ u_long  flags;
     /* 0x68 */ u_char  pad68[0x4D];
     /* 0xB5 */ u_char  species;    /* which demon this is; the negotiation
                                       matches its tables against it       */
-    /* 0xB6 */ u_char  padB6[0xE];
+    /* 0xB6 */ u_char  padB6[2];
+    /* 0xB8 */ u_char  marker;     /* 3 while the member's marker is up, 0
+                                      when it has been taken away          */
+    /* 0xB9 */ u_char  padB9[0xB];
     /* 0xC4 */ u_char  script_pick; /* chooses between two of the model's
                                        scripts when the actor is set going */
-    /* 0xC5 */ u_char  padC5[0x1B];
+    /* 0xC5 */ u_char  padC5[3];
+    /* 0xC8 */ u_char  unkC8;      /* put back to zero alongside Char.unk5D
+                                      when the gun turns out to be unusable */
+    /* 0xC9 */ u_char  padC9[0x17];
     /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
                                       once that offer is done with; the
                                       battle only ever clears it again   */

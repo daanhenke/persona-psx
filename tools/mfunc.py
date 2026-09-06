@@ -696,18 +696,33 @@ def rebuild_jump_tables(lines, target, cand_o=None, sym=None):
         if off is None:
             off = placed
         placements.append((off, 4 * len(entries), "$Ljt%d" % k,
-                           ["    .word $Ljt%dc%X" % (k, e) for e in entries]))
+                           ["    .word $Ljt%dc%X" % (k, e) for e in entries],
+                           None))
         placed = off + 4 * len(entries)
     for k, off, data in blobs:
-        placements.append((off, len(data), "$Lrd%d" % k,
-                           ["    .byte " + ", ".join("0x%02X" % b
-                                                     for b in data)]))
+        placements.append((off, len(data), "$Lrd%d" % k, None, data))
+
+    # How long a blob is cannot be read off the target: splat's data run holds
+    # every constant end to end, so the match runs on out of one initialiser
+    # and into whatever follows it. Two initialisers in one function is the
+    # case that bites - the first swallows the second and would then push its
+    # label past its own offset - so clip each blob where the next thing
+    # starts. The overlap is safe to drop: both came from one image, so the
+    # bytes there agree by construction.
+    placements.sort(key=lambda p: (p[0], p[1]))
+    for i, p in enumerate(placements):
+        if p[4] is None:
+            continue
+        limit = len(cand_raw) if i + 1 >= len(placements) else placements[i + 1][0]
+        n = max(0, min(p[1], limit - p[0]))
+        lines = ["    .byte " + ", ".join("0x%02X" % b for b in p[4][:n])] if n else []
+        placements[i] = (p[0], n, p[2], lines, p[4])
 
     # Emit in offset order, padding the gaps, so a source holding a switch and
     # an initialiser puts both where the candidate has them.
     rodata = ['.section .rodata', '.align 2']
     at = 0
-    for off, size, label, body_lines in sorted(placements):
+    for off, size, label, body_lines, _ in placements:
         if off > at:
             rodata.append("    .space %d" % (off - at))
             at = off

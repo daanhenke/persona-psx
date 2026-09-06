@@ -43,6 +43,8 @@ typedef struct {
     /* 0x4 */ const u_long **scripts;
 } BtlObjDef;                           /* 8 bytes */
 
+struct BtlActor;
+
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free     */
     /* 0x04 */ const u_long **scripts; /* the model's table of scripts, the
@@ -63,7 +65,14 @@ typedef struct BtlObj {
     /* 0x54 */ u_char         pad54[0x10];
     /* 0x64 */ BtlSeqStep    *script;  /* animation script                 */
     /* 0x68 */ u_long         last;    /* first word of the script's last step */
-    /* 0x6C */ u_char         pad6C[0xC];
+    /* 0x6C */ struct BtlActor *actor; /* whose object this is; the spawn
+                                          writes it and BtlObjStatusTint
+                                          reads the ailment through it   */
+    /* 0x70 */ short          unk70;   /* a shadow is given -0x320 here and
+                                          zero in the two below it        */
+    /* 0x72 */ short          unk72;
+    /* 0x74 */ short          unk74;
+    /* 0x76 */ u_char         pad76[2];
     /* 0x78 */ long           scale_x;  /* unity is 0x100 in both of these  */
     /* 0x7C */ long           scale_y;
     /* 0x80 */ long           scale_z;  /* unity is 0x1000 in this one      */
@@ -101,6 +110,10 @@ typedef struct BtlObj {
    first and clears the second when it arms a script, and BtlObjAlloc turns the
    first on for a record whose template has the second clear - so the pair says
    whether the object is running a script or standing still. */
+/* Set on an actor's object exactly when its shadow is hidden, and cleared
+   again with it - BtlObjStatusTint is the only thing that touches either. */
+#define BTL_OBJ_NO_SHADOW 0x1
+
 #define BTL_OBJ_ANIMATING 0x10000000
 #define BTL_OBJ_STATIC    0x20000000
 
