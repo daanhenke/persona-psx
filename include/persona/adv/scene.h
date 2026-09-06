@@ -73,6 +73,18 @@ typedef struct {
                                         scrolls while the followed actor is
                                         at least four tiles from either edge,
                                         which is what these bound. */
+    /* 0x28 */ u_char       pad28[0xC];
+    /* 0x34 */ u_short      map_at;  /* the automap position, already
+                                        resolved: the high byte is the base
+                                        MapMarkTile adds the room to, and the
+                                        low byte is the room. 0xFFFF where the
+                                        scene has no automap block at all  */
+    /* 0x36 */ u_char       seen_x;  /* the rectangle of that room the scene
+                                        reveals on arrival                 */
+    /* 0x37 */ u_char       seen_y;
+    /* 0x38 */ u_char       seen_w;
+    /* 0x39 */ u_char       seen_h;
+    /* 0x3A */ u_char       pad3A[2];
 } AdvScene;
 
 extern AdvScene *g_adv_scene;
