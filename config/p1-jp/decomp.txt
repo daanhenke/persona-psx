@@ -499,3 +499,12 @@ btlp      func_800C45A0    src/p1-jp/btlp/objset.c
 btlp      func_800C469C    src/p1-jp/btlp/objset.c
 btlp      func_800C4608    src/p1-jp/btlp/objset.c
 btlp      func_80066C28    src/p1-jp/btlp/actor.c
+btlp      func_8007D3EC    src/p1-jp/btlp/menu.c
+btlp      func_8007D8F8    src/p1-jp/btlp/menu.c
+btlp      func_8007D924    src/p1-jp/btlp/menu.c
+btlp      func_8007D944    src/p1-jp/btlp/menu.c
+btlp      func_8007D97C    src/p1-jp/btlp/menu.c
+btlp      func_8007D98C    src/p1-jp/btlp/menu.c
+btlp      func_8007D99C    src/p1-jp/btlp/menu.c
+btlp      func_8007A2C0    src/p1-jp/btlp/input.c
+btlp      func_8007A2F0    src/p1-jp/btlp/input.c
