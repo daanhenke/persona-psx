@@ -13,19 +13,7 @@
  */
 #include <types.h>
 #include <libsnd.h>
-
-typedef struct {
-    /* 0x0 */ u_char *vh;           /* VAB header */
-    /* 0x4 */ u_char *vb;           /* VAB body, pushed to SPU RAM */
-    /* 0x8 */ u_long *seq;          /* SEQ data */
-    /* 0xC */ short   nsep;         /* sub-sequences in the SEQ */
-} BtlSoundBank;                     /* 0x10 bytes */
-
-#define BTL_SOUND_SLOTS 16
-
-extern short  g_btl_vab[];
-extern short  g_btl_seq[];
-extern u_char g_btl_seq_count[];
+#include <persona/btlp/sound.h>
 
 int BtlSoundOpen(const BtlSoundBank *banks, int slot, int index)
 {
