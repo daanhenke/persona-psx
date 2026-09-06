@@ -70,8 +70,14 @@ void BtlOpenMessage(int flags, short style, const u_char *script, short x,
         g_btl_text.dx +=
             (u_short)((MSG_CENTRE_W - (cols << MSG_CHAR_W)) >> 1);
     } else {
-        BtlTextOpen(script, x + MSG_TEXT_DROP, y + MSG_Y_DROP);
-        BtlBoxOpen(MSG_WIDE_COLS, x + MSG_WIDE_DROP, y + MSG_Y_DROP, style);
+        /* The wide layout wants a block of its own. Without the do/while the
+           two calls share the narrow arm's and the registers come out
+           differently. */
+        do {
+            BtlTextOpen(script, x + MSG_TEXT_DROP, y + MSG_Y_DROP);
+            BtlBoxOpen(MSG_WIDE_COLS, x + MSG_WIDE_DROP, y + MSG_Y_DROP,
+                       style);
+        } while (0);
     }
 
     if ((mode & MSG_SLIDE) != 0) {
