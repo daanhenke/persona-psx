@@ -355,6 +355,18 @@ record is what indexes it, that byte is the destination kind - which in turn
 named the rest of the record. When a field's meaning will not come out of the
 arithmetic, look for a label the code draws from it.
 
+### Signedness the type has to spell out
+
+Plain `char` is **unsigned** here, so a byte the original reads with `lb` needs
+`signed char` written out - casting the loaded value does nothing, the cast has
+to be on the pointer: `*(signed char *)&actor->c.status`. This is one
+instruction, and it is the last one between 98.5% and exact often enough to
+check first when a `lbu`/`lb` pair is all that is left.
+
+`sizeof` does the same thing from the other end: it is unsigned, so a loop
+bounded by one comes out `sltiu` where the original has `slti`. Give the bound
+a plain integer constant instead.
+
 ### A pointer end-test that comes out signed
 
 `a < &arr[N]` is a comparison of two pointers and assembles as `sltu`. Some of

@@ -17,18 +17,20 @@
 
 void BtlApproach(short *cur, const short *target, int step)
 {
-    int   now;
-    int   next;
-    short out;
+    int now;
+    int sum;
+    int next;
+    int out;
 
     now = *cur;
     if (now == *target) {
         return;
     }
     if (now < *target) {
-        *cur = now + step;
-        next = (short)(now + step);
-        out = next;
+        sum = step + now;
+        *cur = sum;
+        out = sum;
+        next = (short)sum;
         if (next < 0) {
             out = 0;
         } else if (*target < next) {
@@ -36,12 +38,14 @@ void BtlApproach(short *cur, const short *target, int step)
         }
         *cur = out;
     } else {
-        *cur = now - step;
-        next = (short)(now - step);
-        out = *target;
-        if (*target <= next) {
+        sum = now - step;
+        *cur = sum;
+        next = (short)sum;
+        if (next < *target) {
+            out = *target;
+        } else {
             out = next;
-            if (next > APPROACH_MAX) {
+            if (next >= APPROACH_MAX + 1) {
                 out = APPROACH_MAX;
             }
         }

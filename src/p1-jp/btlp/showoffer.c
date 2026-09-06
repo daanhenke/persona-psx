@@ -23,13 +23,17 @@ extern void BtlPanelSetImage(u_char group, u_char index);
 void BtlPanelShowOffer(void)
 {
     u_long kinds;
+    int    shown;
+    int    image;
 
-    /* The mask is fetched before the test, not inside it; the slot itself is
-       read straight from the global each time, and gcc re-reads it after the
-       call rather than holding it. */
+    /* All three are read before the test rather than inside it, and the slot
+       itself comes straight from the global each time - gcc re-reads it after
+       the call rather than holding it. */
+    shown = g_btl_panel_offer;
     kinds = g_btl_offer[g_btl_offer_slot].kinds;
-    if (g_btl_panel_offer != g_btl_offer_slot) {
-        BtlPanelSetImage(PANEL_GROUP_OFFER, kinds & 0xF);
+    image = kinds & 0xF;
+    if (shown != g_btl_offer_slot) {
+        BtlPanelSetImage(PANEL_GROUP_OFFER, image);
         g_btl_panel_offer = g_btl_offer_slot;
     }
 }

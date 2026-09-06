@@ -572,3 +572,7 @@ btlp      func_80073DEC    src/p1-jp/btlp/talkers.c
 btlp      func_80073C64    src/p1-jp/btlp/talkers.c
 btlp      func_80076768    src/p1-jp/btlp/face.c
 btlp      func_80069258    src/p1-jp/btlp/member.c
+btlp      func_80067094    src/p1-jp/btlp/recent.c
+btlp      func_8006C6B4    src/p1-jp/btlp/showoffer.c
+btlp      func_8006BEDC    src/p1-jp/btlp/tint.c
+btlp      func_8006C884    src/p1-jp/btlp/talkscript.c
