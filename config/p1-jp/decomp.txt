@@ -461,3 +461,5 @@ adv       func_8008C630    src/p1-jp/common/game/formation.c
 adv       func_8008D064    src/p1-jp/common/game/formation.c
 dng       func_8009113C    src/p1-jp/common/game/formation.c
 s2d       func_80081648    src/p1-jp/common/game/formation.c
+btlp      func_80080D54    src/p1-jp/btlp/object.c
+btlp      func_80080DAC    src/p1-jp/btlp/object.c
