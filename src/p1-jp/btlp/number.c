@@ -19,6 +19,11 @@
 
 #define DECIMAL_TOP 1000000000
 
+/* A fixed-width field pads with 0xFF and marks a negative with 0xFE, both
+   written as the signed values the original uses. */
+#define FIELD_BLANK (-1)
+#define FIELD_MINUS (-2)
+
 /* Tints, two apart, picked by how full the gauge is. */
 #define GAUGE_FULL   0x24
 #define GAUGE_NORMAL 0x20
@@ -53,6 +58,46 @@ u_char *BtlFormatDecimal(int value, u_char *dst, int pad)
     } while (place != 0);
     *dst = GLYPH_END;
     return dst;
+}
+
+/* The same number into a fixed-width field, right aligned. The last place is
+   always written so zero shows a digit; to its left comes a digit while there
+   is one, then the minus sign once if the value was negative, then blanks. */
+void BtlFormatRight(signed char *dst, int value, int width)
+{
+    signed char *p;
+    int     rest;
+    int     neg;
+
+    neg = 0;
+    if (width <= 0) {
+        width = 1;
+    }
+    if (value < 0) {
+        value = -value;
+        neg = 1;
+    }
+    (width + dst)[-1] = value % 10;
+    rest = value / 10;
+    if (width >= 2) {
+        width -= 2;
+        if (width >= 0) {
+            p = width + dst;
+            do {
+                if (rest != 0) {
+                    *p = rest % 10;
+                    rest /= 10;
+                } else if (neg) {
+                    *p = FIELD_MINUS;
+                    neg = 0;
+                } else {
+                    *p = FIELD_BLANK;
+                }
+                width--;
+                p--;
+            } while (width >= 0);
+        }
+    }
 }
 
 /* Either sprite may be null: the caller draws only the gauges it has. */
