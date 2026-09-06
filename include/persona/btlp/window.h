@@ -28,20 +28,23 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u_char        pad000[2];
     /* 0x002 */ short         state;
-    /* 0x004 */ u_char        pad004[8];
-    /* 0x00C */ const u_char *script;
+    /* 0x004 */ u_char        pad004[4];
+    /* 0x008 */ const u_char *script;  /* how far the script walk has got   */
+    /* 0x00C */ const u_char *text;    /* how far the typing has got        */
     /* 0x010 */ u_long        attr;    /* every cell takes a copy of this   */
     /* 0x014 */ int           timer;
-    /* 0x018 */ u_char        pad018[4];
+    /* 0x018 */ int           unused;  /* cleared with the rest; nothing in
+                                          the battle overlay reads it       */
     /* 0x01C */ int           placed;  /* characters on screen              */
     /* 0x020 */ int           staged;  /* which staging cell is in use      */
-    /* 0x024 */ u_char        pad024[2];
-    /* 0x026 */ short         scroll;  /* moved up four pixels a frame      */
+    /* 0x024 */ short         x;       /* where the window sits             */
+    /* 0x026 */ short         y;       /* moved up four pixels a frame      */
     /* 0x028 */ BtlWindowCell cells[BTL_WINDOW_CELLS];
-    /* 0x268 */ u_char        pad268[4];
+    /* 0x268 */ short         dx;      /* nudge, used to centre a message   */
+    /* 0x26A */ short         dy;
     /* 0x26C */ short         vram_x;  /* where its glyphs are uploaded     */
     /* 0x26E */ short         vram_y;
-    /* 0x270 */ u_char        pad270[4];
+    /* 0x270 */ int           slide;   /* the slower scroll, two a frame    */
 } BtlWindow;                            /* 0x274 bytes */
 
 /* Characters to a row, and the size of one in VRAM. */

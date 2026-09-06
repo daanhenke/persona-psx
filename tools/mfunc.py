@@ -97,6 +97,10 @@ NAMED = re.compile(r"\b(?:func|D)_([0-9A-F]{8})\b")
 PROVIDE = re.compile(r"PROVIDE\(([A-Za-z_]\w*) = 0x([0-9A-Fa-f]{8})\);")
 # %hi(D_7FFFFF) / %lo(D_7FFFFF) - a constant spimdisasm mistook for an address.
 CONSTREF = re.compile(r"%(hi|lo)\(\s*D_([0-9A-Fa-f]+)\s*\)")
+
+# A load or a store names its address in the `%lo(X)($reg)` form; an addiu that
+# only builds the address into a register leaves off the trailing register.
+LOADED_LO = re.compile(r"%lo\(\s*D_([0-9A-Fa-f]{8})\s*\)\s*\(")
 # The $at expansion of an indexed load, in its two forms. Which one the
 # assembler picked says whether the source named a symbol or wrote the address
 # out as a literal - see fold_literal_at_refs.
@@ -257,6 +261,11 @@ def normalize_asm(lines, names=None, gp=None):
     # named object.
     based = sorted(names) if names else []
 
+    # Addresses the function reads or writes directly - `%lo(X)(reg)` - as
+    # opposed to ones it only builds into a register with addiu. Filled in
+    # below, once the offset forms have been folded.
+    loaded = set()
+
     def rename(m):
         addr = int(m.group(1), 16)
         hit = (names or {}).get(addr)
@@ -285,9 +294,17 @@ def normalize_asm(lines, names=None, gp=None):
             # only a power of two counts. An odd gap - the byte three before a
             # configuration flag, say - means the address is a member of the
             # object below and the flag just happens to sit close after it.
+            #
+            # It also has to be an address the function *materialises*, which
+            # is what "the base it builds is one element before the array"
+            # means. An address the function loads from or stores to directly
+            # is a member of the object below however close the next one sits:
+            # the last fields of the battle's message window are 0x26C into it
+            # and eight bytes short of the global that follows, and read as
+            # &that[-1] until the two forms were told apart.
             one_element = (above is not None and above <= 0x10
                            and (above & (above - 1)) == 0)
-            if (one_element and addr % 4 == 0
+            if (one_element and addr % 4 == 0 and addr not in loaded
                     and (below is None or below > 0x10)):
                 return "%s-0x%X" % (names[based[j]], above)
             if below is not None and 0 < below <= 0x400:
@@ -316,6 +333,8 @@ def normalize_asm(lines, names=None, gp=None):
     # reached by literal - g_slots[62].scale_y, written as D_800DD1AC + 0x2 -
     # kept its invented symbol while its neighbours were folded.
     lines = [OFFREF.sub(fold, ln) for ln in lines]
+    for ln in lines:
+        loaded.update(int(m, 16) for m in LOADED_LO.findall(ln))
     # Runs first: once an invented symbol is folded to a literal, `rename` must
     # not turn it back into a name the candidate cannot use.
     for ln in fold_literal_at_refs(lines, names):

@@ -12,7 +12,7 @@
 #include <libgs.h>
 
 /* Reached by hardcoded address; filled just before the picture is loaded. */
-#define g_image_cells ((GsCELL *)0x800E964C)
+#define g_adv_image_cells ((GsCELL *)0x800E964C)
 
 #define CELL      16
 #define IMG_CLUT  0x7800
@@ -27,7 +27,7 @@ void ImageCellsInit(short kind)
     case 0:
     case 1:
         for (i = 0; i < 24 * IMG_ROWS; i++) {
-            c = &g_image_cells[i];
+            c = &g_adv_image_cells[i];
             c->u = (i % 24 & 0xF) * CELL;
             c->v = (i / 24) * CELL;
             c->cba = IMG_CLUT;
@@ -37,7 +37,7 @@ void ImageCellsInit(short kind)
         break;
     case 2:
         for (i = 0; i < 32 * IMG_ROWS; i++) {
-            c = &g_image_cells[i];
+            c = &g_adv_image_cells[i];
             c->u = (i & 0xF) * CELL;
             c->v = (i / 32) * CELL;
             c->cba = IMG_CLUT;
@@ -48,7 +48,7 @@ void ImageCellsInit(short kind)
     case 3:
     case 4:
         for (i = 0; i < 48 * IMG_ROWS; i++) {
-            c = &g_image_cells[i];
+            c = &g_adv_image_cells[i];
             c->u = (i & 0xF) * CELL;
             c->v = (i / 48) * CELL;
             c->cba = IMG_CLUT;

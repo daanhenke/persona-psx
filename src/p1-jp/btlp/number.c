@@ -65,9 +65,8 @@ u_char *BtlFormatDecimal(int value, u_char *dst, int pad)
    is one, then the minus sign once if the value was negative, then blanks. */
 void BtlFormatRight(signed char *dst, int value, int width)
 {
-    signed char *p;
-    int     rest;
-    int     neg;
+    int rest;
+    int neg;
 
     neg = 0;
     if (width <= 0) {
@@ -82,19 +81,17 @@ void BtlFormatRight(signed char *dst, int value, int width)
     if (width >= 2) {
         width -= 2;
         if (width >= 0) {
-            p = width + dst;
             do {
                 if (rest != 0) {
-                    *p = rest % 10;
+                    dst[width] = rest % 10;
                     rest /= 10;
                 } else if (neg) {
-                    *p = FIELD_MINUS;
+                    dst[width] = FIELD_MINUS;
                     neg = 0;
                 } else {
-                    *p = FIELD_BLANK;
+                    dst[width] = FIELD_BLANK;
                 }
                 width--;
-                p--;
             } while (width >= 0);
         }
     }
@@ -104,8 +101,8 @@ void BtlFormatRight(signed char *dst, int value, int width)
 void BtlSetGaugeColour(const Char *c, BtlGaugeSprite *hp,
                        BtlGaugeSprite *sp)
 {
-    u_char tint;
-    int    max;
+    int max;
+    int tint;
 
     if (hp != 0) {
         max = c->hp_max;

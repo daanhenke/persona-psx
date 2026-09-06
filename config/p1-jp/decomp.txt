@@ -556,3 +556,14 @@ btlp      func_80079178    src/p1-jp/btlp/effectdraw.c
 btlp      func_8007BC9C    src/p1-jp/btlp/putchar.c
 btlp      func_8007CA4C    src/p1-jp/btlp/text.c
 btlp      func_8007CC30    src/p1-jp/btlp/text.c
+btlp      func_800AC9C0    src/p1-jp/btlp/number.c
+btlp      func_8007AA5C    src/p1-jp/btlp/box.c
+btlp      func_8007A964    src/p1-jp/btlp/box.c
+btlp      func_8007CA70    src/p1-jp/btlp/text.c
+btlp      func_8007CAF4    src/p1-jp/btlp/text.c
+btlp      func_80076ABC    src/p1-jp/btlp/face.c
+btlp      func_80076AE8    src/p1-jp/btlp/face.c
+btlp      func_8007C54C    src/p1-jp/btlp/seqstate.c
+btlp      func_8007C5BC    src/p1-jp/btlp/seqstate.c
+btlp      func_80092DD8    src/p1-jp/btlp/bgm.c
+btlp      func_800767DC    src/p1-jp/btlp/face.c

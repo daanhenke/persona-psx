@@ -13,12 +13,10 @@
 #include <libsnd.h>
 #include <persona/btlp/sound.h>
 
-/* Where BtlLoadPackEntry leaves whatever it read. */
-#define BTL_PACK_DEST 0x80152400
-
-#define g_btl_pack_vb  (*(u_char **)(BTL_PACK_DEST + 0x0))
-#define g_btl_pack_vh  (*(u_char **)(BTL_PACK_DEST + 0x4))
-#define g_btl_pack_seq (*(u_long **)(BTL_PACK_DEST + 0x8))
+/* The head of whatever BtlLoadPackEntry last read. */
+extern u_char *g_btl_pack_vb;
+extern u_char *g_btl_pack_vh;
+extern u_long *g_btl_pack_seq;
 
 #define BTL_BGM_SEPS 4
 

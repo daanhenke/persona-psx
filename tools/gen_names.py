@@ -37,6 +37,19 @@ SPACE = {
 
 VALID = re.compile(r"^[A-Za-z_][A-Za-z_0-9]*$")
 
+# 0x800D0000-0x800F7FFF is work area, reused by whichever overlay is resident.
+# Ghidra can only hold one label per address there, so a name belonging to one
+# overlay is emitted into every target - and where it lands inside another
+# overlay's object, that object's own fields disassemble under the foreign name
+# and the function can never match.
+#
+# Both names are right, for different overlays, so there is nothing to resolve
+# in Ghidra. A work-area label only one overlay owns is prefixed with that
+# overlay instead, and every other target drops it. Labels the common/ sources
+# share stay unprefixed and reach everybody, as they should.
+WORK_AREA = (0x800D0000, 0x800F7FFF)
+OWNED = ("adv", "btlp", "casino", "dng", "name", "s2d")
+
 
 def gen(target):
     jf, space = SPACE[target]
@@ -55,12 +68,18 @@ def gen(target):
     if space.startswith("OVL_"):
         spaces.append(doc["spaces"]["ram"])
 
+    # Work-area labels another overlay has claimed by prefixing its name.
+    foreign = tuple("g_%s_" % t for t in OWNED if t != target)
+
     def collect(entries, source, blo, bhi, clashes):
         for src in (source.get("names", {}), source.get("symbols", {})):
             for hexaddr, name in src.items():
                 addr = int(hexaddr, 16)
                 if not (blo <= addr <= bhi):
                     continue      # e.g. Ghidra's synthetic GTE macro space
+                if (WORK_AREA[0] <= addr <= WORK_AREA[1]
+                        and name.startswith(foreign)):
+                    continue      # another overlay's name for this address
                 if not VALID.match(name):
                     continue      # skip anything not a C identifier
                 if name.startswith(("FUN_", "thunk_FUN_")):

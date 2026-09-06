@@ -60,7 +60,6 @@ unsigned int BtlItemSlot(u_short id)
 
     p = g_items;
     i = 0;
-    id &= 0xFFFF;
     slot = 0;
     for (;;) {
         if ((*p & ITEM_ID) == id) {
@@ -75,20 +74,19 @@ unsigned int BtlItemSlot(u_short id)
         slot += 0x10000;
         i++;
         p++;
-        if (i >= ITEM_SLOTS) {
-            break;
+        if (i > ITEM_SLOTS - 1) {
+            p = g_items;
+            i = 0;
+            do {
+                if ((*p & ITEM_ID) == 0) {
+                    return i << 16 | SLOT_EMPTY;
+                }
+                i++;
+                p++;
+            } while (i < ITEM_SLOTS);
+            return SLOT_FULL;
         }
     }
-    p = g_items;
-    i = 0;
-    do {
-        if ((*p & ITEM_ID) == 0) {
-            return i << 16 | SLOT_EMPTY;
-        }
-        i++;
-        p++;
-    } while (i < ITEM_SLOTS);
-    return 0;
 }
 
 /* Is there anywhere to put a Persona the battle has just been given? Twelve

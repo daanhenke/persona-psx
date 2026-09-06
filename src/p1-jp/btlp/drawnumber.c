@@ -20,6 +20,7 @@
 
 #define GLYPH_MINUS  0xCC
 #define GLYPH_SPACE  0
+#define GLYPH_END    0xFF
 
 /* d - 0x40 lands on 0xC0 + d, and d - 0x1B on 0xE5 + d. */
 #define DIGIT_BASE     (-0x40)
@@ -31,60 +32,58 @@ extern void BtlFormatRight(signed char *dst, int value, int width);
 
 int BtlDrawNumber(u_char *dst, int value, int width)
 {
+    int         drawn;
     signed char c;
     int         i;
-    int         drawn;
 
+    drawn = 0;
     BtlFormatRight(g_btl_number_buf, value, width);
     i = 0;
-    drawn = 0;
     if (width > 0) {
         do {
             c = g_btl_number_buf[i];
-            if (c != NUMBER_BLANK) {
-                if (c == NUMBER_MINUS) {
-                    *dst = GLYPH_MINUS;
-                } else {
-                    *dst = c + DIGIT_BASE;
-                }
+            if (c == NUMBER_MINUS) {
+                *dst = GLYPH_MINUS;
                 drawn++;
-            } else {
+            } else if (c == NUMBER_BLANK) {
                 *dst = GLYPH_SPACE;
+            } else {
+                *dst = c + DIGIT_BASE;
+                drawn++;
             }
             i++;
             dst++;
         } while (i < width);
     }
-    *dst = -1;
+    *dst = GLYPH_END;
     return drawn;
 }
 
 int BtlDrawNumberAlt(u_char *dst, int value, int width)
 {
+    int         drawn;
     signed char c;
     int         i;
-    int         drawn;
 
+    drawn = 0;
     BtlFormatRight(g_btl_number_buf, value, width);
     i = 0;
-    drawn = 0;
     if (width > 0) {
         do {
             c = g_btl_number_buf[i];
-            if (c != NUMBER_BLANK) {
-                if (c == NUMBER_MINUS) {
-                    *dst = GLYPH_MINUS;
-                } else {
-                    *dst = c + DIGIT_BASE_ALT;
-                }
+            if (c == NUMBER_MINUS) {
+                *dst = GLYPH_MINUS;
                 drawn++;
-            } else {
+            } else if (c == NUMBER_BLANK) {
                 *dst = GLYPH_SPACE;
+            } else {
+                *dst = c + DIGIT_BASE_ALT;
+                drawn++;
             }
             i++;
             dst++;
         } while (i < width);
     }
-    *dst = -1;
+    *dst = GLYPH_END;
     return drawn;
 }
