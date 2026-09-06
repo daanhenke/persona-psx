@@ -17,7 +17,11 @@
 
 typedef struct {
     /* 0x00 */ int    price;
-    /* 0x04 */ u_char pad04[4];
+    /* 0x04 */ u_char pad04[2];
+    /* 0x06 */ u_short unk06;   /* bit 6 marks an entry whose usefulness is
+                                   worth asking about: DrawItemRowUsable greys
+                                   the row unless it is set and SpellUsable
+                                   also says yes                            */
     /* 0x08 */ u_char name[10];   /* packed glyph bytes, ten cells wide */
     /* 0x12 */ u_char pad12[1];
     /* 0x13 */ u_char bonus01;  /* high nibble stat[0], low nibble stat[1] */
