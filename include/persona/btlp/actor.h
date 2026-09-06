@@ -17,8 +17,8 @@
 
 typedef struct {
     /* 0x00 */ u_char  pad00[2];
-    /* 0x02 */ u_char  present;   /* nonzero when the slot holds somebody */
-    /* 0x03 */ u_char  pad03[0xA];
+    /* 0x02 */ u_char  id;        /* the character, and zero in an empty slot */
+    /* 0x03 */ u_char  name[10];  /* packed glyph bytes, as Char keeps a name */
     /* 0x0D */ signed char status;    /* ailment code, extended past the table */
     /* 0x0E */ u_char  pad0E[0x16];
     /* 0x24 */ BtlObj *obj;       /* what is drawn for this actor         */
