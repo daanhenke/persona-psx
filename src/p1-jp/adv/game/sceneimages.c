@@ -34,7 +34,10 @@ typedef struct {
     /* 0x0E */ u_char   pad0E[2];
 } AdvSceneImage;                  /* 16 bytes */
 
-#define g_scene_images ((AdvSceneImage *)SCENE_IMAGES_AT)
+/* An entry is reached by byte offset from the pack rather than by index, and
+   the offset is a variable of its own: writing the accesses as an index
+   instead leaves gcc free to scale it a second time after the conditional. */
+#define g_scene_image(off) (*(AdvSceneImage *)((char *)SCENE_IMAGES_AT + (off)))
 
 #define EVENT_FLAGS_AT 0x801F29C8
 
@@ -48,14 +51,16 @@ void AdvSceneStartImages(void)
     short          flags;
     int            one;
     int            n;
+    int            off;
     u_char         i;
 
     i = 0;
     do {
         n   = i;
-        img = &g_scene_images[n];
+        off = n * sizeof(AdvSceneImage);
+        img = &g_scene_image(off);
         if (img->script != IMG_NONE) {
-            flags = g_scene_images[n].flags;
+            flags = g_scene_image(off).flags;
             if ((flags & IMG_SHOWN) != 0) {
                 if ((flags & IMG_CONDITIONAL) != 0) {
                     /* The 1 is assigned where it is shifted, not before the
@@ -68,8 +73,8 @@ void AdvSceneStartImages(void)
                 }
                 ImageAnimStart(n + SCENE_IMAGE_CHAN,
                                img->script,
-                               g_scene_images[n].x, g_scene_images[n].y,
-                               g_scene_images[n].w, g_scene_images[n].h);
+                               g_scene_image(off).x, g_scene_image(off).y,
+                               g_scene_image(off).w, g_scene_image(off).h);
             }
         }
     next:

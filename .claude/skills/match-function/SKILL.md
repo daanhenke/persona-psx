@@ -84,8 +84,12 @@ noise, and the useful ones are usually a deliberate temporary or a redundant
 assignment that forces a register. Keep a comment saying why, so nobody
 "simplifies" it away.
 
-A permuter score of 0 and a 100% objdiff should agree. If they disagree, the
-harness normalisation is wrong, not the C.
+A permuter score of 0 and a 100% objdiff usually agree, but the permuter's
+scorer does not compare branch *targets*, so it will happily report zero for a
+program that branches somewhere else. `AdvSceneStartImages` scored zero with the
+call moved inside a conditional it does not belong in - a real behaviour change,
+which objdiff showed as one wrong `beqz` and 99.92%. Re-score every output with
+`tools/mfunc.py` and read the C it produced, not just the score.
 
 ## 5. Name everything
 

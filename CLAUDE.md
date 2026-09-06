@@ -166,6 +166,22 @@ function stuck at 96.8% until all three loops listed the fields in the same
 order. If several loops fill one record type, keep the field order identical
 across them unless the original really differs.
 
+### A scaled index that comes out twice
+
+`table[n].field` scales `n` at the point of use, and gcc 2.6 has no global CSE,
+so a second use of `table[n]` after a branch has merged is scaled again. Where
+the original computes the scale **once** at the top of the loop and every later
+access adds the same register, the source held the byte offset in a variable of
+its own:
+
+    off = n * sizeof(Rec);
+    r   = (Rec *)((char *)TABLE_AT + off);
+
+with the later accesses reading through `off` too. This is the last thing
+between `AdvSceneStartImages` and exact, and it is worth recognising: a lone
+`sll rX, rY, k` reappearing after a merge point, with the original adding an
+existing register there instead.
+
 ### Reaching a record in a loop
 
 Two spellings of the same array walk, and they are not interchangeable:

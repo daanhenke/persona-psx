@@ -635,3 +635,4 @@ adv       func_8007E6DC    src/p1-jp/adv/game/fieldtick.c
 adv       func_8007F1DC    src/p1-jp/adv/gfx/pickeffect.c
 adv       func_80085DC0    src/p1-jp/adv/gfx/advfade.c
 adv       func_80085EA0    src/p1-jp/adv/gfx/advfade.c
+adv       func_80084598    src/p1-jp/adv/game/sceneimages.c
