@@ -78,6 +78,7 @@ s2d       func_80065B34    src/p1-jp/common/gfx/fade.c
 adv       func_8006607C    src/p1-jp/common/gfx/fade.c
 dng       func_80075B08    src/p1-jp/common/gfx/fade.c
 s2d       func_80065B6C    src/p1-jp/common/gfx/fade.c
+adv       func_8007CFC8    src/p1-jp/adv/gfx/bgbox.c
 adv       func_8007D50C    src/p1-jp/adv/gfx/bgpanel.c
 adv       func_80066154    src/p1-jp/adv/gfx/slot.c
 adv       func_800660B4    src/p1-jp/adv/gfx/slot.c
