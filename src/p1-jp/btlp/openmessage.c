@@ -49,21 +49,32 @@ void BtlOpenMessage(int flags, short style, const u_char *script, short x,
                     short y)
 {
     int cols;
+    int mode;
+    /* Eight bytes the original reserves and never touches. gcc 2.6 allocates
+       a declared local whether or not it is used, and without these the frame
+       comes out eight short. */
+    int unused[2];
 
-    if ((flags & MSG_NEWPAGE) != 0) {
+    /* The flags are copied before anything else so the copy survives the two
+       calls; testing the argument directly leaves it in a call-clobbered
+       register and costs a saved one. */
+    mode = flags;
+    if ((mode & MSG_NEWPAGE) != 0) {
         g_btl_text_page = 0;
     }
-    if ((flags & MSG_NARROW) != 0) {
+    if ((mode & MSG_NARROW) != 0) {
         cols = BtlTextOpen(script, x + MSG_TEXT_DROP, y + MSG_Y_DROP);
         BtlBoxOpen(MSG_NARROW_COLS, x + MSG_NARROW_DROP, y + MSG_Y_DROP,
                    style);
-        g_btl_text.dx += (MSG_CENTRE_W - (cols << MSG_CHAR_W)) >> 1;
+        /* The nudge is narrowed before it is added, not after. */
+        g_btl_text.dx +=
+            (u_short)((MSG_CENTRE_W - (cols << MSG_CHAR_W)) >> 1);
     } else {
         BtlTextOpen(script, x + MSG_TEXT_DROP, y + MSG_Y_DROP);
         BtlBoxOpen(MSG_WIDE_COLS, x + MSG_WIDE_DROP, y + MSG_Y_DROP, style);
     }
 
-    if ((flags & MSG_SLIDE) != 0) {
+    if ((mode & MSG_SLIDE) != 0) {
         g_btl_box_step = BTL_BOX_OPEN;
         g_btl_box_flags |= BTL_BOX_SLIDE;
     } else {
