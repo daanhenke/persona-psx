@@ -633,3 +633,5 @@ dng       func_80084DA0    src/p1-jp/common/ui/config.c
 s2d       func_800751CC    src/p1-jp/common/ui/config.c
 adv       func_8007E6DC    src/p1-jp/adv/game/fieldtick.c
 adv       func_8007F1DC    src/p1-jp/adv/gfx/pickeffect.c
+adv       func_80085DC0    src/p1-jp/adv/gfx/advfade.c
+adv       func_80085EA0    src/p1-jp/adv/gfx/advfade.c
