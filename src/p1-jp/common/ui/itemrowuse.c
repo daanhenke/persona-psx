@@ -8,6 +8,8 @@
  * worth asking about gets the plain bank when it would still do something and
  * the greyed one when it would not; everything else is greyed, so the page
  * only shows a plain row for a recovery item somebody needs.
+ *
+ * One local carries the item id in and the chosen bank out; do not split it.
  */
 #include <types.h>
 #include <persona/common/item.h>
@@ -48,15 +50,19 @@ extern void   DrawItemName(int id, short *dst, u_short base, int b);
 void DrawItemRowUsable(short slot, short *dst)
 {
     u_short *entry;
+    u_short *count;
     int      bank;
     int      base;
     short    n;
 
     TileMapFillRect(dst, 0, ROW_CELLS, 1, ROW_STRIDE);
+    count = &g_items_pending[slot];
     entry = &g_items_pending[slot];
-    if ((*entry & ITEM_ID) != 0 && (*entry >> ITEM_SHIFT) != 0) {
-        if ((g_item_defs[*entry & ITEM_ID].unk06 & ITEM_ASKABLE) != 0 &&
-            SpellUsable(*entry & ITEM_ID) != 0) {
+    bank = *entry & ITEM_ID;
+    if ((g_items_pending[slot] & ITEM_ID) != 0 &&
+        (*count >> ITEM_SHIFT) != 0) {
+        if ((g_item_defs[g_items_pending[slot] & ITEM_ID].unk06 &
+             ITEM_ASKABLE) != 0 && SpellUsable(bank) != 0) {
             bank = 0;
         } else {
             bank = 1;
@@ -64,7 +70,8 @@ void DrawItemRowUsable(short slot, short *dst)
         base  = bank * GLYPH_BANK;
         entry = &g_items_pending[slot];
         DrawItemName(*entry & ITEM_ID, dst, base, 0);
-        n = FormatDecimal(*entry >> ITEM_SHIFT, g_hud_digits, COUNT_DIGITS);
+        count = entry;
+        n = FormatDecimal(*count >> ITEM_SHIFT, g_hud_digits, COUNT_DIGITS);
         TileMapWriteRowRev(g_hud_digits, &dst[ROW_COUNT_AT],
                            base + GLYPH_DIGIT0, n);
     }

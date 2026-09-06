@@ -9,7 +9,9 @@
  *
  * *cur is written twice on either path - once with the raw step and again with
  * the clamped result - and *target is read again inside the branch rather than
- * kept from the test at the top.
+ * kept from the test at the top. The rising path keeps the untruncated sum as
+ * its answer while the falling one keeps the truncated short; each path has its
+ * own result variable, and they are not one variable spelt twice.
  */
 #include <types.h>
 
@@ -17,10 +19,11 @@
 
 void BtlApproach(short *cur, const short *target, int step)
 {
-    int now;
-    int sum;
-    int next;
-    int out;
+    int   now;
+    int   sum;
+    int   next;
+    int   up;
+    int   down;
 
     now = *cur;
     if (now == *target) {
@@ -29,26 +32,26 @@ void BtlApproach(short *cur, const short *target, int step)
     if (now < *target) {
         sum = step + now;
         *cur = sum;
-        out = sum;
+        up = sum;
         next = (short)sum;
         if (next < 0) {
-            out = 0;
+            up = 0;
         } else if (*target < next) {
-            out = *target;
+            up = *target;
         }
-        *cur = out;
+        *cur = up;
     } else {
         sum = now - step;
         *cur = sum;
         next = (short)sum;
         if (next < *target) {
-            out = *target;
+            down = *target;
         } else {
-            out = next;
-            if (next >= APPROACH_MAX + 1) {
-                out = APPROACH_MAX;
+            if (next > APPROACH_MAX) {
+                next = APPROACH_MAX;
             }
+            down = next;
         }
-        *cur = out;
+        *cur = down;
     }
 }

@@ -11,7 +11,9 @@
  * size of digit the overlay carries.
  *
  * Both return how many characters were actually drawn - blanks do not count -
- * so a caller can centre what it has just laid out.
+ * so a caller can centre what it has just laid out. The count doubles as the
+ * zero the width is tested against on the way in; do not tidy that to a
+ * literal.
  */
 #include <types.h>
 
@@ -39,18 +41,22 @@ int BtlDrawNumber(u_char *dst, int value, int width)
     drawn = 0;
     BtlFormatRight(g_btl_number_buf, value, width);
     i = 0;
-    if (width > 0) {
+    if (width > drawn) {
         do {
             c = g_btl_number_buf[i];
-            if (c == NUMBER_MINUS) {
+            if (c != NUMBER_MINUS) {
+                if (c == NUMBER_BLANK) {
+                    *dst = GLYPH_SPACE;
+                    goto next;
+                }
+            } else {
                 *dst = GLYPH_MINUS;
                 drawn++;
-            } else if (c == NUMBER_BLANK) {
-                *dst = GLYPH_SPACE;
-            } else {
-                *dst = c + DIGIT_BASE;
-                drawn++;
+                goto next;
             }
+            *dst = c + DIGIT_BASE;
+            drawn++;
+        next:
             i++;
             dst++;
         } while (i < width);
@@ -68,18 +74,22 @@ int BtlDrawNumberAlt(u_char *dst, int value, int width)
     drawn = 0;
     BtlFormatRight(g_btl_number_buf, value, width);
     i = 0;
-    if (width > 0) {
+    if (width > drawn) {
         do {
             c = g_btl_number_buf[i];
-            if (c == NUMBER_MINUS) {
+            if (c != NUMBER_MINUS) {
+                if (c == NUMBER_BLANK) {
+                    *dst = GLYPH_SPACE;
+                    goto next;
+                }
+            } else {
                 *dst = GLYPH_MINUS;
                 drawn++;
-            } else if (c == NUMBER_BLANK) {
-                *dst = GLYPH_SPACE;
-            } else {
-                *dst = c + DIGIT_BASE_ALT;
-                drawn++;
+                goto next;
             }
+            *dst = c + DIGIT_BASE_ALT;
+            drawn++;
+        next:
             i++;
             dst++;
         } while (i < width);
