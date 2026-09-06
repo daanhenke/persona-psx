@@ -36,6 +36,8 @@ extern void SlotSetPos(u_char slot, int attr, short x, short y);
 
 void EquipPlaceCursor(void)
 {
+    MenuCtx *menu;
+
     g_slot_cur = &g_slots[CURSOR_FIRST];
     g_slots[CURSOR_FIRST].attr |= SLOT_ATTR_HIDE;
     g_slot_cur = &g_slots[2];
@@ -47,10 +49,11 @@ void EquipPlaceCursor(void)
     g_slot_cur = &g_slots[CURSOR_LAST];
     g_slots[CURSOR_TOP].attr |= SLOT_ATTR_HIDE;
 
+    menu = g_menu;
     if (g_menu->list[1].cur == 0) {
         g_slots[CURSOR_TOP].attr &= ~SLOT_ATTR_HIDE;
     } else if (g_menu->list[1].cur >= 0 &&
-               g_menu->list[1].cur < CURSOR_ROW_MAX) {
+               menu->list[1].cur < CURSOR_ROW_MAX) {
         g_slots[CURSOR_ROWS].attr &= ~SLOT_ATTR_HIDE;
         g_slot_cur = &g_slots[CURSOR_ROWS];
         SlotSetPos(CURSOR_ROWS, CURSOR_Z, CURSOR_X,
