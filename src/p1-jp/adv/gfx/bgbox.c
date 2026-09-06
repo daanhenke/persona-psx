@@ -41,7 +41,7 @@
 
 extern GsBG         g_bg_layers[];
 extern u_short      g_bg_layer_otz[];
-extern u_long       g_adv_bg_shown;
+extern u_long       g_bg_shown;
 extern short        g_panel_cells[];
 extern u_char       g_hud_digits[];
 extern u_int        g_money;
@@ -66,7 +66,7 @@ void BgBoxShow(void)
     g_bg_layers[BOX_LAYER].w = BOX_W;
     g_bg_layers[BOX_LAYER].h = BOX_H;
     g_bg_layer_otz[BOX_LAYER] = BOX_OTZ;
-    g_adv_bg_shown |= BOX_BIT;
+    g_bg_shown |= BOX_BIT;
     TileMapFillRect(cells, 0, BOX_CELLS_W, BOX_CELLS_H, BOX_CELLS_W);
 
     TileMapWriteRow(str_cell_run, &cells[LABEL_TOP_AT], LABEL_TOP_BASE,

@@ -2,7 +2,7 @@
  *
  * One of the six background layers, sized to a wide thin strip and placed
  * wherever the caller asks. Putting it up is three things: the map it draws,
- * the layer's rectangle, and its bit in g_adv_bg_shown - the draw pass hands
+ * the layer's rectangle, and its bit in g_bg_shown - the draw pass hands
  * every layer whose bit is set to GsSortFastBg on the next frame.
  *
  * An id of zero takes it down instead, which means blanking the four rows of
@@ -26,7 +26,7 @@
 #define BG_STATE_AT 0x800E1E4C
 
 extern GsBG   g_bg_layers[];
-extern u_long g_adv_bg_shown;
+extern u_long g_bg_shown;
 extern u_int *g_bg_maps[];
 
 extern void BgMapInit(u_int *map, int arg);
@@ -43,7 +43,7 @@ void BgPanelSet(short id, short x, short y)
         g_bg_layers[PANEL_LAYER].x = x;
         g_bg_layers[PANEL_LAYER].y = y;
         g_bg_layers[PANEL_LAYER].h = PANEL_H;
-        g_adv_bg_shown |= PANEL_BIT;
+        g_bg_shown |= PANEL_BIT;
     } else {
         BgMapClearRow(0);
         BgMapClearRow(1);
