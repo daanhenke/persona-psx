@@ -45,7 +45,7 @@ extern u_char    g_btl_fast_anim;
 extern int  BtlTextOpen(const u_char *script, short x, short y);
 extern void BtlBoxOpen(short cols, short x, short y, int style);
 
-void BtlOpenMessage(int flags, int style, const u_char *script, short x,
+void BtlOpenMessage(int flags, short style, const u_char *script, short x,
                     short y)
 {
     int cols;
