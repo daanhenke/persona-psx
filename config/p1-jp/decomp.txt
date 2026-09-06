@@ -561,6 +561,7 @@ btlp      func_8006BD40    src/p1-jp/btlp/talkreact.c
 btlp      func_8007BAE4    src/p1-jp/btlp/talkpanel.c
 btlp      func_800921B4    src/p1-jp/btlp/packbank.c
 btlp      func_8006A22C    src/p1-jp/btlp/talkperform.c
+btlp      func_800A98D0    src/p1-jp/btlp/pickspawn.c
 btlp      func_800665F4    src/p1-jp/btlp/vramqueue.c
 btlp      func_80079178    src/p1-jp/btlp/effectdraw.c
 btlp      func_8007BC9C    src/p1-jp/btlp/putchar.c

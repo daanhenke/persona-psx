@@ -43,13 +43,19 @@ extern void BtlObjSetAttr(BtlObj *obj, u_long bits);
 
 void BtlPickSpawn(void)
 {
+    /* One scratch, reused for a constant at a time, and a second that just
+       holds a copy of it. It reads like three constants written the long way
+       round and it is: spelling them inline puts them in other registers. */
+    int     held;
     BtlObj *obj;
     int     i;
+    int     scratch;
 
     i = 0;
     obj = 0;
     do {
-        obj = BtlObjAlloc(g_btl_pick_defs, BTL_PICK_GROUP, obj, 1,
+        scratch = BTL_PICK_GROUP;
+        obj = BtlObjAlloc(g_btl_pick_defs, scratch, obj, scratch,
                           i, g_btl_pick_pos[i], 0x1F, 0x27);
         obj->attr |= BTL_PICK_ITEM_BIT;
         g_btl_pick_objs[i] = obj;
@@ -58,12 +64,14 @@ void BtlPickSpawn(void)
 
     i = 0;
     do {
+        scratch = 0x19;
+        held = scratch;
         obj = BtlObjAlloc(g_btl_obj_defs, BTL_PICK_GROUP, obj, 1,
-                          BTL_PICK_FRAME, g_btl_pick_pos[i], 0x19, 0x1E);
+                          BTL_PICK_FRAME, g_btl_pick_pos[i], held, 0x1E);
         obj->attached = g_btl_pick_objs[i];
+        scratch = BTL_PICK_SCALE_XY;
         g_btl_pick_objs[i] = obj;
-        BtlObjSetScale(obj, BTL_PICK_SCALE_XY, BTL_PICK_SCALE_XY,
-                       BTL_PICK_SCALE_Z);
+        BtlObjSetScale(obj, scratch, scratch, BTL_PICK_SCALE_Z);
         BtlObjSetAttr(obj, BTL_PICK_FRAME_BIT);
         i++;
     } while (i < BTL_PICK_SLOTS);
