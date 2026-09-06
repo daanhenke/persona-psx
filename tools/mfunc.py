@@ -307,8 +307,14 @@ def normalize_asm(lines, names=None, gp=None):
             # flat `% 4` reads as a member of the object below.
             one_element = (above is not None and above <= 0x10
                            and (above & (above - 1)) == 0)
+            # `below > 0x10` keeps a struct member near the top of its object
+            # from reading as one element below the next one. It is the wrong
+            # test when the object below is smaller than the gap - a short
+            # eleven bytes back cannot own this address - so an address that
+            # sits closer to the symbol above than to the one below belongs to
+            # the one above whatever the distance.
             if (one_element and addr % above == 0 and addr not in loaded
-                    and (below is None or below > 0x10)):
+                    and (below is None or below > 0x10 or above < below)):
                 return "%s-0x%X" % (names[based[j]], above)
             if below is not None and 0 < below <= 0x400:
                 return "%s+0x%X" % (names[based[i]], below)
