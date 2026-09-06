@@ -30,14 +30,19 @@
 #define COUNT_DIGITS 2
 #define GLYPH_DIGIT0 0xC0
 
+/* The grid is two cells wide, and each glyph bank is this many glyphs on from
+   the last. */
+#define GRID_COLS  2
+#define GLYPH_BANK 215
+
 extern u_char g_hud_digits[];
 
 extern short FormatDecimal(u_int value, u_char *dst, u_short width);
-extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
+extern void  TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
                                 u_short count);
 extern void  TileMapFillRect(short *dst, short value, u_short w, u_short h,
                              u_short stride);
-extern void  DrawItemName(int id, short *dst, int a, int b);
+extern void  DrawItemName(int id, short *dst, u_short base, int b);
 
 void DrawItemRow(short slot, short *dst)
 {
@@ -50,5 +55,26 @@ void DrawItemRow(short slot, short *dst)
         DrawItemName(*entry & ITEM_ID, dst, 0, 0);
         n = FormatDecimal(*entry >> ITEM_SHIFT, g_hud_digits, COUNT_DIGITS);
         TileMapWriteRowRev(g_hud_digits, &dst[ROW_COUNT_AT], GLYPH_DIGIT0, n);
+    }
+}
+
+/* The same cell drawn out of the two-column grid rather than the flat list,
+   and out of whichever glyph bank the caller asks for. */
+void DrawItemCell(short *dst, short col, short row, u_char bank)
+{
+    u_short (*grid)[GRID_COLS];
+    u_short  *entry;
+    int       base;
+    short     n;
+
+    grid = (u_short (*)[GRID_COLS])g_items_pending;
+    TileMapFillRect(dst, 0, ROW_CELLS, 1, ROW_STRIDE);
+    entry = &grid[row][col];
+    if ((*entry & ITEM_ID) != 0 && (*entry >> ITEM_SHIFT) != 0) {
+        base = bank * GLYPH_BANK;
+        DrawItemName(*entry & ITEM_ID, dst, base, 0);
+        n = FormatDecimal(*entry >> ITEM_SHIFT, g_hud_digits, COUNT_DIGITS);
+        TileMapWriteRowRev(g_hud_digits, &dst[ROW_COUNT_AT],
+                           base + GLYPH_DIGIT0, n);
     }
 }
