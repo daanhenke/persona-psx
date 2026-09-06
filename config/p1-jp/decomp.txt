@@ -548,3 +548,11 @@ btlp      func_80074438    src/p1-jp/btlp/offer.c
 btlp      func_80066BB0    src/p1-jp/btlp/money.c
 btlp      func_80075D68    src/p1-jp/btlp/panel.c
 btlp      func_80068F8C    src/p1-jp/btlp/heroname.c
+btlp      func_800774B0    src/p1-jp/btlp/effect.c
+btlp      func_8007C63C    src/p1-jp/btlp/seqstate.c
+btlp      func_8006F114    src/p1-jp/btlp/enemy.c
+btlp      func_800665F4    src/p1-jp/btlp/vramqueue.c
+btlp      func_80079178    src/p1-jp/btlp/effectdraw.c
+btlp      func_8007BC9C    src/p1-jp/btlp/putchar.c
+btlp      func_8007CA4C    src/p1-jp/btlp/text.c
+btlp      func_8007CC30    src/p1-jp/btlp/text.c

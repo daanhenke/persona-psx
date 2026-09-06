@@ -1,6 +1,7 @@
 /* Persona 1 (JP) - searching the Personas on offer.  BTLP only.
  *   0x80069780 BtlOfferFind        0x800697BC BtlOfferFree
  *   0x800743B0 BtlOfferMarkStrong  0x80074438 BtlOfferMarkWeak
+ *   0x8006E28C BtlOfferRank
  *
  * Three slots, and two ways of looking through them: by the Persona an offer
  * would hand over, and for one that is not spoken for yet.
@@ -118,4 +119,35 @@ int BtlOfferFree(void)
     /* Nothing free: the original hangs here rather than reporting it. */
     for (;;) {
     }
+}
+
+/* How well an offer is doing. Both halves of the mask are brought up to date
+   first, and then the lowest set bit is what answers: bits 0 to 3 mean a gauge
+   has passed the higher level, bits 4 to 7 only the lower, and no bit at all
+   means neither. */
+int BtlOfferRank(int slot)
+{
+    BtlOffer *o;
+    u_long    kinds;
+    int       i;
+    int       rank;
+
+    /* The offer is picked out before the two refreshes and its mask read once
+       after them, rather than being indexed again inside the loop. */
+    o = &g_btl_offer[slot];
+    BtlOfferMarkStrong();
+    BtlOfferMarkWeak();
+    kinds = o->kinds;
+    i = 0;
+    do {
+        if (((1 << i) & kinds) != 0) {
+            break;
+        }
+        i++;
+    } while (i < 8);
+    rank = 1;
+    if (i > 3) {
+        rank = (i < 8) << 1;
+    }
+    return rank;
 }

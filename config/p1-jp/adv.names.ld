@@ -3287,6 +3287,7 @@ PROVIDE(g_bg_state_s2d = 0x80101E4C);
 PROVIDE(g_bgm_offsets = 0x800B7E60);
 PROVIDE(g_bgm_seq = 0x801F537C);
 PROVIDE(g_btl_actors = 0x8005D654);
+PROVIDE(g_btl_enemies = 0x8005DAF0);
 PROVIDE(g_btl_grid = 0x8005E674);
 PROVIDE(g_btl_map_id = 0x801F15D4);
 PROVIDE(g_btl_pos_y = 0x801F15D7);

@@ -27,6 +27,11 @@ extern void BtlUpdateVoices(void);
 extern void BtlDrawFrame(void);
 extern void BtlIndicatorClear(void);
 
+/* The sequencer's own message window record, and the routine both windows
+   are stepped through. Not g_btl_seq, which is the SPU sequence handles. */
+extern u_char g_btl_seq_window[];
+extern void   BtlWindowStep(u_char *window, int flag);
+
 void BtlSeqSetState(int state, int mode)
 {
     g_btl_seq_state = state;
@@ -78,4 +83,11 @@ void BtlSeqRun(void)
     BtlSeqWaitDone();
     BtlSeqSetState(BTL_SEQ_RUNNING, BTL_SEQ_RUNNING);
     BtlSeqWaitDone();
+}
+
+/* One frame of the sequencer's message window. The second window is stepped
+   through the same routine, with a flag of its own where this passes 1. */
+void BtlSeqAdvance(void)
+{
+    BtlWindowStep(g_btl_seq_window, 1);
 }

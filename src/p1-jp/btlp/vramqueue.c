@@ -1,4 +1,4 @@
-/* Persona 1 (JP) - BTLP overlay @ 0x80066760
+/* Persona 1 (JP) - BTLP overlay @ 0x80066760, 0x800665F4
  *
  * VRAM writes cannot happen while the GPU is drawing, so the battle code does
  * not call ClearImage/LoadImage where it wants them: it appends a rectangle to
@@ -28,6 +28,24 @@ extern int       g_btl_vram_clear_count;
 extern VramLoad  g_btl_vram_loads[];
 extern VramClear g_btl_vram_clears[];
 extern DRAWENV   g_btl_drawenv;
+
+/* The upload ring wraps here, though nothing ever fills it. */
+#define BTL_VRAM_LOADS 0x48
+
+/* Appends one rectangle. The source pointer is stored between the width and
+   the height, not after them. */
+void BtlQueueVramLoad(u_long *data, short x, short y, short w, short h)
+{
+    int i;
+
+    i = g_btl_vram_load_count;
+    g_btl_vram_loads[i].rect.x = x;
+    g_btl_vram_loads[i].rect.y = y;
+    g_btl_vram_loads[i].rect.w = w;
+    g_btl_vram_loads[i].data = data;
+    g_btl_vram_loads[i].rect.h = h;
+    g_btl_vram_load_count = (g_btl_vram_load_count + 1) % BTL_VRAM_LOADS;
+}
 
 void BtlFlushVramQueues(void)
 {

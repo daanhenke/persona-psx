@@ -1,7 +1,7 @@
 /* Persona 1 (JP) - the battle's effect slots.  BTLP only.
  *   0x800776F8 BtlEffectRelease  0x8007772C BtlEffectSelect
  *   0x8007778C BtlEffectRestore  0x800777E4 BtlEffectSetKind
- *   0x800774E0 BtlEffectDrop
+ *   0x800774E0 BtlEffectDrop     0x800774B0 BtlCopyMood
  *
  * Four slots, each either a pointer to an effect record or -1 for free. The
  * draw pass walks all four: it dispatches on the low nibble of the record's
@@ -18,31 +18,15 @@
  * states.
  */
 #include <types.h>
+#include <persona/btlp/offer.h>
+#include <persona/btlp/effect.h>
 
-#define BTL_EFFECT_SLOTS 4
-#define BTL_EFFECT_FREE  (-1)
-
-/* Taken away when an effect ends. */
-#define BTL_EFFECT_RUNNING 0x20
-
-/* Written over the outgoing effect's mark when another takes over; spelt
-   negative, which is how it reaches the halfword in one instruction. */
-#define BTL_EFFECT_MARK (-0x100)
-
-/* Only the fields these four touch; the record is bigger. */
-typedef struct {
-    /* 0x00 */ u_char  pad00[4];
-    /* 0x04 */ short   mark;
-    /* 0x06 */ u_char  pad06[2];
-    /* 0x08 */ u_short flags;
-    /* 0x0A */ u_char  kind;
-} BtlEffect;
-
-extern BtlEffect *g_btl_effect[];
 extern int        g_btl_effect_cur;
 extern int        g_btl_effect_prev;
 extern int        g_btl_effect_held;
 extern u_char     g_btl_fast_anim;
+
+extern u_long g_btl_mood_shown[];
 
 extern void BtlCursorInitPrims(void);
 
@@ -108,4 +92,23 @@ void BtlEffectSetKind(int slot, u_char kind)
         }
     }
     g_btl_effect[slot]->kind = kind;
+}
+
+/* Not an effect, but it shares this translation unit: the offer's four gauges
+   widened into words of their own for whatever draws them. */
+void BtlCopyMood(const u_short *mood)
+{
+    u_long  *p;
+    u_short  v;
+    int      i;
+
+    i = 0;
+    p = g_btl_mood_shown;
+    do {
+        v = *mood;
+        mood++;
+        i++;
+        *p = v;
+        p++;
+    } while (i < BTL_MOODS);
 }
