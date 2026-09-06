@@ -37,16 +37,26 @@ typedef struct {
 
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free     */
-    /* 0x04 */ u_char         pad04[0x38];
+    /* 0x04 */ u_char         pad04[4];
+    /* 0x08 */ long           x;       /* 16.16, and what a shadow follows */
+    /* 0x0C */ long           y;
+    /* 0x10 */ long           z;
+    /* 0x14 */ u_char         pad14[4];
+    /* 0x18 */ long           x2;      /* a second copy of x and y, given   */
+    /* 0x1C */ long           y2;      /* the same value on an outright put */
+    /* 0x20 */ u_char         pad20[0x1C];
     /* 0x3C */ long           shift;   /* 16.16; what the tick displaces  */
     /* 0x40 */ u_char         pad40[4];
     /* 0x44 */ struct BtlObj *prev;
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ struct BtlObj *attached; /* carried along by every setter    */
-    /* 0x50 */ u_char         pad50[0x14];
+    /* 0x50 */ struct BtlObj *shadow;   /* kept on this one's position      */
+    /* 0x54 */ u_char         pad54[0x10];
     /* 0x64 */ BtlSeqStep    *script;  /* animation script                 */
     /* 0x68 */ u_long         last;    /* first word of the script's last step */
-    /* 0x6C */ u_char         pad6C[0x46];
+    /* 0x6C */ u_char         pad6C[0x44];
+    /* 0xB0 */ u_char         col2;    /* the grid column, doubled          */
+    /* 0xB1 */ char           row;     /* the grid row                      */
     /* 0xB2 */ u_short        kind;    /* BTL_OBJ_HEAD marks a list head    */
     /* 0xB4 */ u_char         padB4[2];
     /* 0xB6 */ short          step;    /* how far into the script it is     */

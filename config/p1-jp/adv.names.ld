@@ -3290,6 +3290,7 @@ PROVIDE(g_btl_actors = 0x8005D690);
 PROVIDE(g_btl_grid = 0x8005E674);
 PROVIDE(g_btl_map_id = 0x801F15D4);
 PROVIDE(g_btl_pos_y = 0x801F15D7);
+PROVIDE(g_btl_scratch = 0x801C0000);
 PROVIDE(g_btn_page_back = 0x800EB680);
 PROVIDE(g_btn_page_back_s2d = 0x8010B680);
 PROVIDE(g_btn_page_fwd = 0x800EB684);
