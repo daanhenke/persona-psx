@@ -401,6 +401,9 @@ adv       func_8007D864    src/p1-jp/common/ui/textnumber.c
 s2d       func_8007C264    src/p1-jp/common/ui/textnumber.c
 adv       func_80093608    src/p1-jp/common/ui/itemrow.c
 s2d       func_8007E3EC    src/p1-jp/common/ui/itemrow.c
+adv       func_80098A40    src/p1-jp/common/ui/personalist.c
+dng       func_80099208    src/p1-jp/common/ui/personalist.c
+s2d       func_800896B8    src/p1-jp/common/ui/personalist.c
 adv       func_8007FC88    src/p1-jp/adv/game/diagstep.c
 adv       func_8007FFD0    src/p1-jp/adv/game/diagstep.c
 adv       func_8007D0F8    src/p1-jp/common/gfx/backdrop.c
