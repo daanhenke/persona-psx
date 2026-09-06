@@ -49,17 +49,18 @@ void BtlOpenMessage(int flags, short style, const u_char *script, short x,
                     short y)
 {
     int cols;
-    int mode;
+    char mode;
     /* Eight bytes the original reserves and never touches. gcc 2.6 allocates
        a declared local whether or not it is used, and without these the frame
        comes out eight short. */
     int unused[2];
 
-    /* The flags are copied before anything else so the copy survives the two
-       calls; testing the argument directly leaves it in a call-clobbered
-       register and costs a saved one. */
+    /* A byte's worth of the flags, kept so the copy survives the two calls -
+       testing the argument itself after them leaves it in a call-clobbered
+       register and costs a saved one. The first test is made before the copy
+       is needed and reads the argument. */
     mode = flags;
-    if ((mode & MSG_NEWPAGE) != 0) {
+    if ((flags & MSG_NEWPAGE) != 0) {
         g_btl_text_page = 0;
     }
     if ((mode & MSG_NARROW) != 0) {
