@@ -24,7 +24,10 @@ typedef struct {
     /* 0x00 */ Char    c;
     /* 0x60 */ BtlObj *obj;       /* what is drawn for this actor */
     /* 0x64 */ u_long  flags;
-    /* 0x68 */ u_char  pad68[0x5C];
+    /* 0x68 */ u_char  pad68[0x4D];
+    /* 0xB5 */ u_char  species;    /* which demon this is; the negotiation
+                                      matches its tables against it       */
+    /* 0xB6 */ u_char  padB6[0xE];
     /* 0xC4 */ u_char  script_pick; /* chooses between two of the model's
                                        scripts when the actor is set going */
     /* 0xC5 */ u_char  padC5[0x27];
