@@ -142,6 +142,14 @@ function well below 100%:
 - Indexing a literal base (`((T *)0xADDR)[i].f`) folds the constant into each
   access. If the original keeps one base register with small offsets, use a
   pointer local instead: `T *p = (T *)0xADDR;`.
+- A **bare symbol** stays folded into the memory operand however often it is
+  used - `lui r,%hi(x)` + `lw r,%lo(x)(r)` every time. A **symbol plus a
+  constant offset** does not: touch `x[1]` twice in one basic block and gcc
+  hoists the address into a register with an `addiu` and uses `0(reg)` for
+  both. So an `addiu` building `%lo(sym+n)` in your output where the original
+  rematerialises means the original had **two variables, not one array** - the
+  second byte or word is its own symbol. `BtlCursorDraw` was 96.5% until
+  `g_btl_cursor_flags[1]` became `g_btl_cursor_buf`, and nothing else changed.
 
 ### Store order
 

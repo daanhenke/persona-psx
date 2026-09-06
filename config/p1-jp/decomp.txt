@@ -509,6 +509,7 @@ btlp      func_8007D98C    src/p1-jp/btlp/menu.c
 btlp      func_8007D99C    src/p1-jp/btlp/menu.c
 btlp      func_8007A2C0    src/p1-jp/btlp/input.c
 btlp      func_8007A2F0    src/p1-jp/btlp/input.c
+btlp      func_8007A728    src/p1-jp/btlp/cursordraw.c
 btlp      func_8007B5D0    src/p1-jp/btlp/talk.c
 btlp      func_8007B5E0    src/p1-jp/btlp/talk.c
 btlp      func_8007B61C    src/p1-jp/btlp/talk.c
@@ -553,6 +554,9 @@ btlp      func_80068F8C    src/p1-jp/btlp/heroname.c
 btlp      func_800774B0    src/p1-jp/btlp/effect.c
 btlp      func_8007C63C    src/p1-jp/btlp/seqstate.c
 btlp      func_8006F114    src/p1-jp/btlp/enemy.c
+btlp      func_8008E7C4    src/p1-jp/btlp/fixedenemies.c
+btlp      func_8007010C    src/p1-jp/btlp/offerfinish.c
+btlp      func_8006A170    src/p1-jp/btlp/menuaside.c
 btlp      func_800665F4    src/p1-jp/btlp/vramqueue.c
 btlp      func_80079178    src/p1-jp/btlp/effectdraw.c
 btlp      func_8007BC9C    src/p1-jp/btlp/putchar.c

@@ -30,7 +30,11 @@ typedef struct {
     /* 0xB6 */ u_char  padB6[0xE];
     /* 0xC4 */ u_char  script_pick; /* chooses between two of the model's
                                        scripts when the actor is set going */
-    /* 0xC5 */ u_char  padC5[0x27];
+    /* 0xC5 */ u_char  padC5[0x1B];
+    /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
+                                      once that offer is done with; the
+                                      battle only ever clears it again   */
+    /* 0xE1 */ u_char  padE1[0xB];
 } BtlActor;                       /* 0xEC bytes */
 
 #define BTL_PARTY   5     /* slots 0..4 */
