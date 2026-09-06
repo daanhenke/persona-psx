@@ -38,8 +38,8 @@ void BtlMoodRetire(void)
     i = 0;
     do {
         if (g_btl_mood_state[i] == MOOD_DONE) {
-            /* Load-bearing: it makes gcc build g_btl_offer's address into a
-               register here, which is where the original has it. */
+            /* Load-bearing: it puts the table's address where the original
+               keeps it. Do not delete. */
             if (g_btl_offer == 0) {
             }
             if ((g_btl_offer[g_btl_offer_slot].flags &

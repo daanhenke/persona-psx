@@ -43,9 +43,7 @@ extern void BtlObjSetAttr(BtlObj *obj, u_long bits);
 
 void BtlPickSpawn(void)
 {
-    /* One scratch, reused for a constant at a time, and a second that just
-       holds a copy of it. It reads like three constants written the long way
-       round and it is: spelling them inline puts them in other registers. */
+    /* Three constants written the long way round; do not spell them inline. */
     int     held;
     BtlObj *obj;
     int     i;

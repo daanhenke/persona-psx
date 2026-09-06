@@ -50,15 +50,10 @@ void BtlOpenMessage(int flags, short style, const u_char *script, short x,
 {
     int cols;
     char mode;
-    /* Eight bytes the original reserves and never touches. gcc 2.6 allocates
-       a declared local whether or not it is used, and without these the frame
-       comes out eight short. */
+    /* Declared and never read; the original reserves the room. */
     int unused[2];
 
-    /* A byte's worth of the flags, kept so the copy survives the two calls -
-       testing the argument itself after them leaves it in a call-clobbered
-       register and costs a saved one. The first test is made before the copy
-       is needed and reads the argument. */
+    /* A byte of the flags kept across the two calls - not redundant. */
     mode = flags;
     if ((flags & MSG_NEWPAGE) != 0) {
         g_btl_text_page = 0;
@@ -71,9 +66,7 @@ void BtlOpenMessage(int flags, short style, const u_char *script, short x,
         g_btl_text.dx +=
             (u_short)((MSG_CENTRE_W - (cols << MSG_CHAR_W)) >> 1);
     } else {
-        /* The wide layout wants a block of its own. Without the do/while the
-           two calls share the narrow arm's and the registers come out
-           differently. */
+        /* The wide arm needs a block of its own; do not unwrap it. */
         do {
             BtlTextOpen(script, x + MSG_TEXT_DROP, y + MSG_Y_DROP);
             BtlBoxOpen(MSG_WIDE_COLS, x + MSG_WIDE_DROP, y + MSG_Y_DROP,

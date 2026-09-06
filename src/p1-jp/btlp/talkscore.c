@@ -39,8 +39,7 @@ u_short BtlTalkScoreLine(short said, short weight)
             }
             g_btl_talk_result |= TALK_REPEATED;
             g_btl_talk_step = TALK_STEP_REPEATED;
-            /* Through a local rather than returned straight; that is what
-               keeps the read in the same register the update left it in. */
+            /* Through a local rather than returned straight; leave it. */
             result = g_btl_talk_result;
             return result;
         }
