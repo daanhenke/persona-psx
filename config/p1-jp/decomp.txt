@@ -405,6 +405,8 @@ adv       func_8007D864    src/p1-jp/common/ui/textnumber.c
 s2d       func_8007C264    src/p1-jp/common/ui/textnumber.c
 adv       func_80093608    src/p1-jp/common/ui/itemrow.c
 s2d       func_8007E3EC    src/p1-jp/common/ui/itemrow.c
+adv       func_8008EC64    src/p1-jp/common/ui/itemrow.c
+s2d       func_80083218    src/p1-jp/common/ui/itemrow.c
 adv       func_8006ABEC    src/p1-jp/common/ui/itemstats.c
 dng       func_8007A150    src/p1-jp/common/ui/itemstats.c
 s2d       func_8006A178    src/p1-jp/common/ui/itemstats.c

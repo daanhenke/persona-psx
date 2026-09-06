@@ -69,10 +69,12 @@ void DrawItemCell(short *dst, short col, short row, u_char bank)
 
     grid = (u_short (*)[GRID_COLS])g_items_pending;
     TileMapFillRect(dst, 0, ROW_CELLS, 1, ROW_STRIDE);
+    /* One scratch: the id test first, then the glyph bank. Do not split it. */
+    base = (grid[row][col] & ITEM_ID) != 0;
     entry = &grid[row][col];
-    if ((*entry & ITEM_ID) != 0 && (*entry >> ITEM_SHIFT) != 0) {
+    if (base && (*entry >> ITEM_SHIFT) != 0) {
         base = bank * GLYPH_BANK;
-        DrawItemName(*entry & ITEM_ID, dst, base, 0);
+        DrawItemName(grid[row][col] & ITEM_ID, dst, base, 0);
         n = FormatDecimal(*entry >> ITEM_SHIFT, g_hud_digits, COUNT_DIGITS);
         TileMapWriteRowRev(g_hud_digits, &dst[ROW_COUNT_AT],
                            base + GLYPH_DIGIT0, n);
