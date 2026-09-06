@@ -631,3 +631,5 @@ s2d       func_80070E88    src/p1-jp/common/ui/menustatus.c
 adv       func_80076214    src/p1-jp/common/ui/config.c
 dng       func_80084DA0    src/p1-jp/common/ui/config.c
 s2d       func_800751CC    src/p1-jp/common/ui/config.c
+adv       func_8007E6DC    src/p1-jp/adv/game/fieldtick.c
+adv       func_8007F1DC    src/p1-jp/adv/gfx/pickeffect.c
