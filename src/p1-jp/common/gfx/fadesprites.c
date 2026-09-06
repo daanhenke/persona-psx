@@ -14,7 +14,7 @@
 #include <types.h>
 #include <libgs.h>
 
-extern GsSPRITE g_fade_sprites[];
+extern GsBG    g_bg_layers[];
 
 /* Returns 1 on the call that reaches `limit`, which is how the blocking fade
    loops know to stop. */
@@ -24,16 +24,16 @@ int FadeSpritesStep(short step, short limit)
     int done;
     int i;
 
-    level = g_fade_sprites[0].r + step;
+    level = g_bg_layers[0].r + step;
     done = 0;
     if (level > limit) {
         level = limit;
         done = 1;
     }
     for (i = 0; i < 6; i++) {
-        g_fade_sprites[i].r = level;
-        g_fade_sprites[i].g = level;
-        g_fade_sprites[i].b = level;
+        g_bg_layers[i].r = level;
+        g_bg_layers[i].g = level;
+        g_bg_layers[i].b = level;
     }
     return done;
 }
@@ -45,16 +45,16 @@ int FadeSpritesStepDown(short step, short floor)
     int done;
     int i;
 
-    level = g_fade_sprites[0].r - step;
+    level = g_bg_layers[0].r - step;
     done = 0;
     if (level < floor) {
         level = floor;
         done = 1;
     }
     for (i = 0; i < 6; i++) {
-        g_fade_sprites[i].r = level;
-        g_fade_sprites[i].g = level;
-        g_fade_sprites[i].b = level;
+        g_bg_layers[i].r = level;
+        g_bg_layers[i].g = level;
+        g_bg_layers[i].b = level;
     }
     return done;
 }

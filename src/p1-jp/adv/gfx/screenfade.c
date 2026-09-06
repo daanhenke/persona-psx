@@ -27,7 +27,7 @@
 
 extern GsOT     g_ot[];
 extern int      g_ot_index;
-extern GsSPRITE g_fade_sprites[];
+extern GsBG    g_bg_layers[];
 
 #define SCREEN_W 0x140
 #define OT_BACK  0x400
@@ -54,7 +54,7 @@ void AdvEffectFadeRed(void)
         l->x0 = 0;
         l->y0 = i;
         l->y1 = i;
-        shade = (GBAND - i) * g_fade_sprites[0].r / 128;
+        shade = (GBAND - i) * g_bg_layers[0].r / 128;
         l->r0 = (l->r1 = shade);
         l->g0 = (l->g1 = 0);
         l->b0 = (l->b1 = 0);
@@ -67,7 +67,7 @@ void AdvEffectFadeRed(void)
         l->x0 = 0;
         l->y0 = i + GLOWER_Y;
         l->y1 = i + GLOWER_Y;
-        shade = i * g_fade_sprites[0].r / 128;
+        shade = i * g_bg_layers[0].r / 128;
         l->r0 = (l->r1 = shade);
         l->g0 = (l->g1 = 0);
         l->b0 = (l->b1 = 0);
@@ -89,7 +89,7 @@ void AdvEffectFadeGreen(void)
         l->x0 = 0;
         l->y0 = i;
         l->y1 = i;
-        shade = (GBAND - i) * g_fade_sprites[0].r / 128;
+        shade = (GBAND - i) * g_bg_layers[0].r / 128;
         l->r0 = (l->r1 = 0);
         l->g0 = (l->g1 = shade);
         l->b0 = (l->b1 = 0);
@@ -102,7 +102,7 @@ void AdvEffectFadeGreen(void)
         l->x0 = 0;
         l->y0 = i + GLOWER_Y;
         l->y1 = i + GLOWER_Y;
-        shade = i * g_fade_sprites[0].r / 128;
+        shade = i * g_bg_layers[0].r / 128;
         l->r0 = (l->r1 = 0);
         l->g0 = (l->g1 = shade);
         l->b0 = (l->b1 = 0);
@@ -124,7 +124,7 @@ void AdvEffectFadeBlue(void)
         l->x0 = 0;
         l->y0 = i;
         l->y1 = i;
-        shade = (GBAND - i) * g_fade_sprites[0].r / 128;
+        shade = (GBAND - i) * g_bg_layers[0].r / 128;
         l->r = 0;
         l->g = 0;
         l->b = shade;
@@ -137,7 +137,7 @@ void AdvEffectFadeBlue(void)
         l->x0 = 0;
         l->y0 = i + LLOWER_Y;
         l->y1 = i + LLOWER_Y;
-        shade = i * g_fade_sprites[0].r / 128;
+        shade = i * g_bg_layers[0].r / 128;
         l->r = 0;
         l->g = 0;
         l->b = shade;

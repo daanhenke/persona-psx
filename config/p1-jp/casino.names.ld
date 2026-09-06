@@ -3049,6 +3049,7 @@ PROVIDE(g_backdrop_lines = 0x800ED180);
 PROVIDE(g_bank_seq = 0x801F539E);
 PROVIDE(g_bg_cells = 0x800E224C);
 PROVIDE(g_bg_cells_s2d = 0x8010224C);
+PROVIDE(g_bg_maps = 0x8004AA54);
 PROVIDE(g_bg_state = 0x800E1E4C);
 PROVIDE(g_bg_state_s2d = 0x80101E4C);
 PROVIDE(g_bgm_seq = 0x801F537C);

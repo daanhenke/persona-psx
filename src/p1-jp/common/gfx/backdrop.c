@@ -21,7 +21,7 @@
 /* Reached by hardcoded address. 155 GsLINEs. */
 #define g_backdrop_lines ((GsLINE *)(0x800ED180 + WORK_BIAS))
 
-extern GsSPRITE g_fade_sprites[];
+extern GsBG    g_bg_layers[];
 extern GsOT     g_ot[];
 extern int      g_ot_index;
 
@@ -48,14 +48,14 @@ void DrawBackdrop(void)
         l->x0 = 0;
         l->y0 = i;
         l->y1 = i;
-        shade = (GRADIENT_H - i) * g_fade_sprites[0].r / 64;
+        shade = (GRADIENT_H - i) * g_bg_layers[0].r / 64;
         l->r = 0;
         l->g = 0;
         l->b = shade;
         GsSortLine(l, &g_ot[g_ot_index], OT_BACK);
         l++;
     }
-    shade = g_fade_sprites[0].r >> 1;
+    shade = g_bg_layers[0].r >> 1;
     for (i = 0; i < 15; i++) {
         l->attribute = 0;
         l->x0 = 0;
