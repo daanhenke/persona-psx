@@ -36,6 +36,11 @@
 #define SLOT_EMPTY 1
 #define SLOT_SOME  2
 
+/* The Persona stock, and the twelve of its fifteen slots the screen shows. */
+#define g_persona_stock ((u_char *)0x801F297C)
+#define STOCK_ROWS 12
+#define STOCK_FREE 0
+
 /* Reached by hardcoded address here rather than through the linker symbol. */
 #define g_items ((u_short *)0x801F267C)
 
@@ -83,6 +88,30 @@ unsigned int BtlItemSlot(u_short id)
         p++;
     } while (i < ITEM_SLOTS);
     return 0;
+}
+
+/* Is there anywhere to put a Persona the battle has just been given? Twelve
+   slots, not the fifteen the array holds - twelve is what the stock screen
+   draws, and what the compaction in common/game/personastock.c tidies. */
+int BtlStockHasRoom(void)
+{
+    u_char *stock;
+    int     i;
+    int     room;
+
+    stock = g_persona_stock;
+    i = 0;
+    do {
+        if (*stock == STOCK_FREE) {
+            room = 1;
+            goto done;
+        }
+        i++;
+        stock++;
+    } while (i < STOCK_ROWS);
+    room = 0;
+done:
+    return room;
 }
 
 /* One more of an item. BtlItemSlot returning SLOT_FULL in its low half is the

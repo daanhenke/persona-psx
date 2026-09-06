@@ -64,6 +64,13 @@ void BtlSeqEndIfDone(void)
     }
 }
 
+/* Set the sequencer going and leave it to run. Callers with something else to
+   do meanwhile use this and poll BtlSeqState themselves. */
+void BtlSeqStart(void)
+{
+    BtlSeqSetState(BTL_SEQ_RUNNING, BTL_SEQ_RUNNING);
+}
+
 /* Play whatever scripts the caller has just armed on its objects: wait out
    anything already running, set the sequencer going, and wait for that too. */
 void BtlSeqRun(void)

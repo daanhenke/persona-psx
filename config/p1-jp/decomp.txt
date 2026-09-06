@@ -519,3 +519,6 @@ btlp      func_80073F8C    src/p1-jp/btlp/drop.c
 btlp      func_80067380    src/p1-jp/btlp/flags.c
 btlp      func_800C4814    src/p1-jp/btlp/cursor.c
 btlp      func_800C494C    src/p1-jp/btlp/cursor.c
+btlp      func_800673B0    src/p1-jp/btlp/flags.c
+btlp      func_8007BEDC    src/p1-jp/btlp/seqstate.c
+btlp      func_80073E90    src/p1-jp/btlp/drop.c

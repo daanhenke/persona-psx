@@ -1,5 +1,5 @@
-/* Persona 1 (JP) - setting a flag from the battle.  BTLP only.
- *   0x80067380 BtlFlagSet
+/* Persona 1 (JP) - reading and setting a flag from the battle.  BTLP only.
+ *   0x80067380 BtlFlagSet   0x800673B0 BtlFlagGet
  *
  * The third flag bank lives in the shared save-game work area, so what the
  * battle sets here is what the field reads afterwards. See common/game/flags.c
@@ -18,4 +18,9 @@ void BtlFlagSet(short n)
 
     p = g_flags_bank3 + (n >> 3);
     *p |= 1 << (n & 7);
+}
+
+int BtlFlagGet(short n)
+{
+    return g_flags_bank3[n >> 3] >> (n & 7) & 1;
 }
