@@ -36,34 +36,40 @@ typedef struct {
 
 #define g_scene_images ((AdvSceneImage *)SCENE_IMAGES_AT)
 
-#define g_event_flags ((u_char *)0x801F29C8)
+#define EVENT_FLAGS_AT 0x801F29C8
 
 /* No prototype: the entry's shorts go out as plain ints. */
 extern void ImageAnimStart();
 
 void AdvSceneStartImages(void)
 {
-    u_short flags;
-    int     one;
-    u_char  i;
+    AdvSceneImage *img;
+    u_char        *event_flags;
+    short          flags;
+    int            one;
+    int            n;
+    u_char         i;
 
     i = 0;
     do {
-        if (g_scene_images[i].script != IMG_NONE) {
-            flags = g_scene_images[i].flags;
+        n   = i;
+        img = &g_scene_images[n];
+        if (img->script != IMG_NONE) {
+            flags = g_scene_images[n].flags;
             if ((flags & IMG_SHOWN) != 0) {
                 if ((flags & IMG_CONDITIONAL) != 0) {
                     /* The 1 is assigned where it is shifted, not before the
                        test - lifting it out costs a saved register. */
-                    if ((g_event_flags[(flags & IMG_FLAG) / 8] &
+                    event_flags = (u_char *)EVENT_FLAGS_AT;
+                    if ((event_flags[(flags & IMG_FLAG) / 8] &
                          ((one = 1) << (flags & 7))) == 0) {
                         goto next;
                     }
                 }
-                ImageAnimStart(i + SCENE_IMAGE_CHAN,
-                               g_scene_images[i].script,
-                               g_scene_images[i].x, g_scene_images[i].y,
-                               g_scene_images[i].w, g_scene_images[i].h);
+                ImageAnimStart(n + SCENE_IMAGE_CHAN,
+                               img->script,
+                               g_scene_images[n].x, g_scene_images[n].y,
+                               g_scene_images[n].w, g_scene_images[n].h);
             }
         }
     next:
