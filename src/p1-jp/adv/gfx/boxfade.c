@@ -69,9 +69,10 @@ void AdvBoxFadeDown(short step, short from, short to, short x, u_short y,
 void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
                   short char_frame)
 {
-    short  end;
-    GsBOXF box;
-    int    level;
+    GsBOXF  box;
+    GsBOXF *b;
+    int     end;
+    int     level;
 
     box.attribute = BOX_ATTR;
     box.x = x;
@@ -85,7 +86,8 @@ void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
     end   = to;
     do {
         box.r = box.g = box.b = level;
-        GsSortBoxFill(&box, &g_ot[g_ot_index], BOX_PRI);
+        b = &box;
+        GsSortBoxFill(b, &g_ot[g_ot_index], BOX_PRI);
         if (char_frame == 0) {
             AdvRunFrame();
         } else {
