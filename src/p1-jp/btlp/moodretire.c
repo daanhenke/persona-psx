@@ -38,6 +38,10 @@ void BtlMoodRetire(void)
     i = 0;
     do {
         if (g_btl_mood_state[i] == MOOD_DONE) {
+            /* Load-bearing: it makes gcc build g_btl_offer's address into a
+               register here, which is where the original has it. */
+            if (g_btl_offer == 0) {
+            }
             if ((g_btl_offer[g_btl_offer_slot].flags &
                  g_btl_mood_flag_bits[i]) != 0) {
                 g_btl_mood_state[i] = MOOD_HELD;
