@@ -28,6 +28,31 @@ const u_char *BtlSeqReadValue(const u_char *p, u_short *out)
     return p + 1;
 }
 
+/* The same copy with an escape: a byte with the high bit set is written out as
+   0x80 and then the byte, so it costs two characters of the limit rather than
+   one. That is how the second glyph page is reached. */
+void BtlStrCopyEsc(u_char *dst, const u_char *src, int max)
+{
+    u_char c;
+    int    i;
+
+    c = *src;
+    i = 0;
+    while (c != STR_END && i < max) {
+        i++;
+        if ((*src & 0x80) != 0) {
+            *dst = 0x80;
+            dst++;
+        }
+        c = *src;
+        src++;
+        *dst = c;
+        c = *src;
+        dst++;
+    }
+    *dst = STR_END;
+}
+
 /* Stops at `max` characters and terminates the destination either way. */
 void BtlStrCopy(char *dst, const char *src, int max)
 {
