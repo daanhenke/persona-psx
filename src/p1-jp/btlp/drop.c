@@ -25,6 +25,9 @@
 #define ITEM_ID    0x1FF
 #define ITEM_SHIFT 9
 
+/* The count occupies the seven bits above the id. */
+#define ITEM_COUNT 0x7F
+
 /* Held this many or more and the item is refused. */
 #define ITEM_MAX 0x63
 
@@ -80,6 +83,49 @@ unsigned int BtlItemSlot(u_short id)
         p++;
     } while (i < ITEM_SLOTS);
     return 0;
+}
+
+/* One more of an item. BtlItemSlot returning SLOT_FULL in its low half is the
+   refusal, so anything else means there is room. The count is seven bits wide
+   and stops at ITEM_MAX. */
+int BtlItemAdd(int id)
+{
+    u_short     *p;
+    unsigned int slot;
+    int          n;
+
+    p = g_items;
+    slot = BtlItemSlot(id);
+    if ((slot & 0xFFFF) != SLOT_FULL) {
+        p += slot >> 16;
+        n = *p >> ITEM_SHIFT;
+        n = n + 1;
+        if (n > ITEM_MAX) {
+            n = ITEM_MAX;
+        }
+        *p = id | (n & ITEM_COUNT) << ITEM_SHIFT;
+    }
+}
+
+/* One fewer, and the slot goes back to nothing when the last one goes. An
+   empty slot means the party was not carrying any, so there is nothing to do. */
+int BtlItemRemove(int id)
+{
+    u_short     *p;
+    unsigned int slot;
+    int          left;
+
+    p = g_items;
+    slot = BtlItemSlot(id);
+    if ((slot & 0xFFFF) != SLOT_EMPTY) {
+        p += slot >> 16;
+        left = (*p >> ITEM_SHIFT) - 1;
+        if (left <= 0) {
+            *p = 0;
+        } else {
+            *p = id | (left & ITEM_COUNT) << ITEM_SHIFT;
+        }
+    }
 }
 
 void BtlRollCommon(void)

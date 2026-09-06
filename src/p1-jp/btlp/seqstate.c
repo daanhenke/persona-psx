@@ -14,11 +14,18 @@
  */
 #include <types.h>
 
+/* Three of the four values seen: nothing playing, running, and the one
+   BtlSeqEndIfDone treats as "the script reached its end". */
+#define BTL_SEQ_REST     0
+#define BTL_SEQ_RUNNING  4
+#define BTL_SEQ_FINISHED 8
+
 extern short g_btl_seq_state;
 extern int   g_btl_seq_mode;
 
 extern void BtlUpdateVoices(void);
 extern void BtlDrawFrame(void);
+extern void BtlIndicatorClear(void);
 
 void BtlSeqSetState(int state, int mode)
 {
@@ -45,4 +52,23 @@ void BtlSeqWaitDone(void)
         BtlDrawFrame();
     }
     BtlRunFrames(5);
+}
+
+/* Puts the sequencer back to rest, but only out of the state that means the
+   script has run to its end - anything still playing is left alone. */
+void BtlSeqEndIfDone(void)
+{
+    if (BtlSeqState() == BTL_SEQ_FINISHED) {
+        BtlSeqSetState(BTL_SEQ_REST, 0);
+        BtlIndicatorClear();
+    }
+}
+
+/* Play whatever scripts the caller has just armed on its objects: wait out
+   anything already running, set the sequencer going, and wait for that too. */
+void BtlSeqRun(void)
+{
+    BtlSeqWaitDone();
+    BtlSeqSetState(BTL_SEQ_RUNNING, BTL_SEQ_RUNNING);
+    BtlSeqWaitDone();
 }

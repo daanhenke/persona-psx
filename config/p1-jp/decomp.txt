@@ -512,3 +512,10 @@ btlp      func_8007B5D0    src/p1-jp/btlp/talk.c
 btlp      func_8007B5E0    src/p1-jp/btlp/talk.c
 btlp      func_8007B61C    src/p1-jp/btlp/talk.c
 btlp      func_8007B648    src/p1-jp/btlp/talk.c
+btlp      func_8007BE6C    src/p1-jp/btlp/seqstate.c
+btlp      func_8007BEA8    src/p1-jp/btlp/seqstate.c
+btlp      func_80073F04    src/p1-jp/btlp/drop.c
+btlp      func_80073F8C    src/p1-jp/btlp/drop.c
+btlp      func_80067380    src/p1-jp/btlp/flags.c
+btlp      func_800C4814    src/p1-jp/btlp/cursor.c
+btlp      func_800C494C    src/p1-jp/btlp/cursor.c

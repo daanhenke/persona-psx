@@ -27,6 +27,10 @@ extern u_char g_btl_seq_count[];
 
 extern int  BtlSoundOpen(const BtlSoundBank *banks, int slot, int index);
 extern void BtlSoundClose(int slot);
-extern void BtlSePlay(int slot, short seq);
+
+/* BtlSePlay takes its sequence as a short, but not every caller knows that:
+   several translation units declare it without a prototype and hand it a full
+   word, which the callee simply truncates. Its declaration therefore belongs
+   with each caller rather than here. */
 
 #endif

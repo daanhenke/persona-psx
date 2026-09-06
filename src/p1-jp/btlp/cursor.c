@@ -7,17 +7,16 @@
  *
  * The four tests are the same in each direction, and in the same order: the
  * slot must hold somebody - an empty one has no character id - the actor must
- * not be down, must not carry the flag
- * that takes it out of the fight, and must not be in the state that leaves it
- * targetable but unable to take an order.
+ * not be down, must not carry the flag that takes it out of the fight, and must
+ * not be in the state that leaves it targetable but unable to take an order.
  */
 #include <types.h>
 #include <persona/btlp/actor.h>
 
 int BtlCursorNext(int slot)
 {
-    slot++;
     for (;;) {
+        slot++;
         slot = (slot < BTL_PARTY) ? slot : 0;
         if (g_btl_actors[slot].id != 0 &&
             g_btl_actors[slot].status != BTL_STATUS_DOWN &&
@@ -25,15 +24,17 @@ int BtlCursorNext(int slot)
             g_btl_actors[slot].status != BTL_STATUS_NOINPUT) {
             break;
         }
-        slot++;
     }
     return slot;
+    /* Unreachable, and load-bearing: without it gcc lays the loop out with a
+       shared increment at the bottom instead of one per back-edge. Leave it. */
+    slot++;
 }
 
 int BtlCursorPrev(int slot)
 {
-    slot--;
     for (;;) {
+        slot--;
         slot = (slot >= 0) ? slot : BTL_PARTY - 1;
         if (g_btl_actors[slot].id != 0 &&
             g_btl_actors[slot].status != BTL_STATUS_DOWN &&
@@ -41,7 +42,7 @@ int BtlCursorPrev(int slot)
             g_btl_actors[slot].status != BTL_STATUS_NOINPUT) {
             break;
         }
-        slot--;
     }
     return slot;
+    slot--;   /* unreachable, and load-bearing the same way */
 }

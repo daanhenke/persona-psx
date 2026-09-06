@@ -16,9 +16,9 @@
 /* Where BtlLoadPackEntry leaves whatever it read. */
 #define BTL_PACK_DEST 0x80152400
 
-#define g_btl_bgm_vb  (*(u_char **)(BTL_PACK_DEST + 0x0))
-#define g_btl_bgm_vh  (*(u_char **)(BTL_PACK_DEST + 0x4))
-#define g_btl_bgm_seq (*(u_long **)(BTL_PACK_DEST + 0x8))
+#define g_btl_pack_vb  (*(u_char **)(BTL_PACK_DEST + 0x0))
+#define g_btl_pack_vh  (*(u_char **)(BTL_PACK_DEST + 0x4))
+#define g_btl_pack_seq (*(u_long **)(BTL_PACK_DEST + 0x8))
 
 #define BTL_BGM_SEPS 4
 
@@ -28,19 +28,75 @@
 #define BGM_BACK_VOL   60
 #define BGM_BACK_TIME  15
 
+/* One byte per (track, column). 0xFF means play nothing; otherwise the low
+   nibble is the sequence inside the bank, and the two top bits say how to read
+   it. */
+#define BGM_SILENT   0xFF
+#define BGM_SEQ      0x0F
+#define BGM_ABSOLUTE 0x40   /* the nibble stands alone, not as an offset */
+#define BGM_ONESHOT  0x80   /* the track ends; BtlWaitBgmEnd waits for it  */
+
+/* BtlWaitBgmEnd tests the sign of g_btl_bgm_seq, so BGM_ONESHOT is carried in
+   the top bit of the number and masked off again when it is played. */
+#define BGM_ENDS 0x80000000
+
 extern int g_btl_bgm_state;
+extern int g_btl_bgm_seq;
+extern u_char g_btl_bgm_table[][4];
 
 extern void BtlRunFrames(int frames);
+extern void BtlLoadPackEntry(int entry);
+extern void BtlDrawFrame(void);
+extern volatile int g_cd_busy;
+
+/* No prototype: this file hands BtlSePlay a whole word and lets the callee
+   truncate it, which is what keeps the mask below a 32-bit one. */
+extern void BtlSePlay();
 
 void BtlBgmOpen(void)
 {
     BtlSoundBank bank;
 
     bank.nsep = BTL_BGM_SEPS;
-    bank.vb = g_btl_bgm_vb;
-    bank.vh = g_btl_bgm_vh;
-    bank.seq = g_btl_bgm_seq;
+    bank.vb = g_btl_pack_vb;
+    bank.vh = g_btl_pack_vh;
+    bank.seq = g_btl_pack_seq;
     BtlSoundOpen(&bank, BTL_BGM_SLOT, 0);
+}
+
+/* Swapping the battle's music. The old sequence is faded down while the new
+   pack entry is read off the disc, and the read is waited out here rather than
+   by a callback, so the screen keeps drawing throughout. */
+void BtlBgmChange(int track, int column, int base)
+{
+    u_char code;
+    int    seq;
+
+    code = g_btl_bgm_table[track][column];
+    if (code != BGM_SILENT) {
+        seq = code & BGM_SEQ;
+        if ((code & BGM_ABSOLUTE) == 0) {
+            seq = seq + base;
+        }
+        g_btl_bgm_seq = seq;
+        if ((code & BGM_ONESHOT) != 0) {
+            g_btl_bgm_seq = g_btl_bgm_seq | BGM_ENDS;
+        }
+        SsSepSetDecrescendo(g_btl_seq[0], 0, BGM_BACK_VOL, BGM_BACK_TIME);
+        BtlLoadPackEntry(track);
+        while (g_cd_busy != -1) {
+            BtlDrawFrame();
+        }
+        BtlBgmOpen();
+        BtlRunFrames(BGM_GAP_FRAMES);
+        SsSepStop(g_btl_seq[0], 0);
+        SsVabTransCompleted(1);
+        BtlSePlay(BTL_BGM_SLOT, g_btl_bgm_seq & ~BGM_ENDS);
+        g_btl_bgm_state = 1;
+    } else {
+        BtlRunFrames(BGM_GAP_FRAMES);
+        g_btl_bgm_state = 0;
+    }
 }
 
 void BtlBgmRestore(void)
