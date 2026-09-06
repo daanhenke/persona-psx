@@ -1,6 +1,7 @@
 /* Persona 1 (JP) - the battle overlay's display object pool.  BTLP only.
  *   0x80080820 BtlInitObjects   0x80080E7C BtlObjSetScript
  *   0x80080D54 BtlObjFree       0x80080DAC BtlObjMoveBefore
+ *   0x80080ED0 BtlObjLast
  *
  * The pool and the record are described in the header; this file is the pool's
  * own operations - bringing it up, arming a script, and the two list edits.
@@ -31,6 +32,7 @@
 
 extern BtlObj  *g_btl_obj_tail[];
 extern BtlObj  *g_btl_obj_pool;
+extern BtlObj  *g_btl_obj_prev;
 extern u_short  g_btl_obj_count[];
 extern u_char  *g_btl_prim_pool;
 extern short    g_btl_slot_owner[];
@@ -180,4 +182,17 @@ int BtlObjMoveBefore(BtlObj *at, BtlObj *obj)
     obj->prev = before;
     obj->next = at;
     return 1;
+}
+
+/* The far end of a chain of attachments. Callers want both ends of it, so the
+   one before last is left in g_btl_obj_prev rather than being worked out
+   again. */
+BtlObj *BtlObjLast(BtlObj *obj)
+{
+    g_btl_obj_prev = obj;
+    while (obj->attached != 0) {
+        g_btl_obj_prev = obj;
+        obj = obj->attached;
+    }
+    return obj;
 }

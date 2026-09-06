@@ -67,4 +67,8 @@ typedef struct {
 #define CHAR_LIST_N 3
 #define CHAR_STATS  5
 
+/* What `entry` holds when no list slot is active, and what an empty list slot
+   holds. */
+#define CHAR_NO_ENTRY 0xFF
+
 #endif

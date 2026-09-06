@@ -4,26 +4,27 @@
  * the nine that follow, which is why the target picker walks nine records from
  * slot 5 and the command cursor wraps at five.
  *
- * `status` is an ailment code in the same space as Char.status - the battle
- * writes STATUS_BIND into it and the HUD turns it into an icon cell by adding
- * the icon strip's base - but it runs on past the seventeen ailments the status
- * screen can name. Those extra codes only exist inside a fight.
+ * Each record opens with a whole Char, so the battle reads a fighter's ailment,
+ * name and key straight out of it and the field's own code understands the same
+ * bytes. The key doubles as "this slot is in use" - it is zero in a record
+ * nobody occupies - and the battle indexes the contact labels with it and loads
+ * that character's graphics by it.
+ *
+ * Char.status runs on past the seventeen ailments the status screen can name;
+ * the codes below are battle-only and never leave the fight.
  */
 #ifndef PERSONA_BTLP_ACTOR_H
 #define PERSONA_BTLP_ACTOR_H
 
 #include <types.h>
+#include <persona/common/char.h>
 #include <persona/btlp/object.h>
 
 typedef struct {
-    /* 0x00 */ u_char  pad00[2];
-    /* 0x02 */ u_char  id;        /* the character, and zero in an empty slot */
-    /* 0x03 */ u_char  name[10];  /* packed glyph bytes, as Char keeps a name */
-    /* 0x0D */ signed char status;    /* ailment code, extended past the table */
-    /* 0x0E */ u_char  pad0E[0x16];
-    /* 0x24 */ BtlObj *obj;       /* what is drawn for this actor         */
-    /* 0x28 */ u_long  flags;
-    /* 0x2C */ u_char  pad2C[0xC0];
+    /* 0x00 */ Char    c;
+    /* 0x60 */ BtlObj *obj;       /* what is drawn for this actor */
+    /* 0x64 */ u_long  flags;
+    /* 0x68 */ u_char  pad68[0x84];
 } BtlActor;                       /* 0xEC bytes */
 
 #define BTL_PARTY   5     /* slots 0..4 */

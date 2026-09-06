@@ -20,6 +20,7 @@
  * above them, the same way a chest's payload does.
  */
 #include <types.h>
+#include <persona/btlp/offer.h>
 
 #define ITEM_SLOTS 0x17E
 #define ITEM_ID    0x1FF
@@ -112,6 +113,29 @@ int BtlStockHasRoom(void)
     room = 0;
 done:
     return room;
+}
+
+/* Is the party already carrying the Persona this offer would hand over? Same
+   twelve slots BtlStockHasRoom looks at. */
+int BtlStockHolds(const BtlOffer *offer)
+{
+    u_char *stock;
+    int     i;
+    int     held;
+
+    stock = g_persona_stock;
+    i = 0;
+    do {
+        if (*stock == offer->persona) {
+            held = 1;
+            goto done;
+        }
+        i++;
+        stock++;
+    } while (i < STOCK_ROWS);
+    held = 0;
+done:
+    return held;
 }
 
 /* One more of an item. BtlItemSlot returning SLOT_FULL in its low half is the

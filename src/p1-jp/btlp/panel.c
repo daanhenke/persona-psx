@@ -39,6 +39,7 @@
 
 extern u_char g_btl_fast_anim;
 extern int    g_btl_panel_state;
+extern u_char g_btl_panel_image[];
 extern VECTOR g_btl_panel_scale;
 extern short  g_btl_panel_rgb[];
 
@@ -50,6 +51,14 @@ void BtlPanelOpen(void)
 void BtlPanelClose(void)
 {
     g_btl_panel_state = PANEL_CLOSING;
+}
+
+/* What the panel shows. The two bytes are read by the prim builders and by
+   nothing else, so this is the whole of choosing its picture. */
+void BtlPanelSetImage(u_char group, u_char index)
+{
+    g_btl_panel_image[0] = group;
+    g_btl_panel_image[1] = index;
 }
 
 int BtlPanelStepOpen(void)

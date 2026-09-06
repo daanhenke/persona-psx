@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - the battle HUD's pulsing row bar.  BTLP only.
  *   0x80075D80 BtlHighlightInitPrims   0x80075E48 BtlHighlightBegin
- *   0x80075EB8 BtlHighlightDraw
+ *   0x80075EB8 BtlHighlightDraw       0x80075EA4 BtlHighlightEnd
  *
  * One slanted, semi-transparent bar is drawn over a row of the battle HUD and
  * pulses: BtlHighlightBegin picks a row and a colour, the level rises to full
@@ -42,6 +42,13 @@ extern int     g_btl_highlight_row;
 extern int     g_btl_highlight_colour;
 extern u_char  g_btl_highlight_x[];
 extern u_char  g_btl_highlight_rgb[];
+
+/* Ends the bar early, by dropping it straight into the phase it would have
+   reached on its own. */
+void BtlHighlightEnd(void)
+{
+    g_btl_highlight_state = HIGHLIGHT_FALLING;
+}
 
 void BtlHighlightInitPrims(void)
 {
