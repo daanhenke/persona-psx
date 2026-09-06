@@ -38,15 +38,14 @@ int BtlAnyStanding(void)
     BtlActor *a;
     int       i;
 
-    i = 0;
     a = g_btl_combatants;
+    i = 0;
     do {
-        if (a->c.key != 0 &&
-            (signed char)a->c.status != BTL_STATUS_DOWN) {
+        if (a[i].c.key != 0 &&
+            (signed char)a[i].c.status != BTL_STATUS_DOWN) {
             return 1;
         }
         i++;
-        a++;
     } while (i < BTL_ENEMIES);
     return 0;
 }

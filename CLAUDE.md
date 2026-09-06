@@ -355,6 +355,21 @@ record is what indexes it, that byte is the destination kind - which in turn
 named the rest of the record. When a field's meaning will not come out of the
 arithmetic, look for a label the code draws from it.
 
+### Where the induction variable is biased
+
+A loop reading two fields of a record can put its pointer at either of them.
+gcc biases it to the *last* field touched, so `a->c.key` at +0x3E and
+`a->c.status` at +0x49 come out as `-0xB(base)` and `0(base)` where the original
+has `0x3e(base)` and `0x49(base)`. Walking with `a++` is what leaves the choice
+to gcc; indexing `a[i].field` and counting `i` makes it derive the pointer from
+the base instead, which is where the original's is. `BtlAnyStanding` went from
+85.9% to exact on that alone, and `BtlAnyEnemy` beside it never showed the
+problem because it only reads one field.
+
+This is the opposite of the array-walk note above: there the pointer form is
+what the original used, here the index form is. Read the offsets off the diff -
+a negative displacement from the base is the tell.
+
 ### Signedness the type has to spell out
 
 Plain `char` is **unsigned** here, so a byte the original reads with `lb` needs
