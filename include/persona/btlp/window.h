@@ -28,7 +28,8 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u_char        pad000[2];
     /* 0x002 */ short         state;
-    /* 0x004 */ u_char        pad004[4];
+    /* 0x004 */ int           answer;  /* left by the script; the sequencer's
+                                          is read when it reaches state 10  */
     /* 0x008 */ const u_char *script;  /* how far the script walk has got   */
     /* 0x00C */ const u_char *text;    /* how far the typing has got        */
     /* 0x010 */ u_long        attr;    /* every cell takes a copy of this   */

@@ -116,6 +116,20 @@ void BtlSeqReset(void)
     g_btl_seq_window.vram_y = BTL_SEQ_VRAM_Y;
 }
 
+/* What the script left behind. Read once, when the sequencer reaches state 10,
+   into the negotiation's own record. */
+int BtlSeqAnswer(void)
+{
+    return g_btl_seq_window.answer;
+}
+
+/* Calls BtlSeqReset and nothing else. Most of the places that empty the window
+   go through this one rather than calling the reset directly. */
+void BtlSeqClear(void)
+{
+    BtlSeqReset();
+}
+
 /* Puts a script into the sequencer's window and sets it running. */
 void BtlSeqPlay(const u_char *script)
 {

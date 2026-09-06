@@ -587,3 +587,5 @@ btlp      func_80093A58    src/p1-jp/btlp/statusstops.c
 btlp      func_8006BFC4    src/p1-jp/btlp/voice.c
 btlp      func_8007A87C    src/p1-jp/btlp/box.c
 btlp      func_80067A34    src/p1-jp/btlp/tint.c
+btlp      func_8007C61C    src/p1-jp/btlp/seqstate.c
+btlp      func_8007BF18    src/p1-jp/btlp/seqstate.c
