@@ -42,8 +42,7 @@ void BtlSetInsert(int which, const u_char *src)
     BtlInsert *slot;
     u_char *dst;
     u_char *q;
-    int     attr;
-    int     end;
+    u_short end;
     u_char  buf[16];
 
     slot = g_btl_insert;
@@ -53,10 +52,9 @@ void BtlSetInsert(int which, const u_char *src)
         BtlFormatDecimal((int)src, buf, 0);
         q = buf;
         dst = slot[0].cell;
-        attr = INSERT_ATTR;
         end = INSERT_END;
         while (*q != end) {
-            dst[0] = attr;
+            dst[0] = INSERT_ATTR;
             dst[1] = *q + DIGIT_BASE;
             q++;
             dst += 2;

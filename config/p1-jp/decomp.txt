@@ -589,3 +589,4 @@ btlp      func_8007A87C    src/p1-jp/btlp/box.c
 btlp      func_80067A34    src/p1-jp/btlp/tint.c
 btlp      func_8007C61C    src/p1-jp/btlp/seqstate.c
 btlp      func_8007BF18    src/p1-jp/btlp/seqstate.c
+btlp      func_80079ED8    src/p1-jp/btlp/insert.c
