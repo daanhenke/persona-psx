@@ -37,7 +37,9 @@ typedef struct {
 
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free     */
-    /* 0x04 */ u_char         pad04[0x40];
+    /* 0x04 */ u_char         pad04[0x38];
+    /* 0x3C */ long           shift;   /* 16.16; what the tick displaces  */
+    /* 0x40 */ u_char         pad40[4];
     /* 0x44 */ struct BtlObj *prev;
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ struct BtlObj *attached; /* carried along by every setter    */
