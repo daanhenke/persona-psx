@@ -639,3 +639,5 @@ adv       func_80084598    src/p1-jp/adv/game/sceneimages.c
 adv       func_80093C68    src/p1-jp/common/game/equipbest.c
 dng       func_8008E53C    src/p1-jp/common/game/equipbest.c
 s2d       func_8007EA4C    src/p1-jp/common/game/equipbest.c
+adv       func_800AF458    src/p1-jp/adv/gfx/growslot.c
+adv       func_800B02E4    src/p1-jp/adv/game/setlevel.c

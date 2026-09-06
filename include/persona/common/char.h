@@ -14,7 +14,16 @@ typedef struct {
     /* 0x04 */ int     hp_max;
     /* 0x08 */ int     sp;
     /* 0x0C */ int     sp_max;  /* both maxima cap at 999 */
-    /* 0x10 */ u_char  pad10[0x10];
+    /* 0x10 */ int     unk10;     /* CharSetLevelExp puts the experience curve
+                                     summed below the character's level here,
+                                     and the casino adds however much it has
+                                     grown since it last looked into two
+                                     counters of its own. That is consistent
+                                     with experience but not enough to say so. */
+    /* 0x14 */ u_char  pad14[4];
+    /* 0x18 */ int     unk18;     /* the curve's own entry for that level, and
+                                     zero once the level is 99                */
+    /* 0x1C */ u_char  pad1C[4];
     /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot.
                                      [0] is the weapon, [1] the gun and [2]
                                      its ammunition - the gun's two numbers
