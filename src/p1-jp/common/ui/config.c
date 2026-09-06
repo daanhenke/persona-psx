@@ -34,6 +34,7 @@
  * which is the only structural difference between the two halves below.
  */
 #include <types.h>
+#include <libsnd.h>
 #include <persona/common/menuctx.h>
 
 /* Saved option bytes, read all over the game: index 0 is the one AdvLoadBgm
@@ -53,6 +54,10 @@ extern void SlotSetPos(int slot, int attr, int x, int y);
 /* The value list is a row of columns: wrap at both ends, Right moves forward,
    and every step clicks. */
 #define OPT_FLAGS (MENU_WRAP | MENU_RIGHT_IS_NEXT | MENU_CLICK_A)
+
+/* This routine reaches the option bytes by address rather than through
+   g_options. */
+#define OPT_AT ((u_char *)0x801F2AC8)
 
 /* An option value never needs more than the low byte of the list index. */
 #define OPT_VALUE (*(u_char *)&g_menu->list[1].cur)
@@ -123,6 +128,25 @@ void ConfigApplyOption(void)
         break;
     case 2:
         g_options[0x23] = OPT_VALUE;
+        break;
+    }
+}
+
+/* The list page's apply. Only its first two rows hold a value, and changing
+   SOUND takes effect at once rather than waiting for the next track. */
+void ConfigListApplyOption(void)
+{
+    switch (g_menu->slot_base) {
+    case 0:
+        OPT_AT[3] = OPT_VALUE;
+        break;
+    case 1:
+        OPT_AT[0] = OPT_VALUE;
+        if (OPT_AT[0] != 0) {
+            SsSetStereo();
+        } else {
+            SsSetMono();
+        }
         break;
     }
 }

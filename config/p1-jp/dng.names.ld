@@ -306,6 +306,7 @@ PROVIDE(CompMatrix = 0x800291F4);
 PROVIDE(ConfigApplyOption = 0x800851D0);
 PROVIDE(ConfigBeginEdit = 0x800850F8);
 PROVIDE(ConfigDrawLabels = 0x8008FE44);
+PROVIDE(ConfigListApplyOption = 0x80084DA0);
 PROVIDE(ConfigListBeginEdit = 0x80084CE8);
 PROVIDE(ConfigListPlaceMarkers = 0x80084C4C);
 PROVIDE(ConfigPlaceMarkers = 0x80084FD0);

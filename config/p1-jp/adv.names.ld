@@ -351,6 +351,7 @@ PROVIDE(ConfigApplyOption = 0x8007664C);
 PROVIDE(ConfigBeginEdit = 0x80076574);
 PROVIDE(ConfigCloseChoice = 0x80075E94);
 PROVIDE(ConfigDrawLabels = 0x8008BC1C);
+PROVIDE(ConfigListApplyOption = 0x80076214);
 PROVIDE(ConfigListBeginEdit = 0x8007615C);
 PROVIDE(ConfigListPlaceMarkers = 0x800760C0);
 PROVIDE(ConfigPlaceMarkers = 0x8007644C);

@@ -628,3 +628,6 @@ btlp      func_80094CD4    src/p1-jp/btlp/enemy.c
 adv       func_80071ED0    src/p1-jp/common/ui/menustatus.c
 dng       func_80080C08    src/p1-jp/common/ui/menustatus.c
 s2d       func_80070E88    src/p1-jp/common/ui/menustatus.c
+adv       func_80076214    src/p1-jp/common/ui/config.c
+dng       func_80084DA0    src/p1-jp/common/ui/config.c
+s2d       func_800751CC    src/p1-jp/common/ui/config.c
