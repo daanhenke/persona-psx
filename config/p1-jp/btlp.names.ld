@@ -322,6 +322,7 @@ PROVIDE(BtlTalkPerform = 0x8006A22C);
 PROVIDE(BtlTalkPickScript = 0x8006C884);
 PROVIDE(BtlTalkReact = 0x8006BD40);
 PROVIDE(BtlTalkScoreLine = 0x800672B8);
+PROVIDE(BtlTalkTakeLine = 0x80067658);
 PROVIDE(BtlTalkUpdate = 0x8007B8A0);
 PROVIDE(BtlTextAdvance = 0x8007CC30);
 PROVIDE(BtlTextOpen = 0x8007CAF4);
