@@ -494,6 +494,7 @@ btlp      func_80075D54    src/p1-jp/btlp/panel.c
 btlp      func_800C4488    src/p1-jp/btlp/objset.c
 btlp      func_800C44CC    src/p1-jp/btlp/objset.c
 btlp      func_800C4500    src/p1-jp/btlp/objset.c
+btlp      func_800C45D4    src/p1-jp/btlp/objset.c
 btlp      func_800C4538    src/p1-jp/btlp/objset.c
 btlp      func_800C45A0    src/p1-jp/btlp/objset.c
 btlp      func_800C469C    src/p1-jp/btlp/objset.c
@@ -543,6 +544,7 @@ btlp      func_80075EA4    src/p1-jp/btlp/highlight.c
 btlp      func_80069780    src/p1-jp/btlp/offer.c
 btlp      func_800697BC    src/p1-jp/btlp/offer.c
 btlp      func_80073EC8    src/p1-jp/btlp/drop.c
+btlp      func_8006E28C    src/p1-jp/btlp/offer.c
 btlp      func_800743B0    src/p1-jp/btlp/offer.c
 btlp      func_80074438    src/p1-jp/btlp/offer.c
 btlp      func_80066BB0    src/p1-jp/btlp/money.c
@@ -568,6 +570,8 @@ btlp      func_8007C5BC    src/p1-jp/btlp/seqstate.c
 btlp      func_80092DD8    src/p1-jp/btlp/bgm.c
 btlp      func_800767DC    src/p1-jp/btlp/face.c
 btlp      func_80073CC0    src/p1-jp/btlp/talkers.c
+btlp      func_80073D1C    src/p1-jp/btlp/memberpair.c
+btlp      func_80073D7C    src/p1-jp/btlp/memberpair.c
 btlp      func_80073DEC    src/p1-jp/btlp/talkers.c
 btlp      func_80073C64    src/p1-jp/btlp/talkers.c
 btlp      func_80076768    src/p1-jp/btlp/face.c

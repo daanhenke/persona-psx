@@ -69,18 +69,21 @@ void BtlBgmChange(int track, int column, int base)
 {
     u_char code;
     int    seq;
+    int    absolute;
 
     code = g_btl_bgm_table[track][column];
+    absolute = code & BGM_ABSOLUTE;
     if (code != BGM_SILENT) {
         seq = code & BGM_SEQ;
-        if ((code & BGM_ABSOLUTE) == 0) {
-            seq = seq + base;
+        if (absolute == 0) {
+            seq = base + seq;
         }
         g_btl_bgm_seq = seq;
+        seq = 0;
         if ((code & BGM_ONESHOT) != 0) {
             g_btl_bgm_seq = g_btl_bgm_seq | BGM_ENDS;
         }
-        SsSepSetDecrescendo(g_btl_seq[0], 0, BGM_BACK_VOL, BGM_BACK_TIME);
+        SsSepSetDecrescendo(g_btl_seq[0], seq, BGM_BACK_VOL, BGM_BACK_TIME);
         BtlLoadPackEntry(track);
         while (g_cd_busy != -1) {
             BtlDrawFrame();

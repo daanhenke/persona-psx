@@ -55,7 +55,11 @@ typedef struct BtlObj {
     /* 0x54 */ u_char         pad54[0x10];
     /* 0x64 */ BtlSeqStep    *script;  /* animation script                 */
     /* 0x68 */ u_long         last;    /* first word of the script's last step */
-    /* 0x6C */ u_char         pad6C[0x44];
+    /* 0x6C */ u_char         pad6C[0xC];
+    /* 0x78 */ long           scale_x;  /* unity is 0x100 in both of these  */
+    /* 0x7C */ long           scale_y;
+    /* 0x80 */ long           scale_z;  /* unity is 0x1000 in this one      */
+    /* 0x84 */ u_char         pad84[0x2C];
     /* 0xB0 */ u_char         col2;    /* the grid column, doubled          */
     /* 0xB1 */ char           row;     /* the grid row                      */
     /* 0xB2 */ u_short        kind;    /* BTL_OBJ_HEAD marks a list head    */

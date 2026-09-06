@@ -130,7 +130,6 @@ int BtlOfferRank(int slot)
     BtlOffer *o;
     u_long    kinds;
     int       i;
-    int       rank;
 
     /* The offer is picked out before the two refreshes and its mask read once
        after them, rather than being indexed again inside the loop. */
@@ -139,15 +138,14 @@ int BtlOfferRank(int slot)
     BtlOfferMarkWeak();
     kinds = o->kinds;
     i = 0;
-    do {
+    while (i < 8) {
         if (((1 << i) & kinds) != 0) {
             break;
         }
         i++;
-    } while (i < 8);
-    rank = 1;
-    if (i > 3) {
-        rank = (i < 8) << 1;
     }
-    return rank;
+    if (i < 4) {
+        return 1;
+    }
+    return (i < 8) << 1;
 }

@@ -66,6 +66,19 @@ void BtlObjSetPhase(BtlObj *obj, u_char phase)
     }
 }
 
+/* The three scales are not in the same unit: the first two count 0x100 to one
+   and the third 0x1000, which is what the callers pass when they want an
+   object at its own size. */
+void BtlObjSetScale(BtlObj *obj, long x, long y, long z)
+{
+    obj->scale_x = x;
+    obj->scale_y = y;
+    obj->scale_z = z;
+    if (obj->attached != 0) {
+        BtlObjSetScale(obj->attached, x, y, z);
+    }
+}
+
 /* The green parameter is wider than the two either side of it because it is
    only ever stored, never handed on - the recursion passes blue in its place.
    That is a bug, and it does not show: every caller asks for a grey, so green
