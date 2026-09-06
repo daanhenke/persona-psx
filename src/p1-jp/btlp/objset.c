@@ -66,15 +66,17 @@ void BtlObjSetPhase(BtlObj *obj, u_char phase)
     }
 }
 
-/* The green parameter really is wider than the two either side of it; leave it
-   that way. */
+/* The green parameter is wider than the two either side of it because it is
+   only ever stored, never handed on - the recursion passes blue in its place.
+   That is a bug, and it does not show: every caller asks for a grey, so green
+   and blue arrive equal anyway. Left as the original has it. */
 void BtlObjSetRgb(BtlObj *obj, short r, int g, short b)
 {
     obj->rgb_to[0] = r;
     obj->rgb_to[1] = g;
     obj->rgb_to[2] = b;
     if (obj->attached != 0) {
-        BtlObjSetRgb(obj->attached, r, g, b);
+        BtlObjSetRgb(obj->attached, r, b, b);
     }
 }
 

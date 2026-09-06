@@ -497,3 +497,5 @@ btlp      func_800C4500    src/p1-jp/btlp/objset.c
 btlp      func_800C4538    src/p1-jp/btlp/objset.c
 btlp      func_800C45A0    src/p1-jp/btlp/objset.c
 btlp      func_800C469C    src/p1-jp/btlp/objset.c
+btlp      func_800C4608    src/p1-jp/btlp/objset.c
+btlp      func_80066C28    src/p1-jp/btlp/actor.c
