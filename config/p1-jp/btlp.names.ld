@@ -249,6 +249,7 @@ PROVIDE(BtlOfferMarkStrong = 0x800743B0);
 PROVIDE(BtlOfferMarkWeak = 0x80074438);
 PROVIDE(BtlOfferPickTalkers = 0x80073DEC);
 PROVIDE(BtlOfferRank = 0x8006E28C);
+PROVIDE(BtlOpenMessage = 0x8007F258);
 PROVIDE(BtlOpenPackBank = 0x800921B4);
 PROVIDE(BtlPadRead = 0x8008DB78);
 PROVIDE(BtlPadRepeat = 0x8007A1A0);
