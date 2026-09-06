@@ -12,6 +12,11 @@
  * The attribute word at +0 doubles as the in-use flag: BtlObjAlloc takes the
  * first record in the group whose attribute is clear, and BtlObjFree clears it
  * again.
+ *
+ * Each group opens with a head record that is never allocated - it carries
+ * BTL_OBJ_HEAD and stays in use for the life of the overlay. Allocation starts
+ * one past its group's head and stops when it reaches the next one, so the
+ * heads are the group boundaries as well as the list anchors.
  */
 #include <types.h>
 #include <libgpu.h>
@@ -22,7 +27,7 @@ typedef struct BtlObj {
     /* 0x44 */ struct BtlObj *prev;
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ u_char         pad4C[0x66];
-    /* 0xB2 */ u_short        end;     /* 0x8000 one past a group's last */
+    /* 0xB2 */ u_short        kind;    /* BTL_OBJ_HEAD marks a list head   */
     /* 0xB4 */ u_char         padB4[0x1B];
     /* 0xCF */ u_char         group;   /* which list the record belongs to */
     /* 0xD0 */ u_char         padD0[8];
@@ -30,7 +35,11 @@ typedef struct BtlObj {
 
 #define BTL_OBJ_GROUPS 6
 #define BTL_OBJ_INUSE  0x80000000   /* attribute bit that marks a record taken */
-#define BTL_OBJ_END    0x8000       /* at +0xB2, one past a group's last       */
+
+/* The kind field's top bit is not a kind at all: it marks the record that
+   stands at the head of a group's list. BtlObjAlloc starts one record past it
+   and stops at the next one, so a head doubles as the previous group's end. */
+#define BTL_OBJ_HEAD   0x8000
 
 /* Two frame buffers of primitives, laid out end to end from g_btl_prim_pool
    and pre-initialised so nothing has to issue SetSprt mid-frame. */
@@ -91,19 +100,19 @@ int BtlInitObjects(void)
     obj = g_btl_obj_pool;
     for (i = 0; i < BTL_OBJ_GROUPS; i++) {
         obj->attr = BTL_OBJ_INUSE;
-        obj->end = BTL_OBJ_END;
+        obj->kind = BTL_OBJ_HEAD;
         obj->prev = 0;
         obj->next = 0;
         g_btl_obj_tail[i] = obj;
         obj++;
         for (n = 1; n < g_btl_obj_count[i]; n++) {
             obj->attr = 0;
-            obj->end = 0;
+            obj->kind = 0;
             obj++;
         }
     }
     obj->attr = BTL_OBJ_INUSE;
-    obj->end = BTL_OBJ_END;
+    obj->kind = BTL_OBJ_HEAD;
 
     frame = 0;
     do {

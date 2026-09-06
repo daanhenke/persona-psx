@@ -232,7 +232,6 @@ main     8001B974     36  SsSetNck
 main     8001B998     36  SsSepClose
 main     8001B9BC    232  _SsInit
 main     8001BAA4     48  SsInit
-main     8001BAD4     32  SsUtReverbOff
 main     8001BAF4     32  SsQuit
 main     8001BB14    124  SpuQuit
 main     8001BB90    224  _SsStart
@@ -378,8 +377,8 @@ main     8001FB80    156  SpuClearReverbWorkArea
 main     8001FC1C    100  S_CRWA_OBJ_9C
 main     8001FC80    116  S_CRWA_OBJ_100
 main     8001FCF4     40  S_CRWA_OBJ_174
-main     8001FD1C     32  FUN_8001fd1c
-main     8001FD3C     32  FUN_8001fd3c
+main     8001FD1C     32  SsUtReverbOn
+main     8001FD3C     32  SsUtReverbOff
 main     8001FD5C     64  SsUtSetReverbFeedback
 main     8001FD9C    152  SsUtSetReverbDepth
 main     8001FE34     64  SsUtSetReverbDelay
@@ -676,7 +675,7 @@ main     80029F04     32  SetTransMatrix
 main     80029F24     24  FUN_80029f24
 main     80029F44     32  ReadGeomOffset
 main     80029F64     24  FUN_80029f64
-main     80029F84     12  FUN_80029f84
+main     80029F84     12  SetGeomScreen
 main     80029F94     40  LightColor
 main     80029FBC     40  DpqColorLight
 main     80029FE4     60  DpqColor3

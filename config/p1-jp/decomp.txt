@@ -463,3 +463,12 @@ dng       func_8009113C    src/p1-jp/common/game/formation.c
 s2d       func_80081648    src/p1-jp/common/game/formation.c
 btlp      func_80080D54    src/p1-jp/btlp/object.c
 btlp      func_80080DAC    src/p1-jp/btlp/object.c
+btlp      func_8008189C    src/p1-jp/btlp/btlinit.c
+btlp      func_8008E4DC    src/p1-jp/btlp/debugstep.c
+btlp      func_8008E638    src/p1-jp/btlp/debugstep.c
+btlp      func_80091D2C    src/p1-jp/btlp/discread.c
+btlp      func_80091DA8    src/p1-jp/btlp/discread.c
+btlp      func_80092D88    src/p1-jp/btlp/discread.c
+btlp      func_80066CCC    src/p1-jp/btlp/discread.c
+btlp      func_80067898    src/p1-jp/btlp/discread.c
+btlp      func_8008DB78    src/p1-jp/btlp/btlinit.c

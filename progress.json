@@ -1081,5 +1081,74 @@
    "casino": 184,
    "name": 1148
   }
+ },
+ {
+  "date": "2026-09-06T02:12:57",
+  "matched_bytes": 86080,
+  "total_bytes": 1026168,
+  "percent": 8.3885,
+  "matched_funcs": 466,
+  "total_funcs": 2132,
+  "sdk_bytes": 511520,
+  "sdk_funcs": 4215,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19948,
+   "btlp": 3032,
+   "s2d": 21924,
+   "adv": 35512,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-06T02:18:30",
+  "matched_bytes": 86532,
+  "total_bytes": 1026168,
+  "percent": 8.4325,
+  "matched_funcs": 471,
+  "total_funcs": 2132,
+  "sdk_bytes": 511520,
+  "sdk_funcs": 4215,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19948,
+   "btlp": 3484,
+   "s2d": 21924,
+   "adv": 35512,
+   "casino": 184,
+   "name": 1148
+  }
+ },
+ {
+  "date": "2026-09-06T02:20:00",
+  "matched_bytes": 86632,
+  "total_bytes": 1026168,
+  "percent": 8.4423,
+  "matched_funcs": 472,
+  "total_funcs": 2132,
+  "sdk_bytes": 511520,
+  "sdk_funcs": 4215,
+  "targets": {
+   "main": 3700,
+   "atlus": 180,
+   "open": 180,
+   "movie": 136,
+   "end": 136,
+   "dng": 19948,
+   "btlp": 3584,
+   "s2d": 21924,
+   "adv": 35512,
+   "casino": 184,
+   "name": 1148
+  }
  }
 ]

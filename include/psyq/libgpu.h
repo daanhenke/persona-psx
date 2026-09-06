@@ -616,13 +616,11 @@ extern int SetGraphReverse(int mode);
 extern int SetGraphQueue(int mode);
 extern u_long DrawSyncCallback(void (*func)());
 extern void FntLoad(int tx, int ty);
-// n.b.! FntPrint has an odd signature where the
-// first arg can be interpretted as a char* or int.
-// the SDK header uses a long, but all uses we've
-// come across so far use a char*. modern compilers
-// are strict about this type of thing, so this
-// doesn't match the docs.
-int FntPrint(const char* fmt, ...);
+/* The SDK header declares the first argument as a long and the manual is not
+   clear about it. In this build it is the stream id FntOpen returned: BTLP's
+   debug print passes g_btl_debug_fnt and then the format string, and hands the
+   same id to FntFlush on the next line. */
+int FntPrint(long id, const char* fmt, ...);
 extern void SetDispMask(int mask);
 extern void SetDrawMode(DR_MODE* p, int dfe, int dtd, int tpage, RECT* tw);
 extern void SetDumpFnt(int id);
