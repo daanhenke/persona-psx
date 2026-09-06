@@ -584,3 +584,6 @@ btlp      func_80067D74    src/p1-jp/btlp/moodband.c
 btlp      func_800677E4    src/p1-jp/btlp/moodgauge.c
 btlp      func_800856C4    src/p1-jp/btlp/talkleave.c
 btlp      func_80093A58    src/p1-jp/btlp/statusstops.c
+btlp      func_8006BFC4    src/p1-jp/btlp/voice.c
+btlp      func_8007A87C    src/p1-jp/btlp/box.c
+btlp      func_80067A34    src/p1-jp/btlp/tint.c

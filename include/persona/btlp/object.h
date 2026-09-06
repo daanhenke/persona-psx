@@ -37,7 +37,8 @@ typedef struct {
 
 typedef struct BtlObj {
     /* 0x00 */ u_long         attr;    /* zero when the record is free     */
-    /* 0x04 */ u_char         pad04[4];
+    /* 0x04 */ const u_long **scripts; /* the model's table of scripts, the
+                                          one a spawn was given            */
     /* 0x08 */ long           x;       /* 16.16, and what a shadow follows */
     /* 0x0C */ long           y;
     /* 0x10 */ long           z;

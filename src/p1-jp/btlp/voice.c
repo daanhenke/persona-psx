@@ -23,7 +23,7 @@ extern short g_btl_offer_slot;
 
 void BtlQueueVoice(u_short line, int alt)
 {
-    short kind;
+    int kind;
 
     /* Written once outright and once again from the branch. The first store
        looks redundant and is in the original. */

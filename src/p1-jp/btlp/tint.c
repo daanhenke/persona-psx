@@ -24,9 +24,22 @@
 /* Steps a frame the tint is reached in. */
 #define TINT_FADE  4
 
+/* The party's tints, and the two scripts a speaker can be put on. */
+#define TINT_PARTY_DIM   0x20
+#define TINT_PARTY_FULL  0x80
+#define TINT_PARTY_FADE  4
+#define TINT_SPEAK_FADE  0x10
+#define TINT_SCRIPT_ALT  2
+#define TINT_SCRIPT_A    (0x8C / 4)
+#define TINT_SCRIPT_B    (0x0C / 4)
+
+extern BtlActor g_btl_actors[];
 extern BtlActor g_btl_enemies[];
 extern short    g_btl_offer_slot;
 extern short    g_btl_talk_target;
+extern short    g_btl_actor_slot;
+
+extern void BtlObjSetScript(BtlObj *obj, const u_long *script);
 
 extern void BtlObjSetMotion(BtlObj *obj, u_char motion);
 extern void BtlObjSetRgb(BtlObj *obj, int r, int g, int b);
@@ -57,4 +70,41 @@ void BtlTintTalkers(void)
         slot++;
         actor++;
     } while (slot < BTL_ENEMIES);
+}
+
+/* The party side of the same thing. The speaker comes up to full and gets
+   there quickly; the rest drop away and fade slowly. Then the speaker is put
+   on whichever of two scripts its own record asks for. */
+void BtlTintParty(void)
+{
+    BtlActor *actor;
+    BtlActor *party;
+    BtlObj   *obj;
+    int       slot;
+
+    slot = 0;
+    actor = g_btl_actors;
+    do {
+        if (actor->c.key != 0) {
+            if (slot == g_btl_actor_slot) {
+                BtlObjSetRgb(actor->obj, TINT_PARTY_FULL, TINT_PARTY_FULL,
+                             TINT_PARTY_FULL);
+                BtlObjSetFade(actor->obj, TINT_SPEAK_FADE);
+            } else {
+                BtlObjSetRgb(actor->obj, TINT_PARTY_DIM, TINT_PARTY_DIM,
+                             TINT_PARTY_DIM);
+                BtlObjSetFade(actor->obj, TINT_PARTY_FADE);
+            }
+        }
+        slot++;
+        actor++;
+    } while (slot < BTL_PARTY);
+    party = g_btl_actors;
+    if (party[g_btl_actor_slot].script_pick == TINT_SCRIPT_ALT) {
+        obj = party[g_btl_actor_slot].obj;
+        BtlObjSetScript(obj, obj->scripts[TINT_SCRIPT_A]);
+    } else {
+        obj = party[g_btl_actor_slot].obj;
+        BtlObjSetScript(obj, obj->scripts[TINT_SCRIPT_B]);
+    }
 }
