@@ -481,3 +481,4 @@ btlp      func_80079E8C    src/p1-jp/btlp/seqvalue.c
 btlp      func_8007A1A0    src/p1-jp/btlp/padrepeat.c
 btlp      func_8008DBDC    src/p1-jp/btlp/unpack.c
 btlp      func_80079E24    src/p1-jp/btlp/seqvalue.c
+btlp      func_800662F4    src/p1-jp/btlp/number.c
