@@ -424,7 +424,7 @@ btlp      func_8007BF00    src/p1-jp/btlp/seqstate.c
 btlp      func_8007C53C    src/p1-jp/btlp/seqstate.c
 btlp      func_80079FE0    src/p1-jp/btlp/seqstate.c
 btlp      func_8007BE24    src/p1-jp/btlp/seqstate.c
-btlp      func_8007EF38    src/p1-jp/btlp/bgmpending.c
+btlp      func_8007EF38    src/p1-jp/btlp/indicator.c
 btlp      func_80066760    src/p1-jp/btlp/vramqueue.c
 btlp      func_800678F8    src/p1-jp/btlp/loadscratch.c
 adv       func_8007644C    src/p1-jp/common/ui/configmarkers.c
@@ -482,3 +482,5 @@ btlp      func_8007A1A0    src/p1-jp/btlp/padrepeat.c
 btlp      func_8008DBDC    src/p1-jp/btlp/unpack.c
 btlp      func_80079E24    src/p1-jp/btlp/seqvalue.c
 btlp      func_800662F4    src/p1-jp/btlp/number.c
+btlp      func_8007EF08    src/p1-jp/btlp/indicator.c
+btlp      func_8007EF24    src/p1-jp/btlp/indicator.c

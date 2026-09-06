@@ -13,7 +13,7 @@ extern short g_btl_seq_handle;
 
 extern int  BtlSeqIsActive(void);
 extern void BtlSeqSetState(int a, int b);
-extern void BtlBgmClearPending(void);
+extern void BtlIndicatorClear(void);
 extern void BtlRunFrames(int arg);
 extern void BtlUpdateVoices(void);
 extern void BtlDrawFrame(void);
@@ -25,7 +25,7 @@ void BtlWaitBgmEnd(void)
         while (BtlSeqIsActive() != 0) {
             if (SsIsEos(g_btl_seq_handle, (short)g_btl_bgm_seq) == 0) {
                 BtlSeqSetState(0, 4);
-                BtlBgmClearPending();
+                BtlIndicatorClear();
                 BtlRunFrames(0x1E);
             }
             BtlUpdateVoices();
