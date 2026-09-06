@@ -355,6 +355,20 @@ record is what indexes it, that byte is the destination kind - which in turn
 named the rest of the record. When a field's meaning will not come out of the
 arithmetic, look for a label the code draws from it.
 
+### `while` or `do`/`while`
+
+Read the loop shape off the diff before changing anything inside it. A back-edge
+straight to the top of the body is a plain loop; a test *before* the loop with
+the body appearing again at the bottom is gcc rotating one, and it does that to
+a `do`/`while` whose first bound test it can prove - which a search loop
+counting from zero always is. Writing those as `while (i < N) { ... }` stops the
+peeling and usually moves a rewrite twenty points in one edit.
+
+`BtlRecentOther`, `BtlItemSlot` and `BtlDropRecent` all wanted it; the last went
+from 58.8% to 87% on that alone. The exception is a loop that genuinely runs at
+least once and whose counter nothing reads afterwards - those really are
+`do`/`while`.
+
 ### Where the induction variable is biased
 
 A loop reading two fields of a record can put its pointer at either of them.

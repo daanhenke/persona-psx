@@ -42,7 +42,7 @@ void BtlPushRecent(int value)
     if (i > 0) {
         base = g_btl_recent;
         dst = &base[i];
-        src = &base[i - 1];
+        src = &(base - 1)[i];
         do {
             *dst = *src;
             src--;
@@ -92,19 +92,21 @@ void BtlDropRecent(int value)
     int *q;
     int *dst;
     int  none;
+    int  gone;
     int  i;
     int  j;
 
     i = 0;
+    gone = BTL_RECENT_NONE;
     p = g_btl_recent;
-    do {
-        i++;
+    while (i < BTL_RECENT) {
         if (*p == value) {
-            *p = BTL_RECENT_NONE;
+            *p = gone;
             break;
         }
+        i++;
         p++;
-    } while (i < BTL_RECENT);
+    }
     i = 0;
     none = BTL_RECENT_NONE;
     base = g_btl_recent;
