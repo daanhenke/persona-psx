@@ -625,3 +625,6 @@ btlp      func_8007C61C    src/p1-jp/btlp/seqstate.c
 btlp      func_8007BF18    src/p1-jp/btlp/seqstate.c
 btlp      func_80079ED8    src/p1-jp/btlp/insert.c
 btlp      func_80094CD4    src/p1-jp/btlp/enemy.c
+adv       func_80071ED0    src/p1-jp/common/ui/menustatus.c
+dng       func_80080C08    src/p1-jp/common/ui/menustatus.c
+s2d       func_80070E88    src/p1-jp/common/ui/menustatus.c
