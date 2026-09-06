@@ -181,7 +181,7 @@ void GsSortLine(GsLINE *line, GsOT *ot, u_short pri);
 void GsSortGLine(GsGLINE *line, GsOT *ot, u_short pri);
 void GsSortBg(GsBG *bg, GsOT *otp);
 void GsSortFastBg(GsBG *bg, GsOT *otp);
-void GsSortBoxFill(GsBOXF *boxf, GsOT *otp);
+void GsSortBoxFill(GsBOXF *boxf, GsOT *otp, u_short pri);
 void GsSortObject4(GsDOBJ2 *objp, GsOT *otp);
 void GsLinkObject4(u_long objnum, u_long *base, GsDOBJ2 *objp);
 u_long *GsMapModelingData(u_long *base);
