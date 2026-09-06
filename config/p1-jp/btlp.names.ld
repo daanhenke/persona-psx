@@ -317,6 +317,7 @@ PROVIDE(BtlTalkLeave = 0x800856C4);
 PROVIDE(BtlTalkLikedEquip = 0x800744C8);
 PROVIDE(BtlTalkLive = 0x8007B5E0);
 PROVIDE(BtlTalkOpen = 0x8007B670);
+PROVIDE(BtlTalkPerform = 0x8006A22C);
 PROVIDE(BtlTalkPickScript = 0x8006C884);
 PROVIDE(BtlTalkReact = 0x8006BD40);
 PROVIDE(BtlTalkScoreLine = 0x800672B8);
