@@ -12,6 +12,9 @@
    how the original addresses it. */
 extern BtlActor g_btl_enemies[];
 
+/* The same nine reached through the pointer the overlay keeps to them. */
+extern BtlActor *g_btl_combatants;
+
 int BtlAnyEnemy(void)
 {
     BtlActor *a;
@@ -21,6 +24,25 @@ int BtlAnyEnemy(void)
     i = 0;
     do {
         if (a->c.key != 0) {
+            return 1;
+        }
+        i++;
+        a++;
+    } while (i < BTL_ENEMIES);
+    return 0;
+}
+
+/* The stricter question: not just occupied, but still able to fight. */
+int BtlAnyStanding(void)
+{
+    BtlActor *a;
+    int       i;
+
+    i = 0;
+    a = g_btl_combatants;
+    do {
+        if (a->c.key != 0 &&
+            (signed char)a->c.status != BTL_STATUS_DOWN) {
             return 1;
         }
         i++;

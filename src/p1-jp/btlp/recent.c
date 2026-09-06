@@ -81,3 +81,49 @@ int BtlRecentOther(int value)
     }
     return found;
 }
+
+/* Takes a value out and closes the gap behind it. The inner walk does not stop
+   at the first entry it moves, so what ends up in a hole is the last non-empty
+   entry after it rather than the first. */
+void BtlDropRecent(int value)
+{
+    int *base;
+    int *p;
+    int *q;
+    int *dst;
+    int  none;
+    int  i;
+    int  j;
+
+    i = 0;
+    p = g_btl_recent;
+    do {
+        i++;
+        if (*p == value) {
+            *p = BTL_RECENT_NONE;
+            break;
+        }
+        p++;
+    } while (i < BTL_RECENT);
+    i = 0;
+    none = BTL_RECENT_NONE;
+    base = g_btl_recent;
+    p = base;
+    do {
+        if (*p == none && i < BTL_RECENT) {
+            q = base + i;
+            dst = p;
+            j = i;
+            do {
+                j++;
+                if (*q != none) {
+                    *dst = *q;
+                    *q = none;
+                }
+                q++;
+            } while (j < BTL_RECENT);
+        }
+        i++;
+        p++;
+    } while (i < BTL_RECENT);
+}

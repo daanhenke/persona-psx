@@ -23,32 +23,37 @@ int BtlSoundOpen(const BtlSoundBank *banks, int slot, int index)
     int i;
     int used;
 
+    /* The slot in hand and the answer are one variable: a caller that asked
+       for any free slot gets back the one that was taken. */
     used = 0;
     if (banks[index].vh != 0) {
+        i = 0;
+        used = slot;
         if (slot < 0) {
             p = g_btl_vab;
-            for (i = 0; i < BTL_SOUND_SLOTS; i++) {
+            do {
+                used = i;
                 if (*p < 0) {
-                    slot = i;
                     break;
                 }
+                i++;
                 p++;
-            }
+                used = slot;
+            } while (i < BTL_SOUND_SLOTS);
         }
 
         SsVabTransCompleted(1);
 
         b = &banks[index];
-        vab = &g_btl_vab[slot];
+        vab = &g_btl_vab[used];
         *vab = SsVabOpenHead(b->vh, -1);
         while (SsVabTransBody(b->vb, *vab) < 0) {
             ;
         }
 
         b = &banks[index];
-        g_btl_seq[slot] = SsSepOpen(b->seq, g_btl_vab[slot], b->nsep);
-        g_btl_seq_count[slot] = b->nsep;
-        used = slot;
+        g_btl_seq[used] = SsSepOpen(b->seq, g_btl_vab[used], b->nsep);
+        g_btl_seq_count[used] = b->nsep;
     }
     return used;
 }

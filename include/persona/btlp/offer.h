@@ -18,7 +18,7 @@ typedef struct {
                                    reads both of these and throws the values
                                    away, so what they hold is still open   */
     /* 0x10 */ u_char pad10[9];
-    /* 0x19 */ u_char pad19;
+    /* 0x19 */ u_char level;   /* measured against g_btl_talk_level    */
     /* 0x1A */ u_short talkers; /* of those, the ones with no ailment  */
     /* 0x1C */ u_short used;    /* enemies this offer involves; zero
                                    while the slot is free              */

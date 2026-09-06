@@ -576,3 +576,11 @@ btlp      func_80067094    src/p1-jp/btlp/recent.c
 btlp      func_8006C6B4    src/p1-jp/btlp/showoffer.c
 btlp      func_8006BEDC    src/p1-jp/btlp/tint.c
 btlp      func_8006C884    src/p1-jp/btlp/talkscript.c
+btlp      func_800753CC    src/p1-jp/btlp/moodgauge.c
+btlp      func_800742C0    src/p1-jp/btlp/leveltest.c
+btlp      func_80066688    src/p1-jp/btlp/vramqueue.c
+btlp      func_80067630    src/p1-jp/btlp/moodband.c
+btlp      func_80067D74    src/p1-jp/btlp/moodband.c
+btlp      func_800677E4    src/p1-jp/btlp/moodgauge.c
+btlp      func_800856C4    src/p1-jp/btlp/talkleave.c
+btlp      func_80093A58    src/p1-jp/btlp/statusstops.c

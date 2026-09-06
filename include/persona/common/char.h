@@ -42,7 +42,9 @@ typedef struct {
     /* 0x49 */ u_char  status;    /* ailment code, 0 for none. Event scripts
                                      set and clear it; recovery items ask
                                      CharHasStatus for the one they cure. */
-    /* 0x4A */ u_char  pad4A;
+    /* 0x4A */ u_char  kind;      /* what sort of fighter this is; the battle
+                                     overlay indexes its table of ailments
+                                     that still let one act by it          */
     /* 0x4B */ u_char  level;     /* a fifth of it goes into melee_atk and
                                      defence; the script interpreter tests
                                      it against an opcode operand         */

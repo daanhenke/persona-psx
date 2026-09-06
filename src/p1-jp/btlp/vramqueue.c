@@ -32,6 +32,32 @@ extern DRAWENV   g_btl_drawenv;
 /* The upload ring wraps here, though nothing ever fills it. */
 #define BTL_VRAM_LOADS 0x48
 
+/* The clear ring is shallower; the contact box is the only thing that uses it
+   more than once a frame. */
+#define BTL_VRAM_CLEARS 0x20
+
+/* Appends one rectangle and the colour to fill it with. The red goes in before
+   the rectangle and the other two after it, and the count is read three times
+   over rather than once - the second and third reads are what put the index
+   arithmetic where the original has it, so the repetition is load-bearing. */
+void BtlQueueVramClear(short x, short y, short w, short h,
+                       u_char r, u_char g, u_char b)
+{
+    int i;
+    int j;
+
+    i = g_btl_vram_clear_count;
+    g_btl_vram_clears[i].r = r;
+    j = g_btl_vram_clear_count;
+    g_btl_vram_clears[i].rect.x = x;
+    g_btl_vram_clears[i].rect.y = y;
+    g_btl_vram_clears[i].rect.w = w;
+    g_btl_vram_clears[i].rect.h = h;
+    g_btl_vram_clears[j].g = g;
+    g_btl_vram_clears[g_btl_vram_clear_count].b = b;
+    g_btl_vram_clear_count = (g_btl_vram_clear_count + 1) % BTL_VRAM_CLEARS;
+}
+
 /* Appends one rectangle. The source pointer is stored between the width and
    the height, not after them. */
 void BtlQueueVramLoad(u_long *data, short x, short y, short w, short h)

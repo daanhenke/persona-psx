@@ -102,12 +102,14 @@ void BtlSetGaugeColour(const Char *c, BtlGaugeSprite *hp,
                        BtlGaugeSprite *sp)
 {
     int max;
-    int tint;
+    u_char tint;
+    u_char low;
 
     if (hp != 0) {
         max = c->hp_max;
+        low = max / 4 < c->hp;
         tint = GAUGE_LOW;
-        if (max / 4 < c->hp) {
+        if (low) {
             tint = GAUGE_NORMAL;
             if (c->hp == max) {
                 tint = GAUGE_FULL;
@@ -117,8 +119,9 @@ void BtlSetGaugeColour(const Char *c, BtlGaugeSprite *hp,
     }
     if (sp != 0) {
         max = c->sp_max;
+        low = max / 4 < c->sp;
         tint = GAUGE_LOW;
-        if (max / 4 < c->sp) {
+        if (low) {
             tint = GAUGE_NORMAL;
             if (c->sp == max) {
                 tint = GAUGE_FULL;

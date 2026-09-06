@@ -179,6 +179,44 @@ int BtlItemRemove(int id)
     }
 }
 
+/* Keeps the ids from a candidate list that the party can actually hold, then
+   picks one of those at random. The kept ids and the slots BtlItemSlot found
+   for them share one array - ids in the first half, slots in the second - so
+   that a single walking pointer fills both. */
+unsigned int BtlPickHoldable(unsigned int count, const u_short *ids)
+{
+    unsigned int kept[18];
+    unsigned int found;
+    unsigned int *p;
+    int i;
+    int n;
+    int pick;
+
+    n = 0;
+    i = 0;
+    if ((count & 0xFF) != 0) {
+        p = kept;
+        do {
+            found = BtlItemSlot(*ids);
+            i++;
+            if ((found & 0xFFFF) != 0) {
+                n++;
+                p[8] = found >> 16;
+                *p = *ids;
+                p++;
+            }
+            ids++;
+        } while (i < (int)(count & 0xFF));
+    }
+    found = 0;
+    if (n != 0) {
+        srand(VSync(-1));
+        pick = rand() % n;
+        found = kept[pick + 8] << 16 | kept[pick];
+    }
+    return found;
+}
+
 void BtlRollCommon(void)
 {
     srand(VSync(-1));
