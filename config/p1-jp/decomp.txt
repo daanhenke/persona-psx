@@ -484,3 +484,6 @@ btlp      func_80079E24    src/p1-jp/btlp/seqvalue.c
 btlp      func_800662F4    src/p1-jp/btlp/number.c
 btlp      func_8007EF08    src/p1-jp/btlp/indicator.c
 btlp      func_8007EF24    src/p1-jp/btlp/indicator.c
+btlp      func_80072F70    src/p1-jp/btlp/drop.c
+btlp      func_80072FA0    src/p1-jp/btlp/drop.c
+btlp      func_80073018    src/p1-jp/btlp/drop.c
