@@ -99,9 +99,23 @@ extern PersonaData g_persona_data[];
    main fills a g_personas slot out of one of these; the battle keeps the byte
    at +0x28 beside every record it copies. */
 typedef struct {
-    /* 0x00 */ u_char pad00[0x28];
-    /* 0x28 */ u_char unk28;
-    /* 0x29 */ u_char pad29[3];
+    /* 0x00 */ u_char  pad00[4];
+    /* 0x04 */ u_short unk04;     /* the pair a contact is weighed with      */
+    /* 0x06 */ u_short unk06;
+    /* 0x08 */ u_char  unk08[10]; /* kept whole, on the battle's record at
+                                     +0x1F and the save game's at +0x19     */
+    /* 0x12 */ u_char  unk12;
+    /* 0x13 */ u_char  level;
+    /* 0x14 */ u_char  kind;      /* pairs a demon species with this Persona */
+    /* 0x15 */ u_char  stat[PERSONA_STATS];
+    /* 0x1A */ u_char  unk1A;
+    /* 0x1B */ u_char  pad1B[1];
+    /* 0x1C */ u_long  unk1C;     /* lands on the record's +0x0C             */
+    /* 0x20 */ u_char  raw[PERSONA_SPELLS];
+                                  /* the spell list as it came off the disc  */
+    /* 0x27 */ u_char  pad27[1];
+    /* 0x28 */ u_char  unk28;
+    /* 0x29 */ u_char  pad29[3];
 } PersonaDef;                     /* 0x2C bytes */
 
 extern const PersonaDef g_persona_defs[];
