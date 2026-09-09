@@ -1,0 +1,58 @@
+name: Megami Ibunroku Persona (JP1) - casino
+sha1: 45e69f62648c32f00a31d23504a9cbbe312b2766
+
+options:
+  platform: psx
+  basename: casino
+  base_path: ../..
+  target_path: rom/JP1/CASINO.BIN
+  asm_path: asm/JP1/casino
+  src_path: src/casino
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/casino.ld
+  symbol_addrs_path: configs/JP1/sym.casino.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.casino.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.casino.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".data", ".text", ".rodata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  # Off for data: the overlay's workspace image is not text, and a guessed
+  # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
+  # than the Shift-JIS ones the ROM holds.
+  data_string_guesser_level: 0
+
+segments:
+  # overlay id 8
+  - name: casino
+    type: code
+    start: 0x0
+    vram: 0x800643A0
+    subsegments:
+      - [0x0, data, casino_id]
+      - [0x4, asm, casino]
+      - [0x1AF10, c, dispatch]
+      - [0x1AFC8, asm, casino_1]
+      # The overlay's own workspace: what the disc carries a value for,
+      # and behind it the run of zeroes the loader never has to write.
+      - [0x2F86C, rodata, casino_data]
+      - [0x43F9C, bss, casino_bss]
+
+  - [0x50408]

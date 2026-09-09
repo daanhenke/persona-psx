@@ -1,0 +1,110 @@
+# Progress categories reported to objdiff / decomp.dev.
+#
+# Paths are relative to the version's expected/ directory, so they are the
+# target name followed by the source tree under it. `common` is its own
+# category: those sources are compiled into several overlays, and a unit only
+# ever appears once under the name splat gave it.
+
+categories:
+  - id: exe
+    name: Executables
+    paths:
+      - main
+      - atlus
+      - open
+      - movie
+      - end
+
+  - id: exe.main
+    name: Boot and Overlay Loader
+    paths:
+      - main
+
+  - id: exe.atlus
+    name: Atlus Logo
+    paths:
+      - atlus
+
+  - id: exe.open
+    name: Opening
+    paths:
+      - open
+
+  - id: exe.movie
+    name: FMV Player
+    paths:
+      - movie
+
+  - id: exe.end
+    name: Ending
+    paths:
+      - end
+
+  - id: ovl
+    name: Overlays
+    paths:
+      - adv
+      - btlp
+      - dng
+      - s2d
+      - casino
+      - name
+      - nld
+
+  - id: ovl.adv
+    name: Adventure / Town
+    paths:
+      - adv
+
+  - id: ovl.btlp
+    name: Battle
+    paths:
+      - btlp
+
+  - id: ovl.dng
+    name: Dungeon
+    paths:
+      - dng
+
+  - id: ovl.s2d
+    name: Status Screen
+    paths:
+      - s2d
+
+  - id: ovl.casino
+    name: Casino
+    paths:
+      - casino
+
+  - id: ovl.name
+    name: Name Entry
+    paths:
+      - name
+
+  - id: ovl.nld
+    name: Name Entry (US)
+    paths:
+      - nld
+
+  - id: common
+    name: Shared
+    paths:
+      - common
+
+expected_paths:
+  ALL: expected/
+  JP1: expected/JP1
+  US:  expected/US
+
+# Kept out of the totals entirely.
+#
+# The PS-EXE header is a fixed 0x800 byte record, not code. Everything under
+# a psyq/ subsegment is Sony's, linked in from the SDK libraries - roughly
+# 4200 routines across the five executables, which is most of what they hold.
+# Counting those as work outstanding buries the game code, so the executables
+# here are only the parts that are actually the game's.
+ignored_files:
+  - main/header
+  - /psyq/
+
+output: ./objdiff.json

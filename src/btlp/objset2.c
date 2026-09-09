@@ -1,0 +1,73 @@
+/* Persona 1 (JP) - changing a display object.  BTLP only.
+ *   0x800C4488 BtlObjSetMotion  0x800C44CC BtlObjSetAttr
+ *   0x800C4500 BtlObjClearAttr  0x800C4538 BtlObjSetTimer
+ *   0x800C45A0 BtlObjSetPhase   0x800C4608 BtlObjSetRgb
+ *   0x800C469C BtlObjSetFade
+ *
+ * One shape, seven times over: write the field, then hand the same value to
+ * whatever is attached. An enemy carries its shadow that way, so tinting the
+ * enemy tints the shadow with it and nothing has to know the assembly's parts.
+ * The recursion is only as deep as the chain is long, which in practice is one.
+ *
+ * Colour is not written straight to the object. Each record keeps the colour it
+ * is drawn in and the colour it is heading for, and the per-frame walk moves the
+ * first toward the second by `fade` a frame - so BtlObjSetRgb asks for a colour
+ * and BtlObjSetFade says how quickly to get there. A fade of 0xFF arrives in one
+ * frame, which is how a caller that wants no transition spells it.
+ *
+ * Motion doubles as a busy flag: the code that plays one sets it and then pumps
+ * frames until the object puts it back to zero, and the command menu ignores the
+ * pad while it is set. Clearing it resets the phase, because a motion that is no
+ * longer running has no step to be on.
+ */
+#include <decomp/types.h>
+#include <persona/btlp/object.h>
+/* Defined in the unit before this one; the prototype is what
+   decides how the arguments are converted. */
+
+void BtlObjSetPhase(BtlObj *obj, u_char phase)
+{
+    obj->phase = phase;
+    if (obj->attached != 0) {
+        BtlObjSetPhase(obj->attached, phase);
+    }
+}
+
+/* The three scales are not in the same unit: the first two count 0x100 to one
+   and the third 0x1000, which is what the callers pass when they want an
+   object at its own size. */
+void BtlObjSetScale(BtlObj *obj, long x, long y, long z)
+{
+    obj->scale_x = x;
+    obj->scale_y = y;
+    obj->scale_z = z;
+    if (obj->attached != 0) {
+        BtlObjSetScale(obj->attached, x, y, z);
+    }
+}
+
+/* The green parameter is wider than the two either side of it because it is
+   only ever stored, never handed on - the recursion passes blue in its place.
+   That is a bug, and it does not show: every caller asks for a grey, so green
+   and blue arrive equal anyway. Left as the original has it. */
+void BtlObjSetRgb(BtlObj *obj, short r, int g, short b)
+{
+    obj->rgb_to[0] = r;
+    obj->rgb_to[1] = g;
+    obj->rgb_to[2] = b;
+    if (obj->attached != 0) {
+        BtlObjSetRgb(obj->attached, r, b, b);
+    }
+}
+
+/* The colour drawn, rather than the colour walked toward, so this arrives
+   whole on the next frame with no fade. Nothing in the overlay calls it. */
+void BtlObjSetRgbNow(BtlObj *obj, short r, short g, short b)
+{
+    obj->rgb[0] = r;
+    obj->rgb[1] = g;
+    obj->rgb[2] = b;
+    if (obj->attached != 0) {
+        BtlObjSetRgbNow(obj->attached, r, g, b);
+    }
+}

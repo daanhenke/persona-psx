@@ -1,0 +1,78 @@
+name: Megami Ibunroku Persona (JP1) - main
+sha1: fd0af59ae98db83db3bb48a4e8e6e449e29a8e6f
+
+options:
+  platform: psx
+  basename: main
+  base_path: ../..
+  target_path: rom/JP1/SLPS_005.00
+  asm_path: asm/JP1/main
+  src_path: src/main
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/main.ld
+  symbol_addrs_path: configs/JP1/sym.main.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.main.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.main.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".text", ".data", ".rodata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: True
+  ld_align_segment_vram_end: True
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+  gp_value: 0x80055BD0
+
+segments:
+  - name: header
+    type: header
+    start: 0x0
+    vram: 0x80010000
+
+  - name: main
+    type: code
+    start: 0x800
+    vram: 0x80010000
+    subsegments:
+      - [0x800, asm, main]
+      - [0x2064, c, boot]
+      # The C runtime's entry, and below it every Psy-Q library object
+      # linked into the executable. Neither is ours to decompile, which is
+      # what the psyq/ prefix says - the progress report drops them.
+      - [0x2118, asm, psyq/crt0]
+      - [0x21DC, c, overlay]
+      - [0x22B0, asm, main_2]
+      - [0x2378, c, cdfileasync]
+      - [0x2430, asm, main_2_x1]
+      - [0x24FC, c, cdqueue]
+      - [0x263C, c, cdfileload]
+      - [0x27A8, asm, main_2_x3]
+      - [0x2890, c, cdfileread]
+      - [0x299C, asm, main_2_x2]
+      - [0x2DE8, c, cdfiledone]
+      - [0x2E30, asm, main_2_x4]
+      - [0x2EB8, c, cdqueuerun]
+      - [0x31E4, asm, main_2_x5]
+      - [0x332C, c, cdfilesearch]
+      - [0x33EC, c, psexe]
+      - [0x3528, c, cdfilepolled]
+      - [0x357C, asm, main_3_x2]
+      - [0x5EAC, c, common/game/eventflag]
+      - [0x5ED4, c, preload]
+      - [0x66E0, asm, psyq/libs]
+
+  - [0x46800]

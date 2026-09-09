@@ -1,0 +1,65 @@
+name: Megami Ibunroku Persona (JP1) - name
+sha1: 2b14f81398bf13ce0ac50a8219d51ff1dabf3a92
+
+options:
+  platform: psx
+  basename: name
+  base_path: ../..
+  target_path: rom/JP1/NAME.BIN
+  asm_path: asm/JP1/name
+  src_path: src/name
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/name.ld
+  symbol_addrs_path: configs/JP1/sym.name.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.name.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.name.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".data", ".text", ".rodata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  # Off for data: the overlay's workspace image is not text, and a guessed
+  # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
+  # than the Shift-JIS ones the ROM holds.
+  data_string_guesser_level: 0
+
+segments:
+  # overlay id 9
+  - name: name
+    type: code
+    start: 0x0
+    vram: 0x800643A0
+    subsegments:
+      - [0x0, data, name_id]
+      - [0x4, asm, name]
+      - [0x1D94, c, ui/entry]
+      - [0x1E40, asm, name_1]
+      - [0x354C, c, gfx/upload]
+      - [0x3588, c, common/gfx/tim]
+      - [0x362C, c, common/gfx/imageone]
+      - [0x3694, c, common/gfx/image]
+      - [0x3738, c, common/gfx/bgpack]
+      - [0x3840, asm, name_2]
+      - [0x3B80, c, ui/keyboard]
+      # The overlay's own workspace: what the disc carries a value for,
+      # and behind it the run of zeroes the loader never has to write.
+      - [0x3C5C, rodata, name_data]
+      - [0x5A9C, bss, name_bss]
+
+  - [0x16900]

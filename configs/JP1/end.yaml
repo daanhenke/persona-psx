@@ -1,0 +1,56 @@
+name: Megami Ibunroku Persona (JP1) - end
+sha1: cb84681e52760c11e14b164f8bf6c828820d7bd9
+
+options:
+  platform: psx
+  basename: end
+  base_path: ../..
+  target_path: rom/JP1/EXE/END.EXE
+  asm_path: asm/JP1/end
+  src_path: src/end
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/end.ld
+  symbol_addrs_path: configs/JP1/sym.end.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.end.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.end.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".text", ".data", ".rodata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: True
+  ld_align_segment_vram_end: True
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+  gp_value: 0x800ADE2C
+
+segments:
+  - name: header
+    type: header
+    start: 0x0
+    vram: 0x80080000
+
+  - name: end
+    type: code
+    start: 0x800
+    vram: 0x80080000
+    subsegments:
+      - [0x800, asm, end]
+      - [0x3324, c, str]
+      # Psy-Q from here down; not ours to decompile.
+      - [0x33AC, asm, psyq/libs]
+
+  - [0x2E800]

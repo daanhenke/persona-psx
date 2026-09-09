@@ -1,0 +1,307 @@
+name: Megami Ibunroku Persona (JP1) - adv
+sha1: e843c4ec1cf3f8f7a0b362cca4f4691e7e836383
+
+options:
+  platform: psx
+  basename: adv
+  base_path: ../..
+  target_path: rom/JP1/ADV.BIN
+  asm_path: asm/JP1/adv
+  src_path: src/adv
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/adv.ld
+  symbol_addrs_path: configs/JP1/sym.adv.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.adv.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.adv.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  # Off for data: the overlay's workspace image is not text, and a guessed
+  # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
+  # than the Shift-JIS ones the ROM holds.
+  data_string_guesser_level: 0
+
+segments:
+  # overlay id 7
+  - name: adv
+    type: code
+    start: 0x0
+    vram: 0x800643A0
+    subsegments:
+      - [0x0, rodata, adv_id]
+      - [0x4, rodata, adv_rodata]
+      # partyhud's ten bytes end at 0x16E; the linker pads to the next word,
+      # so the asm rodata after it begins at 0x170, not in the padding.
+      - [0x164, .rodata, ../common/ui/partyhud]
+      - [0x170, rodata, adv_rodata1]
+      - [0x1E0, .rodata, audio/silencebgm]
+      - [0x1FC, rodata, adv_rodata2]
+      - [0x228, .rodata, game/diagstep]
+      - [0x2C4, rodata, adv_rodata3]
+      - [0x348, .rodata, gfx/imagecells]
+      - [0x35C, rodata, adv_rodata4]
+      - [0x368, .rodata, game/camera]
+      - [0x37C, rodata, adv_rodata5]
+      - [0x6F0, .rodata, ../common/game/equip]
+      - [0x72C, rodata, adv_rodata6]
+      # the two stat-bar units emit their own switch tables.
+      - [0x750, .rodata, ../common/gfx/statbars]
+      - [0x794, rodata, adv_rodata6a]
+      - [0x7B0, .rodata, ../common/gfx/statbarsdata]
+      - [0x7C4, rodata, adv_rodata6b]
+      - [0x9A8, .rodata, ../common/game/spellusable]
+      - [0xBD0, rodata, adv_rodata7]
+      - [0x134C, .rodata, game/stats]
+      - [0x1390, rodata, adv_rodata8]
+      - [0x1924, c, ../common/gfx/slot]
+      - [0x1C6C, c, ../common/gfx/fade]
+      - [0x1D14, c, gfx/slotfade]
+      - [0x1DDC, c, ../common/gfx/slotflicker]
+      - [0x1E30, c, gfx/slot]
+      - [0x1E8C, c, ../common/gfx/slotanim]
+      - [0x1F0C, asm, adv_1_x2]
+      - [0x1F5C, c, audio/sound]
+      - [0x2080, c, ../common/game/playtime]
+      - [0x2148, asm, adv_2]
+      - [0x2224, c, ../common/ui/decimal]
+      - [0x2314, asm, adv_3]
+      - [0x23D8, c, ../common/gfx/bgmap]
+      - [0x2418, asm, adv_3_x1]
+      - [0x34FC, c, ../common/gfx/bgmapcell]
+      - [0x3584, asm, adv_3_x2]
+      - [0x37DC, c, ../common/gfx/tilemap]
+      - [0x3828, asm, adv_3_x3]
+      - [0x387C, c, ../common/gfx/tilemapblit]
+      - [0x39B0, c, ../common/ui/menulist]
+      - [0x39D0, asm, adv_3_x5]
+      - [0x3C1C, c, ../common/ui/menuscroll]
+      - [0x3D48, c, ../common/ui/menurepeat]
+      - [0x3DB4, c, ../common/gfx/imageanim]
+      - [0x3DD8, c, ../common/gfx/imageanimall]
+      - [0x3E08, c, ../common/gfx/imageanimstart]
+      # ImageAnimStep, the rest of imageanim's unit, is not worked out yet.
+      - [0x3E6C, asm, adv_4]
+      - [0x3FFC, c, ../common/gfx/imagequeue]
+      - [0x40FC, asm, adv_5]
+      - [0x5414, c, ../common/ui/menutick]
+      - [0x5484, asm, adv_6]
+      - [0x5574, c, ../common/ui/menupoll]
+      - [0x5628, asm, adv_7]
+      - [0x684C, c, ../common/ui/itemstats]
+      - [0x68B0, c, ../common/ui/itemrowuse]
+      - [0x69FC, asm, adv_8]
+      - [0xDB30, c, ../common/ui/menustatus]
+      - [0xDBC8, asm, adv_9]
+      - [0xFDC0, c, game/formationsave]
+      - [0xFF78, asm, adv_10]
+      - [0x10320, c, ../common/game/formationload]
+      - [0x104D0, asm, adv_11]
+      - [0x11414, c, ../common/ui/placelabel]
+      - [0x114AC, asm, adv_11a]
+      - [0x11A10, c, ../common/ui/configchoice]
+      - [0x11B74, asm, adv_12]
+      # config.c is one unit: the battle-page redraw and the marker placement
+      # sit between its list helpers, so all seven are the same object.
+      - [0x11D20, c, ../common/ui/configlist]
+      - [0x11F00, c, ../common/ui/configbattle]
+      - [0x120A8, c, ../common/ui/config]
+      - [0x12330, asm, adv_13]
+      - [0x12504, c, ../common/ui/padconfig]
+      - [0x12550, asm, adv_14]
+      - [0x12884, c, ../common/game/personastock]
+      - [0x12940, asm, adv_15]
+      - [0x12A48, c, ../common/game/charentry]
+      - [0x12ACC, c, ../common/game/persona]
+      - [0x12B10, asm, adv_16]
+      - [0x12B88, c, ../common/gfx/tilemapruns]
+      - [0x12BD8, asm, adv_17]
+      # box.c is one unit: TileMapWriteBar sits between the window rows and the
+      # box rows, so the bar is part of the same object.
+      - [0x165E0, c, ../common/gfx/box]
+      - [0x16B30, asm, adv_18]
+      - [0x173B4, c, ../common/ui/personaname]
+      - [0x17440, c, ../common/ui/spellname]
+      - [0x174FC, c, gfx/menuscreen]
+      - [0x1761C, c, gfx/statusframes]
+      - [0x17A24, asm, adv_19]
+      - [0x17CF4, c, ../common/ui/partyhud]
+      - [0x17FEC, asm, adv_20]
+      - [0x18A34, c, ../common/gfx/mapcells]
+      - [0x18B34, asm, adv_21]
+      - [0x18C28, c, gfx/bgbox]
+      - [0x18D30, asm, adv_22]
+      - [0x18D58, c, ../common/gfx/backdrop]
+      - [0x18F3C, c, ../common/game/party]
+      - [0x18F68, c, ../common/ui/menumember]
+      - [0x1916C, c, gfx/bgpanel]
+      - [0x1923C, asm, adv_24]
+      - [0x19480, c, ../common/ui/text]
+      - [0x194C4, c, ../common/ui/textnumber]
+      - [0x1956C, c, ../common/game/explevel]
+      - [0x19614, c, ../common/game/eventflag2]
+      - [0x1964C, asm, adv_25_x1]
+      - [0x1A204, c, audio/silencebgm]
+      - [0x1A278, asm, adv_26]
+      - [0x1A33C, c, game/fieldtick]
+      - [0x1A3A4, asm, adv_27]
+      - [0x1AE3C, c, gfx/pickeffect]
+      - [0x1AEA4, asm, adv_28]
+      - [0x1B6D8, c, game/scenefind]
+      - [0x1B8E8, c, game/diagstep]
+      - [0x1BF78, c, game/scenelookup]
+      - [0x1C26C, asm, adv_29]
+      - [0x1D1DC, c, game/chestresult]
+      - [0x1D994, c, game/effectspin]
+      - [0x1DC54, c, ../common/game/flags]
+      - [0x1DD88, asm, adv_30]
+      - [0x1E2D4, c, gfx/slotxscale]
+      - [0x1E358, asm, adv_30_x1]
+      - [0x1EBCC, c, game/scenetile]
+      - [0x1EC48, c, game/actors]
+      - [0x1EE34, asm, adv_30a]
+      - [0x1EF70, c, game/actorstile]
+      - [0x1F014, asm, adv_30b]
+      - [0x1F0C0, c, game/actorswalk]
+      - [0x1F1C0, asm, adv_30c]
+      - [0x1F1C8, c, gfx/imagecells]
+      - [0x1F448, asm, adv_31]
+      - [0x1FA20, c, game/camera]
+      - [0x1FBCC, asm, adv_32]
+      - [0x201F8, c, game/sceneimages]
+      - [0x202F4, asm, adv_32a]
+      - [0x2153C, c, audio/soundfade]
+      - [0x215B8, asm, adv_32a_x1]
+      - [0x21A20, c, gfx/advfade]
+      - [0x21BE0, asm, adv_33]
+      - [0x21FF0, c, game/revealscene]
+      - [0x220C4, asm, adv_34]
+      - [0x22338, c, gfx/effectslots]
+      - [0x2241C, asm, adv_35]
+      - [0x225BC, c, gfx/screenfade]
+      - [0x22A0C, asm, adv_36]
+      - [0x241B4, c, audio/bank]
+      - [0x2444C, asm, adv_37]
+      - [0x26C08, c, ../common/gfx/coord]
+      - [0x26D08, asm, adv_38]
+      # VramClearRect comes out with sw ra scheduled one slot late.
+      - [0x2731C, c, ../common/ui/pad]
+      - [0x2737C, c, ../common/gfx/fadeblock]
+      - [0x2748C, c, ../common/gfx/fadesprites]
+      - [0x27574, asm, adv_39]
+      - [0x2787C, c, ../common/ui/configlabels]
+      - [0x27980, asm, adv_40]
+      - [0x27C58, c, ../common/ui/padbindings]
+      - [0x27DAC, asm, adv_41]
+      - [0x28290, c, ../common/game/formationrepair]
+      - [0x28390, c, ../common/game/formation]
+      # FormationCellFree, the placement rule, is still asm.
+      - [0x285C4, asm, adv_41a]
+      - [0x28718, c, ../common/game/formationplace]
+      - [0x28818, c, ../common/game/formationfits]
+      - [0x288BC, asm, adv_41b]
+      - [0x28AAC, c, ../common/game/equip]
+      - [0x28C10, asm, adv_42]
+      - [0x28CC4, c, ../common/game/formationmembers]
+      # FormationSetMemberSprite is still asm.
+      - [0x28D54, asm, adv_42a]
+      - [0x28E5C, c, ../common/game/formationcompact]
+      - [0x29010, asm, adv_42b]
+      - [0x29080, c, ../common/gfx/statbars]
+      - [0x29584, asm, adv_42b_x1]
+      - [0x296A4, c, ../common/gfx/statbarsdata]
+      - [0x29844, asm, adv_42b_x2]
+      - [0x2A1E4, c, ../common/game/items]
+      # ItemsCommitPending is still asm; the copy helper after it is its own
+      # unit, out of the same source as the party slot helpers.
+      - [0x2A568, asm, adv_42c]
+      - [0x2A694, c, ../common/game/copyshorts]
+      - [0x2A6CC, c, ../common/game/itemslist]
+      - [0x2A740, c, ../common/ui/input]
+      - [0x2A838, asm, adv_43]
+      - [0x2A8C4, c, ../common/ui/itemcell]
+      - [0x2A9D0, asm, adv_43_x1]
+      - [0x2AB74, c, ../common/gfx/checkermap]
+      - [0x2ABCC, c, ../common/gfx/cells]
+      - [0x2ABFC, asm, adv_44_x1]
+      - [0x2ACE4, c, gfx/cellsdigits]
+      - [0x2AD48, c, ../common/gfx/cellsrow]
+      - [0x2AE08, asm, adv_45_x1]
+      - [0x2BC54, c, ../common/game/charstats]
+      - [0x2C2A4, asm, adv_46]
+      - [0x2F044, c, ../common/ui/equipcursor]
+      - [0x2F194, asm, adv_47]
+      - [0x2F268, c, ../common/ui/itemrow]
+      - [0x2F334, asm, adv_47_x1]
+      - [0x2F784, c, ../common/game/equipauto]
+      - [0x2F8C8, c, ../common/game/equipbest]
+      - [0x2F9BC, asm, adv_48]
+      - [0x2FB68, c, ../common/gfx/gauge]
+      - [0x2FCD4, asm, adv_49]
+      - [0x300B0, c, ../common/game/spellusable]
+      - [0x30324, asm, adv_50]
+      # ItemUsableOn and the three party helpers are one unit, cut by a routine
+      # between them that is not worked out yet.
+      - [0x304E0, c, ../common/game/status]
+      - [0x30570, asm, adv_50a]
+      - [0x30628, c, ../common/game/partystatus]
+      - [0x3076C, asm, adv_50c]
+      - [0x314B4, c, ../common/game/roomrotate]
+      - [0x31658, c, ../common/gfx/compass]
+      - [0x31740, c, ../common/gfx/mapmarker]
+      # MapDrawName comes out with s0/s1 swapped against the original; the
+      # schedule is already identical, so it is a register-allocation tie-break
+      # still to be worked out. Kept as asm until then.
+      - [0x317E8, asm, adv_50b]
+      - [0x318E4, asm, adv_51]
+      - [0x3255C, c, ../common/game/tilewalls]
+      - [0x32698, c, ../common/game/automap]
+      - [0x32710, c, ../common/game/automapmark]
+      - [0x32790, asm, adv_52]
+      - [0x34598, c, ../common/game/flags2]
+      - [0x346A0, c, ../common/ui/personalist]
+      - [0x3476C, asm, adv_53]
+      - [0x46C34, c, game/money]
+      - [0x46C68, asm, adv_54]
+      - [0x49820, c, game/chars]
+      - [0x4985C, asm, adv_54a]
+      - [0x49890, c, ../common/game/partycompact]
+      - [0x4995C, asm, adv_54b]
+      - [0x4AA50, c, game/scrollcam]
+      - [0x4AAFC, asm, adv_55]
+      - [0x4B0B8, c, gfx/growslot]
+      - [0x4B1C8, c, gfx/shrinkslot]
+      - [0x4B29C, asm, adv_56]
+      - [0x4B460, c, game/stockslots]
+      - [0x4B5B8, c, ../common/game/partyfind]
+      - [0x4B634, c, game/charfind]
+      - [0x4B730, asm, adv_56c]
+      - [0x4BF44, c, game/setlevel]
+      - [0x4C058, c, game/charslots]
+      - [0x4C19C, asm, adv_57]
+      - [0x4C368, c, game/stats]
+      - [0x4C554, c, ../common/game/itemsedit]
+      - [0x4C6C0, c, ../common/game/flagbank3]
+      - [0x4C6F0, asm, adv_58_x1]
+      # The overlay's own workspace: what the disc carries a value for,
+      # and behind it the run of zeroes the loader never has to write.
+      - [0x4C960, data, adv_data]
+      - [0x5746C, bss, adv_bss]
+  - [0x58274]

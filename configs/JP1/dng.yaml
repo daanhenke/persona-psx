@@ -1,0 +1,196 @@
+name: Megami Ibunroku Persona (JP1) - dng
+sha1: 035300c55c8f468e3946e35aaa6e2018df36d7f5
+
+options:
+  platform: psx
+  basename: dng
+  base_path: ../..
+  target_path: rom/JP1/DNG.BIN
+  asm_path: asm/JP1/dng
+  src_path: src/dng
+  build_path: build/JP1
+  o_path: lib
+  ld_script_path: linkers/JP1/dng.ld
+  symbol_addrs_path: configs/JP1/sym.dng.txt
+  undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.dng.txt
+  undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.dng.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  # Off for data: the overlay's workspace image is not text, and a guessed
+  # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
+  # than the Shift-JIS ones the ROM holds.
+  data_string_guesser_level: 0
+
+segments:
+  # overlay id 4
+  - name: dng
+    type: code
+    start: 0x0
+    vram: 0x800643A0
+    subsegments:
+      - [0x0, rodata, dng_id]
+      # 0x4..0x98C is the leading rodata block; the entry point is at 0x98C.
+      - [0x4, rodata, dng_rodata]
+      - [0x4F0, .rodata, common/game/spellusable]
+      - [0x718, rodata, dng_rodata1]
+      - [0x808, .rodata, common/game/equip]
+      - [0x844, rodata, dng_rodata2]
+      # the two stat-bar units emit their own switch tables.
+      - [0x868, .rodata, common/gfx/statbars]
+      - [0x8AC, rodata, dng_rodata2a]
+      - [0x8C8, .rodata, common/gfx/statbarsdata]
+      - [0x8DC, rodata, dng_rodata2b]
+      - [0x98C, asm, dng]
+      - [0xB638, c, common/gfx/coord]
+      - [0xB738, asm, dng_s1]
+      - [0xB768, c, common/gfx/tim]
+      - [0xB80C, asm, dng_s1_x1]
+      - [0xB874, c, common/gfx/image]
+      - [0xB918, asm, dng_s1_x2]
+      - [0xB9E4, c, common/gfx/bgpack]
+      - [0xBAEC, asm, dng_s1_x3]
+      - [0x113B0, c, common/gfx/slot]
+      - [0x116F8, c, common/gfx/fade]
+      - [0x117A0, asm, dng_s2]
+      - [0x11868, c, common/gfx/slotflicker]
+      - [0x118BC, asm, dng_s2_x1]
+      - [0x11918, c, common/gfx/slotanim]
+      - [0x11998, asm, dng_s2_x2]
+      - [0x11B04, c, common/game/playtime]
+      - [0x11BCC, asm, dng_s3]
+      - [0x11CA8, c, common/ui/decimal]
+      - [0x11D98, asm, dng_s4]
+      - [0x11E5C, c, common/gfx/bgmap]
+      - [0x11E9C, asm, dng_s4_x1]
+      - [0x12CC4, c, common/gfx/bgmapcell]
+      - [0x12D4C, asm, dng_s4_x2]
+      - [0x12FA4, c, common/gfx/tilemap]
+      - [0x12FF0, asm, dng_s4_x3]
+      - [0x13044, c, common/gfx/tilemapblit]
+      - [0x13178, c, common/ui/menulist]
+      - [0x13198, c, ui/menucursor]
+      - [0x13374, c, common/ui/menuscroll]
+      - [0x134A0, asm, dng_1_s1]
+      - [0x1350C, c, common/gfx/imageanim]
+      - [0x13530, asm, dng_1_s1b]
+      - [0x13568, c, common/gfx/imageanimstart]
+      - [0x135CC, asm, dng_1_s1a]
+      - [0x1375C, c, common/gfx/imagequeue]
+      - [0x1385C, asm, dng_1_s2]
+      - [0x149E8, c, common/ui/menutick]
+      - [0x14A58, asm, dng_1_s3]
+      - [0x14B48, c, ui/menupoll]
+      - [0x14BF4, asm, dng_2]
+      - [0x15DB0, c, common/ui/itemstats]
+      - [0x15E14, asm, dng_2_s1]
+      - [0x1C868, c, common/ui/menustatus]
+      - [0x1C900, asm, dng_2_s2]
+      - [0x1FFF8, c, common/ui/placelabel]
+      - [0x20090, asm, dng_2_s3]
+      - [0x208AC, c, common/ui/configlist]
+      # DNG's battle-page redraw is eight bytes longer than the C.
+      - [0x20A88, asm, dng_2_s3_x2]
+      - [0x20C30, c, common/ui/config]
+      - [0x20EB4, asm, dng_2_s3_x1]
+      - [0x21080, c, common/ui/padconfig]
+      - [0x210CC, asm, dng_2_s4]
+      - [0x21400, c, common/game/personastock]
+      - [0x214BC, asm, dng_2_s5]
+      - [0x215C4, c, common/game/charentry]
+      - [0x21648, c, common/game/persona]
+      - [0x2168C, asm, dng_2_s6]
+      - [0x21704, c, common/gfx/tilemapruns]
+      - [0x21754, asm, dng_2_s7]
+      - [0x2515C, c, common/gfx/box]
+      - [0x256AC, asm, dng_2_s8]
+      - [0x26FCC, c, common/gfx/mapcells]
+      - [0x270CC, asm, dng_2_s9]
+      - [0x272E8, c, common/gfx/backdrop]
+      - [0x274CC, c, common/game/party]
+      - [0x274F8, asm, dng_2_s9a]
+      - [0x27A10, c, common/ui/text]
+      - [0x27A54, asm, dng_2_s10]
+      - [0x27B08, c, common/game/explevel]
+      - [0x27BB0, c, common/game/eventflag2]
+      - [0x27BE8, asm, dng_2_s11_x1]
+      - [0x2A19C, c, common/game/equipbest]
+      - [0x2A290, asm, dng_2_s12]
+      - [0x2A43C, c, common/gfx/gauge]
+      - [0x2A5A8, asm, dng_2_s13]
+      - [0x2A984, c, common/game/spellusable]
+      - [0x2ABF8, asm, dng_2_s14]
+      - [0x2ADB4, c, common/game/status]
+      - [0x2AE44, asm, dng_2_s14a]
+      - [0x2AEFC, c, common/game/partystatus]
+      - [0x2B040, asm, dng_2_s14b]
+      - [0x2B544, c, common/ui/pad]
+      - [0x2B5A4, c, common/gfx/fadeblock]
+      - [0x2B6B4, c, common/gfx/fadesprites]
+      - [0x2B79C, asm, dng_2_s15]
+      - [0x2BAA4, c, common/ui/configlabels]
+      - [0x2BBA8, asm, dng_2_s16]
+      - [0x2BE80, c, common/ui/padbindings]
+      - [0x2BFD4, asm, dng_2_s17]
+      - [0x2C4EC, c, common/game/formation]
+      - [0x2C720, asm, dng_2_s17_x1]
+      - [0x2C874, c, common/game/formationplace]
+      - [0x2C97C, c, common/game/formationfits]
+      - [0x2CA20, asm, dng_2_s17_x2]
+      - [0x2CB84, c, common/game/equip]
+      - [0x2CCE8, asm, dng_2_s18]
+      - [0x2CD9C, c, common/game/formationmembers]
+      - [0x2CE2C, asm, dng_2_s18_x3]
+      - [0x2CF2C, c, common/game/formationcompact]
+      - [0x2D0E0, asm, dng_2_s18_x4]
+      - [0x2D150, c, common/gfx/statbars]
+      - [0x2D654, asm, dng_2_s18_x1]
+      - [0x2D774, c, common/gfx/statbarsdata]
+      - [0x2D914, asm, dng_2_s18_x2]
+      - [0x2E2B4, c, common/game/items]
+      # the commit routine, then a copy helper belonging to party.c
+      - [0x2E638, asm, dng_2_s18a]
+      - [0x2E734, c, common/game/copyshorts]
+      - [0x2E76C, c, common/game/itemslist]
+      - [0x2E7E0, c, common/ui/input]
+      - [0x2E8D8, asm, dng_2_s19]
+      - [0x2EC14, c, common/gfx/checkermap]
+      - [0x2EC6C, c, common/gfx/cells]
+      - [0x2EC9C, asm, dng_2_s20_x1]
+      - [0x2EDE8, c, common/gfx/cellsrow]
+      - [0x2EEA8, asm, dng_2_s20_x2]
+      - [0x2FCF4, c, common/game/charstats]
+      - [0x30344, asm, dng_2_s21]
+      - [0x31E30, c, common/game/roomrotate]
+      - [0x31FD4, c, common/gfx/compass]
+      - [0x320BC, c, common/gfx/mapmarker]
+      - [0x32164, asm, dng_2_s22]
+      - [0x32DB4, c, common/game/tilewalls]
+      - [0x32EF0, c, common/game/automap]
+      - [0x32F68, asm, dng_2_s23_x1]
+      - [0x34D60, c, common/game/flags2]
+      - [0x34E68, c, common/ui/personalist]
+      - [0x34F34, asm, dng_2_s24]
+      # The overlay's own workspace: what the disc carries a value for,
+      # and behind it the run of zeroes the loader never has to write.
+      - [0x34FB4, data, dng_data]
+      - [0x3B724, bss, dng_bss]
+
+  - [0x3C4F0]

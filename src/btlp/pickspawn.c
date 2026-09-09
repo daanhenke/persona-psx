@@ -1,0 +1,70 @@
+/* Persona 1 (JP) - putting the six-slot picker on screen.  BTLP only.
+ *   0x800A98D0 BtlPickSpawn
+ *
+ * Twelve objects in two passes of six. The first pass gives every slot its own
+ * template, so those six differ from each other; the second takes one template
+ * for all six and hangs the matching first-pass object off its attached link.
+ * g_btl_pick_objs keeps the second of each pair, which is why BtlPickHighlight
+ * colours the shared piece directly and the per-slot piece through `attached`.
+ *
+ * Each call is handed the object the last one returned, so the twelve come out
+ * of the pool in order and stay in that order in the group's list - which is
+ * the order they are drawn in.
+ */
+#include <decomp/types.h>
+#include <persona/btlp/object.h>
+#include <persona/btlp/pick.h>
+
+/* Which of the six object groups the picker lives in, and the one template
+   the second pass takes for all six. */
+#define BTL_PICK_GROUP 1
+#define BTL_PICK_FRAME 6
+
+/* Turned on for the per-slot piece, and for the one that carries it. */
+#define BTL_PICK_ITEM_BIT  0x400
+#define BTL_PICK_FRAME_BIT 0x40000080
+
+/* Unity, in the two units BtlObjSetScale takes. */
+#define BTL_PICK_SCALE_XY 0x100
+#define BTL_PICK_SCALE_Z  0x1000
+
+extern const BtlObjDef g_btl_pick_defs[];
+extern const BtlObjDef g_btl_obj_defs[];
+extern long            g_btl_pick_pos[][4];
+
+/* The last two arguments end up as the bytes at +0xCD and +0xCE of the record;
+   what they mean there is not settled, only where they go. */
+
+void BtlPickSpawn(void)
+{
+    /* Three constants written the long way round; do not spell them inline. */
+    int     held;
+    BtlObj *obj;
+    int     i;
+    int     scratch;
+
+    i = 0;
+    obj = 0;
+    do {
+        scratch = BTL_PICK_GROUP;
+        obj = BtlObjAlloc(g_btl_pick_defs, scratch, obj, scratch,
+                          i, g_btl_pick_pos[i], 0x1F, 0x27);
+        obj->attr |= BTL_PICK_ITEM_BIT;
+        g_btl_pick_objs[i] = obj;
+        i++;
+    } while (i < BTL_PICK_SLOTS);
+
+    i = 0;
+    do {
+        scratch = 0x19;
+        held = scratch;
+        obj = BtlObjAlloc(g_btl_obj_defs, BTL_PICK_GROUP, obj, 1,
+                          BTL_PICK_FRAME, g_btl_pick_pos[i], held, 0x1E);
+        obj->attached = g_btl_pick_objs[i];
+        scratch = BTL_PICK_SCALE_XY;
+        g_btl_pick_objs[i] = obj;
+        BtlObjSetScale(obj, scratch, scratch, BTL_PICK_SCALE_Z);
+        BtlObjSetAttr(obj, BTL_PICK_FRAME_BIT);
+        i++;
+    } while (i < BTL_PICK_SLOTS);
+}

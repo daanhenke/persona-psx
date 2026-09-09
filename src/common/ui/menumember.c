@@ -1,0 +1,117 @@
+/* Persona 1 (JP) - moving between party members on a menu screen.
+ *
+ *   DNG 0x8008B898   ADV 0x8007D308   S2D 0x8007BD08
+ *
+ * The portraits sit two, two and one, so the vertical cursor swaps 0 with 2 and
+ * 1 with 3 while the horizontal one walks 0-1, 2-3 and 3-4. Callers pass
+ * g_party_last, which is what keeps the cursor off members the party does not
+ * have. The horizontal list steps on either direction, so Left is read back
+ * to tell which way the step went.
+ */
+#include <decomp/types.h>
+#include <decomp/include_asm.h>
+#include <persona/common/menuctx.h>
+
+/* S2D reads its own held-buttons word, at its own name. */
+#ifdef TARGET_S2D
+extern int  g_pad_held_s2d[];
+#define g_pad_held g_pad_held_s2d
+#else
+extern int  g_pad_held[];
+#endif
+extern void SoundPlaySeq(int seq, int a, int b);
+
+#define PAD_LEFT   0x8000
+#define MOVE_SEQ   0x18
+
+/* Not matching in any overlay yet: gcc puts the narrowing of `last` in the
+   branch's delay slot *and* keeps a copy after it, where the original only has
+   the one. Every overlay takes it from asm meanwhile. */
+#ifdef NON_MATCHING
+short MenuStepMember(int *sel, u_char last)
+{
+    short  moved;
+    u_char dir;
+
+    moved = 0;
+    dir = 0;
+    if (MenuStepCursor(&g_menu->list[2])) {
+        dir = 1;
+        moved = 1;
+    }
+    if (MenuStepCursor(&g_menu->list[3])) {
+        dir = 2;
+        moved = 1;
+    }
+    switch (dir) {
+    case 1:
+        SoundPlaySeq(MOVE_SEQ, 1, 1);
+        switch (*sel) {
+        case 0:
+            if (last < 2) {
+                return moved;
+            }
+            *sel = 2;
+            break;
+        case 1:
+            if (last < 3) {
+                return moved;
+            }
+            *sel = 3;
+            break;
+        case 2:
+            *sel = 0;
+            break;
+        case 3:
+            *sel = 1;
+            break;
+        }
+        break;
+    case 2:
+        SoundPlaySeq(MOVE_SEQ, 1, 1);
+        switch (*sel) {
+        case 0:
+            if (last == 0) {
+                return moved;
+            }
+            *sel = 1;
+            break;
+        case 1:
+            *sel = 0;
+            break;
+        case 2:
+            if (g_pad_held[0] & PAD_LEFT) {
+                *sel = last;
+                break;
+            }
+            if (last < 3) {
+                return moved;
+            }
+            *sel = 3;
+            break;
+        case 3:
+            if (g_pad_held[0] & PAD_LEFT) {
+                *sel = 2;
+                break;
+            }
+            if (last < 4) {
+                *sel = 2;
+                break;
+            }
+            *sel = 4;
+            break;
+        case 4:
+            if (g_pad_held[0] & PAD_LEFT) {
+                *sel = 3;
+                break;
+            }
+            *sel = 2;
+            break;
+        }
+        break;
+    }
+    return moved;
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/../common/ui/menumember", MenuStepMember);
+#endif
