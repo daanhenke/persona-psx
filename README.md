@@ -1,6 +1,6 @@
 <picture>
-  <source srcset="https://github.com/persona-psx/blob/main/docs/logo.jpg?raw=true">
-  <img alt="PERSONA 1 DECOMPILATION" title="PERSONA 1 DECOMPILATION" src="https://github.com/persona-psx/blob/main/docs/logo.jpg?raw=true">
+  <source srcset="https://github.com/daanhenke/persona-psx/blob/main/docs/splash.jpg?raw=true">
+  <img alt="PERSONA 1 DECOMPILATION" title="PERSONA 1 DECOMPILATION" src="https://github.com/daanhenke/persona-psx/blob/main/docs/splash.jpg?raw=true">
 </picture>
 <div align="center">
 <br/>
