@@ -45,5 +45,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.
 # interpreter that already has splat and spimdisasm in it.
 ENV PYTHON=python3
 
-USER $USERNAME
+# Deliberately left as root. GitHub Actions mounts its own directories into a
+# container job as root, and a non-root USER makes every step fail with EACCES
+# on /__w before it even reaches the build. The unprivileged account above is
+# still here for local use - docker_run.sh switches to it.
 WORKDIR /app
