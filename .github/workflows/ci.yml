@@ -133,9 +133,10 @@ jobs:
           cp -r .disks/JP1 rom/
           cp -r .disks/US rom/ || true
 
-      - name: Generate
-        run: make GAME_VERSION=${{ matrix.game_version }} generate
-
+      # No `generate` step here: report -> objdiff-config -> objdiff-generate
+      # starts with `regenerate`, which resets and regenerates everything, so
+      # anything done first is thrown away.
+      #
       # Writes build/<version>/progress.json in objdiff's report format, which
       # is what decomp.dev reads.
       - name: Generate progress report
