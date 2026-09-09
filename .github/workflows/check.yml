@@ -4,43 +4,57 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.ksy'
+  pull_request:
     paths-ignore:
       - '**.md'
       - '**.ksy'
 
 jobs:
   build:
-    if: github.repository == 'shdecompilations/silent-hill-decomp'
-    
-    container: ghcr.io/shdecompilations/decomp-images-silent-hill:master
+    if: github.repository == 'daanhenke/persona-psx'
+
+    # credentials so the job can pull the package whether or not it is public
+    container:
+      image: ghcr.io/daanhenke/persona-psx-buildenv:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: true
       matrix:
-        game_id: [ SLUS-00707 ]
-    
+        game_version: [ JP1 ]
+
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          lfs: true
 
-      - name: "Install Extra Dependencies"
-        run: apt-get install -y binutils-mipsel-linux-gnu
+      # The executables the build is checked against. They are not in this
+      # repository; a read-only deploy key gets them from the private one.
+      - name: Checkout reference executables
+        uses: actions/checkout@v4
+        with:
+          repository: daanhenke/persona-psx-disks
+          ssh-key: ${{ secrets.DISKS_DEPLOY_KEY }}
+          path: .disks
 
-      - name: "Setup Python"
-        run: pip3 install -r requirements.txt --break-system-packages
-
-      - name: "Copy ROM"
+      - name: Place reference executables
         run: |
-          mkdir -p ./rom/image
-          cp -r -p /rom/* ./rom/image
+          mkdir -p rom
+          cp -r .disks/JP1 rom/
+          cp -r .disks/US rom/ || true
 
-      - name: Setup Environment
-        run: make setup
+      # Only splat has to run: `make setup` would extract from a disc image,
+      # and there is no disc here - just the executables it would have produced.
+      - name: Generate
+        run: make GAME_VERSION=${{ matrix.game_version }} generate
 
-      - name: Check Executables Match
-        run: make CHECKSUM=1 build
+      - name: Check executables match
+        run: make GAME_VERSION=${{ matrix.game_version }} CHECKSUM=1 build

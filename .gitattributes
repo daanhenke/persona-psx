@@ -1,1 +1,14 @@
 * text=auto eol=lf
+
+# The committed tools are binaries. Without these, `text=auto` is free to
+# guess, and a wrong guess rewrites line endings inside an executable - which
+# shows up as a corrupt cc1 or objdiff on a Linux checkout and nowhere else.
+tools/bin/**            binary
+tools/objdiff/objdiff   binary
+tools/psxiso/dumpsxiso  binary
+tools/psxiso/mkpsxiso   binary
+tools/psxiso/*.exe      binary
+
+# The reference executables the build is checked against.
+rom/**/*.BIN            binary
+rom/**/*.EXE            binary

@@ -67,7 +67,9 @@ CPP     := $(CROSS)-cpp
 CC      := $(TOOLS_DIR)/bin/gcc-2.6.0/cc1
 OBJDIFF := $(OBJDIFF_DIR)/objdiff
 
-PYTHON          := .venv/bin/python3
+# Overridable so a container can point at its own interpreter; unset, this is
+# the local virtualenv exactly as before.
+PYTHON          ?= .venv/bin/python3
 SPLAT           := $(PYTHON) -m splat split
 MASPSX          := $(PYTHON) $(TOOLS_DIR)/maspsx/maspsx.py
 DUMPSXISO       := $(TOOLS_DIR)/psxiso/dumpsxiso
