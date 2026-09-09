@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     gcc \
     git \
+    openssh-client \
     binutils-mipsel-linux-gnu \
     cpp-mipsel-linux-gnu \
     bchunk \
