@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.ksy'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.ksy'
+
+jobs:
+  # The build environment the other jobs run in. It is rebuilt every time, but
+  # the layer cache makes that a few seconds when nothing has changed - which
+  # is cheaper than the alternative, where a Dockerfile change races the jobs
+  # that pull the image and they run against the previous one.
+  image:
+    if: github.repository == 'daanhenke/persona-psx'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # The default docker driver cannot export to the GHA cache; buildx with
+      # the docker-container driver can.
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/daanhenke/persona-psx-buildenv:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  check:
+    name: Check Executables Match
+    needs: image
+    if: github.repository == 'daanhenke/persona-psx'
+
+    container:
+      image: ghcr.io/daanhenke/persona-psx-buildenv:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        game_version: [ JP1 ]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # The executables the build is checked against. They are not in this
+      # repository; a read-only deploy key gets them from the private one.
+      - name: Checkout reference executables
+        uses: actions/checkout@v4
+        with:
+          repository: daanhenke/persona-psx-disks
+          ssh-key: ${{ secrets.DISKS_DEPLOY_KEY }}
+          path: .disks
+
+      - name: Place reference executables
+        run: |
+          mkdir -p rom
+          cp -r .disks/JP1 rom/
+          cp -r .disks/US rom/ || true
+
+      # Only splat has to run: `make setup` would extract from a disc image,
+      # and there is no disc here - just the executables it would have produced.
+      - name: Generate
+        run: make GAME_VERSION=${{ matrix.game_version }} generate
+
+      - name: Check executables match
+        run: make GAME_VERSION=${{ matrix.game_version }} CHECKSUM=1 build
+
+  progress:
+    name: Determine and Push Progress
+    needs: image
+    if: github.repository == 'daanhenke/persona-psx'
+
+    container:
+      image: ghcr.io/daanhenke/persona-psx-buildenv:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        game_version: [ JP1 ]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Checkout reference executables
+        uses: actions/checkout@v4
+        with:
+          repository: daanhenke/persona-psx-disks
+          ssh-key: ${{ secrets.DISKS_DEPLOY_KEY }}
+          path: .disks
+
+      - name: Place reference executables
+        run: |
+          mkdir -p rom
+          cp -r .disks/JP1 rom/
+          cp -r .disks/US rom/ || true
+
+      - name: Generate
+        run: make GAME_VERSION=${{ matrix.game_version }} generate
+
+      # Writes build/<version>/progress.json in objdiff's report format, which
+      # is what decomp.dev reads.
+      - name: Generate progress report
+        run: make GAME_VERSION=${{ matrix.game_version }} report
+
+      - name: Show progress
+        run: |
+          python3 - <<'PY'
+          import json
+          m = json.load(open('build/${{ matrix.game_version }}/progress.json'))['measures']
+          print('functions %d/%d  %.2f%%' % (m['matched_functions'],
+                                             m['total_functions'],
+                                             m['matched_functions_percent']))
+          print('code      %s/%s  %.2f%%' % (m['matched_code'], m['total_code'],
+                                             m['matched_code_percent']))
+          PY
+
+      # decomp.dev reads the report from this artifact.
+      - name: Upload progress report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.game_version }}_report
+          path: ./build/${{ matrix.game_version }}/progress.json
+          if-no-files-found: error
