@@ -109,6 +109,14 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 
 # Adjusts compiler and assembler flags based on source file location.
 # - Files under main executable paths use -G8; overlay files use -G0.
+#
+# WORK_BIAS: src/common is compiled into several overlays, and their work areas
+# do not sit at the same address. Those sources reach a hardcoded address as
+# base + WORK_BIAS, so each overlay has to say how far its own area is above the
+# one the others share.
+#
+# Keep prose out of the body below - it is expanded into every recipe, so a
+# comment there is handed to the shell and echoed once per file built.
 define FlagsSwitch
     $(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /open/,$(1))),$(eval DL_FLAGS = -G8),$(eval DL_FLAGS = -G0))
 
@@ -119,10 +127,6 @@ define FlagsSwitch
 	$(eval CC_FLAGS = $(OPT) $(DL_FLAGS) -mips1 -mcpu=3000 -w -funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return -fcommon -fverbose-asm -msoft-float -mgas -fgnu-linker -fdollars-in-identifiers -quiet)
 	$(eval ASPSX_VERSION := 2.34)
 	$(eval MASPSX_FLAGS = --gnu-as-path $(AS) --aspsx-version=$(ASPSX_VERSION) $(COMMON_FLAG) --run-assembler --expand-div $(AS_FLAGS))
-	# src/common is compiled into several overlays, and their work areas do not
-	# sit at the same address. Those sources reach a hardcoded address as
-	# base + WORK_BIAS, so each overlay has to say how far its own area is
-	# above the one the others share.
 	$(if $(findstring /s2d/,$(1)),$(eval OVL_FLAGS := -DWORK_BIAS=0x20000),$(eval OVL_FLAGS := -DWORK_BIAS=0))
 endef
 
