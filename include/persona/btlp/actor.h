@@ -33,8 +33,13 @@ typedef struct BtlActor {
                                       its price, copied in as the record is
                                       filled from a Persona                 */
     /* 0x7E */ u_short unk7E;
-    /* 0x80 */ u_short unk80;      /* cleared alongside unk84 there         */
-    /* 0x82 */ u_char  pad82[2];
+    /* 0x80 */ u_short targets;    /* who this fighter's action hits, one bit
+                                      per slot. BtlPickableMask fills it in
+                                      for a chosen target and the aiming
+                                      routines for one the move picks itself */
+    /* 0x82 */ u_short targets_kept; /* the copy the party's standing orders
+                                        keep, so "the same again" can put the
+                                        chosen action back                  */
     /* 0x84 */ u_short unk84;      /* cleared as the demon strikes the acting
                                       member on its way out                  */
     /* 0x86 */ u_short melee_atk;  /* the fight's own copy of Char 0x2E..0x3C.
@@ -69,7 +74,10 @@ typedef struct BtlActor {
                                    /* what the seven equipped items add to each
                                       stat, totalled out of ItemDef's three
                                       bonus bytes */
-    /* 0xAF */ u_char  unkAF[6];   /* PersonaData +0x2E..+0x33, kept whole   */
+    /* 0xAF */ u_char  spell[6];   /* what this fighter can cast: PersonaData
+                                      +0x2E..+0x33, kept whole. BtlChooseEnemyMove
+                                      walks these and indexes g_spell_data with
+                                      each, which is what says what they are. */
     /* 0xB5 */ u_char  species;    /* which demon this is; the negotiation
                                       matches its tables against it       */
     /* 0xB6 */ u_char  persona_rank;
@@ -82,20 +90,44 @@ typedef struct BtlActor {
                                       brightness and leaves its palette alone */
     /* 0xB8 */ u_char  marker;     /* 3 while the member's marker is up, 0
                                       when it has been taken away          */
-    /* 0xB9 */ u_char  padB9[8];
+    /* 0xB9 */ u_char  initiative; /* what decides where this fighter comes in
+                                      the round: a roll off Char.stat[3] most
+                                      of the time, stat[4] on a good one, and
+                                      both added on a very good one       */
+    /* 0xBA */ u_char  unkBA;      /* taken off the object as an interruption
+                                      is set up                            */
+    /* 0xBB */ u_char  move;       /* the move this fighter is making. Set from
+                                      the menu for a member and by
+                                      BtlChooseEnemyMove for an enemy, and read
+                                      by BtlAimMove to work out what it hits */
+    /* 0xBC */ u_char  ail_line;   /* which of g_btl_ailment_lines is put up
+                                      when the ailment stops the turn       */
+    /* 0xBD */ u_char  unkBD;      /* cleared and then copied from unkBA    */
+    /* 0xBE */ u_char  move_kept;  /* move and ail_line kept the same way and
+                                      restored together with the two above  */
+    /* 0xBF */ u_char  ail_line_kept;
+    /* 0xC0 */ u_char  padC0[1];
     /* 0xC1 */ u_char  form;      /* which shape a fighter that changes into
                                      something is in. It picks the script out
                                      of the object's own table and the key the
                                      actor takes while it is in that shape. */
-    /* 0xC2 */ u_char  padC2[2];
+    /* 0xC2 */ u_char  order;      /* where this fighter comes in the round.
+                                      An interruption takes the slowest place
+                                      and five more, so it acts last        */
+    /* 0xC3 */ u_char  order_kept;
     /* 0xC4 */ u_char  script_pick; /* chooses between two of the model's
                                        scripts when the actor is set going */
     /* 0xC5 */ u_char  unkC5;      /* both cleared as a record is filled     */
     /* 0xC6 */ u_char  unkC6;
-    /* 0xC7 */ u_char  padC7[1];
+    /* 0xC7 */ u_char  mark_kind;  /* which marker goes up over the fighter;
+                                      5 is the one that says the action it
+                                      was given cannot be made             */
     /* 0xC8 */ u_char  unkC8;      /* put back to zero alongside Char.unk5D
                                       when the gun turns out to be unusable */
-    /* 0xC9 */ u_char  padC9[1];
+    /* 0xC9 */ u_char  action;     /* what the round is doing for this
+                                      fighter this turn - the switch
+                                      BtlStageRound opens the turn with.
+                                      0xFF once the turn is spent          */
     /* 0xCA */ u_char  clut_len;   /* entries in this actor's palette, which is
                                       what BtlStepCluts walks               */
     /* 0xCB */ u_char  padCB[1];
@@ -104,7 +136,15 @@ typedef struct BtlActor {
     /* 0xD2 */ u_char  unkD2;
     /* 0xD3 */ u_char  unkD3;
     /* 0xD4 */ u_char  unkD4;
-    /* 0xD5 */ u_char  padD5[10];
+    /* 0xD5 */ u_char  unkD5;      /* cleared with unkCC as a turn ends    */
+    /* 0xD6 */ u_char  padD6[2];
+    /* 0xD8 */ u_char  unkD8;      /* stops a member's marker being taken away
+                                      as the turn ends, and is cleared there  */
+    /* 0xD9 */ u_char  padD9[2];
+    /* 0xDB */ u_char  unkDB;      /* both cleared for every member once a
+                                      negotiation is over                  */
+    /* 0xDC */ u_char  unkDC;
+    /* 0xDD */ u_char  padDD[2];
     /* 0xDF */ u_char  unkDF;
     /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
                                       once that offer is done with; the

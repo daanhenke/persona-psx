@@ -92,7 +92,6 @@
 /* g_cd_busy while a read is outstanding. */
 #define CD_IDLE (-1)
 
-extern u_char        g_btl_moon;
 extern int           g_money;
 extern volatile int  g_cd_busy;
 extern u_char        g_btl_banks[];
@@ -114,10 +113,10 @@ extern int   BtlSeqState(void);
 extern void  BtlLoadPackEntry(int entry);
 extern void  BtlBgmOpen(void);
 extern void  SsVabTransCompleted(long immediate);
+extern void  BtlSePlay(int slot, int seq);
 /* This unit declares both of these itself: its BtlSoundOpen takes the
    banks as a u_char array and the key as a byte, which is not the
    prototype sound.h carries. */
-extern void BtlSePlay(int slot, short seq);
 extern void  BtlSoundOpen(u_char *banks, int slot, u_char key);
 extern void  BtlSoundClose(int slot);
 

@@ -10,45 +10,29 @@
  *
  * A member who is absent, down or out of the fight is simply not placed, and
  * their cell stays empty.
+ *
+ * Two things in here are load-bearing. The record is read by slot rather than
+ * walked by a byte offset, which leaves the compiler to make the one offset it
+ * needs; and the table entry is reached by stepping to the encounter's block
+ * first and then to the character's pair, which is the order the original adds
+ * them in.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
-
-#define GRID_W     5
-#define GRID_CELLS 25
-#define CELL_EMPTY 0xFF
+#include <persona/btlp/battle.h>
+#include <persona/btlp/formation.h>
 
 /* Encounters that arrange themselves, and where the two tables divide. */
 #define ENCOUNTER_KEEP_A 5
 #define ENCOUNTER_KEEP_B 8
 #define ENCOUNTER_SPLIT  0x11
 
-/* Bytes per character in a table, and per encounter. */
-#define PLACE_CHAR      2
-#define PLACE_ENCOUNTER 0x14
-
-extern u_char        g_btl_place_party;
-extern short         g_btl_encounter;
-extern u_char        g_btl_formation[];
-/* The grid copied whole: the original moves it as one object, seven words
-   at a time, rather than a cell at a time. */
-typedef struct {
-    u_char cell[GRID_CELLS];
-} BtlFormation;
-
-extern BtlFormation  g_btl_formation_saved;
-extern const u_char  g_btl_place_lo[];
-extern const u_char  g_btl_place_hi[];
-
-#ifdef NON_MATCHING
 void BtlPlaceFormation(void)
 {
     const u_char *place;
     u_char *cell;
     char    empty;
     int     slot;
-    int     off;
     int     key;
 
     if (g_btl_place_party != 0 && g_btl_encounter != ENCOUNTER_KEEP_A
@@ -65,29 +49,24 @@ void BtlPlaceFormation(void)
         }
 
         slot = 0;
-        off = 0;
         do {
-            key = *((u_char *)&g_btl_actors[0].c.key + off);
+            key = g_btl_actors[slot].c.key;
             if (key != 0
-                && *(signed char *)((char *)&g_btl_actors[0].c.status + off)
-                       != BTL_STATUS_DOWN
-                && (*(u_long *)((char *)&g_btl_actors[0].flags + off)
-                    & BTL_ACTOR_OUT) == 0) {
+                && (signed char)g_btl_actors[slot].c.status != BTL_STATUS_DOWN
+                && (g_btl_actors[slot].flags & BTL_ACTOR_OUT) == 0) {
                 if (g_btl_encounter < ENCOUNTER_SPLIT) {
-                    place = &g_btl_place_lo[key * PLACE_CHAR
-                                            + g_btl_encounter * PLACE_ENCOUNTER];
+                    place = g_btl_place_lo
+                            + g_btl_encounter * BTL_PLACE_ENCOUNTER
+                            + key * BTL_PLACE_CHAR;
                 } else {
-                    place = &g_btl_place_hi[key * PLACE_CHAR
-                                            + g_btl_encounter * PLACE_ENCOUNTER];
+                    place = g_btl_place_hi
+                            + g_btl_encounter * BTL_PLACE_ENCOUNTER
+                            + key * BTL_PLACE_CHAR;
                 }
                 g_btl_formation[place[1] * GRID_W + place[0]] = slot;
             }
             slot++;
-            off += sizeof(BtlActor);
         } while (slot < BTL_PARTY);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placeform", BtlPlaceFormation);
-#endif
 

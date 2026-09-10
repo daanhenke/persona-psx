@@ -51,6 +51,8 @@ segments:
       # BtlTalkSceneStep's switch table, which the C emits itself.
       - [0x44, .rodata, talkstep]
       - [0x8C, rodata, btlp_rodata0]
+      - [0xE4, .rodata, talkpair]
+      - [0xF4, rodata, btlp_rodata0a]
       - [0x124, .rodata, talkscenetrade]
       - [0x2DC, .rodata, talkscenepanic]
       # BtlTalkSceneCharm's thresholds and switch table, which the C emits
@@ -293,7 +295,7 @@ segments:
       - [0x29F90, c, placeform]
       - [0x2A13C, c, debugstep]
       - [0x2A424, c, fixedenemies]
-      - [0x2A500, asm, btlp_51]
+      - [0x2A500, c, roundflow]
       - [0x2D98C, c, discread]
       - [0x2DA54, c, soundload]
       - [0x2DBD4, c, voiceopen]
@@ -317,7 +319,9 @@ segments:
       - [0x37248, c, menukey]
       - [0x37680, asm, btlp_60]
       - [0x379A4, c, formation]
-      - [0x37A28, asm, btlp_61]
+      - [0x37A28, c, talkorders]
+      - [0x38698, c, commandmenu]
+      - [0x39C60, asm, btlp_61]
       - [0x3F404, c, pickupdate]
       - [0x3F5F8, asm, btlp_62]
       - [0x403C0, c, place]
@@ -353,6 +357,8 @@ segments:
       # The overlay's own workspace: what the disc carries a value for, and
       # behind it the run of zeroes the loader never has to write.
       - [0x61BFC, data, btlp_data]
+      - [0x670FC, .data, talkanswer]
+      - [0x67180, data, btlp_talkanswer_tail]
       - [0x68268, .data, cursorplace]
       - [0x68270, data, btlp_data1]
       - [0x68B44, .data, loadenemy]

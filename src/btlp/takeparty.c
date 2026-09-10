@@ -58,12 +58,10 @@ extern const u_char g_btl_test_party_personas[][5];
 extern const u_char g_btl_test_party_personas2[][5];
 extern const u_char g_btl_test_party_names[][10];
 extern u_char   g_btl_test_party;
-extern u_char   g_btl_place_party;
 extern u_char   g_options[];
 extern u_char   g_formation_preset[];
 extern u_char   g_btl_confirm;
 extern u_char   g_btl_msg_speed;
-extern short    g_btl_encounter;
 
 extern void PersonaCreate(Char *c, int persona);
 

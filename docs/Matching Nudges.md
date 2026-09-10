@@ -90,6 +90,41 @@ top:
   a match once the arms were in the right order. A `for (;;)` with a `break`
   behaves exactly like the `do/while`; only the goto breaks the recognition.
 
+**The whole routine inside one `for (;;)`.** A stage that waits for something
+before it will do anything reads naturally as a wait loop followed by the work:
+
+```c
+while (<not ready>) {
+    BtlDrawFrame();
+}
+<the work>
+```
+
+but gcc rotates that - the frame lands directly under the prologue with a `j`
+into the test. The image instead has the test at the top and the frame at the
+very end, past everything, which is the shape of the whole routine being the
+loop and the work being one `if` inside it:
+
+```c
+for (;;) {
+    if (<ready>) {
+        <the work; every way out is a return>
+        return;
+    }
+    BtlDrawFrame();
+}
+```
+
+That also makes anything the work uses invariant across a loop, so gcc lifts it
+into a saved register in the prologue - which is the tell. `BtlStageOpen` has
+`li s3,0x11` before the frame is even set up, for a `BTL_STATUS_DOWN` compare
+several blocks down.
+
+- [roundflow.c:88](/src/btlp/roundflow.c#L88) - matched on the second try once
+  the wait became the loop; the `li s3,0x11` in the prologue was what said so.
+  [roundflow.c:189](/src/btlp/roundflow.c#L189) is the same shape with a
+  `switch` inside it.
+
 ### 3. Where a value is set up
 
 gcc 2.6 will not carry a constant across a call. If the original loads it once
@@ -193,6 +228,23 @@ table and the link fails.
 original had them in. Read the table, sort the cases into the order its entries
 point, and write them that way - it is not the numeric order. `BtlWindowStep`'s
 run 12, 8/10/11, 9, 2, 3, 4, 6, 5, 7, 1, and it does not match in any other.
+**Do not stack the empty arms onto one label.** Written as
+
+```c
+case 0x41: case 0x42: case 0x43: ... case 0x46:
+    break;
+```
+
+all six share a label, and gcc folds adjacent nodes with the same label into a
+single case node before it decides how to dispatch. It uses a jump table only
+when the range is at most ten times the node count, so folding twenty-one nodes
+down to twelve turned a range of 160 from dense enough into too sparse, and
+8584 bytes of `BtlChooseEnemyMove` came out as a binary compare tree instead.
+One `case X: break;` per line keeps the nodes apart and the table comes back.
+
+- [roundflow.c](/src/btlp/roundflow.c) - 673 instructions as a tree against the
+  image's 618; 634 the moment the arms were split.
+
 Include the arms with no body too (`case X: break;`): a missing low case makes
 gcc subtract before the range test, which shows up as `addiu v1,v0,-1` and a
 `sltiu` against the wrong bound. Identical trailing code in two arms is merged
@@ -202,6 +254,20 @@ The padding after a jump table belongs to nobody: gcc emits the entries and the
 next subsegment starts later, so the gap needs a bare `rodata` segment of its
 own or every following section shifts. See
 [windowstep.c](/src/btlp/windowstep.c) and its `- [0x668, rodata, btlp_rodata4a]`.
+
+**A byte kept as a byte.** A `u_char` local used in an int context is
+zero-extended at each use - `andi v1,a0,0xff` next to arithmetic that uses the
+raw register - while an `int` or `u_int` local is extended once and the masks
+vanish. If the image re-masks the same value more than once, it was held as a
+byte:
+
+```c
+u_char spell = a->spell[i];           /* andi at each test  */
+if ((u_int)(spell - 0x75) < 0x17)     /* the cast keeps the compare unsigned */
+```
+
+- [roundflow.c](/src/btlp/roundflow.c) - `BtlChooseEnemyMove`, sixteen bytes
+  over as a `u_int`, exact as a `u_char`.
 
 ### 9. Code that does nothing
 
@@ -279,6 +345,24 @@ Read the slots straight off the diff (`addiu a1,sp,24` against
 `addiu a1,sp,44`). They tell you how big each local is, which sits where, and -
 with the frame size - how many bytes of locals the original had in total.
 
+**A frame that is bigger than the locals explains it.** The frame is the
+outgoing arguments, plus the locals, plus the saved registers, rounded to
+eight. If the built routine is short by a multiple of eight and no stack slot
+is touched, the original had locals gcc here has none of - and an unused
+aggregate reserves the slot where an unused scalar is dropped:
+
+```c
+SVECTOR unused;   /* eight bytes the image reserves and never writes */
+```
+
+Read the size off the `.frame` directive in the built `.s`
+(`# vars= 8, regs= 5/0, args= 24`) rather than counting the prologue.
+
+- [roundflow.c:190](/src/btlp/roundflow.c#L190) - `vars= 0` against the image's
+  eight; `BtlStageClose` was 0x68C against 0x694 until the eight bytes were
+  there.
+- [cursorplace.c](/src/btlp/cursorplace.c) - the same thing at 56 bytes.
+
 ### 12. Unguarding can break the link
 
 A body that has been sitting behind `INCLUDE_ASM` calls its callees by whatever
@@ -292,6 +376,32 @@ The asm was calling it `func_80029F64`. The fix is a line in
 neighbour `SetGeomScreen` was already there. `objcmp` cannot see this coming,
 because it masks exactly the words the linker fills in; only `make build` does.
 
+### 13. Check the types before keeping a workaround
+
+The four units below were checked with gcc 2.6.0 and then against the linked
+BTLP image, including their relocated calls and tables.
+
+- [menuupdate.c](/src/btlp/menuupdate.c) - `BtlInputKeys() & mask` keeps the
+  result in `v0`; `mask & BtlInputKeys()` uses `v1`. Both up/down checks need
+  the first form.
+- [bgm.c](/src/btlp/bgm.c), [soundbank.c](/src/btlp/soundbank.c) - declaring
+  `BtlSePlay` with an `int` sequence matches both the caller and the callee.
+  The libsnd calls narrow it inside the callee. A `short` caller declaration
+  replaces the full-word bit-31 mask with a signed halfword load. No alternate
+  header declaration is needed. Writing the absolute and relative sequence
+  assignments directly in their respective arms also fixes the addition's
+  register order.
+- [talkpair.c](/src/btlp/talkpair.c) - the first-bit index becomes the start of
+  the partner search. Reusing it as the *distance* instead was the wrong
+  lifetime. The local `{ 0, 4, 7, 9 }` initializer owns 16 bytes of `.rodata`.
+- [talkanswer.c](/src/btlp/talkanswer.c) - the answer table is writable `.data`.
+  Removing `const` fixes the message-group load's scheduling and makes the
+  old `do/while (0)` workaround unnecessary. Initializing the full-moon search
+  counter inside that branch fixes its exit destination: outside the branch,
+  gcc targets an extra moon-state reload. `fdiff` blanks branch destinations,
+  so inspect the actual branch word as well. This unit now owns all 132 bytes
+  of its adjacent partner-order, answer, and pair-mask tables.
+
 ---
 
 ### What does not work
@@ -304,6 +414,12 @@ Worth knowing so the time is not spent twice.
   permutations on `BtlBuildOffers` (no register moved) and on
   `BtlDrawObjPiecesRot` (no slot moved). Change what the locals *are*, not the
   order they are written in; see section 11.
+- **Flipping plain commutative operands.** `a & b` against `b & a`, and the same for
+  `x <= y` against `y >= x`, is usually canonicalised before register allocation.
+  Eight flips across `BtlChooseEnemyMove` - masks, both random rolls, the odds
+  compare, a level difference - left all 618 instructions and all 319 differing
+  words exactly as they were. A function call can change this: see the
+  `BtlInputKeys()` example in section 13.
 - **The `register` keyword.** Ignored for this purpose.
 - **`/=` versus `= x /`,** and the other spellings of the same expression. No
   effect observed.
@@ -322,3 +438,82 @@ more spellings:
 It found `BtlTalkScoreLine` in 560 iterations after a dozen hand variations had
 failed. Progress is written to `permuter/<target>/<Symbol>/` - read it there
 rather than piping the run through `tail`, which buffers.
+
+## A constant kept in a local of its own
+
+`BtlShowReadyMarkers` walks the party's records by slot and its marker byte by
+a pointer, and the last three words of it were the order of the loop's setup:
+the image sets the marker code up before the pointer, and we set it up after.
+
+Everything a loop hoists lands in the preheader, which is emitted *after* the
+statements the source puts in front of the loop - so a hoisted constant can
+never come out ahead of a pointer the source assigns. Writing
+
+    up = MARKER_UP;
+    mark = &g_btl_actors[0].marker;
+
+instead of using `MARKER_UP` in the body keeps the constant out of the
+preheader entirely: it becomes an ordinary assignment, emitted where the
+source puts it, and the order is the image's. That was the whole difference
+between 3 words and a match.
+
+Read the other way, a preheader that sets things up in an order the source
+cannot produce is the tell that one of them is a plain local, not a constant
+the compiler lifted.
+
+## Only one field walked by a pointer
+
+The same routine was 42 words out before that, because it was written as one
+byte offset into the record and every field read through it. The image indexes
+the record by slot for everything - `lui at; addu at,at,off; lbu v0,%lo(f)(at)`
+- and keeps exactly one walking pointer, for the byte it touches three times.
+
+Writing it that way round, `g_btl_actors[slot].field` for the reads and a
+`u_char *mark` for the one field that is written, gives the image's four saved
+registers. Written as a byte offset throughout, gcc strength-reduces a second
+field into a pointer of its own and the whole allocation moves up a register.
+
+## Which way a table index is added up
+
+`BtlPlaceFormation` reaches a two byte entry in a table of encounter blocks.
+Written as one index,
+
+    place = &g_btl_place_lo[key * 2 + g_btl_encounter * 0x14];
+
+gcc adds the two products together and then the base, and the routine comes
+out one instruction long. Written as pointer arithmetic in the order the
+original adds them,
+
+    place = g_btl_place_lo + g_btl_encounter * 0x14 + key * 2;
+
+the base and the block go together first and the character's pair is added
+last, which is a match. Left to right association is not something gcc
+re-associates away here, so the spelling is load-bearing: read the adds off
+the image and write them in that order.
+
+## A two-armed dispatch is a switch, not an if chain
+
+`BtlTalkersJoin` picks between the melee weapon and the gun on one byte that
+is 0 or 1. Written as `if (x == 0) ... else if (x == 1) ...` gcc inverts the
+first test and drops the third branch: `bnez v1,A / li v0,1`, two instructions
+short. Written as `switch (x) { case 0: ... case 1: ... }` it emits the tree
+the image has - `beqz v1,MELEE / li v0,1 / beq v1,v0,GUN / j NEXT` - and it
+matches.
+
+Read it off the image: a chain tests the first value and falls through, a
+switch tests every listed value and then jumps to the default. Three branches
+for two arms means a switch.
+
+## Hoisting a constant is decided by where its uses are, not how many
+
+`BtlTalkersLeaveField` is one instruction from a match and the difference is
+that gcc lifts the `1` that puts the marker up into a saved register, where the
+image writes it out afresh at each use. It is not a use-count threshold: the
+image has *four* uses of 1 and does not lift it, while ours has three and does.
+Two of the image's four sit on the refusal path, so lifting would stretch a
+register across the whole loop to save nothing on the common one.
+
+Nothing at the source level moved it: statement order, taking the kept values
+into locals first, testing the marker through the pointer instead of by slot,
+putting the spell case first. Worth knowing so the next one is not re-fought
+from the start.

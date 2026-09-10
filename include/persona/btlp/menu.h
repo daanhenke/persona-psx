@@ -42,4 +42,14 @@ typedef struct {
 
 extern void BtlPartyResetGfx(void);
 
+extern BtlMenuCell g_btl_menu_cells[];
+extern int g_btl_menu_state;
+extern int g_btl_menu_index;
+extern int g_btl_menu_count;
+extern int g_btl_menu_slide;
+extern int g_btl_menu_slide_frames;
+extern int g_btl_menu_choice;
+
+extern void BtlMenuUpdate(void);
+
 #endif

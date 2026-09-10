@@ -90,9 +90,9 @@ void BtlLoadEnemyStats(int slot, int key)
                   + d->stat[STAT_LUCK] / 4) * ENEMY_SCALE_NUM / ENEMY_SCALE_DEN;
 
     memcpy(a->c.name, d->name, ENEMY_NAME_BYTES);
-    memcpy(a->unkAF, d->unk2E, sizeof(a->unkAF));
+    memcpy(a->spell, d->unk2E, sizeof(a->spell));
 
-    a->unk80 = 0;
+    a->targets = 0;
     a->unk84 = 0;
     a->pickable = 0;
     a->unkCC = 0;

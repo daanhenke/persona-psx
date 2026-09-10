@@ -38,7 +38,6 @@
 #define MORPH_TRIO_KEY_B  0xAD
 #define MORPH_TRIO_KEY_C  0xAE
 
-extern short g_btl_encounter;
 
 extern void BtlActorFromDef(BtlActor *a, int key);
 extern void BtlRefreshAttacks(void);

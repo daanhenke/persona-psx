@@ -12,6 +12,9 @@
 #ifndef PERSONA_BTLP_MODEL_H
 #define PERSONA_BTLP_MODEL_H
 
+/* Ten script indices per shape, four shapes per member. */
+extern u_char g_btl_member_scripts[];
+
 #include <decomp/types.h>
 
 typedef struct {

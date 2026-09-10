@@ -125,7 +125,8 @@ typedef struct BtlObj {
     /* 0xD1 */ u_char         motion;  /* what it is doing, 0 idle          */
     /* 0xD2 */ u_char         unkD2;   /* the marker number, for the records a
                                           party marker is made of        */
-    /* 0xD3 */ u_char         padD3[1];
+    /* 0xD3 */ u_char         unkD3;   /* the acting fighter takes a copy of
+                                          this as its turn is set up      */
     /* 0xD4 */ u_char         phase;   /* how far into that motion          */
     /* 0xD5 */ u_char         padD5[3];
 } BtlObj;                              /* 0xD8 bytes */

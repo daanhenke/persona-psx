@@ -25,6 +25,10 @@ extern u_char g_btl_talk_asked;
 extern u_char g_btl_talk_last_scene;
 extern int    g_btl_talk_reply;
 
+/* Puts the negotiation back to nothing. Answers non-zero when it had one
+   running and the caller should let it finish rather than carry on. */
+extern int BtlResetTalk(int open);
+
 /* Where a line starts, before BtlTalkScoreLine moves it. */
 #define TALK_STEP_FIRST 4
 
@@ -44,10 +48,34 @@ extern u_char  g_btl_talk_pair;
 extern u_short g_btl_choice_row;
 
 extern void BtlTalkStart(void);
+
+/* Answers what the scene ended as; BtlRunTalkScene hands that
+   answer straight back to whoever opened the negotiation. */
+extern int  BtlTalkSceneStep(void);
 extern void BtlTalkLoop(void);
 extern int  BtlBeginTalking(void);
 extern void BtlClearMemberLines(void);
 extern void BtlClearLineHistory(void);
 extern void BtlMoodsFromMoon(void);
+
+/* One answer for each unordered pair of the four talk acts. The table lives
+   in writable data; const changes the scheduling of its message-group load. */
+typedef struct {
+    /* 0x0 */ short two_part;
+    /* 0x2 */ u_char scene;
+    /* 0x3 */ u_char pad03[1];
+    /* 0x4 */ short group;
+    /* 0x6 */ short index;
+} BtlTalkAnswerRow; /* 8 bytes */
+
+extern BtlTalkAnswerRow g_btl_talk_answers[];
+extern u_long g_btl_moon_new_partners[];
+extern u_long g_btl_moon_full_partners[];
+extern short g_btl_talk_pair_acts[];
+extern const u_char *g_btl_arcana_names[];
+
+extern int BtlRecentOther(int value);
+extern int BtlTalkPairIndex(u_int acts);
+extern void BtlTalkAnswer(int slot, u_int act);
 
 #endif

@@ -33,8 +33,6 @@
 #define BTL_LEAVE_DELAY 0x14
 #define BTL_LEAVE_SPREAD 5
 
-extern const BtlSoundBank g_btl_slot_banks[];
-
 extern short BtlPickTalkTarget(short mask);
 extern void BtlSoundClose(int slot);
 

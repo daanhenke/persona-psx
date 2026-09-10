@@ -61,7 +61,6 @@
 extern BtlModel  g_btl_models[];
 extern u_char    g_btl_grid[];
 extern u_char    g_btl_encounters[];
-extern int       g_btl_encounter;
 extern u_short   g_btl_enemy_gfx_offsets[];
 extern int       g_btl_enemy_gfx_base;
 extern u_char   *g_btl_gfx_next;

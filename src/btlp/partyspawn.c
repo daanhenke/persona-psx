@@ -19,12 +19,10 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/formation.h>
 
 /* Five members, and the formation grid they stand on. */
 #define BTL_MEMBERS      5
-#define BTL_FORM_WIDTH   5
-#define BTL_FORM_PLACES  0x19
-#define BTL_FORM_EMPTY   0xFF
 
 /* Char.status for a member who is already down. */
 #define BTL_STATUS_DEAD 0x11
@@ -44,7 +42,6 @@
 #define BTL_SHADOW_Y   0xFFD00000
 #define BTL_SHADOW_X2  0x140000
 
-extern u_char    g_btl_formation[];
 extern u_char    g_btl_member_scripts[];
 extern u_char   *g_btl_gfx_next;
 extern u_char   *g_btl_enemy_gfx_start;
@@ -55,7 +52,6 @@ extern BtlObj  *BtlSpawnMemberObj(int key, int col, int row, int gfx,
 extern BtlObj  *BtlSpawnActorObj(int model, const long *pos);
 extern void     BtlApplyPersona(BtlActor *a);
 extern void     BtlRecalcStats(BtlActor *a);
-extern void     BtlDeriveBattleStats(void);
 extern void     BtlPartyResetGfx(void);
 
 #ifdef NON_MATCHING
@@ -83,8 +79,8 @@ void BtlSpawnParty(void)
     do {
         if (g_btl_actors[member].c.key != 0
             && g_btl_actors[member].c.status == BTL_STATUS_DEAD) {
-            for (n = 0; n < BTL_FORM_PLACES; n++) {
-                if (g_btl_formation[n] == BTL_FORM_EMPTY) {
+            for (n = 0; n < GRID_CELLS; n++) {
+                if (g_btl_formation[n] == CELL_EMPTY) {
                     g_btl_formation[n] = member;
                     break;
                 }
@@ -95,8 +91,8 @@ void BtlSpawnParty(void)
     } while (member < BTL_MEMBERS);
 
     i = 0;
-    for (row = 0; row < BTL_FORM_WIDTH; row++) {
-        for (col = 0; col < BTL_FORM_WIDTH; col++) {
+    for (row = 0; row < GRID_W; row++) {
+        for (col = 0; col < GRID_W; col++) {
             member = g_btl_formation[i];
             if (member != 0xFF) {
                 a = &g_btl_actors[member];
@@ -160,15 +156,15 @@ void BtlSpawnParty(void)
                 a->unkD2 = 0;
                 a->unkD3 = 0;
                 a->unkD4 = 0;
-                a->padD5[0] = 0;
-                a->padD5[7] = 0;
-                a->padD5[6] = 0;
+                a->unkD5 = 0;
+                a->unkDC = 0;
+                a->unkDB = 0;
                 a->unkDF = 0;
                 *(int *)&a->pad68[4] = 0;
                 a->marker = 0;
                 a->unkC5 = 0;
                 a->unkC6 = 0;
-                BtlDeriveBattleStats();
+                BtlDeriveBattleStats(a);
             }
             i++;
         }
@@ -180,7 +176,7 @@ void BtlSpawnParty(void)
         member++;
         if (g_btl_actors[i].c.key != 0
             && g_btl_actors[i].c.status == BTL_STATUS_DEAD) {
-            g_btl_formation[g_btl_actors[i].obj->row * BTL_FORM_WIDTH
+            g_btl_formation[g_btl_actors[i].obj->row * GRID_W
                             + (g_btl_actors[i].obj->col2 >> 1)] = 0xFF;
         }
         i++;

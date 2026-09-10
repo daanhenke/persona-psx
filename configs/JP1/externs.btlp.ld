@@ -167,6 +167,7 @@ srand = 0x80041378;
 g_btl_offer_answers = 0x8005D6AC;
 CdSearchFileLoc = 0x80012B2C;
 SsSepSetCrescendo = 0x8001D8F4;
+SsSepSetDecrescendo = 0x8001DA9C;
 CdControl = 0x8002611C;
 
 /* resolved from the btlp link */
@@ -196,3 +197,16 @@ SetRotMatrix = 0x80029ED4;
 SetTransMatrix = 0x80029F04;
 RotRMD_FT4 = 0x8002A754;
 RotAverage4 = 0x8002A2E4;
+g_btl_debug_skip = 0x8004E26D;
+g_btl_chain_battle = 0x80055BED;
+g_state_prev = 0x80055C30;
+g_state_next = 0x80055C38;
+PreloadDng = 0x80015020;
+PreloadS2d = 0x800156D4;
+PreloadAdv = 0x80015890;
+PreloadBtlField = 0x80015BF8;
+VSyncCallback = 0x800253E0;
+g_moon = 0x801F2B30;
+g_btl_debug_idle = 0x8004E26A;
+g_btl_debug_no_flee = 0x8004E26B;
+g_btl_debug_party_only = 0x8004E263;

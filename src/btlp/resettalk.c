@@ -47,7 +47,6 @@
 
 extern u_char   g_btl_member[];
 extern u_char   g_btl_talking;
-extern u_char   g_btl_battle_kind;
 extern short    g_map_id;
 
 extern int  VSync(int mode);
@@ -107,7 +106,9 @@ int BtlResetTalk(int open)
     if (g_map_id <= BTL_TALK_FIRST_MAP) {
         return 0;
     }
-    if (g_btl_battle_kind == BTL_BATTLE_NO_TALK) {
+    /* Read as a byte, which is what the image does here - the variable
+       itself is a word, and most of the overlay reads all of it. */
+    if ((u_char)g_btl_battle_kind == BTL_BATTLE_NO_TALK) {
         return 0;
     }
     if (open == 0) {

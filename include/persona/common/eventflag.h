@@ -15,4 +15,10 @@
    pass its address. */
 extern int EventFlagTest(u_short *id);
 
+/* The second bank of them, which is the one the battle's winnings land in.
+   Reached by literal address the same way the array itself is inside
+   eventflag.c - the image loads it with lui/ori, not through the linker. */
+#define EVENT_FLAGS_BANK2 ((u_long *)0x801F2A48)
+#define EVENT_FLAG_BANK_WORDS 8
+
 #endif

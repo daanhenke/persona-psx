@@ -64,5 +64,6 @@ extern void BtlPanelClose(void);
 extern void BtlPlacePanel(void);
 extern void BtlDrawPanelBox(int panel);
 extern void BtlDrawPanel(int buf, u_long *ot);
+extern void BtlPanelSetImage(u_char group, u_char image);
 
 #endif

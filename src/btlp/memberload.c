@@ -17,6 +17,7 @@
 #include <libcd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/sound.h>
 
 /* Slots 5 to 9 are the party's; -1 is a free one and 0x8000 the answer when
    none of them can be had. */
@@ -38,7 +39,6 @@
 /* g_cd_busy once the read is over. */
 #define CD_IDLE (-1)
 
-extern short     g_btl_slot_owner[];
 extern u_short   g_btl_member_file[];
 extern int       g_btl_gfx_sector;
 extern u_char   *g_btl_gfx_next;

@@ -57,7 +57,6 @@ typedef struct {
 
 extern BtlMeshVertex g_btl_mesh[];
 extern const char    g_btl_mesh_cells[];
-extern u_short       g_btl_tpage[];
 extern u_char        g_btl_arena_show;
 extern u_char        g_btl_mesh_show;
 

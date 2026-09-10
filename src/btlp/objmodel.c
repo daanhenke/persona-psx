@@ -52,7 +52,6 @@
 #define BTL_FRAME_BYTES 0xE660
 #define BTL_ARENA_OT    0xD6C0
 
-extern u_short   g_btl_tpage[];
 extern u_short   g_btl_poly_count;
 extern int       g_btl_screen_dist;
 extern MATRIX    g_btl_cam_matrix;

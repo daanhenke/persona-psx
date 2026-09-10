@@ -32,7 +32,6 @@
 #define BTL_SPRT_OT     0xE65C
 
 extern SPRT    *g_btl_sprt_next;
-extern u_short  g_btl_tpage[];
 extern u_short  g_btl_sprite_count;
 
 void BtlDrawObjText(BtlObj *o)

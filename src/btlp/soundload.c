@@ -21,13 +21,10 @@
 /* Slots 10..15 are the sound slots; the first of them owns bank 0. */
 #define BTL_SLOT_BANK0 5
 
-extern short        g_btl_slot_owner[];
 extern u_short      g_btl_slot_sound_offsets[];
 extern int          g_btl_slot_sound_base;
-extern BtlSoundBank g_btl_slot_banks[];
 extern u_short      g_btl_sound_offsets[];
 extern int          g_btl_sound_base;
-extern BtlSoundBank g_btl_banks[];
 
 extern void BtlReadSectors(u_long *dest, int sector, int sectors);
 

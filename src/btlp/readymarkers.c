@@ -11,8 +11,9 @@
  * cannot.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/battle.h>
+#include <persona/btlp/status.h>
 
 /* The marker is up. */
 #define MARKER_UP 3
@@ -24,39 +25,43 @@
 #define MARKER_KIND_B 1
 #define MARKER_OTHER  6
 
-extern int  BtlStatusStops(const BtlActor *a);
-extern void BtlShowMarker(int slot, int on, int kind);
-
-#ifdef NON_MATCHING
 void BtlShowReadyMarkers(void)
 {
     int     slot;
-    int     off;
+    int     up;
     int     kind;
+    u_char *mark;
 
+    /* Three things are set up before the walk starts, and this order is the
+       one the routine was written in: the marker code is taken into a local
+       of its own rather than left as the constant it is, which is what keeps
+       it out of the loop's preheader - hoisted, it would be set up after the
+       marker pointer instead of before it.
 
-    off = 0;
+       Only the marker is walked by a pointer; everything else is read out of
+       the record by slot, and the compiler makes the one byte offset it
+       needs for those. */
     slot = 0;
+    up = MARKER_UP;
+    mark = &g_btl_actors[0].marker;
     do {
-        if (*((u_char *)&g_btl_actors[0].c.key + off) == 0) {
+        if (g_btl_actors[slot].c.key == 0) {
             goto clear;
         }
-        if (*(signed char *)((char *)&g_btl_actors[0].c.status + off)
-            == BTL_STATUS_DOWN) {
+        if ((signed char)g_btl_actors[slot].c.status == BTL_STATUS_DOWN) {
             goto clear;
         }
-        if ((*(u_long *)((char *)&g_btl_actors[0].flags + off) & BTL_ACTOR_OUT)
-            != 0) {
+        if ((g_btl_actors[slot].flags & BTL_ACTOR_OUT) != 0) {
             goto clear;
         }
-        if (BtlStatusStops((BtlActor *)((char *)g_btl_actors + off)) != 0) {
+        if (BtlStatusStops(&g_btl_actors[slot]) != 0) {
             goto clear;
         }
-        if (*((u_char *)&g_btl_actors[0].marker + off) == MARKER_UP) {
+        if (*mark == up) {
             goto step;
         }
-        *((u_char *)&g_btl_actors[0].marker + off) = MARKER_UP;
-        switch (*(signed char *)((char *)&g_btl_actors[0].c.status + off)) {
+        *mark = up;
+        switch ((signed char)g_btl_actors[slot].c.status) {
         case MARKER_AIL_A:
             kind = MARKER_KIND_A;
             break;
@@ -70,13 +75,10 @@ void BtlShowReadyMarkers(void)
         BtlShowMarker(slot, 1, kind);
         goto step;
     clear:
-        *((u_char *)&g_btl_actors[0].marker + off) = 0;
+        *mark = 0;
     step:
+        mark += sizeof(BtlActor);
         slot++;
-        off += sizeof(BtlActor);
     } while (slot < BTL_PARTY);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/readymarkers", BtlShowReadyMarkers);
-#endif
 

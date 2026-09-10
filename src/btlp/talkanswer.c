@@ -16,12 +16,13 @@
  * Persona on offer and its arcana.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/common/persona.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/offer.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
+#include <persona/btlp/panel.h>
+#include <persona/btlp/message.h>
 
 /* Which insert each name goes in. */
 #define INSERT_PERSONA 2
@@ -43,101 +44,102 @@
 
 /* What the answer is played as: state 4 for four frames, and the extra scene a
    two-part answer is followed by. */
-#define TALK_SEQ_STATE  4
-#define TALK_SEQ_FRAMES 4
+#define TALK_SEQ_STATE   4
+#define TALK_SEQ_FRAMES  4
 #define TALK_SCENE_AFTER 0xC
 #define TALK_STAGE_OPEN  1
 
 /* The acts live in the low nibble of the offer's mask. */
 #define TALK_ACTS_MASK 0xF
 
-/* One row per unordered pair of acts. */
-typedef struct {
-    /* 0x0 */ short  two_part; /* the answer is followed by scene 0xC */
-    /* 0x2 */ u_char scene;    /* the talk scene the answer is played as */
-    /* 0x3 */ u_char pad03[1];
-    /* 0x4 */ short  group;    /* the message it says */
-    /* 0x6 */ short  index;
-} BtlTalkAnswerRow;            /* 8 bytes */
+/* These four adjacent tables are writable data in the original image. */
+u_long g_btl_moon_new_partners[BTL_TALK_ACTS]  = { 0, 2, 3, 1 };
+u_long g_btl_moon_full_partners[BTL_TALK_ACTS] = { 1, 3, 2, 0 };
 
-extern const BtlTalkAnswerRow g_btl_talk_answers[];
-/* The pair index expanded back into the four act bits. */
-extern const short  g_btl_talk_pair_acts[];
-/* The order the moods are tried in, one table per phase that uses one. */
-extern const u_long g_btl_moon_new_partners[];
-extern const u_long g_btl_moon_full_partners[];
+BtlTalkAnswerRow g_btl_talk_answers[10] = {
+    { 0, 1, { 0 }, 3, 0 },
+    { 0, 1, { 0 }, 0, 0 },
+    { 0, 1, { 0 }, 1, 0 },
+    { 0, 1, { 0 }, 2, 0 },
+    { 1, 3, { 0 }, 0, 3 },
+    { 1, 7, { 0 }, 0, 1 },
+    { 1, 2, { 0 }, 0, 2 },
+    { 1, 5, { 0 }, 0, 5 },
+    { 1, 6, { 0 }, 0, 4 },
+    { 1, 4, { 0 }, 0, 6 }
+};
 
-extern const u_char *g_btl_arcana_names[];
-extern u_char    g_btl_moon;
+short g_btl_talk_pair_acts[10] = { 1, 3, 5, 9, 2, 6, 10, 4, 12, 8 };
 
-extern void          BtlSetInsert(int slot, const u_char *text);
-extern void          BtlPanelSetImage(int group, u_char image);
-extern int           BtlTalkPairIndex(u_int acts);
-extern void          BtlSeqSetState(int state, int frames);
-extern const u_char *BtlMessage(int group, int index);
-extern int           BtlRecentOther(int value);
-
-#ifdef NON_MATCHING
 void BtlTalkAnswer(int slot, u_int act)
 {
-    BtlOffer *o;
-    u_int     acts;
-    const u_long *p;
-    int       one;
-    int       i;
-    int       pair;
+    BtlOffer*     o;
+    u_int         acts;
+    const u_long* p;
+    int           one;
+    int           i;
+    int           pair;
 
     o = g_btl_offer + slot;
     BtlSetInsert(INSERT_DEMON, g_btl_actors[g_btl_actor_slot].c.name);
     BtlSetInsert(INSERT_PERSONA, g_btl_offer[g_btl_offer_slot].name);
     BtlSetInsert(INSERT_ARCANA,
-                 g_btl_arcana_names[g_persona_data[
-                     g_btl_offer[g_btl_offer_slot].persona].arcana]);
+                 g_btl_arcana_names[g_persona_data[g_btl_offer[g_btl_offer_slot].persona].arcana]);
 
     acts = 1 << act;
-    if (g_btl_moon == MOON_NEW) {
-        i = 0;
+    if (g_btl_moon == MOON_NEW)
+    {
+        i   = 0;
         one = 1;
-        p = g_btl_moon_new_partners;
+        p   = g_btl_moon_new_partners;
         /* A plain `while`: written as a do/while gcc peels the first test,
            which the original does not. */
-        while (i < BTL_TALK_ACTS) {
-            if (act != *p && (one << *p & o->kinds) != 0) {
+        while (i < BTL_TALK_ACTS)
+        {
+            if (act != *p && (one << *p & o->kinds) != 0)
+            {
                 break;
             }
             i++;
             p++;
         }
-        if (i != BTL_TALK_ACTS) {
+        if (i != BTL_TALK_ACTS)
+        {
             acts |= 1 << g_btl_moon_new_partners[i];
         }
     }
-    i = 0;
-    if (g_btl_moon == MOON_FULL) {
+    if (g_btl_moon == MOON_FULL)
+    {
+        i   = 0;
         one = 1;
-        p = g_btl_moon_full_partners;
+        p   = g_btl_moon_full_partners;
         /* A plain `while`: written as a do/while gcc peels the first test,
            which the original does not. */
-        while (i < BTL_TALK_ACTS) {
-            if (act != *p && (one << *p & o->kinds) != 0) {
+        while (i < BTL_TALK_ACTS)
+        {
+            if (act != *p && (one << *p & o->kinds) != 0)
+            {
                 break;
             }
             i++;
             p++;
         }
-        if (i != BTL_TALK_ACTS) {
+        if (i != BTL_TALK_ACTS)
+        {
             acts |= 1 << g_btl_moon_full_partners[i];
         }
     }
-    if (g_btl_moon != MOON_NEW && g_btl_moon != MOON_FULL) {
+    if (g_btl_moon != MOON_NEW && g_btl_moon != MOON_FULL)
+    {
         i = BtlRecentOther(act);
-        if (i != BTL_RECENT_NONE) {
+        if (i != BTL_RECENT_NONE)
+        {
             acts |= 1 << i;
         }
     }
 
     BtlPanelSetImage(PANEL_ACTS, acts);
-    pair = BtlTalkPairIndex(acts);
+    pair            = BtlTalkPairIndex(acts);
     g_btl_talk_pair = pair;
     BtlSeqSetState(TALK_SEQ_STATE, TALK_SEQ_FRAMES);
     BtlSeqWaitDone();
@@ -148,24 +150,18 @@ void BtlTalkAnswer(int slot, u_int act)
     g_btl_offer[g_btl_offer_slot].kinds &= ~TALK_ACTS_MASK;
     g_btl_offer[g_btl_offer_slot].kinds |= g_btl_talk_pair_acts[pair];
 
-    if (g_btl_talk_answers[pair].two_part == 0) {
+    if (g_btl_talk_answers[pair].two_part == 0)
+    {
         BtlSeqPlay(BtlMessage(g_btl_talk_answers[pair].group,
                               g_btl_talk_answers[pair].index));
         BtlSeqRun();
-    } else {
-        /* The two stores in a block of their own. Without the boundary gcc
-           schedules the message's group load to the top of the arm instead of
-           after them, which is load-bearing rather than decoration. */
-        do {
-            g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_AFTER;
-            g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_OPEN;
-        } while (0);
+    }
+    else
+    {
+        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_AFTER;
+        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_OPEN;
         g_btl_talk_depth++;
         BtlSeqPlay(BtlMessage(g_btl_talk_answers[pair].group,
                               g_btl_talk_answers[pair].index));
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkanswer", BtlTalkAnswer);
-#endif
-

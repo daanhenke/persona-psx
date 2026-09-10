@@ -59,4 +59,11 @@ extern int BtlTextOpen(const u_char *script, short x, short y);
    one caller getting the prototype wrong. */
 extern void BtlTextSetState(short state, int timer, int pause);
 
+/* A message with a box around it, on one of the overlay's window slots.
+   Closing takes the slot back; the round closes slot zero on its way out of
+   every step that opened one. */
+extern void BtlOpenMessage(int flags, short style, const u_char *script,
+                           short x, short y);
+extern void BtlCloseMessage(int slot);
+
 #endif

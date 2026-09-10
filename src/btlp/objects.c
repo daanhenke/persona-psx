@@ -105,7 +105,6 @@ extern long      g_btl_intro_y;
 extern u_char    g_btl_shake_on;
 extern u_short   g_btl_tick;
 extern signed char g_btl_shake_offsets[];
-extern u_char    g_btl_debug_hud;
 extern u_char    g_btl_debug_grid;
 extern u_char    g_btl_debug_grid_cells[];
 extern u_char    g_btl_arena_show;

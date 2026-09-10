@@ -26,7 +26,6 @@
 #define BTL_PRIM_OT     0xE65C
 
 extern POLY_F4 *g_btl_polyf4_next;
-extern u_short  g_btl_tpage[];
 extern MATRIX   g_btl_obj_matrix;
 extern VECTOR   g_btl_obj_shift;
 extern SVECTOR  g_btl_obj_quad[];

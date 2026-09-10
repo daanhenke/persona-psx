@@ -9,9 +9,10 @@
  * bgmrestore.c: the image puts all three in different places.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libsnd.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/pack.h>
+#include <persona/main/cd.h>
 #include <persona/btlp/battle.h>
 
 /* One byte per (track, column). 0xFF means play nothing; otherwise the low
@@ -19,8 +20,8 @@
    it. */
 #define BGM_SILENT   0xFF
 #define BGM_SEQ      0x0F
-#define BGM_ABSOLUTE 0x40   /* the nibble stands alone, not as an offset */
-#define BGM_ONESHOT  0x80   /* the track ends; BtlWaitBgmEnd waits for it  */
+#define BGM_ABSOLUTE 0x40 /* the nibble stands alone, not as an offset */
+#define BGM_ONESHOT  0x80 /* the track ends; BtlWaitBgmEnd waits for it  */
 
 /* BtlWaitBgmEnd tests the sign of g_btl_bgm_seq, so BGM_ONESHOT is carried in
    the top bit of the number and masked off again when it is played. */
@@ -32,50 +33,44 @@
 #define BGM_BACK_VOL   60
 #define BGM_BACK_TIME  15
 
-extern int g_btl_bgm_state;
-extern int g_btl_bgm_seq;
-extern u_char g_btl_bgm_table[][4];
-
-extern void BtlLoadPackEntry(int entry);
-extern void BtlBgmOpen(void);
-extern volatile int g_cd_busy;
-
-
-#ifdef NON_MATCHING
 void BtlBgmChange(int track, int column, int base)
 {
     u_char code;
     int    seq;
-    int    absolute;
 
     code = g_btl_bgm_table[track][column];
-    absolute = code & BGM_ABSOLUTE;
-    if (code != BGM_SILENT) {
-        seq = code & BGM_SEQ;
-        if (absolute == 0) {
-            seq = base + seq;
+
+    if (code != BGM_SILENT)
+    {
+        if ((code & BGM_ABSOLUTE) == 0)
+        {
+            g_btl_bgm_seq = base + (code & BGM_SEQ);
         }
-        g_btl_bgm_seq = seq;
+        else
+        {
+            g_btl_bgm_seq = code & BGM_SEQ;
+        }
         seq = 0;
-        if ((code & BGM_ONESHOT) != 0) {
+        if ((code & BGM_ONESHOT) != 0)
+        {
             g_btl_bgm_seq = g_btl_bgm_seq | BGM_ENDS;
         }
         SsSepSetDecrescendo(g_btl_seq[0], seq, BGM_BACK_VOL, BGM_BACK_TIME);
         BtlLoadPackEntry(track);
-        while (g_cd_busy != -1) {
+        while (g_cd_busy != -1)
+        {
             BtlDrawFrame();
         }
         BtlBgmOpen();
         BtlRunFrames(BGM_GAP_FRAMES);
         SsSepStop(g_btl_seq[0], 0);
         SsVabTransCompleted(1);
-        BtlSePlay(BTL_BGM_SLOT, (short)(g_btl_bgm_seq & ~BGM_ENDS));
+        BtlSePlay(BTL_BGM_SLOT, g_btl_bgm_seq & ~BGM_ENDS);
         g_btl_bgm_state = 1;
-    } else {
+    }
+    else
+    {
         BtlRunFrames(BGM_GAP_FRAMES);
         g_btl_bgm_state = 0;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/bgm", BtlBgmChange);
-#endif

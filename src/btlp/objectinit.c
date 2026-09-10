@@ -7,8 +7,9 @@
 #include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
-#include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/object.h>
+#include <persona/btlp/sound.h>
 
 /* Two frame buffers of primitives, laid out end to end from g_btl_prim_pool
    and pre-initialised so nothing has to issue SetSprt mid-frame. */
@@ -30,7 +31,6 @@
 
 #define BTL_SLOTS 32
 
-extern short    g_btl_slot_owner[];
 
 extern SPRT     *g_btl_sprt_next;
 extern TILE     *g_btl_tile_next;

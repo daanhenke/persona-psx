@@ -93,7 +93,7 @@ void BtlSoundClose(int slot)
 /* How the battle plays a sound: 44 call sites reach this, from the menu
    cursor to the spell effects. Stopping first is what makes retriggering a
    sound that is already playing restart it rather than do nothing. */
-void BtlSePlay(int slot, short seq)
+void BtlSePlay(int slot, int seq)
 {
     SsSepStop(g_btl_seq[slot], seq);
     SsSepPlay(g_btl_seq[slot], seq, SSPLAY_PLAY, 1);

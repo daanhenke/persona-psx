@@ -52,6 +52,34 @@ extern short  g_btl_vab[];
 extern short  g_btl_seq[];
 extern u_char g_btl_seq_count[];
 
+/* Reading the demon voices in. Two places do it the same way - the
+   negotiation as it opens and the round as it starts - so the run of buffers
+   they read into, and the slots they walk, are here rather than in both.
+
+   Every bank is the same size, so the destination simply walks. The slots
+   below are the ones that belong to nobody in the party: the odd ones from
+   ten, which is what makes the walk step by two. */
+#define BTL_VOICE_BANKS      ((u_long *)0x80172400)
+#define BTL_VOICE_BANK_BYTES 0x5DC0
+#define BTL_VOICE_SLOT_FIRST 10
+#define BTL_VOICE_SLOT_LAST  15
+#define BTL_VOICE_SLOT_STEP  2
+
+extern void BtlLoadSound(u_long *dest, int entry);
+extern void BtlLoadSlotSound(u_long *dest, int slot);
+
+/* Who each of the sixteen slots was opened for, or -1 while it is free. */
+extern short g_btl_slot_owner[];
+
+/* Raised once the run above has been read, so the round does not read it
+   again on top of a negotiation that already did. */
+extern int g_btl_talk_sounds_loaded;
+
+/* The two sets of banks a fighter's voice can come from: the party's own,
+   indexed by the record key, and the slots the rest of the field uses. */
+extern BtlSoundBank g_btl_banks[];
+extern BtlSoundBank g_btl_slot_banks[];
+
 extern int  BtlSoundOpen(const BtlSoundBank *banks, int slot, int index);
 extern void BtlSoundClose(int slot);
 
@@ -66,10 +94,13 @@ extern void BtlSoundClose(int slot);
 extern u_char g_btl_intro_bgm_done;
 extern void   BtlIntroBgmMark(short seq, short sep, short mark);
 
-/* One sound effect, on a slot. The sequence really is a short - see the
-   definition in soundbank.c - and every caller but two hands it a constant, so
-   the narrowing costs nothing. The two that pass a value say so with a cast,
-   which is the same truncation the callee would do anyway. */
-extern void BtlSePlay(int slot, short seq);
+/* Callers pass the sequence as a word. BtlSePlay narrows it for libsnd. */
+extern void BtlSePlay(int slot, int seq);
+
+extern int g_btl_bgm_state;
+extern int g_btl_bgm_seq;
+extern u_char g_btl_bgm_table[][4];
+extern void BtlBgmOpen(void);
+extern void BtlBgmChange(int track, int column, int base);
 
 #endif

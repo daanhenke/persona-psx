@@ -37,4 +37,8 @@ extern short   g_btl_box_cols;
 extern short   g_btl_box_ox;
 extern short   g_btl_box_oy;
 
+/* g_btl_box_step, handed back as a byte. A stage waits on this rather than
+   on the variable so it does not have to know what the box is doing. */
+extern char BtlBoxState(void);
+
 #endif

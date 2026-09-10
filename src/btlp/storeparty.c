@@ -20,6 +20,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/common/char.h>
+#include <persona/btlp/formation.h>
 #include <persona/common/formation.h>
 #include <persona/common/status.h>
 
@@ -27,10 +28,6 @@
    as the one they are standing in. */
 #define FORM_PRESETS 8
 #define FORM_LIVE    8
-
-/* The battle's own copies, immediately before its live grid. */
-extern u_char g_btl_formation_preset[];
-extern u_char g_btl_formation[];
 
 /* The three settings the battle reads through copies of its own. */
 extern u_char g_btl_confirm;

@@ -31,6 +31,7 @@
 #include <persona/btlp/offer.h>
 #include <persona/btlp/pack.h>
 #include <persona/btlp/panel.h>
+#include <persona/btlp/sound.h>
 #include <persona/btlp/status.h>
 #include <persona/btlp/talk.h>
 #include <persona/btlp/text.h>
@@ -96,10 +97,11 @@
    symbol: its low half is zero, so one lui is the whole of it. */
 #define g_btl_scratch ((u_char *)0x801C0000)
 
-extern u_char        g_btl_moon;
-extern u_char        g_btl_battle_kind;
+/* Declared here rather than taken from persona/btlp/battle.h: hud.c
+   defines it int, and the byte the call sites want is what makes the
+   andi come out. The two forms are not interchangeable. */
+extern char BtlHudState(void);
 extern u_long       *g_btl_scratch_end;
-extern short         g_btl_slot_owner[];
 extern const u_char *g_btl_arcana_names[];
 extern volatile long g_cd_busy;
 
@@ -111,8 +113,6 @@ extern const u_char  g_btl_talk_open_lines[];
 extern int           g_btl_talk_sounds_loaded;
 
 extern int   BtlStockHolds(const BtlOffer *offer);
-extern void  BtlLoadSound(u_long *dest, int entry);
-extern void  BtlLoadSlotSound(u_long *dest, int slot);
 extern short BtlPickTalkTarget(short mask);
 extern void  BtlTintTalkers(void);
 extern void  BtlTintParty(void);
@@ -120,7 +120,6 @@ extern void  BtlSeekFile(int index);
 extern void  BtlBoxOpen(short cols, short x, short y, int style);
 extern void  BtlHudShow(void);
 extern void  BtlLoadScratch(int index, int from_table);
-extern char  BtlHudState(void);
 extern void  BtlMenuOpen2(const u_char **text);
 extern void  BtlIndicatorBar(void);
 extern int   BtlMenuChoice(void);
@@ -133,7 +132,6 @@ extern void  BtlFaceLoad(int who, int always);
 extern void  BtlRefreshMoodGauges(void);
 extern void  BtlMenuDismiss(void);
 extern int   BtlMenuState(void);
-extern void  BtlTalkSceneStep(void);
 
 #ifdef NON_MATCHING
 #ifdef NON_MATCHING

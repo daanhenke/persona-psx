@@ -222,7 +222,7 @@ INCLUDE_ASM("main/nonmatchings/preload", AdvResolveSceneLoc);
 
 /* Two more this file carries but does not work out: a helper of the resolver
    and the routine that builds a Persona record from a pack. */
-INCLUDE_ASM("main/nonmatchings/preload", func_80015BF8);
+INCLUDE_ASM("main/nonmatchings/preload", PreloadBtlField);
 
 INCLUDE_ASM("main/nonmatchings/preload", PersonaCreate);
 

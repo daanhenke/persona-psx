@@ -22,7 +22,6 @@
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
 
-extern short   g_btl_tpage[];
 
 #define PAGE_W      64          /* pixels across one page              */
 #define PAGE_BOTTOM 0x10        /* first page in the lower half        */

@@ -62,4 +62,11 @@ typedef struct {
 
 extern BtlStats g_btl_personas[];
 
+/* One word per bank of event flags: which Personas the battle won, ORed
+   into the save's own flags as the battle closes. */
+extern u_long g_btl_persona_won[];
+
+extern void BtlStoreParty(void);
+extern void BtlStorePersonas(void);
+
 #endif

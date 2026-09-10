@@ -13,6 +13,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 
@@ -26,7 +27,6 @@
    original reaches them: both addresses are built in full. */
 extern const u_char g_btl_fixed_enemies[];
 extern const u_char g_btl_fixed_enemies_alt[];
-extern short        g_btl_encounter;
 extern BtlActor    *g_btl_combatants;
 
 extern void BtlLoadEnemyStats(int slot, int species);

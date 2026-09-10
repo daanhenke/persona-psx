@@ -17,7 +17,7 @@
  * by the clamp, so it reads as the first row rather than out of the table.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
+#include <persona/btlp/talk.h>
 
 /* Talk acts, and therefore bits of the mask, per round. */
 #define BTL_TALK_ACTS 4
@@ -25,7 +25,6 @@
 /* Rows in the reaction table: the pairs of four acts, with repetition. */
 #define BTL_TALK_PAIRS 10
 
-#ifdef NON_MATCHING
 int BtlTalkPairIndex(u_int acts)
 {
     /* Where each act's run of pairs starts: 4 pairs begin at act 0, then 3, 2
@@ -33,40 +32,36 @@ int BtlTalkPairIndex(u_int acts)
     int base[BTL_TALK_ACTS] = { 0, 4, 7, 9 };
     int first;
     int act;
-    int start;
-    int above;
     int partner;
     int pair;
 
     first = 0;
-    while (first < BTL_TALK_ACTS) {
-        if ((acts & (1 << first)) != 0) {
+    while (first < BTL_TALK_ACTS)
+    {
+        if ((acts & (1 << first)) != 0)
+        {
             break;
         }
         first++;
     }
 
     partner = 0;
-    pair = base[first];
-    start = first + 1;
-    for (act = start; act < BTL_TALK_ACTS; act++) {
-        /* `first` is done with by here and the original reuses it, which is
-           what keeps the distance and the counter in the right registers. */
-        first = act - start;
-        above = first;
-        if ((acts & (1 << act)) != 0) {
-            partner = above + 1;
+    pair    = base[first];
+    /* Reuse the first-bit index as the start of the partner search. */
+    first++;
+    for (act = first; act < BTL_TALK_ACTS; act++)
+    {
+        if ((acts & (1 << act)) != 0)
+        {
+            partner = act - first + 1;
             break;
         }
     }
 
     pair += partner;
-    if (pair >= BTL_TALK_PAIRS) {
+    if (pair >= BTL_TALK_PAIRS)
+    {
         pair = 0;
     }
     return pair;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkpair", BtlTalkPairIndex);
-#endif
-

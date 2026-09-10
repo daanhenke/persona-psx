@@ -29,7 +29,6 @@
 #define BTL_TILE_OT     0xE65C
 
 extern TILE    *g_btl_tile_next;
-extern u_short  g_btl_tpage[];
 
 void BtlDrawObjTiles(BtlObj *o)
 {

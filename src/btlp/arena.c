@@ -55,7 +55,6 @@ extern void BtlApproach(short *cur, const short *target, int step);
 extern SVECTOR   g_btl_arena_face[];
 extern SVECTOR   g_btl_arena_quad[];
 extern short     g_btl_arena_fade;
-extern short     g_btl_scene_rgb[];
 extern short     g_btl_arena_rgb[];
 
 /* The four edges reach the arena's colour by address, one component at a time.
@@ -65,7 +64,6 @@ extern short     g_btl_arena_rgb[];
 #define g_btl_arena_r (*(short *)0x800CCA12)
 #define g_btl_arena_g (*(short *)0x800CCA14)
 #define g_btl_arena_b (*(short *)0x800CCA16)
-extern u_short   g_btl_tpage[];
 
 /* The face, in the plane z = 0. It is the only one of the five put through
    the GTE by hand rather than through RotAverageNclip4, and it is the one that

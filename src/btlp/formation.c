@@ -13,12 +13,7 @@
  * mode 2 - the mirror turns the party around and this pulls it forward again.
  */
 #include <decomp/types.h>
-
-#define GRID_W     5
-#define GRID_CELLS 25
-#define CELL_EMPTY 0xFF
-
-extern u_char g_btl_formation[];
+#include <persona/btlp/formation.h>
 
 void BtlFormationCloseUp(void)
 {

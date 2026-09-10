@@ -7,10 +7,10 @@
  * negative numerator - even though nothing ever passes one.
  */
 #include <decomp/types.h>
+#include <persona/btlp/stats.h>
 
 #define PERSONA_WON_BITS 32
 
-extern u_long g_btl_persona_won[];
 
 void BtlNotePersonaWon(int id)
 {

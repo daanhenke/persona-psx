@@ -55,6 +55,10 @@
 #define OFFER_CONTACTED 0x10000002
 #define OFFER_ALL_MOODS 0x5F
 
+/* Declared here rather than taken from persona/btlp/battle.h: hud.c
+   defines it int, and the byte the call sites want is what makes the
+   andi come out. The two forms are not interchangeable. */
+extern char BtlHudState(void);
 extern u_char    g_btl_talking;
 extern short     g_btl_stock_choice;
 extern u_long    g_btl_scratch[];
@@ -99,7 +103,6 @@ extern void  BtlMenuDismiss(void);
 extern void  BtlIndicatorIcon(void);
 extern void  BtlShowAilmentMarks(int on);
 extern void  BtlHudShow(void);
-extern char  BtlHudState(void);
 extern int   BtlAnyEnemy(void);
 
 /* A scene's scripts are reached through the scratch buffer's own first word:

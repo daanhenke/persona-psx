@@ -13,8 +13,21 @@ typedef struct {
     /* 0x00 */ u_char name[SPELL_NAME_CELLS];
                                   /* tile bytes for one row, added to whichever
                                      glyph bank the drawer is given */
-    /* 0x0A */ u_char pad0A[10];
+    /* 0x0A */ u_char kind;       /* what it does; the enemy AI masks with
+                                     SPELL_KIND_MASK and treats four of the
+                                     results as always worth casting */
+    /* 0x0B */ u_char pad0B[2];
+    /* 0x0D */ u_char target;     /* which set of targets it can reach; the AI
+                                     hands this to BtlPickAiTarget          */
+    /* 0x0E */ u_char cost;       /* SP, weighed against Char.sp            */
+    /* 0x0F */ u_char pad0F[5];
 } SpellData;                      /* 20 bytes */
+
+#define SPELL_KIND_MASK 0x3E
+
+/* Below this id a spell costs SP and the caster has to be able to afford it;
+   from here up the AI does not check. */
+#define SPELL_FREE_FIRST 0x75
 
 extern SpellData g_spell_data[];
 

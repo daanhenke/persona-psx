@@ -99,6 +99,10 @@
 /* The Persona cards the party is carrying, reached by address the way the rest
    of the save-game area is. */
 
+/* Declared here rather than taken from persona/btlp/battle.h: hud.c
+   defines it int, and the byte the call sites want is what makes the
+   andi come out. The two forms are not interchangeable. */
+extern char BtlHudState(void);
 extern u_char        g_btl_talk_gift;
 extern short         g_btl_stock_choice;
 extern const u_char *g_btl_talk_reply_menus[][3];
@@ -130,7 +134,6 @@ extern void BtlIndicatorIcon(void);
 extern void BtlTalkUpdate(void);
 extern void BtlBoxOpen(short cols, short x, short y, int style);
 extern void BtlHudShow(void);
-extern char BtlHudState(void);
 extern void BtlShowAilmentMarks(int show);
 
 #ifdef NON_MATCHING

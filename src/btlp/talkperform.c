@@ -33,7 +33,6 @@
 /* A last beat before handing control back. */
 #define TALK_TAIL_FRAMES 5
 
-extern const BtlSoundBank  g_btl_banks[];
 extern volatile long       g_cd_busy;
 
 /* Two sequence handles four bytes apart. seq.c reaches the first as a scalar;

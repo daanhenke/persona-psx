@@ -15,6 +15,7 @@
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/offer.h>
 #include <persona/btlp/talk.h>
 
@@ -37,7 +38,6 @@
 #define MOOD_PER_LEVEL 5
 #define MOOD_HELD      3
 
-extern u_char g_btl_moon;
 
 extern int BtlOfferLevelTest(int test, u_short slot);
 extern int BtlStockHolds(const BtlOffer *offer);

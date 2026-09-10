@@ -25,7 +25,6 @@
 #define BTL_FRAME_BYTES 0xE660
 #define BTL_PRIM_OT     0xE65C
 
-extern u_short   g_btl_tpage[];
 extern u_short   g_btl_poly_count;
 extern MATRIX    g_btl_obj_matrix;
 extern VECTOR    g_btl_obj_shift;

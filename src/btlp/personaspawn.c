@@ -18,6 +18,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <decomp/libc.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
 /* The file was read to the shared staging buffer. Its first word is the TIM,
@@ -81,7 +82,6 @@ extern BtlObjDef     g_btl_persona_def;
 extern u_char       *g_btl_persona_image;
 extern u_long       *g_btl_persona_tim;
 extern const u_long **g_btl_effect_gfx;
-extern u_short       g_btl_tpage[];
 
 extern int     BtlBindGfx(u_int kind, int index, u_char **image);
 extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,

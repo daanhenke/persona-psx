@@ -20,6 +20,7 @@
 #include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/sound.h>
 
 /* Slots 5 to 9 are the party's. */
 #define BTL_MEMBER_SLOT0 5
@@ -35,7 +36,6 @@
    zero, so one lui is the whole of it. */
 #define BTL_STAGE ((u_long **)0x80140000)
 
-extern short   g_btl_slot_owner[];
 extern u_short g_btl_member_file[];
 extern int     g_btl_gfx_sector;
 extern u_long *g_btl_slot_clut[];

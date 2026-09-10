@@ -27,6 +27,7 @@
 #include <persona/btlp/offer.h>
 #include <persona/btlp/pick.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/stage.h>
 #include <persona/btlp/talk.h>
 
 /* The scenes this dispatches to. Nought and thirteen both mean "done with
@@ -72,10 +73,12 @@
 #define TALK_SLOT_VOICE 3
 #define TALK_SLOT_BGM   4
 
-/* What is left in g_btl_talk_ending: two for a negotiation that simply
-   finished, one for the demons joining. */
-#define TALK_ENDED  2
-#define TALK_JOINED 1
+/* A negotiation does not unwind - it leaves behind the battle stage that
+   runs next. Simply finishing hands back to the round; the demons joining
+   hands back to the command menu. See persona/btlp/stage.h. */
+
+/* And the kind of fight it becomes once they have joined. */
+#define BTL_KIND_JOINED 2
 
 /* The two entries of the slot array the refresh wants cleared first. */
 #define TALK_SLOT_CLEAR_A 26
@@ -84,9 +87,6 @@
 /* Set on every member still fighting once the demons have joined. */
 #define BTL_ACTOR_JOINED 0x20000
 
-extern u_char g_btl_talk_ending;
-extern u_char g_btl_battle_kind;
-extern short  g_btl_slot_owner[];
 
 extern void  BtlTalkSceneTrade(void);
 extern void  BtlTalkSceneLeave(void);
@@ -207,7 +207,7 @@ int BtlTalkSceneStep(void)
                 SsSepSetCrescendo(g_btl_seq[0], 0,
                                   TALK_FADE_FULL - BtlSeqVolumeMean(),
                                   TALK_FADE_FRAMES);
-                g_btl_talk_ending = TALK_ENDED;
+                g_btl_stage = BTL_STAGE_ROUND;
                 BtlSoundClose(TALK_SLOT_VOICE);
                 BtlSoundClose(TALK_SLOT_BGM);
                 BtlEffectDrop();
@@ -230,7 +230,7 @@ int BtlTalkSceneStep(void)
             BtlEffectDrop();
             return 0;
         case 2:
-            g_btl_talk_ending = TALK_ENDED;
+            g_btl_stage = BTL_STAGE_ROUND;
             SsSepSetCrescendo(g_btl_seq[0], 0,
                               TALK_FADE_FULL - BtlSeqVolumeMean(),
                               TALK_FADE_FRAMES);
@@ -243,8 +243,10 @@ int BtlTalkSceneStep(void)
                 int i;
                 int n;
 
-                g_btl_talk_ending = TALK_JOINED;
-                g_btl_battle_kind = TALK_ENDED;
+                g_btl_stage = BTL_STAGE_COMMAND;
+                /* Written a byte at a time here; the variable is a word
+                   and the rest of the overlay writes all of it. */
+                *(u_char *)&g_btl_battle_kind = BTL_KIND_JOINED;
                 SsSepSetCrescendo(g_btl_seq[0], 0,
                                       TALK_FADE_FULL - BtlSeqVolumeMean(),
                                       TALK_FADE_FRAMES);

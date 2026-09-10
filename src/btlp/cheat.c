@@ -30,6 +30,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/battle.h>
 
 /* Characters of the name that have to match. */
 #define BTL_CHEAT_NAME_LEN 8
@@ -37,7 +38,6 @@
 extern const long  g_btl_cheat_name[];
 extern u_short     g_btl_cheat_pad[];
 extern int         g_btl_cheat_step;
-extern u_char      g_btl_debug_hud;
 extern u_short     g_btl_pad2_edge;
 
 void BtlCheatWatch(void)

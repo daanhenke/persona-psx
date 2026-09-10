@@ -17,8 +17,9 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <decomp/libc.h>
-#include <persona/btlp/model.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/model.h>
+#include <persona/btlp/sound.h>
 
 /* Species whose artwork is bound in place rather than uploaded. */
 #define BTL_SPECIES_FLAT0 0xBB
@@ -52,7 +53,6 @@
 #define BTL_CLUT_Y 0x1E5
 
 extern BtlModel  g_btl_models[];
-extern short     g_btl_slot_owner[];
 extern u_long   *g_btl_slot_clut[];
 extern u_char   *g_btl_gfx_next;
 extern u_char   *g_btl_enemy_clut;
