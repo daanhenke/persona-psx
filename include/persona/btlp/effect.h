@@ -17,6 +17,19 @@
    draw pass walks to put an effect's text on screen. The low nibble of `kind`
    picks the drawer, and the position is in eight-pixel steps from the effect's
    own origin. */
+/* The last word of a row, read one way or the other by the drawer its kind
+   picks. */
+typedef union BtlEffectRowData {
+    long  mask;                 /* a number row: how wide the value at *text
+                                   is - 0xFF a byte, 0xFFFF a halfword, -1 a
+                                   whole word                              */
+    struct {
+        short first;            /* a list row: where in the list of lines at
+                                   *text to start, and how many to draw    */
+        short count;
+    } list;
+} BtlEffectRowData;
+
 typedef struct BtlEffectRow {
     /* 0x0 */ struct BtlEffectRow *next;
     /* 0x4 */ u_char kind;
@@ -25,7 +38,8 @@ typedef struct BtlEffectRow {
     /* 0x6 */ u_char x;
     /* 0x7 */ u_char y;
     /* 0x8 */ const u_char *text;
-} BtlEffectRow;                 /* 0xC bytes */
+    /* 0xC */ BtlEffectRowData u;
+} BtlEffectRow;                 /* 0x10 bytes */
 
 typedef struct BtlEffect {
     /* 0x00 */ BtlEffectRow *next;
@@ -57,15 +71,48 @@ typedef struct BtlEffect {
     /* 0x32 */ short   unk32;
     /* 0x34 */ short   unk34;
     /* 0x36 */ u_char  pad36[2];
-    /* 0x38 */ long    unk38;
-    /* 0x3C */ long    unk3C;
-    /* 0x40 */ long    scale;   /* 0x1000 is unity, as everywhere else here */
+    /* 0x38 */ long    scale_x; /* what the motion handlers wind up and down;
+                                   0x1000 is unity, as everywhere else here */
+    /* 0x3C */ long    scale_y;
+    /* 0x40 */ long    scale;   /* settled at unity when a motion is done   */
     /* 0x44 */ u_char  pad44[0x4C];
     /* 0x90 */ u_long  mode[3]; /* a DR_MODE naming the effect's texture    */
     /* 0x9C */ u_long  mode_kept[3];
                                 /* a copy of it, taken when the record is
                                    opened                                   */
 } BtlEffect;
+
+/* Where the effects' own colours start in g_btl_clut; the kind byte's high
+   nibble picks one of the eight from there. */
+#define EFFECT_CLUT 32
+
+/* One per value of the kind byte's low nibble, in the order the table holds
+   them. Each moves the box a frame on and answers whether it is still
+   running. */
+extern int  BtlEffectMotionHold(BtlEffect *e);
+extern int  BtlEffectMotionGrow(BtlEffect *e);
+extern int  BtlEffectMotionUnroll(BtlEffect *e);
+extern int  BtlEffectMotionOpenNow(BtlEffect *e);
+extern int  BtlEffectMotionShutNow(BtlEffect *e);
+extern int  BtlEffectMotionRoll(BtlEffect *e);
+extern int  BtlEffectMotionShrink(BtlEffect *e);
+extern int  BtlEffectMotionCollapse(BtlEffect *e);
+
+extern int  BtlDrawGlyphs(const u_char *text, short clut);
+extern void BtlEffectDrawRow(const BtlEffectRow *row);
+extern void BtlEffectDrawNumber(const BtlEffectRow *row);
+extern int  BtlEffectDrawLines(const BtlEffectRow *row);
+
+/* Where the next glyph goes. BtlDrawGlyphs walks x along the line and the
+   row drawers step y down. */
+extern short g_btl_glyph_x;
+extern short g_btl_glyph_y;
+extern void BtlFormatHexGlyphs(u_int value, u_char *out);
+
+/* The sixteen glyph codes a hex digit is written with, '0' to '9' and then
+   'A' to 'F'. BtlFormatHexGlyphs takes a copy rather than reading it where it
+   lies, which is what the block move at the top of it is. */
+extern const u_char g_btl_hex_glyphs[16];
 
 #define BTL_EFFECT_SLOTS 4
 #define BTL_EFFECT_FREE  (-1)

@@ -8,6 +8,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/effect.h>
 
 /* Where the text sits relative to the effect. */
 #define EFFECT_TEXT_DX 8
@@ -18,10 +19,7 @@
 
 extern short    g_btl_effect_ox;
 extern short    g_btl_effect_oy;
-extern short    g_btl_glyph_x;
-extern short    g_btl_glyph_y;
 
-extern int BtlDrawGlyphs(const u_char *text, short clut);
 
 void BtlDrawEffectText(u_char *effect)
 {

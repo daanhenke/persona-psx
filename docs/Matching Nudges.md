@@ -517,3 +517,52 @@ Nothing at the source level moved it: statement order, taking the kept values
 into locals first, testing the marker through the pointer instead of by slot,
 putting the spell case first. Worth knowing so the next one is not re-fought
 from the start.
+
+## Which arm falls through
+
+gcc lays the `then` branch out as the fall-through and jumps away to the
+`else`, so the polarity of a branch in the image says which way round the
+source had it. `BtlFormatHexGlyphs` took four goes on that alone: the image
+tests `n != 0` and jumps to the arm that sets the run flag, so the source is
+
+    if (n == 0) {
+        if (seen != 1) { ...blank...; continue; }
+    } else {
+        seen = 1;
+    }
+    *out = digit[n];
+
+and the last of its three tests wanted swapping too - `if (i == 0)` with the
+blank as the else, not the other way round. Nothing about the code changes;
+only which case is written first. Read the branch polarity off the image
+before writing the if, and it is one attempt instead of four.
+
+## A pointer taken again each turn of the loop
+
+Indexing an array by a monotonic counter gets strength-reduced: gcc keeps a
+walking pointer and drops the index. Where the image computes `base + i` fresh
+every iteration instead, the source is holding the base in a pointer that is
+*assigned inside the loop*:
+
+    p = text;
+    do {
+        if (p[i] != BLANK) { p[i] += ZERO; }
+        i++;
+        p = text;              /* this is what stops the walk */
+    } while (p[i] != 0xFF);
+
+Assigned once before the loop it is invariant and gets hoisted, and the walk
+comes back. That one line took BtlEffectDrawNumber from twelve bytes short to
+the right length.
+
+## The permuter does not weigh the frame
+
+Its scorer penalises a stack-layout difference by 1 and a register difference
+by 5, so a candidate that has the frame eight bytes wrong can score better than
+one that has the frame right and two registers swapped. On BtlEffectDrawLines
+its best score of 10 was further from a byte match than the hand version at 8
+differing words.
+
+Take its findings as hints about *shape* - it is very good at spotting that a
+value wants a second variable, or that a local is doing two jobs - and measure
+them with objcmp rather than trusting the score.

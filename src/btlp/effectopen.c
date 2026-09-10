@@ -82,8 +82,8 @@ int BtlEffectOpen(BtlEffect *e)
 opened:
     e->mark = BTL_EFFECT_MARK;
     e->unk28 = 100;
-    e->unk38 = 0x10;
-    e->unk3C = 0x40;
+    e->scale_x = 0x10;
+    e->scale_y = 0x40;
     e->kind = 0;
     e->sel = 0;
     e->unk20 = 0;

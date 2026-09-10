@@ -191,7 +191,7 @@ segments:
       - [0x13194, c, effectopen]
       - [0x13358, c, effect2]
       - [0x13444, c, effect3]
-      - [0x1349C, asm, btlp_25_x2]
+      - [0x1349C, c, effectmotion]
       - [0x13E8C, c, framepiece]
       - [0x1438C, asm, btlp_26]
       - [0x14D88, c, effecttext]
