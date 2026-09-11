@@ -51,6 +51,19 @@ def get_o_target(yaml_file, release, compile_asm_tu, build_base = None):
                                         obj = f"{src_path}/{splits[2]}.c.o"
                                         if obj not in splits_c:
                                             splits_c.append(obj)
+                                        # A unit that is nothing but one of
+                                        # these - a table and no code - has no
+                                        # text .s, so the `c` case above never
+                                        # runs for it and its expected object is
+                                        # never built. Ask for the section one
+                                        # instead, or the progress report has
+                                        # nothing to measure the unit against.
+                                        section = splits[1].lstrip(".")
+                                        asm_tu = f"{asm_base_path}/data/{splits[2]}.{section}.s"
+                                        if (compile_asm_tu == "1"
+                                                and not os.path.exists(f"{asm_base_path}/{splits[2]}.s")
+                                                and os.path.exists(asm_tu)):
+                                            splits_asm.append(f"{build_path}/{asm_tu}.o")
                                     case "pad" | "lib" | "o":
                                         """
                                         Hi, I don't have any SH fun fact for today.
