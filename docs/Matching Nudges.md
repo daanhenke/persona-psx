@@ -841,3 +841,79 @@ plain counter keeps the base where the image has it and the offsets positive.
 
 - [aimorder.c](/src/btlp/aimorder.c) - `a[i].c.key` against `a->c.key`, three
   instructions and the whole allocation.
+
+## A field the image reads twice, and gcc reads once
+
+Where the image loads the same field again a few instructions later, no
+ordinary spelling gets it back: `a->move` written out four times is CSEd into
+one load whether the reads are in one expression, in separate statements, or
+either side of a branch, and a second pointer to the same record is copy-
+propagated away before CSE ever runs. Reading through a volatile lvalue is the
+only thing that separates them:
+
+    #define BTL_MOVE(a) (*(volatile u_char *)&(a)->move)
+
+Nothing can change the byte in between, so this says only "do not keep it" -
+but it is load-bearing, and each read has to go where the image puts one.
+Count the `lbu`s in the image, decide which tests share each of them, and put
+a plain read where the image shares and a volatile one where it does not.
+
+- [aimmove.c](/src/btlp/aimmove.c) - four instructions short and 95% with
+  plain reads, exact with three of the eleven made volatile. Holding the value
+  that is shared in a `u_char` local rather than an `int` is the other half of
+  it: an `int` adds an `andi` the image has no room for.
+
+## A global read at the top of every turn, not above the loop
+
+A global the loop body assigns from is hoisted into the preheader unless it is
+taken into a local *inside* the body. Where the image re-reads it each turn,
+the tell is the order of the stores around it rather than the load itself:
+hoisted, the load leaves the block early and the stores after it come out in
+the wrong order.
+
+    do {
+        gfx = g_btl_unused_gfx;     /* here, not above the do */
+        p->kind = index;
+        p->motion = FX_MOTION;
+        p->scripts = gfx;
+        p = p->attached;
+    } while (p != 0);
+
+- [movefx.c:86](/src/btlp/movefx.c#L86) - 96.50% to 98.21% on that line.
+
+## The byte offset a loop walks a record table by can be the source's own
+
+`g_btl_actors[slot]` read at four offsets makes gcc derive a byte offset and
+step it 0xEC a turn - the same induction variable the image has. What differs
+is *where it is set up*: a compiler-made one is emitted last in the preheader,
+after every statement the source puts in front of the loop, and no order of
+those statements moves it. Where the image sets the offset up before one of
+them, the offset is the source's own variable:
+
+    off = BTL_PARTY * sizeof(BtlActor);
+    p   = g_btl_pick_slots;         /* the image sets this up after off */
+    do {
+        if (ACTOR_FIELD(u_char, off, c.key) != 0) { ... }
+        slot++;
+        off += sizeof(BtlActor);
+    } while (slot < BTL_PARTY + BTL_ENEMIES);
+
+with one macro keeping the field names:
+
+    #define ACTOR_FIELD(type, off, field)         (*(type *)((char *)g_btl_actors + (off) + (int)&((BtlActor *)0)->field))
+
+The generated loop body is identical either way - `lui %hi(sym+field)`,
+`addu at,at,off`, load - so this costs nothing but the spelling.
+
+- [pickrandom.c](/src/btlp/pickrandom.c) - both pickers 97% with the slot
+  indexed and exact with the offset spelt out. Twenty-four orderings of the
+  four set-up statements and a permuter run had not moved it.
+
+Read it off the preheader: a set-up instruction that comes *between* two the
+source clearly owns is not the compiler's.
+
+## Walk the id when two tables are indexed by it
+
+Covered above for spell lines; the same thing decides
+[actordef.c](/src/btlp/actordef.c)'s sibling in reverse - there the record is
+read through one pointer taken once, because only one table is indexed.
