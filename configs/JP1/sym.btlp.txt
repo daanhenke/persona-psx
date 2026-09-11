@@ -1652,8 +1652,8 @@ BtlHoldForMarkers             = 0x8009A034; // type:func size:0x174
 //---------------------------------------------------------------
 BtlAimEnemyMove               = 0x8009A1A8; // type:func size:0x464
 BtlStageCommand               = 0x8009A60C; // type:func size:0x6C4
-func_8009ACD0                 = 0x8009ACD0; // type:func size:0x328
-func_8009AFF8                 = 0x8009AFF8; // type:func size:0x1D8
+BtlPickEnemy                  = 0x8009ACD0; // type:func size:0x328
+BtlPickEnemyLit               = 0x8009AFF8; // type:func size:0x1D8
 
 //-------------------------------------------------------------
 //--- PA: 0x036E30   VA: 0x8009B1D0   subsegment: c, pickmember

@@ -106,8 +106,9 @@ extern void func_800A98A8(void);
 #ifdef NON_MATCHING
 void BtlStageCommand(void)
 {
-    BtlActor *a;
-    int       two;
+    BtlActor  *a;
+    int      (**entry)(void);
+    int        two;
     int       choice;
     int       slot;
 
@@ -198,8 +199,8 @@ void BtlStageCommand(void)
                of them is merged back together. */
         run:
             g_btl_step = 0;
-            if (g_btl_pick_command[choice] != NULL
-                && g_btl_pick_command[choice]() != 0) {
+            entry = &g_btl_pick_command[choice];
+            if (*entry != NULL && (*entry)() != 0) {
                 if (choice == two
                     && g_btl_talk_outcome == BTL_TALK_JOIN) {
                     g_btl_step = choice;
