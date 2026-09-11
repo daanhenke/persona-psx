@@ -3029,6 +3029,7 @@ g_adv_e0_offsets           = 0x8004DA4C;
 g_adv_e1_offsets           = 0x8004DC10;
 g_adv_e2_offsets           = 0x8004DDD4;
 g_adv_e3_offsets           = 0x8004DFB8;
+g_btl_formation_preset     = 0x8004E0D0; // type:u8 size:0xC8
 g_btl_formation            = 0x8004E198;
 g_btl_debug_party_only     = 0x8004E263;
 g_btl_test_party           = 0x8004E269;

@@ -389,7 +389,7 @@ segments:
       - [0x45828, c, pickpage]
       - [0x45984, c, pickhighlight]
       - [0x45B24, c, memberboards]
-      - [0x45CD4, asm, btlp_66]
+      - [0x45CD4, c, formationboard]
       - [0x45E40, c, boards]
       - [0x46128, c, choiceprompt]
       - [0x46348, c, pickgrid]
