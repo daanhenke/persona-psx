@@ -2069,8 +2069,15 @@ func_800B75CC                 = 0x800B75CC; // type:func size:0x174
 func_800B7740                 = 0x800B7740; // type:func size:0x38
 func_800B7778                 = 0x800B7778; // type:func size:0x38
 D_800B77B0                    = 0x800B77B0; // type:func size:0x174
-func_800B7924                 = 0x800B7924; // type:func size:0x8
-func_800B792C                 = 0x800B792C; // type:func size:0xB4
+
+//--------------------------------------------------------
+//--- PA: 0x053584   VA: 0x800B7924   subsegment: c, fxobj
+//--------------------------------------------------------
+BtlOpenFxObj                  = 0x800B7924; // type:func size:0xBC
+
+//--------------------------------------------------------------
+//--- PA: 0x053640   VA: 0x800B79E0   subsegment: asm, btlp_69_c
+//--------------------------------------------------------------
 func_800B79E0                 = 0x800B79E0; // type:func size:0xE4
 func_800B7AC4                 = 0x800B7AC4; // type:func size:0x238
 func_800B7CFC                 = 0x800B7CFC; // type:func size:0x78
@@ -2266,10 +2273,26 @@ func_800BFF34                 = 0x800BFF34; // type:func size:0x88
 func_800BFFBC                 = 0x800BFFBC; // type:func size:0x80
 func_800C003C                 = 0x800C003C; // type:func size:0x20
 func_800C005C                 = 0x800C005C; // type:func size:0x104
-func_800C0160                 = 0x800C0160; // type:func size:0xBC
+
+//---------------------------------------------------------
+//--- PA: 0x05BDC0   VA: 0x800C0160   subsegment: c, fxobj2
+//---------------------------------------------------------
+BtlOpenFxObj2                 = 0x800C0160; // type:func size:0xBC
+
+//--------------------------------------------------------------
+//--- PA: 0x05BE7C   VA: 0x800C021C   subsegment: asm, btlp_69_d
+//--------------------------------------------------------------
 func_800C021C                 = 0x800C021C; // type:func size:0x194
 func_800C03B0                 = 0x800C03B0; // type:func size:0x1C8
-func_800C0578                 = 0x800C0578; // type:func size:0x1C8
+
+//-----------------------------------------------------------
+//--- PA: 0x05C1D8   VA: 0x800C0578   subsegment: c, fxlayers
+//-----------------------------------------------------------
+BtlOpenFxLayers               = 0x800C0578; // type:func size:0x1C8
+
+//--------------------------------------------------------------
+//--- PA: 0x05C3A0   VA: 0x800C0740   subsegment: asm, btlp_69_e
+//--------------------------------------------------------------
 D_800C0740                    = 0x800C0740; // type:func size:0x290
 func_800C09D0                 = 0x800C09D0; // type:func size:0x484
 func_800C0E54                 = 0x800C0E54; // type:func size:0x28C
@@ -2599,6 +2622,9 @@ g_btl_no_flee                 = 0x800CCA33; // type:u8 size:0x1
 g_btl_tint_pick_r             = 0x800CCA38; // type:u32 size:0x8
 g_btl_tint_pick_g             = 0x800CCA39;
 g_btl_tint_pick_b             = 0x800CCA3A;
+g_btl_tint_fx_r               = 0x800CCA3B;
+g_btl_tint_fx_g               = 0x800CCA3C;
+g_btl_tint_fx_b               = 0x800CCA3D;
 g_btl_tint_ail4               = 0x800CCA3E; // size:0x3
 g_btl_tint_ail5               = 0x800CCA41; // size:0x6
 g_btl_frame_due               = 0x800CCA47;
@@ -2761,6 +2787,8 @@ g_btl_tactics_board_pos       = 0x800D029C; // type:s32 size:0x10
 g_btl_config_board_pos        = 0x800D02AC; // type:s32 size:0x10
 g_btl_board15_pos             = 0x800D02BC; // type:s32 size:0x10
 g_btl_status_board_pos        = 0x800D02CC; // type:s32 size:0x10
+g_btl_fx_def                  = 0x800D042C; // size:0x8
+g_btl_fx_shift                = 0x800D0434; // type:s8 size:0x3
 g_btl_spell_fx                = 0x800D0484;
 D_800D1414                    = 0x800D1414; // type:u32 size:0x80
 D_800D1494                    = 0x800D1494; // type:u32 size:0x4084

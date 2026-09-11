@@ -14,12 +14,9 @@
  * A move whose record carries no handler leaves the answer untouched, which is
  * not the same as answering nothing - the caller is handed whatever the last
  * chain was. Nothing appears to depend on it.
- *
- * 98.21% and behind INCLUDE_ASM: the image builds the staged address twice,
- * once for the global and once for the copy, and gcc shares the one.
+
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
@@ -29,7 +26,8 @@
 
 /* What the loader left at 0x80140000: one address per run it read. The effect
    takes the second of them and the tim from the first. */
-#define BTL_STAGE ((u_char **)0x80140000)
+extern u_char *g_load_stage;
+extern u_char *D_80140004;
 
 /* Where the effect's artwork is staged, and how much of it there is. */
 #define FX_GFX_STAGE 0x801D9400
@@ -67,19 +65,23 @@ extern int     BtlBindGfx(u_int kind, int index, u_char **image);
 extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
                             int upload);
 
-#ifdef NON_MATCHING
 BtlObj *BtlStartMoveFx(int index)
 {
     BtlObj *o;
     BtlObj *p;
     u_char *gfx;
+    u_char *stage;
     BtlObj *(*start)();
 
     BtlCloseMessage(0);
     g_btl_fx_gfx = (u_char *)FX_GFX_STAGE;
-    memcpy((u_char *)FX_GFX_STAGE, BTL_STAGE[1], FX_GFX_BYTES);
+    /* One local carries both of the loader's addresses in turn, which is what
+       gives the block move a copy of the first rather than the load itself. */
+    stage = D_80140004;
+    memcpy((u_char *)FX_GFX_STAGE, stage, FX_GFX_BYTES);
     BtlBindGfx(FX_KIND_GFX, index, &g_btl_fx_gfx);
-    BtlUploadTim((u_long *)BTL_STAGE[0], FX_TIM_PAGE, FX_TIM_SLOT, 1, 0, 1);
+    stage = g_load_stage;
+    BtlUploadTim((u_long *)stage, FX_TIM_PAGE, FX_TIM_SLOT, 1, 0, 1);
 
     g_btl_fx_move = g_btl_actors[g_btl_actor_turn].move;
     g_btl_fx_target = g_btl_actors[g_btl_actor_turn].order;
@@ -102,6 +104,3 @@ BtlObj *BtlStartMoveFx(int index)
     BtlSePlay(FX_SE_BANK, 0);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/movefx", BtlStartMoveFx);
-#endif
