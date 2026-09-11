@@ -258,7 +258,6 @@ segments:
       - [0x19DFC, c, hud]
       - [0x19FD4, asm, btlp_34]
       - [0x1AB68, c, indicator]
-      - [0x1ABA8, asm, btlp_35]
       - [0x1AEB8, c, openmessage]
       - [0x1B028, c, boxmessage]
       - [0x1B048, c, entry]

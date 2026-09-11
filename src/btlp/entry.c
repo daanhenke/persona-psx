@@ -62,7 +62,7 @@ extern int    g_state_prev;
    is reached on its own, so they are separate names rather than one table.
    Once they have all been taken the run's own memory is reused, first as the
    battle's one-shade CLUT and then as the TIM scratch. */
-extern u_char *g_load_stage;
+#define g_load_stage (*(u_char **)0x80140000)
 extern u_char *D_80140004;
 extern u_char *D_80140010;
 extern u_char *D_80140014;
@@ -236,10 +236,14 @@ void BtlBoxDismiss(void)
 }
 
 #ifdef NON_MATCHING
-/* Exact size and the same control flow as the image, but not yet the same
-   registers: the image keeps its loop counters and its small constants in saved
-   registers across the debug calls, and this holds them in temporaries, which
-   shifts the allocation from the first loop onwards. */
+static __inline__ int BtlEntryEncounter(void)
+{
+    return g_btl_encounter;
+}
+
+/* The remaining instruction differences are the encounter-check copies,
+   the first texture upload's scheduling, and the final stage-table address.
+   odiff also reports the raw addresses and unowned string section as aliases. */
 void ovl_btlp_entry(void)
 {
     long     pos[4];
@@ -252,14 +256,18 @@ void ovl_btlp_entry(void)
     u_char  *f;
     u_char  *cell;
     u_short *clut;
-    u_short *p;
+    short   *p;
     long    *slot;
     u_char   t;
     u_char   u;
+    u_char   orders;
+    u_char **seq_end;
     BtlObj  *o;
     BtlObj  *lamp;
     int      i;
     int      enc;
+    int      full_moon;
+    short    shade;
     void   (*stage)(void);
     void  (**stages)(void);
 
@@ -324,13 +332,13 @@ void ovl_btlp_entry(void)
         g_btl_battle_kind = 1;
     }
 
-    enc = g_btl_encounter;
+    enc = BtlEntryEncounter();
     if (enc < 9 || (u_int)(enc - 0x11) < 2) {
         g_btl_place_party = 1;
         g_btl_battle_kind = 0;
     }
 
-    enc = g_btl_encounter;
+    enc = BtlEntryEncounter();
     if (enc < 5 || (u_int)(enc - 6) < 2 || (u_int)(enc - 0x11) < 2) {
         D_800CCA2D = 1;
     }
@@ -390,17 +398,18 @@ void ovl_btlp_entry(void)
     /* The three buffers are consecutive words, and the routine works from the
        middle one: the bank itself is a word below what it keeps the address
        of, which is where the negative displacements come from. */
+    seq_end = BTL_LOAD_SEQ_END;
     bank  = &g_btl_open_banks[0].vb;
     g_btl_open_banks[0].vh   = BTL_WORK_A;
     g_btl_open_banks[0].seq  = (u_long *)BTL_WORK_B;
     *bank = g_load_stage;
-    g_btl_open_banks[4].vb   = D_80140014;
-    g_btl_open_banks[2].vb   = *BTL_LOAD_SEQ_END;
+    g_btl_open_banks[2].vb   = *seq_end;
     g_btl_open_banks[3].vb   = D_80140010;
+    g_btl_open_banks[4].vb   = D_80140014;
     g_btl_open_banks[0].nsep = g_btl_bgm_kinds[g_btl_bgm_index];
     memmove(BTL_WORK_A, D_80140004, *BTL_LOAD_VH_END - D_80140004);
     memmove(BTL_WORK_B, *BTL_LOAD_VH_END,
-            *BTL_LOAD_SEQ_END - *BTL_LOAD_VH_END);
+            *seq_end - *BTL_LOAD_VH_END);
 
     if (g_btl_debug != 0) {
         BtlDebugWaitArgs("%02x %02x %02x\n", bank[-1][0], bank[-1][1],
@@ -420,7 +429,8 @@ void ovl_btlp_entry(void)
         BtlDebugWait("CALL BACK SET\n");
     }
 
-    g_btl_tim_buf = g_load_stage;
+    enc = (int)g_load_stage;
+    g_btl_tim_buf = (u_char *)enc;
     BtlUploadPackedTim(D_80140018, 0x1F, 0x20, 0, 0, 7);
     BtlUploadPackedTim(D_8014001C, 0x1F, 0x27, 0, 0x80, 5);
     BtlUploadPackedTim(D_80140020, 0x19, 0x1E, 0, 0, 1);
@@ -461,9 +471,10 @@ void ovl_btlp_entry(void)
     i       = 1;
     clut    = (u_short *)BTL_LOAD_BUF;
     clut[0] = 0;
-    p       = clut + 1;
+    shade   = BTL_CLUT_FILL;
+    p       = (short *)(clut + 1);
     do {
-        *p = BTL_CLUT_FILL;
+        *p = shade;
         p++;
         i++;
     } while (i < BTL_CLUT_ENTRIES);
@@ -487,6 +498,7 @@ void ovl_btlp_entry(void)
         i--;
     } while (i >= 0);
 
+    full_moon = 8;
     BtlTakeParty();
     BtlLoadPersonas();
     BtlPlaceFormation();
@@ -497,22 +509,22 @@ void ovl_btlp_entry(void)
     g_btl_moon = g_moon;
     /* A new moon has the party fight on its own orders and a full moon takes
        them away altogether; anything between is the ordinary set. */
-    switch (g_btl_moon) {
-    case 0:
-        g_btl_ai_set = 2;
-        break;
+    if (g_btl_moon == 0) goto new_moon;
+    if (g_btl_moon == full_moon) goto full_moon_orders;
+    orders = 1;
+    goto store_moon_orders;
+new_moon:
+    orders = 2;
+    goto store_moon_orders;
+full_moon_orders:
+    g_btl_ai_set = 0;
+    goto moon_orders_done;
+store_moon_orders:
+    g_btl_ai_set = orders;
+moon_orders_done:
 
-    case 8:
-        g_btl_ai_set = 0;
-        break;
-
-    default:
-        g_btl_ai_set = 1;
-        break;
-    }
-
-    D_800DAD38 = D_800DF524[g_btl_moon];
-    D_800DAD98 = D_800DF564[g_btl_moon];
+    D_800DAD38 = *(u_char **)((u_char *)D_800DF524 + g_btl_moon * 4);
+    D_800DAD98 = *(u_char **)((u_char *)D_800DF564 + g_btl_moon * 4);
 
     /* Where the next graphics image is read to, which the field and the dungeon
        each have their own buffer for. The copy below is taken from it rather
@@ -582,8 +594,8 @@ void ovl_btlp_entry(void)
        the formation is swapped end for end with the far half. */
     if (g_btl_battle_kind == 2) {
         f = g_btl_formation;
-        a = f;
         b = f + 0x18;
+        do { a = f; } while (0);
         do {
             t = *b;
             u = *a;
@@ -635,7 +647,9 @@ void ovl_btlp_entry(void)
     stages = g_btl_stages;
 
 next_stage:
-    stage = stages[g_btl_stage];
+    enc = g_btl_stage;
+    enc = (u_char)enc * sizeof(stage) + (int)stages;
+    stage = *(void (**)(void))enc;
     if (stage != NULL) {
         g_btl_step = 0;
         stage();

@@ -1089,10 +1089,6 @@ BtlHudDraw                    = 0x8007E374; // type:func size:0xB94
 BtlIndicatorIcon              = 0x8007EF08; // type:func size:0x1C
 BtlIndicatorBar               = 0x8007EF24; // type:func size:0x14
 BtlIndicatorClear             = 0x8007EF38; // type:func size:0x10
-
-//------------------------------------------------------------
-//--- PA: 0x01ABA8   VA: 0x8007EF48   subsegment: asm, btlp_35
-//------------------------------------------------------------
 BtlDrawIndicator              = 0x8007EF48; // type:func size:0x310
 
 //--------------------------------------------------------------
@@ -2465,7 +2461,8 @@ D_800CC8E0                    = 0x800CC8E0; // type:u32 size:0x4
 D_800CC8E4                    = 0x800CC8E4; // type:u32 size:0x40
 D_800CC924                    = 0x800CC924; // type:u32 size:0x18
 D_800CC93C                    = 0x800CC93C; // type:u32 size:0x18
-D_800CC954                    = 0x800CC954; // type:u32 size:0x78
+D_800CC954                    = 0x800CC954; // type:u32 size:0x18
+g_btl_indicator_ramp          = 0x800CC96C; // type:u16 size:0x4C
 g_btl_indicator_mode          = 0x800CC9BA;
 g_btl_indicator_phase         = 0x800CC9BC;
 g_btl_obj_pool                = 0x800CC9C0;
@@ -2821,7 +2818,8 @@ g_btl_cursor_timer            = 0x800EC4FC;
 g_btl_cursor_cel              = 0x800EC500;
 g_btl_cursor_prims            = 0x800EC504; // type:u32 size:0x50
 g_btl_talk_level_text         = 0x800EC554; // type:u32 size:0x18
-g_btl_talk_name_text          = 0x800EC56C; // type:u32 size:0x83A8
+g_btl_talk_name_text          = 0x800EC56C; // type:u32 size:0x58
+g_btl_indicator_cells         = 0x800EC5C4; // type:u16 size:0x16
 g_btl_sprt_next               = 0x800EC5E8;
 g_btl_tile_next               = 0x800EC5EC;
 g_btl_polyft4_next            = 0x800EC5F0;

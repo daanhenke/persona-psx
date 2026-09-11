@@ -136,21 +136,27 @@ extern void BtlBoxOpen(short cols, short x, short y, int style);
 extern void BtlHudShow(void);
 extern void BtlShowAilmentMarks(int show);
 
-#ifdef NON_MATCHING
 void BtlTalkSceneTrade(void)
 {
     int choice;
     int reply;
-    const u_char *(*menus)[3];
-    int which;
+    u_long menus;
     int line;
+    int state;
 
-    switch (g_btl_talk_stage[g_btl_talk_depth - 1]) {
+    /* The stage and byte offset share a scratch. Keep the switch byte-sized;
+       widening it changes the dispatch registers. */
+    state = g_btl_talk_stage[g_btl_talk_depth - 1];
+    switch ((u_char)state) {
     case TRADE_ASK:
         BtlEndTalking();
-        menus = g_btl_talk_reply_menus;
-        which = g_btl_actors[g_btl_actor_slot].c.key - 1;
-        BtlMenuOpen3(menus[which]);
+        menus = (u_long)g_btl_talk_reply_menus;
+        /* Keep the three-entry index in the same local as the later choices,
+           and form its byte offset before adding the menu base. */
+        choice = (g_btl_actors[g_btl_actor_slot].c.key - 1) * 3;
+        state = choice * sizeof(u_char *);
+        menus = state + menus;
+        BtlMenuOpen3((const u_char **)menus);
         g_btl_talk_stage[g_btl_talk_depth - 1] = TRADE_REPLY;
         return;
 
@@ -377,7 +383,4 @@ void BtlTalkSceneTrade(void)
         return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkscenetrade", BtlTalkSceneTrade);
-#endif
 
