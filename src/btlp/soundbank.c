@@ -20,19 +20,19 @@
 #include <persona/btlp/sound.h>
 
 #ifdef NON_MATCHING
-/* A slot of -1 means "any free one", and the slot in hand and the answer are
-   one variable, so a caller that did not care still learns which was taken.
-   A bank with no VAB header is not a bank: nothing is opened and the answer
-   is zero rather than the slot. */
+/* A slot of -1 means "any free one"; the answer is the slot actually used.
+   A bank with no VAB header opens nothing and returns the null header value.
+   Keeping that value as the initial result avoids a separate zero load. */
 int BtlSoundOpen(const BtlSoundBank *banks, int slot, int index)
 {
     short              *p;
     int                 i;
     int                 used;
+    int                 result;
 
-    used = 0;
-    if (banks[index].vh != 0) {
-        used = slot;
+    result = (int)banks[index].vh;
+    used = slot;
+    if (result != 0) {
         if (slot < 0) {
             p = g_btl_vab;
             for (i = 0; i < BTL_SOUND_SLOTS; i++) {
@@ -56,8 +56,9 @@ int BtlSoundOpen(const BtlSoundBank *banks, int slot, int index)
         g_btl_seq[used] = SsSepOpen(banks[index].seq, g_btl_vab[used],
                                     banks[index].nsep);
         g_btl_seq_count[used] = banks[index].nsep;
+        result = used;
     }
-    return used;
+    return result;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/soundbank", BtlSoundOpen);

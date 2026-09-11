@@ -72,30 +72,40 @@ void BtlTalkUpdate(void)
             }
         }
         if ((BtlInputKeys() & g_btl_key_down) != 0) {
+            int previous;
+
             BtlSePlay(TALK_SE_BANK, TALK_SE_MOVE);
-            index = &g_btl_talk_index;
-            was = *index;
-            *index = was + TALK_COLS;
+            do {
+                index = &g_btl_talk_index;
+            } while (0);
+            previous = *index;
+            *index = previous + TALK_COLS;
             if (*index >= TALK_OPTIONS) {
-                *index = was - TALK_COLS;
+                *index = previous - TALK_COLS;
             }
         }
         if ((BtlInputKeys() & g_btl_key_left) != 0) {
+            int *leftIndex;
+
             BtlSePlay(TALK_SE_BANK, TALK_SE_MOVE);
-            index = &g_btl_talk_index;
-            if ((*index & 1) != 0) {
-                *index = *index - 1;
+            leftIndex = &g_btl_talk_index;
+            if ((*leftIndex & 1) != 0) {
+                *leftIndex = *leftIndex - 1;
             } else {
-                *index = *index + 1;
+                *leftIndex = *leftIndex + 1;
             }
         }
         if ((BtlInputKeys() & g_btl_key_right) != 0) {
+            int previous;
+
             BtlSePlay(TALK_SE_BANK, TALK_SE_MOVE);
-            index = &g_btl_talk_index;
-            was = *index;
-            *index = was + 1;
+            do {
+                index = &g_btl_talk_index;
+            } while (0);
+            previous = *index;
+            *index = previous + 1;
             if ((*index & 1) == 0) {
-                *index = was - 1;
+                *index = previous - 1;
             }
         }
 
@@ -118,4 +128,3 @@ void BtlTalkUpdate(void)
 #else
 INCLUDE_ASM("btlp/nonmatchings/talkupdate", BtlTalkUpdate);
 #endif
-

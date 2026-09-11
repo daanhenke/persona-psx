@@ -22,11 +22,8 @@
  * being down itself - it is the enemy's aim, and nothing has filtered the
  * party for it.
  *
- * Both are 99%-and-change and stay behind INCLUDE_ASM. The whole of what is
- * left is the order of the two constants the walk starts from: the image sets
- * the distance up before the row and keeps the row in the lower register,
- * and no order of the statements gets both at once - whichever is written
- * first is both emitted first and given that register.
+ * The distance initialization has its own basic block so GCC emits it before
+ * the row initialization and assigns both to the original registers.
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
@@ -37,7 +34,6 @@
 /* Further apart than two fighters on the grid can be. */
 #define ORDER_FAR 0xFF
 
-#ifdef NON_MATCHING
 int BtlSlowestOrder(void)
 {
     BtlActor *a;
@@ -50,7 +46,9 @@ int BtlSlowestOrder(void)
     int       at;
     int       i;
 
-    dist = ORDER_FAR;
+    do {
+        dist = ORDER_FAR;
+    } while (0);
     row  = 0;
     best = -1;
     col  = g_btl_actors[g_btl_actor_turn].obj->col2;
@@ -72,11 +70,7 @@ int BtlSlowestOrder(void)
     } while (i < BTL_ENEMIES);
     return best;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/aimorder", BtlSlowestOrder);
-#endif
 
-#ifdef NON_MATCHING
 int BtlFrontMemberOrder(BtlActor *by)
 {
     BtlObj *o;
@@ -88,8 +82,10 @@ int BtlFrontMemberOrder(BtlActor *by)
     int     at;
     int     i;
 
+    do {
+        dist = ORDER_FAR;
+    } while (0);
     row  = BTL_PARTY;
-    dist = ORDER_FAR;
     best = -1;
     col  = by->obj->col2;
     i    = 0;
@@ -112,6 +108,3 @@ int BtlFrontMemberOrder(BtlActor *by)
     } while (i < BTL_PARTY);
     return best;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/aimorder", BtlFrontMemberOrder);
-#endif

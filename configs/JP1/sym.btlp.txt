@@ -198,8 +198,8 @@ g_btl_text_cluts              = 0x800648AC;
 //-------------------------------------------------------------
 //--- PA: 0x001990   VA: 0x80065D30   subsegment: asm, btlp_pre
 //-------------------------------------------------------------
-func_80065D30                 = 0x80065D30; // type:func size:0x3C
-func_80065D6C                 = 0x80065D6C; // type:func size:0x108
+func_80065D30                 = 0x80065D30; // type:func size:0x34
+func_80065D64                 = 0x80065D64; // type:func size:0x110
 
 //------------------------------------------------------------
 //--- PA: 0x001AD4   VA: 0x80065E74   subsegment: c, drawfront
@@ -865,10 +865,10 @@ BtlEffectOffset               = 0x80079178; // type:func size:0xA8
 //--- PA: 0x014E80   VA: 0x80079220   subsegment: asm, btlp_27
 //------------------------------------------------------------
 BtlDrawEffects                = 0x80079220; // type:func size:0x3B4
-func_800795D4                 = 0x800795D4; // type:func size:0x34
-func_80079608                 = 0x80079608; // type:func size:0xA0
-func_800796A8                 = 0x800796A8; // type:func size:0x2FC
-func_800799A4                 = 0x800799A4; // type:func size:0x194
+func_800795D4                 = 0x800795D4; // type:func size:0x2C
+func_80079600                 = 0x80079600; // type:func size:0xA0
+func_800796A0                 = 0x800796A0; // type:func size:0x2FC
+func_8007999C                 = 0x8007999C; // type:func size:0x19C
 
 //---------------------------------------------------------------
 //--- PA: 0x015798   VA: 0x80079B38   subsegment: c, effectcursor
@@ -1415,8 +1415,8 @@ BtlUploadPackedTim            = 0x8008DBDC; // type:func size:0x8C
 //------------------------------------------------------------
 //--- PA: 0x0298C8   VA: 0x8008DC68   subsegment: asm, btlp_50
 //------------------------------------------------------------
-BtlDrawDebugHud               = 0x8008DC68; // type:func size:0x500
-func_8008E168                 = 0x8008E168; // type:func size:0xEC
+BtlDrawDebugHud               = 0x8008DC68; // type:func size:0x4F0
+func_8008E158                 = 0x8008E158; // type:func size:0xFC
 
 //--------------------------------------------------------
 //--- PA: 0x029EB4   VA: 0x8008E254   subsegment: c, cheat
@@ -1555,8 +1555,14 @@ func_800951D0                 = 0x800951D0; // type:func size:0xD4
 func_800952A4                 = 0x800952A4; // type:func size:0x74
 func_80095318                 = 0x80095318; // type:func size:0x558
 func_80095870                 = 0x80095870; // type:func size:0xC0
-D_80095930                    = 0x80095930; // type:u32 size:0x48
-func_80095978                 = 0x80095978; // type:func size:0xC8
+func_80095930                 = 0x80095930; // type:func size:0x8
+func_80095938                 = 0x80095938; // type:func size:0x8
+func_80095940                 = 0x80095940; // type:func size:0x8
+func_80095948                 = 0x80095948; // type:func size:0x8
+func_80095950                 = 0x80095950; // type:func size:0x8
+func_80095958                 = 0x80095958; // type:func size:0x8
+func_80095960                 = 0x80095960; // type:func size:0x8
+func_80095968                 = 0x80095968; // type:func size:0xD8
 D_80095A40                    = 0x80095A40; // type:func size:0x54
 func_80095A94                 = 0x80095A94; // type:func size:0xE8
 func_80095B7C                 = 0x80095B7C; // type:func size:0x13C
@@ -1813,8 +1819,8 @@ func_800A9468                 = 0x800A9468; // type:func size:0x38
 func_800A94A0                 = 0x800A94A0; // type:func size:0x8
 func_800A94A8                 = 0x800A94A8; // type:func size:0x20
 func_800A94C8                 = 0x800A94C8; // type:func size:0x94
-func_800A955C                 = 0x800A955C; // type:func size:0x40
-func_800A959C                 = 0x800A959C; // type:func size:0x20
+func_800A955C                 = 0x800A955C; // type:func size:0x38
+func_800A9594                 = 0x800A9594; // type:func size:0x28
 func_800A95BC                 = 0x800A95BC; // type:func size:0x2EC
 func_800A98A8                 = 0x800A98A8; // type:func size:0x8
 func_800A98B0                 = 0x800A98B0; // type:func size:0x20
@@ -1975,8 +1981,8 @@ BtlActorPersona               = 0x800ACAF4; // type:func size:0x48
 //------------------------------------------------------------
 BtlMarkersIdle                = 0x800ACB3C; // type:func size:0x60
 BtlMarkersHidden              = 0x800ACB9C; // type:func size:0x38
-D_800ACBD4                    = 0x800ACBD4; // type:u32 size:0x1D4
-func_800ACDA8                 = 0x800ACDA8; // type:func size:0x1BC
+func_800ACBD4                 = 0x800ACBD4; // type:func size:0x1CC
+func_800ACDA0                 = 0x800ACDA0; // type:func size:0x1C4
 func_800ACF64                 = 0x800ACF64; // type:func size:0xFC
 func_800AD060                 = 0x800AD060; // type:func size:0x28C
 func_800AD2EC                 = 0x800AD2EC; // type:func size:0x68
@@ -2005,8 +2011,8 @@ func_800B07F4                 = 0x800B07F4; // type:func size:0x108
 func_800B08FC                 = 0x800B08FC; // type:func size:0x88
 func_800B0984                 = 0x800B0984; // type:func size:0x540
 func_800B0EC4                 = 0x800B0EC4; // type:func size:0x2A0
-func_800B1164                 = 0x800B1164; // type:func size:0xF8
-func_800B125C                 = 0x800B125C; // type:func size:0x74
+func_800B1164                 = 0x800B1164; // type:func size:0xF0
+func_800B1254                 = 0x800B1254; // type:func size:0x7C
 func_800B12D0                 = 0x800B12D0; // type:func size:0x3EC
 func_800B16BC                 = 0x800B16BC; // type:func size:0x64C
 func_800B1D08                 = 0x800B1D08; // type:func size:0x8
@@ -2054,7 +2060,12 @@ BtlStartMoveFx                = 0x800B6528; // type:func size:0x1D4
 //--- PA: 0x05235C   VA: 0x800B66FC   subsegment: asm, btlp_69_b
 //--------------------------------------------------------------
 func_800B66FC                 = 0x800B66FC; // type:func size:0x4B4
-func_800B6BB0                 = 0x800B6BB0; // type:func size:0xCC
+
+//---------------------------------------------------------
+//--- PA: 0x052810   VA: 0x800B6BB0   subsegment: c, fxtick
+//---------------------------------------------------------
+BtlFxObjTick                  = 0x800B6BB0; // type:func size:0xC4
+BtlFxStartNone                = 0x800B6C74; // type:func size:0x8
 
 //----------------------------------------------------------
 //--- PA: 0x0528DC   VA: 0x800B6C7C   subsegment: c, fxstart
@@ -2062,11 +2073,19 @@ func_800B6BB0                 = 0x800B6BB0; // type:func size:0xCC
 BtlFxStartLayers              = 0x800B6C7C; // type:func size:0x28
 BtlFxStartLayers2             = 0x800B6CA4; // type:func size:0x28
 
+//-----------------------------------------------------------
+//--- PA: 0x05292C   VA: 0x800B6CCC   subsegment: c, fxsheet3
+//-----------------------------------------------------------
+BtlFxStartSheetLate           = 0x800B6CCC; // type:func size:0x17C
+
+//----------------------------------------------------------
+//--- PA: 0x052AA8   VA: 0x800B6E48   subsegment: c, fxside2
+//----------------------------------------------------------
+BtlFxStartSideLayers          = 0x800B6E48; // type:func size:0x128
+
 //----------------------------------------------------------------
-//--- PA: 0x05292C   VA: 0x800B6CCC   subsegment: asm, btlp_69_b_a
+//--- PA: 0x052BD0   VA: 0x800B6F70   subsegment: asm, btlp_69_b_a
 //----------------------------------------------------------------
-func_800B6CCC                 = 0x800B6CCC; // type:func size:0x17C
-func_800B6E48                 = 0x800B6E48; // type:func size:0x128
 func_800B6F70                 = 0x800B6F70; // type:func size:0x240
 
 //----------------------------------------------------------
@@ -2074,21 +2093,25 @@ func_800B6F70                 = 0x800B6F70; // type:func size:0x240
 //----------------------------------------------------------
 BtlFxStartSheet               = 0x800B71B0; // type:func size:0x48
 
-//----------------------------------------------------------------
-//--- PA: 0x052E58   VA: 0x800B71F8   subsegment: asm, btlp_69_b_b
-//----------------------------------------------------------------
-func_800B71F8                 = 0x800B71F8; // type:func size:0x15C
-func_800B7354                 = 0x800B7354; // type:func size:0x1C0
+//---------------------------------------------------------
+//--- PA: 0x052E58   VA: 0x800B71F8   subsegment: c, fxstep
+//---------------------------------------------------------
+BtlFxObjStep                  = 0x800B71F8; // type:func size:0x15C
+
+//---------------------------------------------------------
+//--- PA: 0x052FB4   VA: 0x800B7354   subsegment: c, fxring
+//---------------------------------------------------------
+BtlFxStartRing                = 0x800B7354; // type:func size:0x1C0
 
 //--------------------------------------------------------
 //--- PA: 0x053174   VA: 0x800B7514   subsegment: c, fxaim
 //--------------------------------------------------------
 BtlFxStartOnAim               = 0x800B7514; // type:func size:0xB0
 
-//----------------------------------------------------------------
-//--- PA: 0x053224   VA: 0x800B75C4   subsegment: asm, btlp_69_b_c
-//----------------------------------------------------------------
-func_800B75C4                 = 0x800B75C4; // type:func size:0x17C
+//---------------------------------------------------------
+//--- PA: 0x053224   VA: 0x800B75C4   subsegment: c, fxside
+//---------------------------------------------------------
+BtlFxStartOnSide              = 0x800B75C4; // type:func size:0x17C
 
 //-----------------------------------------------------------
 //--- PA: 0x0533A0   VA: 0x800B7740   subsegment: c, fxsheet2
@@ -2096,10 +2119,10 @@ func_800B75C4                 = 0x800B75C4; // type:func size:0x17C
 BtlFxStartSheetLit            = 0x800B7740; // type:func size:0x38
 BtlFxStartSheetLit2           = 0x800B7778; // type:func size:0x38
 
-//----------------------------------------------------------------
-//--- PA: 0x053410   VA: 0x800B77B0   subsegment: asm, btlp_69_b_d
-//----------------------------------------------------------------
-func_800B77B0                 = 0x800B77B0; // type:func size:0x174
+//----------------------------------------------------------
+//--- PA: 0x053410   VA: 0x800B77B0   subsegment: c, fxsweep
+//----------------------------------------------------------
+BtlFxStartSweep               = 0x800B77B0; // type:func size:0x174
 
 //--------------------------------------------------------
 //--- PA: 0x053584   VA: 0x800B7924   subsegment: c, fxobj
@@ -2138,8 +2161,8 @@ func_800B8AC0                 = 0x800B8AC0; // type:func size:0x20
 func_800B8AE0                 = 0x800B8AE0; // type:func size:0x20
 func_800B8B00                 = 0x800B8B00; // type:func size:0x20
 func_800B8B20                 = 0x800B8B20; // type:func size:0x28
-func_800B8B48                 = 0x800B8B48; // type:func size:0x30
-func_800B8B78                 = 0x800B8B78; // type:func size:0xB8
+func_800B8B48                 = 0x800B8B48; // type:func size:0x28
+func_800B8B70                 = 0x800B8B70; // type:func size:0xC0
 func_800B8C30                 = 0x800B8C30; // type:func size:0x25C
 func_800B8E8C                 = 0x800B8E8C; // type:func size:0x20
 func_800B8EAC                 = 0x800B8EAC; // type:func size:0x20
@@ -2158,10 +2181,10 @@ func_800B9D58                 = 0x800B9D58; // type:func size:0x98
 func_800B9DF0                 = 0x800B9DF0; // type:func size:0x100
 func_800B9EF0                 = 0x800B9EF0; // type:func size:0x368
 func_800BA258                 = 0x800BA258; // type:func size:0x28
-func_800BA280                 = 0x800BA280; // type:func size:0x34
-func_800BA2B4                 = 0x800BA2B4; // type:func size:0x248
-func_800BA4FC                 = 0x800BA4FC; // type:func size:0x1C4
-func_800BA6C0                 = 0x800BA6C0; // type:func size:0xE0
+func_800BA280                 = 0x800BA280; // type:func size:0x2C
+func_800BA2AC                 = 0x800BA2AC; // type:func size:0x250
+func_800BA4FC                 = 0x800BA4FC; // type:func size:0x1BC
+func_800BA6B8                 = 0x800BA6B8; // type:func size:0xE8
 func_800BA7A0                 = 0x800BA7A0; // type:func size:0x2B0
 func_800BAA50                 = 0x800BAA50; // type:func size:0x2C
 func_800BAA7C                 = 0x800BAA7C; // type:func size:0x28
@@ -2175,8 +2198,8 @@ func_800BB268                 = 0x800BB268; // type:func size:0x2C
 func_800BB294                 = 0x800BB294; // type:func size:0x2C
 func_800BB2C0                 = 0x800BB2C0; // type:func size:0x2C
 D_800BB2EC                    = 0x800BB2EC; // type:func size:0x134
-func_800BB420                 = 0x800BB420; // type:func size:0x1A4
-func_800BB5C4                 = 0x800BB5C4; // type:func size:0x55C
+func_800BB420                 = 0x800BB420; // type:func size:0x19C
+func_800BB5BC                 = 0x800BB5BC; // type:func size:0x564
 func_800BBB20                 = 0x800BBB20; // type:func size:0x20
 func_800BBB40                 = 0x800BBB40; // type:func size:0x20
 func_800BBB60                 = 0x800BBB60; // type:func size:0x28
@@ -2194,8 +2217,8 @@ func_800BC35C                 = 0x800BC35C; // type:func size:0x20
 func_800BC37C                 = 0x800BC37C; // type:func size:0x20
 func_800BC39C                 = 0x800BC39C; // type:func size:0x318
 func_800BC6B4                 = 0x800BC6B4; // type:func size:0x28
-func_800BC6DC                 = 0x800BC6DC; // type:func size:0x34
-func_800BC710                 = 0x800BC710; // type:func size:0x9C
+func_800BC6DC                 = 0x800BC6DC; // type:func size:0x2C
+func_800BC708                 = 0x800BC708; // type:func size:0xA4
 func_800BC7AC                 = 0x800BC7AC; // type:func size:0x2C
 func_800BC7D8                 = 0x800BC7D8; // type:func size:0x2C
 func_800BC804                 = 0x800BC804; // type:func size:0x2C
@@ -2227,8 +2250,8 @@ func_800BCF6C                 = 0x800BCF6C; // type:func size:0x3C4
 func_800BD330                 = 0x800BD330; // type:func size:0x78
 func_800BD3A8                 = 0x800BD3A8; // type:func size:0x280
 func_800BD628                 = 0x800BD628; // type:func size:0x44C
-func_800BDA74                 = 0x800BDA74; // type:func size:0x30
-func_800BDAA4                 = 0x800BDAA4; // type:func size:0x104
+func_800BDA74                 = 0x800BDA74; // type:func size:0x28
+func_800BDA9C                 = 0x800BDA9C; // type:func size:0x10C
 func_800BDBA8                 = 0x800BDBA8; // type:func size:0xE8
 func_800BDC90                 = 0x800BDC90; // type:func size:0x88
 func_800BDD18                 = 0x800BDD18; // type:func size:0x20
@@ -2245,15 +2268,15 @@ func_800BDEB0                 = 0x800BDEB0; // type:func size:0x2C
 func_800BDEDC                 = 0x800BDEDC; // type:func size:0x2C
 func_800BDF08                 = 0x800BDF08; // type:func size:0x2C
 func_800BDF34                 = 0x800BDF34; // type:func size:0x2C
-func_800BDF60                 = 0x800BDF60; // type:func size:0x5C
-func_800BDFBC                 = 0x800BDFBC; // type:func size:0x3D0
-func_800BE38C                 = 0x800BE38C; // type:func size:0x44
-func_800BE3D0                 = 0x800BE3D0; // type:func size:0x264
-func_800BE634                 = 0x800BE634; // type:func size:0x44
-func_800BE678                 = 0x800BE678; // type:func size:0x1F8
+func_800BDF60                 = 0x800BDF60; // type:func size:0x54
+func_800BDFB4                 = 0x800BDFB4; // type:func size:0x3D8
+func_800BE38C                 = 0x800BE38C; // type:func size:0x3C
+func_800BE3C8                 = 0x800BE3C8; // type:func size:0x26C
+func_800BE634                 = 0x800BE634; // type:func size:0x3C
+func_800BE670                 = 0x800BE670; // type:func size:0x200
 D_800BE870                    = 0x800BE870; // type:func size:0x178
-func_800BE9E8                 = 0x800BE9E8; // type:func size:0x108
-func_800BEAF0                 = 0x800BEAF0; // type:func size:0xDC
+func_800BE9E8                 = 0x800BE9E8; // type:func size:0x100
+func_800BEAE8                 = 0x800BEAE8; // type:func size:0xE4
 func_800BEBCC                 = 0x800BEBCC; // type:func size:0x10
 func_800BEBDC                 = 0x800BEBDC; // type:func size:0x128
 func_800BED04                 = 0x800BED04; // type:func size:0x10
@@ -2271,8 +2294,8 @@ func_800BEF68                 = 0x800BEF68; // type:func size:0x20
 func_800BEF88                 = 0x800BEF88; // type:func size:0x38
 func_800BEFC0                 = 0x800BEFC0; // type:func size:0x38
 func_800BEFF8                 = 0x800BEFF8; // type:func size:0x20
-func_800BF018                 = 0x800BF018; // type:func size:0x28
-func_800BF040                 = 0x800BF040; // type:func size:0xB8
+func_800BF018                 = 0x800BF018; // type:func size:0x20
+func_800BF038                 = 0x800BF038; // type:func size:0xC0
 func_800BF0F8                 = 0x800BF0F8; // type:func size:0x3D8
 func_800BF4D0                 = 0x800BF4D0; // type:func size:0x28
 func_800BF4F8                 = 0x800BF4F8; // type:func size:0x64
@@ -2300,9 +2323,13 @@ func_800BFD58                 = 0x800BFD58; // type:func size:0x2C
 func_800BFD84                 = 0x800BFD84; // type:func size:0x28
 D_800BFDAC                    = 0x800BFDAC; // type:func size:0x68
 func_800BFE14                 = 0x800BFE14; // type:func size:0x120
-func_800BFF34                 = 0x800BFF34; // type:func size:0x88
-func_800BFFBC                 = 0x800BFFBC; // type:func size:0x80
-func_800C003C                 = 0x800C003C; // type:func size:0x20
+
+//---------------------------------------------------------
+//--- PA: 0x05BB94   VA: 0x800BFF34   subsegment: c, armhit
+//---------------------------------------------------------
+BtlArmHitChain                = 0x800BFF34; // type:func size:0x88
+BtlArmHitOne                  = 0x800BFFBC; // type:func size:0x80
+BtlFinishMoveFx               = 0x800C003C; // type:func size:0x20
 
 //--------------------------------------------------------------
 //--- PA: 0x05BCBC   VA: 0x800C005C   subsegment: c, tinttargets
@@ -2336,8 +2363,8 @@ D_800C0740                    = 0x800C0740; // type:func size:0x290
 func_800C09D0                 = 0x800C09D0; // type:func size:0x484
 func_800C0E54                 = 0x800C0E54; // type:func size:0x28C
 func_800C10E0                 = 0x800C10E0; // type:func size:0x8
-func_800C10E8                 = 0x800C10E8; // type:func size:0x708
-func_800C17F0                 = 0x800C17F0; // type:func size:0xBDC
+func_800C10E8                 = 0x800C10E8; // type:func size:0x700
+func_800C17E8                 = 0x800C17E8; // type:func size:0xBE4
 func_800C23CC                 = 0x800C23CC; // type:func size:0x8
 func_800C23D4                 = 0x800C23D4; // type:func size:0x980
 func_800C2D54                 = 0x800C2D54; // type:func size:0x288
@@ -2829,7 +2856,8 @@ g_btl_status_board_pos        = 0x800D02CC; // type:s32 size:0x10
 g_btl_fx_def                  = 0x800D042C; // size:0x8
 g_btl_fx_shift                = 0x800D0434; // type:s8 size:0x3
 g_btl_fx_grid_order           = 0x800D0438; // type:u8 size:0x19
-g_btl_spell_fx                = 0x800D0484;
+g_btl_fx_ring                 = 0x800D0454; // type:s32 size:0x30
+g_btl_spell_fx                = 0x800D0484; // size:0xF70
 D_800D1414                    = 0x800D1414; // type:u32 size:0x80
 D_800D1494                    = 0x800D1494; // type:u32 size:0x4084
 g_btl_open_banks              = 0x800D536C; // size:0x50

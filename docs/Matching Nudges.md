@@ -504,6 +504,43 @@ Read it off the image: a chain tests the first value and falls through, a
 switch tests every listed value and then jumps to the default. Three branches
 for two arms means a switch.
 
+## Two loop steps by the same amount lift the constant out
+
+A constant that needs a `lui` is lifted into a saved register when the loop
+uses it **more than once**, and left where it is when it is used once. With one
+use `m->savings` is 1 and gcc's loop pass declines; with two it takes it, and
+the routine comes out a whole callee-saved register - and often a stack slot -
+over the image.
+
+Two rows of an effect grid stepping by the same amount is exactly that shape:
+
+    y_party -= FX_GRID_DY;    /* one constant, two uses: lifted   */
+    y_enemy -= FX_GRID_DY;
+
+Cut either line and the `lui` drops back inside the loop and the frame matches.
+Spelling the second one differently does not help - `PLACE_ROW_H * PLACE_FIXED`
+folds to the same value and cse shares it before the loop pass runs.
+
+- [fxsheet3.c](/src/btlp/fxsheet3.c) - 87.47%; one register and two
+  instructions over, and every register above it shifted by one.
+- [fxsweep.c](/src/btlp/fxsweep.c) - the same thing with the row's own delay,
+  `(FX_SWEEP_H - 1 - row) * FX_SWEEP_STEP`, which is invariant in the column
+  loop. Taking it into a local of its own first stops the *product* being
+  lifted - 3.80% to 78.96% - but the subtraction still goes.
+
+What does work is anything that puts the register back under pressure, which is
+why the same source shape matches inside a bigger routine:
+[fxgrid.c](/src/btlp/fxgrid.c) has the same two steps and does **not** lift the
+constant, because the move-9 test already holds a saved register.
+
+A giv is not the same thing: a variable the loop both sets and increments -
+`x = FX_GRID_X0` at the top of the outer loop and `x += FX_GRID_DX` in the
+inner - is set twice and can never be lifted. Writing it out as
+`col * FX_GRID_DX + FX_GRID_X0` instead makes it a compiler-built giv whose
+*base* is a single-set constant, and that gets lifted instead. Read the inner
+loop's preheader to tell which the image has: the source's own assignments come
+out in source order, and the compiler's givs after them.
+
 ## Hoisting a constant is decided by where its uses are, not how many
 
 `BtlTalkersLeaveField` is one instruction from a match and the difference is

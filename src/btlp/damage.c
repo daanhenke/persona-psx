@@ -30,6 +30,7 @@ int BtlRollHit(int ownCount, int accuracy, int selfStatus, int foeCount,
     int chance;
     int spare;
     int raw;
+    int difference;
     int helpless;
     int i;
 
@@ -57,9 +58,10 @@ int BtlRollHit(int ownCount, int accuracy, int selfStatus, int foeCount,
         chance = 0;
     }
 
-    raw = ownCount - foeCount;
-    if (raw >= 0) {
-        spare = raw;
+    raw = chance;
+    difference = ownCount - foeCount;
+    if (difference >= 0) {
+        spare = difference;
         if (spare > BTL_ROLL_MAX) {
             spare = BTL_ROLL_MAX;
         }
@@ -67,8 +69,9 @@ int BtlRollHit(int ownCount, int accuracy, int selfStatus, int foeCount,
         spare = 0;
     }
 
-    raw = (BTL_ROLL_MAX - chance) / ownCount * spare;
-    return chance + raw >= (rand() & BTL_ROLL_MAX);
+    chance = (BTL_ROLL_MAX - raw) / ownCount * spare;
+    chance = (raw + chance) < (rand() & BTL_ROLL_MAX);
+    return !chance;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/damage", BtlRollHit);

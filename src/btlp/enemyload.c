@@ -184,8 +184,13 @@ load:
                (u_char *)g_btl_slot_clut[found], BTL_CLUT_BYTES);
         memcpy(g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
                (u_char *)g_btl_slot_clut[found], BTL_CLUT_BYTES);
-        memcpy(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES,
-               (u_char *)g_btl_slot_clut[found], BTL_CLUT_BYTES);
+        /* The last of the three works its destination out first, and into
+           the local the slot search finished with rather than one of its own;
+           spelled inline like the two above it the sum lands in the wrong
+           register. */
+        wide = (short *)(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES);
+        memcpy((u_char *)wide, (u_char *)g_btl_slot_clut[found],
+               BTL_CLUT_BYTES);
     }
     return (short)found;
 }

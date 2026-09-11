@@ -41,14 +41,12 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
     const u_char     *record;
     const BtlStats *p;
     int               i;
-    int               none;
+    int               persona;
 
-    record = g_btl_demon_talk_profiles[g_btl_offer[offer_slot].persona];
-    /* Zero through a variable of its own, set before the Persona is looked
-       up: it is what keeps the two answers in the registers the original has
-       them in. */
-    none = 0;
-    p = &g_btl_personas[g_btl_actors[slot].c.list[g_btl_actors[slot].c.entry]];
+    i = g_btl_offer[offer_slot].persona;
+    persona = g_btl_actors[slot].c.list[g_btl_actors[slot].c.entry];
+    record = g_btl_demon_talk_profiles[i];
+    p = &g_btl_personas[persona];
     i = 0;
     if (p->key == 0) {
         return 0;
@@ -56,7 +54,7 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
     do {
         if ((record + i)[OFFER_WANT_AT] != OFFER_WANT_END
             && ((record + i)[OFFER_WANT_AT] & OFFER_WANT_KIND) == p->key) {
-            if (((record + i)[OFFER_WANT_AT] & OFFER_WANT_GOOD) != none) {
+            if (((record + i)[OFFER_WANT_AT] & OFFER_WANT_GOOD) != 0) {
                 *out = (record + i)[OFFER_ANSWER];
                 return OFFER_GIVEN;
             }
@@ -71,4 +69,3 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
 #else
 INCLUDE_ASM("btlp/nonmatchings/offeranswer", BtlOfferAnswer);
 #endif
-

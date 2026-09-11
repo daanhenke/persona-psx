@@ -29,13 +29,19 @@
 void BtlPickHighlight(int chosen)
 {
     int i;
+    int colour;
+    BtlObj *frame;
 
     i = 0;
     do {
         if (g_btl_pick_live[g_btl_pick_page][i] == 0) {
-            BtlObjSetRgb(g_btl_pick_objs[i], PICK_DARK, PICK_DARK, PICK_DARK);
+            colour = PICK_DARK;
+            frame = g_btl_pick_objs[i];
+            BtlObjSetRgb(frame, colour, colour, colour);
         } else {
-            BtlObjSetRgb(g_btl_pick_objs[i], PICK_LIVE, PICK_LIVE, PICK_LIVE);
+            colour = PICK_LIVE;
+            frame = g_btl_pick_objs[i];
+            BtlObjSetRgb(frame, colour, colour, colour);
         }
         BtlObjSetFade(g_btl_pick_objs[i], PICK_FADE);
 
@@ -56,4 +62,3 @@ void BtlPickHighlight(int chosen)
 #else
 INCLUDE_ASM("btlp/nonmatchings/pickhighlight", BtlPickHighlight);
 #endif
-

@@ -74,16 +74,15 @@ void BtlBuildOffers(void)
     i = 0;
     g_btl_talk_level = 0;
     do {
-        m->key = a->c.key;
+        m[i].key = a->c.key;
         if (a->c.key != 0) {
             g_btl_talk_level += a->c.level;
-            m->pair[0] = a->c.status;
-            m->pair[1] = a->c.ail_level;
+            m[i].pair[0] = a->c.status;
+            m[i].pair[1] = a->c.ail_level;
             counted++;
         }
         a++;
         i++;
-        m++;
     } while (i < BTL_PARTY);
     g_btl_talk_level = g_btl_talk_level / counted;
 
@@ -146,15 +145,14 @@ void BtlBuildOffers(void)
     rec = g_btl_offer;
     i = 0;
     do {
-        if (rec->demons != 0) {
-            if ((rec->kinds & OFFER_IN_USE) == 0) {
-                rec->kinds |= OFFER_IN_USE;
+        if (rec[i].demons != 0) {
+            if ((rec[i].kinds & OFFER_IN_USE) == 0) {
+                rec[i].kinds |= OFFER_IN_USE;
             }
             g_btl_offer_count++;
         } else {
-            rec->used = 0;
+            rec[i].used = 0;
         }
-        rec++;
         i++;
     } while (i < BTL_OFFERS);
 
