@@ -370,7 +370,7 @@ segments:
       - [0x37118, c, pickdown]
       - [0x37248, c, menukey]
       - [0x37680, c, aimorder]
-      - [0x37820, asm, btlp_60]
+      - [0x37820, c, aftertalk]
       - [0x379A4, c, formation]
       - [0x37A28, c, talkorders]
       - [0x38698, c, commandmenu]

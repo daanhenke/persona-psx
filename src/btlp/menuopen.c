@@ -37,7 +37,6 @@ extern void BtlUploadText(const BtlMenuCell *cell, const u_char *text);
 extern void BtlQueueVramClear(short x, short y, short w, short h,
                               u_char r, u_char g, u_char b);
 
-#ifdef NON_MATCHING
 void BtlMenuOpen2(const u_char **text)
 {
     BtlMenuCell *cell;
@@ -47,25 +46,31 @@ void BtlMenuOpen2(const u_char **text)
     short        y;
     int          i;
     int          off;
+    int          x;
+    const u_char **next;
 
+    /* Keep the fixed column and text walker explicit so setup is emitted
+       in the original order. */
     i = 0;
+    x = MENU_ENTRY_X;
     cell = g_btl_menu_cells;
+    put = cell;
     y = MENU_ENTRY_Y;
+    next = text;
     off = 0;
     g_btl_menu_state = BTL_MENU_LIVE;
     g_btl_menu_index = 0;
     g_btl_menu_count = 2;
-    put = cell;
     /* The two coordinates go in through a byte offset rather than the cell
        pointer that is walking alongside them; that is what keeps the table's
        address folded into each store. */
     do {
         p = put;
         put++;
-        cell->text = *text;
-        text++;
+        cell->text = *next;
+        next++;
         i++;
-        *(short *)((char *)g_btl_menu_cells + off + 4) = MENU_ENTRY_X;
+        *(short *)((char *)g_btl_menu_cells + off + 4) = x;
         *(short *)((char *)g_btl_menu_cells + off + 6) = y;
         s = cell->text;
         cell++;
@@ -80,14 +85,10 @@ void BtlMenuOpen2(const u_char **text)
     BtlCursorInitPrims();
     BtlCursorShow(1);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/menuopen", BtlMenuOpen2);
-#endif
 
 /* Three entries instead of two, and a tighter layout: 0x10 apart from the top
    rather than 0x18 apart from y = 4. The line is worked out from the index
    here rather than carried along. */
-#ifdef NON_MATCHING
 void BtlMenuOpen3(const u_char **text)
 {
     BtlMenuCell *cell;
@@ -97,22 +98,26 @@ void BtlMenuOpen3(const u_char **text)
     int          i;
     int          y;
     int          off;
+    int          x;
+    const u_char **next;
 
     i = 0;
+    x = MENU_ENTRY_X;
     cell = g_btl_menu_cells;
+    put = cell;
+    next = text;
     off = 0;
     g_btl_menu_state = BTL_MENU_LIVE;
     g_btl_menu_index = 0;
     g_btl_menu_count = 3;
-    put = cell;
     do {
         p = put;
         put++;
-        cell->text = *text;
-        text++;
+        cell->text = *next;
+        next++;
         y = i << 4;
         i++;
-        *(short *)((char *)g_btl_menu_cells + off + 4) = MENU_ENTRY_X;
+        *(short *)((char *)g_btl_menu_cells + off + 4) = x;
         *(short *)((char *)g_btl_menu_cells + off + 6) = y;
         s = cell->text;
         cell++;
@@ -126,7 +131,3 @@ void BtlMenuOpen3(const u_char **text)
     BtlCursorInitPrims();
     BtlCursorShow(1);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/menuopen", BtlMenuOpen3);
-#endif
-

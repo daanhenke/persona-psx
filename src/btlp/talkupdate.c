@@ -49,8 +49,8 @@ extern int         g_btl_talk_choice;
 #ifdef NON_MATCHING
 void BtlTalkUpdate(void)
 {
-    /* Three of the four moves work through a pointer of their own, which is
-       what puts the index's address in a register for that block. */
+    /* Down and right share an address temporary initialized in its own
+       block. Left needs a separate one to preserve its register allocation. */
     int *index;
     int *choice;
     int  was;

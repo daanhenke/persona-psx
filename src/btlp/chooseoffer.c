@@ -26,12 +26,8 @@
 extern int BtlStockHolds(const BtlOffer *offer);
 extern int func_8006ED70(u_int offers);
 
-/* Not matched, and down to one thing: gcc folds the first turn of the rank
-   loop, testing the low bit of `kinds` directly and entering the loop at the
-   second bit, where the image walks a register from one all four times. The
-   mask, the three refusals and everything either side of them are the
-   instructions the image has. */
-#ifdef NON_MATCHING
+/* The for-loop keeps the first rank test inside the loop. Giving the counter
+   initialization its own block preserves the original register allocation. */
 int BtlChooseOffer(void)
 {
     u_int mask;
@@ -45,16 +41,16 @@ int BtlChooseOffer(void)
     i    = 0;
     do {
         if (g_btl_offer[i].used != 0) {
-            kind  = 0;
-            bit   = 1;
-            kinds = g_btl_offer[i].kinds;
             do {
+                kind = 0;
+            } while (0);
+            bit = 1;
+            kinds = g_btl_offer[i].kinds;
+            for (; kind < OFFER_KINDS; kind++, bit <<= 1) {
                 if ((bit & kinds) != 0) {
                     break;
                 }
-                kind++;
-                bit <<= 1;
-            } while (kind < OFFER_KINDS);
+            }
             if (kind != OFFER_KINDS) {
                 mask |= 1 << i;
             }
@@ -92,6 +88,3 @@ int BtlChooseOffer(void)
     }
     return -1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/chooseoffer", BtlChooseOffer);
-#endif

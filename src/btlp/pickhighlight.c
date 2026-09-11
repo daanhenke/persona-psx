@@ -29,19 +29,13 @@
 void BtlPickHighlight(int chosen)
 {
     int i;
-    int colour;
-    BtlObj *frame;
 
     i = 0;
     do {
         if (g_btl_pick_live[g_btl_pick_page][i] == 0) {
-            colour = PICK_DARK;
-            frame = g_btl_pick_objs[i];
-            BtlObjSetRgb(frame, colour, colour, colour);
+            BtlObjSetRgb(g_btl_pick_objs[i], PICK_DARK, PICK_DARK, PICK_DARK);
         } else {
-            colour = PICK_LIVE;
-            frame = g_btl_pick_objs[i];
-            BtlObjSetRgb(frame, colour, colour, colour);
+            BtlObjSetRgb(g_btl_pick_objs[i], PICK_LIVE, PICK_LIVE, PICK_LIVE);
         }
         BtlObjSetFade(g_btl_pick_objs[i], PICK_FADE);
 
