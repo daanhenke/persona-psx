@@ -588,3 +588,53 @@ Taking the row first preserves the load order; adding the offset to that
 integer address preserves the operand order. Ordinary pointer indexing and
 putting the whole integer expression in one statement each lose one of those
 properties. See [roundflow.c](/src/btlp/roundflow.c).
+
+## Step a hand-walked pointer after the counter, not before
+
+`BtlOpenMemberBoards` walks a block of sprites by hand and counts the boards
+separately. Written with the step before the counter it came out at 94%; with
+
+    i++;
+    bars += BOARD_SPRITES;
+
+it is exact. Nothing about the two statements depends on the other - what
+changes is which one the delay-slot filler has to hand at each call. The image
+takes the counter for the first call's slot and the pointer for the last, and
+it can only do that if the counter is emitted first.
+
+Worth trying whenever a loop has two or more things stepping and the diff is a
+pile of `addiu` in the wrong delay slots.
+
+## Reading a packed halfword: load, use, load again
+
+An inventory entry packs an id into the low nine bits and a count into the
+seven above. The image reads it twice - once for the id and the store, once
+for the count - and the order the C has to be written in to get that is
+
+    entry = *slot;                   /* load */
+    id    = entry & ITEM_ID;         /* use  */
+    count = *slot >> ITEM_SHIFT;     /* load again */
+
+Put the two loads next to each other and gcc folds them into one; compute the
+count from `entry` and it folds too. The `use` between them is what keeps them
+apart. This is the whole of the three item searches and both list builders.
+
+The second half of the same lever: hold the part you compare in an `int`, not
+the `u_short` it came out of. The image's `id < 0x56` is `slti`, a signed
+compare, and a `u_short` local gives `sltiu` instead.
+
+## A switch is laid out by case value
+
+gcc emits the case bodies in source order and the dispatch in its own order, so
+a three-case switch whose tree tests 1, then 0, then 2 still wants its bodies
+written 0, 1, 2. `BtlDrawIndicator` was 83% with the bodies in dispatch order
+and 94% with them in value order, before anything else was touched.
+
+## The permuter's score is coarse
+
+A base score of 130 was two instructions out of place in `BtlDrawIndicator`,
+and it found the answer - one field assigned before another - in a few minutes
+after half a dozen hand variations had failed. A run that sits at 150 is not
+necessarily far away, so do not read distance into the number; and a candidate
+it finds is usually one line surrounded by noise, so read the diff rather than
+taking the source it writes.
