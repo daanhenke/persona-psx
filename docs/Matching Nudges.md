@@ -638,3 +638,136 @@ after half a dozen hand variations had failed. A run that sits at 150 is not
 necessarily far away, so do not read distance into the number; and a candidate
 it finds is usually one line surrounded by noise, so read the diff rather than
 taking the source it writes.
+
+## Which local is written first decides both their registers
+
+A loop that reads a record by slot and one of its fields twice gets *two*
+walkers out of gcc - one address giv biased to the field, one plain byte
+offset - and neither is a variable in the source. Which register each gets
+follows the order the loop's own set-up is written in, and nothing else moves
+them.
+
+    i = 0;
+    found = 0;          /* this way round: exact                        */
+
+    found = 0;
+    i = 0;              /* the same code, the two walkers swapped, and
+                           nine words out                               */
+
+- [restorefield.c:56](/src/btlp/restorefield.c#L56) - 95.04% to 100% on that
+  line alone.
+- [targetpick.c](/src/btlp/targetpick.c) - the same in all three pickers,
+  where the counter also has to come before the constants the loop hoists.
+
+Writing the walker out by hand as a `BtlActor *` alongside the index gets the
+registers right and then emits its own increment on the wrong side of the
+compiler's, so it is one word out the other way. Let gcc make both.
+
+## Write both arms out, or write one and branch - not the middle
+
+When two arms of an `if` end in the same code, there are two shapes and the
+image tells you which:
+
+**Both arms whole.** gcc merges the tails itself, scanning back from the end
+and stopping at the first instruction that differs - which is exactly where
+the image's duplication ends.
+
+    if (pickable) { ...; obj->rgb_to[0] = LIT; ...; BtlObjSetFade(obj, 8); }
+    else          { ...; obj->rgb_to[0] = DIM; ...; BtlObjSetFade(obj, 8); }
+
+- [pickenemy.c:89](/src/btlp/pickenemy.c#L89) - with the colour in a local and
+  the stores shared instead, the call's argument set-up is merged into the
+  tail as well and the routine is two words short.
+
+**One copy and a `goto`.** Where the shared block is entered from somewhere
+that is not an arm of the same `if` - another `switch` case, or a second exit -
+gcc will not merge two spellings of it at all.
+
+- [commandstage.c](/src/btlp/commandstage.c) - four shared exits written out
+  in each arm came to 81% with fifty-two instructions too many; one copy and a
+  `goto` to it is 96%. The shared block lives in the arm the image puts it in,
+  which is not always the first one.
+- [targetpick.c](/src/btlp/targetpick.c) - BtlPickTargetMember's cancel and
+  abort share a tail the same way.
+
+## A shared answer is the last statement, not a return inside the loop
+
+A wait loop whose success path answers 1 puts that constant in the block
+before the epilogue, and the failing answers keep their own:
+
+    for (;;) {
+        if (confirm) { ...; break; }
+        if (cancel)  { ...; return -1; }
+        if (abort)   { ...; return -2; }
+        BtlDrawFrame();
+    }
+    return 1;
+
+Written as `return 1;` inside the loop it is three words out, and gcc folds
+`if (x) return 1; return 0;` into an `sltu` before the allocator ever sees it.
+
+- [targetpick.c](/src/btlp/targetpick.c), [opendialogue.c](/src/btlp/opendialogue.c) -
+  BtlOpeningLineWanted is exact only with the early returns inside the switch
+  and the shared answer after it.
+
+## A frame drawn before the count, or after it
+
+`do { i++; BtlDrawFrame(); } while (i < n);` and
+`do { BtlDrawFrame(); i++; } while (i < n);` are the same wait and different
+code: which one it is decides what the compiler has free at the loop's guard,
+and therefore what lands in its delay slot.
+
+- [openscenes.c:110](/src/btlp/openscenes.c#L110) - one instruction over as
+  the first, exact as the second; the permuter found it in minutes after the
+  loop shape, the operand order and a second counter had all been tried.
+- [opendialogue.c](/src/btlp/opendialogue.c) - the same line, found
+  independently, in the one wait of six that has it.
+
+Worth trying on any frame wait that is one instruction out.
+
+## The base binds to the last term written
+
+Pointer arithmetic over a table is not associated the way it is written: gcc
+adds the base to whichever term comes *last*, so the image's add order tells
+you the order to write them in - backwards.
+
+    rec = table + enc * ROW + a->c.key;   /* base + key first, then the block */
+    rec = table + a->c.key + enc * ROW;   /* base + block first, then the key */
+
+- [scriptedaction.c:98](/src/btlp/scriptedaction.c#L98) - both routines were
+  82% until the terms were turned round.
+
+Where the image forms the same partial sum in two steps, split the expression
+across a second local rather than assigning the same pointer twice - assigning
+it twice puts the partial sum in the pointer's own register instead of a
+scratch one.
+
+## Two symbols, not one plus an offset
+
+Tables that sit inside one unnamed run get compiled as offsets from each
+other: a counter's address materialised once and the table derived as
+`counter - 2736`. Naming each of them in the sym file is what puts them back
+to a `lui`/`addiu` pair apiece.
+
+- `g_btl_turn_script`, `g_btl_opening_lines`, `g_btl_member_actions`,
+  `g_btl_enemy_lines`, `g_btl_enemy_actions` and `g_btl_enemy_line_next` were
+  one 0x10B8-byte `D_800CE5BC`.
+
+The same applies to sizes: `g_btl_enemies` was sized to one record where the
+table is nine, and every reference past the first came out as a fresh
+`D_8005Dxxx` rather than `g_btl_enemies+N` - forty-four of them.
+
+## Routines go in the file in the order the image has them
+
+A unit's objects are laid out in source order, so two routines written the
+wrong way round are linked at each other's addresses. objdiff pairs symbols by
+**name**, so it reports both as matching and says nothing; only the link
+catches it, and the tell in the binary diff is a whole unit differing plus a
+single byte inside an unrelated caller - the `jal` that now points at the
+wrong one.
+
+Read the addresses out of `configs/JP1/sym.<target>.txt` before writing a new
+unit, and link the one target afterwards:
+
+    make -j16 build/JP1/out/BTLP.BIN
+    sha256sum --ignore-missing --check configs/JP1/checksum.sha
