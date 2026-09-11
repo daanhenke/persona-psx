@@ -920,7 +920,7 @@ void BtlStageRound(void)
                 }
                 break;
             case 2:
-                if (obj->unkD2 == 6) {
+                if (obj->mark_num == 6) {
                     BtlPlayScene(7, g_btl_line_enc04);
                 }
                 break;

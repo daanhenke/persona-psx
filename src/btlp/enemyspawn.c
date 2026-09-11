@@ -146,7 +146,7 @@ void BtlSpawnEnemies(int set)
                                    (int)BTL_STAGE[raw * 2] - (int)image);
             obj = BtlSpawnEnemy(species, col, row, slot, live);
             g_btl_combatants[rec].obj = obj;
-            obj->unkD2 = live + BTL_ENEMY_MARK0;
+            obj->mark_num = live + BTL_ENEMY_MARK0;
             a = &g_btl_combatants[rec];
             a->obj->actor = a;
             a->clut_len = head + 1;

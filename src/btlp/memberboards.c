@@ -20,7 +20,6 @@
  * still point at what was just freed.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/board.h>
 #include <persona/btlp/object.h>
@@ -33,8 +32,10 @@
 #define BOARD_Y    0x2C0000
 #define BOARD_STEP 0x280000
 
-/* The picture the first board is drawn from; the rest follow it. */
+/* The picture the first board is drawn from; the rest follow it, and where
+   that byte sits in the description. */
 #define BOARD_FIRST_PICTURE 5
+#define BOARD_PICTURE_AT    0xC
 
 /* Frames between one board arriving and the next. */
 #define BOARD_DELAY 4
@@ -56,36 +57,45 @@ extern u_char       g_btl_member_board_sprites[][BOARD_SPRITES];
 extern BtlGfxList  *g_btl_member_board_gfx[];
 extern BtlObj      *g_btl_member_boards[];
 
-/* Not matched: the whole routine is the right instructions in the right
-   order, and what is left is the register allocator - the sprite block is
-   walked as two pointers here where the image walks one and adds the two bar
-   offsets to it, and the description's address is rematerialised from the
-   picture byte's rather than loaded. A permuter job rather than a reading
-   one. */
-#ifdef NON_MATCHING
+/* Three things here are the shape rather than the meaning, and all three had
+   to be right before the routine came out.
+
+   The sprite block is walked by hand rather than indexed, so the two bars are
+   an offset off one pointer instead of two pointers of their own - one
+   register moving by 0xB4 a turn, not two. That step is written after the
+   counter's, which is what leaves the counter for the first call's delay slot
+   and the step for BtlObjLast's, the way the image has them.
+
+   The description is reached through the picture byte and not the other way
+   round: the routine keeps the address of the byte it rewrites and takes the
+   table's own address back off it, which is the one register the image
+   carries for both. */
 void BtlOpenMemberBoards(void)
 {
     long    pos[3];
     BtlObj *obj;
+    u_char *bars;
+    u_char *picture;
     long    y;
     int     i;
 
-    i = 0;
-    y = BOARD_Y;
+    i       = 0;
+    bars    = g_btl_member_board_sprites[0];
+    picture = &g_btl_member_board_defs[1].index;
+    y       = BOARD_Y;
     do {
         if (g_btl_actors[i].c.key != 0) {
             g_btl_member_board_gfx[i]->count = BOARD_CELLS_FULL;
-            BtlSetGaugeColour(&g_btl_actors[i].c,
-                              &g_btl_member_board_sprites[i][BOARD_HP_BAR],
-                              &g_btl_member_board_sprites[i][BOARD_SP_BAR]);
+            BtlSetGaugeColour(&g_btl_actors[i].c, bars + BOARD_HP_BAR,
+                              bars + BOARD_SP_BAR);
         } else {
             g_btl_member_board_gfx[i]->count = BOARD_CELLS_EMPTY;
         }
         pos[0] = BOARD_X;
         pos[1] = y;
         pos[2] = 0;
-        g_btl_member_board_defs[1].index = i + BOARD_FIRST_PICTURE;
-        obj = BtlBoardOpen(g_btl_member_board_defs, pos);
+        *picture = i + BOARD_FIRST_PICTURE;
+        obj = BtlBoardOpen((BtlBoardDef *)(picture - BOARD_PICTURE_AT), pos);
         g_btl_member_boards[i] = obj;
         obj->unk58 = (long)&g_btl_member_boards[i];
         BtlObjSetTimer(g_btl_member_boards[i], i * BOARD_DELAY);
@@ -94,11 +104,9 @@ void BtlOpenMemberBoards(void)
         y += BOARD_STEP;
         g_btl_obj_prev->attached = 0;
         i++;
+        bars += BOARD_SPRITES;
     } while (i < MEMBER_BOARDS);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/memberboards", BtlOpenMemberBoards);
-#endif
 
 void BtlCloseMemberBoards(void)
 {

@@ -107,7 +107,7 @@ void BtlSpawnParty(void)
                 obj = BtlSpawnMemberObj(key, col << 1, row,
                                         BtlLoadMemberGfx(key, member), member);
                 a->obj = obj;
-                obj->unkD2 = member;
+                obj->mark_num = member;
                 a->obj->actor = a;
                 a->obj->mark = BtlSpawnActorObj(
                     *(signed char *)&a->c.status, &a->obj->x);

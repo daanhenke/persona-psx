@@ -100,7 +100,7 @@ void BtlSpawnMarkers(void)
                               def->index + marker, pos, def->p7, def->p8);
             def++;
             obj->attached = prev;
-            obj->unkD2 = marker;
+            obj->mark_num = marker;
             obj->attr |= MARKER_PIECE_BIT;
             prev = obj;
         } while (j < BTL_MARKER_PARTS);
@@ -115,7 +115,7 @@ void BtlSpawnMarkers(void)
         obj = BtlObjAlloc(g_btl_obj_defs, MARKER_GROUP, prev, 1, 1,
                           g_btl_marker_pos[marker], 0x19, 0x1E);
         prev = obj;
-        obj->unkD2 = marker;
+        obj->mark_num = marker;
         obj->attached = g_btl_marker_obj[marker];
         g_btl_marker_obj[marker] = obj;
         g_btl_marker_shown[marker] = 0;

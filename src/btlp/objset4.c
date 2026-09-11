@@ -14,7 +14,7 @@
 
 void BtlObjSetMarkNum(BtlObj *obj, u_char num)
 {
-    obj->unkD2 = num;
+    obj->mark_num = num;
     if (obj->attached != 0) {
         BtlObjSetMarkNum(obj->attached, num);
     }

@@ -70,8 +70,8 @@ void BtlApplyPersona(BtlActor *a)
     u_short  *e;
     int       item;
 
-    if (a->obj->unkD2 < BTL_MEMBERS) {
-        which = BtlActorPersona(a->obj->unkD2);
+    if (a->obj->mark_num < BTL_MEMBERS) {
+        which = BtlActorPersona(a->obj->mark_num);
         if (which >= 0 && a->c.blocked == 0) {
             p = &g_btl_personas[which];
             a->persona_num[0] = p->unk10;

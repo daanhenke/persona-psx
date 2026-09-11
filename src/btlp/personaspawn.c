@@ -137,7 +137,7 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
         obj->scripts = g_btl_effect_gfx;
         obj->timer = layer * PERSONA_STAGGER;
         obj->kind = gfx;
-        obj->unkD2 = layer;
+        obj->mark_num = layer;
         obj->fade = PERSONA_FADE;
         obj->col2 = col;
         obj->row = row;

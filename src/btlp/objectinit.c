@@ -223,7 +223,7 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->group = group;
             obj->draw = draw;
             obj->motion = 0;
-            obj->unkD2 = 0;
+            obj->mark_num = 0;
             obj->unkD3 = 0;
             obj->phase = 0;
             return obj;

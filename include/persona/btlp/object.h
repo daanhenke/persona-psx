@@ -129,8 +129,18 @@ typedef struct BtlObj {
                                           flat and transformed halves of one
                                           drawing                          */
     /* 0xD1 */ u_char         motion;  /* what it is doing, 0 idle          */
-    /* 0xD2 */ u_char         unkD2;   /* the marker number, for the records a
-                                          party marker is made of        */
+    /* 0xD2 */ u_char         mark_num; /* which of a set this record stands
+                                          for, and what BtlObjSetMarkNum
+                                          writes: the party slot for a
+                                          member's object and every piece of
+                                          that member's marker, the mark
+                                          index for an enemy's, and how far
+                                          down the trail for one of the six
+                                          records a summoned Persona is made
+                                          of. A member's is under
+                                          BTL_MEMBERS and an enemy's is not,
+                                          which is how BtlApplyPersona tells
+                                          the two apart                  */
     /* 0xD3 */ u_char         unkD3;   /* the acting fighter takes a copy of
                                           this as its turn is set up      */
     /* 0xD4 */ u_char         phase;   /* how far into that motion          */

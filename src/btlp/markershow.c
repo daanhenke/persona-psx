@@ -93,7 +93,7 @@ void BtlShowMarker(int slot, int blocked, int kind)
     obj->attr |= MARKER_OWN_BIT;
     BtlObjMoveBefore(g_btl_marker_obj[slot], obj);
     obj->attached = back;
-    obj->unkD2    = slot;
+    obj->mark_num = slot;
     obj->motion   = MARKER_MOTION;
     back->motion  = MARKER_MOTION;
     obj->phase    = 0;
