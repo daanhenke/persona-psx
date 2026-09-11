@@ -367,6 +367,8 @@ segments:
       - [0x37A28, c, talkorders]
       - [0x38698, c, commandmenu]
       - [0x39C60, asm, btlp_61]
+      - [0x3EA80, c, targetpick]
+      - [0x3F01C, asm, btlp_61_x1]
       - [0x3F404, c, pickupdate]
       - [0x3F5F8, asm, btlp_62]
       - [0x403C0, c, place]

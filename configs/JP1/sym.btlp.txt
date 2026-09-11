@@ -1600,6 +1600,10 @@ BtlLoadDebugGrid              = 0x80097974; // type:func size:0xDC
 //--- PA: 0x0336B0   VA: 0x80097A50   subsegment: asm, btlp_58_x1
 //---------------------------------------------------------------
 func_80097A50                 = 0x80097A50; // type:func size:0xDE4
+
+//---------------------------------------------------------------
+//--- PA: 0x034494   VA: 0x80098834   subsegment: c, restorefield
+//---------------------------------------------------------------
 BtlRestoreField               = 0x80098834; // type:func size:0x410
 
 //------------------------------------------------------------
@@ -1651,7 +1655,15 @@ BtlHoldForMarkers             = 0x8009A034; // type:func size:0x174
 //--- PA: 0x035E08   VA: 0x8009A1A8   subsegment: asm, btlp_58_x3
 //---------------------------------------------------------------
 BtlAimEnemyMove               = 0x8009A1A8; // type:func size:0x464
+
+//---------------------------------------------------------------
+//--- PA: 0x03626C   VA: 0x8009A60C   subsegment: c, commandstage
+//---------------------------------------------------------------
 BtlStageCommand               = 0x8009A60C; // type:func size:0x6C4
+
+//------------------------------------------------------------
+//--- PA: 0x036930   VA: 0x8009ACD0   subsegment: c, pickenemy
+//------------------------------------------------------------
 BtlPickEnemy                  = 0x8009ACD0; // type:func size:0x328
 BtlPickEnemyLit               = 0x8009AFF8; // type:func size:0x1D8
 
@@ -1715,10 +1727,18 @@ func_800A09F0                 = 0x800A09F0; // type:func size:0x364
 func_800A0D54                 = 0x800A0D54; // type:func size:0x8B4
 func_800A1608                 = 0x800A1608; // type:func size:0xC30
 func_800A2238                 = 0x800A2238; // type:func size:0xBE8
-func_800A2E20                 = 0x800A2E20; // type:func size:0x164
-func_800A2F84                 = 0x800A2F84; // type:func size:0x238
-func_800A31BC                 = 0x800A31BC; // type:func size:0x150
-func_800A330C                 = 0x800A330C; // type:func size:0xB0
+
+//-------------------------------------------------------------
+//--- PA: 0x03EA80   VA: 0x800A2E20   subsegment: c, targetpick
+//-------------------------------------------------------------
+BtlPickTargetMember           = 0x800A2E20; // type:func size:0x164
+BtlPickTargetParty            = 0x800A2F84; // type:func size:0x238
+BtlPickTargetEnemies          = 0x800A31BC; // type:func size:0x150
+BtlHoldMessage                = 0x800A330C; // type:func size:0xB0
+
+//---------------------------------------------------------------
+//--- PA: 0x03F01C   VA: 0x800A33BC   subsegment: asm, btlp_61_x1
+//---------------------------------------------------------------
 func_800A33BC                 = 0x800A33BC; // type:func size:0x3AC
 BtlCommandRefuse              = 0x800A3768; // type:func size:0x3C
 
@@ -2690,6 +2710,7 @@ g_btl_debug_row               = 0x800CFBEA; // type:s16 size:0x2
 g_btl_choice1_row             = 0x800CFBEC; // type:s16 size:0x2
 g_btl_choice0_row             = 0x800CFBEE; // type:s16 size:0x2
 g_btl_actor_turn              = 0x800CFC00; // type:s16 size:0x2
+g_btl_target_slot             = 0x800CFC02; // type:s16 size:0x2
 g_btl_talk_outcome            = 0x800CFC04; // type:u8 size:0x1
 g_btl_pick_help               = 0x800CFC08; // size:0x30
 g_btl_pick_command            = 0x800CFC38; // size:0x1C
