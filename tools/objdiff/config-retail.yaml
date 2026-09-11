@@ -67,7 +67,7 @@ categories:
       - dng
 
   - id: ovl.s2d
-    name: Status Screen
+    name: Map
     paths:
       - s2d
 
