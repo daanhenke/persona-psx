@@ -57,7 +57,7 @@ void BtlMoodRetire(void)
         i++;
     } while (i < BTL_MOODS);
 
-    BtlPanelSetImage(g_btl_panel_gauges != 0, g_btl_panel_gauges);
+    BtlPanelSetImage((short)g_btl_panel_gauges != 0, g_btl_panel_gauges);
     BtlSetMoodGauges(g_btl_offer[g_btl_offer_slot].mood[0],
                      g_btl_offer[g_btl_offer_slot].mood[1],
                      g_btl_offer[g_btl_offer_slot].mood[2],
@@ -66,4 +66,3 @@ void BtlMoodRetire(void)
 #else
 INCLUDE_ASM("btlp/nonmatchings/moodretire", BtlMoodRetire);
 #endif
-

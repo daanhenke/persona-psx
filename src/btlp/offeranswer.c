@@ -33,7 +33,7 @@
 #define OFFER_ANSWERED 1
 #define OFFER_GIVEN    2
 
-extern const u_char *g_btl_offer_answers[];
+extern const u_char *g_btl_demon_talk_profiles[];
 
 #ifdef NON_MATCHING
 int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
@@ -43,7 +43,7 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
     int               i;
     int               none;
 
-    record = g_btl_offer_answers[g_btl_offer[offer_slot].persona];
+    record = g_btl_demon_talk_profiles[g_btl_offer[offer_slot].persona];
     /* Zero through a variable of its own, set before the Persona is looked
        up: it is what keeps the two answers in the registers the original has
        them in. */

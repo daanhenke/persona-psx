@@ -30,7 +30,6 @@ extern MATRIX    g_btl_obj_matrix;
 extern VECTOR    g_btl_obj_shift;
 extern SVECTOR   g_btl_obj_quad[];
 
-#ifdef NON_MATCHING
 void BtlDrawObjTextRot(BtlObj *o)
 {
     const BtlGfxText *line;
@@ -38,7 +37,10 @@ void BtlDrawObjTextRot(BtlObj *o)
     u_long *ot;
     u_int   i;
     int     n;
-    int     u;
+    /* Both coordinates are shorts: gcc 2.6 then finishes the row arithmetic
+       before storing u0, as in the original. */
+    short   u;
+    short   v;
     u_char  code;
     /* One four-long scratch: the projection leaves its interpolation
        value in [0] and its clipping flag in [1], and the two above them
@@ -88,9 +90,9 @@ void BtlDrawObjTextRot(BtlObj *o)
                    the division twice. */
                 code = *p;
                 u = (code % BTL_FONT_COLS) * BTL_FONT_W;
+                v = (code / BTL_FONT_COLS) * BTL_FONT_H;
                 g_btl_polyft4_next->u0 = u;
-                g_btl_polyft4_next->v0 = (code / BTL_FONT_COLS) * BTL_FONT_H
-                                         + line->v;
+                g_btl_polyft4_next->v0 = v + line->v;
                 g_btl_polyft4_next->u1 = u + BTL_FONT_W;
                 /* The far three corners take their texture coordinates back
                    out of the quad rather than working them out again. */
@@ -116,7 +118,3 @@ void BtlDrawObjTextRot(BtlObj *o)
         } while (i < ((const BtlGfxList *)o->last)->count);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/objtextrot", BtlDrawObjTextRot);
-#endif
-

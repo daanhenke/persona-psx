@@ -40,7 +40,6 @@
 
 /* Overlay entry. Every slot goes back to unowned, each group's list is reduced
    to its first record, and both frame buffers' primitives are re-tagged. */
-#ifdef NON_MATCHING
 int BtlInitObjects(void)
 {
     BtlObj *obj;
@@ -126,9 +125,6 @@ int BtlInitObjects(void)
     } while (frame < end);
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/objectinit", BtlInitObjects);
-#endif
 
 /* Takes the first free record of a group and fills it in.
  *

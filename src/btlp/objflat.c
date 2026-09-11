@@ -57,7 +57,6 @@ extern MATRIX   g_btl_cam_matrix;
 extern MATRIX   g_btl_obj_matrix;
 extern SVECTOR  g_btl_obj_quad[];
 
-#ifdef NON_MATCHING
 void BtlDrawObjFlat(BtlObj *o)
 {
     const BtlGfxCell *cell;
@@ -66,6 +65,7 @@ void BtlDrawObjFlat(BtlObj *o)
     int     otz;
     int     order;
     int     off;
+    int     shift;
     /* The projected point is one DVECTOR and the two things the
        projection leaves behind are one scratch: the depth in [0], the
        clipping flag in [1]. gcc 2.6 gives an aggregate a lower slot than
@@ -106,12 +106,10 @@ void BtlDrawObjFlat(BtlObj *o)
     if ((o->attr & BTL_OBJ_SHIFT_SCREEN) != 0) {
         /* Read signed: the shift's whole half carries a sign the projected
            point has to keep. */
-        /* Both halves go through the counter, which is not live yet: that is
-           what puts them in the registers the original uses. */
-        i = *(signed short *)((char *)&o->shift_x + 2);
-        sxy.vx = sxy.vx + i;
-        i = *(signed short *)((char *)&o->shift + 2);
-        sxy.vy = sxy.vy + i;
+        shift = *(signed short *)((char *)&o->shift_x + 2);
+        sxy.vx = sxy.vx + shift;
+        shift = *(signed short *)((char *)&o->shift + 2);
+        sxy.vy = sxy.vy + shift;
     }
     if ((o->attr & BTL_OBJ_NO_DEPTH) != 0) {
         ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
@@ -120,7 +118,11 @@ void BtlDrawObjFlat(BtlObj *o)
         ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
                         + BTL_FRAME_BYTES - off * 4);
     }
-    i = 0;
+    /* Keep the sprite counter in its own block: the shift temporary above
+       then uses v1 without changing the loop's register allocation. */
+    do {
+        i = 0;
+    } while (0);
     /* The list is reached through the object every time rather than held in a
        local: the count is re-read from it on each turn of the loop. */
     if (*(const u_char *)o->last != 0) {
@@ -156,7 +158,3 @@ void BtlDrawObjFlat(BtlObj *o)
     addPrim(ot, g_btl_drmode_next);
     g_btl_drmode_next++;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/objflat", BtlDrawObjFlat);
-#endif
-
