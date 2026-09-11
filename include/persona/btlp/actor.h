@@ -29,10 +29,11 @@ typedef struct BtlActor {
                                       its experience to, once Char.unk14 is
                                       under the cap                          */
     /* 0x78 */ u_char  pad78[4];
-    /* 0x7C */ u_short unk7C;      /* PersonaData.drop and the low half of
-                                      its price, copied in as the record is
-                                      filled from a Persona                 */
-    /* 0x7E */ u_short unk7E;
+    /* 0x7C */ u_short drop;       /* PersonaData.drop, copied in as the record
+                                      is filled from a Persona: the item this
+                                      fighter leaves behind and how freely   */
+    /* 0x7E */ u_short price;      /* the low half of PersonaData.price, from
+                                      the same copy                          */
     /* 0x80 */ u_short targets;    /* who this fighter's action hits, one bit
                                       per slot. BtlPickableMask fills it in
                                       for a chosen target and the aiming
@@ -174,6 +175,9 @@ typedef struct BtlActor {
    cursor: the actor is alive and still a target, it just cannot be given an
    order. */
 #define BTL_STATUS_DOWN    0x11    /* DEAD   */
+#define BTL_STATUS_LIFTED  0x12    /* lifted off the floor; the actor goes
+                                      plain white and loses its shadow, and
+                                      a random pick steps over it        */
 #define BTL_STATUS_NOINPUT 0x13    /* PUPPET */
 
 /* The four a contact can end in, one scene each. BtlTalkEndStatus puts the

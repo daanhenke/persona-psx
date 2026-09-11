@@ -175,9 +175,9 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->x2 = pos[0];
             obj->y2 = pos[1];
             obj->z2 = pos[2];
-            obj->unk28 = 0;
-            obj->unk2C = 0;
-            obj->unk30 = 0;
+            obj->step_x = 0;
+            obj->step_y = 0;
+            obj->step_z = 0;
             /* Read again for the second byte rather than kept: the store
                between them is what makes the original go back for it. */
             if (defs->scripts != 0) {

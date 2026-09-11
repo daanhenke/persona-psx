@@ -16,10 +16,10 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
-/* The ailments that colour an actor, and the one that lifts it off the floor. */
+/* The two ailments that colour an actor. The one that lifts it off the floor
+   is BTL_STATUS_LIFTED, beside the rest of them in actor.h. */
 #define BTL_AIL_TINT_A 4
 #define BTL_AIL_TINT_B 5
-#define BTL_AIL_LIFTED 0x12
 
 /* Plain white, and the two rates the colour is reached at. */
 #define BTL_TINT_WHITE 0x80
@@ -55,7 +55,7 @@ void BtlObjStatusTint(BtlObj *obj)
         obj->rgb_to[2] = blue;
         shadow->attr &= ~BTL_OBJ_HIDDEN;
         break;
-    case BTL_AIL_LIFTED:
+    case BTL_STATUS_LIFTED:
         obj->attr |= BTL_OBJ_NO_SHADOW;
         obj->shadow->attr |= BTL_OBJ_HIDDEN;
         obj->rgb_to[0] = BTL_TINT_WHITE;

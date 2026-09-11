@@ -60,9 +60,11 @@ typedef struct BtlObj {
     /* 0x1C */ long           y2;      /* the same value on an outright put */
     /* 0x20 */ long           z2;      /* and the third of that copy       */
     /* 0x24 */ u_char         pad24[4];
-    /* 0x28 */ long           unk28;   /* the three BtlObjAlloc clears and  */
-    /* 0x2C */ long           unk2C;   /* nothing else here has a use for   */
-    /* 0x30 */ long           unk30;
+    /* 0x28 */ long           step_x;  /* what a motion carries the object  */
+    /* 0x2C */ long           step_y;  /* along by each frame, in the same  */
+    /* 0x30 */ long           step_z;  /* 16.16 as the position. BtlObjAlloc
+                                          clears all three; only the first
+                                          two are known to be read.         */
     /* 0x34 */ u_char         pad34[4];
     /* 0x38 */ long           shift_x;  /* 16.16, the pair a script step's
                                            last two signed bytes set      */

@@ -59,8 +59,8 @@ void BtlLoadEnemyStats(int slot, int key)
     a->c.unk3A = d->unk0C;
     a->c.unk3C = d->unk0E;
     *(int *)a->c.pad1C = d->unk10;
-    a->unk7C = d->drop;
-    a->unk7E = (u_short)d->price;
+    a->drop = d->drop;
+    a->price = (u_short)d->price;
 
     /* The key is the row it was taken from. */
     a->c.key = key;
@@ -90,7 +90,7 @@ void BtlLoadEnemyStats(int slot, int key)
                   + d->stat[STAT_LUCK] / 4) * ENEMY_SCALE_NUM / ENEMY_SCALE_DEN;
 
     memcpy(a->c.name, d->name, ENEMY_NAME_BYTES);
-    memcpy(a->spell, d->unk2E, sizeof(a->spell));
+    memcpy(a->spell, d->spell, sizeof(a->spell));
 
     a->targets = 0;
     a->unk84 = 0;

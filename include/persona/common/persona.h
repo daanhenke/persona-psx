@@ -93,7 +93,10 @@ typedef struct {
     /* 0x27 */ u_char arcana;     /* 1-based, into a table of six-cell labels */
     /* 0x28 */ u_char stat[PERSONA_STATS];
     /* 0x2D */ u_char unk2D;      /* lands on Char.unk5C                     */
-    /* 0x2E */ u_char unk2E[6];   /* kept whole on the actor at +0xAF        */
+    /* 0x2E */ u_char spell[6];    /* what a fighter built from this record can
+                                     cast, kept whole on the actor at +0xAF.
+                                     BtlChooseEnemyMove indexes g_spell_data
+                                     with each of them.                     */
     /* 0x34 */ u_char pad34[4];
 } PersonaData;                    /* 0x38 bytes */
 
