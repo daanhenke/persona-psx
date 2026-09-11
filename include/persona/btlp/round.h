@@ -245,7 +245,11 @@ extern int   D_800F4E20;
 extern int   D_800F4AA4;
 extern int   D_800F5A60;
 extern int   D_800F5D58;
-extern short D_800F586C;
+
+/* The item the fight leaves behind, as an id into g_item_defs. Cleared as the
+   battle opens, written by BtlRollDefeatDrop as a demon goes down and read
+   back once the fight is over, so the last kill's prize is the one kept. */
+extern u_short g_btl_drop_item;
 
 /* The object the opening is played on, and how far the camera has pulled
    back for it. */

@@ -119,7 +119,7 @@ void BtlStageOpen(void)
             D_800F4AA4 = 0;
             D_800F5A60 = 0;
             D_800F5D58 = 0;
-            D_800F586C = 0;
+            g_btl_drop_item = 0;
 
             BtlOpenEnemyEntrance();
             BtlOpenEnemyRise();

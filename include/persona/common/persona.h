@@ -80,7 +80,11 @@ typedef struct {
                                      lands on Char.unk3A and Char.unk3C      */
     /* 0x0E */ u_short unk0E;
     /* 0x10 */ int    unk10;      /* lands on Char +0x1C                     */
-    /* 0x14 */ u_short unk14;
+    /* 0x14 */ u_short drop;      /* what a demon of this Persona leaves
+                                     behind: the item's id in the low nine
+                                     bits and one of five drop rates above
+                                     them. BtlRollDefeatDrop weighs the rate
+                                     against the luck difference.          */
     /* 0x16 */ u_char pad16[2];
     /* 0x18 */ int    price;      /* and the money, scaled the same way and
                                      then rounded by BtlRoundMoney           */

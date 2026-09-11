@@ -45,8 +45,7 @@ extern BtlObj           *g_btl_list_board;
 extern u_char            g_btl_list_open;
 extern int               g_btl_spell_slot;
 
-/* Fills the board's twelve lines from a member's spells. Still asm. */
-extern void func_800AB85C(int slot);
+extern void BtlBuildSpellLines(int spell);
 
 /* Whether the entry in this slot is one the fight can offer. */
 #define BtlItemOffered(id, count)                           \
@@ -180,7 +179,7 @@ void BtlCommitUsableItems(void)
 void BtlOpenSpellBoard(void)
 {
     g_btl_list_open = 1;
-    func_800AB85C(g_btl_spell_slot);
+    BtlBuildSpellLines(g_btl_spell_slot);
     g_btl_list_board = BtlBoardOpen(g_btl_list_board_defs, g_btl_spell_board_pos);
 }
 

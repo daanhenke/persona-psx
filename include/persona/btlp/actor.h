@@ -29,7 +29,7 @@ typedef struct BtlActor {
                                       its experience to, once Char.unk14 is
                                       under the cap                          */
     /* 0x78 */ u_char  pad78[4];
-    /* 0x7C */ u_short unk7C;      /* PersonaData +0x14 and the low half of
+    /* 0x7C */ u_short unk7C;      /* PersonaData.drop and the low half of
                                       its price, copied in as the record is
                                       filled from a Persona                 */
     /* 0x7E */ u_short unk7E;

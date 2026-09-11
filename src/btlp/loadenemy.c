@@ -59,7 +59,7 @@ void BtlLoadEnemyStats(int slot, int key)
     a->c.unk3A = d->unk0C;
     a->c.unk3C = d->unk0E;
     *(int *)a->c.pad1C = d->unk10;
-    a->unk7C = d->unk14;
+    a->unk7C = d->drop;
     a->unk7E = (u_short)d->price;
 
     /* The key is the row it was taken from. */

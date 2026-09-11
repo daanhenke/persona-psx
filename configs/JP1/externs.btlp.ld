@@ -184,6 +184,7 @@ PadRead = 0x8002511C;
 SetDefDispEnv = 0x8002B3B4;
 SetDefDrawEnv = 0x8002B2E4;
 SetDispMask = 0x8002CB3C;
+ReadGeomOffset = 0x80029F44;
 SetGeomOffset = 0x80029F64;
 SetGeomScreen = 0x80029F84;
 SetGraphDebug = 0x8002C9A8;

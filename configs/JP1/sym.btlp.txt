@@ -61,6 +61,7 @@ TransMatrix                   = 0x80029D74;
 ScaleMatrix                   = 0x80029DA4;
 SetRotMatrix                  = 0x80029ED4;
 SetTransMatrix                = 0x80029F04;
+ReadGeomOffset                = 0x80029F44;
 SetGeomOffset                 = 0x80029F64;
 SetGeomScreen                 = 0x80029F84;
 RotTransPers                  = 0x8002A1A4;
@@ -182,7 +183,7 @@ g_btl_talk_charm_odds         = 0x800646C0;
 g_btl_talk_bind_odds          = 0x800646EC;
 
 //---------------------------------------------------------------------
-//--- PA: 0x000450   VA: 0x800647F0   subsegment: rodata, btlp_rodata3a
+//--- PA: 0x000488   VA: 0x80064828   subsegment: rodata, btlp_rodata3a
 //---------------------------------------------------------------------
 g_btl_hex_glyphs              = 0x8006486C;
 g_btl_text_cluts              = 0x800648AC;
@@ -776,9 +777,9 @@ BtlFaceLoadFile               = 0x8007649C; // type:func size:0x2CC
 BtlFaceGrow                   = 0x80076768; // type:func size:0x74
 BtlFaceShrink                 = 0x800767DC; // type:func size:0x68
 
-//---------------------------------------------------------------
-//--- PA: 0x0124A4   VA: 0x80076844   subsegment: asm, btlp_24_x1
-//---------------------------------------------------------------
+//-----------------------------------------------------------
+//--- PA: 0x0124A4   VA: 0x80076844   subsegment: c, facedraw
+//-----------------------------------------------------------
 BtlFaceDraw                   = 0x80076844; // type:func size:0x278
 
 //--------------------------------------------------------
@@ -1581,10 +1582,10 @@ BtlEventFlagTest              = 0x800976F4; // type:func size:0x3C
 BtlEventFlagSet               = 0x80097730; // type:func size:0x44
 BtlEventFlagClear             = 0x80097774; // type:func size:0x48
 
-//------------------------------------------------------------
-//--- PA: 0x03341C   VA: 0x800977BC   subsegment: asm, btlp_58
-//------------------------------------------------------------
-func_800977BC                 = 0x800977BC; // type:func size:0x144
+//-------------------------------------------------------------
+//--- PA: 0x03341C   VA: 0x800977BC   subsegment: c, defeatdrop
+//-------------------------------------------------------------
+BtlRollDefeatDrop             = 0x800977BC; // type:func size:0x144
 
 //-------------------------------------------------------------
 //--- PA: 0x033560   VA: 0x80097900   subsegment: c, insertturn
@@ -1682,11 +1683,15 @@ BtlPickDownMember             = 0x8009B4B8; // type:func size:0x130
 //----------------------------------------------------------
 BtlMenuKey                    = 0x8009B5E8; // type:func size:0x438
 
-//------------------------------------------------------------
-//--- PA: 0x037680   VA: 0x8009BA20   subsegment: asm, btlp_60
-//------------------------------------------------------------
+//-----------------------------------------------------------
+//--- PA: 0x037680   VA: 0x8009BA20   subsegment: c, aimorder
+//-----------------------------------------------------------
 BtlSlowestOrder               = 0x8009BA20; // type:func size:0xBC
-func_8009BADC                 = 0x8009BADC; // type:func size:0xE4
+BtlFrontMemberOrder           = 0x8009BADC; // type:func size:0xE4
+
+//------------------------------------------------------------
+//--- PA: 0x037820   VA: 0x8009BBC0   subsegment: asm, btlp_60
+//------------------------------------------------------------
 BtlAfterTalk                  = 0x8009BBC0; // type:func size:0x184
 
 //------------------------------------------------------------
@@ -1915,10 +1920,10 @@ BtlCommitUsableItems          = 0x800AB76C; // type:func size:0x6C
 BtlOpenSpellBoard             = 0x800AB7D8; // type:func size:0x54
 BtlCloseListBoard             = 0x800AB82C; // type:func size:0x30
 
-//---------------------------------------------------------------
-//--- PA: 0x0474BC   VA: 0x800AB85C   subsegment: asm, btlp_66_x3
-//---------------------------------------------------------------
-func_800AB85C                 = 0x800AB85C; // type:func size:0x100
+//-------------------------------------------------------------
+//--- PA: 0x0474BC   VA: 0x800AB85C   subsegment: c, spelllines
+//-------------------------------------------------------------
+BtlBuildSpellLines            = 0x800AB85C; // type:func size:0x100
 
 //-------------------------------------------------------------
 //--- PA: 0x0475BC   VA: 0x800AB95C   subsegment: c, menuboards
@@ -2736,6 +2741,7 @@ g_btl_tactics_board_pos       = 0x800D029C; // type:s32 size:0x10
 g_btl_config_board_pos        = 0x800D02AC; // type:s32 size:0x10
 g_btl_board15_pos             = 0x800D02BC; // type:s32 size:0x10
 g_btl_status_board_pos        = 0x800D02CC; // type:s32 size:0x10
+g_btl_spell_fx                = 0x800D0484;
 D_800D1414                    = 0x800D1414; // type:u32 size:0x80
 D_800D1494                    = 0x800D1494; // type:u32 size:0x4084
 g_btl_open_banks              = 0x800D536C; // size:0x50
@@ -2885,7 +2891,7 @@ g_btl_highlight_state         = 0x800E9120;
 g_btl_highlight_level         = 0x800E9124;
 g_btl_highlight_row           = 0x800E9128;
 g_btl_highlight_colour        = 0x800E912C;
-g_btl_face_prim               = 0x800E9130; // size:0x29
+g_btl_face_prim               = 0x800E9130; // size:0x50
 g_btl_face_sprt               = 0x800E9180; // size:0x18
 g_btl_face_mode               = 0x800E91A8; // size:0x10
 g_btl_face_x                  = 0x800E91C0; // type:u32 size:0x84
@@ -3026,6 +3032,7 @@ g_btl_enemy_luck              = 0x800F57BC;
 g_btl_key_confirm             = 0x800F57C0;
 g_btl_banks                   = 0x800F57C4; // size:0x10
 g_btl_summon_obj              = 0x800F5864;
+g_btl_drop_item               = 0x800F586C; // type:u16 size:0x2
 g_btl_party_agility           = 0x800F5874;
 g_btl_party_level             = 0x800F5888;
 g_btl_debug_grid_cells        = 0x800F59B0;
