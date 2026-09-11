@@ -771,3 +771,73 @@ unit, and link the one target afterwards:
 
     make -j16 build/JP1/out/BTLP.BIN
     sha256sum --ignore-missing --check configs/JP1/checksum.sha
+
+## An abs written as a ternary keeps the delay slot empty
+
+`if (n < 0) { n = -n; }` and `n = n < 0 ? -n : n;` are the same three
+instructions and different delay slots. Written as the `if`, gcc fills the
+`bgez` by stealing the first instruction of the block the branch lands in -
+redirecting the branch past it - and the routine comes out one word short of
+the image, which has a `nop` there. Written as the ternary it does not, and the
+block after the join starts where the image starts it.
+
+    gap = o->col2 - col;
+    gap = gap < 0 ? -gap : gap;      /* the image's shape           */
+    if (gap < 0) { gap = -gap; }     /* one word short, every time  */
+
+- [aimorder.c](/src/btlp/aimorder.c) - both walks went from 94% to 99% on that
+  line alone, and nothing else moved.
+
+Worth trying on any short conditional whose branch the build fills and the
+image does not.
+
+## A temp assigned inside the arm is not propagated into it
+
+Where the image clamps into a second variable, the copy has to be *inside* the
+arm that goes on to test it. Written above the `if`, gcc propagates the copy
+away and the test comes out on the original:
+
+    if (odds >= 0) {
+        chance = odds;                       /* here: the test is on chance */
+        if (chance > MAX) { chance = MAX; }
+    } else {
+        chance = 0;
+    }
+
+    chance = odds;                           /* above: the test folds back
+    if (odds >= 0) {                            onto odds and one word differs */
+        if (chance > MAX) { chance = MAX; }
+    } else {
+        chance = 0;
+    }
+
+The copy still lands in the branch's delay slot either way, so the diff is a
+single `slti` on the wrong register. Read which register the image compares
+and put the assignment on that side of the brace.
+
+- [defeatdrop.c:64](/src/btlp/defeatdrop.c#L64) - exact with the copy inside
+  the arm, one word out with it above. The `else` arm being the negative case
+  is the branch-polarity rule in the section above it.
+
+## Walk the id, not the index
+
+Two tables indexed by the same running value - `t[first + i]` and
+`u[first + i]` - are not strength-reduced by gcc 2.6: it works `first + i` out
+afresh every turn and multiplies twice. Step the *id* instead and both
+disappear into induction variables, one per table, incremented at the bottom
+of the loop exactly as the image has them:
+
+    do { ... t[id] ... u[id] ... id++; i++; } while (i < n);
+
+- [spelllines.c](/src/btlp/spelllines.c) - forty-eight bytes over as
+  `spell + i`, exact as `spell++`.
+
+## Index a record array rather than walking it
+
+A `BtlActor *a` walked with `a++` and read at three offsets gets biased to the
+largest of them, so the record's own offsets come out negative and the
+preheader carries an extra `addiu` for the bias. `g_btl_combatants[i]` with a
+plain counter keeps the base where the image has it and the offsets positive.
+
+- [aimorder.c](/src/btlp/aimorder.c) - `a[i].c.key` against `a->c.key`, three
+  instructions and the whole allocation.
