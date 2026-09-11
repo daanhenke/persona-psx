@@ -21,14 +21,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
-
-/* The group effect records come out of, and what one is drawn as. */
-#define FX_OBJ_GROUP 2
-#define FX_OBJ_DRAW  5
-
-/* The two bytes BtlObjAlloc leaves at +0xCD and +0xCE. */
-#define FX_OBJ_CD 0x1D
-#define FX_OBJ_CE 0xE
+#include <persona/btlp/spellfx.h>
 
 /* Layers, and how fast the fighter walks toward the effect's colour. */
 #define FX_LAYERS 3
@@ -44,19 +37,6 @@
 #define FX_STEP_TIGHT  2
 #define FX_MOVE_SPREAD_A 2
 #define FX_MOVE_SPREAD_B 5
-
-extern BtlObjDef g_btl_fx_def;
-
-/* How far each layer of a spread move stands from the middle, in pixels. */
-extern signed char g_btl_fx_shift[];
-
-/* The colour a fighter is put on while an effect stands over it. */
-extern u_char g_btl_tint_fx_r;
-extern u_char g_btl_tint_fx_g;
-extern u_char g_btl_tint_fx_b;
-
-extern u_char g_btl_fx_move;
-extern u_char *g_btl_unused_gfx;
 
 BtlObj *BtlOpenFxLayers(int slot, int timer)
 {

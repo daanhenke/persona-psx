@@ -15,23 +15,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
-
-/* The group effect records come out of, and what one is drawn as. */
-#define FX_OBJ_GROUP 2
-#define FX_OBJ_DRAW  5
-
-/* The two bytes BtlObjAlloc leaves at +0xCD and +0xCE. */
-#define FX_OBJ_CD 0x1D
-#define FX_OBJ_CE 0xE
-
-/* What the record starts as: hidden, static, and without a shadow. */
-#define FX_OBJ_ATTR (BTL_OBJ_HIDDEN | BTL_OBJ_STATIC | BTL_OBJ_NO_SHADOW)
-
-/* The template every effect record is built from, filled in afresh each time
-   from the staged artwork's own script table. */
-extern BtlObjDef g_btl_fx_def;
-
-extern u_char *g_btl_unused_gfx;
+#include <persona/btlp/spellfx.h>
 
 BtlObj *BtlOpenFxObj(int slot, int timer)
 {

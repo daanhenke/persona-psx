@@ -13,16 +13,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
-
-/* Thirty pixels to a column from -0x3C, twenty to a row from +0x3C. */
-#define PLACE_COL_W   0x1E
-#define PLACE_COL_ORG (-0x3C)
-#define PLACE_ROW_H   0x14
-#define PLACE_ROW_ORG 0x3C
-
-/* Positions are 16.16. The column is stored on the object doubled, because the
-   grid is kept to half-column resolution. */
-#define PLACE_FIXED 0x10000
+#include <persona/btlp/formation.h>
 
 void BtlPlaceMember(int slot, short col, short row)
 {

@@ -22,6 +22,7 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/spellfx.h>
 #include <persona/common/spell.h>
 
 /* What the loader left at 0x80140000: one address per run it read. The effect
@@ -41,24 +42,6 @@ extern u_char *D_80140004;
 #define FX_KIND_GFX 3
 #define FX_MOTION   2
 #define FX_SE_BANK  4
-
-/* What a spell effect's handlers are told, in place of arguments. */
-extern u_char g_btl_fx_move;
-extern u_char g_btl_fx_target;
-
-/* Where the staged artwork is, which BtlBindGfx is handed the address of. */
-extern u_char *g_btl_fx_gfx;
-
-extern u_char *g_btl_unused_gfx;
-
-typedef struct {
-    /* 0x0 */ BtlObj *(*start)();
-    /* 0x4 */ void (*step)();
-    /* 0x8 */ void (*finish)();
-    /* 0xC */ int  group;
-} BtlSpellFx;                          /* 16 bytes */
-
-extern BtlSpellFx g_btl_spell_fx[];
 
 extern void    BtlCloseMessage(int slot);
 extern int     BtlBindGfx(u_int kind, int index, u_char **image);

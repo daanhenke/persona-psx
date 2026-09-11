@@ -19,6 +19,7 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/spellfx.h>
 #include <persona/common/spell.h>
 
 /* Lines the list holds, and how many of them are drawn. */
@@ -32,19 +33,6 @@
    not. The same pair the tactics page greys an empty row with. */
 #define SPELL_CLUT_LIVE 0x20
 #define SPELL_CLUT_NONE 0x23
-
-/* What a spell does, indexed by the same id g_spell_data is. Record zero is
-   the empty one, so the table is as long as the spell list plus its head.
-   The three handlers are the effect's start, its step and its finish; `group`
-   sorts the spell into one of five families. */
-typedef struct {
-    /* 0x0 */ void (*start)();
-    /* 0x4 */ void (*step)();
-    /* 0x8 */ void (*finish)();
-    /* 0xC */ int  group;
-} BtlSpellFx;                          /* 16 bytes */
-
-extern BtlSpellFx g_btl_spell_fx[];
 
 /* The three things each line is made of, and the rows they are drawn as -
    twelve for the board and twelve more directly behind them. */

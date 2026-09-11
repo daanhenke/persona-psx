@@ -34,6 +34,20 @@ extern BtlFormation g_btl_formation_saved;
 extern const u_char g_btl_place_lo[];
 extern const u_char g_btl_place_hi[];
 
+/* What a cell of the grid is worth on the field. Thirty pixels to a column
+   from -0x3C, twenty to a row from +0x3C for the party; the enemies are laid
+   out the same way from their own origin, mirrored across the middle. Row 0 is
+   the front row on both sides - the one nearest the other side.
+
+   Positions are 16.16. An object's column is stored doubled, because the grid
+   is kept to half-column resolution. */
+#define PLACE_COL_W   0x1E
+#define PLACE_COL_ORG (-0x3C)
+#define PLACE_ROW_H   0x14
+#define PLACE_ROW_ORG 0x3C
+#define PLACE_FIXED   0x10000
+
+extern void BtlPlaceMember(int slot, short col, short row);
 extern void BtlPlaceFormation(void);
 extern void BtlFormationCloseUp(void);
 
