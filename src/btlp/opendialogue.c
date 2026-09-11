@@ -24,6 +24,7 @@
  * level moved either.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -91,45 +92,7 @@ extern int  BtlEventFlagTest(int id);
 extern void BtlSetInsert(int which, const u_char *src);
 
 
-/* Whether the speaker's line is still worth playing. Three of the four
-   speakers each have a flag of their own and play only once it is set; the
-   fourth is the line that stands in for all three and plays only while none
-   of them is. */
-int BtlOpeningLineWanted(int who)
-{
-    switch (who) {
-    case 3:
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER3) != 0) {
-            return 1;
-        }
-        break;
-    case 6:
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER6) != 0) {
-            return 1;
-        }
-        break;
-    case 7:
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER7) != 0) {
-            return 1;
-        }
-        break;
-    case 9:
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER3) != 0) {
-            break;
-        }
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER6) != 0) {
-            break;
-        }
-        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER7) != 0) {
-            break;
-        }
-        return 1;
-    default:
-        return 1;
-    }
-    return 0;
-}
-
+#ifdef NON_MATCHING
 void BtlOpenDialogue(void)
 {
     BtlOpeningLine *line;
@@ -247,4 +210,46 @@ void BtlOpenDialogue(void)
         }
         BtlHudHide();
     }
+}
+#else
+INCLUDE_ASM("btlp/nonmatchings/opendialogue", BtlOpenDialogue);
+#endif
+
+/* Whether the speaker's line is still worth playing. Three of the four
+   speakers each have a flag of their own and play only once it is set; the
+   fourth is the line that stands in for all three and plays only while none
+   of them is. */
+int BtlOpeningLineWanted(int who)
+{
+    switch (who) {
+    case 3:
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER3) != 0) {
+            return 1;
+        }
+        break;
+    case 6:
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER6) != 0) {
+            return 1;
+        }
+        break;
+    case 7:
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER7) != 0) {
+            return 1;
+        }
+        break;
+    case 9:
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER3) != 0) {
+            break;
+        }
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER6) != 0) {
+            break;
+        }
+        if (BtlEventFlagTest(OPENING_FLAG_SPEAKER7) != 0) {
+            break;
+        }
+        return 1;
+    default:
+        return 1;
+    }
+    return 0;
 }

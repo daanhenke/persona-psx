@@ -19,6 +19,7 @@
  * value and reads it signed, which is the declaration every other unit has.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -95,6 +96,7 @@ void BtlOpenEnemyEntrance(void)
     }
 }
 
+#ifdef NON_MATCHING
 void BtlOpenEnemyRise(void)
 {
     BtlObj *obj;
@@ -124,6 +126,9 @@ void BtlOpenEnemyRise(void)
         } while (i < OPEN_SETTLE);
     }
 }
+#else
+INCLUDE_ASM("btlp/nonmatchings/openscenes", BtlOpenEnemyRise);
+#endif
 
 void BtlOpenEnemyWhiten(void)
 {
