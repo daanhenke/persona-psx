@@ -79,7 +79,6 @@ INCLUDE_ASM("btlp/nonmatchings/damage", BtlRollHit);
  * where an upright one is measured on the average of the three stats that say
  * how well it is paying attention, and can never be worse than one chance in
  * six however far ahead the swinger is. */
-#ifdef NON_MATCHING
 int BtlRollCritical(BtlActor *actor, BtlActor *foe)
 {
     int raw;
@@ -112,11 +111,10 @@ int BtlRollCritical(BtlActor *actor, BtlActor *foe)
         }
     }
 
-    return (rand() & BTL_ROLL_MAX) < chance;
+    /* Reuse the raw value's local to hold the clamped chance across rand. */
+    raw = chance;
+    return (rand() & BTL_ROLL_MAX) < raw;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/damage", BtlRollCritical);
-#endif
 
 /* Raw damage: the swing squared against four times the guard, and never less
    than one however far behind it comes out. */

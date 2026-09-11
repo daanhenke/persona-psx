@@ -22,7 +22,6 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/offer.h>
 #include <persona/common/item.h>
 
@@ -33,43 +32,46 @@ extern int BtlPickItemFrom(unsigned int tier);
    picks one of those at random. The kept ids and the slots BtlItemSlot found
    for them share one array - ids in the first half, slots in the second - so
    that a single walking pointer fills both. */
-#ifdef NON_MATCHING
 unsigned int BtlPickHoldable(unsigned int count, const u_short *ids)
 {
     unsigned int kept[18];
     unsigned int found;
+    unsigned int item;
     unsigned int *p;
+    const u_short *id;
+    int limit;
     int i;
     int n;
-    int pick;
 
     n = 0;
     i = 0;
-    if ((count & 0xFF) != 0) {
+    count &= 0xFF;
+    if ((int)count > 0) {
+        /* Save the bound before reusing count for the packed item-slot result. */
+        limit = count;
+        id = ids;
         p = kept;
         do {
-            found = BtlItemSlot(*ids);
-            i++;
-            if ((found & 0xFFFF) != 0) {
+            count = BtlItemSlot(*id);
+            if ((count & 0xFFFF) != 0) {
                 n++;
-                p[8] = found >> 16;
-                *p = *ids;
+                item = *id;
+                p[8] = count >> 16;
+                *p = item;
                 p++;
             }
-            ids++;
-        } while (i < (int)(count & 0xFF));
+            i++;
+            id++;
+        } while (i < limit);
     }
     found = 0;
     if (n != 0) {
         srand(VSync(-1));
-        pick = rand() % n;
-        found = kept[pick + 8] << 16 | kept[pick];
+        i = rand() % n;
+        found = kept[i + 8] << 16 | kept[i];
     }
     return found;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/drop", BtlPickHoldable);
-#endif
 
 /* The candidates, sixteen consecutive item ids split across the four tiers.
    Each row is eight wide however many it uses, and the count beside it says

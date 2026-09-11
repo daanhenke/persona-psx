@@ -12,7 +12,6 @@
  * the count the step names.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/sound.h>
 
@@ -50,7 +49,6 @@ extern u_char     g_btl_se_off;
 extern u_char     g_btl_seq_catchup;
 
 
-#ifdef NON_MATCHING
 void BtlStepObjScripts(void)
 {
     BtlObj     *o;
@@ -62,6 +60,7 @@ void BtlStepObjScripts(void)
     u_long      attr;
     u_long      nosound;
     u_long      nojump;
+    int         flags;
 
     group = 0;
     child = &g_btl_obj_child_def.scripts;
@@ -84,10 +83,7 @@ void BtlStepObjScripts(void)
                Written inline gcc materialises each one where it is used. */
             nosound = ~BTL_OBJ_SOUNDED;
             nojump = ~BTL_OBJ_JUMPED;
-            attr |= BTL_OBJ_RUNNING;
-            attr &= nosound;
-            attr &= nojump;
-            o->attr = attr;
+            o->attr = ((attr | BTL_OBJ_RUNNING) & nosound) & nojump;
             do {
                 more = 1;
                 if ((s->flags & SEQ_OP) == SEQ_SOUND) {
@@ -116,8 +112,10 @@ void BtlStepObjScripts(void)
                     more = 0;
                     /* The remaining opcodes are matched whole rather than by
                        their high byte, which is what puts them in a switch of
-                       their own. */
-                    switch (s->flags) {
+                       their own. The signed selector is reused for the jump's
+                       attribute update, preserving its register allocation. */
+                    flags = s->flags;
+                    switch (flags) {
                     case SEQ_STATIC:
                         o->attr = (o->attr | BTL_OBJ_STILL) & ~BTL_OBJ_RUNNING;
                         break;
@@ -128,7 +126,9 @@ void BtlStepObjScripts(void)
                         break;
 
                     case SEQ_JUMP:
-                        o->attr |= BTL_OBJ_JUMPED;
+                        flags = o->attr;
+                        flags |= BTL_OBJ_JUMPED;
+                        o->attr = flags;
                         s = (BtlSeqStep *)s->value;
                         more = 1;
                         if ((s->flags & SEQ_HOLD) == 0) {
@@ -175,7 +175,4 @@ void BtlStepObjScripts(void)
         group++;
     } while (group <= BTL_OBJ_GROUPS - 1);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/stepscripts", BtlStepObjScripts);
-#endif
 

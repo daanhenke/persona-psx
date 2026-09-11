@@ -13,7 +13,6 @@
  * per gauge.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/offer.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
@@ -31,10 +30,15 @@ extern void BtlDropRecent(int gauge);
 extern void BtlPanelSetImage(int on, u_char image);
 extern void BtlSetMoodGauges(short a, short b, short c, short d);
 
-#ifdef NON_MATCHING
 void BtlMoodRetire(void)
 {
     int i;
+    /* A column of mood values, one offer apart. Keeping the gauge offset
+       before the offer stride preserves the original address calculation. */
+    typedef struct {
+        short value;
+        char pad[sizeof(BtlOffer) - sizeof(short)];
+    } MoodRow;
 
     i = 0;
     do {
@@ -48,7 +52,8 @@ void BtlMoodRetire(void)
                 g_btl_mood_state[i] = MOOD_HELD;
             } else {
                 g_btl_offer[g_btl_offer_slot].kinds &= ~(1 << i);
-                g_btl_offer[g_btl_offer_slot].mood[i] = MOOD_RETIRED;
+                ((MoodRow *)(g_btl_offer[0].mood + i))
+                    [g_btl_offer_slot].value = MOOD_RETIRED;
                 g_btl_mood_state[i] = 0;
                 g_btl_panel_gauges &= ~(1 << i);
                 BtlDropRecent(i);
@@ -63,6 +68,3 @@ void BtlMoodRetire(void)
                      g_btl_offer[g_btl_offer_slot].mood[2],
                      g_btl_offer[g_btl_offer_slot].mood[3]);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/moodretire", BtlMoodRetire);
-#endif

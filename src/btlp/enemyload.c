@@ -69,7 +69,6 @@ int BtlLoadEnemyGfx(int species, int actor, u_long *tim, u_char *image,
                     int bytes)
 {
     u_long  *clut;
-    u_long **held;
     int      size;
     u_short  found;
     short   *wide;
@@ -164,16 +163,15 @@ load:
         memcpy(g_btl_gfx_next, image, bytes);
         BtlBindGfx(1, species, &g_btl_gfx_next);
         clut = BtlUploadTim(tim, slot, actor + BTL_ENEMY_SLOT0, 1, 0, 1);
-        /* The first copy reads the palette back through a pointer to it. That
-           is what keeps the uploaded address in the register the original uses
-           across the three copies; it is not redundant. */
-        held = &clut;
         g_btl_slot_clut[slot] = clut;
-        memcpy(g_btl_enemy_clut + actor * BTL_CLUT_BYTES, (u_char *)*held,
+        memcpy(g_btl_enemy_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
                BTL_CLUT_BYTES);
-        memcpy(g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES, (u_char *)clut,
+        /* Each later copy reloads the palette from the slot table. */
+        memcpy(g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
+               (u_char *)g_btl_slot_clut[found & 0xFFFF],
                BTL_CLUT_BYTES);
-        memcpy(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES, (u_char *)clut,
+        memcpy(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES,
+               (u_char *)g_btl_slot_clut[found & 0xFFFF],
                BTL_CLUT_BYTES);
         g_btl_slot_clut[found & 0xFFFF] =
             (u_long *)(g_btl_enemy_clut + actor * BTL_CLUT_BYTES);
