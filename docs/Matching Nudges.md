@@ -917,3 +917,39 @@ source clearly owns is not the compiler's.
 Covered above for spell lines; the same thing decides
 [actordef.c](/src/btlp/actordef.c)'s sibling in reverse - there the record is
 read through one pointer taken once, because only one table is indexed.
+
+## Reuse the local, do not give the value one of its own
+
+Section 4 goes both ways, and the reuse direction closed two routines in the
+effect block that no ordering had moved.
+
+**Two addresses, one local.** A routine that reads the loader's first address,
+uses it, then reads its second wants *one* variable taken twice rather than two
+expressions:
+
+    stage = D_80140004;                 /* the artwork  */
+    memcpy(dst, stage, FX_GFX_BYTES);
+    stage = g_load_stage;               /* and the tim  */
+    BtlUploadTim((u_long *)stage, ...);
+
+Written as two expressions in place, gcc hands the block move the load itself;
+written this way it hands it a copy, which is the instruction the image has.
+
+- [movefx.c:80](/src/btlp/movefx.c#L80) - 98.21% to exact on those two lines.
+
+**The call's answer goes in the local that already held something else.** A
+loop that reads a fighter's object at the top and makes a record at the bottom
+keeps *one* pointer for both, not one each. With a variable of its own, gcc
+builds the record's attribute word before it has moved the call's answer out of
+`v0`, and the constant and the object come out in each other's registers.
+
+    ob = g_btl_actors[slot].obj;        /* on the way in  */
+    ...
+    ob = BtlObjAlloc(...);              /* and on the way out */
+    ob->attr = FX_LAYER_ATTR;
+
+- [fxlayers.c:84](/src/btlp/fxlayers.c#L84) - 95.75% to exact; the permuter
+  found it after a dozen orderings of the three stores had not.
+
+Both are worth trying whenever two values with disjoint lifetimes sit in one
+routine and the diff is registers rather than instructions.
