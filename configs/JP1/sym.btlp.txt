@@ -138,7 +138,7 @@ g_btl_personas                = 0x8005CD84; // size:0x8D0
 // 236 with five of them and g_btl_enemies exactly 0x49C later, so the size
 // below is the one the record's own arithmetic asserts.
 g_btl_actors                  = 0x8005D654; // size:0x49C
-g_btl_enemies                 = 0x8005DAF0; // size:0xA8
+g_btl_enemies                 = 0x8005DAF0; // size:0x84C
 g_btl_usable_items            = 0x8005E498;
 g_adv_scene_file              = 0x8005E654; // size:0x8
 g_btl_grid                    = 0x8005E674; // size:0x30
@@ -768,7 +768,7 @@ BtlFaceLoad                   = 0x800761B0; // type:func size:0x2EC
 //------------------------------------------------------------
 //--- PA: 0x0120FC   VA: 0x8007649C   subsegment: asm, btlp_24
 //------------------------------------------------------------
-func_8007649C                 = 0x8007649C; // type:func size:0x2CC
+BtlFaceLoadFile               = 0x8007649C; // type:func size:0x2CC
 
 //-------------------------------------------------------
 //--- PA: 0x0123C8   VA: 0x80076768   subsegment: c, face
@@ -1574,34 +1574,83 @@ func_80097698                 = 0x80097698; // type:func size:0x18
 //-------------------------------------------------------------
 BtlNotePersonaWon             = 0x800976B0; // type:func size:0x44
 
+//-----------------------------------------------------------
+//--- PA: 0x033354   VA: 0x800976F4   subsegment: c, btlflags
+//-----------------------------------------------------------
+BtlEventFlagTest              = 0x800976F4; // type:func size:0x3C
+BtlEventFlagSet               = 0x80097730; // type:func size:0x44
+BtlEventFlagClear             = 0x80097774; // type:func size:0x48
+
 //------------------------------------------------------------
-//--- PA: 0x033354   VA: 0x800976F4   subsegment: asm, btlp_58
+//--- PA: 0x03341C   VA: 0x800977BC   subsegment: asm, btlp_58
 //------------------------------------------------------------
-func_800976F4                 = 0x800976F4; // type:func size:0x3C
-D_80097730                    = 0x80097730; // type:func size:0x44
-func_80097774                 = 0x80097774; // type:func size:0x48
 func_800977BC                 = 0x800977BC; // type:func size:0x144
-func_80097900                 = 0x80097900; // type:func size:0x74
-D_80097974                    = 0x80097974; // type:func size:0xDC
-func_80097A50                 = 0x80097A50; // type:func size:0x8
-func_80097A58                 = 0x80097A58; // type:func size:0xDDC
+
+//-------------------------------------------------------------
+//--- PA: 0x033560   VA: 0x80097900   subsegment: c, insertturn
+//-------------------------------------------------------------
+BtlInsertTurn                 = 0x80097900; // type:func size:0x74
+
+//------------------------------------------------------------
+//--- PA: 0x0335D4   VA: 0x80097974   subsegment: c, debuggrid
+//------------------------------------------------------------
+BtlLoadDebugGrid              = 0x80097974; // type:func size:0xDC
+
+//---------------------------------------------------------------
+//--- PA: 0x0336B0   VA: 0x80097A50   subsegment: asm, btlp_58_x1
+//---------------------------------------------------------------
+func_80097A50                 = 0x80097A50; // type:func size:0xDE4
 func_80098834                 = 0x80098834; // type:func size:0x410
+
+//------------------------------------------------------------
+//--- PA: 0x0348A4   VA: 0x80098C44   subsegment: c, turnorder
+//------------------------------------------------------------
 BtlResetTurnOrder             = 0x80098C44; // type:func size:0xF4
+
+//---------------------------------------------------------------
+//--- PA: 0x034998   VA: 0x80098D38   subsegment: c, opendialogue
+//---------------------------------------------------------------
 BtlOpenDialogue               = 0x80098D38; // type:func size:0x340
-func_80099078                 = 0x80099078; // type:func size:0xAC
-func_80099124                 = 0x80099124; // type:func size:0x1A4
-func_800992C8                 = 0x800992C8; // type:func size:0x13C
+BtlOpeningLineWanted          = 0x80099078; // type:func size:0xAC
+
+//-----------------------------------------------------------------
+//--- PA: 0x034D84   VA: 0x80099124   subsegment: c, scriptedaction
+//-----------------------------------------------------------------
+BtlAimScriptedMember          = 0x80099124; // type:func size:0x1A4
+BtlAimScriptedEnemy           = 0x800992C8; // type:func size:0x13C
+
+//------------------------------------------------------------
+//--- PA: 0x035064   VA: 0x80099404   subsegment: c, returnmap
+//------------------------------------------------------------
 BtlSetReturnMap               = 0x80099404; // type:func size:0x40
+
+//------------------------------------------------------------
+//--- PA: 0x0350A4   VA: 0x80099444   subsegment: c, playscene
+//------------------------------------------------------------
 BtlPlayScene                  = 0x80099444; // type:func size:0xBC
+
+//-------------------------------------------------------------
+//--- PA: 0x035160   VA: 0x80099500   subsegment: c, openscenes
+//-------------------------------------------------------------
 BtlOpenEnemyEntrance          = 0x80099500; // type:func size:0xB4
 BtlOpenEnemyRise              = 0x800995B4; // type:func size:0xC8
 BtlOpenEnemyWhiten            = 0x8009967C; // type:func size:0x28C
+
+//------------------------------------------------------------
+//--- PA: 0x035568   VA: 0x80099908   subsegment: c, roundover
+//------------------------------------------------------------
 BtlRoundOverScene             = 0x80099908; // type:func size:0x5A0
 BtlLastEnemyScene             = 0x80099EA8; // type:func size:0x18C
-BtlHoldForMarkers             = 0x8009A034; // type:func size:0x8
-func_8009A03C                 = 0x8009A03C; // type:func size:0x16C
-BtlAimEnemyMove               = 0x8009A1A8; // type:func size:0x8
-func_8009A1B0                 = 0x8009A1B0; // type:func size:0x45C
+
+//--------------------------------------------------------------
+//--- PA: 0x035C94   VA: 0x8009A034   subsegment: c, holdmarkers
+//--------------------------------------------------------------
+BtlHoldForMarkers             = 0x8009A034; // type:func size:0x174
+
+//---------------------------------------------------------------
+//--- PA: 0x035E08   VA: 0x8009A1A8   subsegment: asm, btlp_58_x3
+//---------------------------------------------------------------
+BtlAimEnemyMove               = 0x8009A1A8; // type:func size:0x464
 BtlStageCommand               = 0x8009A60C; // type:func size:0x6C4
 func_8009ACD0                 = 0x8009ACD0; // type:func size:0x328
 func_8009AFF8                 = 0x8009AFF8; // type:func size:0x1D8
@@ -2585,6 +2634,22 @@ g_btl_line_enc05d             = 0x800CD838;
 g_btl_line_enc05e             = 0x800CD844;
 g_btl_line_enc05f             = 0x800CD854;
 g_btl_line_enc08              = 0x800CDA04;
+g_btl_line_hold08             = 0x800CDA20;
+g_btl_line_hold09             = 0x800CDA88;
+g_btl_line_hold10             = 0x800CDBA0;
+g_btl_line_hold13             = 0x800CDC4C;
+g_btl_line_enc15a             = 0x800CDEDC;
+g_btl_line_enc15b             = 0x800CDF50;
+g_btl_line_enc15c             = 0x800CDF8C;
+g_btl_line_enc15d             = 0x800CDFD0;
+g_btl_line_enc15e             = 0x800CDFE4;
+g_btl_line_enc15f             = 0x800CDFF4;
+g_btl_line_enc15g             = 0x800CE004;
+g_btl_line_enc15h             = 0x800CE028;
+g_btl_line_enc16a             = 0x800CE078;
+g_btl_line_enc16b             = 0x800CE090;
+g_btl_line_enc16c             = 0x800CE0A4;
+g_btl_line_enc16d             = 0x800CE0B4;
 g_btl_line_enc11a             = 0x800CE174;
 g_btl_line_enc11b             = 0x800CE190;
 g_btl_line_enc11c             = 0x800CE1C4;
@@ -2599,10 +2664,20 @@ g_btl_boss22_shape            = 0x800CE4BC; // type:u8 size:0x1
 g_btl_boss22_shown            = 0x800CE4BD; // type:u8 size:0x1
 g_btl_boss20_shape            = 0x800CE4BE; // type:u8 size:0x1
 g_btl_boss20_shown            = 0x800CE4BF; // type:u8 size:0x1
+g_btl_round_over_done         = 0x800CE4C0; // type:u8 size:0x1
 g_btl_affinity_scale          = 0x800CE4C4; // type:u32 size:0xEC
 D_800CE5B0                    = 0x800CE5B0; // type:u32 size:0xC
-D_800CE5BC                    = 0x800CE5BC; // type:u32 size:0x10B8
-g_btl_encounter_maps          = 0x800CF674; // size:0x8C
+// The block below was one unnamed run; the five tables inside it are
+// separate objects in the source, and naming each is what keeps a reference
+// to one from being compiled as an offset from another.
+D_800CE5BC                    = 0x800CE5BC; // type:u32 size:0x14
+g_btl_turn_script             = 0x800CE5D0;
+g_btl_opening_lines           = 0x800CE8E4;
+g_btl_member_actions          = 0x800CE960;
+g_btl_enemy_lines             = 0x800CEBC0;
+g_btl_enemy_actions           = 0x800CEFF0;
+g_btl_enemy_line_next         = 0x800CF670; // type:s32 size:0x4
+g_btl_encounter_maps          = 0x800CF674; // size:0x88
 g_btl_msg_ailment             = 0x800CF7FC;
 g_btl_msg_defeat              = 0x800CFA98;
 g_btl_msg_place1              = 0x800CFACC;

@@ -99,6 +99,9 @@ segments:
       # 0x3FC bytes there, which is the whole 0x8D8..0xCD4 span.
       - [0xA50, .rodata, roundflow]
       - [0xCD4, rodata, btlp_rodata6a]
+      # BtlHoldForMarkers's switch table, which the C emits itself.
+      - [0xD98, .rodata, holdmarkers]
+      - [0xDB0, rodata, btlp_rodata6b]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]
       - [0x1AD4, c, drawfront]
@@ -337,7 +340,22 @@ segments:
       - [0x30934, c, enemy2]
       - [0x30984, asm, btlp_57_x1]
       - [0x33310, c, personawon]
-      - [0x33354, asm, btlp_58]
+      # The event-flag trio the battle keeps for itself, then the turn-order
+      # helpers, the scripted opening and the two scenes that close a round.
+      - [0x33354, c, btlflags]
+      - [0x3341C, asm, btlp_58]
+      - [0x33560, c, insertturn]
+      - [0x335D4, c, debuggrid]
+      - [0x336B0, asm, btlp_58_x1]
+      - [0x348A4, c, turnorder]
+      - [0x34998, c, opendialogue]
+      - [0x34D84, c, scriptedaction]
+      - [0x35064, c, returnmap]
+      - [0x350A4, c, playscene]
+      - [0x35160, c, openscenes]
+      - [0x35568, c, roundover]
+      - [0x35C94, c, holdmarkers]
+      - [0x35E08, asm, btlp_58_x3]
       - [0x36E30, c, pickmember]
       - [0x37118, c, pickdown]
       - [0x37248, c, menukey]

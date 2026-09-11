@@ -44,9 +44,15 @@ extern u_char g_btl_msg_place1[];
 extern u_char g_btl_msg_place2[];
 extern u_char g_btl_msg_defeat[];
 
-/* Two shorts per encounter: the map to go back to, and the room in it.
+/* Four bytes per encounter: the map to go back to, and the room in it.
    BtlSetReturnMap copies the pair into g_map_id and g_map_room. */
-extern u_short g_btl_encounter_maps[];
+typedef struct {
+    /* 0x0 */ u_short map;
+    /* 0x2 */ u_char  room;
+    /* 0x3 */ u_char  pad3;
+} BtlReturnMap;                 /* 4 bytes */
+
+extern BtlReturnMap g_btl_encounter_maps[];
 
 #define BTL_AI_MOVES 7
 #define BTL_AI_MOODS 3
