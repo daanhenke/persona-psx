@@ -97,17 +97,43 @@ def _normalize_suffixed_symbols(path: Path):
 
     return normalized
 
-EXCLUDED_NAMES = {"data", "rodata", "sdata", "bss"}
+# splat writes a unit's non-text sections to data/<unit>.<section>.s, so the
+# expected tree holds <unit>.s.o beside data/<unit>.<section>.s.o. Section
+# objects are normally left out of the totals: the unit's text object is
+# measured against the C object, which already carries every section, so
+# counting the section object as well would report the unit twice.
+SECTION_SUFFIX = re.compile(r"\.(data|rodata|sdata|bss)\.s\.o$")
+
+
+def _unit_of(obj: Path, root: Path) -> str:
+    """expected/JP1/btlp/data/spellfxtable.data.s.o -> btlp/spellfxtable"""
+    rel = SECTION_SUFFIX.sub(".s.o", obj.relative_to(root).as_posix())
+    rel = re.sub(r"(^|/)data/", r"\1", rel)
+    return re.sub(r"\.(s|c)\.o$", "", rel)
+
 
 def _collect_objects(path: Path, config) -> list[Path]:
     ignored = config["ignored_files"]
-    return [
-        path for path in path.rglob("*.o")
-        if not any(name in path.name for name in EXCLUDED_NAMES ) and not any(file in str(path) for file in ignored)
-    ]
+    objects = [o for o in path.rglob("*.o") if not any(f in str(o) for f in ignored)]
+    text = [o for o in objects if not SECTION_SUFFIX.search(o.name)]
+    keep = list(text)
+    have_text = {_unit_of(o, path) for o in text}
+    # A unit written entirely as data - a table and nothing else - has no text
+    # object to be measured by, so take its section object instead. Only when
+    # the C source is really there: the un-decompiled <target>_data and
+    # <target>_rodata blobs are section objects too, and they are not units.
+    for o in objects:
+        if not SECTION_SUFFIX.search(o.name):
+            continue
+        unit = _unit_of(o, path)
+        if unit in have_text:
+            continue
+        if Path(f"src/{re.sub(r'^(JP1|US)/', '', unit)}.c").exists():
+            keep.append(o)
+    return keep
 
 def _determine_categories(path: Path, config) -> tuple[UnitMetadata, str]:
-    modified_path = path.relative_to(config["expected_paths"][game_version]).as_posix()
+    modified_path = _unit_of(path, Path(config["expected_paths"][game_version])) + ".s.o"
     if game_version == "ALL":
         modified_path = re.sub(r"^(JP1|US)/", "", str(modified_path))
 

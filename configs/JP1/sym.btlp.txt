@@ -796,8 +796,7 @@ func_80076B0C                 = 0x80076B0C; // type:func size:0xAC
 func_80076BB8                 = 0x80076BB8; // type:func size:0xB8
 func_80076C70                 = 0x80076C70; // type:func size:0xA4
 func_80076D14                 = 0x80076D14; // type:func size:0x13C
-func_80076E50                 = 0x80076E50; // type:func size:0x8
-func_80076E58                 = 0x80076E58; // type:func size:0x658
+func_80076E50                 = 0x80076E50; // type:func size:0x660
 
 //---------------------------------------------------------
 //--- PA: 0x013110   VA: 0x800774B0   subsegment: c, effect
@@ -1229,8 +1228,7 @@ BtlSpawnActorObj              = 0x80084E90; // type:func size:0xB4
 //------------------------------------------------------------
 //--- PA: 0x020BA4   VA: 0x80084F44   subsegment: asm, btlp_42
 //------------------------------------------------------------
-BtlLoadActorGfx               = 0x80084F44; // type:func size:0x450
-D_80085394                    = 0x80085394; // type:func size:0x34
+BtlLoadActorGfx               = 0x80084F44; // type:func size:0x484
 BtlSummonPersona              = 0x800853C8; // type:func size:0x2FC
 
 //------------------------------------------------------------
@@ -1374,8 +1372,7 @@ BtlTickPopup                  = 0x8008AAAC; // type:func size:0x164
 //------------------------------------------------------------
 //--- PA: 0x026870   VA: 0x8008AC10   subsegment: asm, btlp_48
 //------------------------------------------------------------
-func_8008AC10                 = 0x8008AC10; // type:func size:0x8
-func_8008AC18                 = 0x8008AC18; // type:func size:0x368
+func_8008AC10                 = 0x8008AC10; // type:func size:0x370
 func_8008AF80                 = 0x8008AF80; // type:func size:0x44
 func_8008AFC4                 = 0x8008AFC4; // type:func size:0xFC
 func_8008B0C0                 = 0x8008B0C0; // type:func size:0x64
@@ -1764,8 +1761,7 @@ BtlPickUpdate                 = 0x800A37A4; // type:func size:0x1F4
 func_800A3998                 = 0x800A3998; // type:func size:0x1A0
 func_800A3B38                 = 0x800A3B38; // type:func size:0x230
 func_800A3D68                 = 0x800A3D68; // type:func size:0x2B8
-func_800A4020                 = 0x800A4020; // type:func size:0x8
-func_800A4028                 = 0x800A4028; // type:func size:0x738
+func_800A4020                 = 0x800A4020; // type:func size:0x740
 
 //--------------------------------------------------------
 //--- PA: 0x0403C0   VA: 0x800A4760   subsegment: c, place
@@ -1813,17 +1809,14 @@ func_800A8A44                 = 0x800A8A44; // type:func size:0x164
 func_800A8BA8                 = 0x800A8BA8; // type:func size:0x58
 func_800A8C00                 = 0x800A8C00; // type:func size:0x53C
 func_800A913C                 = 0x800A913C; // type:func size:0x304
-func_800A9440                 = 0x800A9440; // type:func size:0x8
-func_800A9448                 = 0x800A9448; // type:func size:0x20
+func_800A9440                 = 0x800A9440; // type:func size:0x28
 func_800A9468                 = 0x800A9468; // type:func size:0x38
-func_800A94A0                 = 0x800A94A0; // type:func size:0x8
-func_800A94A8                 = 0x800A94A8; // type:func size:0x20
+func_800A94A0                 = 0x800A94A0; // type:func size:0x28
 func_800A94C8                 = 0x800A94C8; // type:func size:0x94
 func_800A955C                 = 0x800A955C; // type:func size:0x38
 func_800A9594                 = 0x800A9594; // type:func size:0x28
 func_800A95BC                 = 0x800A95BC; // type:func size:0x2EC
-func_800A98A8                 = 0x800A98A8; // type:func size:0x8
-func_800A98B0                 = 0x800A98B0; // type:func size:0x20
+func_800A98A8                 = 0x800A98A8; // type:func size:0x28
 
 //------------------------------------------------------------
 //--- PA: 0x045530   VA: 0x800A98D0   subsegment: c, pickspawn
@@ -1856,8 +1849,7 @@ BtlCloseMemberBoards          = 0x800AA024; // type:func size:0x50
 //--- PA: 0x045CD4   VA: 0x800AA074   subsegment: asm, btlp_66
 //------------------------------------------------------------
 func_800AA074                 = 0x800AA074; // type:func size:0x144
-func_800AA1B8                 = 0x800AA1B8; // type:func size:0x8
-func_800AA1C0                 = 0x800AA1C0; // type:func size:0x20
+func_800AA1B8                 = 0x800AA1B8; // type:func size:0x28
 
 //---------------------------------------------------------
 //--- PA: 0x045E40   VA: 0x800AA1E0   subsegment: c, boards
@@ -1900,12 +1892,9 @@ BtlPlacePickCursors           = 0x800AAAB4; // type:func size:0x1FC
 //---------------------------------------------------------------
 //--- PA: 0x046910   VA: 0x800AACB0   subsegment: asm, btlp_66_x1
 //---------------------------------------------------------------
-func_800AACB0                 = 0x800AACB0; // type:func size:0x8
-func_800AACB8                 = 0x800AACB8; // type:func size:0x2A8
-func_800AAF60                 = 0x800AAF60; // type:func size:0x8
-func_800AAF68                 = 0x800AAF68; // type:func size:0x20
-func_800AAF88                 = 0x800AAF88; // type:func size:0x8
-func_800AAF90                 = 0x800AAF90; // type:func size:0x350
+func_800AACB0                 = 0x800AACB0; // type:func size:0x2B0
+func_800AAF60                 = 0x800AAF60; // type:func size:0x28
+func_800AAF88                 = 0x800AAF88; // type:func size:0x358
 
 //------------------------------------------------------------
 //--- PA: 0x046F40   VA: 0x800AB2E0   subsegment: c, itemboard
@@ -2015,8 +2004,7 @@ func_800B1164                 = 0x800B1164; // type:func size:0xF0
 func_800B1254                 = 0x800B1254; // type:func size:0x7C
 func_800B12D0                 = 0x800B12D0; // type:func size:0x3EC
 func_800B16BC                 = 0x800B16BC; // type:func size:0x64C
-func_800B1D08                 = 0x800B1D08; // type:func size:0x8
-func_800B1D10                 = 0x800B1D10; // type:func size:0x91C
+func_800B1D08                 = 0x800B1D08; // type:func size:0x924
 func_800B262C                 = 0x800B262C; // type:func size:0x12C0
 func_800B38EC                 = 0x800B38EC; // type:func size:0x119C
 func_800B4A88                 = 0x800B4A88; // type:func size:0xF4
@@ -2619,16 +2607,12 @@ BtlOpenFxLayers               = 0x800C0578; // type:func size:0x1C8
 D_800C0740                    = 0x800C0740; // type:func size:0x290
 func_800C09D0                 = 0x800C09D0; // type:func size:0x484
 func_800C0E54                 = 0x800C0E54; // type:func size:0x28C
-func_800C10E0                 = 0x800C10E0; // type:func size:0x8
-func_800C10E8                 = 0x800C10E8; // type:func size:0x700
+func_800C10E0                 = 0x800C10E0; // type:func size:0x708
 func_800C17E8                 = 0x800C17E8; // type:func size:0xBE4
-func_800C23CC                 = 0x800C23CC; // type:func size:0x8
-func_800C23D4                 = 0x800C23D4; // type:func size:0x980
+func_800C23CC                 = 0x800C23CC; // type:func size:0x988
 func_800C2D54                 = 0x800C2D54; // type:func size:0x288
-func_800C2FDC                 = 0x800C2FDC; // type:func size:0x8
-func_800C2FE4                 = 0x800C2FE4; // type:func size:0x12D0
-func_800C42B4                 = 0x800C42B4; // type:func size:0x8
-func_800C42BC                 = 0x800C42BC; // type:func size:0x1CC
+func_800C2FDC                 = 0x800C2FDC; // type:func size:0x12D8
+func_800C42B4                 = 0x800C42B4; // type:func size:0x1D4
 
 //---------------------------------------------------------
 //--- PA: 0x0600E8   VA: 0x800C4488   subsegment: c, objset
