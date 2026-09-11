@@ -290,7 +290,7 @@ void BtlStageClose(void)
                         } while (m < BTL_PARTY);
                         BtlBattleResults();
                         func_80097A50();
-                        func_80098834();
+                        BtlRestoreField();
                     }
 
                     BtlStoreParty();

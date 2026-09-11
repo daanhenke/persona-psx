@@ -347,6 +347,7 @@ segments:
       - [0x33560, c, insertturn]
       - [0x335D4, c, debuggrid]
       - [0x336B0, asm, btlp_58_x1]
+      - [0x34494, c, restorefield]
       - [0x348A4, c, turnorder]
       - [0x34998, c, opendialogue]
       - [0x34D84, c, scriptedaction]

@@ -1600,7 +1600,7 @@ BtlLoadDebugGrid              = 0x80097974; // type:func size:0xDC
 //--- PA: 0x0336B0   VA: 0x80097A50   subsegment: asm, btlp_58_x1
 //---------------------------------------------------------------
 func_80097A50                 = 0x80097A50; // type:func size:0xDE4
-func_80098834                 = 0x80098834; // type:func size:0x410
+BtlRestoreField               = 0x80098834; // type:func size:0x410
 
 //------------------------------------------------------------
 //--- PA: 0x0348A4   VA: 0x80098C44   subsegment: c, turnorder

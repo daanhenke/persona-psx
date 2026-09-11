@@ -158,7 +158,7 @@ void BtlOpenDialogue(void)
                     }
                     break;
                 case OPENING_SCENE_ENCOUNTER:
-                    if (*who == 0) {
+                    if (line->who == 0) {
                         BtlHudHide();
                         BtlLoadPackBank(OPENING_SCENE_BANK);
                         BtlObjSetScript(
@@ -172,8 +172,10 @@ void BtlOpenDialogue(void)
                         BtlHudShow();
                         i = 0;
                         do {
-                            i++;
+                            /* This one frame comes before the count where
+                               every other wait here has it after. */
                             BtlDrawFrame();
+                            i++;
                         } while (i < OPENING_SETTLE);
 
                         BtlSeqPlay(line->script);
@@ -196,7 +198,10 @@ void BtlOpenDialogue(void)
                 BtlSeqPlay(line->script);
                 BtlSeqRun();
             skip:
-                if (*who != 0) {
+                /* These two read the speaker through the record rather than
+                   through the walker; the two pointers come out in each
+                   other's saved registers otherwise. */
+                if (line->who != 0) {
                     BtlFaceClose();
                 }
                 i = 0;

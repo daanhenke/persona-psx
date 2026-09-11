@@ -282,7 +282,7 @@ extern void BtlSetReturnMap(void);
 extern int  BtlBattleOutcome(void);
 extern void BtlBattleResults(void);
 extern void func_80097A50(void);
-extern void func_80098834(void);
+extern void BtlRestoreField(void);
 
 /* Adds one of an item to the party's bag. */
 extern void BtlGiveItem(int item);
