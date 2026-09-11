@@ -19,7 +19,6 @@
  * value and reads it signed, which is the declaration every other unit has.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -96,7 +95,6 @@ void BtlOpenEnemyEntrance(void)
     }
 }
 
-#ifdef NON_MATCHING
 void BtlOpenEnemyRise(void)
 {
     BtlObj *obj;
@@ -111,24 +109,19 @@ void BtlOpenEnemyRise(void)
             BtlDrawFrame();
         } while (i < OPEN_SETTLE_LONG);
         BtlObjSetScript(obj, obj->scripts[OPEN_SCRIPT_RISE]);
-        /* One instruction over: gcc fills the guard's delay slot with the
-           counter's zero and then re-materialises it, where the image puts
-           the loop's own constant there. Nothing at the source level has
-           moved it - the loop shape, the operand order and a second counter
-           were all tried. */
         while ((obj->attr & BTL_OBJ_BUSY_MASK) != BTL_OBJ_JUMPED) {
             BtlDrawFrame();
         }
         i = 0;
         do {
-            i++;
+            /* This one draws before it counts where the other two here count
+               first, which is what leaves the guard's delay slot free for the
+               loop's own constant. */
             BtlDrawFrame();
+            i++;
         } while (i < OPEN_SETTLE);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/openscenes", BtlOpenEnemyRise);
-#endif
 
 void BtlOpenEnemyWhiten(void)
 {
