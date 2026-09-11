@@ -27,7 +27,6 @@
 #define BTL_FRAME_BYTES 0xE660
 #define BTL_SPRT_OT     0xE65C
 
-extern SPRT    *g_btl_sprt_next;
 extern u_short  g_btl_sprite_count;
 
 void BtlDrawObjPieces(BtlObj *o)

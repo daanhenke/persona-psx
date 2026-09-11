@@ -58,7 +58,12 @@ typedef struct BtlObj {
     /* 0x14 */ u_char         pad14[4];
     /* 0x18 */ long           x2;      /* a second copy of x and y, given   */
     /* 0x1C */ long           y2;      /* the same value on an outright put */
-    /* 0x20 */ u_char         pad20[0x18];
+    /* 0x20 */ long           z2;      /* and the third of that copy       */
+    /* 0x24 */ u_char         pad24[4];
+    /* 0x28 */ long           unk28;   /* the three BtlObjAlloc clears and  */
+    /* 0x2C */ long           unk2C;   /* nothing else here has a use for   */
+    /* 0x30 */ long           unk30;
+    /* 0x34 */ u_char         pad34[4];
     /* 0x38 */ long           shift_x;  /* 16.16, the pair a script step's
                                            last two signed bytes set      */
     /* 0x3C */ long           shift;   /* 16.16; what the tick displaces  */
@@ -70,7 +75,8 @@ typedef struct BtlObj {
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ struct BtlObj *attached; /* carried along by every setter    */
     /* 0x50 */ struct BtlObj *shadow;   /* kept on this one's position      */
-    /* 0x54 */ u_char         pad54[8];
+    /* 0x54 */ long           unk54;   /* both cleared as a record is taken */
+    /* 0x58 */ long           unk58;
     /* 0x5C */ struct BtlObj *mark;    /* the ailment marker floating on
                                           this one: the frame tick keeps it
                                           and its attached piece on this
@@ -98,9 +104,9 @@ typedef struct BtlObj {
     /* 0xB4 */ u_short        children; /* a kind-3 parent counts one on here
                                            each time its script spawns one  */
     /* 0xB6 */ short          step;    /* how far into the script it is     */
-    /* 0xB8 */ u_char         padB8[2];
+    /* 0xB8 */ short          unkB8;   /* cleared with age beside it        */
     /* 0xBA */ short          age;     /* frames since the record was taken */
-    /* 0xBC */ u_char         padBC[2];
+    /* 0xBC */ short          unkBC;   /* cleared with timer beside it      */
     /* 0xBE */ short          timer;   /* counts down a frame at a time     */
     /* 0xC0 */ short          rgb[3];  /* the colour actually drawn         */
     /* 0xC6 */ short          rgb_to[3]; /* the colour it is walking toward */

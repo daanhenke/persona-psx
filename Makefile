@@ -326,7 +326,7 @@ endif
 endif
 
 config-formatter:
-	$(PYTHON) $(TOOLS_DIR)/configs_formatter.py
+	$(PYTHON) scripts/format_configs.py
 
 # Recipes
 

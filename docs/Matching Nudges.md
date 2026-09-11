@@ -566,3 +566,25 @@ differing words.
 Take its findings as hints about *shape* - it is very good at spotting that a
 value wants a second variable, or that a local is doing two jobs - and measure
 them with objcmp rather than trusting the score.
+
+## Let the compiler share the successful loop exits
+
+In `BtlChooseEnemyMove`, six searches finish by enabling a move. A `goto` from
+each search to one shared store produced the right instructions, but swapped
+the actor pointer and the constant 1 between `s3` and `s4`. Writing the store
+and `break` inside each search lets gcc merge the tails itself and fixes all
+30 affected words. Identical final control flow can still come from source
+loops with different register lifetimes.
+
+The remaining two words were `addu v0,v1,v0` where the image has
+`addu v0,v0,v1`. Both table lookups need a separate integer row address:
+
+```c
+u_long row = (u_long)ai[a->c.key];
+p = (u_char *)(g_btl_ai_set * sizeof(BtlEnemyAi) + row);
+```
+
+Taking the row first preserves the load order; adding the offset to that
+integer address preserves the operand order. Ordinary pointer indexing and
+putting the whole integer expression in one statement each lose one of those
+properties. See [roundflow.c](/src/btlp/roundflow.c).

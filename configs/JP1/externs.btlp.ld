@@ -94,6 +94,8 @@ SsSetTickMode = 0x8001C7F8;
 SsStart = 0x8001BDF8;
 SsUtReverbOff = 0x8001FD3C;
 SsUtSetReverbDepth = 0x8001FD9C;
+SsSetRVol = 0x80018B38;
+SsUtReverbOn = 0x8001FD1C;
 SsUtSetReverbType = 0x8001EF34;
 SsVabClose = 0x8001DAF4;
 SsVabOpenHead = 0x8001DF4C;
@@ -210,3 +212,19 @@ g_moon = 0x801F2B30;
 g_btl_debug_idle = 0x8004E26A;
 g_btl_debug_no_flee = 0x8004E26B;
 g_btl_debug_party_only = 0x8004E263;
+/* The options block's control-scheme byte, and the two fields beside the map
+   id that the battle takes its encounter and its kind from. */
+g_pad_config = 0x801F2AC7;
+g_map_unk4 = 0x801F5354;
+g_map_room = 0x801F5355;
+D_8004E267 = 0x8004E267;
+/* Names used by the C round flow and overlay entry. */
+g_spell_data = 0x80047D20;
+CdPosToInt = 0x80026654;
+D_801F2678 = 0x801F2678;
+D_800F4D94 = 0x800F4D94;
+D_800F4D6C = 0x800F4D6C;
+D_800F5D68 = 0x800F5D68;
+D_800F5D6C = 0x800F5D6C;
+D_800F5CAC = 0x800F5CAC;
+D_800F4D68 = 0x800F4D68;

@@ -65,7 +65,47 @@ extern u_short g_btl_clut[];
 extern short g_btl_talk_target;
 extern u_char g_btl_frame;
 extern int g_btl_phase;
+/* The frame the battle draws into. Two of them lie end to end from
+   g_btl_prim_pool: each starts with its draw environment, carries its display
+   environment BTL_DISPENV in, holds a thousand-entry ordering table at BTL_OT
+   and the one entry everything unsorted goes into at BTL_OT_END. */
+#define BTL_FRAME_STRIDE 0xE660
+#define BTL_DISPENV      0x5C
+#define BTL_OT           0xD6C0
+#define BTL_OT_LEN       1000
+#define BTL_OT_END       0xE65C
+
+extern u_char  g_btl_frame_due;   /* the clock raises it, the frame clears it */
+extern u_char  g_btl_vsync_count; /* fields since the last frame was drawn    */
+extern u_char  g_btl_half_rate;   /* draw every other field rather than every */
+extern u_short g_btl_tick;        /* frames drawn since the battle opened     */
+extern int     g_btl_screen_dist;
+extern int     g_btl_draw_dist;   /* the copy the frame takes of it           */
+extern u_char  g_btl_interlace;   /* goes into both display environments      */
+extern u_char  g_btl_blank_on_load; /* blank the screen while VRAM is written */
+extern u_char  g_btl_auto_confirm;  /* holds confirm down for the next read   */
+extern u_short g_btl_help_key;      /* the pad bits that turn the help off    */
+extern RECT    g_btl_clut_block;    /* where the party's palettes are put     */
+
+extern void BtlDrawFrame(void);
+extern void BtlDrawDebugHud(void);
+extern void BtlCheatWatch(void);
+extern void BtlTickObjects(void);
+extern void BtlStepObjScripts(void);
+extern void BtlWaveMesh(void);
+extern void BtlDrawBehind(u_long *ot);
+extern void BtlDrawFront(u_long *ot);
+extern void BtlFlushVramQueues(void);
+extern void BtlPadRead(void);
+
+/* Where the next primitive of each kind comes from. BtlInitObjects lays the
+   pool out and every drawer takes from these as it goes. */
+extern SPRT     *g_btl_sprt_next;
+extern TILE     *g_btl_tile_next;
 extern POLY_FT4 *g_btl_polyft4_next;
+extern POLY_F4  *g_btl_polyf4_next;
+extern POLY_G4  *g_btl_polyg4_next;
+extern LINE_G2  *g_btl_lineg2_next;
 extern u_char g_btl_fast_anim;
 extern short g_btl_obj_x;
 extern short g_btl_obj_y;

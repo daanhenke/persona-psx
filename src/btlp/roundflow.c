@@ -187,11 +187,15 @@ void BtlStageOpen(void)
 }
 
 #ifdef NON_MATCHING
-/* Exact size, exact instruction count and the same control flow as the image,
-   but the registers are not the ones it chose: the image keeps the ailment in
-   a pseudo of its own, which pushes the two loop walkers up one register each,
-   and gcc here folds that copy away. Everything structural is settled, so what
-   is left is the permuter's job.
+/* 99.62% by objdiff, and one instruction short of the image: it loads the
+   ailment into the same register the key check used, so it has to copy the value
+   out before the range test overwrites that register - `addu v1,v0,zero`, in the
+   delay slot of the POISON branch. This loads straight into the register the
+   range test wants and needs no copy, which is better code and four bytes
+   shorter. Everything structural is settled; the copy is an allocator
+   coin-flip, so it is the permuter's job. Do not chase it by routing a value
+   through one of the loop counters - that is what the permuter proposes and it
+   breaks the loop.
 
    Same shape as BtlStageOpen: the tail of the loop is the frame, and every
    step that is not finished simply falls out of the switch to draw one. Only
@@ -246,7 +250,11 @@ void BtlStageClose(void)
     BtlCloseMessage(0);
 
     for (;;) {
-        switch (g_btl_step) {
+        /* Taken into a local first: the step decides the block and the ailment
+           below shares the register it lands in, which is what the image
+           does - switching on the global straight costs the match. */
+        st = g_btl_step;
+        switch (st) {
         case 0:
             if (BtlHudState() == 0 && BtlBoxState() == 0) {
                 if (g_btl_party_lost == 0) {
@@ -259,16 +267,19 @@ void BtlStageClose(void)
                         n = 0;
                         do {
                             if (g_btl_actors[n].c.key != 0) {
+                                /* POISON stands on its own and SICK and DOWN
+                                   are tested as the one range they are - a
+                                   three-case switch makes the compiler walk all
+                                   three instead of folding the pair. */
+                                /* POISON stands on its own and SICK and DOWN
+                                   are tested as the one range they are - a
+                                   three-case switch makes the compiler walk all
+                                   three instead of folding the pair. */
                                 st = (signed char)g_btl_actors[n].c.status;
-                                if (st != BTL_STATUS_POISON) {
-                                    switch (st) {
-                                    case BTL_STATUS_SICK:
-                                    case BTL_STATUS_DOWN:
-                                        break;
-                                    default:
-                                        g_btl_actors[n].c.status = 0;
-                                        g_btl_actors[n].c.ail_level = 0;
-                                    }
+                                if (st != BTL_STATUS_POISON
+                                    && (u_int)(st - BTL_STATUS_SICK) >= 2) {
+                                    g_btl_actors[n].c.status = 0;
+                                    g_btl_actors[n].c.ail_level = 0;
                                 }
                                 if (g_btl_actors[n].c.hp < 1) {
                                     g_btl_actors[n].c.hp = 1;
@@ -418,11 +429,12 @@ void BtlStageRound(void)
     SVECTOR unused[4];
 
     /* Only these four outlive the step that sets them, which is why they are
-       the only ones the routine puts on the stack. */
+       the only ones the routine puts on the stack. The cancel flag comes first:
+       it takes the slot right above the reserved bytes in the image. */
+    int cancelled;
     BtlActor *actor;
     BtlObj *obj;
     u_char action;
-    int cancelled;
 
     cancelled = 0;
     for (;;) {
@@ -440,16 +452,24 @@ void BtlStageRound(void)
             int hit;
             int amount;
             int r;
-            /* Whose stats are worked out again: one side, or both. */
-            if (g_btl_battle_kind == 1) {
+            /* Whose stats are worked out again: one side, or both. Written as
+               a switch, which is what the image tests - it jumps to each arm
+               rather than branching past it. */
+            switch (g_btl_battle_kind) {
+            case 1:
                 first = 0;
                 last = BTL_PARTY;
-            } else if (g_btl_battle_kind == 2) {
+                break;
+
+            case 2:
                 first = BTL_PARTY;
                 last = BTL_ACTORS;
-            } else {
+                break;
+
+            default:
                 first = 0;
                 last = BTL_ACTORS;
+                break;
             }
             g_btl_battle_kind = 0;
             if (g_btl_debug_party_only != 0) {
@@ -1380,7 +1400,6 @@ void BtlStageRound(void)
 INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageRound);
 #endif
 
-#ifdef NON_MATCHING
 /* One enemy's turn, chosen fresh each time it comes round.
  *
  * Three things can take the turn before the move list is even looked at: a
@@ -1388,16 +1407,16 @@ INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageRound);
  * then are the six spells the fighter knows tested for whether they could be
  * cast at all, and whatever survives is weighed against the mood's odds.
  *
- * The mask below is why the whole routine is skipped for some ailments - gcc
- * folds it into the test and still leaves the constant in rodata, which is
- * what the unreferenced word before the jump table is.
+ * The unused copy of the ailment mask before the jump table remains in the
+ * overlay's raw rodata; this unit emits the switch table itself.
  */
-static const u_long AI_SKIP_AILMENTS = 0x0060C0FC;
+#define AI_SKIP_AILMENTS 0x0060C0FCUL
 
 u_char BtlChooseEnemyMove(BtlActor *a)
 {
     SVECTOR unused;
     const u_char *odds;
+    u_char (*weights)[8][8];
     BtlActor *q;
     u_char *ok;
     u_char *p;
@@ -1406,7 +1425,8 @@ u_char BtlChooseEnemyMove(BtlActor *a)
     int n;
     int live;
     int roll;
-    int which;
+    u_char enabled;
+    u_char spell;
 
     /* Cleared backwards, from the last of the six spells down to the plain
        attack at the front. */
@@ -1430,8 +1450,8 @@ u_char BtlChooseEnemyMove(BtlActor *a)
             } else {
                 if ((rand() & 1) == 0) {
                     g_btl_boss22_shown = 1;
-                    a->form = 0x24;
                     g_btl_boss22_shape = 0;
+                    a->form = 0x24;
                     return BTL_MOVE_MORPH;
                 }
             }
@@ -1480,26 +1500,27 @@ u_char BtlChooseEnemyMove(BtlActor *a)
             g_btl_move_ok[0] = 1;
         }
 
-        i = 0;
         if ((signed char)a->c.ail_level != 2
             || (u_int)(a->c.status - 8) >= 2) {
+            i = 0;
+            enabled = 1;
             ok = &g_btl_move_ok[1];
             do {
                 /* Held as a byte, not widened once into an int: the
                    image re-masks it at each test, which is what a u_char in
                    an int context costs. */
-                u_char spell = a->spell[i];
+                spell = a->spell[i];
 
                 if (spell == 0) {
                     goto next;
                 }
-                if ((u_int)(spell - 0x75) < 0x17
+                if ((spell >= 0x75 && spell < 0x8C)
                     || ((u_char)(spell + 0x5D) < 0x41 && spell != 0xDB)) {
                     if (spell == 0xE1) {
                         /* only worth calling for help when there is
                            almost none left */
-                        live = 0;
                         n = 0;
+                        live = 0;
                         do {
                             if (g_btl_combatants[n].c.key != 0) {
                                 live++;
@@ -1509,11 +1530,11 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         if (live >= 2) {
                             goto next;
                         }
-                        *ok = 1;
+                        *ok = enabled;
                     } else if (spell != 0xE2
                                && BtlPickAiTarget(a, g_spell_data[spell].target)
                                       >= 0) {
-                        *ok = 1;
+                        *ok = enabled;
                     }
                     goto next;
                 }
@@ -1529,7 +1550,7 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         if (g_btl_combatants[n].c.key != 0
                             && g_btl_combatants[n].c.hp
                                    < g_btl_combatants[n].c.hp_max) {
-                            *ok = 1;
+                            *ok = enabled;
                         }
                         n++;
                     } while (n < BTL_ENEMIES);
@@ -1538,101 +1559,108 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                     do {
                         if (g_btl_combatants[n].c.key != 0
                             && (g_btl_combatants[n].flags & 0x1E00) == 0) {
-                            *ok = 1;
+                            *ok = enabled;
                         }
                         n++;
                     } while (n < BTL_ENEMIES);
                 } else {
+                    /* Keep successful writes inside each scan. Sharing them
+                       with a goto changes gcc's saved-register allocation. */
                     switch (spell) {
                     case 0xA2:
                         if (g_btl_ai_set != BTL_AI_SET_TAME) {
-                            *ok = 1;
+                            *ok = enabled;
                         } else {
                             break;
                         }
                     case 0x56:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0
-                                && (q->offered | q->unkE1[0] | q->unkE1[1])
-                                       != 0) {
-                                *ok = 1;
-                                break;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0) {
+                                int flags = q[n].offered;
+                                flags |= q[n].unkE1[0];
+                                flags |= q[n].unkE1[1];
+                                if (flags != 0) {
+                                    *ok = enabled;
+                                    break;
+                                }
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                     case 0x5B:
                         n = 0;
-                        do {
-                            n++;
-                            if (g_btl_actors[n - 1].c.key != 0
-                                && (g_btl_actors[n - 1].unkE1[2]
-                                    | g_btl_actors[n - 1].unkE1[3]
-                                    | g_btl_actors[n - 1].unkE1[4]
-                                    | g_btl_actors[n - 1].unkE1[5]) != 0) {
-                                goto mark;
+                        while (n < BTL_PARTY) {
+                            if (g_btl_actors[n].c.key != 0) {
+                                int flags = g_btl_actors[n].unkE1[2];
+                                flags |= g_btl_actors[n].unkE1[3];
+                                flags |= g_btl_actors[n].unkE1[4];
+                                flags |= g_btl_actors[n].unkE1[5];
+                                if (flags != 0) {
+                                    *ok = enabled;
+                                    break;
+                                }
                             }
-                        } while (n < BTL_PARTY);
+                            n++;
+                        }
                         break;
                     case 0x5D:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0 && (q->flags & 0x80) == 0) {
-                                goto mark;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0 && (q[n].flags & 0x80) == 0) {
+                                *ok = enabled;
+                                break;
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                         break;
                     case 0x5E:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0 && (q->flags & 0x100) == 0) {
-                                goto mark;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0 && (q[n].flags & 0x100) == 0) {
+                                *ok = enabled;
+                                break;
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                         break;
                     case 0x67:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0
-                                && (signed char)q->c.status == 0xD) {
-                                goto mark;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0
+                                && (signed char)q[n].c.status == 0xD) {
+                                *ok = enabled;
+                                break;
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                         break;
                     case 0x68:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0
-                                && (signed char)q->c.status == 0xE) {
-                                goto mark;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0
+                                && (signed char)q[n].c.status == 0xE) {
+                                *ok = enabled;
+                                break;
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                         break;
                     case 0x69:
                         n = 0;
                         q = g_btl_combatants;
-                        do {
-                            n++;
-                            if (q->c.key != 0
-                                && (signed char)q->c.status == 0xF) {
-                                goto mark;
+                        while (n < BTL_ENEMIES) {
+                            if (q[n].c.key != 0
+                                && (signed char)q[n].c.status == 0xF) {
+                                *ok = enabled;
+                                break;
                             }
-                            q++;
-                        } while (n < BTL_ENEMIES);
+                            n++;
+                        }
                         break;
                     /* Thirteen moves the AI never has to test for. They
                        are written one to a line rather than stacked: stacked
@@ -1658,11 +1686,16 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                             u_char kind = g_spell_data[spell].kind
                                           & SPELL_KIND_MASK;
 
-                            if (kind == 0x1C || kind == 0x1E || kind == 0x1A
-                                || kind == 0x32
-                                || BtlAnyMemberTargetable() != 0) {
-                            mark:
-                                *ok = 1;
+                            switch (kind) {
+                            default:
+                                if (BtlAnyMemberTargetable() == 0) {
+                                    break;
+                                }
+                            case 0x1C:
+                            case 0x1E:
+                            case 0x1A:
+                            case 0x32:
+                                *ok = enabled;
                             }
                         }
                     }
@@ -1678,24 +1711,33 @@ u_char BtlChooseEnemyMove(BtlActor *a)
     i = 0;
     n = 0;
     do {
-        u_char move = g_btl_enemy_ai[a->c.key][g_btl_ai_set].move[i];
-
-        i++;
-        if (g_btl_move_ok[move] != 0) {
-            g_btl_move_choices[n] = move;
+        BtlEnemyAi (*ai)[BTL_AI_MOODS] = g_btl_enemy_ai;
+        /* Keep the row address separate: gcc adds the mood offset first. */
+        u_long row = (u_long)ai[a->c.key];
+        p = (u_char *)(g_btl_ai_set * sizeof(BtlEnemyAi) + row);
+        if (g_btl_move_ok[p[i]] != 0) {
+            g_btl_move_choices[n] = p[i];
             n++;
         }
+        i++;
     } while (i < BTL_AI_MOVES);
 
     i = 0;
-    which = g_btl_enemy_ai[a->c.key][g_btl_ai_set].odds;
     roll = rand() % 255 + 1;
+    spell = g_btl_ai_set;
+    chance = g_btl_enemy_ai[a->c.key][spell].odds;
     if (n > 0) {
+        u_long row;
         /* A row of eight per length, the first being for a list of one -
            so the count lands one row past its own. */
-        odds = g_btl_move_odds[which][n] - 8;
+        live = (u_char)roll;
+        weights = g_btl_move_odds;
+        /* As above, the integer row address preserves the add's operands. */
+        row = (u_long)weights[chance];
+        p = (u_char *)(n * 8 + row);
+        odds = p - 8;
         do {
-            if ((u_char)roll <= *odds) {
+            if ((u_int)live <= *odds) {
                 return g_btl_move_choices[i];
             }
             i++;
@@ -1708,7 +1750,3 @@ u_char BtlChooseEnemyMove(BtlActor *a)
     a->flags |= BTL_ACTOR_IDLE;
     return BTL_MOVE_IDLE;
 }
-
-#else
-INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlChooseEnemyMove);
-#endif

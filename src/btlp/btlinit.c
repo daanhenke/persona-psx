@@ -32,7 +32,6 @@
 #define DEBUG_FNT_H  0x80
 #define DEBUG_FNT_N  0x200
 
-extern long    g_btl_screen_dist;
 extern u_char  g_btl_debug;
 extern int     g_btl_debug_fnt;
 extern RECT    g_btl_clear_rect;

@@ -14,12 +14,49 @@ on:
       - '**.ksy'
 
 jobs:
-  # The build environment the other jobs run in. It is rebuilt every time, but
-  # the layer cache makes that a few seconds when nothing has changed - which
-  # is cheaper than the alternative, where a Dockerfile change races the jobs
-  # that pull the image and they run against the previous one.
-  image:
+  # What the push or pull request actually touched. Every job below is gated on
+  # this, so a change to one half of the repository does not pay for the other.
+  changes:
     if: github.repository == 'daanhenke/persona-psx'
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.filter.outputs.image }}
+      sources: ${{ steps.filter.outputs.sources }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            image:
+              - 'Dockerfile'
+              - 'requirements.txt'
+              - '.github/workflows/ci.yml'
+            sources:
+              - 'src/**'
+              - 'include/**'
+              - 'asm/**'
+              - 'configs/**'
+              - 'linkers/**'
+              - 'lib/**'
+              - 'assets/**'
+              - 'tools/**'
+              - 'Makefile'
+              - '.github/workflows/ci.yml'
+
+  # The build environment the other jobs run in. Only the Dockerfile and what it
+  # installs can change it, so it is built only when one of those moves; the
+  # tagged image from the last such push is what the jobs below pull otherwise.
+  # When it does run, `needs` holds those jobs back, so they can never race a
+  # Dockerfile change and run against the previous image.
+  image:
+    needs: changes
+    if: |
+      github.repository == 'daanhenke/persona-psx' &&
+      (needs.changes.outputs.image == 'true' ||
+       github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,8 +90,15 @@ jobs:
 
   check:
     name: Check Executables Match
-    needs: image
-    if: github.repository == 'daanhenke/persona-psx'
+    needs: [ changes, image ]
+    # `always()` so a skipped image job does not skip this one with it; the
+    # result check is what stops it running against an image that failed.
+    if: |
+      always() &&
+      github.repository == 'daanhenke/persona-psx' &&
+      needs.image.result != 'failure' && needs.image.result != 'cancelled' &&
+      (needs.changes.outputs.sources == 'true' ||
+       github.event_name == 'workflow_dispatch')
 
     container:
       image: ghcr.io/daanhenke/persona-psx-buildenv:main
@@ -99,8 +143,13 @@ jobs:
 
   progress:
     name: Determine and Push Progress
-    needs: image
-    if: github.repository == 'daanhenke/persona-psx'
+    needs: [ changes, image ]
+    if: |
+      always() &&
+      github.repository == 'daanhenke/persona-psx' &&
+      needs.image.result != 'failure' && needs.image.result != 'cancelled' &&
+      (needs.changes.outputs.sources == 'true' ||
+       github.event_name == 'workflow_dispatch')
 
     container:
       image: ghcr.io/daanhenke/persona-psx-buildenv:main

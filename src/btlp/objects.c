@@ -87,11 +87,6 @@
 #define BTL_MESH_COLS 0x14
 #define BTL_MESH_TOP  0x80000000
 
-extern SPRT     *g_btl_sprt_next;
-extern TILE     *g_btl_tile_next;
-extern POLY_F4  *g_btl_polyf4_next;
-extern POLY_G4  *g_btl_polyg4_next;
-extern LINE_G2  *g_btl_lineg2_next;
 extern u_short   g_btl_sprite_count;
 extern u_short   g_btl_poly_count;
 extern u_short   g_btl_sprite_peak;

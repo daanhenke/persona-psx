@@ -51,7 +51,6 @@
 #define BTL_FRAME_BYTES 0xE660
 #define BTL_PRIM_OT     0xE65C
 
-extern SPRT    *g_btl_sprt_next;
 extern u_short  g_btl_sprite_count;
 extern int      g_btl_screen_dist;
 extern MATRIX   g_btl_cam_matrix;

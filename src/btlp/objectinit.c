@@ -31,12 +31,12 @@
 
 #define BTL_SLOTS 32
 
+/* What a fresh record starts at: all three scales at unity and the colour at
+   half, which is what the drawers read as "leave it alone". */
+#define BTL_ALLOC_SCALE 0x1000
+#define BTL_ALLOC_RGB   0x80
 
-extern SPRT     *g_btl_sprt_next;
-extern TILE     *g_btl_tile_next;
-extern POLY_F4  *g_btl_polyf4_next;
-extern POLY_G4  *g_btl_polyg4_next;
-extern LINE_G2  *g_btl_lineg2_next;
+
 
 /* Overlay entry. Every slot goes back to unowned, each group's list is reduced
    to its first record, and both frame buffers' primitives are re-tagged. */
@@ -49,6 +49,7 @@ int BtlInitObjects(void)
     int     n;
     int     frame;
     short   none;
+    int     end;
 
     /* One counter runs the slot fill and then the group loop; it is the same
        register in the original, so it is the same variable. The fill value is
@@ -62,15 +63,18 @@ int BtlInitObjects(void)
         slot--;
     } while (i >= 0);
 
+    i = 0;
     obj = g_btl_obj_pool;
-    for (i = 0; i < BTL_OBJ_GROUPS; i++) {
+    for (; i < BTL_OBJ_GROUPS; i++) {
         obj->attr = BTL_OBJ_INUSE;
         obj->kind = BTL_OBJ_HEAD;
         obj->prev = 0;
         obj->next = 0;
         g_btl_obj_tail[i] = obj;
         obj++;
-        for (n = 1; n < g_btl_obj_count[i]; n++) {
+        n = 1;
+        while (n < g_btl_obj_count[i]) {
+            n++;
             obj->attr = 0;
             obj->kind = 0;
             obj++;
@@ -118,9 +122,116 @@ int BtlInitObjects(void)
             g_btl_lineg2_next++;
         }
         frame += BTL_FRAME_STRIDE;
-    } while (frame < BTL_FRAME_END);
+        end = BTL_FRAME_END;
+    } while (frame < end);
     return 1;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/objectinit", BtlInitObjects);
 #endif
+
+/* Takes the first free record of a group and fills it in.
+ *
+ * The search starts at `after` when the caller has one - which is how a spawn
+ * hangs a shadow immediately behind the thing it belongs to - and otherwise at
+ * the record past the group's own head. It walks forward until it finds one
+ * whose attribute word is clear, and gives up when it reaches the next
+ * group's head rather than running into it.
+ *
+ * The template is an array and `index` picks the entry, so one table serves a
+ * whole family. Everything else the record needs is either handed in or comes
+ * off the template's first script step: the two signed bytes at the end of it
+ * are the shift the object starts with, sixteen places up.
+ */
+BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
+                    int index, const long *pos, int unkCD, int unkCE)
+{
+    BtlObj *obj;
+    BtlObj *tail;
+
+    defs += index;
+    if (after == 0) {
+        after = &g_btl_obj_pool[g_btl_obj_first[group]] + 1;
+    }
+    obj = after;
+    for (;;) {
+        if ((obj->kind & BTL_OBJ_HEAD) != 0) {
+            return 0;
+        }
+        if (obj->attr == 0) {
+            tail = g_btl_obj_tail[group];
+            tail->next = obj;
+            obj->prev = tail;
+            obj->next = 0;
+            g_btl_obj_tail[group] = obj;
+
+            /* A template that does not say it is static starts out
+               animating. */
+            if ((defs->attr & BTL_OBJ_STATIC) != 0) {
+                obj->attr = defs->attr | BTL_OBJ_INUSE;
+            } else {
+                obj->attr = defs->attr | BTL_OBJ_INUSE | BTL_OBJ_ANIMATING;
+            }
+            obj->scripts = 0;
+            obj->x = pos[0];
+            obj->y = pos[1];
+            obj->z = pos[2];
+            obj->x2 = pos[0];
+            obj->y2 = pos[1];
+            obj->z2 = pos[2];
+            obj->unk28 = 0;
+            obj->unk2C = 0;
+            obj->unk30 = 0;
+            /* Read again for the second byte rather than kept: the store
+               between them is what makes the original go back for it. */
+            if (defs->scripts != 0) {
+                obj->shift = ((const BtlSeqStep *)defs->scripts)->arg1 << 16;
+                obj->shift_x = ((const BtlSeqStep *)defs->scripts)->arg0 << 16;
+            } else {
+                obj->shift_x = 0;
+                obj->shift = 0;
+            }
+            obj->scale_to = 0;
+            obj->attached = 0;
+            obj->shadow = 0;
+            obj->unk54 = 0;
+            obj->unk58 = 0;
+            obj->mark = 0;
+            obj->unk60 = 0;
+            obj->script = (BtlSeqStep *)defs->scripts;
+            obj->last = ((const BtlSeqStep *)defs->scripts)->value;
+            obj->unk70 = 0;
+            obj->unk72 = 0;
+            obj->unk74 = 0;
+            obj->scale_x = BTL_ALLOC_SCALE;
+            obj->scale_y = BTL_ALLOC_SCALE;
+            obj->scale_z = BTL_ALLOC_SCALE;
+            obj->col2 = 0;
+            obj->row = 0;
+            obj->kind = index;
+            obj->children = 0;
+            obj->step = 0;
+            obj->unkB8 = 0;
+            obj->age = 0;
+            obj->unkBC = 0;
+            obj->timer = 0;
+            obj->rgb[0] = BTL_ALLOC_RGB;
+            obj->rgb[1] = BTL_ALLOC_RGB;
+            obj->rgb[2] = BTL_ALLOC_RGB;
+            obj->rgb_to[0] = BTL_ALLOC_RGB;
+            obj->rgb_to[1] = BTL_ALLOC_RGB;
+            obj->rgb_to[2] = BTL_ALLOC_RGB;
+            obj->fade = 0;
+            obj->unkCD = unkCD;
+            obj->unkCE = unkCE;
+            obj->group = group;
+            obj->draw = draw;
+            obj->motion = 0;
+            obj->unkD2 = 0;
+            obj->unkD3 = 0;
+            obj->phase = 0;
+            return obj;
+        }
+        obj++;
+    }
+}

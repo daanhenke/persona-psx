@@ -173,8 +173,8 @@ Follow these steps prior to committing:
 3. Review the changes with `git diff`, then re-stage and commit them:</br>
    `git add src/`
 
-### [configs_formatter.py](https://github.com/Vatuu/silent-hill-decomp/tree/master/tools/configs_formatter.py)
-A Python script is provided to rearrange registered symbol in `*.sym.txt` files based on addresses. Prior to committing, run it with `python3 tools/configs_formatter.py`.
+### scripts/format_configs.py
+Sorts each `sym.<target>.txt` by address, upper-cases the hex and re-inserts the subsegment comments from the matching `<target>.yaml`, so a symbol's position in the file says which unit it belongs to. Prior to committing a sym file change, run it with `python3 scripts/format_configs.py` - the diff is otherwise a reshuffle on top of the real edit. With no arguments it formats every region under `configs/`; name one or more to narrow it.
 
 ## Naming Conventions
 

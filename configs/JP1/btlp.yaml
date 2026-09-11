@@ -38,6 +38,16 @@ options:
   # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
   # than the Shift-JIS ones the ROM holds - four bytes become six.
   data_string_guesser_level: 0
+  # Everything the overlay reaches outside its own image lives here: the
+  # resident executable's code and data. It must stop where the overlay's own
+  # image starts: past that, symbol-plus-offset starts swallowing this
+  # overlay's own routines into whatever symbol precedes them.
+  # Without this range splat never hands those symbols to spimdisasm, so a
+  # reference into the middle of one - g_btl_actors + 0x3e, say - comes out as a
+  # fresh D_8005D692 instead of the offset the C actually writes, and every such
+  # reference reads as a difference in objdiff.
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   # overlay id 5
@@ -73,9 +83,22 @@ segments:
       - [0x634, .rodata, windowstep]
       - [0x668, rodata, btlp_rodata4a]  # the assembler pads .rodata to 8
       - [0x66C, .rodata, menuupdate]
+      # ovl_btlp_entry's own strings - every debug line it announces a step
+      # with, and the ten pack names it looks up on the disc. The C emits them
+      # byte for byte already; this becomes `.rodata, entry` the moment the
+      # routine itself comes out of asm, and not before - under INCLUDE_ASM the
+      # body is not compiled, so nothing would emit them.
       - [0x684, rodata, btlp_rodata5]
       - [0x7B4, .rodata, bindgfx]
       - [0x7C8, rodata, btlp_rodata6]
+      # Only BtlChooseEnemyMove's table, because it is the one routine in
+      # roundflow.c that is already out of asm. The unit's rodata really starts
+      # at 0x8D8 - BtlStageRound's five tables and the word behind them sit in
+      # btlp_rodata6 until that routine matches, and this becomes
+      # `[0x8D8, .rodata, roundflow]` when it does. The C already emits exactly
+      # 0x3FC bytes there, which is the whole 0x8D8..0xCD4 span.
+      - [0xA50, .rodata, roundflow]
+      - [0xCD4, rodata, btlp_rodata6a]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]
       - [0x1AD4, c, drawfront]
@@ -238,7 +261,9 @@ segments:
       - [0x1ABA8, asm, btlp_35]
       - [0x1AEB8, c, openmessage]
       - [0x1B028, c, boxmessage]
-      - [0x1B048, asm, btlp_36]
+      - [0x1B048, c, entry]
+      - [0x1C034, c, drawframe]
+      - [0x1C480, c, objectinit]
       - [0x1C9B4, c, object]
       - [0x1CBA0, c, bindgfx]
       - [0x1CD04, c, unpack]

@@ -1,58 +1,50 @@
 #!/usr/bin/env python3
-import sys
+"""Put every sym file in a config directory into the project's house order.
+
+Sorts each `sym.<target>.txt` by address, upper-cases the hex, and re-inserts
+the subsegment comments from the matching `<target>.yaml`, so a symbol's file
+position says which unit it belongs to.
+
+Run it before committing a change to a sym file - the diff is otherwise a
+reshuffle on top of the real edit.
+
+  usage: format_configs.py [region ...]
+
+Regions default to every directory under `configs/` that holds a `sym.*.txt`,
+so this needs no arguments and nothing hardcoded about which versions exist.
+"""
 import re
+import sys
 from pathlib import Path
 
-
-# =============================================================================
-# FILE DISCOVERY AND VALIDATION
-# =============================================================================
-
-def validate_input_path(input_path):
-    path = Path(input_path)
-    if not path.exists():
-        print(f"Error: Path not found: {path}")
-        sys.exit(1)
-    if not path.is_dir():
-        print(f"Error: Not a directory: {path}")
-        sys.exit(1)
-    return path
+ROOT = Path(__file__).resolve().parent.parent
+CONFIGS = ROOT / "configs"
 
 
-def discover_and_validate_files(region):
-    # Get input path
-    default_path = Path(__file__).parent.parent / 'configs' / region
-    input_path = validate_input_path(sys.argv[1] if len(sys.argv) > 1 else default_path)
-
-    # Find files
-    txt_files = sorted(input_path.rglob('*.txt'))
-    yaml_files = sorted(input_path.rglob('*.yaml'))
-
-    # no txt files found
-    if not txt_files:
-        print(f"Error: No files found in {input_path}")
-        sys.exit(1)
-
-    if region == "USA":
-        # txt file count is not equal to yaml file count
-        if len(txt_files) != len(yaml_files):
-            print(f"Error: Found {len(txt_files)} .txt and {len(yaml_files)} .yaml files")
-            sys.exit(1)
-
-    return txt_files, yaml_files
+def regions(argv):
+    """The config directories to format: those named, or all that have syms."""
+    if argv:
+        out = []
+        for name in argv:
+            path = Path(name)
+            if not path.is_dir():
+                path = CONFIGS / name
+            if not path.is_dir():
+                sys.exit("no such config directory: %s" % name)
+            out.append(path)
+        return out
+    found = sorted(p for p in CONFIGS.iterdir()
+                   if p.is_dir() and any(p.glob("sym.*.txt")))
+    if not found:
+        sys.exit("no sym files under %s" % CONFIGS)
+    return found
 
 
-def discover_file_pairs(txt_files, yaml_files):
-    """Create file pairs based on matching base names"""
-    txt_dict = {txt_file.stem.replace('sym.', ''): txt_file for txt_file in txt_files}
-    yaml_dict = {yaml_file.stem: yaml_file for yaml_file in yaml_files}
-
-    pairs = []
-    for base_name in sorted(txt_dict.keys()):
-        if base_name in yaml_dict:
-            pairs.append((txt_dict[base_name], yaml_dict[base_name]))
-
-    return pairs
+def pairs(region):
+    """Each sym file with the yaml that names its subsegments."""
+    syms = {p.stem[len("sym."):]: p for p in sorted(region.glob("sym.*.txt"))}
+    yamls = {p.stem: p for p in sorted(region.glob("*.yaml"))}
+    return [(syms[k], yamls[k]) for k in sorted(syms) if k in yamls]
 
 
 # =============================================================================
@@ -325,53 +317,28 @@ def sort_and_format_with_yaml_comments(input_text, section_map, subsegment_map):
 
     return '\n'.join(output_lines)
 
-
-# =============================================================================
-# MAIN EXECUTION
-# =============================================================================
-
 def main():
-    # Discover and validate files
-    for region in ["USA", "JAP0", "JAP1"]:
-        txt_files, yaml_files = discover_and_validate_files(region)
-
-        # Process pairs
-        pairs = discover_file_pairs(txt_files, yaml_files)
-        print(f"Processing {len(pairs)} file pairs")
-
-        for txt_file, yaml_file in pairs:
-            print(f"\n\n=== {txt_file.name} + {yaml_file.name} ===\n")
-
-            # Read files
-            with open(txt_file, 'r', encoding='utf-8') as f:
-                txt_content = f.read()
-
-            # Parse YAML
+    total = 0
+    for region in regions(sys.argv[1:]):
+        matched = pairs(region)
+        print("%s: %d sym files" % (region.name, len(matched)))
+        for sym_file, yaml_file in matched:
+            text = sym_file.read_text(encoding="utf-8")
             section_map, subsegment_map = parse_yaml_for_comments(yaml_file)
-            print(f"Found {len(subsegment_map)} subsegments")
 
+            lines = clean_yaml_comments_from_txt(text.split("\n"))
+            cleaned = convert_hex_to_uppercase("\n".join(lines))
+            formatted = sort_and_format_with_yaml_comments(
+                cleaned, section_map, subsegment_map)
 
-
-            # Process pipeline:
-            # 1. Clean old YAML comments
-            txt_lines = txt_content.split('\n')
-            cleaned_lines = clean_yaml_comments_from_txt(txt_lines)
-            cleaned_content = '\n'.join(cleaned_lines)
-
-            # 2. Convert hex to uppercase
-            uppercase_content = convert_hex_to_uppercase(cleaned_content)
-
-            # 3. Sort and add YAML comments
-            final_content = sort_and_format_with_yaml_comments(
-                uppercase_content, section_map, subsegment_map
-            )
-
-            # Output (debug mode)
-            # print(final_content)
-
-            # to write to files
-            with open(txt_file, 'w', encoding='utf-8') as f:
-                f.write(final_content)
+            if formatted != text:
+                sym_file.write_text(formatted, encoding="utf-8")
+                print("  %-20s rewritten (%d subsegments)"
+                      % (sym_file.name, len(subsegment_map)))
+                total += 1
+            else:
+                print("  %-20s already formatted" % sym_file.name)
+    print("%d file(s) rewritten" % total)
 
 
 if __name__ == "__main__":

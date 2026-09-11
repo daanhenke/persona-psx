@@ -1,641 +1,1245 @@
-g_overlay_base = 0x800643A0;
-D_800643A4 = 0x800643A4; // type:u32 size:0xE7C
-func_80065220 = 0x80065220; // type:func size:0x594
-SlotClearAll = 0x800657B4; // type:func size:0x38
-SlotClear = 0x800657EC; // type:func size:0x64
-SlotInit = 0x80065850; // type:func size:0x128
-SlotInitTagged = 0x80065978; // type:func size:0x12C
-SlotSetPos = 0x80065AA4; // type:func size:0x58
-FadeBlackout = 0x80065AFC; // type:func size:0x38
-FadeStepUp = 0x80065B34; // type:func size:0x38
-FadeStepDown = 0x80065B6C; // type:func size:0x38
-D_80065BA4 = 0x80065BA4; // type:func size:0xC8
-SlotSetFlicker = 0x80065C6C; // type:func size:0x54
-D_80065CC0 = 0x80065CC0; // type:func size:0x5C
-SlotSetAnim = 0x80065D1C; // type:func size:0x80
-D_80065D9C = 0x80065D9C; // type:func size:0x50
-SoundPlaySeq = 0x80065DEC; // type:func size:0x60
-func_80065E4C = 0x80065E4C; // type:func size:0x6C
-PlayTimeTick = 0x80065EB8; // type:func size:0xC8
-D_80065F80 = 0x80065F80; // type:func size:0xDC
-FormatDecimal = 0x8006605C; // type:func size:0xF0
-BgMapInit = 0x8006614C; // type:func size:0xC4
-BgMapClearRow = 0x80066210; // type:func size:0x40
-func_80066250 = 0x80066250; // type:func size:0x144
-func_80066394 = 0x80066394; // type:func size:0xCF8
-switchD = 0x8006682C;
-default = 0x8006704C;
-BgMapSetCell = 0x8006708C; // type:func size:0x88
-func_80067114 = 0x80067114; // type:func size:0x258
-TileMapWriteRow = 0x8006736C; // type:func size:0x4C
-D_800673B8 = 0x800673B8; // type:func size:0x54
-TileMapWriteRowRev = 0x8006740C; // type:func size:0x4C
-TileMapFillRect = 0x80067458; // type:func size:0x5C
-TileMapBlitRle = 0x800674B4; // type:func size:0x8C
-MenuListInit = 0x80067540; // type:func size:0x20
-MenuStepCursor = 0x80067560; // type:func size:0x1DC
-MenuScrollCursor = 0x8006773C; // type:func size:0x12C
-func_80067868 = 0x80067868; // type:func size:0x6C
-ImageAnimStop = 0x800678D4; // type:func size:0x24
-func_800678F8 = 0x800678F8; // type:func size:0x38
-ImageAnimStart = 0x80067930; // type:func size:0x64
-func_80067994 = 0x80067994; // type:func size:0x190
-QueueImageUpload = 0x80067B24; // type:func size:0x78
-FlushImageUploads = 0x80067B9C; // type:func size:0x88
-D_80067C24 = 0x80067C24; // type:func size:0xA8
-func_80067CCC = 0x80067CCC; // type:func size:0xB0
-func_80067D7C = 0x80067D7C; // type:func size:0x26C
-func_80067FE8 = 0x80067FE8; // type:func size:0xD58
-MenuTick = 0x80068D40; // type:func size:0x70
-MenuBuild = 0x80068DB0; // type:func size:0xF0
-MenuPollInput = 0x80068EA0; // type:func size:0xB4
-func_80068F54 = 0x80068F54; // type:func size:0xD4
-func_80069028 = 0x80069028; // type:func size:0x60
-func_80069088 = 0x80069088; // type:func size:0x724
-func_800697AC = 0x800697AC; // type:func size:0x690
-func_80069E3C = 0x80069E3C; // type:func size:0x33C
-TextSlotStatRow = 0x8006A178; // type:func size:0x64
-DrawItemRowUsable = 0x8006A1DC; // type:func size:0x14C
-PageScrollValue = 0x8006A328; // type:func size:0x1A4
-func_8006A4CC = 0x8006A4CC; // type:func size:0x1E0
-func_8006A6AC = 0x8006A6AC; // type:func size:0x558
-func_8006AC04 = 0x8006AC04; // type:func size:0x6D4
-func_8006B2D8 = 0x8006B2D8; // type:func size:0x8E0
-func_8006BBB8 = 0x8006BBB8; // type:func size:0xF4
-func_8006BCAC = 0x8006BCAC; // type:func size:0x60
-func_8006BD0C = 0x8006BD0C; // type:func size:0x3D0
-func_8006C0DC = 0x8006C0DC; // type:func size:0xF8
-func_8006C1D4 = 0x8006C1D4; // type:func size:0x278
-func_8006C44C = 0x8006C44C; // type:func size:0x23C
-func_8006C688 = 0x8006C688; // type:func size:0x4D0
-func_8006CB58 = 0x8006CB58; // type:func size:0x3B0
-func_8006CF08 = 0x8006CF08; // type:func size:0x334
-func_8006D23C = 0x8006D23C; // type:func size:0x190
-func_8006D3CC = 0x8006D3CC; // type:func size:0x3B4
-D_8006D780 = 0x8006D780; // type:func size:0x2FC
-func_8006DA7C = 0x8006DA7C; // type:func size:0x42C
-func_8006DEA8 = 0x8006DEA8; // type:func size:0x2A8
-func_8006E150 = 0x8006E150; // type:func size:0x39C
-func_8006E4EC = 0x8006E4EC; // type:func size:0x314
-func_8006E800 = 0x8006E800; // type:func size:0x3D0
-func_8006EBD0 = 0x8006EBD0; // type:func size:0x90
-func_8006EC60 = 0x8006EC60; // type:func size:0x3D0
-func_8006F030 = 0x8006F030; // type:func size:0xC0
-func_8006F0F0 = 0x8006F0F0; // type:func size:0x480
-func_8006F570 = 0x8006F570; // type:func size:0x36C
-func_8006F8DC = 0x8006F8DC; // type:func size:0x2B0
-func_8006FB8C = 0x8006FB8C; // type:func size:0x1F0
-func_8006FD7C = 0x8006FD7C; // type:func size:0x538
-func_800702B4 = 0x800702B4; // type:func size:0x130
-func_800703E4 = 0x800703E4; // type:func size:0x2C8
-D_800706AC = 0x800706AC; // type:func size:0x7DC
-MenuStatusTick = 0x80070E88; // type:func size:0x98
-MenuStatusOpen = 0x80070F20; // type:func size:0x184
-MenuStatusSelect = 0x800710A4; // type:func size:0x91C
-MenuStatusView = 0x800719C0; // type:func size:0x374
-func_80071D34 = 0x80071D34; // type:func size:0x3A4
-func_800720D8 = 0x800720D8; // type:func size:0x5B4
-func_8007268C = 0x8007268C; // type:func size:0x2F8
-func_80072984 = 0x80072984; // type:func size:0x344
-func_80072CC8 = 0x80072CC8; // type:func size:0x450
-FormationSavePrompt = 0x80073118; // type:func size:0x1B8
-func_800732D0 = 0x800732D0; // type:func size:0x3A8
-FormationLoadPrompt = 0x80073678; // type:func size:0x1B0
-func_80073828 = 0x80073828; // type:func size:0xE4
-func_8007390C = 0x8007390C; // type:func size:0xDC
-func_800739E8 = 0x800739E8; // type:func size:0x154
-func_80073B3C = 0x80073B3C; // type:func size:0x930
-func_8007446C = 0x8007446C; // type:func size:0x108
-func_80074574 = 0x80074574; // type:func size:0x1F8
-DrawPlaceLabel = 0x8007476C; // type:func size:0x98
-func_80074804 = 0x80074804; // type:func size:0x394
-func_80074B98 = 0x80074B98; // type:func size:0x1D0
-ConfigStepChoice = 0x80074D68; // type:func size:0xE4
-ConfigCloseChoice = 0x80074E4C; // type:func size:0x80
-func_80074ECC = 0x80074ECC; // type:func size:0x1AC
-ConfigListPlaceMarkers = 0x80075078; // type:func size:0x9C
-ConfigListBeginEdit = 0x80075114; // type:func size:0xB8
-ConfigListApplyOption = 0x800751CC; // type:func size:0x88
-ConfigRedrawBattlePage = 0x80075254; // type:func size:0x1B0
-ConfigPlaceMarkers = 0x80075404; // type:func size:0x128
-ConfigBeginEdit = 0x8007552C; // type:func size:0xD8
-ConfigApplyOption = 0x80075604; // type:func size:0x84
-D_80075688 = 0x80075688; // type:func size:0x1D4
-PadSetPageButtons = 0x8007585C; // type:func size:0x4C
-func_800758A8 = 0x800758A8; // type:func size:0xF8
-func_800759A0 = 0x800759A0; // type:func size:0x23C
-PersonaStockCompact = 0x80075BDC; // type:func size:0xBC
-func_80075C98 = 0x80075C98; // type:func size:0x108
-CharTopEntry = 0x80075DA0; // type:func size:0x84
-PersonaTopSpell = 0x80075E24; // type:func size:0x44
-D_80075E68 = 0x80075E68; // type:func size:0x78
-TileMapWriteRun12 = 0x80075EE0; // type:func size:0x28
-TileMapWriteRun10 = 0x80075F08; // type:func size:0x28
-func_80075F30 = 0x80075F30; // type:func size:0x69C
-func_800765CC = 0x800765CC; // type:func size:0x484
-func_80076A50 = 0x80076A50; // type:func size:0x4F4
-func_80076F44 = 0x80076F44; // type:func size:0x318
-func_8007725C = 0x8007725C; // type:func size:0x6A4
-D_80077900 = 0x80077900; // type:func size:0x728
-UpdateMenuSprites = 0x80078028; // type:func size:0xA30
-D_80078A58 = 0x80078A58; // type:func size:0xA68
-func_800794C0 = 0x800794C0; // type:func size:0x124
-func_800795E4 = 0x800795E4; // type:func size:0x10C
-D_800796F0 = 0x800796F0; // type:func size:0x104
-func_800797F4 = 0x800797F4; // type:func size:0x9C
-D_80079890 = 0x80079890; // type:func size:0xA8
-TileMapDrawWindow = 0x80079938; // type:func size:0x108
-WindowRowTop = 0x80079A40; // type:func size:0x9C
-WindowRowMiddle = 0x80079ADC; // type:func size:0x70
-WindowRowBottom = 0x80079B4C; // type:func size:0xA0
-TileMapWriteBar = 0x80079BEC; // type:func size:0x38
-TileMapDrawBox = 0x80079C24; // type:func size:0x114
-BoxRowTop = 0x80079D38; // type:func size:0x70
-BoxRowMiddle = 0x80079DA8; // type:func size:0x70
-BoxRowBottom = 0x80079E18; // type:func size:0x70
-D_80079E88 = 0x80079E88; // type:func size:0xA8
-func_80079F30 = 0x80079F30; // type:func size:0x1D8
-func_8007A108 = 0x8007A108; // type:func size:0x2CC
-func_8007A3D4 = 0x8007A3D4; // type:func size:0x16C
-func_8007A540 = 0x8007A540; // type:func size:0x94
-DrawPersonaName = 0x8007A5D4; // type:func size:0x8C
-DrawSpellName = 0x8007A660; // type:func size:0xBC
-func_8007A71C = 0x8007A71C; // type:func size:0x94
-func_8007A7B0 = 0x8007A7B0; // type:func size:0x1C4
-func_8007A974 = 0x8007A974; // type:func size:0x17C
-DrawPartySlotStatus = 0x8007AAF0; // type:func size:0x2F8
-func_8007ADE8 = 0x8007ADE8; // type:func size:0x9EC
-FontCellsInit = 0x8007B7D4; // type:func size:0x100
-DrawStatusHud = 0x8007B8D4; // type:func size:0xF4
-func_8007B9C8 = 0x8007B9C8; // type:func size:0x108
-RunFrame = 0x8007BAD0; // type:func size:0x28
-DrawBackdrop = 0x8007BAF8; // type:func size:0x1E4
-PartyLastSlot = 0x8007BCDC; // type:func size:0x2C
-MenuStepMember = 0x8007BD08; // type:func size:0x204
-func_8007BF0C = 0x8007BF0C; // type:func size:0xD0
-TextItemStatRow = 0x8007BFDC; // type:func size:0x244
-TextCopyUntilEnd = 0x8007C220; // type:func size:0x44
-TextAppendNumber = 0x8007C264; // type:func size:0xA8
-ExpToLevel = 0x8007C30C; // type:func size:0xA8
-EventFlagGet2 = 0x8007C3B4; // type:func size:0x38
-func_8007C3EC = 0x8007C3EC; // type:func size:0x63C
-func_8007CA28 = 0x8007CA28; // type:func size:0x7C8
-func_8007D1F0 = 0x8007D1F0; // type:func size:0x790
-func_8007D980 = 0x8007D980; // type:func size:0x338
-func_8007DCB8 = 0x8007DCB8; // type:func size:0x338
-func_8007DFF0 = 0x8007DFF0; // type:func size:0x1D8
-EquipPlaceCursor = 0x8007E1C8; // type:func size:0x150
-ItemsListUsable = 0x8007E318; // type:func size:0xD4
-DrawItemRow = 0x8007E3EC; // type:func size:0xCC
-func_8007E4B8 = 0x8007E4B8; // type:func size:0x450
-CharEquipBest = 0x8007E908; // type:func size:0x144
-ItemsStrongestUsable = 0x8007EA4C; // type:func size:0xF4
-func_8007EB40 = 0x8007EB40; // type:func size:0x1AC
-DrawGauge = 0x8007ECEC; // type:func size:0x16C
-func_8007EE58 = 0x8007EE58; // type:func size:0x3DC
-SpellUsable = 0x8007F234; // type:func size:0x158
-CharSpellUsable = 0x8007F38C; // type:func size:0x11C
-func_8007F4A8 = 0x8007F4A8; // type:func size:0x1BC
-ItemUsableOn = 0x8007F664; // type:func size:0x90
-ItemUsableAny = 0x8007F6F4; // type:func size:0xB8
-PartyAnyStatus = 0x8007F7AC; // type:func size:0x84
-CharHasStatus = 0x8007F830; // type:func size:0x3C
-PartyAnyBelowMax = 0x8007F86C; // type:func size:0x84
-CharBelowMax = 0x8007F8F0; // type:func size:0xE4
-func_8007F9D4 = 0x8007F9D4; // type:func size:0x8
-VramClearRect = 0x8007F9DC; // type:func size:0x64
-func_8007FA40 = 0x8007FA40; // type:func size:0x36C
-D_8007FDAC = 0x8007FDAC; // type:func size:0x48
-PadPoll = 0x8007FDF4; // type:func size:0x60
-FadeUpBlocking = 0x8007FE54; // type:func size:0x88
-FadeDownBlocking = 0x8007FEDC; // type:func size:0x88
-FadeSpritesStep = 0x8007FF64; // type:func size:0x74
-FadeSpritesStepDown = 0x8007FFD8; // type:func size:0x74
-D_8008004C = 0x8008004C; // type:func size:0x308
-ConfigDrawLabels = 0x80080354; // type:func size:0x104
-func_80080458 = 0x80080458; // type:func size:0x130
-D_80080588 = 0x80080588; // type:func size:0x1A8
-PadLoadBindings = 0x80080730; // type:func size:0x154
-D_80080884 = 0x80080884; // type:func size:0xF0
-func_80080974 = 0x80080974; // type:func size:0x228
-D_80080B9C = 0x80080B9C; // type:func size:0xE4
-func_80080C80 = 0x80080C80; // type:func size:0xE8
-func_80080D68 = 0x80080D68; // type:func size:0x38
-FormationLoadPreset = 0x80080DA0; // type:func size:0x7C
-FormationOtherAt = 0x80080E1C; // type:func size:0x54
-FormationSyncCells = 0x80080E70; // type:func size:0x64
-FormationCellOf = 0x80080ED4; // type:func size:0x48
-FormationPresetCellOf = 0x80080F1C; // type:func size:0x60
-FormationFirstFree = 0x80080F7C; // type:func size:0x58
-FormationCellFree = 0x80080FD4; // type:func size:0x154
-FormationPlaceMarkers = 0x80081128; // type:func size:0x100
-FormationPresetFits = 0x80081228; // type:func size:0xA4
-func_800812CC = 0x800812CC; // type:func size:0x164
-CharEquip = 0x80081430; // type:func size:0xA4
-CharUnequip = 0x800814D4; // type:func size:0xC0
-D_80081594 = 0x80081594; // type:func size:0xB4
-FormationDrawMembers = 0x80081648; // type:func size:0x90
+
+
+
+//================================================
+//=== .rodata section
+//================================================
+
+
+//--------------------------------------------------------------
+//--- PA: 0x000000   VA: 0x800643A0   subsegment: rodata, s2d_id
+//--------------------------------------------------------------
+g_overlay_base           = 0x800643A0;
+
+//------------------------------------------------------------------
+//--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, s2d_rodata
+//------------------------------------------------------------------
+D_800643A4               = 0x800643A4; // type:u32 size:0xE7C
+
+
+
+//================================================
+//=== .text section
+//================================================
+
+
+//--------------------------------------------------------
+//--- PA: 0x000E80   VA: 0x80065220   subsegment: asm, s2d
+//--------------------------------------------------------
+func_80065220            = 0x80065220; // type:func size:0x594
+
+//------------------------------------------------------------------
+//--- PA: 0x001414   VA: 0x800657B4   subsegment: c, common/gfx/slot
+//------------------------------------------------------------------
+SlotClearAll             = 0x800657B4; // type:func size:0x38
+SlotClear                = 0x800657EC; // type:func size:0x64
+SlotInit                 = 0x80065850; // type:func size:0x128
+SlotInitTagged           = 0x80065978; // type:func size:0x12C
+SlotSetPos               = 0x80065AA4; // type:func size:0x58
+
+//------------------------------------------------------------------
+//--- PA: 0x00175C   VA: 0x80065AFC   subsegment: c, common/gfx/fade
+//------------------------------------------------------------------
+FadeBlackout             = 0x80065AFC; // type:func size:0x38
+FadeStepUp               = 0x80065B34; // type:func size:0x38
+FadeStepDown             = 0x80065B6C; // type:func size:0x38
+
+//-----------------------------------------------------------
+//--- PA: 0x001804   VA: 0x80065BA4   subsegment: asm, s2d_s1
+//-----------------------------------------------------------
+D_80065BA4               = 0x80065BA4; // type:func size:0xC8
+
+//-------------------------------------------------------------------------
+//--- PA: 0x0018CC   VA: 0x80065C6C   subsegment: c, common/gfx/slotflicker
+//-------------------------------------------------------------------------
+SlotSetFlicker           = 0x80065C6C; // type:func size:0x54
+
+//--------------------------------------------------------------
+//--- PA: 0x001920   VA: 0x80065CC0   subsegment: asm, s2d_s1_x1
+//--------------------------------------------------------------
+D_80065CC0               = 0x80065CC0; // type:func size:0x5C
+
+//----------------------------------------------------------------------
+//--- PA: 0x00197C   VA: 0x80065D1C   subsegment: c, common/gfx/slotanim
+//----------------------------------------------------------------------
+SlotSetAnim              = 0x80065D1C; // type:func size:0x80
+
+//--------------------------------------------------------------
+//--- PA: 0x0019FC   VA: 0x80065D9C   subsegment: asm, s2d_s1_x2
+//--------------------------------------------------------------
+D_80065D9C               = 0x80065D9C; // type:func size:0x50
+SoundPlaySeq             = 0x80065DEC; // type:func size:0x60
+func_80065E4C            = 0x80065E4C; // type:func size:0x6C
+
+//-----------------------------------------------------------------------
+//--- PA: 0x001B18   VA: 0x80065EB8   subsegment: c, common/game/playtime
+//-----------------------------------------------------------------------
+PlayTimeTick             = 0x80065EB8; // type:func size:0xC8
+
+//-----------------------------------------------------------
+//--- PA: 0x001BE0   VA: 0x80065F80   subsegment: asm, s2d_s2
+//-----------------------------------------------------------
+D_80065F80               = 0x80065F80; // type:func size:0xDC
+
+//--------------------------------------------------------------------
+//--- PA: 0x001CBC   VA: 0x8006605C   subsegment: c, common/ui/decimal
+//--------------------------------------------------------------------
+FormatDecimal            = 0x8006605C; // type:func size:0xF0
+
+//-----------------------------------------------------------
+//--- PA: 0x001DAC   VA: 0x8006614C   subsegment: asm, s2d_s3
+//-----------------------------------------------------------
+BgMapInit                = 0x8006614C; // type:func size:0xC4
+
+//-------------------------------------------------------------------
+//--- PA: 0x001E70   VA: 0x80066210   subsegment: c, common/gfx/bgmap
+//-------------------------------------------------------------------
+BgMapClearRow            = 0x80066210; // type:func size:0x40
+
+//--------------------------------------------------------------
+//--- PA: 0x001EB0   VA: 0x80066250   subsegment: asm, s2d_s3_x1
+//--------------------------------------------------------------
+func_80066250            = 0x80066250; // type:func size:0x144
+func_80066394            = 0x80066394; // type:func size:0xCF8
+switchD                  = 0x8006682C;
+default                  = 0x8006704C;
+
+//-----------------------------------------------------------------------
+//--- PA: 0x002CEC   VA: 0x8006708C   subsegment: c, common/gfx/bgmapcell
+//-----------------------------------------------------------------------
+BgMapSetCell             = 0x8006708C; // type:func size:0x88
+
+//--------------------------------------------------------------
+//--- PA: 0x002D74   VA: 0x80067114   subsegment: asm, s2d_s3_x2
+//--------------------------------------------------------------
+func_80067114            = 0x80067114; // type:func size:0x258
+
+//---------------------------------------------------------------------
+//--- PA: 0x002FCC   VA: 0x8006736C   subsegment: c, common/gfx/tilemap
+//---------------------------------------------------------------------
+TileMapWriteRow          = 0x8006736C; // type:func size:0x4C
+
+//--------------------------------------------------------------
+//--- PA: 0x003018   VA: 0x800673B8   subsegment: asm, s2d_s3_x3
+//--------------------------------------------------------------
+D_800673B8               = 0x800673B8; // type:func size:0x54
+
+//-------------------------------------------------------------------------
+//--- PA: 0x00306C   VA: 0x8006740C   subsegment: c, common/gfx/tilemapblit
+//-------------------------------------------------------------------------
+TileMapWriteRowRev       = 0x8006740C; // type:func size:0x4C
+TileMapFillRect          = 0x80067458; // type:func size:0x5C
+TileMapBlitRle           = 0x800674B4; // type:func size:0x8C
+
+//---------------------------------------------------------------------
+//--- PA: 0x0031A0   VA: 0x80067540   subsegment: c, common/ui/menulist
+//---------------------------------------------------------------------
+MenuListInit             = 0x80067540; // type:func size:0x20
+
+//----------------------------------------------------------------
+//--- PA: 0x0031C0   VA: 0x80067560   subsegment: c, ui/menucursor
+//----------------------------------------------------------------
+MenuStepCursor           = 0x80067560; // type:func size:0x1DC
+
+//-----------------------------------------------------------------------
+//--- PA: 0x00339C   VA: 0x8006773C   subsegment: c, common/ui/menuscroll
+//-----------------------------------------------------------------------
+MenuScrollCursor         = 0x8006773C; // type:func size:0x12C
+
+//-------------------------------------------------------------
+//--- PA: 0x0034C8   VA: 0x80067868   subsegment: asm, s2d_1_s1
+//-------------------------------------------------------------
+func_80067868            = 0x80067868; // type:func size:0x6C
+
+//-----------------------------------------------------------------------
+//--- PA: 0x003534   VA: 0x800678D4   subsegment: c, common/gfx/imageanim
+//-----------------------------------------------------------------------
+ImageAnimStop            = 0x800678D4; // type:func size:0x24
+
+//--------------------------------------------------------------
+//--- PA: 0x003558   VA: 0x800678F8   subsegment: asm, s2d_1_s1b
+//--------------------------------------------------------------
+func_800678F8            = 0x800678F8; // type:func size:0x38
+
+//----------------------------------------------------------------------------
+//--- PA: 0x003590   VA: 0x80067930   subsegment: c, common/gfx/imageanimstart
+//----------------------------------------------------------------------------
+ImageAnimStart           = 0x80067930; // type:func size:0x64
+
+//--------------------------------------------------------------
+//--- PA: 0x0035F4   VA: 0x80067994   subsegment: asm, s2d_1_s1a
+//--------------------------------------------------------------
+func_80067994            = 0x80067994; // type:func size:0x190
+
+//------------------------------------------------------------------------
+//--- PA: 0x003784   VA: 0x80067B24   subsegment: c, common/gfx/imagequeue
+//------------------------------------------------------------------------
+QueueImageUpload         = 0x80067B24; // type:func size:0x78
+FlushImageUploads        = 0x80067B9C; // type:func size:0x88
+
+//-------------------------------------------------------------
+//--- PA: 0x003884   VA: 0x80067C24   subsegment: asm, s2d_1_s2
+//-------------------------------------------------------------
+D_80067C24               = 0x80067C24; // type:func size:0xA8
+func_80067CCC            = 0x80067CCC; // type:func size:0xB0
+func_80067D7C            = 0x80067D7C; // type:func size:0x26C
+func_80067FE8            = 0x80067FE8; // type:func size:0xD58
+
+//---------------------------------------------------------------------
+//--- PA: 0x0049A0   VA: 0x80068D40   subsegment: c, common/ui/menutick
+//---------------------------------------------------------------------
+MenuTick                 = 0x80068D40; // type:func size:0x70
+
+//-------------------------------------------------------------
+//--- PA: 0x004A10   VA: 0x80068DB0   subsegment: asm, s2d_1_s3
+//-------------------------------------------------------------
+MenuBuild                = 0x80068DB0; // type:func size:0xF0
+
+//---------------------------------------------------------------------
+//--- PA: 0x004B00   VA: 0x80068EA0   subsegment: c, common/ui/menupoll
+//---------------------------------------------------------------------
+MenuPollInput            = 0x80068EA0; // type:func size:0xB4
+
+//-------------------------------------------------------------
+//--- PA: 0x004BB4   VA: 0x80068F54   subsegment: asm, s2d_1_s4
+//-------------------------------------------------------------
+func_80068F54            = 0x80068F54; // type:func size:0xD4
+func_80069028            = 0x80069028; // type:func size:0x60
+func_80069088            = 0x80069088; // type:func size:0x724
+func_800697AC            = 0x800697AC; // type:func size:0x690
+func_80069E3C            = 0x80069E3C; // type:func size:0x33C
+
+//----------------------------------------------------------------------
+//--- PA: 0x005DD8   VA: 0x8006A178   subsegment: c, common/ui/itemstats
+//----------------------------------------------------------------------
+TextSlotStatRow          = 0x8006A178; // type:func size:0x64
+
+//-----------------------------------------------------------------------
+//--- PA: 0x005E3C   VA: 0x8006A1DC   subsegment: c, common/ui/itemrowuse
+//-----------------------------------------------------------------------
+DrawItemRowUsable        = 0x8006A1DC; // type:func size:0x14C
+
+//-------------------------------------------------------------
+//--- PA: 0x005F88   VA: 0x8006A328   subsegment: asm, s2d_1_s5
+//-------------------------------------------------------------
+PageScrollValue          = 0x8006A328; // type:func size:0x1A4
+func_8006A4CC            = 0x8006A4CC; // type:func size:0x1E0
+func_8006A6AC            = 0x8006A6AC; // type:func size:0x558
+func_8006AC04            = 0x8006AC04; // type:func size:0x6D4
+func_8006B2D8            = 0x8006B2D8; // type:func size:0x8E0
+func_8006BBB8            = 0x8006BBB8; // type:func size:0xF4
+func_8006BCAC            = 0x8006BCAC; // type:func size:0x60
+func_8006BD0C            = 0x8006BD0C; // type:func size:0x3D0
+func_8006C0DC            = 0x8006C0DC; // type:func size:0xF8
+func_8006C1D4            = 0x8006C1D4; // type:func size:0x278
+func_8006C44C            = 0x8006C44C; // type:func size:0x23C
+func_8006C688            = 0x8006C688; // type:func size:0x4D0
+func_8006CB58            = 0x8006CB58; // type:func size:0x3B0
+func_8006CF08            = 0x8006CF08; // type:func size:0x334
+func_8006D23C            = 0x8006D23C; // type:func size:0x190
+func_8006D3CC            = 0x8006D3CC; // type:func size:0x3B4
+D_8006D780               = 0x8006D780; // type:func size:0x2FC
+func_8006DA7C            = 0x8006DA7C; // type:func size:0x42C
+func_8006DEA8            = 0x8006DEA8; // type:func size:0x2A8
+func_8006E150            = 0x8006E150; // type:func size:0x39C
+func_8006E4EC            = 0x8006E4EC; // type:func size:0x314
+func_8006E800            = 0x8006E800; // type:func size:0x3D0
+func_8006EBD0            = 0x8006EBD0; // type:func size:0x90
+func_8006EC60            = 0x8006EC60; // type:func size:0x3D0
+func_8006F030            = 0x8006F030; // type:func size:0xC0
+func_8006F0F0            = 0x8006F0F0; // type:func size:0x480
+func_8006F570            = 0x8006F570; // type:func size:0x36C
+func_8006F8DC            = 0x8006F8DC; // type:func size:0x2B0
+func_8006FB8C            = 0x8006FB8C; // type:func size:0x1F0
+func_8006FD7C            = 0x8006FD7C; // type:func size:0x538
+func_800702B4            = 0x800702B4; // type:func size:0x130
+func_800703E4            = 0x800703E4; // type:func size:0x2C8
+D_800706AC               = 0x800706AC; // type:func size:0x7DC
+
+//-----------------------------------------------------------------------
+//--- PA: 0x00CAE8   VA: 0x80070E88   subsegment: c, common/ui/menustatus
+//-----------------------------------------------------------------------
+MenuStatusTick           = 0x80070E88; // type:func size:0x98
+
+//-------------------------------------------------------------
+//--- PA: 0x00CB80   VA: 0x80070F20   subsegment: asm, s2d_1_s6
+//-------------------------------------------------------------
+MenuStatusOpen           = 0x80070F20; // type:func size:0x184
+MenuStatusSelect         = 0x800710A4; // type:func size:0x91C
+MenuStatusView           = 0x800719C0; // type:func size:0x374
+func_80071D34            = 0x80071D34; // type:func size:0x3A4
+func_800720D8            = 0x800720D8; // type:func size:0x5B4
+func_8007268C            = 0x8007268C; // type:func size:0x2F8
+func_80072984            = 0x80072984; // type:func size:0x344
+func_80072CC8            = 0x80072CC8; // type:func size:0x450
+
+//---------------------------------------------------------------------
+//--- PA: 0x00ED78   VA: 0x80073118   subsegment: c, game/formationsave
+//---------------------------------------------------------------------
+FormationSavePrompt      = 0x80073118; // type:func size:0x1B8
+
+//----------------------------------------------------------
+//--- PA: 0x00EF30   VA: 0x800732D0   subsegment: asm, s2d_2
+//----------------------------------------------------------
+func_800732D0            = 0x800732D0; // type:func size:0x3A8
+
+//----------------------------------------------------------------------------
+//--- PA: 0x00F2D8   VA: 0x80073678   subsegment: c, common/game/formationload
+//----------------------------------------------------------------------------
+FormationLoadPrompt      = 0x80073678; // type:func size:0x1B0
+
+//-------------------------------------------------------------
+//--- PA: 0x00F488   VA: 0x80073828   subsegment: asm, s2d_2_s1
+//-------------------------------------------------------------
+func_80073828            = 0x80073828; // type:func size:0xE4
+func_8007390C            = 0x8007390C; // type:func size:0xDC
+func_800739E8            = 0x800739E8; // type:func size:0x154
+func_80073B3C            = 0x80073B3C; // type:func size:0x930
+func_8007446C            = 0x8007446C; // type:func size:0x108
+func_80074574            = 0x80074574; // type:func size:0x1F8
+
+//-----------------------------------------------------------------------
+//--- PA: 0x0103CC   VA: 0x8007476C   subsegment: c, common/ui/placelabel
+//-----------------------------------------------------------------------
+DrawPlaceLabel           = 0x8007476C; // type:func size:0x98
+
+//-------------------------------------------------------------
+//--- PA: 0x010464   VA: 0x80074804   subsegment: asm, s2d_2_s2
+//-------------------------------------------------------------
+func_80074804            = 0x80074804; // type:func size:0x394
+func_80074B98            = 0x80074B98; // type:func size:0x1D0
+
+//-------------------------------------------------------------------------
+//--- PA: 0x0109C8   VA: 0x80074D68   subsegment: c, common/ui/configchoice
+//-------------------------------------------------------------------------
+ConfigStepChoice         = 0x80074D68; // type:func size:0xE4
+ConfigCloseChoice        = 0x80074E4C; // type:func size:0x80
+
+//-------------------------------------------------------------
+//--- PA: 0x010B2C   VA: 0x80074ECC   subsegment: asm, s2d_2_s3
+//-------------------------------------------------------------
+func_80074ECC            = 0x80074ECC; // type:func size:0x1AC
+
+//-----------------------------------------------------------------------
+//--- PA: 0x010CD8   VA: 0x80075078   subsegment: c, common/ui/configlist
+//-----------------------------------------------------------------------
+ConfigListPlaceMarkers   = 0x80075078; // type:func size:0x9C
+ConfigListBeginEdit      = 0x80075114; // type:func size:0xB8
+ConfigListApplyOption    = 0x800751CC; // type:func size:0x88
+ConfigRedrawBattlePage   = 0x80075254; // type:func size:0x1B0
+
+//-------------------------------------------------------------------
+//--- PA: 0x011060   VA: 0x80075400   subsegment: c, common/ui/config
+//-------------------------------------------------------------------
+ConfigPlaceMarkers       = 0x80075404; // type:func size:0x128
+ConfigBeginEdit          = 0x8007552C; // type:func size:0xD8
+ConfigApplyOption        = 0x80075604; // type:func size:0x84
+
+//-------------------------------------------------------------
+//--- PA: 0x0112E8   VA: 0x80075688   subsegment: asm, s2d_2_s4
+//-------------------------------------------------------------
+D_80075688               = 0x80075688; // type:func size:0x1D4
+
+//----------------------------------------------------------------------
+//--- PA: 0x0114BC   VA: 0x8007585C   subsegment: c, common/ui/padconfig
+//----------------------------------------------------------------------
+PadSetPageButtons        = 0x8007585C; // type:func size:0x4C
+
+//-------------------------------------------------------------
+//--- PA: 0x011508   VA: 0x800758A8   subsegment: asm, s2d_2_s5
+//-------------------------------------------------------------
+func_800758A8            = 0x800758A8; // type:func size:0xF8
+func_800759A0            = 0x800759A0; // type:func size:0x23C
+
+//---------------------------------------------------------------------------
+//--- PA: 0x01183C   VA: 0x80075BDC   subsegment: c, common/game/personastock
+//---------------------------------------------------------------------------
+PersonaStockCompact      = 0x80075BDC; // type:func size:0xBC
+
+//-------------------------------------------------------------
+//--- PA: 0x0118F8   VA: 0x80075C98   subsegment: asm, s2d_2_s6
+//-------------------------------------------------------------
+func_80075C98            = 0x80075C98; // type:func size:0x108
+
+//------------------------------------------------------------------------
+//--- PA: 0x011A00   VA: 0x80075DA0   subsegment: c, common/game/charentry
+//------------------------------------------------------------------------
+CharTopEntry             = 0x80075DA0; // type:func size:0x84
+
+//----------------------------------------------------------------------
+//--- PA: 0x011A84   VA: 0x80075E24   subsegment: c, common/game/persona
+//----------------------------------------------------------------------
+PersonaTopSpell          = 0x80075E24; // type:func size:0x44
+
+//-------------------------------------------------------------
+//--- PA: 0x011AC8   VA: 0x80075E68   subsegment: asm, s2d_2_s7
+//-------------------------------------------------------------
+D_80075E68               = 0x80075E68; // type:func size:0x78
+
+//-------------------------------------------------------------------------
+//--- PA: 0x011B40   VA: 0x80075EE0   subsegment: c, common/gfx/tilemapruns
+//-------------------------------------------------------------------------
+TileMapWriteRun12        = 0x80075EE0; // type:func size:0x28
+TileMapWriteRun10        = 0x80075F08; // type:func size:0x28
+
+//-------------------------------------------------------------
+//--- PA: 0x011B90   VA: 0x80075F30   subsegment: asm, s2d_2_s8
+//-------------------------------------------------------------
+func_80075F30            = 0x80075F30; // type:func size:0x69C
+func_800765CC            = 0x800765CC; // type:func size:0x484
+func_80076A50            = 0x80076A50; // type:func size:0x4F4
+func_80076F44            = 0x80076F44; // type:func size:0x318
+func_8007725C            = 0x8007725C; // type:func size:0x6A4
+D_80077900               = 0x80077900; // type:func size:0x728
+UpdateMenuSprites        = 0x80078028; // type:func size:0xA30
+D_80078A58               = 0x80078A58; // type:func size:0xA68
+func_800794C0            = 0x800794C0; // type:func size:0x124
+func_800795E4            = 0x800795E4; // type:func size:0x10C
+D_800796F0               = 0x800796F0; // type:func size:0x104
+func_800797F4            = 0x800797F4; // type:func size:0x9C
+D_80079890               = 0x80079890; // type:func size:0xA8
+
+//-----------------------------------------------------------------
+//--- PA: 0x015598   VA: 0x80079938   subsegment: c, common/gfx/box
+//-----------------------------------------------------------------
+TileMapDrawWindow        = 0x80079938; // type:func size:0x108
+WindowRowTop             = 0x80079A40; // type:func size:0x9C
+WindowRowMiddle          = 0x80079ADC; // type:func size:0x70
+WindowRowBottom          = 0x80079B4C; // type:func size:0xA0
+TileMapWriteBar          = 0x80079BEC; // type:func size:0x38
+TileMapDrawBox           = 0x80079C24; // type:func size:0x114
+BoxRowTop                = 0x80079D38; // type:func size:0x70
+BoxRowMiddle             = 0x80079DA8; // type:func size:0x70
+BoxRowBottom             = 0x80079E18; // type:func size:0x70
+
+//-------------------------------------------------------------
+//--- PA: 0x015AE8   VA: 0x80079E88   subsegment: asm, s2d_2_s9
+//-------------------------------------------------------------
+D_80079E88               = 0x80079E88; // type:func size:0xA8
+func_80079F30            = 0x80079F30; // type:func size:0x1D8
+func_8007A108            = 0x8007A108; // type:func size:0x2CC
+func_8007A3D4            = 0x8007A3D4; // type:func size:0x16C
+func_8007A540            = 0x8007A540; // type:func size:0x94
+
+//------------------------------------------------------------------------
+//--- PA: 0x016234   VA: 0x8007A5D4   subsegment: c, common/ui/personaname
+//------------------------------------------------------------------------
+DrawPersonaName          = 0x8007A5D4; // type:func size:0x8C
+
+//----------------------------------------------------------------------
+//--- PA: 0x0162C0   VA: 0x8007A660   subsegment: c, common/ui/spellname
+//----------------------------------------------------------------------
+DrawSpellName            = 0x8007A660; // type:func size:0xBC
+
+//--------------------------------------------------------------
+//--- PA: 0x01637C   VA: 0x8007A71C   subsegment: asm, s2d_2_s10
+//--------------------------------------------------------------
+func_8007A71C            = 0x8007A71C; // type:func size:0x94
+func_8007A7B0            = 0x8007A7B0; // type:func size:0x1C4
+func_8007A974            = 0x8007A974; // type:func size:0x17C
+
+//---------------------------------------------------------------------
+//--- PA: 0x016750   VA: 0x8007AAF0   subsegment: c, common/ui/partyhud
+//---------------------------------------------------------------------
+DrawPartySlotStatus      = 0x8007AAF0; // type:func size:0x2F8
+
+//--------------------------------------------------------------
+//--- PA: 0x016A48   VA: 0x8007ADE8   subsegment: asm, s2d_2_s11
+//--------------------------------------------------------------
+func_8007ADE8            = 0x8007ADE8; // type:func size:0x9EC
+
+//----------------------------------------------------------------------
+//--- PA: 0x017434   VA: 0x8007B7D4   subsegment: c, common/gfx/mapcells
+//----------------------------------------------------------------------
+FontCellsInit            = 0x8007B7D4; // type:func size:0x100
+
+//--------------------------------------------------------------
+//--- PA: 0x017534   VA: 0x8007B8D4   subsegment: asm, s2d_2_s12
+//--------------------------------------------------------------
+DrawStatusHud            = 0x8007B8D4; // type:func size:0xF4
+func_8007B9C8            = 0x8007B9C8; // type:func size:0x108
+RunFrame                 = 0x8007BAD0; // type:func size:0x28
+
+//----------------------------------------------------------------------
+//--- PA: 0x017758   VA: 0x8007BAF8   subsegment: c, common/gfx/backdrop
+//----------------------------------------------------------------------
+DrawBackdrop             = 0x8007BAF8; // type:func size:0x1E4
+
+//--------------------------------------------------------------------
+//--- PA: 0x01793C   VA: 0x8007BCDC   subsegment: c, common/game/party
+//--------------------------------------------------------------------
+PartyLastSlot            = 0x8007BCDC; // type:func size:0x2C
+
+//---------------------------------------------------------------
+//--- PA: 0x017968   VA: 0x8007BD08   subsegment: asm, s2d_2_s12a
+//---------------------------------------------------------------
+MenuStepMember           = 0x8007BD08; // type:func size:0x204
+func_8007BF0C            = 0x8007BF0C; // type:func size:0xD0
+TextItemStatRow          = 0x8007BFDC; // type:func size:0x244
+
+//-----------------------------------------------------------------
+//--- PA: 0x017E80   VA: 0x8007C220   subsegment: c, common/ui/text
+//-----------------------------------------------------------------
+TextCopyUntilEnd         = 0x8007C220; // type:func size:0x44
+
+//-----------------------------------------------------------------------
+//--- PA: 0x017EC4   VA: 0x8007C264   subsegment: c, common/ui/textnumber
+//-----------------------------------------------------------------------
+TextAppendNumber         = 0x8007C264; // type:func size:0xA8
+
+//-----------------------------------------------------------------------
+//--- PA: 0x017F6C   VA: 0x8007C30C   subsegment: c, common/game/explevel
+//-----------------------------------------------------------------------
+ExpToLevel               = 0x8007C30C; // type:func size:0xA8
+
+//-------------------------------------------------------------------------
+//--- PA: 0x018014   VA: 0x8007C3B4   subsegment: c, common/game/eventflag2
+//-------------------------------------------------------------------------
+EventFlagGet2            = 0x8007C3B4; // type:func size:0x38
+
+//-----------------------------------------------------------------
+//--- PA: 0x01804C   VA: 0x8007C3EC   subsegment: asm, s2d_2_s13_x1
+//-----------------------------------------------------------------
+func_8007C3EC            = 0x8007C3EC; // type:func size:0x63C
+func_8007CA28            = 0x8007CA28; // type:func size:0x7C8
+func_8007D1F0            = 0x8007D1F0; // type:func size:0x790
+func_8007D980            = 0x8007D980; // type:func size:0x338
+func_8007DCB8            = 0x8007DCB8; // type:func size:0x338
+func_8007DFF0            = 0x8007DFF0; // type:func size:0x1D8
+
+//------------------------------------------------------------------------
+//--- PA: 0x019E28   VA: 0x8007E1C8   subsegment: c, common/ui/equipcursor
+//------------------------------------------------------------------------
+EquipPlaceCursor         = 0x8007E1C8; // type:func size:0x150
+
+//--------------------------------------------------------------
+//--- PA: 0x019F78   VA: 0x8007E318   subsegment: asm, s2d_2_s14
+//--------------------------------------------------------------
+ItemsListUsable          = 0x8007E318; // type:func size:0xD4
+
+//--------------------------------------------------------------------
+//--- PA: 0x01A04C   VA: 0x8007E3EC   subsegment: c, common/ui/itemrow
+//--------------------------------------------------------------------
+DrawItemRow              = 0x8007E3EC; // type:func size:0xCC
+
+//-----------------------------------------------------------------
+//--- PA: 0x01A118   VA: 0x8007E4B8   subsegment: asm, s2d_2_s14_x1
+//-----------------------------------------------------------------
+func_8007E4B8            = 0x8007E4B8; // type:func size:0x450
+
+//------------------------------------------------------------------------
+//--- PA: 0x01A568   VA: 0x8007E908   subsegment: c, common/game/equipauto
+//------------------------------------------------------------------------
+CharEquipBest            = 0x8007E908; // type:func size:0x144
+
+//------------------------------------------------------------------------
+//--- PA: 0x01A6AC   VA: 0x8007EA4C   subsegment: c, common/game/equipbest
+//------------------------------------------------------------------------
+ItemsStrongestUsable     = 0x8007EA4C; // type:func size:0xF4
+
+//--------------------------------------------------------------
+//--- PA: 0x01A7A0   VA: 0x8007EB40   subsegment: asm, s2d_2_s15
+//--------------------------------------------------------------
+func_8007EB40            = 0x8007EB40; // type:func size:0x1AC
+
+//-------------------------------------------------------------------
+//--- PA: 0x01A94C   VA: 0x8007ECEC   subsegment: c, common/gfx/gauge
+//-------------------------------------------------------------------
+DrawGauge                = 0x8007ECEC; // type:func size:0x16C
+
+//--------------------------------------------------------------
+//--- PA: 0x01AAB8   VA: 0x8007EE58   subsegment: asm, s2d_2_s16
+//--------------------------------------------------------------
+func_8007EE58            = 0x8007EE58; // type:func size:0x3DC
+
+//--------------------------------------------------------------------------
+//--- PA: 0x01AE94   VA: 0x8007F234   subsegment: c, common/game/spellusable
+//--------------------------------------------------------------------------
+SpellUsable              = 0x8007F234; // type:func size:0x158
+CharSpellUsable          = 0x8007F38C; // type:func size:0x11C
+
+//--------------------------------------------------------------
+//--- PA: 0x01B108   VA: 0x8007F4A8   subsegment: asm, s2d_2_s17
+//--------------------------------------------------------------
+func_8007F4A8            = 0x8007F4A8; // type:func size:0x1BC
+
+//---------------------------------------------------------------------
+//--- PA: 0x01B2C4   VA: 0x8007F664   subsegment: c, common/game/status
+//---------------------------------------------------------------------
+ItemUsableOn             = 0x8007F664; // type:func size:0x90
+
+//---------------------------------------------------------------
+//--- PA: 0x01B354   VA: 0x8007F6F4   subsegment: asm, s2d_2_s17a
+//---------------------------------------------------------------
+ItemUsableAny            = 0x8007F6F4; // type:func size:0xB8
+
+//--------------------------------------------------------------------------
+//--- PA: 0x01B40C   VA: 0x8007F7AC   subsegment: c, common/game/partystatus
+//--------------------------------------------------------------------------
+PartyAnyStatus           = 0x8007F7AC; // type:func size:0x84
+CharHasStatus            = 0x8007F830; // type:func size:0x3C
+PartyAnyBelowMax         = 0x8007F86C; // type:func size:0x84
+
+//---------------------------------------------------------------
+//--- PA: 0x01B550   VA: 0x8007F8F0   subsegment: asm, s2d_2_s17b
+//---------------------------------------------------------------
+CharBelowMax             = 0x8007F8F0; // type:func size:0xE4
+func_8007F9D4            = 0x8007F9D4; // type:func size:0x8
+VramClearRect            = 0x8007F9DC; // type:func size:0x64
+func_8007FA40            = 0x8007FA40; // type:func size:0x36C
+D_8007FDAC               = 0x8007FDAC; // type:func size:0x48
+
+//----------------------------------------------------------------
+//--- PA: 0x01BA54   VA: 0x8007FDF4   subsegment: c, common/ui/pad
+//----------------------------------------------------------------
+PadPoll                  = 0x8007FDF4; // type:func size:0x60
+
+//-----------------------------------------------------------------------
+//--- PA: 0x01BAB4   VA: 0x8007FE54   subsegment: c, common/gfx/fadeblock
+//-----------------------------------------------------------------------
+FadeUpBlocking           = 0x8007FE54; // type:func size:0x88
+FadeDownBlocking         = 0x8007FEDC; // type:func size:0x88
+
+//-------------------------------------------------------------------------
+//--- PA: 0x01BBC4   VA: 0x8007FF64   subsegment: c, common/gfx/fadesprites
+//-------------------------------------------------------------------------
+FadeSpritesStep          = 0x8007FF64; // type:func size:0x74
+FadeSpritesStepDown      = 0x8007FFD8; // type:func size:0x74
+
+//--------------------------------------------------------------
+//--- PA: 0x01BCAC   VA: 0x8008004C   subsegment: asm, s2d_2_s18
+//--------------------------------------------------------------
+D_8008004C               = 0x8008004C; // type:func size:0x308
+
+//-------------------------------------------------------------------------
+//--- PA: 0x01BFB4   VA: 0x80080354   subsegment: c, common/ui/configlabels
+//-------------------------------------------------------------------------
+ConfigDrawLabels         = 0x80080354; // type:func size:0x104
+
+//--------------------------------------------------------------
+//--- PA: 0x01C0B8   VA: 0x80080458   subsegment: asm, s2d_2_s19
+//--------------------------------------------------------------
+func_80080458            = 0x80080458; // type:func size:0x130
+D_80080588               = 0x80080588; // type:func size:0x1A8
+
+//------------------------------------------------------------------------
+//--- PA: 0x01C390   VA: 0x80080730   subsegment: c, common/ui/padbindings
+//------------------------------------------------------------------------
+PadLoadBindings          = 0x80080730; // type:func size:0x154
+
+//--------------------------------------------------------------
+//--- PA: 0x01C4E4   VA: 0x80080884   subsegment: asm, s2d_2_s20
+//--------------------------------------------------------------
+D_80080884               = 0x80080884; // type:func size:0xF0
+func_80080974            = 0x80080974; // type:func size:0x228
+D_80080B9C               = 0x80080B9C; // type:func size:0xE4
+func_80080C80            = 0x80080C80; // type:func size:0xE8
+func_80080D68            = 0x80080D68; // type:func size:0x38
+
+//------------------------------------------------------------------------
+//--- PA: 0x01CA00   VA: 0x80080DA0   subsegment: c, common/game/formation
+//------------------------------------------------------------------------
+FormationLoadPreset      = 0x80080DA0; // type:func size:0x7C
+FormationOtherAt         = 0x80080E1C; // type:func size:0x54
+FormationSyncCells       = 0x80080E70; // type:func size:0x64
+FormationCellOf          = 0x80080ED4; // type:func size:0x48
+FormationPresetCellOf    = 0x80080F1C; // type:func size:0x60
+FormationFirstFree       = 0x80080F7C; // type:func size:0x58
+
+//-----------------------------------------------------------------
+//--- PA: 0x01CC34   VA: 0x80080FD4   subsegment: asm, s2d_2_s20_x1
+//-----------------------------------------------------------------
+FormationCellFree        = 0x80080FD4; // type:func size:0x154
+
+//-----------------------------------------------------------------------------
+//--- PA: 0x01CD88   VA: 0x80081128   subsegment: c, common/game/formationplace
+//-----------------------------------------------------------------------------
+FormationPlaceMarkers    = 0x80081128; // type:func size:0x100
+
+//----------------------------------------------------------------------------
+//--- PA: 0x01CE88   VA: 0x80081228   subsegment: c, common/game/formationfits
+//----------------------------------------------------------------------------
+FormationPresetFits      = 0x80081228; // type:func size:0xA4
+
+//-----------------------------------------------------------------
+//--- PA: 0x01CF2C   VA: 0x800812CC   subsegment: asm, s2d_2_s20_x3
+//-----------------------------------------------------------------
+func_800812CC            = 0x800812CC; // type:func size:0x164
+
+//--------------------------------------------------------------------
+//--- PA: 0x01D090   VA: 0x80081430   subsegment: c, common/game/equip
+//--------------------------------------------------------------------
+CharEquip                = 0x80081430; // type:func size:0xA4
+CharUnequip              = 0x800814D4; // type:func size:0xC0
+
+//--------------------------------------------------------------
+//--- PA: 0x01D1F4   VA: 0x80081594   subsegment: asm, s2d_2_s21
+//--------------------------------------------------------------
+D_80081594               = 0x80081594; // type:func size:0xB4
+
+//-------------------------------------------------------------------------------
+//--- PA: 0x01D2A8   VA: 0x80081648   subsegment: c, common/game/formationmembers
+//-------------------------------------------------------------------------------
+FormationDrawMembers     = 0x80081648; // type:func size:0x90
+
+//-----------------------------------------------------------------
+//--- PA: 0x01D338   VA: 0x800816D8   subsegment: asm, s2d_2_s21_x3
+//-----------------------------------------------------------------
 FormationSetMemberSprite = 0x800816D8; // type:func size:0x108
-FormationCompact = 0x800817E0; // type:func size:0x14C
-FormationClearMarkers = 0x8008192C; // type:func size:0x68
-D_80081994 = 0x80081994; // type:func size:0x70
-DrawCharStatBars = 0x80081A04; // type:func size:0x5C
-DrawCharStatBar = 0x80081A60; // type:func size:0x32C
-DrawPersonaStatBars = 0x80081D8C; // type:func size:0x5C
-DrawPersonaStatBar = 0x80081DE8; // type:func size:0x120
-D_80081F08 = 0x80081F08; // type:func size:0x120
-DrawPersonaDataStatBars = 0x80082028; // type:func size:0x64
-DrawPersonaDataStatBar = 0x8008208C; // type:func size:0x13C
-D_800821C8 = 0x800821C8; // type:func size:0x20
-func_800821E8 = 0x800821E8; // type:func size:0x980
-ItemsMergePending = 0x80082B68; // type:func size:0x174
-ItemsAddPending = 0x80082CDC; // type:func size:0xDC
-ItemsRemovePending = 0x80082DB8; // type:func size:0x74
-ItemsFind = 0x80082E2C; // type:func size:0x60
-ItemsFindPending = 0x80082E8C; // type:func size:0x60
-func_80082EEC = 0x80082EEC; // type:func size:0xFC
-CopyShorts = 0x80082FE8; // type:func size:0x38
-ItemsClearPending = 0x80083020; // type:func size:0x24
-ItemsCompact = 0x80083044; // type:func size:0x50
-InputCheckAcceptA = 0x80083094; // type:func size:0x7C
-InputCheckAcceptB = 0x80083110; // type:func size:0x7C
-D_8008318C = 0x8008318C; // type:func size:0x8C
-DrawItemCell = 0x80083218; // type:func size:0x10C
-D_80083324 = 0x80083324; // type:func size:0x4C
-func_80083370 = 0x80083370; // type:func size:0x158
-CheckerMapInit = 0x800834C8; // type:func size:0x58
-CellsClear = 0x80083520; // type:func size:0x30
-D_80083550 = 0x80083550; // type:func size:0x14C
-CellsWriteRow = 0x8008369C; // type:func size:0xC0
-D_8008375C = 0x8008375C; // type:func size:0x970
-DrawItemName = 0x800840CC; // type:func size:0x64
-D_80084130 = 0x80084130; // type:func size:0xFC
-func_8008422C = 0x8008422C; // type:func size:0xD0
-func_800842FC = 0x800842FC; // type:func size:0x294
-CharApplyStats = 0x80084590; // type:func size:0x650
-func_80084BE0 = 0x80084BE0; // type:func size:0x6C0
-func_800852A0 = 0x800852A0; // type:func size:0x7F0
-D_80085A90 = 0x80085A90; // type:func size:0x588
-func_80086018 = 0x80086018; // type:func size:0xEC
-func_80086104 = 0x80086104; // type:func size:0x10C
-func_80086210 = 0x80086210; // type:func size:0x454
-RoomRotatePoint = 0x80086664; // type:func size:0x1A4
-DrawCompass = 0x80086808; // type:func size:0xE8
-MapPlaceMarker = 0x800868F0; // type:func size:0xA8
-MapDrawName = 0x80086998; // type:func size:0xFC
-func_80086A94 = 0x80086A94; // type:func size:0x220
-func_80086CB4 = 0x80086CB4; // type:func size:0x338
-func_80086FEC = 0x80086FEC; // type:func size:0x68
-func_80087054 = 0x80087054; // type:func size:0x5A0
-TileWallsFacing = 0x800875F4; // type:func size:0x13C
-MapTileSeen = 0x80087730; // type:func size:0x78
-D_800877A8 = 0x800877A8; // type:func size:0x80
-func_80087828 = 0x80087828; // type:func size:0x5AC
-func_80087DD4 = 0x80087DD4; // type:func size:0x150
-func_80087F24 = 0x80087F24; // type:func size:0x480
-func_800883A4 = 0x800883A4; // type:func size:0x3B8
-func_8008875C = 0x8008875C; // type:func size:0x23C
-func_80088998 = 0x80088998; // type:func size:0x354
-func_80088CEC = 0x80088CEC; // type:func size:0x40C
-func_800890F8 = 0x800890F8; // type:func size:0x4B8
-FlagsCollectGroup = 0x800895B0; // type:func size:0xD0
-FlagBank2Get = 0x80089680; // type:func size:0x38
-DrawPersonaList = 0x800896B8; // type:func size:0xCC
-func_80089784 = 0x80089784; // type:func size:0x80
-func_80089804 = 0x80089804; // type:func size:0x3C
-func_80089840 = 0x80089840; // type:func size:0x168
-func_800899A8 = 0x800899A8; // type:func size:0x18
-func_800899C0 = 0x800899C0; // type:func size:0x18
-func_800899D8 = 0x800899D8; // type:func size:0x80
-func_80089A58 = 0x80089A58; // type:func size:0x34
-func_80089A8C = 0x80089A8C; // type:func size:0x18
-func_80089AA4 = 0x80089AA4; // type:func size:0x38
-func_80089ADC = 0x80089ADC; // type:func size:0x20
-func_80089AFC = 0x80089AFC; // type:func size:0x98
-func_80089B94 = 0x80089B94; // type:func size:0x24
-func_80089BB8 = 0x80089BB8; // type:func size:0x34
-func_80089BEC = 0x80089BEC; // type:func size:0x18
-ovl_s2d_entry = 0x80089C04; // type:func size:0x358
-func_80089F5C = 0x80089F5C; // type:func size:0xCB4
-func_8008AC10 = 0x8008AC10; // type:func size:0x1F0
-func_8008AE00 = 0x8008AE00; // type:func size:0xA8
-func_8008AEA8 = 0x8008AEA8; // type:func size:0x1A0
-func_8008B048 = 0x8008B048; // type:func size:0x444
-func_8008B48C = 0x8008B48C; // type:func size:0x148
-func_8008B5D4 = 0x8008B5D4; // type:func size:0xD8
-func_8008B6AC = 0x8008B6AC; // type:func size:0x3F0
-func_8008BA9C = 0x8008BA9C; // type:func size:0x78
-func_8008BB14 = 0x8008BB14; // type:func size:0x70
-func_8008BB84 = 0x8008BB84; // type:func size:0x54
-func_8008BBD8 = 0x8008BBD8; // type:func size:0xF0
-func_8008BCC8 = 0x8008BCC8; // type:func size:0xB0
-func_8008BD78 = 0x8008BD78; // type:func size:0x2C0
-func_8008C038 = 0x8008C038; // type:func size:0x314
-func_8008C34C = 0x8008C34C; // type:func size:0x6DC
-func_8008CA28 = 0x8008CA28; // type:func size:0x118
-func_8008CB40 = 0x8008CB40; // type:func size:0xD8
-func_8008CC18 = 0x8008CC18; // type:func size:0xE0
-func_8008CCF8 = 0x8008CCF8; // type:func size:0xE0
-func_8008CDD8 = 0x8008CDD8; // type:func size:0xE0
-func_8008CEB8 = 0x8008CEB8; // type:func size:0xA34
-func_8008D8EC = 0x8008D8EC; // type:func size:0x9C
-func_8008D988 = 0x8008D988; // type:func size:0xF8
-func_8008DA80 = 0x8008DA80; // type:func size:0x6D8
-func_8008E158 = 0x8008E158; // type:func size:0x68
-func_8008E1C0 = 0x8008E1C0; // type:func size:0xC8
-func_8008E288 = 0x8008E288; // type:func size:0x300
-func_8008E588 = 0x8008E588; // type:func size:0xAC
-func_8008E634 = 0x8008E634; // type:func size:0x74
-func_8008E6A8 = 0x8008E6A8; // type:func size:0x90
-func_8008E738 = 0x8008E738; // type:func size:0x17C
-func_8008E8B4 = 0x8008E8B4; // type:func size:0x390
-func_8008EC44 = 0x8008EC44; // type:func size:0xC8
-func_8008ED0C = 0x8008ED0C; // type:func size:0x48
-func_8008ED54 = 0x8008ED54; // type:func size:0x60
-func_8008EDB4 = 0x8008EDB4; // type:func size:0x204
-func_8008EFB8 = 0x8008EFB8; // type:func size:0x204
-func_8008F1BC = 0x8008F1BC; // type:func size:0x204
-func_8008F3C0 = 0x8008F3C0; // type:func size:0xE4
-func_8008F4A4 = 0x8008F4A4; // type:func size:0xCC
-func_8008F570 = 0x8008F570; // type:func size:0x268
-func_8008F7D8 = 0x8008F7D8; // type:func size:0xA0
-func_8008F878 = 0x8008F878; // type:func size:0x388
-func_8008FC00 = 0x8008FC00; // type:func size:0x5C
-func_8008FC5C = 0x8008FC5C; // type:func size:0x5EC
-func_80090248 = 0x80090248; // type:func size:0x138
-func_80090380 = 0x80090380; // type:func size:0x1D4
-func_80090554 = 0x80090554; // type:func size:0x24C
-func_800907A0 = 0x800907A0; // type:func size:0xAD0
-func_80091270 = 0x80091270; // type:func size:0xB0
-func_80091320 = 0x80091320; // type:func size:0x50C
-func_8009182C = 0x8009182C; // type:func size:0x4F8
-func_80091D24 = 0x80091D24; // type:func size:0x528
-func_8009224C = 0x8009224C; // type:func size:0x7BC
-func_80092A08 = 0x80092A08; // type:func size:0x264
-func_80092C6C = 0x80092C6C; // type:func size:0x4B8
-func_80093124 = 0x80093124; // type:func size:0x10C
-func_80093230 = 0x80093230; // type:func size:0x1E8
-func_80093418 = 0x80093418; // type:func size:0x40
-func_80093458 = 0x80093458; // type:func size:0xB8
-func_80093510 = 0x80093510; // type:func size:0xB8
-func_800935C8 = 0x800935C8; // type:func size:0xB8
-func_80093680 = 0x80093680; // type:func size:0xEC
-func_8009376C = 0x8009376C; // type:func size:0x18
-func_80093784 = 0x80093784; // type:func size:0x78
-func_800937FC = 0x800937FC; // type:func size:0x2E4
-func_80093AE0 = 0x80093AE0; // type:func size:0x318
-func_80093DF8 = 0x80093DF8; // type:func size:0x79C
-func_80094594 = 0x80094594; // type:func size:0x4C
-func_800945E0 = 0x800945E0; // type:func size:0x80
-func_80094660 = 0x80094660; // type:func size:0x3D4
-D_80094A34 = 0x80094A34; // type:func size:0x70
-func_80094AA4 = 0x80094AA4; // type:func size:0x64
-func_80094B08 = 0x80094B08; // type:func size:0x360
-func_80094E68 = 0x80094E68; // type:func size:0xC4
-func_80094F2C = 0x80094F2C; // type:func size:0x70
-func_80094F9C = 0x80094F9C; // type:func size:0x5C
-func_80094FF8 = 0x80094FF8; // type:func size:0x708
-func_80095700 = 0x80095700; // type:func size:0x734
-func_80095E34 = 0x80095E34; // type:func size:0x340
-func_80096174 = 0x80096174; // type:func size:0x24
-func_80096198 = 0x80096198; // type:func size:0x8C
-func_80096224 = 0x80096224; // type:func size:0x230
-func_80096454 = 0x80096454; // type:func size:0xC0
-func_80096514 = 0x80096514; // type:func size:0x2C8
-func_800967DC = 0x800967DC; // type:func size:0x128
-func_80096904 = 0x80096904; // type:func size:0x134
-func_80096A38 = 0x80096A38; // type:func size:0x3AC
-func_80096DE4 = 0x80096DE4; // type:func size:0x28
-func_80096E0C = 0x80096E0C; // type:func size:0x3C8
-func_800971D4 = 0x800971D4; // type:func size:0xB4
-func_80097288 = 0x80097288; // type:func size:0xE8
-func_80097370 = 0x80097370; // type:func size:0x90
-func_80097400 = 0x80097400; // type:func size:0x38
-func_80097438 = 0x80097438; // type:func size:0x38
-func_80097470 = 0x80097470; // type:func size:0x40
-func_800974B0 = 0x800974B0; // type:func size:0x30
-D_800974E0 = 0x800974E0; // type:u32 size:0x28
-func_80097508 = 0x80097508; // type:func size:0x274
-func_8009777C = 0x8009777C; // type:func size:0x1E8
-func_80097964 = 0x80097964; // type:func size:0x284
-func_80097BE8 = 0x80097BE8; // type:func size:0xEC
-D_80097CD4 = 0x80097CD4; // type:func size:0x11C
-func_80097DF0 = 0x80097DF0; // type:func size:0xC4
-func_80097EB4 = 0x80097EB4; // type:func size:0x3C
-func_80097EF0 = 0x80097EF0; // type:func size:0x7C
-func_80097F6C = 0x80097F6C; // type:func size:0x270
-func_800981DC = 0x800981DC; // type:func size:0x144
-func_80098320 = 0x80098320; // type:func size:0xF8
-func_80098418 = 0x80098418; // type:func size:0x50
-func_80098468 = 0x80098468; // type:func size:0x50
-func_800984B8 = 0x800984B8; // type:func size:0xE8
-func_800985A0 = 0x800985A0; // type:func size:0xE0
-D_80098680 = 0x80098680; // type:func size:0xA0
-func_80098720 = 0x80098720; // type:func size:0xA0
-D_800987C0 = 0x800987C0; // type:func size:0xA8
-func_80098868 = 0x80098868; // type:func size:0x80
-func_800988E8 = 0x800988E8; // type:func size:0xD8
-func_800989C0 = 0x800989C0; // type:func size:0xF0
-func_80098AB0 = 0x80098AB0; // type:func size:0x14C
-func_80098BFC = 0x80098BFC; // type:func size:0x330
-func_80098F2C = 0x80098F2C; // type:func size:0x370
-func_8009929C = 0x8009929C; // type:func size:0x694
-func_80099930 = 0x80099930; // type:func size:0x1C
-func_8009994C = 0x8009994C; // type:func size:0x84
-func_800999D0 = 0x800999D0; // type:func size:0x30
-func_80099A00 = 0x80099A00; // type:func size:0xD8
-func_80099AD8 = 0x80099AD8; // type:func size:0x288
-func_80099D60 = 0x80099D60; // type:func size:0x104
-func_80099E64 = 0x80099E64; // type:func size:0x48
-func_80099EAC = 0x80099EAC; // type:func size:0x3C
-func_80099EE8 = 0x80099EE8; // type:func size:0x5C
-func_80099F44 = 0x80099F44; // type:func size:0x3C
-func_80099F80 = 0x80099F80; // type:func size:0x28
-func_80099FA8 = 0x80099FA8; // type:func size:0x2C
-func_80099FD4 = 0x80099FD4; // type:func size:0x2C
-func_8009A000 = 0x8009A000; // type:func size:0xE8
-func_8009A0E8 = 0x8009A0E8; // type:func size:0x150
-func_8009A238 = 0x8009A238; // type:func size:0x48
-func_8009A280 = 0x8009A280; // type:func size:0x28
-func_8009A2A8 = 0x8009A2A8; // type:func size:0xC0
-func_8009A368 = 0x8009A368; // type:func size:0x2F0
-func_8009A658 = 0x8009A658; // type:func size:0xBC
-func_8009A714 = 0x8009A714; // type:func size:0x60
-func_8009A774 = 0x8009A774; // type:func size:0x44
-func_8009A7B8 = 0x8009A7B8; // type:func size:0x4C
-func_8009A804 = 0x8009A804; // type:func size:0x8C
-func_8009A890 = 0x8009A890; // type:func size:0x290
-func_8009AB20 = 0x8009AB20; // type:func size:0xE4
-D_8009AC04 = 0x8009AC04; // type:func size:0x14
-func_8009AC18 = 0x8009AC18; // type:func size:0x810
-D_8009B428 = 0x8009B428; // type:func size:0x68
-func_8009B490 = 0x8009B490; // type:func size:0x14
-func_8009B4A4 = 0x8009B4A4; // type:func size:0x10
-func_8009B4B4 = 0x8009B4B4; // type:func size:0x11C
-func_8009B5D0 = 0x8009B5D0; // type:func size:0x10
-func_8009B5E0 = 0x8009B5E0; // type:func size:0x34
-func_8009B614 = 0x8009B614; // type:func size:0x30
-func_8009B644 = 0x8009B644; // type:func size:0x114
-func_8009B758 = 0x8009B758; // type:func size:0x434
-func_8009BB8C = 0x8009BB8C; // type:func size:0x68
-func_8009BBF4 = 0x8009BBF4; // type:func size:0x30
-EventFlagTest = 0x8009BC24; // type:func size:0x28
-func_8009BC4C = 0x8009BC4C; // type:func size:0x70
-func_8009BCBC = 0x8009BCBC; // type:func size:0x2E0
-func_8009BF9C = 0x8009BF9C; // type:func size:0xE0
-func_8009C07C = 0x8009C07C; // type:func size:0x28C
-func_8009C308 = 0x8009C308; // type:func size:0x34
-func_8009C33C = 0x8009C33C; // type:func size:0x30
-func_8009C36C = 0x8009C36C; // type:func size:0x10C
-func_8009C478 = 0x8009C478; // type:func size:0x204
-func_8009C67C = 0x8009C67C; // type:func size:0xD4
-g_flicker_ramp = 0x8009C750; // type:u32 size:0x85A4
-g_pow10 = 0x8009C770;
-g_config_marker_def = 0x8009CB98;
-g_menu_sel = 0x8009D1D8;
-g_menu_subsel = 0x8009D1DA;
-str_cell_run = 0x8009D208;
-str_empty = 0x8009D224;
-str_cfg_command_confirm = 0x8009D278;
-str_cfg_window_anim = 0x8009D284;
-str_cfg_do_or_not = 0x8009D2A0;
-str_place_3d_adv = 0x8009D2F8;
-str_place_2d = 0x8009D304;
-str_place_battle_top = 0x8009D310;
-str_place_in_battle = 0x8009D31C;
-g_persona_list_rule = 0x8009DEDC;
-g_formation_member_def = 0x8009E200;
-g_bg_map = 0x8009E59C;
-g_bg_layers = 0x8009E5BC;
-g_formation_marker_def = 0x8009EBB4;
-g_pad_binding_table = 0x8009EBC8;
-str_cfg_message_speed = 0x8009ED2C;
-str_cfg_battle = 0x8009ED6C;
-str_cfg_auto_battle = 0x8009ED74;
-str_cfg_speeds = 0x8009EDD0;
-g_config_labels_left = 0x8009EE30;
-g_config_labels_right = 0x8009EE60;
-g_stat_bar_cells = 0x8009F438;
-str_config_title = 0x8009F44C;
-g_compass_cels = 0x8009F5BC;
-g_map_marker_defs = 0x8009F63C;
-g_tile_walls = 0x8009F6D8;
-g_flag_groups = 0x8009FA10;
-D_800A4CF4 = 0x800A4CF4; // type:u32 size:0x4
-D_800A4CF8 = 0x800A4CF8; // type:u32 size:0x4
-D_800A4CFC = 0x800A4CFC; // type:u32 size:0x38C
-D_800A5088 = 0x800A5088; // type:u32 size:0xE0
-D_800A5168 = 0x800A5168; // type:u32 size:0x34
-D_800A519C = 0x800A519C; // type:u32 size:0x54
-D_800A51F0 = 0x800A51F0; // type:u32 size:0x124
-D_800A5314 = 0x800A5314; // type:u32 size:0x358
-D_800A566C = 0x800A566C; // type:u32 size:0x5000
-D_800AA66C = 0x800AA66C; // type:u32 size:0x5E30
-D_800B049C = 0x800B049C; // type:u32 size:0x8
-D_800B04A4 = 0x800B04A4; // type:u32 size:0x364
-D_800B0808 = 0x800B0808; // type:u32 size:0x8C
-D_800B0894 = 0x800B0894; // type:u32 size:0x3D4
-D_800B0C68 = 0x800B0C68; // type:u32 size:0x8C
-D_800B0CF4 = 0x800B0CF4; // type:u32 size:0xA0
-D_800B0D94 = 0x800B0D94; // type:u32 size:0x78
-D_800B0E0C = 0x800B0E0C; // type:u32 size:0x74
-D_800B0E80 = 0x800B0E80; // type:u32 size:0x68
-D_800B0EE8 = 0x800B0EE8; // type:u32 size:0xC
-D_800B0EF4 = 0x800B0EF4; // type:u32 size:0x10
-D_800B0F04 = 0x800B0F04; // type:u32 size:0x4
-D_800B0F08 = 0x800B0F08; // type:u32 size:0x4
-D_800B0F0C = 0x800B0F0C; // type:u32 size:0x4
-D_800B0F10 = 0x800B0F10; // type:u32 size:0x4
-D_800B0F14 = 0x800B0F14; // type:u32 size:0x6C
-D_800B0F80 = 0x800B0F80; // type:u32 size:0x30
-D_800B0FB0 = 0x800B0FB0; // type:u32 size:0xD80
-D_800B1D30 = 0x800B1D30; // type:u32 size:0x1008
-D_800B2D38 = 0x800B2D38; // type:u32 size:0x4
-D_800B2D3C = 0x800B2D3C; // type:u32 size:0x5C
-D_800B2D98 = 0x800B2D98; // type:u32 size:0x8
-D_800B2DA0 = 0x800B2DA0; // type:u32 size:0x1CC
-D_800B2F6C = 0x800B2F6C; // type:u32 size:0x2670
-D_800B55DC = 0x800B55DC; // type:u32 size:0xB4
-D_800B5690 = 0x800B5690; // type:u32 size:0x4
-D_800B5694 = 0x800B5694; // type:u32 size:0x4
-D_800B5698 = 0x800B5698; // type:u32 size:0x20
-D_800B56B8 = 0x800B56B8; // type:u32 size:0x4
-D_800B56BC = 0x800B56BC; // type:u32 size:0x4
-D_800B56C0 = 0x800B56C0; // type:u32 size:0x18
-D_800B56D8 = 0x800B56D8; // type:u32 size:0x18
-D_800B56F0 = 0x800B56F0; // type:u32 size:0x4
-D_800B56F4 = 0x800B56F4; // type:u32 size:0x1A4
-D_800B5898 = 0x800B5898; // type:u32 size:0x4
-D_800B589C = 0x800B589C; // type:u32 size:0x2FC
-D_800B5B98 = 0x800B5B98; // type:u32 size:0x4
-D_800B5B9C = 0x800B5B9C; // type:u32 size:0x4
-D_800B5BA0 = 0x800B5BA0; // type:u32 size:0x18C
-D_800B5D2C = 0x800B5D2C; // type:u32 size:0x8
-D_800B5D34 = 0x800B5D34; // type:u32 size:0x8
-D_800B5D3C = 0x800B5D3C; // type:u32 size:0x8
-D_800B5D44 = 0x800B5D44; // type:u32 size:0x5C
-D_800B5DA0 = 0x800B5DA0; // type:u32 size:0x4
-D_800B5DA4 = 0x800B5DA4; // type:u32 size:0x8
-D_800B5DAC = 0x800B5DAC; // type:u32 size:0x8
-D_800B5DB4 = 0x800B5DB4; // type:u32 size:0x8
-D_800B5DBC = 0x800B5DBC; // type:u32 size:0x8
-D_800B5DC4 = 0x800B5DC4; // type:u32 size:0x4
-D_800B5DC8 = 0x800B5DC8; // type:u32 size:0x4
-D_800B5DCC = 0x800B5DCC; // type:u32 size:0x4
-D_800B5DD0 = 0x800B5DD0; // type:u32 size:0x4
-D_800B5DD4 = 0x800B5DD4; // type:u32 size:0x4
-D_800B5DD8 = 0x800B5DD8; // type:u32 size:0x4
-D_800B5DDC = 0x800B5DDC; // type:u32 size:0x4
-D_800B5DE0 = 0x800B5DE0; // type:u32 size:0x4
-D_800B5DE4 = 0x800B5DE4; // type:u32 size:0x1C
-D_800B5E00 = 0x800B5E00; // type:u32 size:0x28
-D_800B5E28 = 0x800B5E28; // type:u32 size:0x4
-D_800B5E2C = 0x800B5E2C; // type:u32 size:0x4
-D_800B5E30 = 0x800B5E30; // type:u32 size:0x128
-g_page_fwd_repeat = 0x800B5F4C;
-D_800B5F58 = 0x800B5F58; // type:u32 size:0x25E8
-g_menu_allow_hold = 0x800B853C;
-D_800B8540 = 0x800B8540; // type:u32 size:0x4
-D_800B8544 = 0x800B8544; // type:u32 size:0x4
-D_800B8548 = 0x800B8548; // type:u32 size:0x63C
-g_map_view_x = 0x800B85A0;
-g_map_view_y = 0x800B85A4;
-g_slot_cur = 0x800B85A8;
-g_menu_blink = 0x800B85AC;
-g_menu = 0x800B85B8;
-g_party_last = 0x800B85EC;
-D_800B8B84 = 0x800B8B84; // type:u32 size:0x4
-D_800B8B88 = 0x800B8B88; // type:u32 size:0x34
-g_image_queue_count = 0x800B8BA4;
-g_map_name_cells = 0x800B8BA8;
-D_800B8BBC = 0x800B8BBC; // type:u32 size:0x18
-g_page_back_repeat = 0x800B8BC8;
-D_800B8BD4 = 0x800B8BD4; // type:u32 size:0x8
-g_image_queue = 0x800B8BD8;
-D_800B8BDC = 0x800B8BDC; // type:u32 size:0x4
-D_800B8BE0 = 0x800B8BE0; // type:u32 size:0x400
-g_ot_index = 0x800B8ED8;
-g_bg_index = 0x800B8EEC;
-g_persona_list_count = 0x800B8FCC;
-D_800B8FE0 = 0x800B8FE0; // type:u32 size:0x4
-D_800B8FE4 = 0x800B8FE4; // type:u32 size:0x4
-D_800B8FE8 = 0x800B8FE8; // type:u32 size:0x4
-D_800B8FEC = 0x800B8FEC; // type:u32 size:0x4
-D_800B8FF0 = 0x800B8FF0; // type:u32 size:0x4
-D_800B8FF4 = 0x800B8FF4; // type:u32 size:0x4
-D_800B8FF8 = 0x800B8FF8; // type:u32 size:0x4
-D_800B8FFC = 0x800B8FFC; // type:u32 size:0x18
-g_image_anim = 0x800B9008;
-D_800B9014 = 0x800B9014; // type:u32 size:0x4
-D_800B9018 = 0x800B9018; // type:u32 size:0x1B4
-g_bg_shown = 0x800B914C;
-g_equip_last = 0x800B91CC; // type:u32 size:0x20
-g_hud_digits = 0x800B91D0;
-D_800B91EC = 0x800B91EC; // type:u32 size:0x23C
-D_800B9428 = 0x800B9428; // type:u32 size:0x4
-D_800B942C = 0x800B942C; // type:u32 size:0xA8
-D_800B94D4 = 0x800B94D4; // type:u32 size:0x8
-D_800B94DC = 0x800B94DC; // type:u32 size:0x8
-D_800B94E4 = 0x800B94E4; // type:u32 size:0x8
-D_800B94EC = 0x800B94EC; // type:u32 size:0x94
-g_ot = 0x800B953C;
+
+//-------------------------------------------------------------------------------
+//--- PA: 0x01D440   VA: 0x800817E0   subsegment: c, common/game/formationcompact
+//-------------------------------------------------------------------------------
+FormationCompact         = 0x800817E0; // type:func size:0x14C
+FormationClearMarkers    = 0x8008192C; // type:func size:0x68
+
+//-----------------------------------------------------------------
+//--- PA: 0x01D5F4   VA: 0x80081994   subsegment: asm, s2d_2_s21_x4
+//-----------------------------------------------------------------
+D_80081994               = 0x80081994; // type:func size:0x70
+
+//----------------------------------------------------------------------
+//--- PA: 0x01D664   VA: 0x80081A04   subsegment: c, common/gfx/statbars
+//----------------------------------------------------------------------
+DrawCharStatBars         = 0x80081A04; // type:func size:0x5C
+DrawCharStatBar          = 0x80081A60; // type:func size:0x32C
+DrawPersonaStatBars      = 0x80081D8C; // type:func size:0x5C
+DrawPersonaStatBar       = 0x80081DE8; // type:func size:0x120
+
+//-----------------------------------------------------------------
+//--- PA: 0x01DB68   VA: 0x80081F08   subsegment: asm, s2d_2_s21_x1
+//-----------------------------------------------------------------
+D_80081F08               = 0x80081F08; // type:func size:0x120
+
+//--------------------------------------------------------------------------
+//--- PA: 0x01DC88   VA: 0x80082028   subsegment: c, common/gfx/statbarsdata
+//--------------------------------------------------------------------------
+DrawPersonaDataStatBars  = 0x80082028; // type:func size:0x64
+DrawPersonaDataStatBar   = 0x8008208C; // type:func size:0x13C
+
+//-----------------------------------------------------------------
+//--- PA: 0x01DE28   VA: 0x800821C8   subsegment: asm, s2d_2_s21_x2
+//-----------------------------------------------------------------
+D_800821C8               = 0x800821C8; // type:func size:0x20
+func_800821E8            = 0x800821E8; // type:func size:0x980
+
+//--------------------------------------------------------------------
+//--- PA: 0x01E7C8   VA: 0x80082B68   subsegment: c, common/game/items
+//--------------------------------------------------------------------
+ItemsMergePending        = 0x80082B68; // type:func size:0x174
+ItemsAddPending          = 0x80082CDC; // type:func size:0xDC
+ItemsRemovePending       = 0x80082DB8; // type:func size:0x74
+ItemsFind                = 0x80082E2C; // type:func size:0x60
+ItemsFindPending         = 0x80082E8C; // type:func size:0x60
+
+//---------------------------------------------------------------
+//--- PA: 0x01EB4C   VA: 0x80082EEC   subsegment: asm, s2d_2_s21a
+//---------------------------------------------------------------
+func_80082EEC            = 0x80082EEC; // type:func size:0xFC
+
+//-------------------------------------------------------------------------
+//--- PA: 0x01EC48   VA: 0x80082FE8   subsegment: c, common/game/copyshorts
+//-------------------------------------------------------------------------
+CopyShorts               = 0x80082FE8; // type:func size:0x38
+
+//------------------------------------------------------------------------
+//--- PA: 0x01EC80   VA: 0x80083020   subsegment: c, common/game/itemslist
+//------------------------------------------------------------------------
+ItemsClearPending        = 0x80083020; // type:func size:0x24
+ItemsCompact             = 0x80083044; // type:func size:0x50
+
+//------------------------------------------------------------------
+//--- PA: 0x01ECF4   VA: 0x80083094   subsegment: c, common/ui/input
+//------------------------------------------------------------------
+InputCheckAcceptA        = 0x80083094; // type:func size:0x7C
+InputCheckAcceptB        = 0x80083110; // type:func size:0x7C
+
+//--------------------------------------------------------------
+//--- PA: 0x01EDEC   VA: 0x8008318C   subsegment: asm, s2d_2_s22
+//--------------------------------------------------------------
+D_8008318C               = 0x8008318C; // type:func size:0x8C
+
+//---------------------------------------------------------------------
+//--- PA: 0x01EE78   VA: 0x80083218   subsegment: c, common/ui/itemcell
+//---------------------------------------------------------------------
+DrawItemCell             = 0x80083218; // type:func size:0x10C
+
+//-----------------------------------------------------------------
+//--- PA: 0x01EF84   VA: 0x80083324   subsegment: asm, s2d_2_s22_x1
+//-----------------------------------------------------------------
+D_80083324               = 0x80083324; // type:func size:0x4C
+func_80083370            = 0x80083370; // type:func size:0x158
+
+//------------------------------------------------------------------------
+//--- PA: 0x01F128   VA: 0x800834C8   subsegment: c, common/gfx/checkermap
+//------------------------------------------------------------------------
+CheckerMapInit           = 0x800834C8; // type:func size:0x58
+
+//-------------------------------------------------------------------
+//--- PA: 0x01F180   VA: 0x80083520   subsegment: c, common/gfx/cells
+//-------------------------------------------------------------------
+CellsClear               = 0x80083520; // type:func size:0x30
+
+//-----------------------------------------------------------------
+//--- PA: 0x01F1B0   VA: 0x80083550   subsegment: asm, s2d_2_s23_x1
+//-----------------------------------------------------------------
+D_80083550               = 0x80083550; // type:func size:0x14C
+
+//----------------------------------------------------------------------
+//--- PA: 0x01F2FC   VA: 0x8008369C   subsegment: c, common/gfx/cellsrow
+//----------------------------------------------------------------------
+CellsWriteRow            = 0x8008369C; // type:func size:0xC0
+
+//-----------------------------------------------------------------
+//--- PA: 0x01F3BC   VA: 0x8008375C   subsegment: asm, s2d_2_s23_x2
+//-----------------------------------------------------------------
+D_8008375C               = 0x8008375C; // type:func size:0x970
+DrawItemName             = 0x800840CC; // type:func size:0x64
+D_80084130               = 0x80084130; // type:func size:0xFC
+func_8008422C            = 0x8008422C; // type:func size:0xD0
+func_800842FC            = 0x800842FC; // type:func size:0x294
+
+//------------------------------------------------------------------------
+//--- PA: 0x0201F0   VA: 0x80084590   subsegment: c, common/game/charstats
+//------------------------------------------------------------------------
+CharApplyStats           = 0x80084590; // type:func size:0x650
+
+//--------------------------------------------------------------
+//--- PA: 0x020840   VA: 0x80084BE0   subsegment: asm, s2d_2_s24
+//--------------------------------------------------------------
+func_80084BE0            = 0x80084BE0; // type:func size:0x6C0
+func_800852A0            = 0x800852A0; // type:func size:0x7F0
+D_80085A90               = 0x80085A90; // type:func size:0x588
+func_80086018            = 0x80086018; // type:func size:0xEC
+func_80086104            = 0x80086104; // type:func size:0x10C
+func_80086210            = 0x80086210; // type:func size:0x454
+
+//-------------------------------------------------------------------------
+//--- PA: 0x0222C4   VA: 0x80086664   subsegment: c, common/game/roomrotate
+//-------------------------------------------------------------------------
+RoomRotatePoint          = 0x80086664; // type:func size:0x1A4
+
+//---------------------------------------------------------------------
+//--- PA: 0x022468   VA: 0x80086808   subsegment: c, common/gfx/compass
+//---------------------------------------------------------------------
+DrawCompass              = 0x80086808; // type:func size:0xE8
+
+//-----------------------------------------------------------------------
+//--- PA: 0x022550   VA: 0x800868F0   subsegment: c, common/gfx/mapmarker
+//-----------------------------------------------------------------------
+MapPlaceMarker           = 0x800868F0; // type:func size:0xA8
+
+//--------------------------------------------------------------
+//--- PA: 0x0225F8   VA: 0x80086998   subsegment: asm, s2d_2_s25
+//--------------------------------------------------------------
+MapDrawName              = 0x80086998; // type:func size:0xFC
+func_80086A94            = 0x80086A94; // type:func size:0x220
+func_80086CB4            = 0x80086CB4; // type:func size:0x338
+func_80086FEC            = 0x80086FEC; // type:func size:0x68
+func_80087054            = 0x80087054; // type:func size:0x5A0
+
+//------------------------------------------------------------------------
+//--- PA: 0x023254   VA: 0x800875F4   subsegment: c, common/game/tilewalls
+//------------------------------------------------------------------------
+TileWallsFacing          = 0x800875F4; // type:func size:0x13C
+
+//----------------------------------------------------------------------
+//--- PA: 0x023390   VA: 0x80087730   subsegment: c, common/game/automap
+//----------------------------------------------------------------------
+MapTileSeen              = 0x80087730; // type:func size:0x78
+
+//-----------------------------------------------------------------
+//--- PA: 0x023408   VA: 0x800877A8   subsegment: asm, s2d_2_s26_x1
+//-----------------------------------------------------------------
+D_800877A8               = 0x800877A8; // type:func size:0x80
+func_80087828            = 0x80087828; // type:func size:0x5AC
+func_80087DD4            = 0x80087DD4; // type:func size:0x150
+func_80087F24            = 0x80087F24; // type:func size:0x480
+func_800883A4            = 0x800883A4; // type:func size:0x3B8
+func_8008875C            = 0x8008875C; // type:func size:0x23C
+func_80088998            = 0x80088998; // type:func size:0x354
+func_80088CEC            = 0x80088CEC; // type:func size:0x40C
+func_800890F8            = 0x800890F8; // type:func size:0x4B8
+
+//---------------------------------------------------------------------
+//--- PA: 0x025210   VA: 0x800895B0   subsegment: c, common/game/flags2
+//---------------------------------------------------------------------
+FlagsCollectGroup        = 0x800895B0; // type:func size:0xD0
+FlagBank2Get             = 0x80089680; // type:func size:0x38
+
+//------------------------------------------------------------------------
+//--- PA: 0x025318   VA: 0x800896B8   subsegment: c, common/ui/personalist
+//------------------------------------------------------------------------
+DrawPersonaList          = 0x800896B8; // type:func size:0xCC
+
+//--------------------------------------------------------------
+//--- PA: 0x0253E4   VA: 0x80089784   subsegment: asm, s2d_2_s27
+//--------------------------------------------------------------
+func_80089784            = 0x80089784; // type:func size:0x80
+func_80089804            = 0x80089804; // type:func size:0x3C
+func_80089840            = 0x80089840; // type:func size:0x168
+func_800899A8            = 0x800899A8; // type:func size:0x18
+func_800899C0            = 0x800899C0; // type:func size:0x18
+func_800899D8            = 0x800899D8; // type:func size:0x80
+func_80089A58            = 0x80089A58; // type:func size:0x34
+func_80089A8C            = 0x80089A8C; // type:func size:0x18
+func_80089AA4            = 0x80089AA4; // type:func size:0x38
+func_80089ADC            = 0x80089ADC; // type:func size:0x20
+func_80089AFC            = 0x80089AFC; // type:func size:0x98
+func_80089B94            = 0x80089B94; // type:func size:0x24
+func_80089BB8            = 0x80089BB8; // type:func size:0x34
+func_80089BEC            = 0x80089BEC; // type:func size:0x18
+ovl_s2d_entry            = 0x80089C04; // type:func size:0x358
+func_80089F5C            = 0x80089F5C; // type:func size:0xCB4
+func_8008AC10            = 0x8008AC10; // type:func size:0x1F0
+func_8008AE00            = 0x8008AE00; // type:func size:0xA8
+func_8008AEA8            = 0x8008AEA8; // type:func size:0x1A0
+func_8008B048            = 0x8008B048; // type:func size:0x444
+func_8008B48C            = 0x8008B48C; // type:func size:0x148
+func_8008B5D4            = 0x8008B5D4; // type:func size:0xD8
+func_8008B6AC            = 0x8008B6AC; // type:func size:0x3F0
+func_8008BA9C            = 0x8008BA9C; // type:func size:0x78
+func_8008BB14            = 0x8008BB14; // type:func size:0x70
+func_8008BB84            = 0x8008BB84; // type:func size:0x54
+func_8008BBD8            = 0x8008BBD8; // type:func size:0xF0
+func_8008BCC8            = 0x8008BCC8; // type:func size:0xB0
+func_8008BD78            = 0x8008BD78; // type:func size:0x2C0
+func_8008C038            = 0x8008C038; // type:func size:0x314
+func_8008C34C            = 0x8008C34C; // type:func size:0x6DC
+func_8008CA28            = 0x8008CA28; // type:func size:0x118
+func_8008CB40            = 0x8008CB40; // type:func size:0xD8
+func_8008CC18            = 0x8008CC18; // type:func size:0xE0
+func_8008CCF8            = 0x8008CCF8; // type:func size:0xE0
+func_8008CDD8            = 0x8008CDD8; // type:func size:0xE0
+func_8008CEB8            = 0x8008CEB8; // type:func size:0xA34
+func_8008D8EC            = 0x8008D8EC; // type:func size:0x9C
+func_8008D988            = 0x8008D988; // type:func size:0xF8
+func_8008DA80            = 0x8008DA80; // type:func size:0x6D8
+func_8008E158            = 0x8008E158; // type:func size:0x68
+func_8008E1C0            = 0x8008E1C0; // type:func size:0xC8
+func_8008E288            = 0x8008E288; // type:func size:0x300
+func_8008E588            = 0x8008E588; // type:func size:0xAC
+func_8008E634            = 0x8008E634; // type:func size:0x74
+func_8008E6A8            = 0x8008E6A8; // type:func size:0x90
+func_8008E738            = 0x8008E738; // type:func size:0x17C
+func_8008E8B4            = 0x8008E8B4; // type:func size:0x390
+func_8008EC44            = 0x8008EC44; // type:func size:0xC8
+func_8008ED0C            = 0x8008ED0C; // type:func size:0x48
+func_8008ED54            = 0x8008ED54; // type:func size:0x60
+func_8008EDB4            = 0x8008EDB4; // type:func size:0x204
+func_8008EFB8            = 0x8008EFB8; // type:func size:0x204
+func_8008F1BC            = 0x8008F1BC; // type:func size:0x204
+func_8008F3C0            = 0x8008F3C0; // type:func size:0xE4
+func_8008F4A4            = 0x8008F4A4; // type:func size:0xCC
+func_8008F570            = 0x8008F570; // type:func size:0x268
+func_8008F7D8            = 0x8008F7D8; // type:func size:0xA0
+func_8008F878            = 0x8008F878; // type:func size:0x388
+func_8008FC00            = 0x8008FC00; // type:func size:0x5C
+func_8008FC5C            = 0x8008FC5C; // type:func size:0x5EC
+func_80090248            = 0x80090248; // type:func size:0x138
+func_80090380            = 0x80090380; // type:func size:0x1D4
+func_80090554            = 0x80090554; // type:func size:0x24C
+func_800907A0            = 0x800907A0; // type:func size:0xAD0
+func_80091270            = 0x80091270; // type:func size:0xB0
+func_80091320            = 0x80091320; // type:func size:0x50C
+func_8009182C            = 0x8009182C; // type:func size:0x4F8
+func_80091D24            = 0x80091D24; // type:func size:0x528
+func_8009224C            = 0x8009224C; // type:func size:0x7BC
+func_80092A08            = 0x80092A08; // type:func size:0x264
+func_80092C6C            = 0x80092C6C; // type:func size:0x4B8
+func_80093124            = 0x80093124; // type:func size:0x10C
+func_80093230            = 0x80093230; // type:func size:0x1E8
+func_80093418            = 0x80093418; // type:func size:0x40
+func_80093458            = 0x80093458; // type:func size:0xB8
+func_80093510            = 0x80093510; // type:func size:0xB8
+func_800935C8            = 0x800935C8; // type:func size:0xB8
+func_80093680            = 0x80093680; // type:func size:0xEC
+func_8009376C            = 0x8009376C; // type:func size:0x18
+func_80093784            = 0x80093784; // type:func size:0x78
+func_800937FC            = 0x800937FC; // type:func size:0x2E4
+func_80093AE0            = 0x80093AE0; // type:func size:0x318
+func_80093DF8            = 0x80093DF8; // type:func size:0x79C
+func_80094594            = 0x80094594; // type:func size:0x4C
+func_800945E0            = 0x800945E0; // type:func size:0x80
+func_80094660            = 0x80094660; // type:func size:0x3D4
+D_80094A34               = 0x80094A34; // type:func size:0x70
+func_80094AA4            = 0x80094AA4; // type:func size:0x64
+func_80094B08            = 0x80094B08; // type:func size:0x360
+func_80094E68            = 0x80094E68; // type:func size:0xC4
+func_80094F2C            = 0x80094F2C; // type:func size:0x70
+func_80094F9C            = 0x80094F9C; // type:func size:0x5C
+func_80094FF8            = 0x80094FF8; // type:func size:0x708
+func_80095700            = 0x80095700; // type:func size:0x734
+func_80095E34            = 0x80095E34; // type:func size:0x340
+func_80096174            = 0x80096174; // type:func size:0x24
+func_80096198            = 0x80096198; // type:func size:0x8C
+func_80096224            = 0x80096224; // type:func size:0x230
+func_80096454            = 0x80096454; // type:func size:0xC0
+func_80096514            = 0x80096514; // type:func size:0x2C8
+func_800967DC            = 0x800967DC; // type:func size:0x128
+func_80096904            = 0x80096904; // type:func size:0x134
+func_80096A38            = 0x80096A38; // type:func size:0x3AC
+func_80096DE4            = 0x80096DE4; // type:func size:0x28
+func_80096E0C            = 0x80096E0C; // type:func size:0x3C8
+func_800971D4            = 0x800971D4; // type:func size:0xB4
+func_80097288            = 0x80097288; // type:func size:0xE8
+func_80097370            = 0x80097370; // type:func size:0x90
+func_80097400            = 0x80097400; // type:func size:0x38
+func_80097438            = 0x80097438; // type:func size:0x38
+func_80097470            = 0x80097470; // type:func size:0x40
+func_800974B0            = 0x800974B0; // type:func size:0x30
+D_800974E0               = 0x800974E0; // type:u32 size:0x28
+func_80097508            = 0x80097508; // type:func size:0x274
+func_8009777C            = 0x8009777C; // type:func size:0x1E8
+func_80097964            = 0x80097964; // type:func size:0x284
+func_80097BE8            = 0x80097BE8; // type:func size:0xEC
+D_80097CD4               = 0x80097CD4; // type:func size:0x11C
+func_80097DF0            = 0x80097DF0; // type:func size:0xC4
+func_80097EB4            = 0x80097EB4; // type:func size:0x3C
+func_80097EF0            = 0x80097EF0; // type:func size:0x7C
+func_80097F6C            = 0x80097F6C; // type:func size:0x270
+func_800981DC            = 0x800981DC; // type:func size:0x144
+func_80098320            = 0x80098320; // type:func size:0xF8
+func_80098418            = 0x80098418; // type:func size:0x50
+func_80098468            = 0x80098468; // type:func size:0x50
+func_800984B8            = 0x800984B8; // type:func size:0xE8
+func_800985A0            = 0x800985A0; // type:func size:0xE0
+D_80098680               = 0x80098680; // type:func size:0xA0
+func_80098720            = 0x80098720; // type:func size:0xA0
+D_800987C0               = 0x800987C0; // type:func size:0xA8
+func_80098868            = 0x80098868; // type:func size:0x80
+func_800988E8            = 0x800988E8; // type:func size:0xD8
+func_800989C0            = 0x800989C0; // type:func size:0xF0
+func_80098AB0            = 0x80098AB0; // type:func size:0x14C
+func_80098BFC            = 0x80098BFC; // type:func size:0x330
+func_80098F2C            = 0x80098F2C; // type:func size:0x370
+func_8009929C            = 0x8009929C; // type:func size:0x694
+func_80099930            = 0x80099930; // type:func size:0x1C
+func_8009994C            = 0x8009994C; // type:func size:0x84
+func_800999D0            = 0x800999D0; // type:func size:0x30
+func_80099A00            = 0x80099A00; // type:func size:0xD8
+func_80099AD8            = 0x80099AD8; // type:func size:0x288
+func_80099D60            = 0x80099D60; // type:func size:0x104
+func_80099E64            = 0x80099E64; // type:func size:0x48
+func_80099EAC            = 0x80099EAC; // type:func size:0x3C
+func_80099EE8            = 0x80099EE8; // type:func size:0x5C
+func_80099F44            = 0x80099F44; // type:func size:0x3C
+func_80099F80            = 0x80099F80; // type:func size:0x28
+func_80099FA8            = 0x80099FA8; // type:func size:0x2C
+func_80099FD4            = 0x80099FD4; // type:func size:0x2C
+func_8009A000            = 0x8009A000; // type:func size:0xE8
+func_8009A0E8            = 0x8009A0E8; // type:func size:0x150
+func_8009A238            = 0x8009A238; // type:func size:0x48
+func_8009A280            = 0x8009A280; // type:func size:0x28
+func_8009A2A8            = 0x8009A2A8; // type:func size:0xC0
+func_8009A368            = 0x8009A368; // type:func size:0x2F0
+func_8009A658            = 0x8009A658; // type:func size:0xBC
+func_8009A714            = 0x8009A714; // type:func size:0x60
+func_8009A774            = 0x8009A774; // type:func size:0x44
+func_8009A7B8            = 0x8009A7B8; // type:func size:0x4C
+func_8009A804            = 0x8009A804; // type:func size:0x8C
+func_8009A890            = 0x8009A890; // type:func size:0x290
+func_8009AB20            = 0x8009AB20; // type:func size:0xE4
+D_8009AC04               = 0x8009AC04; // type:func size:0x14
+func_8009AC18            = 0x8009AC18; // type:func size:0x810
+D_8009B428               = 0x8009B428; // type:func size:0x68
+func_8009B490            = 0x8009B490; // type:func size:0x14
+func_8009B4A4            = 0x8009B4A4; // type:func size:0x10
+func_8009B4B4            = 0x8009B4B4; // type:func size:0x11C
+func_8009B5D0            = 0x8009B5D0; // type:func size:0x10
+func_8009B5E0            = 0x8009B5E0; // type:func size:0x34
+func_8009B614            = 0x8009B614; // type:func size:0x30
+func_8009B644            = 0x8009B644; // type:func size:0x114
+func_8009B758            = 0x8009B758; // type:func size:0x434
+func_8009BB8C            = 0x8009BB8C; // type:func size:0x68
+func_8009BBF4            = 0x8009BBF4; // type:func size:0x30
+
+//------------------------------------------------------------------------
+//--- PA: 0x037884   VA: 0x8009BC24   subsegment: c, common/game/eventflag
+//------------------------------------------------------------------------
+EventFlagTest            = 0x8009BC24; // type:func size:0x28
+
+//--------------------------------------------------------------
+//--- PA: 0x0378AC   VA: 0x8009BC4C   subsegment: asm, s2d_2_s28
+//--------------------------------------------------------------
+func_8009BC4C            = 0x8009BC4C; // type:func size:0x70
+func_8009BCBC            = 0x8009BCBC; // type:func size:0x2E0
+func_8009BF9C            = 0x8009BF9C; // type:func size:0xE0
+func_8009C07C            = 0x8009C07C; // type:func size:0x28C
+func_8009C308            = 0x8009C308; // type:func size:0x34
+func_8009C33C            = 0x8009C33C; // type:func size:0x30
+func_8009C36C            = 0x8009C36C; // type:func size:0x10C
+func_8009C478            = 0x8009C478; // type:func size:0x204
+func_8009C67C            = 0x8009C67C; // type:func size:0xD4
+
+
+
+//================================================
+//=== .data section
+//================================================
+
+
+//--------------------------------------------------------------
+//--- PA: 0x0383B0   VA: 0x8009C750   subsegment: data, s2d_data
+//--------------------------------------------------------------
+g_flicker_ramp           = 0x8009C750; // type:u32 size:0x85A4
+g_pow10                  = 0x8009C770;
+g_config_marker_def      = 0x8009CB98;
+g_menu_sel               = 0x8009D1D8;
+g_menu_subsel            = 0x8009D1DA;
+str_cell_run             = 0x8009D208;
+str_empty                = 0x8009D224;
+str_cfg_command_confirm  = 0x8009D278;
+str_cfg_window_anim      = 0x8009D284;
+str_cfg_do_or_not        = 0x8009D2A0;
+str_place_3d_adv         = 0x8009D2F8;
+str_place_2d             = 0x8009D304;
+str_place_battle_top     = 0x8009D310;
+str_place_in_battle      = 0x8009D31C;
+g_persona_list_rule      = 0x8009DEDC;
+g_formation_member_def   = 0x8009E200;
+g_bg_map                 = 0x8009E59C;
+g_bg_layers              = 0x8009E5BC;
+g_formation_marker_def   = 0x8009EBB4;
+g_pad_binding_table      = 0x8009EBC8;
+str_cfg_message_speed    = 0x8009ED2C;
+str_cfg_battle           = 0x8009ED6C;
+str_cfg_auto_battle      = 0x8009ED74;
+str_cfg_speeds           = 0x8009EDD0;
+g_config_labels_left     = 0x8009EE30;
+g_config_labels_right    = 0x8009EE60;
+g_stat_bar_cells         = 0x8009F438;
+str_config_title         = 0x8009F44C;
+g_compass_cels           = 0x8009F5BC;
+g_map_marker_defs        = 0x8009F63C;
+g_tile_walls             = 0x8009F6D8;
+g_flag_groups            = 0x8009FA10;
+D_800A4CF4               = 0x800A4CF4; // type:u32 size:0x4
+D_800A4CF8               = 0x800A4CF8; // type:u32 size:0x4
+D_800A4CFC               = 0x800A4CFC; // type:u32 size:0x38C
+D_800A5088               = 0x800A5088; // type:u32 size:0xE0
+D_800A5168               = 0x800A5168; // type:u32 size:0x34
+D_800A519C               = 0x800A519C; // type:u32 size:0x54
+D_800A51F0               = 0x800A51F0; // type:u32 size:0x124
+D_800A5314               = 0x800A5314; // type:u32 size:0x358
+D_800A566C               = 0x800A566C; // type:u32 size:0x5000
+D_800AA66C               = 0x800AA66C; // type:u32 size:0x5E30
+
+
+
+//================================================
+//=== .bss section
+//================================================
+
+
+//------------------------------------------------------------
+//--- PA: 0x04C0FC   VA: 0x800B049C   subsegment: bss, s2d_bss
+//------------------------------------------------------------
+D_800B049C               = 0x800B049C; // type:u32 size:0x8
+D_800B04A4               = 0x800B04A4; // type:u32 size:0x364
+D_800B0808               = 0x800B0808; // type:u32 size:0x8C
+D_800B0894               = 0x800B0894; // type:u32 size:0x3D4
+D_800B0C68               = 0x800B0C68; // type:u32 size:0x8C
+D_800B0CF4               = 0x800B0CF4; // type:u32 size:0xA0
+D_800B0D94               = 0x800B0D94; // type:u32 size:0x78
+D_800B0E0C               = 0x800B0E0C; // type:u32 size:0x74
+D_800B0E80               = 0x800B0E80; // type:u32 size:0x68
+D_800B0EE8               = 0x800B0EE8; // type:u32 size:0xC
+D_800B0EF4               = 0x800B0EF4; // type:u32 size:0x10
+D_800B0F04               = 0x800B0F04; // type:u32 size:0x4
+D_800B0F08               = 0x800B0F08; // type:u32 size:0x4
+D_800B0F0C               = 0x800B0F0C; // type:u32 size:0x4
+D_800B0F10               = 0x800B0F10; // type:u32 size:0x4
+D_800B0F14               = 0x800B0F14; // type:u32 size:0x6C
+D_800B0F80               = 0x800B0F80; // type:u32 size:0x30
+D_800B0FB0               = 0x800B0FB0; // type:u32 size:0xD80
+D_800B1D30               = 0x800B1D30; // type:u32 size:0x1008
+D_800B2D38               = 0x800B2D38; // type:u32 size:0x4
+D_800B2D3C               = 0x800B2D3C; // type:u32 size:0x5C
+D_800B2D98               = 0x800B2D98; // type:u32 size:0x8
+D_800B2DA0               = 0x800B2DA0; // type:u32 size:0x1CC
+D_800B2F6C               = 0x800B2F6C; // type:u32 size:0x2670
+D_800B55DC               = 0x800B55DC; // type:u32 size:0xB4
+D_800B5690               = 0x800B5690; // type:u32 size:0x4
+D_800B5694               = 0x800B5694; // type:u32 size:0x4
+D_800B5698               = 0x800B5698; // type:u32 size:0x20
+D_800B56B8               = 0x800B56B8; // type:u32 size:0x4
+D_800B56BC               = 0x800B56BC; // type:u32 size:0x4
+D_800B56C0               = 0x800B56C0; // type:u32 size:0x18
+D_800B56D8               = 0x800B56D8; // type:u32 size:0x18
+D_800B56F0               = 0x800B56F0; // type:u32 size:0x4
+D_800B56F4               = 0x800B56F4; // type:u32 size:0x1A4
+D_800B5898               = 0x800B5898; // type:u32 size:0x4
+D_800B589C               = 0x800B589C; // type:u32 size:0x2FC
+D_800B5B98               = 0x800B5B98; // type:u32 size:0x4
+D_800B5B9C               = 0x800B5B9C; // type:u32 size:0x4
+D_800B5BA0               = 0x800B5BA0; // type:u32 size:0x18C
+D_800B5D2C               = 0x800B5D2C; // type:u32 size:0x8
+D_800B5D34               = 0x800B5D34; // type:u32 size:0x8
+D_800B5D3C               = 0x800B5D3C; // type:u32 size:0x8
+D_800B5D44               = 0x800B5D44; // type:u32 size:0x5C
+D_800B5DA0               = 0x800B5DA0; // type:u32 size:0x4
+D_800B5DA4               = 0x800B5DA4; // type:u32 size:0x8
+D_800B5DAC               = 0x800B5DAC; // type:u32 size:0x8
+D_800B5DB4               = 0x800B5DB4; // type:u32 size:0x8
+D_800B5DBC               = 0x800B5DBC; // type:u32 size:0x8
+D_800B5DC4               = 0x800B5DC4; // type:u32 size:0x4
+D_800B5DC8               = 0x800B5DC8; // type:u32 size:0x4
+D_800B5DCC               = 0x800B5DCC; // type:u32 size:0x4
+D_800B5DD0               = 0x800B5DD0; // type:u32 size:0x4
+D_800B5DD4               = 0x800B5DD4; // type:u32 size:0x4
+D_800B5DD8               = 0x800B5DD8; // type:u32 size:0x4
+D_800B5DDC               = 0x800B5DDC; // type:u32 size:0x4
+D_800B5DE0               = 0x800B5DE0; // type:u32 size:0x4
+D_800B5DE4               = 0x800B5DE4; // type:u32 size:0x1C
+D_800B5E00               = 0x800B5E00; // type:u32 size:0x28
+D_800B5E28               = 0x800B5E28; // type:u32 size:0x4
+D_800B5E2C               = 0x800B5E2C; // type:u32 size:0x4
+D_800B5E30               = 0x800B5E30; // type:u32 size:0x128
+g_page_fwd_repeat        = 0x800B5F4C;
+D_800B5F58               = 0x800B5F58; // type:u32 size:0x25E8
+g_menu_allow_hold        = 0x800B853C;
+D_800B8540               = 0x800B8540; // type:u32 size:0x4
+D_800B8544               = 0x800B8544; // type:u32 size:0x4
+D_800B8548               = 0x800B8548; // type:u32 size:0x63C
+g_map_view_x             = 0x800B85A0;
+g_map_view_y             = 0x800B85A4;
+g_slot_cur               = 0x800B85A8;
+g_menu_blink             = 0x800B85AC;
+g_menu                   = 0x800B85B8;
+g_party_last             = 0x800B85EC;
+D_800B8B84               = 0x800B8B84; // type:u32 size:0x4
+D_800B8B88               = 0x800B8B88; // type:u32 size:0x34
+g_image_queue_count      = 0x800B8BA4;
+g_map_name_cells         = 0x800B8BA8;
+D_800B8BBC               = 0x800B8BBC; // type:u32 size:0x18
+g_page_back_repeat       = 0x800B8BC8;
+D_800B8BD4               = 0x800B8BD4; // type:u32 size:0x8
+g_image_queue            = 0x800B8BD8;
+D_800B8BDC               = 0x800B8BDC; // type:u32 size:0x4
+D_800B8BE0               = 0x800B8BE0; // type:u32 size:0x400
+g_ot_index               = 0x800B8ED8;
+g_bg_index               = 0x800B8EEC;
+g_persona_list_count     = 0x800B8FCC;
+D_800B8FE0               = 0x800B8FE0; // type:u32 size:0x4
+D_800B8FE4               = 0x800B8FE4; // type:u32 size:0x4
+D_800B8FE8               = 0x800B8FE8; // type:u32 size:0x4
+D_800B8FEC               = 0x800B8FEC; // type:u32 size:0x4
+D_800B8FF0               = 0x800B8FF0; // type:u32 size:0x4
+D_800B8FF4               = 0x800B8FF4; // type:u32 size:0x4
+D_800B8FF8               = 0x800B8FF8; // type:u32 size:0x4
+D_800B8FFC               = 0x800B8FFC; // type:u32 size:0x18
+g_image_anim             = 0x800B9008;
+D_800B9014               = 0x800B9014; // type:u32 size:0x4
+D_800B9018               = 0x800B9018; // type:u32 size:0x1B4
+g_bg_shown               = 0x800B914C;
+g_equip_last             = 0x800B91CC; // type:u32 size:0x20
+g_hud_digits             = 0x800B91D0;
+D_800B91EC               = 0x800B91EC; // type:u32 size:0x23C
+D_800B9428               = 0x800B9428; // type:u32 size:0x4
+D_800B942C               = 0x800B942C; // type:u32 size:0xA8
+D_800B94D4               = 0x800B94D4; // type:u32 size:0x8
+D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
+D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
+D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
+g_ot                     = 0x800B953C;
