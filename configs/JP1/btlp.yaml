@@ -356,6 +356,8 @@ segments:
       - [0x35568, c, roundover]
       - [0x35C94, c, holdmarkers]
       - [0x35E08, asm, btlp_58_x3]
+      - [0x3626C, c, commandstage]
+      - [0x36930, asm, btlp_58_x4]
       - [0x36E30, c, pickmember]
       - [0x37118, c, pickdown]
       - [0x37248, c, menukey]
