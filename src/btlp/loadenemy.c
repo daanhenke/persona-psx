@@ -103,7 +103,7 @@ void BtlLoadEnemyStats(int slot, int key)
     a->unkE1[3] = 0;
     a->unkE1[4] = 0;
     a->unkE1[5] = 0;
-    a->unkE1[6] = 0;
+    a->ward_turns = 0;
     a->unkD2 = 0;
     a->unkD3 = 0;
     a->unkD4 = 0;

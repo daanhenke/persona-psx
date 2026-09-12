@@ -134,10 +134,12 @@ typedef struct BtlActor {
     /* 0xCB */ u_char  padCB[1];
     /* 0xCC */ u_char  unkCC;      /* the five below are cleared as a record  */
     /* 0xCD */ u_char  padCD[3];   /* is filled, and nothing has read them    */
-    /* 0xD0 */ u_char  unkD0;      /* counted up on the acting fighter when
-                                      move 0x4C's effect resolves and the
-                                      fight is one that may be run from;
-                                      nothing has been found that reads it  */
+    /* 0xD0 */ u_char  unkD0;      /* counted up on the acting fighter by two
+                                      of the effect handlers - move 0x4C's,
+                                      when the fight is one that may be run
+                                      from, and the ward the 0x8C family
+                                      leaves; nothing has been found that
+                                      reads it                              */
     /* 0xD1 */ u_char  padD1[1];
     /* 0xD2 */ u_char  unkD2;
     /* 0xD3 */ u_char  unkD3;
@@ -155,7 +157,13 @@ typedef struct BtlActor {
     /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
                                       once that offer is done with; the
                                       battle only ever clears it again   */
-    /* 0xE1 */ u_char  unkE1[7];   /* cleared with `offered`, as one run     */
+    /* 0xE1 */ u_char  unkE1[6];   /* cleared with `offered`, as one run     */
+    /* 0xE7 */ u_char  ward_turns; /* rounds the ward at BTL_ACTOR_WARDS has
+                                      left to run. BtlFxFinish8C sets it as
+                                      the ward lands and the round counts it
+                                      down, clearing all four bits together
+                                      when it reaches nought. Cleared with
+                                      the run above as a record is filled   */
     /* 0xE8 */ u_char  padE8[2];
     /* 0xEA */ u_char  ail_turns;  /* how long the ailment at Char.status is
                                       meant to last. BtlInflictStatus sets it
@@ -199,6 +207,19 @@ typedef struct BtlActor {
 /* An actor flag with the same effect as BTL_STATUS_DOWN everywhere it is
    tested; the two are always checked together. */
 #define BTL_ACTOR_OUT 0x4000
+
+/* The ward moves 0x8C..0x8F leave behind, one bit each and mutually
+   exclusive: BtlFxFinish8C clears all four before it sets the one its own
+   move grants, and the round clears all four together when `ward_turns` runs
+   out. They are named for the move that grants them, the way the effect
+   handlers themselves are, because nothing else says what each one turns
+   aside. BtlStageRound greys all four moves out on a fighter already carrying
+   one, and move 0x86 will not reach a fighter behind the last two. */
+#define BTL_ACTOR_WARD_8C 0x200
+#define BTL_ACTOR_WARD_8D 0x400
+#define BTL_ACTOR_WARD_8E 0x800
+#define BTL_ACTOR_WARD_8F 0x1000
+#define BTL_ACTOR_WARDS   0x1E00
 
 extern BtlActor g_btl_actors[];
 

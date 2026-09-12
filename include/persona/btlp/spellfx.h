@@ -118,6 +118,13 @@ extern long g_btl_fx_origin[];
 /* The six places round a fighter a ring's records stand, as offsets from it. */
 extern long g_btl_fx_ring[][2];
 
+/* Where the layers of a built-up effect stand relative to the fighter they are
+   built on, in the same 16.16 the field is placed in. BtlFxStart90 takes the
+   first five - four corners of a box and then the middle - and BtlFxStart91
+   the eight that follow, which is the same box again with the sides and the
+   ends between them. */
+extern long g_btl_fx_spread[][2];
+
 extern u_char g_btl_fx_ring_cells[];
 extern u_char g_btl_fx_nine_order[];
 

@@ -1558,7 +1558,7 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                     n = 0;
                     do {
                         if (g_btl_combatants[n].c.key != 0
-                            && (g_btl_combatants[n].flags & 0x1E00) == 0) {
+                            && (g_btl_combatants[n].flags & BTL_ACTOR_WARDS) == 0) {
                             *ok = enabled;
                         }
                         n++;
