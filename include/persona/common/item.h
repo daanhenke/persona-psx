@@ -17,11 +17,15 @@
 
 typedef struct {
     /* 0x00 */ int    price;
-    /* 0x04 */ u_char pad04[2];
+    /* 0x04 */ u_short owners;  /* one bit per Char key - who is allowed to
+                                   equip this. g_btl_char_bit turns a key into
+                                   the bit to test                          */
     /* 0x06 */ u_short unk06;   /* bit 6 marks an entry whose usefulness is
                                    worth asking about: DrawItemRowUsable greys
                                    the row unless it is set and SpellUsable
-                                   also says yes                            */
+                                   also says yes. Bits 3 to 5 are which of the
+                                   seven equipment groups it belongs to, which
+                                   g_btl_equip_kind gives per slot          */
     /* 0x08 */ u_char name[10];   /* packed glyph bytes, ten cells wide */
     /* 0x12 */ u_char pad12[1];
     /* 0x13 */ u_char bonus01;  /* high nibble stat[0], low nibble stat[1] */

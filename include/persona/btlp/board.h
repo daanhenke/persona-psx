@@ -31,4 +31,11 @@ typedef struct {
 extern BtlObj *BtlBoardOpen(const BtlBoardDef *parts, const long *pos);
 extern void    BtlBoardShut(BtlObj *board);
 
+/* The two boards a menu outside boards.c puts up: the debug page, and the
+   status view an analysis is shown on. */
+extern void BtlOpenDebugBoard(void);
+extern void BtlCloseDebugBoard(void);
+extern void BtlOpenStatusBoard(void);
+extern void BtlCloseStatusBoard(void);
+
 #endif

@@ -111,9 +111,12 @@ typedef struct BtlObj {
     /* 0xB4 */ u_short        children; /* a kind-3 parent counts one on here
                                            each time its script spawns one  */
     /* 0xB6 */ short          step;    /* how far into the script it is     */
-    /* 0xB8 */ short          unkB8;   /* cleared with age beside it        */
+    /* 0xB8 */ u_short        angle;   /* where round the wave tables a record
+                                          swung about a point stands; cleared
+                                          with age beside it               */
     /* 0xBA */ short          age;     /* frames since the record was taken */
-    /* 0xBC */ short          unkBC;   /* cleared with timer beside it      */
+    /* 0xBC */ short          steps;   /* frames of step_x and step_y a glide
+                                          has left; cleared with timer     */
     /* 0xBE */ short          timer;   /* counts down a frame at a time     */
     /* 0xC0 */ short          rgb[3];  /* the colour actually drawn         */
     /* 0xC6 */ short          rgb_to[3]; /* the colour it is walking toward */
@@ -176,6 +179,11 @@ typedef struct BtlObj {
 /* Taken out of the drawing pass without being freed. Set on an object, its
    shadow, its ailment marker and the marker's own attached piece together. */
 #define BTL_OBJ_HIDDEN    0x40000000
+
+/* Every layer of a summoned Persona but the first. The three persona motions
+   test it to keep the trailing copies from acting, stopping the music or
+   shaking the field - only the leading layer does any of that. */
+#define BTL_OBJ_TRAIL     0x400
 
 /* The pair that says an object is still running its script: the animating bit
    set and the one above it clear. Tested together, never on their own. */

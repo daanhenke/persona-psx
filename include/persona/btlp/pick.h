@@ -41,4 +41,16 @@ extern int  BtlPickUpdate(short *row);
 extern void BtlPickHighlight(int chosen);
 extern int  BtlPickShowPage(int page);
 
+/* Puts the picker back where it stands between choices. */
+extern void BtlPickSettle(void);
+
+/* Runs the cursor over the nine enemy slots. The answer is the slot on a
+   confirm, -1 on a cancel and BTL_PICK_WAIT while nothing has been decided;
+   the slot the cursor is on is left in *slot either way. */
+extern int BtlPickEnemy(short *slot);
+extern int BtlPickEnemyLit(short *slot);
+
+/* The enemy that cursor is on, which the analysis view reads as well. */
+extern short g_btl_enemy_slot;
+
 #endif

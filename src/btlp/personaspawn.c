@@ -49,8 +49,8 @@ extern u_long *g_load_stage[];
 #define PERSONA_LAYERS 6
 #define PERSONA_STAGGER 4
 
-/* Every layer but the first is one of the trailing copies. */
-#define BTL_OBJ_TRAIL 0x400
+/* Every layer but the first is one of the trailing copies; BTL_OBJ_TRAIL is
+   in object.h, because the persona motions read it too. */
 #define PERSONA_TRAIL_CD 0x1B
 
 /* How far a layer's colour walks in one frame. */

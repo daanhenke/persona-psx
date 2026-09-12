@@ -207,9 +207,9 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->kind = index;
             obj->children = 0;
             obj->step = 0;
-            obj->unkB8 = 0;
+            obj->angle = 0;
             obj->age = 0;
-            obj->unkBC = 0;
+            obj->steps = 0;
             obj->timer = 0;
             obj->rgb[0] = BTL_ALLOC_RGB;
             obj->rgb[1] = BTL_ALLOC_RGB;

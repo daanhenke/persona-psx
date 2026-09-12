@@ -25,7 +25,7 @@ BtlObj *BtlFxStart84(void)
     BtlObj *obj;
 
     obj = BtlOpenFxObj2(g_btl_fx_target, FX_TIMER);
-    obj->unkBC = FX_84_COUNT;
+    obj->steps = FX_84_COUNT;
     obj->y    -= FX_84_RISE;
     obj->attr &= ~BTL_OBJ_HIDDEN;
     return obj;

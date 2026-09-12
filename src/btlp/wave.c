@@ -14,12 +14,13 @@
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
+#include <persona/btlp/battle.h>
 
 #define BTL_MESH_COLS 21
 #define BTL_MESH_ROWS 10
 
-/* Entries in each wave table, and the step between neighbouring vertices. */
-#define BTL_WAVE_MASK  0x1FF
+/* The step between neighbouring vertices; BTL_WAVE_MASK is in battle.h with
+   the tables themselves. */
 #define BTL_WAVE_STEP  0x20
 
 /* How far the phase moves in a frame. */
@@ -34,8 +35,6 @@ typedef struct {
 } BtlMeshVertex;              /* 0x18 bytes */
 
 extern BtlMeshVertex g_btl_mesh[];
-extern const int     g_btl_wave_sin[];
-extern const int     g_btl_wave_cos[];
 extern u_short       g_btl_wave_phase;
 extern u_short       g_btl_mesh_phase;
 

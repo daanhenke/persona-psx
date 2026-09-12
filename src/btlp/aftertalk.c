@@ -72,7 +72,7 @@ void BtlAfterTalk(void)
                 -(rows * (PLACE_ROW_H * PLACE_FIXED)) / TALK_WALK_FRAMES;
             g_btl_actors[slot].obj->row   -= rows;
             g_btl_actors[slot].obj->motion = TALK_WALK_MOTION;
-            g_btl_actors[slot].obj->unkBC  = TALK_WALK_FRAMES;
+            g_btl_actors[slot].obj->steps  = TALK_WALK_FRAMES;
 
             o = g_btl_actors[slot].obj;
             g_btl_formation[o->row * GRID_W + (o->col2 >> 1)] = slot;

@@ -26,8 +26,17 @@ typedef struct {
 extern BtlFormation g_btl_formation_saved;
 
 /* Where a scripted encounter stands each character: one block per encounter,
-   and within it a column and a row for every Char key. The two tables split
-   the encounter range between them. */
+   and within it a column and a row for every Char key.
+
+   There is one table of ten blocks and two bases into it. Encounters under
+   0x11 index it from its own start; 0x11 and above index it from a base nine
+   blocks below, so those two land on blocks 8 and 9. The original materialises
+   that biased address rather than subtracting, which is why it reads as a
+   second array - and the address it materialises is not an object at all: it
+   falls eight words into g_btl_enemy_motion, on the tail of that table. Both
+   bases are kept as symbols because the image sets each up with a lui and an
+   addiu of its own, which writing the bias as arithmetic on the first does
+   not reproduce - gcc shares the lui and subtracts. */
 #define BTL_PLACE_CHAR      2
 #define BTL_PLACE_ENCOUNTER 0x14
 

@@ -87,6 +87,12 @@ extern u_char  g_btl_auto_confirm;  /* holds confirm down for the next read   */
 extern u_short g_btl_help_key;      /* the pad bits that turn the help off    */
 extern RECT    g_btl_clut_block;    /* where the party's palettes are put     */
 
+/* A whole turn of sine and cosine, 0x200 entries each. The floor ripples on
+   them and an object swung round a point steps an angle through them. */
+extern const int g_btl_wave_sin[];
+extern const int g_btl_wave_cos[];
+#define BTL_WAVE_MASK 0x1FF
+
 extern void BtlDrawFrame(void);
 extern void BtlDrawDebugHud(void);
 extern void BtlCheatWatch(void);

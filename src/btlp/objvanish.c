@@ -48,7 +48,7 @@ void BtlObjTickVanish(BtlObj *o)
     o->shadow->scale_x = o->scale_x;
     o->shadow->scale_y = o->scale_y;
 
-    if (--o->unkBC != 0) {
+    if (--o->steps != 0) {
         return;
     }
 

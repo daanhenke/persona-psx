@@ -21,6 +21,9 @@ extern short g_btl_talk_last_line;
 extern short g_btl_talk_said;
 extern short g_btl_talk_step;
 extern short g_btl_talk_result;
+/* Raised while a demon that has agreed to go is walking off, and cleared by
+   whatever finishes that - the persona motions among them. */
+extern u_char g_btl_talk_leaving;
 extern u_char g_btl_talk_asked;
 extern u_char g_btl_talk_last_scene;
 extern int    g_btl_talk_reply;

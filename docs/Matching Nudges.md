@@ -439,6 +439,57 @@ It found `BtlTalkScoreLine` in 560 iterations after a dozen hand variations had
 failed. Progress is written to `permuter/<target>/<Symbol>/` - read it there
 rather than piping the run through `tail`, which buffers.
 
+## `ori` in the low half means a literal, `addiu` means a symbol
+
+A full address materialised as `lui reg,0x801F / ori reg,reg,0x5354` is a number
+in the source; the same address through a symbol is `lui reg,%hi(sym) /
+addiu reg,reg,%lo(sym)`. splat prints the symbol either way for a `lui` paired
+with a *load*, so the pairing that tells the two apart is the one that takes the
+address into a register of its own.
+
+`BtlDebugMenu` has both spellings for the same byte. The line it puts up before
+the loop reaches it as `g_map_unk4`, with the relocation that comes with that;
+the step that reads and writes it every time round reaches it as
+`*(u_char *)0x801F5354`, which is the only way the whole address lands in a
+saved register. Written through the extern throughout, the address is rebuilt at
+each use and the routine comes out a callee-saved register short.
+
+- [debugmenu.c](/src/btlp/debugmenu.c) - exact with the two spellings, 94.19%
+  with either one alone.
+
+## An `int` local where the record has a byte
+
+gcc knows a `u_char` loaded with `lbu` is not negative and narrows a signed
+comparison against a constant into `sltiu`. Where the image has `slti`, what
+puts it back is taking the byte into an `int` of its own first:
+
+    move = o->actor->move;
+    if (move >= 0xA3 && move != 0xDB) {
+
+- [personamotion.c](/src/btlp/personamotion.c) - `BtlPersonaMotion02`, exact on
+  that alone. This is the opposite direction to the `sltiu` case in section 8:
+  read which one the image has and pick the spelling for it.
+
+## Two arms that differ only in a constant share their tail
+
+Compute the *part that differs* in the arms and combine it once afterwards:
+
+    if (half) { step = drop / 26; } else { step = drop / 53; }
+    o->scale_y = drop - step;
+
+Spelled `o->scale_y = drop - drop / 26;` in each arm, the subtraction is
+duplicated into the branch's delay slot instead of being shared at a label the
+two arms meet at.
+
+- [personamotion.c](/src/btlp/personamotion.c) - `BtlPersonaMotion03`, 92.71% to
+  99.35% with that and a local of its own for the second scale (section 4's
+  split direction: the value and the result are two variables, not one). The
+  residual is three words, and it is a choice between two of them - loaded
+  before the test the register is the image's but gcc lifts the divide's sign
+  fixup out of the arms, loaded inside the arm the fixup stays where the image
+  has it but the load wants a move. Seven shapes and 29,000 permuter iterations
+  found nothing under the hand version.
+
 ## A constant kept in a local of its own
 
 `BtlShowReadyMarkers` walks the party's records by slot and its marker byte by
@@ -778,6 +829,20 @@ Where the image forms the same partial sum in two steps, split the expression
 across a second local rather than assigning the same pointer twice - assigning
 it twice puts the partial sum in the pointer's own register instead of a
 scratch one.
+
+The same rule decides the `addu`'s **operand order** when a constant folds into
+the load's own offset and only two terms are left. Read it straight off the
+image:
+
+    which = species[ATTACK + a->unkBA];     /* addu v0, index, base */
+    which = (species + a->unkBA)[ATTACK];   /* addu v0, base, index */
+
+- [enemymotion6.c](/src/btlp/enemymotion6.c) - one instruction out of sixty-one,
+  and exact once the pointer was the first term written.
+- [debugequip.c](/src/btlp/debugequip.c) - 96.19% to 98.94% on
+  `equip = c->equip; cell = &equip[slot];` rather than `&c->equip[slot]`: the
+  image adds 0x20 to the record and then the slot, not the slot and then the
+  record.
 
 ## Two symbols, not one plus an offset
 

@@ -208,6 +208,12 @@ extern int BtlDownMemberPrev(int slot);
 extern int BtlPickableNext(int slot);
 extern int BtlPickablePrev(int slot);
 
+/* Reads one fighter's artwork in over whatever was there. */
+extern void BtlLoadActorGfx(int slot);
+
+/* Fills the status board in with one enemy's derived numbers. */
+extern void BtlShowEnemyStatus(int slot);
+
 /* Unlike the walkers above these stop at the ends of the party instead of
    wrapping, and answer -1 when no slot is left. */
 extern int BtlUnreadyMemberNext(int slot);
