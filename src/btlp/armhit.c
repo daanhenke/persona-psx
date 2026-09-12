@@ -20,15 +20,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 
-/* The fight's own counters, set together as the hit is armed and read by the
-   damage step. Only the values written here are known. */
-extern short g_btl_hit_mask;
-extern short g_btl_hit_walk;
-extern short g_btl_hits_left;
-
-/* Which actor the fight is resolving; BtlRollDefeatDrop reads it too. */
-extern short g_btl_hit_slot;
-
 extern void func_800C0E54(BtlObj *obj);
 
 void BtlArmHitChain(void)

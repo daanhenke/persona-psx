@@ -22,6 +22,7 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/stats.h>
+#include <persona/common/item.h>
 #include <persona/btlp/text.h>
 #include <persona/btlp/round.h>
 
@@ -101,10 +102,6 @@ void BtlChoiceSpawn(int set)
     } while (i < CHOICE_OPTIONS);
 }
 
-INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion02);
-
-INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberStrike);
-
 
 
 /* Stride of g_btl_member_scripts, by model and by the actor's script_pick,
@@ -180,8 +177,394 @@ extern int  BtlBindGfx(u_int kind, int index, u_char **image);
 extern void BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
                          int upload);
 extern short g_btl_scene_rgb[];
-extern short g_btl_hit_slot;
 extern short g_btl_arena_fade;
+
+/* Of the ten script indices a shape carries, the swing takes four: the run
+   in at 0, the one the blow itself is struck from at 1, and the two the
+   fighter is left standing in - 2 for an ordinary turn and 0 when the record
+   has been marked. */
+#define SCRIPT_RUN_IN 0
+#define SCRIPT_STRIKE 1
+#define SCRIPT_AFTER  2
+
+/* The ailment that stops a swing outright, and the slot codes the walk skips
+   over. */
+#define SWING_AIL_0C 0x0C
+
+/* Raised on a fighter the swing may not land on. */
+#define SWING_SPARED 0x4000
+
+/* Slots the target walk runs through: the five of the party and the nine
+   behind them. */
+#define SWING_SLOTS 0xE
+
+/* Frames the run in and the run back each take, and how far up the field a
+   member that has changed places lands. */
+#define SWING_FRAMES 0x14
+#define SWING_STAND  0xD20000
+#define SWING_LIFT   0x3C0000
+
+/* Cleared as the swing is set up: the bit that says the record is being
+   carried rather than standing. */
+#define SWING_CARRIED 0x20000
+
+/* The two kinds the swing poses differently for, and the message it waits
+   behind when there is nothing left to hit. */
+#define SWING_KIND_A 2
+#define SWING_KIND_B 8
+
+/* Where the party stops and the field's own slots start. */
+#define SWING_FIRST_ENEMY 5
+
+/* Where the grid puts a member back, written the way the image writes it -
+   the row biased by ten and the whole thing pulled back by 0x8C, which comes
+   to the same place memberobj.c reaches by adding 0x3C. */
+#define SWING_X_STEP   15
+#define SWING_X_BASE   (-0x3C)
+#define SWING_ROW_BIAS 10
+#define SWING_Y_STEP   20
+#define SWING_Y_BASE   (-0x8C)
+
+/* The weapon record the swing is reading. */
+extern ItemDef *g_btl_swing_item;
+
+/* The order and targets a member that swapped places had before it did, put
+   back as the turn ends. */
+extern u_char  D_800F4BA4;
+extern u_short D_800F5AAC;
+
+/* The line that goes up when the swing finds nothing to land on. */
+extern u_char D_800CFA00;
+
+/* Two bytes 0x1E into the same row of g_btl_member_scripts: which voice bank
+   the fighter speaks the swing from, one per hand. */
+extern u_char g_btl_member_voice[];
+
+extern int  BtlMarkMoveArea(BtlActor *a, int area, int spread);
+extern int  BtlSlowestOrder(void);
+extern int  func_80094E60(int hits);
+extern void BtlReadVoiceBank(int entry);
+extern void BtlOpenVoiceBank(void);
+extern void BtlMemberStrike(BtlObj *o);
+
+#ifdef NON_MATCHING
+/* The swing: entry 2 of g_btl_member_motion, and entry 0x0C as well.
+ *
+ * Nought settles what is being swung - which hand, which weapon record, which
+ * voice - and works out the run in; one carries the record there; two opens
+ * the voice and either finds a target or puts the "nothing to hit" line up.
+ * Three is the walk that picks the next slot out of the acting fighter's
+ * target mask, four sounds the swing, five hands over to BtlMemberStrike, and
+ * six closes that hit and goes back to three for the next one. Seven and
+ * eight carry the record home; nine and ten are the two ways a turn that
+ * never landed anything ends.
+ */
+void BtlMemberMotion02(BtlObj *o)
+{
+    /* Thirty-two bytes of frame nothing here writes; the routine is the
+       wrong length without them. */
+    long          scratch[8];
+    BtlActor     *a;
+    const u_char *scripts;
+    u_short       walk;
+    u_short       kept;
+    int           done;
+    int           slot;
+    int           i;
+
+    a = o->actor;
+    switch (o->phase) {
+    case 0:
+        o->attr &= ~SWING_CARRIED;
+        if (*(signed char *)&a->c.status == SWING_AIL_0C) {
+            o->phase = 0xA;
+            break;
+        }
+        if (a->script_pick != 2) {
+            g_btl_swing_item = &g_item_defs[a->c.equip[0]];
+            BtlReadVoiceBank(g_btl_member_voice[a->c.key
+                                                * MEMBER_SCRIPT_MODEL]);
+        } else {
+            g_btl_swing_item = &g_item_defs[a->c.equip[1]];
+            BtlReadVoiceBank(g_btl_member_voice[a->c.key * MEMBER_SCRIPT_MODEL
+                                                + 1]);
+        }
+        g_btl_hit_slot = a->order;
+        if (g_btl_actors[g_btl_hit_slot].c.key == 0) {
+            if (BtlMarkMoveArea(a, g_btl_swing_item->area,
+                                g_btl_swing_item->swing)
+                < 0) {
+                o->phase = 0xA;
+                break;
+            }
+            slot = BtlSlowestOrder();
+            g_btl_hit_slot = slot;
+            if ((short)slot < 0) {
+                o->phase = 0xA;
+                break;
+            }
+            g_btl_hit_slot = slot + SWING_FIRST_ENEMY;
+            a->order = g_btl_hit_slot;
+        }
+        g_btl_hits_left = func_80094E60(g_btl_swing_item->hits);
+        scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
+                                        + o->kind * MEMBER_SCRIPT_MODEL];
+        BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+            scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+        if (o->motion == 0xC) {
+            o->step_x = (g_btl_actors[g_btl_hit_slot].obj->x - o->x)
+                        / SWING_FRAMES;
+            o->step_y = (SWING_STAND - o->y) / SWING_FRAMES;
+        } else {
+            o->step_x = (g_btl_actors[g_btl_hit_slot].obj->x - o->x)
+                        / SWING_FRAMES;
+            o->step_y = (g_btl_actors[g_btl_hit_slot].obj->y - o->y
+                         + SWING_LIFT)
+                        / SWING_FRAMES;
+        }
+        o->steps = SWING_FRAMES;
+        o->phase++;
+        break;
+    case 1:
+        if (g_btl_hit_slot < SWING_FIRST_ENEMY || a->script_pick == 0
+            || (a->script_pick != 2 && o->kind != SWING_KIND_A
+                && o->kind != SWING_KIND_B)) {
+            o->x += o->step_x;
+            o->y += o->step_y;
+            if (--o->steps != 0) {
+                return;
+            }
+            o->x2 = o->x;
+            o->y2 = o->y;
+            scripts = &g_btl_member_scripts[SCRIPT_STRIKE
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
+            BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+                scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+            o->steps = SWING_FRAMES;
+            o->phase++;
+        } else {
+            scripts = &g_btl_member_scripts[SCRIPT_STRIKE
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
+            BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+                scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+            o->phase++;
+        }
+        break;
+    case 2:
+        if ((o->attr & BTL_OBJ_ANIMATING) != 0) {
+            return;
+        }
+        if (g_cd_busy != -1) {
+            return;
+        }
+        BtlOpenVoiceBank();
+        if (g_btl_hits_left == 0) {
+            if (g_btl_msg_speed != 2) {
+                BtlOpenMessage(1, 1, &D_800CFA00, 8, 0xC);
+                if (g_btl_msg_speed == 0) {
+                    i = 0x3C;
+                } else {
+                    i = 0x1E;
+                }
+                g_btl_msg_timer = i;
+            }
+            o->timer = 0x3C;
+            o->phase = 9;
+            break;
+        }
+        g_btl_hit_walk = -1;
+        g_btl_hit_mask = 1;
+        a->targets &= ~(1 << g_btl_hit_slot);
+        o->phase += 2;
+        break;
+    case 3:
+        do {
+            kept = g_btl_hits_left;
+            done = 0;
+            if ((g_btl_swing_item->swing & 1) != 0
+                || g_btl_swing_item->swing == 8) {
+                if (g_btl_actors[g_btl_hit_slot].c.key == 0
+                    || *(signed char *)&g_btl_actors[g_btl_hit_slot].c.status
+                           == BTL_STATUS_DOWN
+                    || (done = 1,
+                        (g_btl_actors[g_btl_hit_slot].flags & SWING_SPARED)
+                            != 0)) {
+                    g_btl_hits_left = 0;
+                    done = 1;
+                }
+            } else {
+                walk = g_btl_hit_walk;
+                if ((short)g_btl_hit_walk < SWING_SLOTS) {
+                    do {
+                        if ((a->targets & g_btl_hit_mask) != 0
+                            && g_btl_actors[(short)walk].c.key != 0
+                            && *(signed char *)&g_btl_actors[(short)walk]
+                                    .c.status
+                                   != BTL_STATUS_DOWN
+                            && (g_btl_actors[(short)walk].flags & SWING_SPARED)
+                                   == 0) {
+                            g_btl_hit_slot = walk;
+                            done = 1;
+                            break;
+                        }
+                        walk = g_btl_hit_walk + 1;
+                        g_btl_hit_mask <<= 1;
+                        g_btl_hit_walk = walk;
+                    } while ((short)walk < SWING_SLOTS);
+                    if ((short)g_btl_hit_walk < SWING_SLOTS) {
+                        continue;
+                    }
+                }
+                done = 1;
+                if ((g_btl_swing_item->swing & 2) == 0) {
+                    g_btl_hits_left = 0;
+                    done = 1;
+                } else {
+                    i = 0;
+                    g_btl_hits_left = 0;
+                    a->targets |= 1 << a->order;
+                    do {
+                        if (((a->targets >> (i & 0x1F)) & 1) != 0
+                            && g_btl_actors[i].c.key != 0
+                            && *(signed char *)&g_btl_actors[i].c.status
+                                   != BTL_STATUS_DOWN
+                            && (g_btl_actors[i].flags & SWING_SPARED) == 0) {
+                            done = 0;
+                            g_btl_hits_left = kept;
+                            g_btl_hit_walk = 0;
+                            g_btl_hit_mask = 1;
+                        }
+                        i++;
+                    } while (i < SWING_SLOTS);
+                }
+            }
+        } while (done == 0);
+        o->phase++;
+        /* fallthrough */
+    case 4:
+        if (g_btl_hits_left > 0) {
+            if (g_btl_hit_slot < SWING_FIRST_ENEMY) {
+                BtlSoundOpen(g_btl_banks, 6,
+                             g_btl_actors[g_btl_hit_slot].c.key);
+            } else {
+                BtlSoundOpen(g_btl_slot_banks, 6,
+                             (g_btl_actors[g_btl_hit_slot].obj->unkCD >> 1)
+                                 - SWING_FIRST_ENEMY);
+            }
+            o->phase++;
+            break;
+        }
+        if (g_btl_place_party != 0) {
+            a->action = 0xFF;
+        }
+        if (a->unkD5 != 0) {
+            a->unkD8 = 1;
+            a->unkD5 = 0;
+            a->order = D_800F4BA4;
+            a->targets = D_800F5AAC;
+            if (a->padD6[1] != 0) {
+                a->action = 0;
+            } else {
+                a->action = 0xFF;
+            }
+        }
+        BtlRefreshAttacks();
+        BtlSoundClose(6);
+        if ((o->attr & SWING_CARRIED) != 0) {
+            scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
+        } else {
+            scripts = &g_btl_member_scripts[SCRIPT_AFTER
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
+        }
+        BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+            scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+        o->phase = 7;
+        break;
+    case 5:
+        BtlMemberStrike(o);
+        break;
+    case 6:
+        if (g_btl_actors[g_btl_hit_slot].obj->motion != 0) {
+            return;
+        }
+        if (o->timer != 0) {
+            return;
+        }
+        BtlSoundClose(6);
+        if ((g_btl_swing_item->swing & 4) == 0) {
+            g_btl_hits_left--;
+        }
+        if ((short)g_btl_hit_walk < 0) {
+            i = 1;
+        } else {
+            i = g_btl_hit_mask << 1;
+        }
+        g_btl_hit_mask = i;
+        g_btl_hit_walk++;
+        o->phase = 3;
+        break;
+    case 7:
+        if ((o->attr & BTL_OBJ_ANIMATING) != 0) {
+            return;
+        }
+        o->timer = 0x1E;
+        o->phase++;
+        break;
+    case 8:
+        if (o->timer != 0) {
+            return;
+        }
+        if (g_btl_hit_slot < SWING_FIRST_ENEMY || a->script_pick == 0
+            || (a->script_pick != 2 && o->kind != SWING_KIND_A
+                && o->kind != SWING_KIND_B)) {
+            o->x -= o->step_x;
+            o->y -= o->step_y;
+            if (--o->steps != 0) {
+                return;
+            }
+            o->x = (o->col2 * SWING_X_STEP + SWING_X_BASE) << 16;
+            o->y = ((*(u_char *)&o->row + SWING_ROW_BIAS) * SWING_Y_STEP
+                    + SWING_Y_BASE)
+                   << 16;
+            o->motion = 0;
+            o->x2 = o->x;
+            o->attr &= ~SWING_CARRIED;
+            o->y2 = o->y;
+        } else {
+            o->motion = 0;
+            o->attr &= ~SWING_CARRIED;
+        }
+        break;
+    case 9:
+        if (o->timer != 0) {
+            return;
+        }
+        BtlCloseMessage(0);
+        o->phase = 4;
+        break;
+    case 0xA:
+        if (g_cd_busy != -1) {
+            return;
+        }
+        if (a->unkD5 != 0) {
+            a->unkD8 = 1;
+            a->unkD5 = 0;
+            a->order = D_800F4BA4;
+            a->targets = D_800F5AAC;
+        }
+        BtlRefreshAttacks();
+        BtlSoundClose(6);
+        o->motion = 0;
+        o->phase = 0;
+        break;
+    }
+}
+#else
+INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion02);
+#endif
+
+INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberStrike);
 
 /* The ailments that stop a cast before it starts. None of them is named
    anywhere else in the tree, so they are spelt by their codes: 0x0C once it
@@ -251,6 +634,7 @@ extern BtlObj *func_80084E10(int kind, long *pos);
 extern BtlObj *func_80084A14(int kind, int col, int row);
 extern void    func_80097158(BtlStats *s);
 
+#ifdef NON_MATCHING
 /* The cast: what a member's turn runs through when the move is a spell and
  * the Persona has to come out to make it.
  *
@@ -569,6 +953,9 @@ void BtlMemberMotion06(BtlObj *o)
         break;
     }
 }
+#else
+INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion06);
+#endif
 
 /* The Persona coming out: the file is read while the member takes the pose,
    the fanfare behind it, and then the trail is thrown round the member and

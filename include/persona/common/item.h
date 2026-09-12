@@ -33,7 +33,19 @@ typedef struct {
     /* 0x15 */ u_char bonus4;   /* high nibble stat[4]                     */
     /* 0x16 */ u_char power;
     /* 0x17 */ u_char rate;
-    /* 0x18 */ u_char pad18[8];
+    /* 0x18 */ u_char pad18[1];
+    /* 0x19 */ u_char area;     /* how wide a swing reaches: BtlMarkMoveArea
+                                   takes this and `swing` together to mark the
+                                   cells it can land on                     */
+    /* 0x1A */ u_char swing;    /* how the swing is aimed. Bit 0, and the whole
+                                   byte being 8, both mean it stays on the slot
+                                   it was given; bit 1 lets the turn look for
+                                   another slot once the mask is walked out;
+                                   bit 2 makes a hit free rather than counting
+                                   against the number left                  */
+    /* 0x1B */ u_char hits;     /* what 0x80094E60 turns into the number of
+                                   times the swing lands                    */
+    /* 0x1C */ u_char pad1C[4];
 } ItemDef;                      /* 0x20 bytes */
 
 extern ItemDef g_item_defs[];

@@ -21,43 +21,33 @@
 #ifdef NON_MATCHING
 void BtlApproach(short *cur, const short *target, int step)
 {
-    int   now;
-    int   sum;
-    int   next;
-    int   up;
-    int   down;
+    int unused[2];
+    int now;
+    int up;
+    int sum;
 
     now = *cur;
-    if (now == *target) {
-        return;
-    }
-    if (now < *target) {
-        sum = step + now;
-        *cur = sum;
-        up = sum;
-        next = (short)sum;
-        if (next < 0) {
-            up = 0;
-        } else if (*target < next) {
-            up = *target;
-        }
-        *cur = up;
-    } else {
-        sum = now - step;
-        *cur = sum;
-        next = (short)sum;
-        if (next < *target) {
-            down = *target;
-        } else {
-            if (next > APPROACH_MAX) {
-                next = APPROACH_MAX;
+    up = now;
+    if (now != *target) {
+        if (now < *target) {
+            sum = step + up;
+            *cur = sum;
+            up = sum;
+            if (*cur >= 0) {
+                if (*target < *cur) {
+                    up = *target;
+                }
+            } else {
+                up = 0;
             }
-            down = next;
+            *cur = up;
+        } else {
+            *cur = up - step;
+            *cur = *cur < *target ? *target
+                : (*cur > APPROACH_MAX ? APPROACH_MAX : *cur);
         }
-        *cur = down;
     }
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/approach", BtlApproach);
 #endif
-

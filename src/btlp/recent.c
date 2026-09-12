@@ -10,7 +10,6 @@
  * answer into a bit number, so the values stored here are small.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/offer.h>
 
 #define BTL_RECENT 4
@@ -61,12 +60,10 @@ void BtlPushRecent(int value)
     g_btl_recent[BTL_RECENT] = end;
 }
 
-#ifdef NON_MATCHING
 void BtlDropRecent(int value)
 {
+    int *scan;
     int *base;
-    int *p;
-    int *q;
     int *dst;
     int  none;
     int  gone;
@@ -75,40 +72,30 @@ void BtlDropRecent(int value)
 
     i = 0;
     gone = BTL_RECENT_NONE;
-    p = g_btl_recent;
+    scan = g_btl_recent;
     while (i < BTL_RECENT) {
-        if (*p == value) {
-            *p = gone;
+        if (*scan == value) {
+            *scan = gone;
             break;
         }
         i++;
-        p++;
+        scan++;
     }
     i = 0;
     none = BTL_RECENT_NONE;
     base = g_btl_recent;
-    p = base;
-    do {
-        if (*p == none && i < BTL_RECENT) {
-            q = base + i;
-            dst = p;
-            j = i;
-            do {
-                j++;
-                if (*q != none) {
-                    *dst = *q;
-                    *q = none;
+    for (; i < BTL_RECENT; i++) {
+        if (base[i] == none) {
+            for (j = i; j < BTL_RECENT; j++) {
+                dst = &base[i];
+                if (base[j] != none) {
+                    *dst = base[j];
+                    base[j] = none;
                 }
-                q++;
-            } while (j < BTL_RECENT);
+            }
         }
-        i++;
-        p++;
-    } while (i < BTL_RECENT);
+    }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/recent", BtlDropRecent);
-#endif
 
 
 int BtlRecentOther(int value)

@@ -243,6 +243,16 @@ extern u_char BtlChooseEnemyMove(BtlActor *a);
 extern int   D_800F4D5C;
 extern int   D_800F4E20;
 extern int   D_800F4AA4;
+/* The four counters the fight resolves a hit through, set together as one is
+   armed and walked down as it lands. `left` is how many are still to come,
+   `walk` the slot the target search has reached and `mask` its bit, and
+   `slot` whichever fighter is being resolved right now. armhit.c arms them
+   and BtlMemberMotion02 walks them. */
+extern short g_btl_hits_left;
+extern short g_btl_hit_walk;
+extern short g_btl_hit_mask;
+extern short g_btl_hit_slot;
+
 extern int   D_800F5A60;
 extern int   D_800F5D58;
 

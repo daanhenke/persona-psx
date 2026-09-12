@@ -112,7 +112,7 @@ segments:
       # BtlMemberMotion05's switch table, which memberact.c emits itself.
       # The two tables in front of it belong to the same unit and join
       # this segment as their routines come out of asm.
-      - [0x1144, .rodata, memberact]
+      - [0x119C, .rodata, memberact]
       - [0x11B0, rodata, btlp_rodata6b1]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]

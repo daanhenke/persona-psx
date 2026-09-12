@@ -3310,6 +3310,7 @@ g_btl_models                  = 0x800E3518; // type:u32 size:0x15
 g_btl_member_scripts          = 0x800E5A05; // type:u8 size:0x18F
 g_btl_talk_motion             = 0x800E5A0E;
 g_btl_morph_scripts           = 0x800E5A19;
+g_btl_member_voice            = 0x800E5A23; // type:u8 size:0x2
 g_btl_persona_gfx             = 0x800E5B94; // size:0xF
 g_btl_encounters              = 0x800E6204; // type:u32 size:0x2400
 
