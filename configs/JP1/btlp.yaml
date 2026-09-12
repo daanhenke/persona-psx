@@ -511,7 +511,7 @@ segments:
       - [0x59BC0, c, fxspell84]
       - [0x59C14, asm, btlp_69_c_y]
       - [0x59FEC, c, fxspell86]
-      - [0x5A028, asm, btlp_69_c_z]
+      - [0x5A028, c, fxstep86]
       - [0x5A294, c, fxspell87]
       - [0x5A2D0, asm, btlp_69_c_aa]
       - [0x5AAA8, c, fxspell92]
