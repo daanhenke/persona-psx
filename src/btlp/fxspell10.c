@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - a sheet that rises off the field, and a step handler
  * nothing reaches.  BTLP only.
- *   0x800B7E2C BtlFxStepUnused  0x800B7F88 BtlFxStart10
+ *   0x800B7E2C BtlFxStepUnused2  0x800B7F88 BtlFxStart10
  *
  * BtlFxStart10 lays a five-wide sheet over the side being aimed at and gives
  * every record a standing lift, so the whole sheet drifts up the screen as it
@@ -8,7 +8,7 @@
  * move 0x11 - the one whose own start handler is nothing but a call to this
  * one - gets three rows, and everything else gets one.
  *
- * BtlFxStepUnused in front of it is a step handler of the ordinary shape,
+ * BtlFxStepUnused2 in front of it is a step handler of the ordinary shape,
  * four phases and a hit armed at the end, but no record in g_btl_spell_fx
  * points at it, nothing calls it, and no word anywhere in BTLP.BIN holds its
  * address - the same way move 0x0F's second start handler is unreachable. It
@@ -47,7 +47,7 @@
    added to the drift every frame. */
 #define FX_10_LIFT 0x20000
 
-void BtlFxStepUnused(BtlObj *o)
+void BtlFxStepUnused2(BtlObj *o)
 {
     switch (o->phase) {
     case 0:

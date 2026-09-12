@@ -458,7 +458,7 @@ segments:
       - [0x533A0, c, fxsheet2]
       - [0x53410, c, fxsweep]
       - [0x53584, c, fxobj]
-      - [0x53640, asm, btlp_69_c]
+      - [0x53640, c, fxstep09]
       - [0x53A4C, c, fxspell0f]
       - [0x53A8C, c, fxspell10]
       - [0x53DA8, c, fxspell11]
