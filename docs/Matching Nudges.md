@@ -1255,3 +1255,55 @@ The signedness reads the same way: `lb` against a `u_char` field means this
 translation unit read it as a `signed char`, the way `lhu` against a `short`
 means unsigned. `BtlFxStep2F` reads `Char.status` with `lb` where char.h has it
 unsigned, and casting was the whole difference on that instruction.
+
+## A magic multiply's post-shift is part of the divisor
+
+`mult x, 0x2AAAAAAB; mfhi; sra 2` is not a divide by six with a stray shift -
+it is a divide by twenty-four. Read the shift as part of the constant before
+believing the multiply: `mulhi(x, M)` gives `x / 6` and the `sra 2` finishes
+the job. Writing the six compiles, links, and is wrong by a factor of four.
+
+- [fxspelle5.c](/src/btlp/fxspelle5.c) - the step a fleeing enemy is given is
+  its distance over the twenty-four frames it has, which is also why the two
+  constants are the same number.
+
+The tell that a divisor is *not* what it looks: gcc emits no post-shift for the
+plain case, so a `sra` between the `mfhi` and the sign fixup always means the
+divisor is larger than the multiply alone says.
+
+## Two constants that happen to be equal must not share
+
+`g_btl_clut_fading |= 1 << g_btl_hit_slot;` and `i = 1;` next to each other
+give gcc one register holding 1 and two uses of it; the image materialises the
+one twice. Putting the shift *before* the counter's initialiser is enough - the
+counter is then no longer live when the shift needs its own.
+
+- [fxstep86.c](/src/btlp/fxstep86.c) - 89.94% to exact with that and the line
+  below.
+
+## Which of two stores is written first decides how the scheduler pairs them
+
+Where two fields of the same record are set back to back and the diff has them
+in each other's slots, the source order is the lever and it is not always the
+image's store order - the scheduler reverses a pair as readily as it keeps one.
+
+    n->kind = o->kind;          /* written first  */
+    n->mark_num = FX_COPY_MARK; /* stored first   */
+
+- [fxstep09.c](/src/btlp/fxstep09.c) - 99.65% to exact; a local for the kind
+  and either store order got the load hoisted but left the registers swapped,
+  and only writing the kind first fixed both.
+- [fxstep86.c](/src/btlp/fxstep86.c) - the target's own word cleared before its
+  record is reached for, though the image stores it after the record's load.
+
+## One routine can want both arm shapes
+
+The same expression twice in one routine does not want the same treatment
+twice. `BtlFxStep09` sets its record's step from the acting side in two places:
+the first is an assignment, and the image writes the store out in both arms; the
+second is a `+=`, and the image loads the field once and preloads the else
+value. Written the same way both times it is wrong in one of them, whichever
+way round you choose.
+
+Read each occurrence's own branch in the image - a `j` between the arms means
+write them out, no `j` means the ternary.
