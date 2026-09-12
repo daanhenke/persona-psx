@@ -39,9 +39,9 @@ extern int     g_btl_voice_base;
 #define BTL_VOICE_BUFFER 0x801A1200
 #define BTL_VOICE_SEPS   1
 
-#define g_btl_voice_vb  (*(u_char **)0x801A1200)
-#define g_btl_voice_vh  (*(u_char **)0x801A1204)
-#define g_btl_voice_seq (*(u_long **)0x801A1208)
+extern u_char *g_btl_voice_vb;
+extern u_char *g_btl_voice_vh;
+extern u_long *g_btl_voice_seq;
 
 extern void BtlLoadVoiceBank(int entry);
 extern void BtlReadVoiceBank(int entry);

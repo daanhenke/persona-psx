@@ -41,12 +41,11 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
     const u_char     *record;
     const BtlStats *p;
     int               i;
-    int               persona;
 
     i = g_btl_offer[offer_slot].persona;
-    persona = g_btl_actors[slot].c.list[g_btl_actors[slot].c.entry];
+    offer_slot = g_btl_actors[slot].c.list[g_btl_actors[slot].c.entry];
     record = g_btl_demon_talk_profiles[i];
-    p = &g_btl_personas[persona];
+    p = &g_btl_personas[offer_slot];
     i = 0;
     if (p->key == 0) {
         return 0;

@@ -12,7 +12,6 @@
  * side, and hands out one share for every fighter it has over the other side.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <rand.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/damage.h>
@@ -23,13 +22,13 @@
  * is not aiming at all. Past those, a target that cannot move is hit whatever
  * the numbers say - and the test for that is the whole of a loop the compiler
  * was left to work out is the same answer thirty-two times over. */
-#ifdef NON_MATCHING
 int BtlRollHit(int ownCount, int accuracy, int selfStatus, int foeCount,
                int evade, int foeStatus)
 {
     int chance;
     int spare;
     int raw;
+    int bonus;
     int difference;
     int helpless;
     int i;
@@ -70,12 +69,11 @@ int BtlRollHit(int ownCount, int accuracy, int selfStatus, int foeCount,
     }
 
     chance = (BTL_ROLL_MAX - raw) / ownCount * spare;
-    chance = (raw + chance) < (rand() & BTL_ROLL_MAX);
+    /* Keep a separate copy so the final sum adds raw before the bonus. */
+    bonus = chance;
+    chance = (raw + bonus) < (rand() & BTL_ROLL_MAX);
     return !chance;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/damage", BtlRollHit);
-#endif
 
 /* Whether it is a critical. A petrified target is a special case with its own
  * curve - luck alone, taken half again as far, and allowed past a certainty -

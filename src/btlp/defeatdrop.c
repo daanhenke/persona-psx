@@ -33,7 +33,7 @@
 #define DROP_ODDS_MAX  255
 
 /* Which actor the fight is resolving. */
-extern short D_800F4A88;
+extern short g_btl_hit_slot;
 
 void BtlRollDefeatDrop(BtlActor *by, BtlActor *dead)
 {
@@ -77,6 +77,6 @@ void BtlRollDefeatDrop(BtlActor *by, BtlActor *dead)
 
     if (odds >= (rand() & 0xFF)) {
         g_btl_drop_item =
-            g_persona_data[g_btl_actors[D_800F4A88].c.key].drop & DROP_ITEM_MASK;
+            g_persona_data[g_btl_actors[g_btl_hit_slot].c.key].drop & DROP_ITEM_MASK;
     }
 }

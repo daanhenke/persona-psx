@@ -22,12 +22,12 @@
 
 /* The fight's own counters, set together as the hit is armed and read by the
    damage step. Only the values written here are known. */
-extern short D_800F4984;
-extern short D_800F49D4;
-extern short D_800F4C44;
+extern short g_btl_hit_mask;
+extern short g_btl_hit_walk;
+extern short g_btl_hits_left;
 
 /* Which actor the fight is resolving; BtlRollDefeatDrop reads it too. */
-extern short D_800F4A88;
+extern short g_btl_hit_slot;
 
 extern void func_800C0E54(BtlObj *obj);
 
@@ -36,10 +36,10 @@ void BtlArmHitChain(void)
     int slot;
 
     slot = g_btl_actors[g_btl_actor_turn].order;
-    D_800F4C44 = 9;
-    D_800F49D4 = -1;
-    D_800F4984 = 1;
-    D_800F4A88 = slot;
+    g_btl_hits_left = 9;
+    g_btl_hit_walk = -1;
+    g_btl_hit_mask = 1;
+    g_btl_hit_slot = slot;
     g_btl_actors[g_btl_actor_turn].targets &= ~(1 << slot);
 }
 
@@ -48,10 +48,10 @@ void BtlArmHitOne(void)
     int slot;
 
     slot = g_btl_actors[g_btl_actor_turn].order;
-    D_800F4C44 = 1;
-    D_800F49D4 = -1;
-    D_800F4984 = 1;
-    D_800F4A88 = slot;
+    g_btl_hits_left = 1;
+    g_btl_hit_walk = -1;
+    g_btl_hit_mask = 1;
+    g_btl_hit_slot = slot;
     g_btl_actors[g_btl_actor_turn].targets &= ~(1 << slot);
 }
 

@@ -21,6 +21,13 @@
 extern u_short g_btl_pack_offsets[];
 extern int     g_btl_pack_base;
 
+/* The Persona pack: one start sector per graphics id, an entry running to
+   where the next one begins, so a length is always a subtraction.
+   summonpersona.c emits it. The entries past the last Persona are the
+   summon's own artwork, which is why BtlMemberMotion05 indexes the table
+   beyond where the graphics ids stop. */
+extern u_short g_btl_persona_sectors[];
+
 /* The demon voice banks. */
 extern u_short g_btl_pack_bank_sectors[];
 extern int     g_btl_pack_bank_base;

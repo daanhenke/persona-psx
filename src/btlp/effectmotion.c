@@ -263,10 +263,8 @@ INCLUDE_ASM("btlp/nonmatchings/effectmotion", BtlEffectDrawNumber);
 /* A run of lines out of the list the row points at, one under the next. It
    stops early on a line of -1, and on a drawer that says it could not fit
    what it was given. */
-#ifdef NON_MATCHING
 int BtlEffectDrawLines(const BtlEffectRow *row)
 {
-    SVECTOR unused;
     const BtlEffectRow *rr;
     const BtlEffectRow *r;
     const u_char **line;
@@ -278,23 +276,17 @@ int BtlEffectDrawLines(const BtlEffectRow *row)
     d = &r->u;
     rr = r;
     line = &((const u_char **)rr->text)[d->list.first];
-    if (rr->u.list.count > 0) {
-        do {
-            if (*line == (const u_char *)-1) {
-                return 1;
-            }
-            if (BtlDrawGlyphs(*line,
-                              g_btl_clut[EFFECT_CLUT + ((row->kind >> 4) & 7)])
-                == 0) {
-                return 0;
-            }
-            n++;
-            g_btl_glyph_y += 8;
-            line++;
-        } while (n < rr->u.list.count);
+    for (; n < rr->u.list.count; n++) {
+        if (*line == (const u_char *)-1) {
+            return 1;
+        }
+        if (BtlDrawGlyphs(*line,
+                          g_btl_clut[EFFECT_CLUT + ((row->kind >> 4) & 7)])
+            == 0) {
+            return 0;
+        }
+        g_btl_glyph_y += 8;
+        line++;
     }
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectmotion", BtlEffectDrawLines);
-#endif

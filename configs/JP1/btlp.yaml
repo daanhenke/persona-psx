@@ -109,6 +109,11 @@ segments:
       # BtlHoldForMarkers's switch table, which the C emits itself.
       - [0xD98, .rodata, holdmarkers]
       - [0xDB0, rodata, btlp_rodata6b]
+      # BtlMemberMotion05's switch table, which memberact.c emits itself.
+      # The two tables in front of it belong to the same unit and join
+      # this segment as their routines come out of asm.
+      - [0x1144, .rodata, memberact]
+      - [0x11B0, rodata, btlp_rodata6b1]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]
       - [0x1AD4, c, drawfront]
@@ -557,6 +562,6 @@ segments:
       - [0x6D054, data, btlp_data2b]
       # The Persona sector table, which summonpersona.c now emits itself.
       - [0x752B4, .data, summonpersona]
-      - [0x75594, data, btlp_data2a]
+      - [0x7559C, data, btlp_data2a]
       - [0x84264, bss, btlp_bss]
   - [0x91F0C]

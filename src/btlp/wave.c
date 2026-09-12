@@ -13,7 +13,6 @@
  * tearing away from whatever is drawn around it.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/battle.h>
 
 #define BTL_MESH_COLS 21
@@ -38,13 +37,13 @@ extern BtlMeshVertex g_btl_mesh[];
 extern u_short       g_btl_wave_phase;
 extern u_short       g_btl_mesh_phase;
 
-#ifdef NON_MATCHING
 void BtlWaveMesh(void)
 {
     BtlMeshVertex *v;
     const int     *sine;
     const int     *cosine;
     const int     *phase;
+    int           *xy;
     u_int          along;
     u_int          down;
     u_int          start;
@@ -59,32 +58,41 @@ void BtlWaveMesh(void)
     start = g_btl_wave_phase;
     cosine = g_btl_wave_cos;
     down = start;
-    do {
+next_row:
+    {
         col = 0;
-        phase = &sine[down & BTL_WAVE_MASK];
+        phase = (const int *)((down & BTL_WAVE_MASK) * sizeof(int)
+                              + (u_int)sine);
+        xy = &v->y;
         along = start;
+next_column:
+        /* Keep the coordinate work in its own scope; the vertex advances
+           afterwards so the two walking values retain separate lifetimes. */
         do {
             if (col != 0 && col != last) {
-                v->x = *phase * 4 + v->rest_x;
+                v->x = *phase * 4 + xy[1];
             }
             col++;
             /* The row test also excludes 15, which a ten-row grid never
                reaches; it is in the original and reproducing it costs a
                comparison that would otherwise not be there. */
             if (row != 0 && row != BTL_MESH_ROWS - 1 && row != 15) {
-                v->y = cosine[along & BTL_WAVE_MASK] * 8 + v->rest_y;
+                xy[0] = cosine[along & BTL_WAVE_MASK] * 8 + xy[2];
             }
             along += BTL_WAVE_STEP;
-            v++;
-        } while (col < BTL_MESH_COLS);
+            xy += sizeof(BtlMeshVertex) / sizeof(int);
+        } while (0);
+        v++;
+        if (col < BTL_MESH_COLS) {
+            goto next_column;
+        }
         row++;
         down += BTL_WAVE_STEP;
-    } while (row < BTL_MESH_ROWS);
+    }
+    if (row < BTL_MESH_ROWS) {
+        goto next_row;
+    }
 
     g_btl_wave_phase += BTL_WAVE_SPEED;
     g_btl_mesh_phase += BTL_WAVE_SPEED;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/wave", BtlWaveMesh);
-#endif
-
