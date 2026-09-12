@@ -2349,7 +2349,7 @@ BtlFxStart31                  = 0x800B9C08; // type:func size:0x28
 //--- PA: 0x055890   VA: 0x800B9C30   subsegment: asm, btlp_69_c_k
 //----------------------------------------------------------------
 BtlFxStart32                  = 0x800B9C30; // type:func size:0x128
-func_800B9D58                 = 0x800B9D58; // type:func size:0x98
+BtlOpenFxStack                = 0x800B9D58; // type:func size:0x98
 BtlFxStart33                  = 0x800B9DF0; // type:func size:0x100
 BtlFxStep33                   = 0x800B9EF0; // type:func size:0x368
 
@@ -3233,6 +3233,12 @@ g_btl_spell_fx                = 0x800D0484; // size:0xF70
 //-----------------------------------------------------------------
 g_btl_fx_nine_order           = 0x800D1408; // type:u8 size:0x9
 g_btl_fx_ring_cells           = 0x800D1414; // type:u8 size:0x10
+g_btl_fx_lift                 = 0x800D1424; // type:s32 size:0xC
+g_btl_fx_lift_pad             = 0x800D1430; // type:s32 size:0x4
+g_btl_fx_high                 = 0x800D1474; // type:s32 size:0xC
+g_btl_fx_high_pad             = 0x800D1480; // type:s32 size:0x4
+g_btl_fx_centre               = 0x800D1484; // type:s32 size:0xC
+g_btl_fx_centre_pad           = 0x800D1490; // type:s32 size:0x4
 D_800D1494                    = 0x800D1494; // type:u8 size:0x10
 g_btl_fx_spread               = 0x800D14A4; // type:u32 size:0x70
 g_btl_fx_middle               = 0x800D1514; // type:s32 size:0xC

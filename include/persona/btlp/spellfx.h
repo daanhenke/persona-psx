@@ -112,6 +112,17 @@ extern signed char g_btl_fx_shift[];
    units toward the camera, written out in the data rather than worked out. */
 extern long g_btl_fx_middle[];
 
+/* Three more of the same: a position written out in the data rather than
+   worked out, each nothing across and nothing along the field and a depth
+   toward the camera. Move 0x72's is the same sixty-four units as
+   g_btl_fx_middle - the overlay carries two copies of it, the way it carries
+   two of BtlOpenFxObj - and move 0x39's is eighty-eight. The first is shared
+   by moves 0x39 and 0x3A, which want different depths, so its own handler
+   writes the depth in before it builds. */
+extern long g_btl_fx_lift[];
+extern long g_btl_fx_high[];
+extern long g_btl_fx_centre[];
+
 /* And where move 0xE5's stands: the middle of the field exactly. */
 extern long g_btl_fx_origin[];
 
@@ -140,6 +151,7 @@ extern BtlObj *BtlStartMoveFx(int index);
 extern BtlObj *BtlOpenFxObj(int slot, int timer);
 extern BtlObj *BtlOpenFxObj2(int slot, int timer);
 extern BtlObj *BtlOpenFxLayers(int slot, int timer);
+extern BtlObj *BtlOpenFxStack(int slot);
 extern BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer);
 extern BtlObj *BtlOpenFxGrid(int table);
 
