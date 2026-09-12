@@ -176,6 +176,18 @@ typedef struct BtlObj {
    again with it - BtlObjStatusTint is the only thing that touches either. */
 #define BTL_OBJ_NO_SHADOW 0x1
 
+/* Set while a record is not to be stepped at all: the three group handlers
+   skip its motion, and the marker pulse leaves its colour where it is. */
+#define BTL_OBJ_HELD 0x8
+
+/* Set on the one record an effect stands its artwork on, which follows the
+   camera rather than the move. */
+#define BTL_OBJ_TRACKING 0x40
+
+/* Set on an effect record the negotiation drives rather than the move: its
+   group's frame handler sends it somewhere else entirely. */
+#define BTL_OBJ_ATTR_2000 0x2000
+
 #define BTL_OBJ_ANIMATING 0x10000000
 #define BTL_OBJ_STATIC    0x20000000
 

@@ -1365,12 +1365,12 @@ BtlTickPopup                  = 0x8008AAAC; // type:func size:0x164
 //--- PA: 0x026870   VA: 0x8008AC10   subsegment: asm, btlp_48
 //------------------------------------------------------------
 func_8008AC10                 = 0x8008AC10; // type:func size:0x370
-func_8008AF80                 = 0x8008AF80; // type:func size:0x44
-func_8008AFC4                 = 0x8008AFC4; // type:func size:0xFC
-func_8008B0C0                 = 0x8008B0C0; // type:func size:0x64
-func_8008B124                 = 0x8008B124; // type:func size:0x64
-D_8008B188                    = 0x8008B188; // type:func size:0x7C
-func_8008B204                 = 0x8008B204; // type:func size:0xC0
+BtlTickEffects                = 0x8008AF80; // type:func size:0x44
+BtlTickPersona                = 0x8008AFC4; // type:func size:0xFC
+BtlTickEnemy                  = 0x8008B0C0; // type:func size:0x64
+BtlTickMember                 = 0x8008B124; // type:func size:0x64
+BtlWhitenActorClut            = 0x8008B188; // type:func size:0x7C
+BtlPulsePicked                = 0x8008B204; // type:func size:0xC0
 D_8008B2C4                    = 0x8008B2C4; // type:func size:0xD0
 func_8008B394                 = 0x8008B394; // type:func size:0x7DC
 func_8008BB70                 = 0x8008BB70; // type:func size:0x1050

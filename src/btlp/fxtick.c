@@ -25,10 +25,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* The attribute bit that says this record follows the camera instead of the
-   move. Set on the one record an effect stands its artwork on. */
-#define FX_OBJ_TRACKING 0x40
-
 /* The motion BtlStartMoveFx puts every record of the chain on. */
 #define FX_MOTION 2
 
@@ -42,7 +38,7 @@ void BtlFxObjTick(BtlObj *o)
     short *dist;
 
     dist = &g_btl_intro_dist;
-    if (!(o->attr & FX_OBJ_TRACKING))
+    if (!(o->attr & BTL_OBJ_TRACKING))
     {
         step = g_btl_spell_fx[g_btl_fx_move].step;
         if (step != 0 && o->motion == FX_MOTION)
