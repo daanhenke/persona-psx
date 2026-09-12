@@ -68,7 +68,7 @@
 #define TALK_VOICE_MIN 10
 
 /* The talk scratch buffer, reached by address rather than through a symbol. */
-#define g_btl_scratch ((u_long*)0x801C0000)
+#define BTL_SCRATCH_W ((u_long *)0x801C0000)
 extern int g_btl_menu_aside;
 /* The party purse, reached by address here as it is everywhere else. */
 #define g_money (*(int*)0x801F2674)
@@ -96,7 +96,7 @@ extern void BtlPanelSetImage(int on, u_char image);
 extern void BtlPushRecent(int gauge);
 
 /* The scene's own tables live at a per-scene offset the scratch header holds. */
-#define TALK_BASE ((char*)g_btl_scratch + g_btl_scratch[2])
+#define TALK_BASE ((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[2])
 
 #ifdef NON_MATCHING
 void BtlTalkSceneDemand(void)
@@ -204,9 +204,9 @@ void BtlTalkSceneDemand(void)
                     break;
             }
 
-            offset = g_btl_scratch[0];
-            p      = (const u_char*)g_btl_scratch +
-                *(u_long*)((char*)g_btl_scratch + offset + (base->rows[g_btl_demand_kind].entry[0]) * 4);
+            offset = BTL_SCRATCH_W[0];
+            p      = (const u_char*)BTL_SCRATCH_W +
+                *(u_long*)((char*)BTL_SCRATCH_W + offset + (base->rows[g_btl_demand_kind].entry[0]) * 4);
             BtlSeqPlay(p + offset);
             BtlSeqRun();
             /* Both arms work the member's row out the same way; only the blood
@@ -393,9 +393,9 @@ void BtlTalkSceneDemand(void)
             {
                 BtlHighlightBegin(gauge);
             }
-            offset = g_btl_scratch[0];
-            p      = (const u_char*)g_btl_scratch +
-                *(u_long*)((char*)g_btl_scratch + offset + (base->rows[g_btl_demand_kind].entry[i]) * 4);
+            offset = BTL_SCRATCH_W[0];
+            p      = (const u_char*)BTL_SCRATCH_W +
+                *(u_long*)((char*)BTL_SCRATCH_W + offset + (base->rows[g_btl_demand_kind].entry[i]) * 4);
             BtlSeqPlay(p + offset);
             if (weight > TALK_VOICE_MIN - 1)
             {

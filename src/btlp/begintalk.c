@@ -95,7 +95,6 @@
 
 /* The scratch buffer, reached by address rather than through the linker's
    symbol: its low half is zero, so one lui is the whole of it. */
-#define g_btl_scratch ((u_char *)0x801C0000)
 
 /* Declared here rather than taken from persona/btlp/battle.h: hud.c
    defines it int, and the byte the call sites want is what makes the
@@ -325,9 +324,9 @@ int BtlBeginTalking(void)
                 BtlDrawFrame();
             }
 
-            dir = *(u_long *)g_btl_scratch;
-            BtlSeqPlay(g_btl_scratch + dir
-                       + *(u_long *)(g_btl_scratch + dir + *line * 4));
+            dir = *(u_long *)BTL_SCRATCH;
+            BtlSeqPlay(BTL_SCRATCH + dir
+                       + *(u_long *)(BTL_SCRATCH + dir + *line * 4));
 
             g_btl_phase = 1;
             g_btl_talking = 1;

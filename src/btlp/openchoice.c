@@ -14,9 +14,8 @@
 #define CHOICE_ROW 12
 
 /* The scratch area is reached by address, the way the rest of the work area
-   is. */
-#define g_btl_scratch      ((u_char *)0x801C0000)
-#define g_btl_choice_table (*(int *)0x801C000C)
+   is; the header word saying where the rows start has a name of its own in
+   talk.h. */
 
 extern int     g_btl_choice_shown;
 
@@ -30,7 +29,7 @@ void BtlOpenChoice(void)
     g_btl_choice_shown = g_btl_choice_row;
     BtlDrawFrame();
     BtlDrawFrame();
-    BtlMenuOpenChoices((u_short *)(g_btl_scratch + g_btl_choice_table
+    BtlMenuOpenChoices((u_short *)(BTL_SCRATCH + g_btl_choice_table
                                    + g_btl_choice_row * CHOICE_ROW));
     BtlIndicatorIcon();
 }

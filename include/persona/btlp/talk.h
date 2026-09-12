@@ -50,6 +50,25 @@ extern int     g_btl_level_gap;
 extern u_char  g_btl_talk_pair;
 extern u_short g_btl_choice_row;
 
+/* Three words of the scratch pack's header, reached by name rather than as an
+   offset off the buffer's address. The buffer itself stays a bare address -
+   0x801C0000 has nothing in its low half, so naming it would cost a word - but
+   a header word is read with a %hi/%lo pair either way, and through the name
+   the pair is the image's. How far into the pack the choice rows and the acts
+   that go with them begin, and how long the whole pack is. */
+/* The pack itself, reached two ways because the image reaches it two ways: as
+   a bare address where only the address is wanted - 0x801C0000 has nothing in
+   its low half, so one `lui` does it and naming it would cost a word - and
+   through the symbol where a word is read out of it, which is a %hi/%lo pair
+   either way and so costs nothing. */
+#define BTL_SCRATCH ((u_char *)0x801C0000)
+extern u_char g_btl_scratch[];
+
+extern int g_btl_choice_text;
+extern int g_btl_scratch_size;
+extern int g_btl_choice_table;
+extern int g_btl_choice_acts;
+
 extern void BtlTalkStart(void);
 
 /* Answers what the scene ended as; BtlRunTalkScene hands that

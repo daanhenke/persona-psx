@@ -25,16 +25,6 @@
 /* The states. Eight, ten and eleven wait for the same key and go the same way
    afterwards; only the code that put the window in one of them tells them
    apart. */
-#define WIN_DONE    0     /* settled, nothing to do            */
-#define WIN_SCRIPT  1     /* walking the script                */
-#define WIN_SETTLE  2     /* counting down to WIN_SCRIPT       */
-#define WIN_CLOSE   3     /* sliding off, then back to SETTLE  */
-#define WIN_RAISE   4     /* sliding up out of the way         */
-#define WIN_SLIDE   5     /* the slower scroll                 */
-#define WIN_LOWER   6     /* sliding back down to its place    */
-#define WIN_TYPE    7     /* typing a character a frame        */
-#define WIN_ASK     8
-#define WIN_HOLD    9     /* counting down to WIN_DONE         */
 #define WIN_ASK2    0xA
 #define WIN_ASK3    0xB
 #define WIN_CONFIRM 0xC

@@ -25,7 +25,7 @@ typedef struct {
 
 #define BTL_WINDOW_CELLS 48
 
-typedef struct {
+typedef struct BtlWindow {
     /* 0x000 */ u_char        pad000[2];
     /* 0x002 */ short         state;
     /* 0x004 */ int           answer;  /* left by the script; the sequencer's
@@ -48,6 +48,18 @@ typedef struct {
     /* 0x26E */ short         vram_y;
     /* 0x270 */ int           slide;   /* the slower scroll, two a frame    */
 } BtlWindow;                            /* 0x274 bytes */
+
+/* What `state` holds, a frame at a time. */
+#define WIN_DONE    0     /* settled, nothing to do            */
+#define WIN_SCRIPT  1     /* walking the script                */
+#define WIN_SETTLE  2     /* counting down to WIN_SCRIPT       */
+#define WIN_CLOSE   3     /* sliding off, then back to SETTLE  */
+#define WIN_RAISE   4     /* sliding up out of the way         */
+#define WIN_SLIDE   5     /* the slower scroll                 */
+#define WIN_LOWER   6     /* sliding back down to its place    */
+#define WIN_TYPE    7     /* typing a character a frame        */
+#define WIN_ASK     8
+#define WIN_HOLD    9     /* counting down to WIN_DONE         */
 
 /* Characters to a row, and the size of one in VRAM. */
 #define BTL_GLYPH_ROW 15

@@ -17,8 +17,9 @@
 #include <decomp/types.h>
 #include <libcd.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/talk.h>
 
-#define BTL_SCRATCH ((u_long *)0x801C0000)
+#define BTL_SCRATCH_W ((u_long *)BTL_SCRATCH)
 
 extern CdlFILE g_btl_files[];
 extern CdlFILE g_btl_scratch_file;
@@ -40,14 +41,14 @@ void BtlLoadScratch(int index, int from_table)
             }
             CdReadFileToAddrAsync(&g_btl_scratch_file,
                                   (g_btl_scratch_file.size + 2047) >> 11,
-                                  BTL_SCRATCH);
+                                  BTL_SCRATCH_W);
             while (g_cd_busy != -1) {
                 BtlDrawFrame();
             }
             g_btl_scratch_loaded = 1;
         }
     } else {
-        LoadFileToAddr(&g_btl_files[index], BTL_SCRATCH);
+        LoadFileToAddr(&g_btl_files[index], BTL_SCRATCH_W);
     }
-    g_btl_scratch_end = (u_long *)((int)BTL_SCRATCH + (int)BTL_SCRATCH[2]);
+    g_btl_scratch_end = (u_long *)((int)BTL_SCRATCH_W + g_btl_scratch_size);
 }

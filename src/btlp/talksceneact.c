@@ -55,7 +55,7 @@
 #define OFFER_RANK_BEST 1
 
 /* Not matched yet: the original reaches every field of the record as
-   %lo(g_btl_scratch + n)(reg), which is the array-indexed form rather than a
+   %lo(BTL_SCRATCH + n)(reg), which is the array-indexed form rather than a
    pointer. Writing it that way gets the addressing right and the surrounding
    register allocation wrong, so this keeps the pointer for now. */
 
@@ -70,7 +70,7 @@ typedef struct {
 
 /* The scratch area is reached by address, the way BtlOpenChoice reaches it and
    the way the rest of the work area is reached. */
-#define g_btl_scratch       ((u_char *)0x801C0000)
+
 #define g_btl_choice_acts   (*(int *)0x801C0010)
 extern int     g_btl_menu_aside;
 extern u_char *g_btl_talk_said_script;
@@ -114,7 +114,7 @@ void BtlTalkSceneAct(void)
     g_btl_menu_aside = 0;
     choice = BtlMenuChoice();
     mood_of = g_btl_offer[g_btl_offer_slot].mood;
-    rec = (BtlTalkChoice *)(g_btl_scratch + g_btl_choice_row * CHOICE_ROW
+    rec = (BtlTalkChoice *)(BTL_SCRATCH + g_btl_choice_row * CHOICE_ROW
                             + g_btl_choice_acts + choice * 10);
     BtlFaceClose();
     BtlRunFrames(ACT_SETTLE);
@@ -136,10 +136,10 @@ void BtlTalkSceneAct(void)
     if (rec->amount[which] != 0) {
         BtlHighlightBegin(mood);
     }
-    dir = *(u_long *)g_btl_scratch;
+    dir = *(u_long *)BTL_SCRATCH;
     g_btl_talk_said_script =
-        g_btl_scratch + dir
-        + *(u_long *)(g_btl_scratch + dir
+        BTL_SCRATCH + dir
+        + *(u_long *)(BTL_SCRATCH + dir
                       + rec->line[which] * 4);
     BtlRunFrames(ACT_PAUSE);
     BtlTalkScoreLine(rec->mood[which],
@@ -151,16 +151,16 @@ void BtlTalkSceneAct(void)
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
-        dir = *(u_long *)g_btl_scratch;
-        script = g_btl_scratch + dir
-                 + *(u_long *)(g_btl_scratch + dir + rec->line[which] * 4);
+        dir = *(u_long *)BTL_SCRATCH;
+        script = BTL_SCRATCH + dir
+                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
     } else {
         if ((g_btl_panel_gauges >> mood & 1) != 0) {
             if ((1 << mood & g_btl_offer[g_btl_offer_slot].kinds) != 0
                 && rec->amount[which] >= ACT_NOTICED) {
-                dir = *(u_long *)g_btl_scratch;
-                BtlSeqPlay(g_btl_scratch + dir
-                           + *(u_long *)(g_btl_scratch + dir
+                dir = *(u_long *)BTL_SCRATCH;
+                BtlSeqPlay(BTL_SCRATCH + dir
+                           + *(u_long *)(BTL_SCRATCH + dir
                                          + rec->line[which] * 4));
                 BtlSeqRun();
                 BtlEndTalking();
@@ -185,9 +185,9 @@ void BtlTalkSceneAct(void)
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
-        dir = *(u_long *)g_btl_scratch;
-        script = g_btl_scratch + dir
-                 + *(u_long *)(g_btl_scratch + dir + rec->line[which] * 4);
+        dir = *(u_long *)BTL_SCRATCH;
+        script = BTL_SCRATCH + dir
+                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
     }
     g_btl_talk_depth++;
     BtlSeqPlay(script);

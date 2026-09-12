@@ -43,6 +43,13 @@ typedef struct {
 extern void BtlPartyResetGfx(void);
 
 extern BtlMenuCell g_btl_menu_cells[];
+
+/* The three windows the choice box types its entries into, the row of the
+   choice table the box was opened on, and the directory slot each of its
+   three entries reads its text from. */
+extern struct BtlWindow g_btl_choice_windows[];
+extern u_short *g_btl_choice_at;
+extern u_int    g_btl_choice_lines[];
 extern int g_btl_menu_state;
 extern int g_btl_menu_index;
 extern int g_btl_menu_count;

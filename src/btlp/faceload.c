@@ -10,6 +10,12 @@
  * A portrait already loaded is not read again unless the caller insists, which
  * is what lets the negotiation put the same face up between scenes without
  * spinning the drive.
+ *
+ * BtlFaceLoadFile behind it is the same routine with the test taken out and
+ * the file named outright rather than looked up by character, which is what
+ * the scene player and the opening dialogue want: they know which portrait
+ * file they need and there is no character to key the cache on. It leaves the
+ * cache saying nothing is loaded, so the next BtlFaceLoad reads again.
  */
 #include <decomp/types.h>
 #include <libcd.h>
@@ -50,7 +56,11 @@ extern int      g_btl_face_step;
 extern CdlFILE  g_adv_scene_file;
 extern int      g_cd_busy;
 
-extern void AdvResolveSceneLoc(short kind, short index, void *unused);
+/* The index is `short` where the routine is defined, and every other caller
+   declares it that way; this unit does not. BtlFaceLoadFile hands it an int
+   and the image passes the register straight through, so the declaration this
+   translation unit was built against had no narrowing in it. */
+extern void AdvResolveSceneLoc(short kind, int index, void *unused);
 extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 
 void BtlFaceLoad(int who, int always)
@@ -72,6 +82,56 @@ void BtlFaceLoad(int who, int always)
                          FACE_TEX_W, FACE_TEX_H);
         g_btl_face_id = who;
     }
+
+    SetPolyFT4(g_btl_face_prim);
+    SetSemiTrans(g_btl_face_prim, 0);
+    SetShadeTex(g_btl_face_prim, 1);
+    g_btl_face_prim[0].u0 = FACE_U0;
+    g_btl_face_prim[0].v0 = FACE_V0;
+    g_btl_face_prim[0].u1 = FACE_U1;
+    g_btl_face_prim[0].v1 = FACE_V0;
+    g_btl_face_prim[0].u2 = FACE_U0;
+    g_btl_face_prim[0].v2 = FACE_V1;
+    g_btl_face_prim[0].u3 = FACE_U1;
+    g_btl_face_prim[0].v3 = FACE_V1;
+    g_btl_face_prim[0].tpage = GetTPage(1, 0, FACE_TEX_X, FACE_TEX_Y);
+    g_btl_face_prim[0].clut = GetClut(FACE_CLUT_X, FACE_CLUT_Y);
+
+    SetSprt(g_btl_face_sprt);
+    SetSemiTrans(g_btl_face_sprt, 0);
+    SetShadeTex(g_btl_face_sprt, 1);
+    g_btl_face_sprt[0].w = FACE_U1 - FACE_U0;
+    g_btl_face_sprt[0].u0 = FACE_U0;
+    g_btl_face_sprt[0].v0 = FACE_V0;
+    g_btl_face_sprt[0].h = FACE_V1 - FACE_V0;
+    g_btl_face_sprt[0].clut = GetClut(FACE_CLUT_X, FACE_CLUT_Y);
+
+    SetDrawMode(g_btl_face_mode, 0, 0,
+                GetTPage(1, 0, FACE_TEX_X, FACE_TEX_Y), 0);
+
+    g_btl_face_prim[1] = g_btl_face_prim[0];
+    g_btl_face_sprt[1] = g_btl_face_sprt[0];
+    g_btl_face_mode[1] = g_btl_face_mode[0];
+    g_btl_face_step = 0;
+}
+
+void BtlFaceLoadFile(int file)
+{
+    TIM_IMAGE tim;
+
+    AdvResolveSceneLoc(FACE_SCENE_KIND, file, 0);
+    CdReadFileToAddrAsync(&g_adv_scene_file, g_adv_scene_file.size,
+                          FACE_STAGE);
+    while (g_cd_busy != -1) {
+        BtlDrawFrame();
+    }
+    OpenTIM(FACE_TIM);
+    ReadTIM(&tim);
+    BtlQueueVramLoad(tim.caddr, FACE_CLUT_X, FACE_CLUT_Y,
+                     FACE_CLUT_W, FACE_CLUT_H);
+    BtlQueueVramLoad(tim.paddr, FACE_TEX_X, FACE_TEX_Y,
+                     FACE_TEX_W, FACE_TEX_H);
+    g_btl_face_id = -1;
 
     SetPolyFT4(g_btl_face_prim);
     SetSemiTrans(g_btl_face_prim, 0);
