@@ -24,11 +24,6 @@
 /* How fast the fighter under a record walks toward the effect's colour. */
 #define FX_FADE 2
 
-/* Which of a set each record stands for: the head of the chain and then every
-   one hanging off it. */
-#define FX_MARK_HEAD 0x10
-#define FX_MARK_REST 0x11
-
 /* How much later each record starts than the one before it. */
 #define FX_STEP 2
 

@@ -26,10 +26,7 @@
 #define FX_SIDE_B    0xFF
 #define FX_SIDE_FADE 1
 
-/* Which of a set each record stands for, and how much later each one
-   starts. */
-#define FX_MARK_HEAD 0x10
-#define FX_MARK_REST 0x11
+/* How much later each record starts than the one before it. */
 #define FX_SIDE_STEP 2
 
 BtlObj *BtlFxStartOnSide(void)

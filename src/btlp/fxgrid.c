@@ -27,20 +27,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* The cells of one side, laid out the way BtlPlaceMember lays out fighters. */
-#define FX_GRID_W  5
-#define FX_GRID_H  5
-
-#define FX_GRID_X0 (PLACE_COL_ORG * PLACE_FIXED)
-#define FX_GRID_DX (PLACE_COL_W * PLACE_FIXED)
-#define FX_GRID_DY (PLACE_ROW_H * PLACE_FIXED)
-
-/* Where each side's sheet starts: the party's back row, and the enemies'
-   front one. Both walk up the screen from there, a row at a time. */
-#define FX_GRID_Y_PARTY \
-    ((PLACE_ROW_ORG + (FX_GRID_H - 1) * PLACE_ROW_H) * PLACE_FIXED)
-#define FX_GRID_Y_ENEMY (PLACE_COL_ORG * PLACE_FIXED)
-
 /* How far off the floor the own-side sheet stands. */
 #define FX_GRID_Z_LIFT (-0x64 * PLACE_FIXED)
 
@@ -48,14 +34,9 @@
    far one. */
 #define FX_MOVE_OWN_SIDE 9
 
-/* Which of a set each record stands for: the cell's own number, biased by one
-   of two amounts so the far sheet and the own-side one are told apart. */
-#define FX_MARK_FAR 0x10
+/* The own-side sheet's cells are biased further so the two are told
+   apart. */
 #define FX_MARK_OWN 0x20
-
-/* When each cell of the sheet arrives, in halves of a frame - a shuffle of the
-   twenty-five, which is what scatters the sheet rather than sweeping it. */
-extern u_char g_btl_fx_grid_order[FX_GRID_W * FX_GRID_H];
 
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxGrid(int table)
@@ -124,7 +105,7 @@ BtlObj *BtlOpenFxGrid(int table)
             o->mark_num = g_btl_fx_move == FX_MOVE_OWN_SIDE
                               ? cell + FX_MARK_OWN
                               : cell + FX_MARK_FAR;
-            o->timer = g_btl_fx_grid_order[cell] >> 1;
+            o->timer = g_btl_fx_grid_order[cell + FX_MARK_FAR] >> 1;
             cell--;
         }
         y_enemy -= FX_GRID_DY;

@@ -54,8 +54,6 @@ extern void BtlApproach(short *cur, const short *target, int step);
 
 extern SVECTOR   g_btl_arena_face[];
 extern SVECTOR   g_btl_arena_quad[];
-extern short     g_btl_arena_fade;
-extern short     g_btl_arena_rgb[];
 
 /* The four edges reach the arena's colour by address, one component at a time.
    Through the array symbol gcc hoists the base into a saved register for the

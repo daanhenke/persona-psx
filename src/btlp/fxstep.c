@@ -19,16 +19,13 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
+#include <persona/btlp/spellfx.h>
 
 /* The two phases the record does something in, and what it is put on once the
    effect is over. */
 #define FX_PHASE_WAIT 0
 #define FX_PHASE_RUN  1
 #define FX_PHASE_DONE 0x80
-
-/* Which of a set the head of a chain is marked with: nought for a chain of
-   one, 0x10 for the first of several. */
-#define FX_MARK_HEAD 0x10
 
 /* Where the move ids stop belonging to each family. */
 #define FX_FAMILY1_END 7

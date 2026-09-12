@@ -8,19 +8,10 @@
  * the table that does both.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
-
-/* None of these staggers its records. */
-#define FX_TIMER 0
-/* Which of the staged script tables the grid is built from. */
-#define FX_GRID_TABLE 0
-
-/* The colour a fighter under one of these is walked to. */
-#define FX_WHITE 0xFF
-
-extern u_char g_btl_shake_on;
 
 BtlObj *BtlFxStart16(void)
 {

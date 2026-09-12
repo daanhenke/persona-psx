@@ -147,6 +147,20 @@ extern void    BtlEffectDrop(void);
 /* The colour the whole scene is drawn at. */
 extern short g_btl_scene_rgb[];
 
+/* The colour the arena's five faces are drawn at, and how fast it walks
+   toward g_btl_scene_rgb - the arena tick closes that much of the gap on
+   each component every frame. */
+extern short g_btl_arena_rgb[];
+extern short g_btl_arena_fade;
+
+/* The camera's own rotation. The field is drawn through it, and a tracked
+   effect record is given a copy of it so it faces the camera. */
+extern SVECTOR g_btl_cam_rot;
+
+/* Raised for the frame an effect that shakes the field opens on; the camera
+   reads it and clears it again. */
+extern u_char g_btl_shake_on;
+
 /* How fast a line is put up: 0 slow, 2 off altogether. */
 extern u_char g_btl_msg_speed;
 

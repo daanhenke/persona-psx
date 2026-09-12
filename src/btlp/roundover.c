@@ -60,10 +60,6 @@
 #define BTL_CLUT_BYTES   0x200
 #define BTL_CLUT_WHITE   0xFFFF
 
-/* Set on the model as the shape changes; what the drawing side makes of it is
-   not established. */
-#define BTL_OBJ_ATTR_4000 0x4000
-
 /* How far the model sinks each frame and how far down it goes, then how much
    of the gap the shrink and the growth close each frame and where each of
    them stops. */

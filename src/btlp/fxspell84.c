@@ -12,9 +12,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* None of these staggers its records. */
-#define FX_TIMER 0
-
 /* What the step handler counts down, and how far above the fighter the record
    starts - 16.16, so four whole units. */
 #define FX_84_COUNT 0x40

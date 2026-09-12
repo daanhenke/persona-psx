@@ -20,6 +20,7 @@
  */
 #include <decomp/types.h>
 #include <libgte.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
@@ -30,10 +31,6 @@
 
 /* The motion BtlStartMoveFx puts every record of the chain on. */
 #define FX_MOTION 2
-
-/* The camera's own rotation; the tracked record takes all three of it, the
-   last through the name the opening pulls the camera back with. */
-extern SVECTOR g_btl_cam_rot;
 
 void BtlFxObjTick(BtlObj *o)
 {

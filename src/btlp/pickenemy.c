@@ -36,10 +36,6 @@
 #define PICK_DIM  0x20
 #define PICK_FADE 8
 
-/* Cleared on every enemy the cursor is not on, and set again by the lit
-   sweep. */
-#define BTL_OBJ_PICKED 0x400000
-
 /* One actor's palette. */
 #define CLUT_BYTES 0x200
 

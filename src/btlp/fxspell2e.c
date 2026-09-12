@@ -13,6 +13,7 @@
  * symbol of their own until this routine needed them written together.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
@@ -27,8 +28,6 @@
 #define FX_2E_B     0xC0
 #define FX_2E_TIMER 4
 
-extern short g_btl_arena_fade;
-extern short g_btl_arena_rgb[];
 
 BtlObj *BtlFxStart2E(void)
 {

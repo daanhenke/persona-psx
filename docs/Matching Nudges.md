@@ -1102,3 +1102,118 @@ the image.
 
 - [memberact.c](/src/btlp/memberact.c) - case 0 above, case 3 and case 8
   inside; 1.5% between them.
+
+## Write the whole thing in both arms and let the tail be shared
+
+Section "Two arms that differ only in a constant share their tail" says to lift
+the common part out of the arms. The opposite is also a real shape, and it is
+the one every start handler that chooses a side uses: the *whole* group of
+statements is written in both arms and gcc's cross-jumping folds the identical
+tail back into one copy at the label the arms meet at.
+
+    if (g_btl_actor_turn < BTL_PARTY) {
+        pos[0] = 0; pos[1] = -FX_52_OFF; pos[2] = 0;
+    } else {
+        pos[0] = 0; pos[1] =  FX_52_OFF; pos[2] = 0;
+    }
+
+Lifted out behind one chosen offset, gcc turns the arms into "load the else
+value, branch over the then value" and the three stores come out *ahead* of the
+test. Written out twice, the arms are one `lui` each and the three stores land
+at the join - which is what the image has, `j` and all.
+
+- [fxspell52.c](/src/btlp/fxspell52.c) - 76% to exact on that alone.
+- [fxspell1b.c](/src/btlp/fxspell1b.c) - `BtlFxStart1C`, the same for the two
+  position words plus `pos[2]`; 93.8% to 95.9%.
+
+Read the image first: the giveaway is a `j` between the arms. No `j` means the
+value was lifted out, and section "Two arms..." applies instead.
+
+## Let strength reduction produce the running offset
+
+A row of records laid out in depth or across the field reads naturally as a
+running value stepped once per turn:
+
+    z = -FX_56_BACK;
+    ...  o->z = z;  z += FX_56_GAP;
+
+That is a variable, and it costs a register the image does not spend - the
+constant gets hoisted into a saved register too, so it costs two. Written as
+the product the row actually is,
+
+    o->z = -i * FX_56_GAP;
+
+gcc's strength reduction builds exactly the same running add, initialises it to
+`-2 * GAP` and *re-materialises* the step with a `lui` inside the loop, which is
+the image's register count and the image's instruction.
+
+- [fxspell56.c](/src/btlp/fxspell56.c) - 71% to 94% on that line.
+- [fxspell2f.c](/src/btlp/fxspell2f.c) - `(i - 1) * FX_2F_SPREAD` for the same
+  reason.
+
+## One local threaded through a whole tail
+
+Section "Reuse the local" again, at the scale of a whole run of statements. A
+routine that finishes by copying three shorts into a record and then writing
+four more out to globals has, in the image, *one* register carrying every one
+of those values in turn. Give each value a name and the loads become
+independent, the scheduler interleaves them, and the tail comes out shuffled -
+a dozen words out of place with nothing structurally wrong.
+
+    n = g_btl_cam_rot.vx;  o->rot.vx = n;
+    n = g_btl_cam_rot.vy;  o->rot.vy = n;
+    n = g_btl_intro_dist;  o->rot.vz = n;
+    n = FX_6E_LIT;         g_btl_scene_rgb[1] = n; g_btl_scene_rgb[2] = n;
+                           g_btl_scene_rgb[0] = 0;
+    n = FX_6E_FADE;        g_btl_arena_fade = n;
+
+gcc 2.6 gives a local one pseudo for the whole function, so reusing it puts a
+true anti-dependency between every pair and the scheduler cannot reorder them.
+
+- [fxspell6e.c](/src/btlp/fxspell6e.c) - 81.8% to exact; the intermediate step
+  of reusing one local for only the three angles took it to 86%.
+
+## A pointer to the field, and the record worked out from it
+
+Where a loop rewrites one field of a global template and then hands the
+template to a call, the image keeps *the field's* address in the saved register
+and works the template's out from it - `addiu a0, s8, -0x4` - rather than
+naming the symbol a second time.
+
+    scripts = &g_btl_fx_def.scripts;
+    ...
+    *scripts = ...;
+    o = BtlObjAlloc((BtlObjDef *)(scripts - 1), ...);
+
+Three shapes and none of the other two is it: `&g_btl_fx_def` at the call site
+gets its own `lui`/`addiu` and no CSE; a `BtlObjDef *` local biases the register
+to the record instead of the field, so the store gains an offset and the call
+loses one. The tell is which of the two the store's displacement is zero on.
+
+Assigning the pointer before the loop also matters for a second reason - see
+"A constant kept in a local of its own": a hoisted invariant lands in the
+preheader, *after* everything the source puts in front of the loop, so a
+register set up ahead of the loop's other locals cannot be one gcc lifted.
+
+- [fxspell15.c](/src/btlp/fxspell15.c) - 97.8% to exact.
+
+## Step the loop counter where the image steps it
+
+`for (; col < W; col++)` puts the increment last, after every other statement
+in the body. When the image has it early - filling a divide's latency, say, or
+sitting between two stores - the source stepped it by hand:
+
+    for (; col < FX_GRID_W; ) {
+        ...
+        col++;          /* where the image has it */
+        ...
+    }
+
+The tell is two counters swapping places in the diff: the scheduler fills the
+same two slots either way and takes whichever came first in the source.
+
+- [fxspell1b.c](/src/btlp/fxspell1b.c) - `BtlFxStart1C`, `col++` between the
+  record's link and its attribute.
+- [fxspell15.c](/src/btlp/fxspell15.c) - `col++` and `cell--` both *before* the
+  allocation, which no amount of reordering at the end of the body can produce:
+  the scheduler will not move them across the call.

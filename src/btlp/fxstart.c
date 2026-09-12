@@ -13,9 +13,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* Neither move staggers its layers, so the first one starts at once. */
-#define FX_TIMER 0
-
 BtlObj *BtlFxStartLayers(void)
 {
     return BtlOpenFxLayers(g_btl_fx_target, FX_TIMER);

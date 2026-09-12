@@ -53,10 +53,6 @@
    for it to be the only half of the pair still standing. */
 #define BTL_OBJ_JUMPED 0x08000000
 
-/* Set on the model as the whitening starts and again as the round-over scene
-   does; what the drawing side makes of it is not established. */
-#define BTL_OBJ_ATTR_4000 0x4000
-
 /* An actor's palette: 256 entries, one page each. */
 #define BTL_CLUT_ENTRIES 0x100
 #define BTL_CLUT_BYTES   0x200

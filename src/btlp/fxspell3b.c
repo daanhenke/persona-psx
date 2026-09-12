@@ -13,12 +13,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-#define FX_TIMER 0
-
-/* Half of full on each channel - the grey a fighter under one of these is
-   walked to, rather than the white the brighter moves use. */
-#define FX_GREY 0x80
-
 BtlObj *BtlFxStart3B(void)
 {
     return BtlOpenFxOnTargets(FX_GREY, FX_GREY, FX_GREY, FX_TIMER);

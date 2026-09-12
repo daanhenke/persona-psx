@@ -15,9 +15,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-#define FX_TIMER 0
-#define FX_GREY  0x80
-
 BtlObj *BtlFxStart76(void)
 {
     return BtlFxStart75();

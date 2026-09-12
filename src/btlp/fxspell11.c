@@ -8,14 +8,9 @@
  * the shake and the effect arrive on the same frame.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
-
-/* None of these staggers its records. */
-#define FX_TIMER 0
-
-/* Raised for the frame the effect opens on; the camera clears it again. */
-extern u_char g_btl_shake_on;
 
 BtlObj *BtlFxStart11(void)
 {

@@ -12,10 +12,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-#define FX_TIMER      0
-#define FX_GREY       0x80
-#define FX_GRID_TABLE 0
-
 BtlObj *BtlFxStartEC(void)
 {
     return BtlOpenFxGrid(FX_GRID_TABLE);

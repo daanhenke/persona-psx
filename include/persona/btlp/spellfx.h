@@ -17,6 +17,7 @@
 #define PERSONA_BTLP_SPELLFX_H
 
 #include <decomp/types.h>
+#include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
 
 /* What a spell does, indexed by the same id g_spell_data is. Record zero is
@@ -65,6 +66,51 @@ extern signed char g_btl_fx_shift[];
 /* What a plain effect record starts as: hidden, static, and without a
    shadow. */
 #define FX_OBJ_ATTR (BTL_OBJ_HIDDEN | BTL_OBJ_STATIC | BTL_OBJ_NO_SHADOW)
+
+/* The timer nearly every start handler opens its records with. None of them
+   staggers what it builds: every record arrives on the frame it is opened
+   on, and the few that do stagger count in their own units. */
+#define FX_TIMER 0
+
+/* Which of the staged artwork's script tables a grid is built from. */
+#define FX_GRID_TABLE 0
+
+/* The two colours a fighter standing under an effect is walked to: full on
+   every channel for the bright moves, half of full for the rest. */
+#define FX_WHITE 0xFF
+#define FX_GREY  0x80
+
+/* Which of a set each record stands for. A chain of one is left at nought;
+   where there are several the first carries FX_MARK_HEAD and the rest
+   FX_MARK_REST, which is what BtlFxStep reads to find the head again. */
+#define FX_MARK_HEAD 0x10
+#define FX_MARK_REST 0x11
+
+/* The cells of one side's sheet, laid out the way BtlPlaceMember lays out
+   fighters, and which of a set each cell stands for. */
+#define FX_GRID_W   5
+#define FX_GRID_H   5
+#define FX_MARK_FAR 0x10
+
+/* Where a sheet's first cell stands and how far apart the cells are, in the
+   same 16.16 the field is placed in. */
+#define FX_GRID_X0 (PLACE_COL_ORG * PLACE_FIXED)
+#define FX_GRID_DX (PLACE_COL_W * PLACE_FIXED)
+#define FX_GRID_DY (PLACE_ROW_H * PLACE_FIXED)
+
+/* Where each side's sheet starts: the party's back row, and the enemies'
+   front one. Both walk up the screen from there, a row at a time. */
+#define FX_GRID_Y_PARTY \
+    ((PLACE_ROW_ORG + (FX_GRID_H - 1) * PLACE_ROW_H) * PLACE_FIXED)
+#define FX_GRID_Y_ENEMY (PLACE_COL_ORG * PLACE_FIXED)
+
+/* When each cell of a sheet arrives, in halves of a frame - a shuffle of the
+   twenty-five, which is what scatters the sheet rather than sweeping it.
+   Every one of the four routines that reads it does so by the record's mark
+   rather than the cell's number, so the table is declared from FX_MARK_HEAD
+   below where its entries begin: the sixteen bytes in front belong to other
+   data and nothing reaches them through this name. */
+extern u_char g_btl_fx_grid_order[FX_MARK_HEAD + FX_GRID_W * FX_GRID_H];
 
 extern BtlObj *BtlStartMoveFx(int index);
 extern BtlObj *BtlOpenFxObj(int slot, int timer);

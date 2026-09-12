@@ -19,9 +19,6 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
-/* Set as the object starts vanishing, the same bit the whitening sets. */
-#define BTL_OBJ_ATTR_4000 0x4000
-
 /* How much of the scale goes each frame; unity is 0x100. */
 #define VANISH_STEP 0xAA
 

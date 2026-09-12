@@ -14,12 +14,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* None of the eight staggers its records. */
-#define FX_TIMER 0
-
-/* Which of the staged script tables the grid is built from. */
-#define FX_GRID_TABLE 0
-
 BtlObj *BtlFxStart1F(void)
 {
     return BtlOpenFxObj2(g_btl_fx_target, FX_TIMER);

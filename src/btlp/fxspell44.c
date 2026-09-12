@@ -10,9 +10,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* None of these staggers its records. */
-#define FX_TIMER 0
-
 BtlObj *BtlFxStart44(void)
 {
     return BtlFxStart47();

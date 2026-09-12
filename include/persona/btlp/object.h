@@ -176,6 +176,15 @@ typedef struct BtlObj {
 #define BTL_OBJ_ANIMATING 0x10000000
 #define BTL_OBJ_STATIC    0x20000000
 
+/* Set on a model as the whitening starts, again as the round-over scene
+   changes its shape, and on the pair of records move 0x19's effect is drawn
+   as; what the drawing side makes of it is not established. */
+#define BTL_OBJ_ATTR_4000 0x4000
+
+/* Set on whatever is being aimed at - an enemy's own record, or the marker
+   over a party member - and cleared off everything that is not. */
+#define BTL_OBJ_PICKED 0x400000
+
 /* Taken out of the drawing pass without being freed. Set on an object, its
    shadow, its ailment marker and the marker's own attached piece together. */
 #define BTL_OBJ_HIDDEN    0x40000000

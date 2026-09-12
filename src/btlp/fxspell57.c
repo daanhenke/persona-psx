@@ -13,9 +13,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-#define FX_TIMER 0
-#define FX_WHITE 0xFF
-
 /* How long the borrowed effect is left standing, in frames. */
 #define FX_5B_TIMER 0x78
 

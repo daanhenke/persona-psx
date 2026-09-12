@@ -3214,7 +3214,7 @@ g_btl_summon_def              = 0x800D0414; // size:0x8
 g_btl_enemy_attack            = 0x800D041C;
 g_btl_fx_def                  = 0x800D042C; // size:0x8
 g_btl_fx_shift                = 0x800D0434; // type:s8 size:0x3
-g_btl_fx_grid_order           = 0x800D0438; // type:u8 size:0x19
+g_btl_fx_grid_order           = 0x800D0428; // type:u8 size:0x29
 g_btl_fx_ring                 = 0x800D0454; // type:s32 size:0x30
 
 //-------------------------------------------------------------------

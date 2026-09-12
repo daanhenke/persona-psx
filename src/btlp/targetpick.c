@@ -39,9 +39,6 @@
 /* Set on the marker of whoever is being aimed at, and cleared off the rest. */
 #define MARK_CHOSEN 0x1000000
 
-/* Cleared off a marker as the party is lit, along with the picked bit. */
-#define MARK_PICKED 0x400000
-
 /* How bright everything is drawn while a target is being chosen, and the
    motion a member is put on once they are one. */
 #define TARGET_LIT    0x80
@@ -128,12 +125,12 @@ int BtlPickTargetParty(BtlActor *a)
     marks = g_btl_marker_obj;
     tint = &g_btl_tint_pick_r;
     do {
-        marks[i]->attr &= ~(MARK_CHOSEN | MARK_PICKED);
+        marks[i]->attr &= ~(MARK_CHOSEN | BTL_OBJ_PICKED);
         marks[i]->rgb[0] = TARGET_LIT;
         marks[i]->rgb[1] = TARGET_LIT;
         marks[i]->rgb[2] = TARGET_LIT;
         if (g_btl_actors[i].pickable != 0) {
-            g_btl_actors[i].obj->attr &= ~MARK_PICKED;
+            g_btl_actors[i].obj->attr &= ~BTL_OBJ_PICKED;
             g_btl_actors[i].obj->rgb[0] = TARGET_LIT;
             g_btl_actors[i].obj->rgb[1] = TARGET_LIT;
             g_btl_actors[i].obj->rgb[2] = TARGET_LIT;

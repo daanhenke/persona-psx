@@ -16,27 +16,8 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* The cells of one side, laid out the way BtlPlaceMember lays out fighters. */
-#define FX_GRID_W 5
-#define FX_GRID_H 5
-
-#define FX_GRID_X0 (PLACE_COL_ORG * PLACE_FIXED)
-#define FX_GRID_DX (PLACE_COL_W * PLACE_FIXED)
-#define FX_GRID_DY (PLACE_ROW_H * PLACE_FIXED)
-
-/* Where each side's sheet starts: the party's back row, and the enemies'
-   front one. */
-#define FX_GRID_Y_PARTY \
-    ((PLACE_ROW_ORG + (FX_GRID_H - 1) * PLACE_ROW_H) * PLACE_FIXED)
-#define FX_GRID_Y_ENEMY (PLACE_COL_ORG * PLACE_FIXED)
-
-/* Which of a set each record stands for, and how long every cell waits on top
-   of its own entry in the scatter. */
-#define FX_MARK_FAR   0x10
-#define FX_GRID_LATE  8
-
-/* When each cell of the sheet arrives, in halves of a frame. */
-extern u_char g_btl_fx_grid_order[FX_GRID_W * FX_GRID_H];
+/* How long every cell waits on top of its own entry in the scatter. */
+#define FX_GRID_LATE 8
 
 #ifdef NON_MATCHING
 BtlObj *BtlFxStartSheetLate(void)
@@ -87,7 +68,8 @@ BtlObj *BtlFxStartSheetLate(void)
             after = o;
             x    += FX_GRID_DX;
             o->mark_num = cell + FX_MARK_FAR;
-            o->timer    = (g_btl_fx_grid_order[cell] >> 1) + FX_GRID_LATE;
+            o->timer    = (g_btl_fx_grid_order[cell + FX_MARK_FAR] >> 1)
+                        + FX_GRID_LATE;
             cell--;
         }
         /* Both rows step by the same amount, so the compiler shares the one

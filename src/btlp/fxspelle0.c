@@ -19,9 +19,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-#define FX_TIMER      0
-#define FX_GRID_TABLE 0
-
 BtlObj *BtlFxStartE0(void)
 {
     return BtlOpenFxObj2(g_btl_actor_turn, FX_TIMER);

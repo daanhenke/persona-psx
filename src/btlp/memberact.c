@@ -177,7 +177,6 @@ extern int  BtlBindGfx(u_int kind, int index, u_char **image);
 extern void BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
                          int upload);
 extern short g_btl_scene_rgb[];
-extern short g_btl_arena_fade;
 
 /* Of the ten script indices a shape carries, the swing takes four: the run
    in at 0, the one the blow itself is struck from at 1, and the two the

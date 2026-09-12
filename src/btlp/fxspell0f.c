@@ -12,9 +12,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* Which of the staged script tables the grid is built from. */
-#define FX_GRID_TABLE 0
-
 BtlObj *BtlFxStart0F(void)
 {
     return BtlOpenFxGrid(FX_GRID_TABLE);

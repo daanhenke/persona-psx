@@ -20,12 +20,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* None of the fifteen staggers its records, so each arrives at once. */
-#define FX_TIMER 0
-
-/* The colour the fighters under a spread effect are walked to. */
-#define FX_WHITE 0xFF
-
 BtlObj *BtlFxStart5C(void)
 {
     return BtlOpenFxOnTargets(FX_WHITE, FX_WHITE, FX_WHITE, FX_TIMER);

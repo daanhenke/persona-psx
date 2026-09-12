@@ -16,10 +16,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* Which of a set each record stands for. */
-#define FX_MARK_HEAD 0x10
-#define FX_MARK_REST 0x11
-
 BtlObj *BtlFxStartSideLayers(void)
 {
     BtlObj *o;

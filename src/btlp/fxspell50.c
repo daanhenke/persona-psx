@@ -8,11 +8,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* None of these staggers its records. */
-#define FX_TIMER 0
-
-#define FX_GREY 0x80
-
 BtlObj *BtlFxStart50(void)
 {
     return BtlOpenFxObj2(g_btl_fx_target, FX_TIMER);
