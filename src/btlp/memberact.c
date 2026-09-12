@@ -664,12 +664,17 @@ void BtlMemberMotion06(BtlObj *o)
     int           i;
     int           speed;
     int           status;
+    /* The ailment code and the message's last argument are the same number,
+       and the image holds it across the whole arm rather than building it
+       again for the call. */
+    int           stop;
 
     a = o->actor;
     switch (o->phase) {
     case 0:
+        stop = CAST_AIL_0C;
         status = *(signed char *)&a->c.status;
-        if ((status == CAST_AIL_0C && *(signed char *)&a->c.ail_level > 0)
+        if ((status == stop && *(signed char *)&a->c.ail_level > 0)
             || (*(u_long *)&a->c.name[9] & CAST_AIL_MASK) == CAST_AIL_09_DEEP
             || status == BTL_STATUS_LIFTED) {
             o->phase = 0xA;
@@ -688,7 +693,7 @@ void BtlMemberMotion06(BtlObj *o)
             } else {
                 goto spoken;
             }
-            BtlOpenMessage(1, 1, line, 0x10, CAST_AIL_0C);
+            BtlOpenMessage(1, 1, line, 0x10, stop);
             if (g_btl_msg_speed == 0) {
                 speed = 0xB4;
             } else {
@@ -811,8 +816,8 @@ void BtlMemberMotion06(BtlObj *o)
             } while (i < BTL_PARTY);
         }
         BtlCloseMessage(0);
-        *(int *)&o->actor->pad68[8] += 1;
         g_btl_seq_catchup = 1;
+        *(int *)&o->actor->pad68[8] += 1;
         D_800F5A60++;
         if (D_8004E264 == 0 && g_btl_act_kind == 0) {
             a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].unk29;
@@ -891,17 +896,17 @@ void BtlMemberMotion06(BtlObj *o)
         BtlEnemyDeriveStats(&g_btl_personas[BtlActorPersona(o->mark_num)]);
         if (g_btl_act_kind != 0) {
             a->order = g_btl_act_speed;
-            a->action = 0;
             a->targets = g_btl_act_targets;
+            a->action = 0;
             a->move = g_btl_act_move;
         }
         BtlRefreshAttacks();
         o->phase++;
         break;
     case 8:
-        scripts = &g_btl_member_scripts[SCRIPT_STAND
-                                        + o->kind * MEMBER_SCRIPT_MODEL];
         if ((a->flags & CAST_SCRIPTED) == 0 && a->unkDF == 0) {
+            scripts = &g_btl_member_scripts[SCRIPT_STAND
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
             BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
                 scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
         }
