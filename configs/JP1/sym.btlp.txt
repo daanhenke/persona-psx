@@ -1722,8 +1722,8 @@ BtlOrdersMenu                 = 0x8009DDC8; // type:func size:0x238
 //------------------------------------------------------------
 //--- PA: 0x039C60   VA: 0x8009E000   subsegment: asm, btlp_61
 //------------------------------------------------------------
-func_8009E000                 = 0x8009E000; // type:func size:0xEB4
-func_8009EEB4                 = 0x8009EEB4; // type:func size:0x784
+BtlPlaceMenu                  = 0x8009E000; // type:func size:0xEB4
+BtlEscapeMenu                 = 0x8009EEB4; // type:func size:0x784
 
 //----------------------------------------------------------
 //--- PA: 0x03B298   VA: 0x8009F638   subsegment: c, analyse
