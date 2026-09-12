@@ -1217,3 +1217,41 @@ same two slots either way and takes whichever came first in the source.
 - [fxspell15.c](/src/btlp/fxspell15.c) - `col++` and `cell--` both *before* the
   allocation, which no amount of reordering at the end of the body can produce:
   the scheduler will not move them across the call.
+
+## Force the association with a temp when the arms share a term
+
+Section "Two arms that differ only in a constant share their tail" tells you to
+compute the differing part in the arms. The other half of the same lever is to
+compute the *shared* part in front of them, and it is worth reaching for the
+moment the diff shows a table reading duplicated into both arms:
+
+    wide = g_btl_wave_cos[o->angle] * FX_2A_WIDE;
+    o->y = (g_btl_actor_turn < BTL_PARTY) ? wide - FX_2A_LIFT
+                                          : wide + FX_2A_LIFT;
+
+- [fxspell2a.c](/src/btlp/fxspell2a.c) - `BtlFxStep2A`, 85.07% to 98.41%.
+- [fxspell27.c](/src/btlp/fxspell27.c) - the same for the row a spark stands
+  on, 85.97% to 92.40%.
+
+And where the residual is which of two additions happens first, a temp forces
+it. `o->scale_x + 8 + o->scale_x / 8` is reassociated by gcc into
+`(scale/8 + 8) + scale`; written
+
+    grew = o->scale_x + FX_2A_GROW;
+    o->scale_x = grew + o->scale_x / FX_2A_EIGHTH;
+
+it is the image's `(scale + 8) + scale/8`, and that was the last word of
+`BtlFxStep2A`.
+
+## The load's width says how the source read the field
+
+A byte load where the field is an `int` is not the compiler narrowing for you -
+it is the source reading it as a byte. `g_btl_spell_fx[...].group` is an `int`
+and the image reads it with `lbu`, so the cast is in the source:
+
+    o->children = (u_char)g_btl_spell_fx[g_btl_fx_move].group;
+
+The signedness reads the same way: `lb` against a `u_char` field means this
+translation unit read it as a `signed char`, the way `lhu` against a `short`
+means unsigned. `BtlFxStep2F` reads `Char.status` with `lb` where char.h has it
+unsigned, and casting was the whole difference on that instruction.

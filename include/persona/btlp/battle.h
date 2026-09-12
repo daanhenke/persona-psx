@@ -99,6 +99,7 @@ extern RECT    g_btl_clut_block;    /* where the party's palettes are put     */
 extern const int g_btl_wave_sin[];
 extern const int g_btl_wave_cos[];
 #define BTL_WAVE_MASK 0x1FF
+#define BTL_WAVE_TURN 0x200
 
 extern void BtlDrawFrame(void);
 extern void BtlDrawDebugHud(void);
