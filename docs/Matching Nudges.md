@@ -1055,3 +1055,50 @@ builds the record's attribute word before it has moved the call's answer out of
 
 Both are worth trying whenever two values with disjoint lifetimes sit in one
 routine and the diff is registers rather than instructions.
+
+## The loop counter is not a temp, whatever section 4 says
+
+The reuse direction has a limit, and it is the counter a loop below is about to
+start from. `BtlMemberMotion06` sets a message timer through the same `i` its
+dim loop then walks, and the loop pays for it: gcc no longer knows `i` is zero
+at the loop's head, so instead of `s2 = 0` and a walking pointer taken straight
+off the symbol it emits the whole `i * 0xEC` again and builds all three
+induction variables from it - ten instructions for one shared local.
+
+    if (g_btl_msg_speed == 0) { speed = 0xB4; } else { speed = 0x1E; }
+    g_btl_msg_timer = speed;            /* not `i` */
+    ...
+    i = 0;
+    do { ... g_btl_actors[i] ... } while (i < BTL_PARTY);
+
+- [memberact.c](/src/btlp/memberact.c) - 91.5% to 93.4% on that one rename.
+
+The sign of it in `odiff --args` is a run of `sll`/`subu` pairs marked **extra**
+immediately before a loop, against a `addu sN, zero, zero` in the image.
+
+## The phase is written in every arm, not through one variable
+
+A tick routine whose arms nearly all end `o->phase++` looks like it wants a
+`phase` local and one store after the switch. It does not. Written that way gcc
+cross-jumps the *load and the add* as well as the store, and four or five arms
+come out as a bare `j` into a shared block; the image has `lbu`, `addiu` and a
+`j` in each arm and shares only the `sb`.
+
+    case 4:
+        ...
+        o->phase++;      /* in each arm */
+        break;
+
+- [memberact.c](/src/btlp/memberact.c) - 93.4% to 95.1%, seven arms.
+
+## The same row formed in front of one guard and inside the next
+
+`&g_btl_member_scripts[kind * 0x28 + entry]` is a row pointer the image builds
+in two different places in the same routine - above the `if` that uses it in
+one arm and inside it in the next - and the diff says which. Above the guard
+the address computation sits before the `and`/`bnez` of the flag test; inside
+it, after. Do not make the two arms agree with each other; make each agree with
+the image.
+
+- [memberact.c](/src/btlp/memberact.c) - case 0 above, case 3 and case 8
+  inside; 1.5% between them.
