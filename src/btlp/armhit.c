@@ -20,7 +20,7 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 
-extern void func_800C0E54(BtlObj *obj);
+extern void BtlFxFinish01(BtlObj *obj);
 
 void BtlArmHitChain(void)
 {
@@ -52,5 +52,5 @@ void BtlFinishMoveFx(BtlObj *obj)
        other opener in the family declares, left behind here. */
     long pos[3];
 
-    func_800C0E54(obj);
+    BtlFxFinish01(obj);
 }

@@ -34,6 +34,13 @@ extern int g_btl_battle_kind;
    this unsigned, which is also what GetTPage hands back. */
 extern u_short g_btl_tpage[];
 
+/* The blend bits of a texture page word - bits 5 and 6 - and the two settings
+   the effect handlers put there: back minus front, and back plus a quarter of
+   the front. */
+#define BTL_TPAGE_BLEND     0x60
+#define BTL_TPAGE_SUBTRACT  0x40
+#define BTL_TPAGE_QUARTER   0x60
+
 /* The moon phase the battle is fought under - its own copy of g_moon, taken
    as the fight opens and written back as it closes. */
 extern u_char g_btl_moon;

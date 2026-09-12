@@ -78,7 +78,10 @@ typedef struct BtlObj {
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ struct BtlObj *attached; /* carried along by every setter    */
     /* 0x50 */ struct BtlObj *shadow;   /* kept on this one's position      */
-    /* 0x54 */ long           unk54;   /* both cleared as a record is taken */
+    /* 0x54 */ long           unk54;   /* both cleared as a record is taken.
+                                          BtlFxStep27 keeps the spark it just
+                                          opened here, and reaches back through
+                                          it to finish setting the spark up  */
     /* 0x58 */ long           unk58;
     /* 0x5C */ struct BtlObj *mark;    /* the ailment marker floating on
                                           this one: the frame tick keeps it

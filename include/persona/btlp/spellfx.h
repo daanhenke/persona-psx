@@ -104,6 +104,13 @@ extern signed char g_btl_fx_shift[];
     ((PLACE_ROW_ORG + (FX_GRID_H - 1) * PLACE_ROW_H) * PLACE_FIXED)
 #define FX_GRID_Y_ENEMY (PLACE_COL_ORG * PLACE_FIXED)
 
+/* Where the eight records of a ring stand, as a column and a row of a
+   three-by-three grid with the middle left out - the column in quarters and
+   the row in halves, which is what the two multiplies in BtlFxStep27 undo.
+   Beside it, the order the nine cells of a three-by-three sheet arrive in. */
+extern u_char g_btl_fx_ring_cells[];
+extern u_char g_btl_fx_nine_order[];
+
 /* When each cell of a sheet arrives, in halves of a frame - a shuffle of the
    twenty-five, which is what scatters the sheet rather than sweeping it.
    Every one of the four routines that reads it does so by the record's mark
@@ -145,6 +152,49 @@ extern BtlObj *BtlFxStartSweep(void);
    in the table points at it, and that id is what they carry, the way the fixed
    boards carry the picture they are drawn from. Several moves share a handler;
    the name is the lowest id that reaches it. In the order the image has them. */
+/* g_btl_spell_fx's step column - one call per frame while the effect stands -
+   and its finish column, which is handed whatever the record is holding when
+   the effect ends. Neither is reached anywhere but through the table, so each
+   carries the lowest move id that reaches it, the way the start column does.
+   Twenty-seven step handlers and five finish handlers cover all 247 moves;
+   BtlFxStep01 alone covers 138 of them and BtlFxFinish01 88. They are declared
+   without a prototype because that is how the table reaches them - a step
+   handler is handed the record it is stepping, and BtlFxObjTick calls it
+   through a pointer that says nothing about arguments. */
+extern void BtlFxStep01();
+extern void BtlFxStep09();
+extern void BtlFxStep12();
+extern void BtlFxStep27();
+extern void BtlFxStep2A();
+extern void BtlFxStep2F();
+extern void BtlFxStep33();
+extern void BtlFxStep36();
+extern void BtlFxStep38();
+extern void BtlFxStep3A();
+extern void BtlFxStep42();
+extern void BtlFxStep44();
+extern void BtlFxStep4C();
+extern void BtlFxStep4F();
+extern void BtlFxStep5B();
+extern void BtlFxStep6D();
+extern void BtlFxStep6E();
+extern void BtlFxStep72();
+extern void BtlFxStep84();
+extern void BtlFxStep86();
+extern void BtlFxStep87();
+extern void BtlFxStep88();
+extern void BtlFxStepA0();
+extern void BtlFxStepA2();
+extern void BtlFxStepDB();
+extern void BtlFxStepE5();
+extern void BtlFxStepE8();
+
+extern void BtlFxFinish01();
+extern void BtlFxFinish37();
+extern void BtlFxFinish53();
+extern void BtlFxFinish5F();
+extern void BtlFxFinish8C();
+
 extern BtlObj *BtlFxStart05(void);
 extern BtlObj *BtlFxStart0D(void);
 extern BtlObj *BtlFxStart0E(void);
