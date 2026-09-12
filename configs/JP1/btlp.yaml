@@ -423,7 +423,7 @@ segments:
       - [0x49548, c, objmotion12]
       - [0x49584, c, gaugecolour]
       - [0x4960C, c, markers]
-      - [0x49734, asm, btlp_69]
+      - [0x49734, c, memberact]
       - [0x4C454, c, membermotion12]
       - [0x4C5E4, asm, btlp_69_a]
       - [0x4CB24, c, personamotion]
@@ -546,6 +546,10 @@ segments:
       - [0x68270, data, btlp_data1]
       - [0x68B44, .data, loadenemy]
       - [0x68B5C, data, btlp_data2]
+      # The two choice prompts' pictures, positions and arrays, which
+      # memberact.c emits itself.
+      - [0x6C040, .data, memberact]
+      - [0x6C070, data, btlp_data2c]
       # g_btl_spell_fx, which spellfxtable.c now emits itself. The unit is data
       # only - it has no text of its own - so nothing places it in the overlay
       # but this line.

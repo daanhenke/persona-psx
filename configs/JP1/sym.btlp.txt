@@ -2060,10 +2060,10 @@ BtlPlaceMemberMarkers         = 0x800AD9AC; // type:func size:0x128
 //--- PA: 0x049734   VA: 0x800ADAD4   subsegment: asm, btlp_69
 //------------------------------------------------------------
 BtlChoiceSpawn                = 0x800ADAD4; // type:func size:0x150
-func_800ADC24                 = 0x800ADC24; // type:func size:0xC8C
-func_800AE8B0                 = 0x800AE8B0; // type:func size:0xD5C
-func_800AF60C                 = 0x800AF60C; // type:func size:0xD40
-func_800B034C                 = 0x800B034C; // type:func size:0x4A8
+BtlMemberMotion02             = 0x800ADC24; // type:func size:0xC8C
+BtlMemberStrike               = 0x800AE8B0; // type:func size:0xD5C
+BtlMemberMotion06             = 0x800AF60C; // type:func size:0xD40
+BtlMemberMotion05             = 0x800B034C; // type:func size:0x4A8
 
 //-----------------------------------------------------------------
 //--- PA: 0x04C454   VA: 0x800B07F4   subsegment: c, membermotion12
@@ -3206,6 +3206,9 @@ g_btl_tactics_board_pos       = 0x800D029C; // type:s32 size:0x10
 g_btl_config_board_pos        = 0x800D02AC; // type:s32 size:0x10
 g_btl_board15_pos             = 0x800D02BC; // type:s32 size:0x10
 g_btl_status_board_pos        = 0x800D02CC; // type:s32 size:0x10
+g_btl_choice_pos              = 0x800D03E0; // type:s32 size:0x20
+g_btl_choice_kind             = 0x800D0400; // type:u16 size:0x8
+g_btl_choice_objs             = 0x800D0408; // size:0x8
 g_btl_persona_ready           = 0x800D0410; // type:u8 size:0x1
 g_btl_enemy_attack            = 0x800D041C;
 g_btl_fx_def                  = 0x800D042C; // size:0x8
