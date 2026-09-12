@@ -133,7 +133,12 @@ typedef struct BtlActor {
                                       what BtlStepCluts walks               */
     /* 0xCB */ u_char  padCB[1];
     /* 0xCC */ u_char  unkCC;      /* the five below are cleared as a record  */
-    /* 0xCD */ u_char  padCD[5];   /* is filled, and nothing has read them    */
+    /* 0xCD */ u_char  padCD[3];   /* is filled, and nothing has read them    */
+    /* 0xD0 */ u_char  unkD0;      /* counted up on the acting fighter when
+                                      move 0x4C's effect resolves and the
+                                      fight is one that may be run from;
+                                      nothing has been found that reads it  */
+    /* 0xD1 */ u_char  padD1[1];
     /* 0xD2 */ u_char  unkD2;
     /* 0xD3 */ u_char  unkD3;
     /* 0xD4 */ u_char  unkD4;
