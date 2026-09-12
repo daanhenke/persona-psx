@@ -2290,9 +2290,9 @@ BtlFxStart24                  = 0x800B8B00; // type:func size:0x20
 BtlFxStart25                  = 0x800B8B20; // type:func size:0x28
 BtlFxStart26                  = 0x800B8B48; // type:func size:0x28
 
-//----------------------------------------------------------------
-//--- PA: 0x0547D0   VA: 0x800B8B70   subsegment: asm, btlp_69_c_f
-//----------------------------------------------------------------
+//------------------------------------------------------------
+//--- PA: 0x0547D0   VA: 0x800B8B70   subsegment: c, fxspell27
+//------------------------------------------------------------
 BtlFxStart27                  = 0x800B8B70; // type:func size:0xC0
 BtlFxStep27                   = 0x800B8C30; // type:func size:0x25C
 
@@ -2302,9 +2302,9 @@ BtlFxStep27                   = 0x800B8C30; // type:func size:0x25C
 BtlFxStart28                  = 0x800B8E8C; // type:func size:0x20
 BtlFxStart29                  = 0x800B8EAC; // type:func size:0x20
 
-//----------------------------------------------------------------
-//--- PA: 0x054B2C   VA: 0x800B8ECC   subsegment: asm, btlp_69_c_g
-//----------------------------------------------------------------
+//------------------------------------------------------------
+//--- PA: 0x054B2C   VA: 0x800B8ECC   subsegment: c, fxspell2a
+//------------------------------------------------------------
 BtlFxStart2A                  = 0x800B8ECC; // type:func size:0x128
 BtlFxStep2A                   = 0x800B8FF4; // type:func size:0x228
 BtlFxStart2B                  = 0x800B921C; // type:func size:0x70
@@ -2334,9 +2334,9 @@ BtlFxStart2F                  = 0x800B9638; // type:func size:0x11C
 //------------------------------------------------------------
 BtlFxStart30                  = 0x800B9754; // type:func size:0x20
 
-//----------------------------------------------------------------
-//--- PA: 0x0553D4   VA: 0x800B9774   subsegment: asm, btlp_69_c_j
-//----------------------------------------------------------------
+//-----------------------------------------------------------
+//--- PA: 0x0553D4   VA: 0x800B9774   subsegment: c, fxstep12
+//-----------------------------------------------------------
 BtlFxStep12                   = 0x800B9774; // type:func size:0x170
 BtlFxStep2F                   = 0x800B98E4; // type:func size:0x324
 
@@ -2476,9 +2476,9 @@ BtlFxStart59                  = 0x800BC91C; // type:func size:0x2C
 BtlFxStart5A                  = 0x800BC948; // type:func size:0x2C
 BtlFxStart5B                  = 0x800BC974; // type:func size:0x28
 
-//----------------------------------------------------------------
-//--- PA: 0x0585FC   VA: 0x800BC99C   subsegment: asm, btlp_69_c_u
-//----------------------------------------------------------------
+//-----------------------------------------------------------
+//--- PA: 0x0585FC   VA: 0x800BC99C   subsegment: c, fxstep5b
+//-----------------------------------------------------------
 BtlFxStep5B                   = 0x800BC99C; // type:func size:0x258
 
 //------------------------------------------------------------
@@ -2612,9 +2612,9 @@ BtlFxStepA0                   = 0x800BF0F8; // type:func size:0x3D8
 //------------------------------------------------------------
 BtlFxStartA1                  = 0x800BF4D0; // type:func size:0x28
 
-//-----------------------------------------------------------------
-//--- PA: 0x05B158   VA: 0x800BF4F8   subsegment: asm, btlp_69_c_ac
-//-----------------------------------------------------------------
+//------------------------------------------------------------
+//--- PA: 0x05B158   VA: 0x800BF4F8   subsegment: c, fxspella2
+//------------------------------------------------------------
 BtlFxStartA2                  = 0x800BF4F8; // type:func size:0x64
 BtlFxStepA2                   = 0x800BF55C; // type:func size:0xCC
 
@@ -3020,7 +3020,9 @@ g_btl_seq_catchup             = 0x800CCA2B;
 g_btl_place_party             = 0x800CCA2C; // type:u8 size:0x1
 g_btl_hold_markers            = 0x800CCA30; // type:u8 size:0x1
 g_btl_pick_slowest            = 0x800CCA32; // type:u8 size:0x1
+g_btl_no_escape               = 0x800CCA2E; // type:u8 size:0x1
 g_btl_no_flee                 = 0x800CCA33; // type:u8 size:0x1
+g_btl_party_no_flee           = 0x800CCA34; // type:u8 size:0x1
 g_btl_tint_pick_r             = 0x800CCA38; // type:u32 size:0x8
 g_btl_tint_pick_g             = 0x800CCA39;
 g_btl_tint_pick_b             = 0x800CCA3A;
@@ -3231,7 +3233,9 @@ g_btl_spell_fx                = 0x800D0484; // size:0xF70
 //-----------------------------------------------------------------
 g_btl_fx_nine_order           = 0x800D1408; // type:u8 size:0x9
 g_btl_fx_ring_cells           = 0x800D1414; // type:u8 size:0x10
-D_800D1494                    = 0x800D1494; // type:u32 size:0x4084
+D_800D1494                    = 0x800D1494; // type:u32 size:0x80
+g_btl_fx_middle               = 0x800D1514; // type:s32 size:0xC
+g_btl_fx_origin               = 0x800D1524; // type:s32 size:0xC
 g_btl_open_banks              = 0x800D536C; // size:0x50
 g_btl_bgm_kinds               = 0x800D53BC;
 g_btl_affinity                = 0x800D5518; // type:u8 size:0x1790

@@ -108,8 +108,19 @@ extern u_char g_btl_move_choices[8];
 /* Set on the fighter alongside BTL_MOVE_IDLE. */
 #define BTL_ACTOR_IDLE 0x8000
 
-/* Suppresses running for the rest of the fight. */
+/* Set as the battle opens for any of the first 0x23 encounters that is not
+   one of the placement scenes: this fight may not be run from. BtlEscapeMenu
+   rules the roll out on it, and the two effect handlers that would otherwise
+   send the enemies running check it first. */
+extern u_char g_btl_no_escape;
+
+/* The two sides' counts of rounds nobody may run for. The first is what the
+   enemy AI tests before it decides to flee, the second what BtlEscapeMenu
+   tests before it rolls; both are counted down a round at a time as the turn
+   order is built, and move 0xA2 sets whichever belongs to the side that did
+   not cast it. */
 extern u_char g_btl_no_flee;
+extern u_char g_btl_party_no_flee;
 
 /* The two bosses that change shape rather than act. Each keeps which shape it
    is in and whether it has already changed, and each has its own pair of

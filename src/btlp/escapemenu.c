@@ -56,8 +56,6 @@ extern u_char D_800CFA58;
 /* Three ways the roll is ruled out before it is made: the fight is one that
    may not be left, the field says so, and the level gap. */
 extern u_char D_8004E260;
-extern u_char D_800CCA2E;
-extern u_char D_800CCA34;
 
 /* How many times the key was pressed while the question stood, kept where
    something else can read it. */
@@ -135,9 +133,9 @@ int BtlEscapeMenu(void)
                            ESCAPE_MSG_STYLE);
             if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE || D_8004E260 != 0) {
                 got = 1;
-            } else if (D_800CCA2E != 0
+            } else if (g_btl_no_escape != 0
                        || g_btl_enemy_level - g_btl_party_level >= 10
-                       || D_800CCA34 != 0) {
+                       || g_btl_party_no_flee != 0) {
                 got = 0;
             } else {
                 i = 0;

@@ -33,7 +33,6 @@
 #define FX_RING_ATTR (FX_OBJ_ATTR | 0x40000)
 
 /* Where each record stands relative to the fighter, in 16.16. */
-extern long g_btl_fx_ring[][2];
 
 BtlObj *BtlFxStartRing(void)
 {

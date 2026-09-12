@@ -108,6 +108,16 @@ extern signed char g_btl_fx_shift[];
    three-by-three grid with the middle left out - the column in quarters and
    the row in halves, which is what the two multiplies in BtlFxStep27 undo.
    Beside it, the order the nine cells of a three-by-three sheet arrive in. */
+/* Where move 0xA2's one record stands: the middle of the field, sixty-four
+   units toward the camera, written out in the data rather than worked out. */
+extern long g_btl_fx_middle[];
+
+/* And where move 0xE5's stands: the middle of the field exactly. */
+extern long g_btl_fx_origin[];
+
+/* The six places round a fighter a ring's records stand, as offsets from it. */
+extern long g_btl_fx_ring[][2];
+
 extern u_char g_btl_fx_ring_cells[];
 extern u_char g_btl_fx_nine_order[];
 
