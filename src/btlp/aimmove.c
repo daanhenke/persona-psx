@@ -21,7 +21,7 @@
  * back out of it - answering nothing if that leaves nobody - and the rest aim
  * at a single member like everything else.
  *
- * The two halves of the pickable pair go together: func_800C5A00 with
+ * The two halves of the pickable pair go together: BtlSetPartyPickable with
  * BtlPickRandomMember for the party, BtlSetPickable with BtlPickRandomEnemy
  * for the enemies.
  */
@@ -81,7 +81,6 @@ extern int  BtlPickAiTarget(BtlActor *a, int reach);
 extern int  BtlPickableMask(void);
 extern void BtlSetPickable(void);
 extern int  BtlFrontMemberOrder(BtlActor *by);
-extern void func_800C5A00(void);
 extern int  BtlPickRandomMember(void);
 extern int  BtlPickRandomEnemy(void);
 extern void func_80094A20(BtlActor *at, int reach);
@@ -110,7 +109,7 @@ void BtlAimMove(BtlActor *a)
     }
 
     if (a->move == MOVE_AIMED_ONE) {
-        func_800C5A00();
+        BtlSetPartyPickable();
         slot = BtlPickRandomMember();
         a->order = slot;
         a->targets = 1 << slot;
@@ -144,7 +143,7 @@ void BtlAimMove(BtlActor *a)
             a->targets = BtlPickableMask();
             return;
         }
-        func_800C5A00();
+        BtlSetPartyPickable();
         a->order = BtlPickRandomMember();
         a->targets = func_80094C40();
         return;
@@ -204,18 +203,18 @@ swing:
     }
     switch (reach) {
     case REACH_ONE:
-        func_800C5A00();
+        BtlSetPartyPickable();
         slot = BtlPickRandomMember();
         a->order = slot;
         a->targets = 1 << slot;
         break;
     case REACH_SIDE:
-        func_800C5A00();
+        BtlSetPartyPickable();
         a->order = BtlPickRandomMember();
         a->targets = func_80094C40();
         break;
     default:
-        func_800C5A00();
+        BtlSetPartyPickable();
         slot = BtlPickRandomMember();
         func_80094A20(&g_btl_actors[slot], g_spell_data[a->move].target);
         a->order = slot;

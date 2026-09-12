@@ -57,8 +57,6 @@ extern const u_char g_btl_tint_pick_r;
 extern void BtlTintActorClut(int actor, int r, int g, int b);
 extern int  BtlPickMember(short *slot);
 extern void BtlOpenItemBoard(void);
-extern void func_800C5600(void);
-extern void func_800C5A00(void);
 extern void func_800C56CC(int slot);
 extern int  func_80094C40(void);
 
@@ -70,8 +68,8 @@ int BtlPickTargetMember(BtlActor *a)
 
     BtlDrawFrame();
     BtlRefreshMarkers();
-    func_800C5600();
-    func_800C5A00();
+    BtlDimEnemies();
+    BtlSetPartyPickable();
     g_btl_target_slot = g_btl_actor_turn;
 
     for (;;) {
@@ -119,8 +117,8 @@ int BtlPickTargetParty(BtlActor *a)
 
     BtlDrawFrame();
     BtlRefreshMarkers();
-    func_800C5600();
-    func_800C5A00();
+    BtlDimEnemies();
+    BtlSetPartyPickable();
     i = 0;
     marks = g_btl_marker_obj;
     tint = &g_btl_tint_pick_r;

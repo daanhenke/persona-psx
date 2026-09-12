@@ -353,6 +353,9 @@ segments:
       - [0x2F800, asm, btlp_57]
       - [0x30934, c, enemy2]
       - [0x30984, asm, btlp_57_x1]
+      - [0x30B54, c, itembag]
+      - [0x30C68, c, packgrid]
+      - [0x30E30, asm, btlp_57_x1_a]
       - [0x33310, c, personawon]
       # The event-flag trio the battle keeps for itself, then the turn-order
       # helpers, the scripted opening and the two scenes that close a round.
@@ -562,6 +565,11 @@ segments:
       - [0x605AC, c, cursor2]
       - [0x60648, c, targetcursor]
       - [0x607E0, asm, btlp_69_x5]
+      - [0x611A4, c, dimsides]
+      - [0x6132C, asm, btlp_69_x5_a]
+      - [0x615F0, c, pickable]
+      - [0x61780, c, partyattr]
+      - [0x61924, asm, btlp_69_x5_b]
       - [0x619E4, c, statustint]
       - [0x61B2C, c, actoridle]
       # The overlay's own workspace: what the disc carries a value for, and

@@ -211,6 +211,22 @@ extern void BtlAimMove(BtlActor *a);
 extern int  BtlOrderTurns(u_char *order, int n);
 extern int  BtlResetTurnOrder(void);
 extern void BtlSetPickable(void);
+
+/* The party's half of the same pair: an enemy is pickable unless its slot is
+   empty or it cannot be given an order, a member also has to be alive and
+   still in the fight. */
+extern void BtlSetPartyPickable(void);
+
+/* Puts one side of the field into the background as a pick opens - stopped
+   where it stands and walking toward an eighth of full brightness, ailment
+   markers and all. */
+extern void BtlDimParty(void);
+extern void BtlDimEnemies(void);
+
+/* One attribute bit across every live member, its shadow and its marker.
+   BtlObjSetAttr only walks `attached` and would not reach the other two. */
+extern void BtlPartySetAttr(u_long bits);
+extern void BtlPartyClearAttr(u_long bits);
 extern u_long BtlPickableMask(void);
 
 /* Markers: whether they are all still, whether any is up, and taking them

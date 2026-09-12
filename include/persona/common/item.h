@@ -101,6 +101,13 @@ extern u_short g_btl_usable_items[];
 
 extern int          BtlItemAdd(int id);
 extern int          BtlItemRemove(int id);
+
+/* The battle's own pair on the same list, which walk it themselves rather than
+   asking BtlItemSlot where the entry is. Giving refuses a stack already at
+   ITEM_MAX instead of opening a second one; taking answers whether it found
+   anything to take. */
+extern void         BtlGiveItem(int id);
+extern int          BtlTakeItem(int id);
 /* BtlItemSlot answers a packed word. Some callers were built against a
    declaration that narrowed it for them; they cast at the call instead, which
    is the same instruction and keeps one prototype here. */
