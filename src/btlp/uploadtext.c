@@ -11,7 +11,6 @@
  * field ends between them.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/window.h>
 #include <persona/btlp/battle.h>
 
@@ -38,24 +37,30 @@ typedef struct {
 extern const u_char *BtlSeqReadValue(const u_char *p, u_short *out);
 extern void BtlExpandGlyph(int code, u_int *dest, int font);
 
-#ifdef NON_MATCHING
 void BtlUploadText(const BtlTalkCell *cell, const u_char *text)
 {
     u_short value[4];
     int     n;
     int     x;
+    u_char *glyph_cells;
+    int     field;
 
     n = 0;
     if (*text != STR_END && *text != STR_FIELD) {
+        field = STR_FIELD;
+        glyph_cells = g_btl_glyph_cells;
         x = BTL_TEXT_X;
-        while (n < BTL_TEXT_MAX && text[1] != STR_FIELD) {
+        do {
+            if (n >= BTL_TEXT_MAX || text[1] == field) {
+                break;
+            }
             text = BtlSeqReadValue(text, value);
             BtlExpandGlyph(value[0],
-                           (u_int *)&g_btl_glyph_cells[g_btl_glyph_next *
-                                                       BTL_GLYPH_STRIDE],
+                           (u_int *)(g_btl_glyph_next * BTL_GLYPH_STRIDE +
+                                     (u_int)glyph_cells),
                            g_font_bits);
-            BtlQueueVramLoad(&g_btl_glyph_cells[g_btl_glyph_next *
-                                                BTL_GLYPH_STRIDE],
+            BtlQueueVramLoad((u_char *)(g_btl_glyph_next * BTL_GLYPH_STRIDE +
+                                       (u_int)glyph_cells),
                              cell->x * 2 + x, cell->y + BTL_TEXT_Y,
                              BTL_GLYPH_W, BTL_GLYPH_H);
             g_btl_glyph_next++;
@@ -64,13 +69,6 @@ void BtlUploadText(const BtlTalkCell *cell, const u_char *text)
             if (*text == STR_END) {
                 break;
             }
-            if (*text == STR_FIELD) {
-                break;
-            }
-        }
+        } while (*text != field);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/uploadtext", BtlUploadText);
-#endif
-

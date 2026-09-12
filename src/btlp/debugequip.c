@@ -21,7 +21,6 @@
 #include <decomp/types.h>
 #include <persona/common/char.h>
 #include <persona/common/item.h>
-#include <decomp/include_asm.h>
 
 /* One bit per Char key, and the group each of the seven slots takes. */
 extern const u_short g_btl_char_bit[];
@@ -38,23 +37,19 @@ extern const u_short g_btl_equip_kind[];
 #define EQUIP_DOWN (-1)
 #define EQUIP_UP   1
 
-/* 98.94%: three words, all of them the slot's address. The image adds the
-   slot to the row and this adds the row to the slot, and it keeps the address
-   in a register of its own for the third walk. Binding the 0x20 to the row
-   took it from 96.19%; the rest is a register question. */
-#ifdef NON_MATCHING
 void BtlDebugStepEquip(Char *c, int slot, int dir)
 {
     u_short *equip;
     u_short *cell;
+    const u_short *kind;
+    const u_short *char_bit;
     int      id;
 
     /* The slot's row is taken first and the slot added to it. Reached as
        c->equip[slot] throughout, the 0x20 binds to the index instead and every
        address in here comes out the other way round. */
     equip = c->equip;
-    cell = &equip[slot];
-    id = *cell;
+    id = *(u_short *)(slot * sizeof(*equip) + (u_int)equip);
 
     if (dir == EQUIP_DOWN) {
         id--;
@@ -78,15 +73,17 @@ void BtlDebugStepEquip(Char *c, int slot, int dir)
         }
     } else {
         id++;
-        while (id <= EQUIP_LAST) {
-            if ((g_item_defs[id].owners & g_btl_char_bit[c->key]) != 0
-                && (g_item_defs[id].unk06 & EQUIP_KIND) == g_btl_equip_kind[slot]) {
-                *cell = id;
-            }
-            id++;
+        if (id <= EQUIP_LAST) {
+            char_bit = g_btl_char_bit;
+            kind = &g_btl_equip_kind[slot];
+            cell = (u_short *)(slot * sizeof(*equip) + (u_int)equip);
+            do {
+                if ((g_item_defs[id].owners & char_bit[c->key]) != 0
+                    && (g_item_defs[id].unk06 & EQUIP_KIND) == *kind) {
+                    *cell = id;
+                }
+                id++;
+            } while (id <= EQUIP_LAST);
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/debugequip", BtlDebugStepEquip);
-#endif

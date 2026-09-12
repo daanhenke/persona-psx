@@ -17,7 +17,6 @@
  * Returns where the CLUT was read from, which is zero for a file with none.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
@@ -28,7 +27,6 @@
 #define CLUT_ROW0   0x1E0       /* first VRAM row CLUTs are kept in    */
 #define CLUT_X0     0xF0        /* leftmost CLUT column past the first */
 
-#ifdef NON_MATCHING
 u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, short y,
                      int nclut)
 {
@@ -36,14 +34,18 @@ u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, short y,
     RECT r;             /* declared and never used; the frame is 8 bytes
                            larger than the code needs, so leave it */
     u_short *c;
+    u_short *clut;
     int i;
+    u_short page_y;
 
     OpenTIM(tim);
     ReadTIM(&t);
 
     if (t.paddr != 0) {
         t.prect->x = (page & 0xF) * PAGE_W;
-        t.prect->y = (page & PAGE_BOTTOM) * 0x10 + y;
+        page_y = (page & PAGE_BOTTOM) * 0x10;
+        page_y += y;
+        t.prect->y = page_y;
         LoadImage(t.prect, t.paddr);
         g_btl_tpage[page] = GetTPage(t.mode & 3, abr, t.prect->x, t.prect->y);
         if (t.prect->w > 0x80) {
@@ -70,7 +72,8 @@ u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, short y,
             i = 0;
         } while (0);
         if (nclut > 0) {
-            c = &g_btl_clut[slot];
+            clut = g_btl_clut;
+            c = (u_short *)(slot * sizeof(*c) + (u_int)clut);
             do {
                 *c = GetClut(t.crect->x, t.crect->y);
                 i++;
@@ -81,7 +84,4 @@ u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, short y,
     }
     return t.caddr;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/uploadtim", BtlUploadTim);
-#endif
 

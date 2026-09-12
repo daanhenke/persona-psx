@@ -16,7 +16,6 @@
  * the front row is already occupied, because the walk is then nought rows.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
@@ -25,15 +24,13 @@
 #define TALK_WALK_MOTION 0xD
 #define TALK_WALK_FRAMES 0x10
 
-#ifdef NON_MATCHING
 void BtlAfterTalk(void)
 {
     BtlObj *o;
     u_char *cell;
-    u_char  empty;
+    int     empty;
     int     rows;
     int     col;
-    int     at;
     int     taken;
     int     slot;
 
@@ -55,13 +52,13 @@ void BtlAfterTalk(void)
     /* Cleared back to front through a pointer of its own; indexed, the store
        works the address out afresh every turn. */
     empty = CELL_EMPTY;
-    at    = GRID_CELLS - 1;
+    slot  = GRID_CELLS - 1;
     cell  = &g_btl_formation[GRID_CELLS - 1];
     do {
         *cell = empty;
-        at--;
+        slot--;
         cell--;
-    } while (at >= 0);
+    } while (slot >= 0);
 
     slot = 0;
     do {
@@ -80,6 +77,3 @@ void BtlAfterTalk(void)
         slot++;
     } while (slot < BTL_PARTY);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/aftertalk", BtlAfterTalk);
-#endif
