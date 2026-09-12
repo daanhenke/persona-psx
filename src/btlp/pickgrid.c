@@ -60,9 +60,10 @@
 #define GRID_CURSOR_SCALE 0x80
 #define GRID_PIECE_BIT    0x400
 
-/* The two numbers a cell is given, and the motion the whole grid runs. */
-#define GRID_CELL_UNK72 0xC00
-#define GRID_CELL_UNK74 0x800
+/* The two angles a cell is given - three quarters of a turn and half of one -
+   and the motion the whole grid runs. */
+#define GRID_CELL_ROT_Y 0xC00
+#define GRID_CELL_ROT_Z 0x800
 #define GRID_MOTION     8
 
 /* What the backing plate and the cursors are put away with. */
@@ -145,8 +146,8 @@ void BtlSpawnPickGrid(void)
                 col++;
                 script += 2;
                 obj->unk58 = (long)&g_btl_grid_tail;
-                obj->unk72 = GRID_CELL_UNK72;
-                obj->unk74 = GRID_CELL_UNK74;
+                obj->rot.vy = GRID_CELL_ROT_Y;
+                obj->rot.vz = GRID_CELL_ROT_Z;
                 obj->motion = GRID_MOTION;
             } while (col < GRID_COLS);
             row++;

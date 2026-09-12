@@ -75,9 +75,9 @@ BtlObj *BtlSpawnMemberObj(int model, int col, int row, short p7, int slot)
     shadow->kind = model;
     shadow->col2 = col;
     shadow->row = row;
-    shadow->unk70 = SHADOW_LIFT;
-    shadow->unk72 = 0;
-    shadow->unk74 = 0;
+    shadow->rot.vx = SHADOW_LIFT;
+    shadow->rot.vy = 0;
+    shadow->rot.vz = 0;
     shadow->attr |= SHADOW_ATTR;
     obj->shadow = shadow;
     return obj;

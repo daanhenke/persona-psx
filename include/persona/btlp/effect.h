@@ -107,7 +107,7 @@ extern int  BtlEffectDrawLines(const BtlEffectRow *row);
    row drawers step y down. */
 extern short g_btl_glyph_x;
 extern short g_btl_glyph_y;
-extern void BtlFormatHexGlyphs(u_int value, u_char *out);
+extern void BtlFormatHexGlyphs(u_int value, u_char *out, int unused);
 
 /* The sixteen glyph codes a hex digit is written with, '0' to '9' and then
    'A' to 'F'. BtlFormatHexGlyphs takes a copy rather than reading it where it

@@ -167,7 +167,7 @@ void BtlEffectDrawRow(const BtlEffectRow *row)
 
 /* Eight hex digits and a terminator, leading zeros left blank - except the
    last, so a value of zero still writes one digit. */
-void BtlFormatHexGlyphs(u_int value, u_char *out)
+void BtlFormatHexGlyphs(u_int value, u_char *out, int unused)
 {
     u_char digit[16];
     int    i;
@@ -216,6 +216,7 @@ void BtlEffectDrawNumber(const BtlEffectRow *row)
 {
     const BtlEffectRow *r;
     u_char *p;
+    u_char *base;
     u_char text[16];
     u_int  value;
     int    i;
@@ -234,18 +235,21 @@ void BtlEffectDrawNumber(const BtlEffectRow *row)
         break;
     }
     if ((r->kind & 0x80) != 0) {
-        BtlFormatHexGlyphs(value, text);
+        BtlFormatHexGlyphs(value, text, 0);
     } else {
-        BtlFormatDecimal(value, text, 0);
-        p = text;
-        i = 0;
+        do {
+            BtlFormatDecimal(value, text, 0);
+            i = 0;
+        } while (0);
+        base = text;
+        p = base;
         if (p[0] != 0xFF) {
             do {
                 if (p[i] != EFFECT_DIGIT_BLANK) {
                     p[i] += EFFECT_DIGIT_ZERO;
                 }
                 i++;
-                p = text;
+                p = base;
             } while (p[i] != 0xFF);
         }
         text[i] = 0xFF;

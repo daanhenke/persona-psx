@@ -112,9 +112,9 @@ placed:
     shadow->kind = species;
     shadow->col2 = col;
     shadow->row = row;
-    shadow->unk70 = BTL_SHADOW_DROP;
-    shadow->unk72 = 0;
-    shadow->unk74 = 0;
+    shadow->rot.vx = BTL_SHADOW_DROP;
+    shadow->rot.vy = 0;
+    shadow->rot.vz = 0;
     shadow->scripts = (const u_long **)g_btl_species_gfx[species];
     shadow->attr |= BTL_SHADOW_ATTR;
     obj->shadow = shadow;

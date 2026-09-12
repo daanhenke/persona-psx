@@ -196,9 +196,9 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->unk60 = 0;
             obj->script = (BtlSeqStep *)defs->scripts;
             obj->last = ((const BtlSeqStep *)defs->scripts)->value;
-            obj->unk70 = 0;
-            obj->unk72 = 0;
-            obj->unk74 = 0;
+            obj->rot.vx = 0;
+            obj->rot.vy = 0;
+            obj->rot.vz = 0;
             obj->scale_x = BTL_ALLOC_SCALE;
             obj->scale_y = BTL_ALLOC_SCALE;
             obj->scale_z = BTL_ALLOC_SCALE;

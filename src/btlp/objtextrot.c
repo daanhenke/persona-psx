@@ -49,7 +49,7 @@ void BtlDrawObjTextRot(BtlObj *o)
 
     /* The rotation is the vector of shorts at +0x70 and the scale the three
        words at +0x78. */
-    RotMatrix((SVECTOR *)&o->unk70, &g_btl_obj_matrix);
+    RotMatrix(&o->rot, &g_btl_obj_matrix);
     ScaleMatrix(&g_btl_obj_matrix, (VECTOR *)&o->scale_x);
     TransMatrix(&g_btl_obj_matrix, &g_btl_obj_shift);
     SetRotMatrix(&g_btl_obj_matrix);

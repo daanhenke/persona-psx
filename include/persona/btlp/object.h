@@ -24,6 +24,7 @@
 #define PERSONA_BTLP_OBJECT_H
 
 #include <decomp/types.h>
+#include <libgte.h>
 
 /* One step of an animation script. The high byte of `flags` is set on every
    step but the last, which is how the end is found. */
@@ -91,11 +92,15 @@ typedef struct BtlObj {
     /* 0x6C */ struct BtlActor *actor; /* whose object this is; the spawn
                                           writes it and BtlObjStatusTint
                                           reads the ailment through it   */
-    /* 0x70 */ short          unk70;   /* a shadow is given -0x320 here and
-                                          zero in the two below it        */
-    /* 0x72 */ short          unk72;
-    /* 0x74 */ short          unk74;
-    /* 0x76 */ u_char         pad76[2];
+    /* 0x70 */ SVECTOR        rot;     /* the three angles the record is drawn
+                                          through, handed to RotMatrix as it
+                                          stands - which is what says the three
+                                          shorts and the pad behind them are one
+                                          vector. 0x1000 is a whole turn, so a
+                                          shadow laid flat takes -0x320 on vx
+                                          and nothing on the other two, and the
+                                          pick grid's motions step vy and vz
+                                          round one whole turn              */
     /* 0x78 */ long           scale_x;  /* unity is 0x100 in both of these  */
     /* 0x7C */ long           scale_y;
     /* 0x80 */ long           scale_z;  /* unity is 0x1000 in this one      */

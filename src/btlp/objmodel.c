@@ -112,9 +112,9 @@ void BtlDrawObjModel(BtlObj *o)
     at.vy = sxy.vy;
     at.vz = g_btl_screen_dist;
     if ((o->attr & BTL_OBJ_FACE_CAMERA) != 0) {
-        o->unk70 = g_btl_cam_rot.vx;
+        o->rot.vx = g_btl_cam_rot.vx;
     }
-    RotMatrix((SVECTOR *)&o->unk70, &g_btl_obj_matrix);
+    RotMatrix(&o->rot, &g_btl_obj_matrix);
     ScaleMatrix(&g_btl_obj_matrix, (VECTOR *)&o->scale_x);
     ScaleMatrix(&g_btl_obj_matrix, &g_btl_intro_x);
     TransMatrix(&g_btl_obj_matrix, &at);

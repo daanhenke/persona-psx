@@ -42,7 +42,7 @@ void BtlDrawObjTilesRot(BtlObj *o)
 
     /* The rotation is the vector of shorts at +0x70 and the scale the three
        words at +0x78. */
-    RotMatrix((SVECTOR *)&o->unk70, &g_btl_obj_matrix);
+    RotMatrix(&o->rot, &g_btl_obj_matrix);
     /* The block boundary is load-bearing: it is what puts the counter in the
        register the original uses. Do not unwrap it. */
     do {

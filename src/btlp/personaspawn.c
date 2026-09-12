@@ -98,9 +98,6 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
     int     y;
     int     which;
 
-    /* A second name for the id, used only by the loop below. It looks
-       redundant and is not: it is what keeps the table's index in the register
-       the original uses. */
     which = gfx;
     g_btl_persona_image = PERSONA_IMAGE;
     memcpy(PERSONA_IMAGE, g_load_stage[1], PERSONA_IMAGE_BYTES);
@@ -158,4 +155,3 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
 #else
 INCLUDE_ASM("btlp/nonmatchings/personaspawn", BtlSpawnPersona);
 #endif
-

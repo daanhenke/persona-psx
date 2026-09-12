@@ -55,9 +55,9 @@ void BtlFxObjTick(BtlObj *o)
     }
     else
     {
-        o->unk70 = g_btl_cam_rot.vx;
-        o->unk72 = g_btl_cam_rot.vy;
-        o->unk74 = *dist;
+        o->rot.vx = g_btl_cam_rot.vx;
+        o->rot.vy = g_btl_cam_rot.vy;
+        o->rot.vz = *dist;
         if (!(o->attr & BTL_OBJ_ANIMATING))
         {
             BtlObjSetScript(o, (BtlSeqStep *)o->unk60);
