@@ -1,6 +1,11 @@
-/* Persona 1 (JP) - one frame of the move drawn as a turning disc and the
- * pieces going round it.  BTLP only.
- *   0x800BA4FC BtlFxStep36
+/* Persona 1 (JP) - the move drawn as a turning disc and the pieces going
+ * round it.  BTLP only.
+ *   0x800BA2AC BtlFxStart36  0x800BA4FC BtlFxStep36
+ *
+ * BtlFxStart36 builds the set over the far side of the field from whoever is
+ * acting: eight pieces spaced evenly round the circle, each chained behind the
+ * last and started dark, and then the disc on top of them, drawn at one and a
+ * half times its size on the camera's own angles and held FX_36_HOLD frames.
  *
  * A step handler out of g_btl_spell_fx, called once a frame on each record of
  * the set. Which record it is is told by the mark: the head is the disc, and
@@ -14,6 +19,7 @@
  * copies free themselves once it has.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -39,6 +45,83 @@
 
 /* The mark a piece going round carries. */
 #define FX_COPY_MARK 0xFF
+
+/* The pieces round the circle, how far apart they start on the wave tables,
+   the colour they are walked to, and the disc's attributes and size. */
+#define FX_36_PIECES     8
+#define FX_36_SPACING    0x40
+#define FX_36_LIT        0x80
+#define FX_36_DISC_ATTR  (BTL_OBJ_ATTR_4000 | 0x4 | BTL_OBJ_NO_SHADOW)
+#define FX_36_DISC_SCALE 0x1800
+
+/* 75.20%. Every constant the two BtlObjAlloc calls take - the effect
+   template, the position's address, the group, 0x1D and 0xE - and the fade's
+   2 are kept in saved registers here and shared by both calls; the image
+   loads each afresh where it is used and holds only the 0x80 in a saved
+   register. It is not loop invariant motion: the loop written with a goto,
+   as a for and as a while all keep the sharing, and so does taking the 0x80
+   into a local. The pieces' fields are also stored through `after` in the
+   image once it has been advanced. */
+#ifdef NON_MATCHING
+BtlObj *BtlFxStart36(void)
+{
+    BtlObj *o;
+    BtlObj *after;
+    long    pos[3];
+    int     i;
+
+    g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[1];
+    i = FX_36_PIECES - 1;
+    after = NULL;
+    do {
+        pos[0] = g_btl_wave_sin[i * FX_36_SPACING] * FX_36_RADIUS;
+        pos[1] = g_btl_wave_cos[i * FX_36_SPACING] * FX_36_RADIUS
+                 + (g_btl_actor_turn < BTL_PARTY ? -FX_36_Y : FX_36_Y);
+        pos[2] = 0;
+        o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0, pos,
+                        FX_OBJ_CD, FX_OBJ_CE);
+        o->attached = after;
+        after = o;
+        o->attr = BTL_OBJ_NO_SHADOW;
+        o->mark_num = FX_COPY_MARK;
+        o->angle = i * FX_36_SPACING;
+        o->fade = FX_36_FADE;
+        o->rgb[0] = 0;
+        o->rgb[1] = 0;
+        o->rgb[2] = 0;
+        o->rgb_to[0] = FX_36_LIT;
+        o->rgb_to[1] = FX_36_LIT;
+        o->rgb_to[2] = FX_36_LIT;
+        i--;
+    } while (i >= 0);
+
+    g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
+    pos[0] = 0;
+    pos[1] = g_btl_actor_turn < BTL_PARTY ? -FX_36_Y : FX_36_Y;
+    pos[2] = 0;
+    o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0, pos,
+                    FX_OBJ_CD, FX_OBJ_CE);
+    o->attr = FX_36_DISC_ATTR;
+    o->scale_x = FX_36_DISC_SCALE;
+    o->scale_y = FX_36_DISC_SCALE;
+    o->mark_num = FX_MARK_HEAD;
+    o->fade = FX_36_FADE;
+    o->attached = after;
+    o->rgb[0] = 0;
+    o->rgb[1] = 0;
+    o->rgb[2] = 0;
+    o->rgb_to[0] = FX_36_LIT;
+    o->rgb_to[1] = FX_36_LIT;
+    o->rgb_to[2] = FX_36_LIT;
+    o->rot.vx = g_btl_cam_rot.vx;
+    o->rot.vy = g_btl_cam_rot.vy;
+    o->rot.vz = g_btl_intro_dist;
+    BtlObjSetTimer(o, FX_36_HOLD);
+    return o;
+}
+#else
+INCLUDE_ASM("btlp/nonmatchings/fxstep36", BtlFxStart36);
+#endif
 
 void BtlFxStep36(BtlObj *o)
 {

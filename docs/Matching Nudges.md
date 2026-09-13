@@ -1432,6 +1432,23 @@ stay unsigned in the struct - every other reader of it loads the same bits.
 - [objmotion6.c](/src/btlp/objmotion6.c) - `BtlObjMotion07`, 99.98% to exact,
   on the two rows that step the font row back.
 
+## A field tested after stores through a byte is read into a local before them
+
+Where the image loads a field early, then makes stores through a byte field of
+some other record, and only then subtracts from the value it loaded, the
+source read the field into a local before those stores. Written straight into
+the test, the field is read again after them - a store through a byte may
+alias anything, so gcc cannot keep the earlier load.
+
+In the same routine a clamp the image does on a copy of the value (`bltz a0`
+with `a1 = a0` in its delay slot) is a ternary, not an if chain, and two
+updates in a row the image stores `+0x18` then `+0x10` were written
+`+0x10` then `+0x18`: the scheduler turns an independent pair round.
+
+- [fxspell87.c](/src/btlp/fxspell87.c) - `BtlFxStep87`: 86.94% as first
+  written, 90.52% with the ternary clamp, 96.77% with the experience read into
+  a local ahead of the hit stores, and exact with the last two updates swapped.
+
 ## Reuse the first loop's locals in the second
 
 When a routine's second loop needs a lane and a row of its own, the image may
