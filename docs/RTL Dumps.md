@@ -124,6 +124,24 @@ routine's, so confirm anything it suggests with a sweep on the real unit.
   image's sched2 leaves them alone. Still open - see the trace below for why
   ours moves it.
 
+- **A copy is only tested if cse keeps it canonical.** In `cse.c`'s
+  `make_regs_eqv`, a register made equal to another becomes the one cse
+  substitutes everywhere only if its **last use in the whole function** comes
+  after the original's (and outside the current block). So
+  `owner = member; if (owner >= 10) ...` tests `member` whenever `member` is
+  used later than `owner` - scope does not matter, and neither does spelling
+  the wrap any other way. `BtlReloadMemberGfx`'s image tests the copy; taking a
+  second copy of the original after the wrap (`file = member;`, used for the
+  file lookup) ends `member`'s life early, and the `.cse` dump then shows the
+  test on `owner` and the subtraction in place, as the image has it. The
+  registers still differ (98.66% against 99.20% without), so it is not yet a
+  match.
+- **combine removes a copy whose source dies at its use.** In
+  `BtlPlaceFallenStep`'s up and left steps a `short` store copy survives cse
+  (the modes differ) and is then folded into the store by combine. The image's
+  copy survives because the value it copies is still wanted by the test
+  after it. Still open.
+
 ### How the scheduler decides
 
 gcc 2.6.0's own `sched.c` is in the release tarball that
