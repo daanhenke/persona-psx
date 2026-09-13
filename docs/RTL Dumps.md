@@ -107,6 +107,36 @@ routine's, so confirm anything it suggests with a sweep on the real unit.
   its block keeps expand order. See the section on it in
   [Matching Nudges](Matching%20Nudges.md), and `BtlMemberMotion06` in
   [memberact.c](/src/btlp/memberact.c).
+- **A label between a store and the call after it** stops sched moving the
+  call's argument set-up ahead of the store, and stops dbr pulling it into the
+  branch in front. Where the image has the argument in both branches' delay
+  slots, the shared tail was written out twice rather than reached by `goto`:
+  jump2's cross-jumping folds the copies back together, but only after sched
+  has run. `BtlStageCommand`'s handover, 98.24% to 98.89%, in
+  [commandstage.c](/src/btlp/commandstage.c).
 - **The load in front of `ovl_btlp_entry`'s first texture upload** is placed by
   sched, and every placement of the `g_btl_tim_buf` store in the source gives
-  the same scheduled order. Still open.
+  the same scheduled order. Still open; 16,000 permuter iterations found
+  nothing under the base score either.
+- **`BtlStageCommand`'s `run:` block** is placed by sched2. combine and sched
+  leave `g_btl_step = 0` ahead of the table index's `sll`; after reload sched2
+  moves the `sll` first, and dbr then copies it into step 5's delay slot. The
+  image's sched2 leaves them alone. Still open.
+
+### What cut-down compiles have settled
+
+These came from small hand-written functions compiled on their own, then
+confirmed on the real unit.
+
+- **An array member reached through a pointer adds the base first.**
+  `base->rows[k].entry[j]` builds `base + k*size`; `(base->rows + k)->entry[j]`
+  builds `k*size + base`. The `.rtl` dump shows it at generation - no later
+  pass swaps two registers. `BtlTalkSceneDemand` uses both, one per site, and
+  the image says which.
+- **A field's address used once in an update is built at the top of the
+  block.** `g_btl_offer[slot].mood[gauge] += weight` materialises
+  `g_btl_offer+0x3E` before the slot is even loaded; through
+  `short *mood = g_btl_offer[slot].mood;` it is built just before it is added
+  in, as the image has it. `BtlTalkSceneDemand`, 99.13% to 99.57%.
+- **The scratch script's address** - see the section on it in
+  [Matching Nudges](Matching%20Nudges.md).

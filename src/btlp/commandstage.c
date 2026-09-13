@@ -98,7 +98,7 @@ extern int  BtlCommandEntry(void);
 
 /* The two halves of the R1 display, which is held up until a key comes. */
 extern void func_800A95BC(void);
-extern void func_800A98A8(void);
+extern void BtlCloseBoard23(void);
 
 
 #ifdef NON_MATCHING
@@ -153,7 +153,7 @@ void BtlStageCommand(void)
                        == 0) {
                     BtlDrawFrame();
                 }
-                func_800A98A8();
+                BtlCloseBoard23();
                 break;
             }
             if (BtlMarkersHidden() && (g_btl_pad1_edge & g_btl_key_r2)) {
@@ -209,7 +209,9 @@ void BtlStageCommand(void)
                     BtlPickHighlight(g_btl_pick_help_row);
                     break;
                 }
-                goto handover;
+                BtlCloseMessage(0);
+                g_btl_stage++;
+                return;
             }
             g_btl_talk_outcome = 0;
         back_to_picker:
@@ -249,7 +251,6 @@ void BtlStageCommand(void)
             g_btl_step = 0;
             if (BtlCommandEntry() != 0) {
                 g_btl_step = 0;
-            handover:
                 BtlCloseMessage(0);
                 g_btl_stage++;
                 return;

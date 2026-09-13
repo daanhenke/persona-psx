@@ -1447,6 +1447,58 @@ with the value the test compares, so that value moves to another register.
 - [enemyload.c](/src/btlp/enemyload.c) - `BtlLoadEnemyGfx`, 99.97% to exact;
   with `slot` set above the test, `*wide` was loaded into `t0` instead of `v1`.
 
+## The scratch script's address is read with the offset spelled out
+
+The talk scenes find a script in the scratch file by reading the directory
+offset at its head, indexing the table past it, and adding both back on. The
+image loads the table entry into `a0` and adds the base and then the offset to
+it in place:
+
+    lw    a0, 0(v0)        # the table entry
+    addu  a0, a0, v1       # + the scratch base
+    addu  a0, a0, a1       # + the directory offset
+
+With the offset read into a local first - `dir = *(u_long *)BTL_SCRATCH;` and
+then `BTL_SCRATCH + dir + table[...]` - gcc still loads it once, but it adds the
+entry and the base *to the offset*: `addu a0, a1, a0`. Spelled out at both uses
+it comes out as the image:
+
+    BtlSeqPlay(BTL_SCRATCH + *(u_long *)BTL_SCRATCH
+               + *(u_long *)(BTL_SCRATCH + *(u_long *)BTL_SCRATCH + *line * 4));
+
+The two reads are CSEd into one load, so nothing is paid for it. What changes is
+that the offset is an expression rather than a variable when the sum is built,
+and a variable gets associated differently. A cut-down copy compiled on its own
+(see [RTL Dumps](RTL%20Dumps.md)) showed the same thing before either routine
+was touched.
+
+- [begintalk.c](/src/btlp/begintalk.c) - `BtlBeginTalking`, the last word.
+- [talkscenedemand.c](/src/btlp/talkscenedemand.c) - both script plays in
+  `BtlTalkSceneDemand`, 97.45% to 98.03% on that alone.
+
+## One saved register doing several jobs is one variable
+
+Where the image keeps a single saved register for values whose lifetimes never
+overlap, the source had a single variable. `BtlBeginTalking` uses `i` as a loop
+counter, then for the moon test, then for the menu's answer, then for the
+line's base address, and `n` counts the live offers and then picks the opening
+line. Given variables of their own, the short-lived ones land in `v1` or get
+tied to their neighbour, and the copies the image makes between them vanish.
+
+Where the image copies one of those into another register *after* a call - `addu
+s2, s0, zero` in a branch's delay slot - the copy is the else arm of an `if`,
+not an assignment above it:
+
+    i = g_btl_moon != MOON_FULL;
+    if (rand() % TALK_OPEN_SETS == 0) {
+        n = TALK_OPEN_SPARE;
+    } else {
+        n = i;
+    }
+
+- [begintalk.c](/src/btlp/begintalk.c) - `BtlBeginTalking`, 99.70% to 99.94% on
+  the reuse and the else arm together.
+
 ## A call that ends its basic block keeps its arguments in expand order
 
 gcc expands a call as the stack arguments first and then the register

@@ -330,7 +330,7 @@ void BtlTalkSceneDemand(void)
                     {
                         weight = BLOOD_MID;
                     }
-                    entry = base->rows[g_btl_demand_kind].entry[i + 5];
+                    entry = (base->rows + g_btl_demand_kind)->entry[i + 5];
                     if ((entry >> 8) == 0)
                     {
                         weight = 0;
@@ -344,8 +344,13 @@ void BtlTalkSceneDemand(void)
                         n      = rand();
                         /* What it costs the member who agreed: the demon's own level and
                            an eighth of unk20, plus a roll of sixteen. */
-                        used = offer->level + (offer->damage >> 3);
-                        take = used + n % 0x10 + 1;
+                        {
+                            /* A local of its own: in used, which lives on to
+                               hold the chosen enemy's total, the sum takes the
+                               register the division's adjustment wants. */
+                            int level = offer->level + (offer->damage >> 3);
+                            take = level + n % 0x10 + 1;
+                        }
                         g_btl_actors[g_btl_actor_slot].hit_amount = 0;
                         g_btl_actors[g_btl_actor_slot].c.hp -= take;
                         if (g_btl_actors[g_btl_actor_slot].c.hp < 1)
@@ -381,7 +386,7 @@ void BtlTalkSceneDemand(void)
                     break;
             }
 
-            entry  = base->rows[g_btl_demand_kind].entry[i + 5];
+            entry  = (base->rows + g_btl_demand_kind)->entry[i + 5];
             gauge  = entry & 0xFF;
             weight = entry >> 8;
         take_line:
@@ -392,7 +397,7 @@ void BtlTalkSceneDemand(void)
                 BtlHighlightBegin(gauge);
             }
             BtlSeqPlay((u_char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] +
-                *(u_long*)((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] + (base->rows[g_btl_demand_kind].entry[i]) * 4));
+                *(u_long*)((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] + ((base->rows + g_btl_demand_kind)->entry[i]) * 4));
             if (weight > TALK_VOICE_MIN - 1)
             {
                 BtlQueueVoice(gauge & 0xFF, 0);
@@ -401,7 +406,13 @@ void BtlTalkSceneDemand(void)
             {
                 BtlTalkPerform();
             }
-            (g_btl_offer + g_btl_offer_slot)->mood[gauge] += weight;
+            {
+                /* Through a pointer to the gauges: written as one indexed
+                   lvalue, gcc builds the table's address first thing in the
+                   block rather than just before it is added in. */
+                short* mood = g_btl_offer[g_btl_offer_slot].mood;
+                mood[gauge] += weight;
+            }
             BtlRefreshMoodGauges();
             if (BtlOfferRank(g_btl_offer_slot) == 1)
             {
