@@ -72,6 +72,11 @@ u_short g_btl_choice_kind[CHOICE_SETS][CHOICE_OPTIONS] = {
 
 BtlObj **g_btl_choice_objs[CHOICE_SETS] = {g_btl_choice0_objs, g_btl_choice1_objs};
 
+/* Raised once the summoned Persona is standing, and the template the summon's
+   picture is made from; both are filled in as the cast runs. */
+u_char    g_btl_persona_ready = 0;
+BtlObjDef g_btl_summon_def = {0, 0};
+
 /* Both options of one set come out of a single pass, so the frame of the
    first is already in the group's list when the second picture is linked
    after it - and `after` stays the picture rather than the frame, which is
@@ -140,7 +145,6 @@ extern int D_800F4BA0;
 
 extern u_char   *g_btl_fx_gfx;
 extern u_char   *g_btl_unused_gfx;
-extern BtlObjDef g_btl_summon_def;
 
 /* What the arena drops to while the Persona comes out, and what it is put
    back to afterwards. */
@@ -610,7 +614,6 @@ extern int D_800F4BAC;
 #define CAST_BOSS 3
 
 extern u_char   g_btl_seq_catchup;
-extern u_char   g_btl_persona_ready;
 extern u_char   g_btl_act_speed;
 extern u_char   g_btl_act_move;
 extern u_char  *g_btl_move_lines[];

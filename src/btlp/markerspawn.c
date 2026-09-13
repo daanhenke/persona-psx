@@ -55,8 +55,22 @@ typedef struct {
 extern const BtlObjDef    g_btl_shadow_defs[];
 extern const BtlObjDef    g_btl_obj_defs[];
 extern const BtlObjDef    g_btl_lone_defs[];
-extern const BtlMarkerDef g_btl_marker_defs[];
-extern long               g_btl_marker_pos[][4];
+
+/* Where the five party markers stand - two on the back row and three on the
+   front - and the two records each is made of. Both are written data, not
+   read-only: the image keeps them in .data. */
+long g_btl_marker_pos[BTL_MARKERS][4] = {
+    {0xA00000, 0xB80000, 0, 0},
+    {0x1040000, 0xB80000, 0, 0},
+    {0x3C0000, 0xD40000, 0, 0},
+    {0xA00000, 0xD40000, 0, 0},
+    {0x1040000, 0xD40000, 0, 0},
+};
+
+BtlMarkerDef g_btl_marker_defs[BTL_MARKER_PARTS] = {
+    {&g_btl_obj_defs[9], 0, 1, 0x1F, 0x27},
+    {g_btl_lone_defs, 0, 3, 0x1F, 0x20},
+};
 extern BtlObj            *g_btl_marker_obj[];
 extern BtlObj            *g_btl_marker_shown[];
 

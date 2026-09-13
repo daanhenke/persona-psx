@@ -14,7 +14,9 @@
 #define MARKER_MOTION 3
 
 extern BtlObj      *g_btl_marker_obj[];
-extern const u_char g_btl_marker_delay[];
+/* How long each of the five markers waits before it goes up, in halves of a
+   frame, so they arrive one after another. Written data in the image. */
+u_char g_btl_marker_delay[] = {1, 2, 3, 4, 5};
 
 extern void BtlBuildMarkers(void);
 

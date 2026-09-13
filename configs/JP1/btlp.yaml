@@ -96,6 +96,9 @@ segments:
       - [0x684, rodata, btlp_rodata5]
       - [0x7B4, .rodata, bindgfx]
       - [0x7C8, rodata, btlp_rodata6]
+      # BtlMemberMotion0D's two switch tables, which membermotion0d.c emits.
+      - [0x8AC, .rodata, membermotion0d]
+      - [0x8D8, rodata, btlp_rodata6_round]
       # Only BtlChooseEnemyMove's table, because it is the one routine in
       # roundflow.c that is already out of asm. The unit's rodata really starts
       # at 0x8D8 - BtlStageRound's five tables and the word behind them sit in
@@ -346,7 +349,8 @@ segments:
       - [0x26F24, asm, btlp_48_a]
       # The motions a fighter takes a blow in.
       - [0x28820, c, hitmotion]
-      - [0x28C8C, asm, btlp_48_a_x1]
+      # A member's record walking on and off in a scene.
+      - [0x28C8C, c, membermotion0d]
       # A fighter going out of the fight, and the angle helper after it.
       - [0x28F50, c, leavefield]
       - [0x292E0, c, angle]
@@ -659,13 +663,18 @@ segments:
       # The flag editor's line for each switch, which debugflags.c emits.
       - [0x6BC70, .data, debugflags]
       - [0x6BCF0, data, btlp_data2_x0]
+      # Where the party markers stand and what each is made of, which
+      # markerspawn.c emits, and the delay each goes up after, which
+      # markerrefresh.c does.
+      - [0x6BD28, .data, markerspawn]
+      - [0x6BD88, .data, markerrefresh]
       # The editor board's seven parts, which editboard.c emits itself.
       - [0x6BD90, .data, editboard]
       - [0x6BDC8, data, btlp_data2_x1]
       # The two choice prompts' pictures, positions and arrays, which
       # memberact.c emits itself.
       - [0x6C040, .data, memberact]
-      - [0x6C070, data, btlp_data2c]
+      - [0x6C07C, data, btlp_data2c]
       # g_btl_spell_fx, which spellfxtable.c now emits itself. The unit is data
       # only - it has no text of its own - so nothing places it in the overlay
       # but this line.
