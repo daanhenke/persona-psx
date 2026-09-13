@@ -1477,6 +1477,20 @@ scheduler puts it among the argument stores instead.
   pulls the running x step up among the copies, where the image has it), and
   exact with `pos[2] = 0` written in both arms.
 
+## A copy written ahead of a test, where the image has it in the branch's delay slot
+
+Where two locals that live through a whole loop nest trade saved registers and
+everything else matches, look at the plain copies around a test. `after = o`
+written after `if (o->mark_num == FX_MARK_HEAD) head = o;` gives `after` a
+different place in the allocator's order from the image's; written ahead of
+the test - which is where the image has it, in the delay slot of the test's
+branch - `after` and the hoisted copy of the column's x come out in the
+image's registers. Declaration order and where `after` is first set did not
+move them.
+
+- [fxsheet.c](/src/btlp/fxsheet.c) - `BtlFxStart05`: 99.67% to exact, a swap
+  of s2 and s3 with the caller-saved spills and stack slots already right.
+
 ## Reuse the first loop's locals in the second
 
 When a routine's second loop needs a lane and a row of its own, the image may
