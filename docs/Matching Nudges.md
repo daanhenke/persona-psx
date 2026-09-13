@@ -1709,3 +1709,33 @@ The `.combine` and `.sched` dumps show it directly - see
 - [memberact.c](/src/btlp/memberact.c) - `BtlMemberMotion06`, 98.61% to exact
   with this, `(signed char)` casts in place of `*(signed char *)&` on the
   acting fighter's status, and a local for `o->actor` across a byte store.
+
+## A store the image makes between the join's two stores goes last in both arms
+
+Where both arms of a side test set `pos[0]` and `pos[1]` and the image's join
+stores `pos[0]`, then `pos[2]`, then `pos[1]`, the source wrote `pos[2]` inside
+the arms as well, last. Written once after the `if`, its store is scheduled
+down among the next call's argument set-up instead.
+
+    if (g_btl_actor_turn < BTL_PARTY) {
+        pos[0] = ...; pos[1] = ...; pos[2] = layer * FX_12_RISE * PLACE_FIXED;
+    } else {
+        pos[0] = ...; pos[1] = ...; pos[2] = layer * FX_12_RISE * PLACE_FIXED;
+    }
+
+- [fxspell12.c](/src/btlp/fxspell12.c) - `BtlFxStart12`, 90.88% to exact with
+  this, the depth as a product rather than a stepped `z`, `after` cleared
+  before `row` is set, and the ring's three stores written whole in both arms.
+- [fxspell1e.c](/src/btlp/fxspell1e.c) - `BtlFxStart1E`, 91.98% to exact with
+  this, the same product, and the first loop's `cell` reused as the second
+  loop's mark counter.
+
+## A call whose argument loads come first is written first
+
+`BtlFxStart1E`'s image loads `BtlTintTargets`' four arguments ahead of the
+saved-register inits for `cell` and `after`, with `row = 0` in the call's
+delay slot. Every order of the three inits in front of the call scores the
+same; moving the call ahead of them all is exact. Read the argument loads'
+position against the inits before permuting the inits.
+
+- [fxspell1e.c](/src/btlp/fxspell1e.c) - 92.97% to 96.82% on that alone.
