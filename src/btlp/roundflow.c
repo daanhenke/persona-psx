@@ -711,7 +711,7 @@ void BtlStageRound(void)
                         action = actor->action;
                         switch (action) {
                         case 2:
-                            if (actor->unkD5 != 0 && g_btl_msg_speed != 2) {
+                            if (actor->counter != 0 && g_btl_msg_speed != 2) {
                                 BtlOpenMessage(1, 1, g_btl_msg_ailment, 0x10,
                                                0xC);
                                 g_btl_msg_timer = 0x1E;
@@ -880,7 +880,7 @@ void BtlStageRound(void)
             BtlDrawFrame();
             BtlDrawFrame();
             g_btl_actors[g_btl_actor_turn].unkCC = 0;
-            g_btl_actors[g_btl_actor_turn].unkD5 = 0;
+            g_btl_actors[g_btl_actor_turn].counter = 0;
             if (g_btl_effect_obj != NULL) {
                 BtlObjSetMotion(g_btl_effect_obj, 4);
                 i = 0;

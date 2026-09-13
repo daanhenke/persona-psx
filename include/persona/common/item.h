@@ -33,7 +33,9 @@ typedef struct {
     /* 0x15 */ u_char bonus4;   /* high nibble stat[4]                     */
     /* 0x16 */ u_char power;
     /* 0x17 */ u_char rate;
-    /* 0x18 */ u_char pad18[1];
+    /* 0x18 */ u_char element;  /* which of the elements a swing counts as,
+                                  which is what BtlApplyAffinity weighs
+                                  against the target's resistances     */
     /* 0x19 */ u_char area;     /* how wide a swing reaches: BtlMarkMoveArea
                                    takes this and `swing` together to mark the
                                    cells it can land on                     */

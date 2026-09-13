@@ -144,8 +144,13 @@ typedef struct BtlActor {
     /* 0xD2 */ u_char  unkD2;
     /* 0xD3 */ u_char  unkD3;
     /* 0xD4 */ u_char  unkD4;
-    /* 0xD5 */ u_char  unkD5;      /* cleared with unkCC as a turn ends    */
-    /* 0xD6 */ u_char  padD6[2];
+    /* 0xD5 */ u_char  counter;     /* a counter-attack is armed: the fighter
+                                      answers the blow it was just dealt
+                                      before its own turn resumes. Cleared
+                                      with unkCC as a turn ends           */
+    /* 0xD6 */ u_char  counter_slot; /* whose blow it is answering       */
+    /* 0xD7 */ u_char  unkD7;      /* read as the counter is put away, and
+                                      decides whether the turn is spent  */
     /* 0xD8 */ u_char  unkD8;      /* stops a member's marker being taken away
                                       as the turn ends, and is cleared there  */
     /* 0xD9 */ u_char  padD9[2];
@@ -203,6 +208,12 @@ typedef struct BtlActor {
 /* And the one the critical roll singles out: a fighter turned to stone is
    still a target, and an easy one. */
 #define BTL_STATUS_STONE 0xF
+
+/* Where a fighter's own order is kept while a counter-attack borrows it, so
+   the turn it interrupted can be put back. The target mask beside it at
+   0x800F5AAC is not here: it is written as a whole word and read back as a
+   half, so the two units that touch it declare it for themselves. */
+extern u_char g_btl_counter_order;
 
 /* An actor flag with the same effect as BTL_STATUS_DOWN everywhere it is
    tested; the two are always checked together. */

@@ -15,7 +15,6 @@
  * ink and the dark blue behind it - with 0 left transparent.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 
 /* A glyph as it arrives, and as it is drawn. */
 #define GLYPH_BYTES 0x20
@@ -26,19 +25,17 @@
 #define GLYPH_PER_WORD 8
 #define GLYPH_ROW_BYTES 2
 
-#ifdef NON_MATCHING
 void BtlExpandGlyph(int code, u_int *dst, int font)
 {
     const u_char *src;
     u_int        *out;
     u_int         bit;
     int           row;
-    int           col;
+    u_char        bits;
     int           i;
     int           j;
     int           sbit;
     int           dbit;
-    int           shift;
 
     /* The shadow, a row down and a pixel across. */
     src = (const u_char *)(font + code * GLYPH_BYTES);
@@ -53,10 +50,12 @@ void BtlExpandGlyph(int code, u_int *dst, int font)
         j = 1;
         i = 0;
         do {
-            sbit = i % GLYPH_PER_WORD;
-            bit = (*src >> (7 - sbit) & 1) << 1;
-            dbit = j % GLYPH_PER_WORD;
-            *dst = bit << (dbit * 4) | *dst;
+            bits = *src;
+            sbit = i - i / GLYPH_PER_WORD * GLYPH_PER_WORD;
+            bit = (bits >> (7 - sbit) & 1) << 1;
+            dbit = j - j / GLYPH_PER_WORD * GLYPH_PER_WORD;
+            bit <<= dbit * 4;
+            *dst = bit | *dst;
             if (sbit == 7) {
                 src++;
             }
@@ -72,29 +71,27 @@ void BtlExpandGlyph(int code, u_int *dst, int font)
     } while (row < GLYPH_H - 1);
 
     /* The ink over it. */
+    dst = out;
     src = (const u_char *)(font + code * GLYPH_BYTES);
     row = 0;
     do {
-        col = 0;
+        i = 0;
         do {
-            i = 0;
+            j = 0;
             do {
-                bit = *src >> (7 - i) & 1;
-                shift = i * 4;
-                bit <<= shift;
-                i++;
+                bits = *src;
+                bits >>= 7 - j;
+                bit = bits & 1;
+                bit <<= j * 4;
                 if (bit != 0) {
-                    *out = bit | ~(3 << shift) & *out;
+                    *dst = bit | ~(3 << (j * 4)) & *dst;
                 }
-            } while (i < GLYPH_PER_WORD);
-            out++;
-            col++;
+                j++;
+            } while (j < GLYPH_PER_WORD);
+            dst++;
+            i++;
             src++;
-        } while (col < GLYPH_ROW_BYTES);
+        } while (i < GLYPH_ROW_BYTES);
         row++;
     } while (row < GLYPH_H);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/glyph", BtlExpandGlyph);
-#endif
-

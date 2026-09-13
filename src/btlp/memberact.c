@@ -227,10 +227,10 @@ extern short g_btl_scene_rgb[];
 /* The weapon record the swing is reading. */
 extern ItemDef *g_btl_swing_item;
 
-/* The order and targets a member that swapped places had before it did, put
-   back as the turn ends. */
-extern u_char  D_800F4BA4;
-extern u_short D_800F5AAC;
+/* The order and targets a counter-attack borrowed, put back as the turn ends.
+   The mask is read as a half here and written as a whole word by
+   BtlAilmentTurnCounter, so each side declares it for itself. */
+extern u_short g_btl_counter_targets;
 
 /* The line that goes up when the swing finds nothing to land on. */
 extern u_char D_800CFA00;
@@ -456,12 +456,12 @@ void BtlMemberMotion02(BtlObj *o)
         if (g_btl_place_party != 0) {
             a->action = 0xFF;
         }
-        if (a->unkD5 != 0) {
+        if (a->counter != 0) {
             a->unkD8 = 1;
-            a->unkD5 = 0;
-            a->order = D_800F4BA4;
-            a->targets = D_800F5AAC;
-            if (a->padD6[1] != 0) {
+            a->counter = 0;
+            a->order = g_btl_counter_order;
+            a->targets = g_btl_counter_targets;
+            if (a->unkD7 != 0) {
                 a->action = 0;
             } else {
                 a->action = 0xFF;
@@ -546,11 +546,11 @@ void BtlMemberMotion02(BtlObj *o)
         if (g_cd_busy != -1) {
             return;
         }
-        if (a->unkD5 != 0) {
+        if (a->counter != 0) {
             a->unkD8 = 1;
-            a->unkD5 = 0;
-            a->order = D_800F4BA4;
-            a->targets = D_800F5AAC;
+            a->counter = 0;
+            a->order = g_btl_counter_order;
+            a->targets = g_btl_counter_targets;
         }
         BtlRefreshAttacks();
         BtlSoundClose(6);

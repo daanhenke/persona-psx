@@ -356,6 +356,13 @@ segments:
       - [0x30B54, c, itembag]
       - [0x30C68, c, packgrid]
       - [0x30E30, asm, btlp_57_x1_a]
+      - [0x30F04, c, ailhappy]
+      - [0x30F78, asm, btlp_57_x1_b]
+      - [0x314D0, c, ailturn]
+      - [0x316F4, c, ailcounter]
+      - [0x31918, asm, btlp_57_x1_c]
+      - [0x31DE0, c, ailwolf]
+      - [0x31DE8, asm, btlp_57_x1_d]
       - [0x33310, c, personawon]
       # The event-flag trio the battle keeps for itself, then the turn-order
       # helpers, the scripted opening and the two scenes that close a round.

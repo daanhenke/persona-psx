@@ -156,7 +156,7 @@ void BtlSpawnParty(void)
                 a->unkD2 = 0;
                 a->unkD3 = 0;
                 a->unkD4 = 0;
-                a->unkD5 = 0;
+                a->counter = 0;
                 a->unkDC = 0;
                 a->unkDB = 0;
                 a->unkDF = 0;

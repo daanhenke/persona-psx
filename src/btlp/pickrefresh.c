@@ -12,7 +12,6 @@
  * variables rather than in a pair.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/pick.h>
 
@@ -26,24 +25,33 @@
 
 extern void BtlOpenMessage(int a, int b, const char *text, int x, int y);
 
-#ifdef NON_MATCHING
 void BtlPickRefresh(void)
 {
     const u_char (*live)[BTL_PICK_SLOTS];
     const char **help;
     BtlObj **slot;
     int      i;
-    const char *text;
+    const char **text;
+    short red, blue;
+    int green;
+    BtlObj *obj;
 
     i = 0;
     live = g_btl_pick_live;
     slot = g_btl_pick_objs;
     do {
         if (live[g_btl_pick_page][i] == 0) {
-            BtlObjSetRgb(*slot, PICK_DARK, PICK_DARK, PICK_DARK);
+            red = PICK_DARK;
+            green = PICK_DARK;
+            obj = *slot;
+            blue = PICK_DARK;
         } else {
-            BtlObjSetRgb(*slot, PICK_LIVE, PICK_LIVE, PICK_LIVE);
+            red = PICK_LIVE;
+            green = PICK_LIVE;
+            obj = *slot;
+            blue = PICK_LIVE;
         }
+        BtlObjSetRgb(obj, red, green, blue);
         i++;
         BtlObjSetFade(*slot, PICK_FADE);
         BtlObjSetTimer(*slot, 0);
@@ -54,16 +62,13 @@ void BtlPickRefresh(void)
     if (g_btl_no_help == 0) {
         help = g_btl_pick_help + g_btl_pick_page * BTL_PICK_SLOTS;
         if (g_btl_pick_page != 0) {
-            text = help[g_btl_pick_help_row2];
+            text = &help[g_btl_pick_help_row2];
         } else {
-            text = help[g_btl_pick_help_row];
+            text = &help[g_btl_pick_help_row];
         }
-        BtlOpenMessage(0, 0, text, PICK_HELP_X, PICK_HELP_Y);
+        BtlOpenMessage(0, 0, *text, PICK_HELP_X, PICK_HELP_Y);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/pickrefresh", BtlPickRefresh);
-#endif
 
 /* Puts all six back to their resting state: full size and, once the motion
    runs out, full colour again. Phase 1 starts it on the second half of motion
