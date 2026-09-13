@@ -20,12 +20,17 @@ extern u_char g_btl_member_scripts[];
 typedef struct {
     /* 0x00 */ u_char spawn;      /* armed when the actor is first put out */
     /* 0x01 */ u_char talk;       /* the reaction every other kind takes   */
-    /* 0x02 */ u_char pad02[4];
+    /* 0x02 */ u_char pad02[2];
+    /* 0x04 */ u_char hit;        /* the flinch an enemy is put on         */
+    /* 0x05 */ u_char pad05;
     /* 0x06 */ u_char react3;
     /* 0x07 */ u_char react0;
     /* 0x08 */ u_char react1;
     /* 0x09 */ u_char react2;
-    /* 0x0A */ u_char pad0A[0x26];
+    /* 0x0A */ u_char pad0A[6];
+    /* 0x10 */ signed char number_z; /* how high over the enemy the amount a
+                                     blow took is put, before the shift    */
+    /* 0x11 */ u_char pad11[0x1F];
 } BtlModel;                       /* 48 bytes */
 
 extern BtlModel g_btl_models[];

@@ -305,7 +305,7 @@ void BtlTalkSceneGift(void)
             g_btl_actors[slot].c.hp = 1;
         }
         e = &g_btl_enemies[g_btl_talk_target];
-        g_btl_actors[g_btl_actor_slot].unk84 = 0;
+        g_btl_actors[g_btl_actor_slot].hit_amount = 0;
         BtlObjSetScript(e->obj,
                         e->obj->scripts[g_btl_models[e->c.key].talk]);
         BtlRunFrames(GIFT_HIT_PAUSE);

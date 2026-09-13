@@ -348,7 +348,7 @@ void BtlTalkSceneDemand(void)
                         /* What it costs the member who agreed: the demon's own level and
                            an eighth of unk20, plus a roll of sixteen. */
                         take                                 = offer->level + (offer->damage >> 3) + n % 0x10 + 1;
-                        g_btl_actors[g_btl_actor_slot].unk84 = 0;
+                        g_btl_actors[g_btl_actor_slot].hit_amount = 0;
                         g_btl_actors[g_btl_actor_slot].c.hp -= take;
                         if (g_btl_actors[g_btl_actor_slot].c.hp < 1)
                         {

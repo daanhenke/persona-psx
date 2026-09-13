@@ -1221,7 +1221,7 @@ void BtlStageRound(void)
                         case 7:
                             if (amount != 0) {
                                 actor->c.hp -= amount;
-                                actor->unk84 = amount;
+                                actor->hit_amount = amount;
                                 if (actor->c.hp < 1) {
                                     actor->c.hp = 0;
                                     actor->obj->motion = 8;
@@ -1239,7 +1239,7 @@ void BtlStageRound(void)
                             break;
                         case 0x0F:
                             BtlSePlay(2, 0xB);
-                            actor->unk84 = amount;
+                            actor->hit_amount = amount;
                             amount += actor->c.hp;
                             actor->c.hp = amount;
                             n = amount;

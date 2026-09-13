@@ -1377,3 +1377,14 @@ written `if ... else if ... else goto past;` with the tail once after them, it
 emits the one.
 
 - [menunav.c](/src/btlp/menunav.c) - `BtlSpellMenuUpdate`, 93.51% to 98.88%.
+
+## A global kept across a call is reached through a local pointer
+
+When the image loads a global's address into a saved register, stores through
+it in a call's delay slot and reads it back through the same register after,
+the source took the address into a local: `slot = &g_btl_talk_board_slot;`
+and then `*slot = ...` and `*slot` around the calls. Written against the
+global directly - or as an assignment inside the argument - gcc reaches it with
+a fresh `lui` each time and the saved register never appears.
+
+- [stocklist.c](/src/btlp/stocklist.c) - `BtlRunTalkBoard`, 83.28% to exact.

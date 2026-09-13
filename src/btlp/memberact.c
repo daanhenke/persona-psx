@@ -631,7 +631,6 @@ extern int     BtlActorSlotByKey(int key);
 extern void    func_800A6D3C(BtlActor *a, int move);
 extern BtlObj *func_80084E10(int kind, long *pos);
 extern BtlObj *func_80084A14(int kind, int col, int row);
-extern void    func_80097158(BtlStats *s);
 
 #ifdef NON_MATCHING
 /* The cast: what a member's turn runs through when the move is a spell and
@@ -888,7 +887,7 @@ void BtlMemberMotion06(BtlObj *o)
             i++;
         } while (i < CAST_PERSONA_PIECES);
         BtlSoundClose(BTL_BGM_SLOT);
-        func_80097158(&g_btl_personas[BtlActorPersona(o->mark_num)]);
+        BtlPersonaGrow(&g_btl_personas[BtlActorPersona(o->mark_num)]);
         BtlApplyPersona(a);
         BtlRecalcStats(a);
         BtlDeriveBattleStats(a);

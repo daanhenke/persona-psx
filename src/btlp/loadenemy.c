@@ -93,7 +93,7 @@ void BtlLoadEnemyStats(int slot, int key)
     memcpy(a->spell, d->spell, sizeof(a->spell));
 
     a->targets = 0;
-    a->unk84 = 0;
+    a->hit_amount = 0;
     a->pickable = 0;
     a->unkCC = 0;
     a->offered = 0;

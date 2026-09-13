@@ -41,7 +41,6 @@
 extern u_short  g_btl_clut_fading;
 extern u_short *g_btl_actor_clut;
 
-extern void func_80097484(BtlActor *a);
 
 void BtlFxStep86(BtlObj *o)
 {
@@ -75,14 +74,14 @@ void BtlFxStep86(BtlObj *o)
         }
         if ((signed char)g_btl_actors[g_btl_fx_target].c.status
                 == FX_86_STATUS) {
-            func_80097484(&g_btl_actors[g_btl_fx_target]);
-            g_btl_actors[g_btl_fx_target].unk84 = 0;
+            BtlDrainLevel(&g_btl_actors[g_btl_fx_target]);
+            g_btl_actors[g_btl_fx_target].hit_amount = 0;
             g_btl_actors[g_btl_fx_target].obj->motion = FX_86_MOTION;
             g_btl_actors[g_btl_fx_target].obj->phase = 0;
             o->timer = FX_86_HOLD;
         } else if (BtlInflictStatus(&g_btl_actors[g_btl_fx_target],
                                     FX_86_STATUS) != 0) {
-            g_btl_actors[g_btl_fx_target].unk84 = 0;
+            g_btl_actors[g_btl_fx_target].hit_amount = 0;
             g_btl_actors[g_btl_fx_target].obj->motion = FX_86_MOTION;
             g_btl_actors[g_btl_fx_target].obj->phase = 0;
             BtlSePlay(FX_86_SLOT, FX_86_LAND);

@@ -28,9 +28,9 @@ void BtlStorePersonas(void)
     s = g_btl_personas;
     i = 0;
     do {
-        d->unk00 = s->unk00;
-        d->unk04 = s->unk04;
-        d->unk08 = s->unk08;
+        d->unk00 = s->exp;
+        d->unk04 = s->rank_exp;
+        d->unk08 = s->rank_left;
         d->unk0C = s->unk0C;
         d->unk10 = s->unk10;
         d->unk12 = s->unk12;
@@ -72,9 +72,9 @@ void BtlGivePersona(Char *c, int key)
     i = 0;
     do {
         if (d->key == 0) {
-            d->unk00 = 0;
-            d->unk04 = 0;
-            d->unk08 = 0;
+            d->exp = 0;
+            d->rank_exp = 0;
+            d->rank_left = 0;
             d->unk0C = def->unk1C;
             d->unk10 = def->unk04;
             d->unk12 = def->unk06;
@@ -92,7 +92,7 @@ void BtlGivePersona(Char *c, int key)
             d->slots = 1;
             memcpy(d->raw, def->raw, BTL_STATS_SPELLS);
             d->unk41 = def->raw[BTL_STATS_SPELLS - 1];
-            d->unk44 = def->unk28;
+            d->growth = def->unk28;
             c->entry = 0;
             c->list[0] = i;
             c->list[1] = BTL_SLOT_NONE;

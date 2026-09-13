@@ -330,6 +330,9 @@ segments:
       - [0x26DE8, c, whitenclut]
       - [0x26E64, c, pulsepick]
       - [0x26F24, asm, btlp_48_a]
+      # The motions a fighter takes a blow in.
+      - [0x28820, c, hitmotion]
+      - [0x28C8C, asm, btlp_48_a_x1]
       - [0x29410, c, clock]
       - [0x29548, c, tintclut]
       - [0x297D8, c, btlinit2]
@@ -371,6 +374,9 @@ segments:
       - [0x31F38, c, pickother]
       - [0x32170, c, roundtick]
       - [0x323C0, asm, btlp_57_x1_e]
+      # A Persona growing, and a fighter losing a level.
+      - [0x32DB8, c, personagrow]
+      - [0x332F8, asm, btlp_57_x1_f]
       - [0x33310, c, personawon]
       # The event-flag trio the battle keeps for itself, then the turn-order
       # helpers, the scripted opening and the two scenes that close a round.

@@ -30,9 +30,9 @@ void BtlLoadPersonas(void)
     d = g_btl_personas;
     i = 0;
     do {
-        d->unk00 = s->unk00;
-        d->unk04 = s->unk04;
-        d->unk08 = s->unk08;
+        d->exp = s->unk00;
+        d->rank_exp = s->unk04;
+        d->rank_left = s->unk08;
         d->unk0C = s->unk0C;
         d->unk10 = s->unk10;
         d->unk12 = s->unk12;
@@ -54,8 +54,8 @@ void BtlLoadPersonas(void)
         /* The definition is reached through a pointer of its own; indexing
            g_persona_defs at the point of use scales the key twice. */
         def = &g_persona_defs[d->key];
-        d->unk44 = def->unk28;
-        d->unk43 = 0;
+        d->growth = def->unk28;
+        d->no_growth = 0;
         BtlEnemyDeriveStats(d);
         i++;
         s++;

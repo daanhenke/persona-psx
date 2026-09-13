@@ -24,10 +24,14 @@
 #define BTL_SLOT_NONE    0xFF
 
 typedef struct {
-    /* 0x00 */ u_long  unk00;    /* the save record's first four words, which
-                                    line up one for one                     */
-    /* 0x04 */ u_long  unk04;
-    /* 0x08 */ u_long  unk08;
+    /* 0x00 */ long    exp;      /* the save record's first four words, which
+                                    line up one for one. The experience a
+                                    Persona has gained, all told,          */
+    /* 0x04 */ long    rank_exp; /* how much of it counts toward the next
+                                    rank,                                  */
+    /* 0x08 */ long    rank_left; /* and how much the next rank still wants;
+                                    BtlPersonaGrow carries what is over
+                                    into the rank after                    */
     /* 0x0C */ u_long  unk0C;
     /* 0x10 */ u_short unk10;
     /* 0x12 */ u_short unk12;
@@ -55,12 +59,18 @@ typedef struct {
     /* 0x3A */ u_char  raw[BTL_STATS_SPELLS];    /* as it came off the disc     */
     /* 0x41 */ u_char  unk41;
     /* 0x42 */ u_char  pad42[1];
-    /* 0x43 */ u_char  unk43;    /* cleared when a Persona is copied in      */
-    /* 0x44 */ u_char  unk44;    /* g_persona_defs[key] +0x28, kept here     */
+    /* 0x43 */ u_char  no_growth; /* cleared when a Persona is copied in;
+                                     BtlPersonaGrow leaves one with it set
+                                     alone                                 */
+    /* 0x44 */ u_char  growth;   /* g_persona_defs[key] +0x28, kept here: the
+                                    row of g_btl_persona_growth a rank adds */
     /* 0x45 */ u_char  pad45[3];
 } BtlStats;                      /* 0x48 bytes */
 
 extern BtlStats g_btl_personas[];
+
+/* A cast Persona's experience, and its rank-up. personagrow.c. */
+extern void BtlPersonaGrow(BtlStats *p);
 
 /* One word per bank of event flags: which Personas the battle won, ORed
    into the save's own flags as the battle closes. */

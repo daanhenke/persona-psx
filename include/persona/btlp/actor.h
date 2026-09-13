@@ -41,8 +41,10 @@ typedef struct BtlActor {
     /* 0x82 */ u_short targets_kept; /* the copy the party's standing orders
                                         keep, so "the same again" can put the
                                         chosen action back                  */
-    /* 0x84 */ u_short unk84;      /* cleared as the demon strikes the acting
-                                      member on its way out                  */
+    /* 0x84 */ u_short hit_amount; /* what the last blow took off hp, which
+                                      the number put up over the fighter
+                                      shows; cleared as the demon strikes
+                                      the acting member on its way out     */
     /* 0x86 */ u_short melee_atk;  /* the fight's own copy of Char 0x2E..0x3C.
                                       BtlActorDeriveStats takes it field for
                                       field as the actor joins and then bends
@@ -248,6 +250,10 @@ extern u_char g_btl_counter_order;
 #define BTL_ACTOR_TIMED_B 0x200000
 
 extern BtlActor g_btl_actors[];
+
+/* Takes a level off a fighter and works its experience out again.
+   personagrow.c. */
+extern void BtlDrainLevel(BtlActor *a);
 
 /* The same table reached through a pointer. Several units walk it this way
    rather than by the array, and the two are the same records. */
