@@ -37,15 +37,13 @@ extern u_char *g_btl_scratch_end;
 u_char *BtlMessage(int index, int group)
 {
     u_char *at;
-    u_char *scratch;
     u_long  dir;
     u_short slot;
 
     slot = ((u_short *)(g_btl_scratch_end + BTL_MSG_TABLE))
            [group * BTL_MSG_GROUP + index];
-    scratch = g_btl_scratch;
-    dir = *(u_long *)scratch;
-    at = *(u_long *)(scratch + dir + slot * 4) + scratch;
+    dir = *(u_long *)g_btl_scratch;
+    at = *(u_long *)(g_btl_scratch + dir + slot * 4) + g_btl_scratch;
     return at + dir;
 }
 #else

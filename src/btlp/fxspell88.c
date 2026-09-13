@@ -13,7 +13,6 @@
  * turning. Which place that is depends on the side acting: the party's ring
  * opens about the top of the circle and an enemy's about the bottom.
  */
-#include <decomp/include_asm.h>
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -46,13 +45,6 @@
 /* How fast a piece leaves, in the wave table's own units. */
 #define FX_88_SPEED 12
 
-/* Ninety-four of the ninety-five instructions, in the image's registers and
-   the image's order. The one that is out is the chain link: the image fills
-   the slot between the angle store and the read back with it and gcc here
-   hoists it to the top of the block, and none of eight placements, three
-   spellings of the mask or a block boundary round either statement moves it.
-   Left guarded until the permuter finds the shape. */
-#ifdef NON_MATCHING
 BtlObj *BtlFxStart88(void)
 {
     BtlObj *o;
@@ -80,14 +72,15 @@ BtlObj *BtlFxStart88(void)
             } else {
                 angle = FX_88_PARTY_DOWN - (i - FX_88_HALF) * FX_88_SPREAD;
             }
+            o->angle = angle & (FX_88_TURN - 1);
         } else {
             if (i < FX_88_HALF) {
                 angle = i * FX_88_SPREAD + FX_88_ENEMY_UP;
             } else {
                 angle = FX_88_ENEMY_DOWN - (i - FX_88_HALF) * FX_88_SPREAD;
             }
+            o->angle = angle & (FX_88_TURN - 1);
         }
-        o->angle = angle & (FX_88_TURN - 1);
         after = o;
         /* The angle is read back off the record rather than kept, which is
            what puts the two table reads where the image has them. */
@@ -97,6 +90,3 @@ BtlObj *BtlFxStart88(void)
     } while (i >= 0);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell88", BtlFxStart88);
-#endif

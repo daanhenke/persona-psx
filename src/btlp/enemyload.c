@@ -15,7 +15,6 @@
  * all three of the actor's palettes so it starts at rest.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/model.h>
@@ -63,7 +62,6 @@ extern int     BtlBindGfx(u_int kind, int index, u_char **image);
 extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
                             int put);
 
-#ifdef NON_MATCHING
 int BtlLoadEnemyGfx(int species, int actor, u_long *tim, u_char *image,
                     int bytes)
 {
@@ -91,12 +89,16 @@ int BtlLoadEnemyGfx(int species, int actor, u_long *tim, u_char *image,
             found = BTL_SLOT_PAIR;
             goto load;
         }
-        {
-        u_int slot = BTL_SLOT_FIRST;
         if (*wide == BTL_SLOT_FREE) {
             found = 0xC;
             goto load;
         }
+        /* The search starts after the free test, not before it, though the
+           image has the 10 in that test's delay slot: reorg pulled it back
+           from here. Set above the test, the counter is live across it and
+           the wide slot's load is pushed out of the register they share. */
+        {
+        u_int slot = BTL_SLOT_FIRST;
         owner = wide - BTL_WIDE0;
         do {
             if (owner[slot & 0xFFFF] == species) {
@@ -193,7 +195,4 @@ load:
     }
     return (short)found;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/enemyload", BtlLoadEnemyGfx);
-#endif
 

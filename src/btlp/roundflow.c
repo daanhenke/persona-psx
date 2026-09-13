@@ -186,26 +186,13 @@ void BtlStageOpen(void)
     }
 }
 
-#ifdef NON_MATCHING
-/* 99.62% by objdiff, and one instruction short of the image: it loads the
-   ailment into the same register the key check used, so it has to copy the value
-   out before the range test overwrites that register - `addu v1,v0,zero`, in the
-   delay slot of the POISON branch. This loads straight into the register the
-   range test wants and needs no copy, which is better code and four bytes
-   shorter. Everything structural is settled; the copy is an allocator
-   coin-flip, so it is the permuter's job. Do not chase it by routing a value
-   through one of the loop counters - that is what the permuter proposes and it
-   breaks the loop.
-
-   Same shape as BtlStageOpen: the tail of the loop is the frame, and every
+/* Same shape as BtlStageOpen: the tail of the loop is the frame, and every
    step that is not finished simply falls out of the switch to draw one. Only
    the last step returns, and it is the one that hands the stage on - past the
    end of the table, which is what ends the battle. */
 void BtlStageClose(void)
 {
-    SVECTOR unused;
     BtlObj *obj;
-    int st;
     int m;
     int i;
     int n;
@@ -250,11 +237,7 @@ void BtlStageClose(void)
     BtlCloseMessage(0);
 
     for (;;) {
-        /* Taken into a local first: the step decides the block and the ailment
-           below shares the register it lands in, which is what the image
-           does - switching on the global straight costs the match. */
-        st = g_btl_step;
-        switch (st) {
+        switch (g_btl_step) {
         case 0:
             if (BtlHudState() == 0 && BtlBoxState() == 0) {
                 if (g_btl_party_lost == 0) {
@@ -267,17 +250,19 @@ void BtlStageClose(void)
                         n = 0;
                         do {
                             if (g_btl_actors[n].c.key != 0) {
-                                /* POISON stands on its own and SICK and DOWN
-                                   are tested as the one range they are - a
-                                   three-case switch makes the compiler walk all
-                                   three instead of folding the pair. */
-                                /* POISON stands on its own and SICK and DOWN
-                                   are tested as the one range they are - a
-                                   three-case switch makes the compiler walk all
-                                   three instead of folding the pair. */
-                                st = (signed char)g_btl_actors[n].c.status;
-                                if (st != BTL_STATUS_POISON
-                                    && (u_int)(st - BTL_STATUS_SICK) >= 2) {
+                                /* POISON stands on its own, and SICK and DOWN
+                                   fold into one range test - a three-case
+                                   switch walks all three instead. All three
+                                   read the field itself, not a local: the fold
+                                   then keeps the byte in a saved copy of its
+                                   own, which is the image's `addu v1,v0,zero`,
+                                   and that copy's slot is the eight bytes of
+                                   frame no local accounts for. Taken into a
+                                   local first, the copy and the eight bytes
+                                   both go. */
+                                if ((signed char)g_btl_actors[n].c.status != BTL_STATUS_POISON
+                                    && (signed char)g_btl_actors[n].c.status != BTL_STATUS_SICK
+                                    && (signed char)g_btl_actors[n].c.status != BTL_STATUS_DOWN) {
                                     g_btl_actors[n].c.status = 0;
                                     g_btl_actors[n].c.ail_level = 0;
                                 }
@@ -405,10 +390,6 @@ void BtlStageClose(void)
         BtlDrawFrame();
     }
 }
-
-#else
-INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageClose);
-#endif
 
 #ifdef NON_MATCHING
 /* The round itself, and the largest routine in the overlay.

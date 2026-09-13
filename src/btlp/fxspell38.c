@@ -15,7 +15,6 @@
  * materialises the template's address twice, which is what says they are not
  * in the same block.
  */
-#include <decomp/include_asm.h>
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
@@ -38,13 +37,6 @@
 #define FX_38_FADE  2
 #define FX_38_TIMER 0x40
 
-/* Fifty-three of the fifty-six instructions, and the whole tail from the call
-   on. What is out is three slots of argument set-up: the image builds the
-   position before it takes the template's address and gcc here takes the
-   address first. Fourteen orderings of the three position stores, the
-   template store and the side test move it no further, so this is the
-   permuter's kind of residual rather than a shape one. */
-#ifdef NON_MATCHING
 BtlObj *BtlFxStart38(void)
 {
     BtlObj *o;
@@ -54,11 +46,13 @@ BtlObj *BtlFxStart38(void)
     g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
     if (g_btl_actor_turn < BTL_PARTY) {
         pos[1] = -FX_38_Y;
+        pos[0] = 0;
+        pos[2] = FX_38_Z;
     } else {
         pos[1] = FX_38_Y;
+        pos[0] = 0;
+        pos[2] = FX_38_Z;
     }
-    pos[0] = 0;
-    pos[2] = FX_38_Z;
     o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, 0, FX_OBJ_DRAW, 0, pos,
                     FX_OBJ_CD, FX_OBJ_CE);
     o->mark_num = FX_MARK_HEAD;
@@ -77,6 +71,3 @@ BtlObj *BtlFxStart38(void)
     BtlObjSetTimer(o, FX_38_TIMER);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell38", BtlFxStart38);
-#endif

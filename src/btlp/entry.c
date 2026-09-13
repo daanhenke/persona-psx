@@ -130,7 +130,6 @@ extern int     D_800F4BA0;
 extern int     D_800F4BAC;
 extern u_char *D_800F4ABC;
 extern u_char *D_800F4AC4;
-extern u_char *D_800F5CAC;
 extern u_char *D_800F5D68;
 extern u_char *D_800F5D6C;
 extern u_char *g_btl_hud_packed;
@@ -144,9 +143,6 @@ extern int     g_btl_slot_sound_base;
 extern int     g_btl_sound_base;
 extern short   D_800F4C86;
 extern long    D_800F4BF0[];
-extern u_short D_800F4D68;
-extern u_short D_800F4D6C;
-extern u_short D_800F4D94;
 
 /* The moon's two tables, and the pair of pointers the battle keeps out of
    them for the fight it is about to run. */
@@ -224,19 +220,17 @@ void BtlBoxDismiss(void)
 }
 
 #ifdef NON_MATCHING
-static __inline__ int BtlEntryEncounter(void)
-{
-    return g_btl_encounter;
-}
-
-/* The remaining instruction differences are the encounter-check copies,
-   the first texture upload's scheduling, and the final stage-table address.
-   odiff also reports the raw addresses and unowned string section as aliases. */
+/* Two instructions out, both in the first texture upload: the image loads
+   g_load_stage after the fifth argument's store, and gcc here loads it ahead
+   of the first register argument. Moving the g_btl_tim_buf store into any of
+   the argument slots, dropping the enc temporary or nesting the assignment all
+   compile to the same order. odiff also reports the raw addresses and the
+   unowned string section as aliases; those are names, not bytes. */
 void ovl_btlp_entry(void)
 {
     long     pos[4];
     CdlFILE  file[2];
-    u_char *image[6];
+    u_char *image[2];
     u_char  *bg;
     u_char **bank;
     u_char  *a;
@@ -320,14 +314,13 @@ void ovl_btlp_entry(void)
         g_btl_battle_kind = 1;
     }
 
-    enc = BtlEntryEncounter();
-    if (enc < 9 || (u_int)(enc - 0x11) < 2) {
+    if (g_btl_encounter < 9 || g_btl_encounter == 0x11 || g_btl_encounter == 0x12) {
         g_btl_place_party = 1;
         g_btl_battle_kind = 0;
     }
 
-    enc = BtlEntryEncounter();
-    if (enc < 5 || (u_int)(enc - 6) < 2 || (u_int)(enc - 0x11) < 2) {
+    if (g_btl_encounter < 5 || g_btl_encounter == 6 || g_btl_encounter == 7
+        || g_btl_encounter == 0x11 || g_btl_encounter == 0x12) {
         D_800CCA2D = 1;
     }
 
@@ -425,7 +418,7 @@ void ovl_btlp_entry(void)
     if (g_btl_debug == 0) {
         BtlUploadPackedTim(g_load_stage_9, 0x18, 0x17, 2, 0x80, 1);
     }
-    D_800F4D6C = D_800F4D94;
+    g_btl_tpage[4] = g_btl_tpage[24];
     BtlUploadPackedTim(g_load_stage_10, 0x15, 0x15, 0, 0, 1);
     BtlUploadPackedTim(g_load_stage_11, 0x16, 0x16, 0, 0, 1);
     if (g_btl_debug == 0) {
@@ -524,11 +517,11 @@ moon_orders_done:
     }
 
     g_btl_tpage[0]  = 0x40;
-    D_800F4D68      = 0;
+    g_btl_tpage[2]  = 0;
     pos[0]          = 0;
     pos[1]          = 0;
     pos[2]          = 0;
-    D_800F5CAC      = g_btl_gfx_next;
+    g_btl_gfx_base  = g_btl_gfx_next;
     g_btl_draw_dist = g_btl_screen_dist;
 
     o = BtlObjAlloc(g_btl_shadow_defs, 0, NULL, 6, 0, pos, 0, 0);

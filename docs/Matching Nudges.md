@@ -30,6 +30,7 @@ Before reaching for a lever, know which kind of difference you have:
 | An extra `lui`/`addiu` pair per access | Walking vs indexing, or a linker symbol where the original used an address |
 | A constant re-materialised after a call | The value is being set up on the wrong side of the call |
 | Wrong length | Not a nudge. The structure is wrong; go back to the decompiler |
+| Right instructions in the wrong order, or a different delay-slot filler | A pass made that choice; ask cc1 which one with [RTL Dumps](RTL%20Dumps.md) before sweeping spellings |
 
 `scripts/local/fdiff.py` normalises everything the linker decides, so a routine
 of the wrong length still lines up either side of the divergence. Note that
@@ -1388,3 +1389,94 @@ global directly - or as an assignment inside the argument - gcc reaches it with
 a fresh `lui` each time and the saved register never appears.
 
 - [stocklist.c](/src/btlp/stocklist.c) - `BtlRunTalkBoard`, 83.28% to exact.
+
+## A range test on the field itself keeps a copy of the load
+
+Where the image loads a value, tests the fresh load, and then copies it into a
+second register for a `(u_int)(x - lo) < n` range test,
+
+    lb    v0, %lo(g_btl_actors+0x49)(at)
+    beq   v0, s3, skip
+    addu  v1, v0, zero          # the copy
+    addiu v0, v1, -0x10
+    sltiu v0, v0, 2
+
+the source compared the field (or global) directly each time and let gcc fold
+the adjacent pair into the range itself:
+
+    if ((signed char)g_btl_actors[n].c.status != BTL_STATUS_POISON
+        && (signed char)g_btl_actors[n].c.status != BTL_STATUS_SICK
+        && (signed char)g_btl_actors[n].c.status != BTL_STATUS_DOWN) {
+
+Taken into a local first and written as the range - `st = ...status;` and
+`(u_int)(st - BTL_STATUS_SICK) >= 2` - the load goes straight into the register
+the range test uses and the copy is gone. Nothing done with locals brings it
+back: a copy inside the arm, a `short` or `signed char` local, re-reading the
+field for the first test only. `==`/`!=` pairs and `>=`/`<=` bounds fold the
+same way.
+
+The fold also grows the frame, and nothing reads the extra space: eight bytes
+in `BtlStageClose`, sixteen for the two tests in `ovl_btlp_entry`. Both routines
+had been padded to the image's frame size with locals that are not there -
+`SVECTOR unused`, and an `image[6]` that only ever uses one element - so take
+the padding back out when the fold goes in.
+
+- [roundflow.c](/src/btlp/roundflow.c) - `BtlStageClose`, 99.74% to exact, with
+  the pad removed.
+- [entry.c](/src/btlp/entry.c) - `ovl_btlp_entry`'s encounter tests,
+  `g_btl_encounter == 0x11 || g_btl_encounter == 0x12`, and `image[2]` for
+  `image[6]`; both copies came back and the frame stayed the image's.
+
+## A constant in a branch's delay slot can come from the fall-through
+
+A variable's first value sitting in the delay slot of the test just before its
+loop is not evidence that the source assigned it before the test. reorg fills
+the slot with the first instruction on the fall-through side, and that is where
+the source had it:
+
+    if (*wide == BTL_SLOT_FREE) {
+        found = 0xC;
+        goto load;
+    }
+    {
+    u_int slot = BTL_SLOT_FIRST;    /* image: `ori v1,zero,0xA` in the test's slot */
+
+Assigned above the test, `slot` is live across it and cannot share a register
+with the value the test compares, so that value moves to another register.
+
+- [enemyload.c](/src/btlp/enemyload.c) - `BtlLoadEnemyGfx`, 99.97% to exact;
+  with `slot` set above the test, `*wide` was loaded into `t0` instead of `v1`.
+
+## A call that ends its basic block keeps its arguments in expand order
+
+gcc expands a call as the stack arguments first and then the register
+arguments, and its `sched` pass normally reorders that - the image's calls load
+`a0`..`a3` and store the fifth argument last, often in the call's delay slot.
+sched does not touch a call that is the **last insn of its basic block**, so
+that one comes out stack argument first:
+
+    ori v0,zero,0xC ; sw v0,0x10(sp) ; ori a0.. ; ori a1.. ; ... ; jal   # last in block
+    ori a0.. ; ori a1.. ; ... ; ori v0,zero,0xC ; jal ; sw v0,0x10(sp)   # scheduled
+
+Where the image's order is the scheduled one but the source ends a block at the
+call - two arms that each make a call and then fall into shared code - write the
+shared code into each arm. jump2's cross-jumping runs after sched and folds the
+copies back into one tail, so the image still shows a single copy, and a `j`
+from the first arm straight to the second arm's `jal`.
+
+    if (...) {
+        BtlOpenMessage(1, 1, g_btl_move_lines[a->move], 0x10, stop);
+        if (g_btl_msg_speed == 0) { speed = 0xB4; } else { speed = 0x1E; }
+        g_btl_msg_timer = speed;
+    } else if (...) {
+        BtlOpenMessage(1, 1, D_800CF7EC, 0x10, CAST_AIL_0C);
+        if (g_btl_msg_speed == 0) { speed = 0xB4; } else { speed = 0x1E; }
+        g_btl_msg_timer = speed;
+    }
+
+The `.combine` and `.sched` dumps show it directly - see
+[RTL Dumps](RTL%20Dumps.md) for getting and reading them.
+
+- [memberact.c](/src/btlp/memberact.c) - `BtlMemberMotion06`, 98.61% to exact
+  with this, `(signed char)` casts in place of `*(signed char *)&` on the
+  acting fighter's status, and a local for `o->actor` across a byte store.

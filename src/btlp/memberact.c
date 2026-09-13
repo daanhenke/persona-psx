@@ -628,7 +628,6 @@ extern void    func_800A6D3C(BtlActor *a, int move);
 extern BtlObj *func_80084E10(int kind, long *pos);
 extern BtlObj *func_80084A14(int kind, int col, int row);
 
-#ifdef NON_MATCHING
 /* The cast: what a member's turn runs through when the move is a spell and
  * the Persona has to come out to make it.
  *
@@ -648,19 +647,19 @@ void BtlMemberMotion06(BtlObj *o)
 {
     CdlLOC       loc;
     BtlSoundBank bank;
-    /* Eight bytes of frame nothing here writes; the routine is the
+    /* Sixteen bytes of frame nothing here writes; the routine is the
        wrong length without them. */
-    long          scratch[2];
+    long          scratch[4];
     BtlActor     *a;
     BtlObj       *p;
     const u_char *scripts;
-    const u_char *line;
     int           i;
     int           speed;
     int           status;
-    /* The ailment code and the message's last argument are the same number,
-       and the image holds it across the whole arm rather than building it
-       again for the call. */
+    /* The ailment code and the move line's last argument are the same
+       number, and the image holds it across the whole arm rather than
+       building it again for that call. The fixed line's call builds its
+       own. */
     int           stop;
 
     a = o->actor;
@@ -680,22 +679,31 @@ void BtlMemberMotion06(BtlObj *o)
             return;
         }
         if (g_btl_msg_speed != 2) {
+            /* Each arm is written out whole, call and timer both, and
+               cross-jumping folds the two tails back into one. With the timer
+               shared after the arms instead, the fixed line's call is the last
+               insn of its basic block, and gcc's sched pass leaves a call like
+               that with its arguments in expand order - the stack argument
+               first - where the image has them scheduled like every other
+               call's, the stack argument last. */
             if (g_btl_place_party == 0 && g_btl_act_kind == 0) {
-                line = g_btl_move_lines[a->move];
+                BtlOpenMessage(1, 1, g_btl_move_lines[a->move], 0x10, stop);
+                if (g_btl_msg_speed == 0) {
+                    speed = 0xB4;
+                } else {
+                    speed = 0x1E;
+                }
+                g_btl_msg_timer = speed;
             } else if (g_btl_act_kind != 0) {
-                line = D_800CF7EC;
-            } else {
-                goto spoken;
+                BtlOpenMessage(1, 1, D_800CF7EC, 0x10, CAST_AIL_0C);
+                if (g_btl_msg_speed == 0) {
+                    speed = 0xB4;
+                } else {
+                    speed = 0x1E;
+                }
+                g_btl_msg_timer = speed;
             }
-            BtlOpenMessage(1, 1, line, 0x10, stop);
-            if (g_btl_msg_speed == 0) {
-                speed = 0xB4;
-            } else {
-                speed = 0x1E;
-            }
-            g_btl_msg_timer = speed;
         }
-    spoken:
         i = 0;
         o->actor->padCB[0] = g_btl_personas[BtlActorPersona(o->mark_num)].key;
         do {
@@ -718,9 +726,9 @@ void BtlMemberMotion06(BtlObj *o)
         } else if (g_btl_act_kind != 3) {
             func_80084E10(0, &o->x)->z += CAST_LIFT;
         }
-        if (*(signed char *)&g_btl_actors[g_btl_actor_turn].c.status == CAST_AIL_08
+        if ((signed char)g_btl_actors[g_btl_actor_turn].c.status == CAST_AIL_08
             && ((rand() & 1) != 0
-                || *(signed char *)&g_btl_actors[g_btl_actor_turn].c.ail_level
+                || (signed char)g_btl_actors[g_btl_actor_turn].c.ail_level
                        == CAST_AIL_DEEPEST)) {
             BtlOpenMessage(1, 1, D_800CFA10, 8, 0xC);
             o->timer = 0x78;
@@ -810,8 +818,12 @@ void BtlMemberMotion06(BtlObj *o)
             } while (i < BTL_PARTY);
         }
         BtlCloseMessage(0);
-        g_btl_seq_catchup = 1;
-        *(int *)&o->actor->pad68[8] += 1;
+        {
+            BtlActor *actor = o->actor;
+            int count = *(int *)&actor->pad68[8];
+            g_btl_seq_catchup = 1;
+            *(int *)&actor->pad68[8] = count + 1;
+        }
         D_800F5A60++;
         if (D_8004E264 == 0 && g_btl_act_kind == 0) {
             a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].unk29;
@@ -891,8 +903,8 @@ void BtlMemberMotion06(BtlObj *o)
         if (g_btl_act_kind != 0) {
             a->order = g_btl_act_speed;
             a->targets = g_btl_act_targets;
-            a->action = 0;
             a->move = g_btl_act_move;
+            a->action = 0;
         }
         BtlRefreshAttacks();
         o->phase++;
@@ -952,9 +964,6 @@ void BtlMemberMotion06(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion06);
-#endif
 
 /* The Persona coming out: the file is read while the member takes the pose,
    the fanfare behind it, and then the trail is thrown round the member and

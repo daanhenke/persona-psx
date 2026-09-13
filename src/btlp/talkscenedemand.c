@@ -171,8 +171,7 @@ void BtlTalkSceneDemand(void)
                 }
             }
 
-            n                 = rand();
-            weight            = n % 0x100;
+            weight            = rand() % 0x100;
             g_btl_demand_roll = weight;
             g_btl_demand_kind = 0;
             while (g_btl_demand_kind < DEMAND_KINDS)
@@ -334,11 +333,11 @@ void BtlTalkSceneDemand(void)
                         weight = BLOOD_MID;
                     }
                     entry = base->rows[g_btl_demand_kind].entry[i + 5];
-                    gauge = entry & 0xFF;
                     if ((entry >> 8) == 0)
                     {
                         weight = 0;
                     }
+                    gauge = entry & 0xFF;
                     goto take_line;
                 case DEMAND_BLOOD:
                     if (g_btl_demand_answer == DEMAND_YES)
@@ -347,7 +346,8 @@ void BtlTalkSceneDemand(void)
                         n      = rand();
                         /* What it costs the member who agreed: the demon's own level and
                            an eighth of unk20, plus a roll of sixteen. */
-                        take                                 = offer->level + (offer->damage >> 3) + n % 0x10 + 1;
+                        used = offer->level + (offer->damage >> 3);
+                        take = used + n % 0x10 + 1;
                         g_btl_actors[g_btl_actor_slot].hit_amount = 0;
                         g_btl_actors[g_btl_actor_slot].c.hp -= take;
                         if (g_btl_actors[g_btl_actor_slot].c.hp < 1)

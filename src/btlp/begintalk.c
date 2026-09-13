@@ -133,7 +133,18 @@ extern void  BtlMenuDismiss(void);
 extern int   BtlMenuState(void);
 
 #ifdef NON_MATCHING
-#ifdef NON_MATCHING
+/* One word out: the sequence's address is the entry, plus the scratch base,
+   plus the directory offset, and the image adds the offset to the other two
+   where gcc here adds the other two to the offset. Parenthesising the sum,
+   indexing, a pointer or an int temporary for it, and every order of the three
+   terms leave it there or cost a word. odiff also reports the scratch base and
+   g_btl_talk_stage-1 under other names; those are names, not bytes.
+
+   The rest is a few saved registers each doing several jobs, as the image has
+   them: i counts, holds the moon test, takes the menu's answer and builds the
+   line's address, and n counts the live offers and then picks the opening
+   line. Given variables of their own, gcc keeps them in short-lived registers
+   and the copy between them disappears. */
 int BtlBeginTalking(void)
 {
     const BtlMember *m;
@@ -143,10 +154,6 @@ int BtlBeginTalking(void)
     u_short         *line;
     u_char           live[8];
     int              n;
-    int              other;
-    int              set;
-    int              pick;
-    int              answer;
     int              slot;
     int              value;
     int              i;
@@ -227,15 +234,16 @@ int BtlBeginTalking(void)
             g_btl_talk_sounds_loaded = 1;
 
             gauge = g_btl_offer[g_btl_offer_slot].mood;
-            other = g_btl_moon != MOON_FULL;
-            set = other;
+            i = g_btl_moon != MOON_FULL;
             if (rand() % TALK_OPEN_SETS == 0) {
-                set = TALK_OPEN_SPARE;
+                n = TALK_OPEN_SPARE;
+            } else {
+                n = i;
             }
             i = 0;
-            pick = rand() % g_btl_talk_open_counts[set] + set * TALK_OPEN_SETS;
+            n = rand() % g_btl_talk_open_counts[n] + n * TALK_OPEN_SETS;
             do {
-                if ((g_btl_talk_open_moods[pick] >> i & 1) != 0) {
+                if ((g_btl_talk_open_moods[n] >> i & 1) != 0) {
                     value = *gauge + TALK_OPEN_GAIN;
                     if (value > TALK_OPEN_CAP) {
                         value = TALK_OPEN_CAP;
@@ -275,14 +283,14 @@ int BtlBeginTalking(void)
             BtlIndicatorBar();
             BtlMenuUpdate();
             BtlTalkUpdate();
-            while ((answer = BtlMenuChoice()) < 0) {
+            while ((i = BtlMenuChoice()) < 0) {
                 BtlMenuUpdate();
                 BtlTalkUpdate();
                 BtlDrawFrame();
             }
 
-            g_btl_battle_kind = 0;
-            if (answer == TALK_ANSWER_NO) {
+            *(u_char *)&g_btl_battle_kind = 0;
+            if (i == TALK_ANSWER_NO) {
                 g_btl_talk_flags |= TALK_TURNED_DOWN;
                 BtlSoundClose(TALK_ASK_SLOT);
                 BtlMenuHide();
@@ -313,8 +321,8 @@ int BtlBeginTalking(void)
 
             /* The line's own three scripts are found before the roll that picks one,
                so the roll lands in the call's delay slot rather than ahead of it. */
-            value = (int)g_btl_scratch_end + TALK_OPEN_TABLE;
-            line = (u_short *)(value + g_btl_talk_open_lines[pick] * 8);
+            i = (int)g_btl_scratch_end + TALK_OPEN_TABLE;
+            line = (u_short *)(i + g_btl_talk_open_lines[n] * 8);
             line += rand() % TALK_OPEN_LINES;
             BtlRunFrames(TALK_OPEN_WAIT);
             BtlMenuDismiss();
@@ -328,8 +336,8 @@ int BtlBeginTalking(void)
             BtlSeqPlay(BTL_SCRATCH + dir
                        + *(u_long *)(BTL_SCRATCH + dir + *line * 4));
 
-            g_btl_phase = 1;
             g_btl_talking = 1;
+            g_btl_phase = 1;
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_OPEN;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_OPEN;
             g_btl_talk_depth++;
@@ -343,9 +351,6 @@ int BtlBeginTalking(void)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/begintalk", BtlBeginTalking);
-#endif
 #else
 INCLUDE_ASM("btlp/nonmatchings/begintalk", BtlBeginTalking);
 #endif
