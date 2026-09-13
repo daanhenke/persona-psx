@@ -250,6 +250,14 @@ typedef struct {
     /* 0xB */ u_char        v;
 } BtlGfxText;                          /* 12 bytes */
 
+/* The same header as BtlGfxList on a text kind's step, whose rows are
+   BtlGfxText rather than cells. The list boards scroll by writing into those
+   rows in place (objmotion6.c). */
+typedef struct {
+    /* 0x0 */ u_int       count;
+    /* 0x4 */ BtlGfxText *rows;
+} BtlGfxTextList;                      /* 8 bytes */
+
 #define BTL_FONT_COLS 31
 #define BTL_FONT_W    8
 #define BTL_FONT_H    12

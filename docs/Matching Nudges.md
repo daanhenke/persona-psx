@@ -1404,6 +1404,29 @@ constants, wherever the assignment is written.
 - [stockboard.c](/src/btlp/stockboard.c) - `BtlOpenStockBoard`, 97.15% to
   exact on both of its packed lists.
 
+## Rows a loop touches at several fixed distances are indexed, not walked
+
+A loop that writes a row and the rows ten, twelve and twenty-two after it
+reads, in the image, as one pointer based on the *first* row with the others
+at fixed offsets (`addu a0, s1, zero`, then `0x82(a0)`, `0x9A(a0)`). A walked
+pointer (`c = rows; ... c[10].h ... c++`) leaves gcc free to base its reduced
+pointer on another row - here the last one, `addiu a0, s1, 0x112`. Writing
+`rows[i].h`, `rows[i + 10].h` and so on gives it one reduced address to hang
+all of them from, and it takes the first.
+
+- [objmotion6.c](/src/btlp/objmotion6.c) - `BtlObjMotion06`, 98.96% to exact,
+  and `BtlObjMotion07`, 97.48% to 99.98%.
+
+## A byte stepped down is read signed when the image adds a negative
+
+`field -= 3` on an unsigned byte folds the step into the byte's own width and
+the image shows `addiu v1, v1, 0xfd`; where it shows `addiu v1, v1, -0x3` the
+byte was read signed first: `field = (signed char)field - 3`. The field can
+stay unsigned in the struct - every other reader of it loads the same bits.
+
+- [objmotion6.c](/src/btlp/objmotion6.c) - `BtlObjMotion07`, 99.98% to exact,
+  on the two rows that step the font row back.
+
 ## Reuse the first loop's locals in the second
 
 When a routine's second loop needs a lane and a row of its own, the image may

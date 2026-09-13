@@ -92,7 +92,6 @@ extern short      g_btl_preset_row;
 extern short      g_btl_orders_row;
 extern short      g_btl_tactics_row;
 extern short      g_btl_spell_row;
-extern int        g_btl_spell_slot;
 extern u_char     g_btl_orders_line0[];
 extern u_char     g_btl_orders_line1[];
 extern u_char     g_btl_orders_line2[];

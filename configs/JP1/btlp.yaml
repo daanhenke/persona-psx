@@ -503,7 +503,8 @@ segments:
       - [0x48834, c, objmotion4]
       - [0x48CC0, asm, btlp_68_0]
       - [0x48F4C, c, objmotion8]
-      - [0x49138, asm, btlp_68_a]
+      # The two motions that scroll a list board by a page.
+      - [0x49138, c, objmotion6]
       - [0x49548, c, objmotion12]
       - [0x49584, c, gaugecolour]
       - [0x4960C, c, markers]

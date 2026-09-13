@@ -19,6 +19,7 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/menu.h>
 #include <persona/btlp/spellfx.h>
 #include <persona/common/spell.h>
 

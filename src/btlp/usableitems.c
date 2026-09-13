@@ -29,6 +29,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/board.h>
+#include <persona/btlp/menu.h>
 #include <persona/btlp/object.h>
 #include <persona/common/item.h>
 
@@ -42,10 +43,6 @@
 extern const BtlBoardDef g_btl_list_board_defs[];
 extern const long        g_btl_spell_board_pos[];
 extern BtlObj           *g_btl_list_board;
-extern u_char            g_btl_list_open;
-extern int               g_btl_spell_slot;
-
-extern void BtlBuildSpellLines(int spell);
 
 /* Whether the entry in this slot is one the fight can offer. */
 #define BtlItemOffered(id, count)                           \

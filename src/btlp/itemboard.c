@@ -21,6 +21,7 @@
 #include <decomp/libc.h>
 #include <persona/btlp/board.h>
 #include <persona/btlp/number.h>
+#include <persona/btlp/menu.h>
 #include <persona/btlp/object.h>
 #include <persona/common/item.h>
 
@@ -43,9 +44,6 @@ extern const long        g_btl_item_board_pos[];
 extern BtlObj           *g_btl_list_board;
 extern BtlObj           *g_btl_stock_board;
 
-/* Where the menu has got to in the inventory. */
-extern u_short *g_btl_item_at;
-
 /* The twelve entries the board is drawn from, and the three things each line
    is made of: the name, the count, and the two rows it is drawn as. */
 extern u_short   g_btl_item_slots[];
@@ -53,8 +51,6 @@ extern u_char    g_btl_item_names[][10];
 extern u_char    g_btl_item_counts[][3];
 extern BtlGfxText g_btl_item_rows[];
 extern BtlGfxText g_btl_item_rows2[];
-
-void BtlBuildItemLines(u_short *from);
 
 void BtlOpenItemBoard(void)
 {

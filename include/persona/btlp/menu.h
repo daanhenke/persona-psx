@@ -83,6 +83,19 @@ extern int BtlCommandRefuse(void);
 /* One frame of the Persona swap board. personamenu.c. */
 extern int BtlPersonaSwapUpdate(short *row);
 
+/* The list board the spell and item boards share: which of the two it is
+   showing, the first spell slot on its page, and where the menu has got to
+   in the inventory; the two builders that fill a page, and the steps to the
+   next and previous usable item. objmotion6.c scrolls it. */
+extern u_char   g_btl_list_open;
+extern int      g_btl_spell_slot;
+extern u_short *g_btl_item_at;
+
+extern void     BtlBuildSpellLines(int spell);
+extern void     BtlBuildItemLines(u_short *from);
+extern u_short *BtlNextUsableItem(u_short *slot);
+extern u_short *BtlPrevUsableItem(u_short *slot);
+
 /* Lights one member at full colour with their marker chosen, and sends the
    rest of the living party toward the background with theirs. */
 extern void BtlSingleOutMember(int slot);
