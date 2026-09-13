@@ -106,14 +106,15 @@ extern void BtlAilmentTurnMad();
 extern void BtlAilmentTurnWolf();
 
 /* What a handler leaves in the byte. Nought is a lost turn; a redirected turn
-   is run as AIMED, a fleeing one as FLEE, and Barsak leaves NONE when it finds
-   nothing worth swinging at. BtlAilmentTakeTurn answers one more, 0xC, that no
-   handler read so far writes. */
+   is run as AIMED, or as GUN when it is the member's gun that is turned; a
+   fleeing one as FLEE, and Barsak leaves NONE when it finds nothing worth
+   swinging at. A panicking member who runs to another cell leaves MOVED. */
 #define AIL_ACT_LOST  0
 #define AIL_ACT_AIMED 2
 #define AIL_ACT_NONE  4
-#define AIL_ACT_0C    0xC
+#define AIL_ACT_GUN   0xC
 #define AIL_ACT_FLEE  0xE
+#define AIL_ACT_MOVED 0x13
 
 /* Hands the fighter's turn to whichever of the above its ailment picks, and
    then acts on the byte the handler left. */

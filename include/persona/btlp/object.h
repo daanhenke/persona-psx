@@ -185,6 +185,10 @@ typedef struct BtlObj {
    camera rather than the move. */
 #define BTL_OBJ_TRACKING 0x40
 
+/* Set on every record that belongs to the enemies' side: what the handlers
+   both sides share test to tell an enemy from a member. */
+#define BTL_OBJ_OTHER_SIDE 0x200
+
 /* Set on an effect record the negotiation drives rather than the move: its
    group's frame handler sends it somewhere else entirely. */
 #define BTL_OBJ_ATTR_2000 0x2000

@@ -41,12 +41,10 @@
 #define WALK_B_SOUND_OPEN  0
 #define WALK_B_SOUND_CLOSE 1
 
-/* Where a row is put down: twenty pixels a row, from either side's baseline.
-   The attribute bit that says the record belongs to the other side. */
-#define WALK_ROW_H      20
-#define WALK_ROW_ORG    (-0x8C)
-#define WALK_ROW_OTHER  0x3C
-#define WALK_OTHER_SIDE 0x200
+/* Where a row is put down: twenty pixels a row, from either side's baseline. */
+#define WALK_ROW_H     20
+#define WALK_ROW_ORG   (-0x8C)
+#define WALK_ROW_OTHER 0x3C
 
 void BtlMemberMotion0D(BtlObj *o)
 {
@@ -124,7 +122,7 @@ void BtlMemberMotion0D(BtlObj *o)
     } else {
         o->y += o->step_y;
         if (--o->steps == 0) {
-            o->y = ((o->attr & WALK_OTHER_SIDE)
+            o->y = ((o->attr & BTL_OBJ_OTHER_SIDE)
                         ? (u_char)o->row * WALK_ROW_H + WALK_ROW_ORG
                         : (u_char)o->row * WALK_ROW_H + WALK_ROW_OTHER) << 16;
             o->motion = 0;

@@ -21,10 +21,8 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
 
-/* The attribute bit that says the record belongs to the other side, and the
-   one on an enemy that carries a fall sound of its own. */
-#define LEAVE_OTHER_SIDE 0x200
-#define LEAVE_OWN_SOUND  0x800
+/* The attribute bit on an enemy that carries a fall sound of its own. */
+#define LEAVE_OWN_SOUND 0x800
 
 /* An actor flag for a member no longer standing in the formation. */
 #define ACTOR_UNPLACED 0x80000000
@@ -66,7 +64,7 @@ void BtlMemberMotion0E(BtlObj *o)
             break;
         }
         o->actor->flags |= BTL_ACTOR_OUT;
-        if (o->attr & LEAVE_OTHER_SIDE) {
+        if (o->attr & BTL_OBJ_OTHER_SIDE) {
             if (o->attr & LEAVE_OWN_SOUND) {
                 BtlSePlay((o->unkCD >> 1) + LEAVE_SOUND_SIZE, 1);
             } else {
@@ -77,7 +75,7 @@ void BtlMemberMotion0E(BtlObj *o)
             *ACTOR_CLUT(g_btl_actor_clut_base, o->mark_num);
         *ACTOR_CLUT(g_btl_actor_clut, o->mark_num) =
             *ACTOR_CLUT(g_btl_actor_clut_base, o->mark_num);
-        o->step_y = (o->attr & LEAVE_OTHER_SIDE) ? -LEAVE_SINK : LEAVE_SINK;
+        o->step_y = (o->attr & BTL_OBJ_OTHER_SIDE) ? -LEAVE_SINK : LEAVE_SINK;
         o->rgb[0] = LEAVE_GREY;
         o->rgb[1] = LEAVE_GREY;
         o->rgb[2] = LEAVE_GREY;
@@ -91,11 +89,11 @@ void BtlMemberMotion0E(BtlObj *o)
     case 1:
         if ((u_short)(o->rgb[0] | o->rgb[1] | o->rgb[2])) {
             o->y += o->step_y;
-            o->step_y += (o->attr & LEAVE_OTHER_SIDE) ? -LEAVE_SPEED
+            o->step_y += (o->attr & BTL_OBJ_OTHER_SIDE) ? -LEAVE_SPEED
                                                       : LEAVE_SPEED;
             break;
         }
-        if (o->attr & LEAVE_OTHER_SIDE) {
+        if (o->attr & BTL_OBJ_OTHER_SIDE) {
             g_btl_grid[o->row * ENEMY_GRID_W + o->col2] = CELL_EMPTY;
             o->actor->c.key = 0;
         } else {

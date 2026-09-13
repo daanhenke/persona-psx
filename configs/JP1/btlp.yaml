@@ -111,6 +111,8 @@ segments:
       # the word of padding behind it that belongs to nobody.
       - [0xD20, .rodata, ailtaketurn]
       - [0xD5C, rodata, btlp_rodata6a0]
+      # BtlAilmentTurnPanic's switch table sits in here too, and becomes
+      # `[0xD60, .rodata, ailpanic]` when the routine comes out of its guard.
       # BtlRollDefeatDrop's rate table, which the C emits itself, and the word of
       # padding behind it that belongs to nobody.
       - [0xD80, .rodata, defeatdrop]
@@ -388,7 +390,8 @@ segments:
       - [0x30C68, c, packgrid]
       - [0x30E30, c, ailtaketurn]
       - [0x30F04, c, ailhappy]
-      - [0x30F78, asm, btlp_57_x1_b]
+      # What panic does to a fighter's turn.
+      - [0x30F78, c, ailpanic]
       - [0x314D0, c, ailturn]
       - [0x316F4, c, ailcounter]
       - [0x31918, asm, btlp_57_x1_c]

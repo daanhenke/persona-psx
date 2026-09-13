@@ -39,10 +39,6 @@
 #include <persona/btlp/sides.h>
 #include <persona/btlp/status.h>
 
-/* The attribute bit that says the record belongs to the other side, which is
-   the whole of what picks between the two pickers. */
-#define AIL_OTHER_SIDE 0x200
-
 /* Charm clears these two off a fighter it turns round. */
 #define AIL_CHARM_CLEAR 0x18000
 
@@ -60,7 +56,7 @@ void BtlAilmentTurnCharm(BtlActor *a, u_char *act)
     int     slot;
 
     o = a->obj;
-    if ((o->attr & AIL_OTHER_SIDE) == 0) {
+    if ((o->attr & BTL_OBJ_OTHER_SIDE) == 0) {
         slot = BtlPickOtherMember(o->mark_num);
         if (slot >= 0) {
             a->targets = 1 << slot;

@@ -30,7 +30,7 @@ void BtlAilmentTakeTurn(BtlActor *a, u_char *act)
     }
     switch (*act) {
     case AIL_ACT_AIMED:
-    case AIL_ACT_0C:
+    case AIL_ACT_GUN:
         a->flags &= ~TURN_AIMED_BITS;
         break;
     case AIL_ACT_FLEE:

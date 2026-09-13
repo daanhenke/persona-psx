@@ -35,10 +35,8 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 
-/* The attribute bit that says the record belongs to the other side, and the
-   two that mean it is not free to move yet. */
-#define HIT_OTHER_SIDE 0x200
-#define HIT_BUSY       (BTL_OBJ_HELD | BTL_OBJ_TRACKING)
+/* The two attribute bits that mean the record is not free to move yet. */
+#define HIT_BUSY (BTL_OBJ_HELD | BTL_OBJ_TRACKING)
 
 /* The number's kind as it is spawned, the kind a number record ends up with,
    and the height a member's is put at. */
@@ -75,7 +73,7 @@ void BtlMemberMotion0F(BtlObj *o)
     case 0:
         num = BtlSpawnHitNumber(g_btl_actors[o->mark_num].hit_amount, &o->x,
                                 HIT_NUMBER_SPAWN);
-        if (o->attr & HIT_OTHER_SIDE) {
+        if (o->attr & BTL_OBJ_OTHER_SIDE) {
             num->z = (g_btl_models[o->kind].number_z << 16) + o->z;
         } else {
             num->z = HIT_NUMBER_Z;
@@ -117,7 +115,7 @@ void BtlActorMotion04(BtlObj *o)
 {
     int script;
 
-    if (o->attr & HIT_OTHER_SIDE) {
+    if (o->attr & BTL_OBJ_OTHER_SIDE) {
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[g_btl_models[o->kind].hit]);
         o->motion = 0;
     } else {
@@ -148,7 +146,7 @@ void BtlMemberMotion11(BtlObj *o)
 
     switch (o->phase) {
     case 0:
-        if (o->attr & HIT_OTHER_SIDE) {
+        if (o->attr & BTL_OBJ_OTHER_SIDE) {
             script = g_btl_models[o->kind].hit;
         } else {
             script = g_btl_member_scripts[SCRIPT_HIT
@@ -165,7 +163,7 @@ void BtlMemberMotion11(BtlObj *o)
             break;
         }
         if ((o->actor->flags & BTL_ACTOR_FLINCHED) == 0) {
-            if (o->attr & HIT_OTHER_SIDE) {
+            if (o->attr & BTL_OBJ_OTHER_SIDE) {
                 script = g_btl_models[o->kind].spawn;
             } else {
                 script = g_btl_member_scripts[SCRIPT_STAND
