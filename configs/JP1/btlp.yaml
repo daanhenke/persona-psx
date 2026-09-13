@@ -440,7 +440,8 @@ segments:
       - [0x3C2BC, c, debugailment]
       - [0x3C9B4, asm, btlp_61_b]
       - [0x3EA80, c, targetpick]
-      - [0x3F01C, asm, btlp_61_x1]
+      # The commands that change a Persona and that refuse.
+      - [0x3F01C, c, commandpersona]
       - [0x3F404, c, pickupdate]
       # One frame of the two-option prompt.
       - [0x3F5F8, c, choiceupdate]
@@ -486,8 +487,9 @@ segments:
       - [0x46348, c, pickgrid]
       - [0x46714, c, pickplace]
       - [0x46910, c, personaboard]
-      - [0x46BE8, asm, btlp_66_x1]
-      - [0x46F40, c, itemboard]
+      # The stock board: filled in and put up, and taken down.
+      - [0x46BE8, c, stockboard]
+      - [0x46F68, c, itemboard]
       - [0x471EC, c, usableitems]
       - [0x474BC, c, spelllines]
       - [0x475BC, c, menuboards]

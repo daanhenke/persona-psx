@@ -34,6 +34,11 @@ typedef struct {
 extern BtlObj *BtlBoardOpen(BtlBoardDef *parts, const long *pos);
 extern void    BtlBoardShut(BtlObj *board);
 
+/* The stock board the Persona change is picked on, filled in from the acting
+   member and put up, and taken down. stockboard.c. */
+extern void BtlOpenStockBoard(void);
+extern void BtlCloseStockBoard(void);
+
 /* The boards a menu outside boards.c puts up: the debug page, the switch
    board of its flag editor, and the status view an analysis is shown on. */
 extern void BtlOpenDebugBoard(void);

@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - the board the fight picks an item off.  BTLP only.
- *   0x800AB2E0 BtlCloseStockBoard  0x800AB308 BtlOpenItemBoard
- *   0x800AB350 BtlCloseItemBoard   0x800AB378 BtlBuildItemLines
+ *   0x800AB308 BtlOpenItemBoard   0x800AB350 BtlCloseItemBoard
+ *   0x800AB378 BtlBuildItemLines
  *
  * Twelve lines, filled from the inventory before the board goes up.
  *
@@ -55,11 +55,6 @@ extern BtlGfxText g_btl_item_rows[];
 extern BtlGfxText g_btl_item_rows2[];
 
 void BtlBuildItemLines(u_short *from);
-
-void BtlCloseStockBoard(void)
-{
-    BtlBoardShut(g_btl_stock_board);
-}
 
 void BtlOpenItemBoard(void)
 {

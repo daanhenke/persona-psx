@@ -80,8 +80,6 @@
 extern BtlGfxText g_btl_persona_cells[];
 extern u_char     g_btl_persona_name[];
 extern u_char     g_btl_persona_level_cells[];
-extern u_char     g_btl_persona_sp_cells[];
-extern u_char     g_btl_persona_sp_max_cells[];
 extern u_char     D_800F5B3C[];
 
 /* The board itself and what it is built from. */

@@ -73,6 +73,11 @@ extern BtlStats g_btl_personas[];
    row. BtlPersonaSwapUpdate fills them for the Persona it offers. */
 extern u_char g_btl_persona_spell_lines[][11];
 
+/* The SP figure and its maximum, three cells each, which the Persona board
+   and the stock board both draw the acting member's SP into. */
+extern u_char g_btl_persona_sp_cells[];
+extern u_char g_btl_persona_sp_max_cells[];
+
 /* A cast Persona's experience, and its rank-up. personagrow.c. */
 extern void BtlPersonaGrow(BtlStats *p);
 

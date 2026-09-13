@@ -556,6 +556,16 @@ Read it off the image: a chain tests the first value and falls through, a
 switch tests every listed value and then jumps to the default. Three branches
 for two arms means a switch.
 
+The same holds for three answers out of range of a jump table: a binary
+compare tree (`beq -2`, `slti -1`, `beq -0x100`, then `bne -1` on the other
+side) is a switch, and the arms it jumps to are laid out in the order the
+cases are written - which the image tells you by where each arm's return
+value is loaded.
+
+- [commandpersona.c](/src/btlp/commandpersona.c) - `BtlCommandChangePersona`,
+  94.13% as an if chain, 97.51% as a switch with the abort case first, and
+  exact with the cancel case ahead of it.
+
 ## Two loop steps by the same amount lift the constant out
 
 A constant that needs a `lui` is lifted into a saved register when the loop
@@ -1379,6 +1389,20 @@ gives a `slt`/`beqz` entry test instead - and, in `BtlBoardOpen`, an 8-byte
 smaller frame.
 
 - [boardopen.c](/src/btlp/boardopen.c) - `BtlBoardOpen`, 96.91% to exact.
+
+## A list packed as it is filled is indexed by a count, not walked
+
+When a loop copies into a destination only for the entries that qualify, and
+the image's destination pointer is set up *after* the loop's hoisted constants
+and the strength-reduced offset of its other arrays, the source indexed the
+destination with a count it bumps on each copy - `memcpy(lines[n], ...); n++`.
+gcc reduces that index to the pointer the image steps, and a reduced
+variable's start is inserted after invariant motion. A pointer assigned before
+the loop (`line = lines[1]; ... line += 11`) keeps its set-up ahead of the
+constants, wherever the assignment is written.
+
+- [stockboard.c](/src/btlp/stockboard.c) - `BtlOpenStockBoard`, 97.15% to
+  exact on both of its packed lists.
 
 ## Reuse the first loop's locals in the second
 

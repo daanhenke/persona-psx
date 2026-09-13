@@ -72,6 +72,17 @@ extern void BtlPartyResetGfx(void);
 /* The same for one member, whatever state it is in. partyresetgfx.c. */
 extern void BtlMemberResetGfx(int slot);
 
+/* What each row of the command list runs, and the two that stand in it on
+   their own: changing the Persona and refusing. Each answers 1 once the member
+   has an order, 0 when the command came to nothing and -2 on the third key.
+   commandpersona.c. */
+extern int (*g_btl_command_fn[])(void);
+extern int BtlCommandChangePersona(void);
+extern int BtlCommandRefuse(void);
+
+/* One frame of the Persona swap board. personamenu.c. */
+extern int BtlPersonaSwapUpdate(short *row);
+
 /* Lights one member at full colour with their marker chosen, and sends the
    rest of the living party toward the background with theirs. */
 extern void BtlSingleOutMember(int slot);
