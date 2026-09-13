@@ -636,6 +636,11 @@ blank as the else, not the other way round. Nothing about the code changes;
 only which case is written first. Read the branch polarity off the image
 before writing the if, and it is one attempt instead of four.
 
+- [objmotion4.c](/src/btlp/objmotion4.c) - `BtlObjMotion02`, 87.21% to exact.
+  Both of its nested tests are `bnez piece` to the piece's script with the
+  front record's as the fall-through, so both are written
+  `if ((attr & MARKER_PIECE) == 0)` first.
+
 ## A pointer taken again each turn of the loop
 
 Indexing an array by a monotonic counter gets strength-reduced: gcc keeps a

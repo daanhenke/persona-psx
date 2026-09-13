@@ -2,6 +2,13 @@
  * through.  BTLP only.
  *   0x800ACBD4 BtlObjMotion03
  *   0x800ACDA0 BtlObjMotion04  0x800ACF64 BtlObjMotion05
+ *   0x800AD060 BtlObjMotion02
+ *
+ * 02 is the flip a party marker arrives and leaves with, on rot.vy and rot.vz
+ * at the same pace as 05's: at the edge the record changes face and takes the
+ * script for it, and once round it settles - the front record hands the
+ * marker its standing script and gives itself up, the piece behind rejoins
+ * the marker and moves back into line.
  *
  * Entries 3, 4 and 5 of g_btl_obj_motion, named for the motion they answer to
  * the way the rest of the table is (see objmotion8.c).
@@ -225,6 +232,84 @@ void BtlObjMotion05(BtlObj *obj)
             obj->draw &= ~OBJ_DRAW_XFORM;
         } else {
             obj->rot.vx += FLIP_STEP;
+        }
+        break;
+    }
+}
+
+/* A shown marker's two records, as BtlShowMarker builds them: the front one
+   carrying MARKER_FACE, and the piece behind it carrying MARKER_PIECE and its
+   kind in scale_to. The kind scripts come before the slot scripts in
+   g_btl_marker_scripts, and the marker stands MARKER_LIFT to the side while
+   the flip runs. */
+#define MARKER_FACE  0x100
+#define MARKER_PIECE 0x400
+#define MARKER_KINDS 7
+#define MARKER_LIFT  0x210000
+
+extern BtlSeqStep  D_800DA2B8[];
+extern BtlSeqStep  D_800DA2C8[];
+extern BtlSeqStep  D_800DA2E8[];
+extern BtlSeqStep  D_800DA2F8[];
+extern BtlSeqStep *g_btl_marker_scripts[];
+extern BtlSeqStep *g_btl_marker_back_scripts[];
+extern BtlObj     *g_btl_marker_shown[];
+
+void BtlObjMotion02(BtlObj *obj)
+{
+    switch (obj->phase) {
+    case FLIP_OUT:
+        obj->draw |= OBJ_DRAW_XFORM;
+        if ((obj->rot.vy & (OBJ_TURN - 1)) == FLIP_EDGE) {
+            obj->attr ^= MARKER_FACE;
+            obj->rot.vy = FLIP_FAR;
+            obj->rot.vz = FLIP_FAR;
+            /* The front record's arm is written first on both faces: the
+               image falls through to it and branches to the piece's. */
+            if (obj->attr & MARKER_FACE) {
+                if ((obj->attr & MARKER_PIECE) == 0) {
+                    BtlObjSetScript(obj, D_800DA2F8);
+                } else {
+                    BtlObjSetScript(obj, g_btl_marker_scripts[obj->scale_to]);
+                }
+            } else if ((obj->attr & MARKER_PIECE) == 0) {
+                BtlObjSetScript(obj, D_800DA2E8);
+            } else {
+                BtlObjSetScript(obj,
+                                g_btl_marker_scripts[MARKER_KINDS + obj->mark_num]);
+                BtlPlaceMemberMarkers(obj->mark_num, 1);
+            }
+            obj->phase++;
+        } else {
+            obj->rot.vy += FLIP_STEP;
+            obj->rot.vz += FLIP_STEP;
+        }
+        break;
+
+    case FLIP_BACK:
+        if ((obj->rot.vy & (OBJ_TURN - 1)) == 0) {
+            obj->draw &= ~OBJ_DRAW_XFORM;
+            if ((obj->attr & MARKER_PIECE) == 0) {
+                BtlObjSetScript(g_btl_marker_obj[obj->mark_num],
+                                (obj->attr & MARKER_FACE) ? D_800DA2C8
+                                                          : D_800DA2B8);
+                g_btl_marker_shown[obj->mark_num] = NULL;
+                BtlObjFree(obj);
+            } else {
+                BtlObjLast(g_btl_marker_obj[obj->mark_num])->attached = obj;
+                BtlObjSetScript(obj,
+                                (obj->attr & MARKER_FACE)
+                                    ? g_btl_marker_back_scripts[obj->scale_to]
+                                    : g_btl_marker_scripts[MARKER_KINDS
+                                                           + obj->mark_num]);
+                BtlPlaceMemberMarkers(obj->mark_num, 0);
+                obj->motion = 0;
+                obj->phase = 0;
+                obj->x += MARKER_LIFT;
+            }
+        } else {
+            obj->rot.vy += FLIP_STEP;
+            obj->rot.vz += FLIP_STEP;
         }
         break;
     }

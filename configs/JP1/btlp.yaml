@@ -501,7 +501,6 @@ segments:
       - [0x4879C, c, markeridle]
       # Three more of the motions a display record can be put through.
       - [0x48834, c, objmotion4]
-      - [0x48CC0, asm, btlp_68_0]
       - [0x48F4C, c, objmotion8]
       # The two motions that scroll a list board by a page.
       - [0x49138, c, objmotion6]
