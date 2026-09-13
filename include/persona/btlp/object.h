@@ -210,6 +210,12 @@ typedef struct BtlObj {
    record, each cell in its own frame for a model. */
 #define BTL_OBJ_SHIFT_SCREEN 0x40000
 
+/* A floating record's height is read out of a sixteen-entry table a quarter
+   as fast as the record ages, and the entries are whole units. */
+#define BTL_HOVER_ENTRIES 16
+#define BTL_HOVER_SHIFT   2
+#define BTL_HOVER_FIXED   16
+
 /* Taken out of the drawing pass without being freed. Set on an object, its
    shadow, its ailment marker and the marker's own attached piece together. */
 #define BTL_OBJ_HIDDEN    0x40000000

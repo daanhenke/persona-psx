@@ -571,7 +571,6 @@ segments:
       - [0x566B0, c, fxspell37]
       - [0x56704, c, fxspell39]
       - [0x56A04, c, fxspell3a]
-      - [0x56ABC, asm, btlp_69_c_m_a]
       - [0x56E70, c, fxspell3b]
       - [0x56F4C, asm, btlp_69_c_n]
       - [0x57780, c, fxspell44]

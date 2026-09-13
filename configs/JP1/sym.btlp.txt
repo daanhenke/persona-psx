@@ -2394,7 +2394,7 @@ BtlFxStart39                  = 0x800BAAA4; // type:func size:0x12C
 BtlOpenFxScatter              = 0x800BABD0; // type:func size:0x1D4
 BtlFxStart3A                  = 0x800BADA4; // type:func size:0xB8
 BtlFxStep3A                   = 0x800BAE5C; // type:func size:0x31C
-func_800BB178                 = 0x800BB178; // type:func size:0x98
+BtlFxStartHigh                = 0x800BB178; // type:func size:0x98
 
 //------------------------------------------------------------
 //--- PA: 0x056E70   VA: 0x800BB210   subsegment: c, fxspell3b
@@ -3312,6 +3312,7 @@ g_btl_fx_nine_order           = 0x800D1408; // type:u8 size:0x9
 g_btl_fx_ring_cells           = 0x800D1414; // type:u8 size:0x10
 g_btl_fx_lift                 = 0x800D1424; // type:s32 size:0xC
 g_btl_fx_lift_pad             = 0x800D1430; // type:s32 size:0x4
+g_btl_fx_hover                = 0x800D1434; // type:s32 size:0x40
 g_btl_fx_high                 = 0x800D1474; // type:s32 size:0xC
 g_btl_fx_high_pad             = 0x800D1480; // type:s32 size:0x4
 g_btl_fx_centre               = 0x800D1484; // type:s32 size:0xC

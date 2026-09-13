@@ -121,9 +121,10 @@ extern long g_btl_fx_middle[];
    worked out, each nothing across and nothing along the field and a depth
    toward the camera. Move 0x72's is the same sixty-four units as
    g_btl_fx_middle - the overlay carries two copies of it, the way it carries
-   two of BtlOpenFxObj - and move 0x39's is eighty-eight. The first is shared
-   by moves 0x39 and 0x3A, which want different depths, so its own handler
-   writes the depth in before it builds. */
+   two of BtlOpenFxObj - and the one BtlFxStartHigh stands on, which nothing
+   in the overlay reaches, is eighty-eight. The first is shared by moves 0x3A
+   and 0x3E, which want different depths, so their handler writes the depth
+   in before it builds. */
 extern long g_btl_fx_lift[];
 extern long g_btl_fx_high[];
 extern long g_btl_fx_centre[];

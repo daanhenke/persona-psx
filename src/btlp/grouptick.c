@@ -35,10 +35,6 @@ extern void (*g_btl_member_motion[])();
 /* How far a summoned Persona floats, one entry per four frames of its age. */
 extern long g_btl_persona_hover[];
 
-#define HOVER_ENTRIES 16
-#define HOVER_SHIFT   2
-#define HOVER_FIXED   16
-
 /* The motion a Persona is on while it is being drawn in, which does its own
    colour work and must not be pulsed under. */
 #define PERSONA_ARRIVING 4
@@ -70,8 +66,8 @@ void BtlTickPersona(BtlObj *o)
     } else {
         o->phase = 0;
     }
-    o->z = (g_btl_persona_hover[(o->age >> HOVER_SHIFT) & (HOVER_ENTRIES - 1)]
-            << HOVER_FIXED) + o->z2;
+    o->z = (g_btl_persona_hover[(o->age >> BTL_HOVER_SHIFT) & (BTL_HOVER_ENTRIES - 1)]
+            << BTL_HOVER_FIXED) + o->z2;
     if (o->motion != PERSONA_ARRIVING && (o->attr & BTL_OBJ_TRAIL) == 0) {
         /* The first two channels are tested as the one word the record keeps
            them in, which is what the image compares. */
