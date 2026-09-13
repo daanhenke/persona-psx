@@ -1739,3 +1739,51 @@ same; moving the call ahead of them all is exact. Read the argument loads'
 position against the inits before permuting the inits.
 
 - [fxspell1e.c](/src/btlp/fxspell1e.c) - 92.97% to 96.82% on that alone.
+
+## A clamp tests the cast of the field, and clamps a local of its own
+
+Where the image stores an increment, sign-extends it *in place*, branches on
+that register and copies it into a second register in the branch's delay
+slot, the test was written on the field's cast and the local only read inside
+the arm that needs it:
+
+    if ((signed char)++a->stage[0] >= 0) {
+        n = (signed char)a->stage[0];
+        if (n > FX_53_LOW_MAX) {
+            n = FX_53_LOW_MAX;
+        }
+        m = n;
+    } else {
+        m = 0;
+    }
+    a->stage[0] = m;
+
+`n = (signed char)++a->stage[0]; if (n >= 0) ...` sign-extends straight into
+`n`, keeps the incremented value alive until the delay slot, and is seven
+words out per clamp. The clamped value going through `m` - with the constant
+written into `n` first - is what gives the single store behind both arms.
+Ternaries, an `else if` chain, block-scoped locals and `signed char` locals
+all landed further away.
+
+- [fxfinish53.c](/src/btlp/fxfinish53.c) - `BtlFxFinish53`, 92.10% to 99.96%
+  over its seven clamps; the rest is the jump table and a table name.
+
+## A case the dispatch tree swallows goes first in the switch
+
+A one-statement case can end up *inside* the compare tree - `bne` to the
+default with its store in a `j`'s delay slot - rather than among the bodies.
+gcc lays bodies out in source order straight after the tree, so that case was
+the first body, and writing it last instead leaves the tree ending in a `beq`
+to a body at the far end and the body before it with a `j` of its own.
+
+- [fxfinish53.c](/src/btlp/fxfinish53.c) - 0xEF's `a->unkD3 = 1`; 92.10% to
+  92.82%.
+
+## `x += x / 8 + GROW`, not `x = x + GROW + x / 8`
+
+The image forms `x + GROW` in the delay slot of the division's sign test and
+adds the quotient to it. Every spelling that puts the constant beside the
+first `x` is folded to `x / 8 + GROW + x`, which needs the quotient first and
+blocks the dispatch branch's delay slot as well.
+
+- [fxmotion.c](/src/btlp/fxmotion.c) - `BtlFxStepOrbitUnused`, 95.33% to exact.

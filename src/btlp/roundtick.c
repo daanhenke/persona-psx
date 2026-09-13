@@ -24,13 +24,10 @@
 #include <persona/btlp/round.h>
 
 /* The flags that only ever last the turn they were set in. */
-#define ROUND_FLAGS 0x20000180
+#define ROUND_FLAGS (0x20000000 | BTL_ACTOR_5E | BTL_ACTOR_5D)
 
 /* What an ailment that has stepped down a level is given to run. */
 #define ROUND_AIL_TURNS 2
-
-/* The attribute bit `unkDE` holds up. */
-#define ROUND_DE_BIT 0x40
 
 extern BtlActor g_btl_enemies[];
 
@@ -67,7 +64,7 @@ void BtlCountDownRound(void)
         }
         if (a->unkDE != 0) {
             a->unkDE = 0;
-            a->flags &= ~ROUND_DE_BIT;
+            a->flags &= ~BTL_ACTOR_5C;
         }
 
         status = a->c.status;

@@ -210,6 +210,11 @@ typedef struct BtlObj {
    record, each cell in its own frame for a model. */
 #define BTL_OBJ_SHIFT_SCREEN 0x40000
 
+/* Set on a fighter's object while something else is carrying it - a member's
+   swing, or move 0xE0's effect taking hold of the acting fighter - and cleared
+   again as it is let go. */
+#define BTL_OBJ_CARRIED 0x20000
+
 /* A floating record's height is read out of a sixteen-entry table a quarter
    as fast as the record ages, and the entries are whole units. */
 #define BTL_HOVER_ENTRIES 16

@@ -201,10 +201,6 @@ extern short g_btl_scene_rgb[];
 #define SWING_STAND  0xD20000
 #define SWING_LIFT   0x3C0000
 
-/* Cleared as the swing is set up: the bit that says the record is being
-   carried rather than standing. */
-#define SWING_CARRIED 0x20000
-
 /* The two kinds the swing poses differently for, and the message it waits
    behind when there is nothing left to hit. */
 #define SWING_KIND_A 2
@@ -272,7 +268,7 @@ void BtlMemberMotion02(BtlObj *o)
     a = o->actor;
     switch (o->phase) {
     case 0:
-        o->attr &= ~SWING_CARRIED;
+        o->attr &= ~BTL_OBJ_CARRIED;
         if (*(signed char *)&a->c.status == SWING_AIL_0C) {
             o->phase = 0xA;
             break;
@@ -467,7 +463,7 @@ void BtlMemberMotion02(BtlObj *o)
         }
         BtlRefreshAttacks();
         BtlSoundClose(6);
-        if ((o->attr & SWING_CARRIED) != 0) {
+        if ((o->attr & BTL_OBJ_CARRIED) != 0) {
             scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
                                             + o->kind * MEMBER_SCRIPT_MODEL];
         } else {
@@ -526,11 +522,11 @@ void BtlMemberMotion02(BtlObj *o)
                    << 16;
             o->motion = 0;
             o->x2 = o->x;
-            o->attr &= ~SWING_CARRIED;
+            o->attr &= ~BTL_OBJ_CARRIED;
             o->y2 = o->y;
         } else {
             o->motion = 0;
-            o->attr &= ~SWING_CARRIED;
+            o->attr &= ~BTL_OBJ_CARRIED;
         }
         break;
     case 9:

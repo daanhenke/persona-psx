@@ -56,7 +56,7 @@ void BtlOfferFinish(void)
     offer = &g_btl_offer[g_btl_offer_slot];
     do {
         if ((offer->used >> i & 1) != 0) {
-            a->offered = 1;
+            a->stage[0] = 1;
         }
         i++;
         a++;

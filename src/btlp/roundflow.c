@@ -1559,9 +1559,9 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         q = g_btl_combatants;
                         while (n < BTL_ENEMIES) {
                             if (q[n].c.key != 0) {
-                                int flags = q[n].offered;
-                                flags |= q[n].unkE1[0];
-                                flags |= q[n].unkE1[1];
+                                int flags = q[n].stage[0];
+                                flags |= q[n].stage[1];
+                                flags |= q[n].stage[2];
                                 if (flags != 0) {
                                     *ok = enabled;
                                     break;
@@ -1573,10 +1573,10 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         n = 0;
                         while (n < BTL_PARTY) {
                             if (g_btl_actors[n].c.key != 0) {
-                                int flags = g_btl_actors[n].unkE1[2];
-                                flags |= g_btl_actors[n].unkE1[3];
-                                flags |= g_btl_actors[n].unkE1[4];
-                                flags |= g_btl_actors[n].unkE1[5];
+                                int flags = g_btl_actors[n].stage[3];
+                                flags |= g_btl_actors[n].stage[4];
+                                flags |= g_btl_actors[n].stage[5];
+                                flags |= g_btl_actors[n].stage[6];
                                 if (flags != 0) {
                                     *ok = enabled;
                                     break;
@@ -1589,7 +1589,7 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         n = 0;
                         q = g_btl_combatants;
                         while (n < BTL_ENEMIES) {
-                            if (q[n].c.key != 0 && (q[n].flags & 0x80) == 0) {
+                            if (q[n].c.key != 0 && (q[n].flags & BTL_ACTOR_5D) == 0) {
                                 *ok = enabled;
                                 break;
                             }
@@ -1600,7 +1600,7 @@ u_char BtlChooseEnemyMove(BtlActor *a)
                         n = 0;
                         q = g_btl_combatants;
                         while (n < BTL_ENEMIES) {
-                            if (q[n].c.key != 0 && (q[n].flags & 0x100) == 0) {
+                            if (q[n].c.key != 0 && (q[n].flags & BTL_ACTOR_5E) == 0) {
                                 *ok = enabled;
                                 break;
                             }

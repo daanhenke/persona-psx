@@ -27,7 +27,6 @@
 
 /* What the last phase leaves behind: the record is hidden, put on the phase
    nothing steps, and given four children for the hit to count. */
-#define FX_STEP_DONE   0x80
 #define FX_STEP_HITS   4
 
 /* The move whose sheet is three rows deep rather than one. */

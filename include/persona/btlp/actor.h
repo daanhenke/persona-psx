@@ -170,10 +170,17 @@ typedef struct BtlActor {
                                       end clears it and attribute bit 0x40 with
                                       it                                     */
     /* 0xDF */ u_char  unkDF;
-    /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
-                                      once that offer is done with; the
-                                      battle only ever clears it again   */
-    /* 0xE1 */ u_char  unkE1[6];   /* cleared with `offered`, as one run     */
+    /* 0xE0 */ u_char  stage[7];   /* how far the stage moves have driven the
+                                      fighter. BtlFxFinish53 puts the first
+                                      three up by one for 0x53..0x55, to at
+                                      most four, and the last four for
+                                      0x57..0x5A, to at most seven, and 0x56
+                                      and 0x5B clear each group; the move menu
+                                      offers those two only while some enemy
+                                      holds one of the first three or some
+                                      member one of the last four. An offer
+                                      that is done with sets the first on
+                                      every enemy it involved             */
     /* 0xE7 */ u_char  ward_turns; /* rounds the ward at BTL_ACTOR_WARDS has
                                       left to run. BtlFxFinish8C sets it as
                                       the ward lands and the round counts it
@@ -257,6 +264,15 @@ extern u_char g_btl_counter_order;
    own at `timed_a` and `timed_b`. Nothing read so far says what either is. */
 #define BTL_ACTOR_TIMED_A 0x100000
 #define BTL_ACTOR_TIMED_B 0x200000
+
+/* Three more set by the stage moves' finish and named for the move that sets
+   them. BTL_ACTOR_5C goes on with unkDE cleared and comes off again with
+   unkDE as the round ends; the other two are set on every fighter 0x5D or
+   0x5E reaches and only last the turn, and the move menu offers 0x5D only
+   while some enemy is still without its bit. */
+#define BTL_ACTOR_5C 0x40
+#define BTL_ACTOR_5D 0x80
+#define BTL_ACTOR_5E 0x100
 
 extern BtlActor g_btl_actors[];
 

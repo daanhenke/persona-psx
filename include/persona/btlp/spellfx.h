@@ -91,6 +91,31 @@ extern signed char g_btl_fx_shift[];
    head that made it. */
 #define FX_COPY_MARK 0xFF
 
+/* The phase a step handler leaves the record that armed the hit on. Nothing
+   steps a record there; it is the first phase the move's finish handler acts
+   on. */
+#define FX_STEP_DONE 0x80
+
+/* The moves the plain step carries along as well as animating, and what it
+   does to them each frame - read by BtlFxStep01 and by the copy of its motion
+   nothing reaches. The two throws glide on their step while `steps` lasts,
+   the two rising sheets take a standing step that grows by FX_STEP_FALL, 0x28
+   slides FX_STEP_SLIDE_BY toward the far side, and the six moves from
+   FX_STEP_TINT_FIRST walk the arena's colour to a sea green. */
+#define FX_STEP_THROW      0x0D
+#define FX_STEP_THROW2     0x0E
+#define FX_STEP_RISE       0x10
+#define FX_STEP_RISE2      0x11
+#define FX_STEP_SLIDE      0x28
+#define FX_STEP_TINT_FIRST 0x2B
+#define FX_STEP_TINT_MOVES 6
+#define FX_STEP_FALL       0x8000
+#define FX_STEP_SLIDE_BY   0x20000
+#define FX_STEP_TINT_R     0
+#define FX_STEP_TINT_G     0xFF
+#define FX_STEP_TINT_B     0xC0
+#define FX_STEP_TINT_FADE  8
+
 /* The cells of one side's sheet, laid out the way BtlPlaceMember lays out
    fighters, and which of a set each cell stands for. */
 #define FX_GRID_W   5

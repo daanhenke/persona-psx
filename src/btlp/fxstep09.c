@@ -39,8 +39,7 @@
 #define FX_0E_BACK 0x280000
 #define FX_0E_LIFE 0x14
 
-/* What a step handler leaves behind, and what the hit counts. */
-#define FX_STEP_DONE 0x80
+/* What the hit counts. */
 #define FX_STEP_HITS 2
 
 void BtlFxStepUnused(BtlObj *o)

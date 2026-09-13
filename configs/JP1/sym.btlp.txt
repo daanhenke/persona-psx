@@ -2715,7 +2715,8 @@ BtlOpenFxLayers               = 0x800C0578; // type:func size:0x1C8
 //--------------------------------------------------------------
 //--- PA: 0x05C3A0   VA: 0x800C0740   subsegment: asm, btlp_69_e
 //--------------------------------------------------------------
-D_800C0740                    = 0x800C0740; // type:func size:0x290
+BtlFxMotionUnused             = 0x800C0740; // type:func size:0x100
+BtlFxStepOrbitUnused          = 0x800C0840; // type:func size:0x190
 BtlFxStep01                   = 0x800C09D0; // type:func size:0x484
 BtlFxFinish01                 = 0x800C0E54; // type:func size:0x28C
 BtlFxFinish53                 = 0x800C10E0; // type:func size:0x708
@@ -3122,6 +3123,7 @@ g_btl_fixed_enemies_alt       = 0x800CD198;
 g_btl_fixed_enemies           = 0x800CD1A0;
 g_btl_status_over             = 0x800CD1A8;
 g_btl_status_allowed          = 0x800CD2EC;
+g_btl_demon_stage_moves       = 0x800CD303; // type:u8 size:0xC5
 g_btl_seq_hud_up              = 0x800CD434;
 g_btl_line_enc02              = 0x800CD534;
 g_btl_line_enc03a             = 0x800CD5F4;

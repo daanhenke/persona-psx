@@ -23,9 +23,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* What a step handler leaves behind once the hit is armed. */
-#define FX_STEP_DONE 0x80
-
 /* How far move 0x12's record is carried each frame, and how far round the
    tables it steps. */
 #define FX_12_SWING 6
