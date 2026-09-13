@@ -1181,7 +1181,7 @@ void BtlStageRound(void)
                                 amount = actor->c.sp_max / 8;
                             } else if ((actor->flags & 0x1000000) == 0) {
                                 kind = 0;
-                                if ((actor->flags & 0x2000000) != 0) {
+                                if ((actor->flags & BTL_ACTOR_F5) != 0) {
                                     kind = 0x0F;
                                     amount = actor->c.hp_max / 8;
                                 }

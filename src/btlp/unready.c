@@ -13,16 +13,13 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 
-/* Marker values below this mean it is not up. */
-#define BTL_MARKER_UP 2
-
 int BtlUnreadyMemberNext(int slot)
 {
     for (slot++; slot < BTL_PARTY; slot++) {
         if (g_btl_actors[slot].c.key != 0
             && (signed char)g_btl_actors[slot].c.status != BTL_STATUS_DOWN
             && (g_btl_actors[slot].flags & BTL_ACTOR_OUT) == 0
-            && g_btl_actors[slot].marker < BTL_MARKER_UP) {
+            && g_btl_actors[slot].marker < BTL_MARKER_MOVED) {
             return slot;
         }
     }

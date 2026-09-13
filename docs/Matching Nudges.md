@@ -1787,3 +1787,43 @@ first `x` is folded to `x / 8 + GROW + x`, which needs the quotient first and
 blocks the dispatch branch's delay slot as well.
 
 - [fxmotion.c](/src/btlp/fxmotion.c) - `BtlFxStepOrbitUnused`, 95.33% to exact.
+
+## A min written with the new value first
+
+`a->c.hp = a->c.hp_max < a->c.hp ? a->c.hp_max : a->c.hp` computes the result
+into the maximum's register; the image copies the new value into a register of
+its own and overwrites that. Written the other way round -
+`a->c.hp > a->c.hp_max ? a->c.hp_max : a->c.hp` - the copy and the compare
+come out as the image has them. The same held for a clamp of a local against a
+difference: `amount > a->c.sp_max - a->c.sp ? a->c.sp_max - a->c.sp : amount`,
+which also settled two saved registers elsewhere in the routine.
+
+- [fxfinish5f.c](/src/btlp/fxfinish5f.c) - `BtlFxFinish5F`, 96.33% to 99.94%
+  over its five heal caps and four restoration clamps.
+
+## An address-taken local is assigned with a ternary, not in two arms
+
+A local whose address is passed somewhere lives in the frame, so each arm of an
+`if` stores it on its own and the next use reloads it. The image computing the
+value in a register, storing it once behind both arms and using the register
+afterwards was a ternary assignment.
+
+- [fxfinish5f.c](/src/btlp/fxfinish5f.c) - `amount` for the heal moves and the
+  Persona's restorations; 94.37% to 98.22%.
+
+## A frame eight bytes too small with every slot right
+
+When the image's frame is larger but every stack offset it uses already
+matches, the source had a local nothing uses. An array declared with the
+routine's other locals is laid below the address-taken scalar and moves it;
+declared inside a later block, it is laid out when that block is and sits above
+it, leaving every offset alone.
+
+- [fxfinish5f.c](/src/btlp/fxfinish5f.c) - a `long unused[2]` in the Persona
+  block; the six prologue and epilogue rows went.
+
+## `-1` on a byte is a signed byte
+
+`--a->c.ail_level` on a `u_char` folds the constant to 255 and emits
+`addiu v0, v0, 0xff`; the image's `addiu v0, v0, -1` is the same decrement
+through `*(signed char *)&a->c.ail_level`.

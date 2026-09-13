@@ -15,9 +15,6 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/status.h>
 
-/* The marker is up. */
-#define MARKER_UP 3
-
 /* The two ailments with markers of their own, and what everything else takes. */
 #define MARKER_AIL_A 0x15
 #define MARKER_AIL_B 0x16
@@ -42,7 +39,7 @@ void BtlShowReadyMarkers(void)
        the record by slot, and the compiler makes the one byte offset it
        needs for those. */
     slot = 0;
-    up = MARKER_UP;
+    up = BTL_MARKER_UP;
     mark = &g_btl_actors[0].marker;
     do {
         if (g_btl_actors[slot].c.key == 0) {

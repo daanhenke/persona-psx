@@ -19,7 +19,7 @@
  * from PRESET_Y.
  *
  * BtlMarkMovedMembers compares the live grid with g_btl_formation_before, the
- * one the menu opened on, and puts MARKER_MOVED on every member still in the
+ * one the menu opened on, and puts BTL_MARKER_MOVED on every member still in the
  * fight who is standing somewhere else now - unless that member's marker is
  * already up - answering whether anybody moved at all.
  */
@@ -38,10 +38,6 @@
 #define PRESET_Y      0x78
 #define PRESET_XPITCH 16
 #define PRESET_YPITCH 8
-
-/* BtlActor.marker: up, and what a member who has moved is given. */
-#define MARKER_UP    3
-#define MARKER_MOVED 2
 
 extern BtlObj *g_btl_pick_cursors[];
 
@@ -154,8 +150,8 @@ int BtlMarkMovedMembers(void)
             o = g_btl_actors[i].obj;
             cell = o->row * GRID_W + (o->col2 >> 1);
             if (g_btl_formation[cell] != g_btl_formation_before[cell]
-                && g_btl_actors[i].marker != MARKER_UP) {
-                g_btl_actors[i].marker = MARKER_MOVED;
+                && g_btl_actors[i].marker != BTL_MARKER_UP) {
+                g_btl_actors[i].marker = BTL_MARKER_MOVED;
                 moved = 1;
             }
         }

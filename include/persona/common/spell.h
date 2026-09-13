@@ -16,7 +16,10 @@ typedef struct {
     /* 0x0A */ u_char kind;       /* what it does; the enemy AI masks with
                                      SPELL_KIND_MASK and treats four of the
                                      results as always worth casting */
-    /* 0x0B */ u_char pad0B[2];
+    /* 0x0B */ u_char pad0B;
+    /* 0x0C */ u_char element;    /* what the recovery moves' finish hands
+                                     BtlApplyAffinity for the fighter it has
+                                     reached                                */
     /* 0x0D */ u_char target;     /* which set of targets it can reach; the AI
                                      hands this to BtlPickAiTarget          */
     /* 0x0E */ u_char cost;       /* SP, weighed against Char.sp            */

@@ -141,7 +141,11 @@ segments:
       - [0x15E8, rodata, btlp_rodata6b1_fxa1b]
       - [0x15EC, .rodata, fxfinish53]
       - [0x1630, rodata, btlp_rodata6b1_fxa1c]
-      - [0x1634, rodata, btlp_rodata6b1_fxa2]
+      # BtlFxFinish5F's three switch tables with the word of padding behind
+      # the first and the last - the unit's .rodata comes out 0x290 with
+      # both inside it.
+      - [0x1634, .rodata, fxfinish5f]
+      - [0x18C4, rodata, btlp_rodata6b1_fxa2]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]
       - [0x1AD4, c, drawfront]
@@ -634,7 +638,8 @@ segments:
       - [0x5C3A0, c, fxmotion]
       - [0x5C630, c, fxstep01]
       - [0x5CD40, c, fxfinish53]
-      - [0x5D448, asm, btlp_69_e]
+      - [0x5D448, c, fxfinish5f]
+      - [0x5E02C, asm, btlp_69_e]
       - [0x5E9B4, c, fxfinish8c]
       - [0x5EC3C, asm, btlp_69_e_a]
       - [0x600E8, c, objset]

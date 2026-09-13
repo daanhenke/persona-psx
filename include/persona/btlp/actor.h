@@ -274,6 +274,15 @@ extern u_char g_btl_counter_order;
 #define BTL_ACTOR_5D 0x80
 #define BTL_ACTOR_5E 0x100
 
+/* Set by the recovery moves' finish for 0xF5, on a fighter
+   BTL_ACTOR_TIMED_A does not hold. */
+#define BTL_ACTOR_F5 0x2000000
+
+/* BtlActor.marker: up over the fighter, and what a member who has moved is
+   given. */
+#define BTL_MARKER_UP    3
+#define BTL_MARKER_MOVED 2
+
 extern BtlActor g_btl_actors[];
 
 /* Takes a level off a fighter and works its experience out again.
