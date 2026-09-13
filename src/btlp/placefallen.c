@@ -143,7 +143,7 @@ INCLUDE_ASM("btlp/nonmatchings/placefallen", BtlPlaceFallen);
 #ifdef NON_MATCHING
 int BtlPlaceFallenStep(void)
 {
-    short next;
+    int next;
     int   keys;
     int   cell;
 
@@ -153,29 +153,29 @@ int BtlPlaceFallenStep(void)
         BtlSePlay(1, 0);
     }
     if (keys & PAD_UP) {
-        next = g_btl_place_row - 1;
+        next = (unsigned short)g_btl_place_row - 1;
         g_btl_place_row = next;
-        if (next < 0) {
+        if ((short)next < 0) {
             next = GRID_H - 1;
             g_btl_place_row = next;
         }
     }
     if (keys & PAD_DOWN) {
-        next = g_btl_place_row + 1;
-        next &= -(next < GRID_H);
+        next = (unsigned short)g_btl_place_row + 1;
+        next &= -((short)next < GRID_H);
         g_btl_place_row = next;
     }
     if (keys & PAD_LEFT) {
-        next = g_btl_place_col - 1;
+        next = (unsigned short)g_btl_place_col - 1;
         g_btl_place_col = next;
-        if (next < 0) {
+        if ((short)next < 0) {
             next = GRID_W - 1;
             g_btl_place_col = next;
         }
     }
     if (keys & PAD_RIGHT) {
-        next = g_btl_place_col + 1;
-        next &= -(next < GRID_W);
+        next = (unsigned short)g_btl_place_col + 1;
+        next &= -((short)next < GRID_W);
         g_btl_place_col = next;
     }
 

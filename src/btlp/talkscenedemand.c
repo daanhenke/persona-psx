@@ -370,7 +370,10 @@ void BtlTalkSceneDemand(void)
                             i++;
                             e++;
                         } while (i < 9);
-                        e    = &g_btl_enemies[worst];
+                        /* The address and HP total share this scratch local;
+                           a direct pointer assignment loses the image's copy. */
+                        used = (int)&g_btl_enemies[worst];
+                        e = (BtlActor *)used;
                         used = take + e->c.hp;
                         if (e->c.hp_max < used)
                         {
@@ -386,7 +389,10 @@ void BtlTalkSceneDemand(void)
                     break;
             }
 
-            entry  = (base->rows + g_btl_demand_kind)->entry[i + 5];
+            /* Carry the row index into the response local before loading it;
+               indexing the global directly changes the address registers. */
+            entry = g_btl_demand_kind;
+            entry = (base->rows + entry)->entry[i + 5];
             gauge  = entry & 0xFF;
             weight = entry >> 8;
         take_line:

@@ -17,7 +17,6 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/offer.h>
 #include <persona/common/persona.h>
@@ -61,7 +60,8 @@
 extern char BtlHudState(void);
 extern u_char    g_btl_talking;
 extern short     g_btl_stock_choice;
-extern u_long    g_btl_scratch[];
+/* The zero low half lets each script lookup use one base register. */
+#define g_btl_scratch ((u_long *)0x801C0000)
 extern u_char    g_btl_summon_lines[][9];
 extern u_char   *g_btl_summon_line;
 extern int       g_btl_summon_answer;
@@ -76,6 +76,7 @@ extern const u_char *g_btl_talk_gift_shown_script;
 extern const u_char *g_btl_talk_gift_taken_script;
 extern const u_char *g_btl_talk_joined_script;
 extern const u_char  g_btl_talk_give_menu[];
+extern const u_char  g_btl_demand_menus[];
 
 extern int   BtlStockHolds(const BtlOffer *offer);
 extern void  BtlStockAdd(int persona);
@@ -111,7 +112,6 @@ extern int   BtlAnyEnemy(void);
     ((const u_char *)g_btl_scratch + g_btl_scratch[0] \
      + ((const int *)((const char *)g_btl_scratch + g_btl_scratch[0]))[n])
 
-#ifdef NON_MATCHING
 void BtlTalkSceneSummon(void)
 {
     BtlOffer *offer;
@@ -191,8 +191,8 @@ void BtlTalkSceneSummon(void)
             BtlSeekFile(0x1C);
             BtlLoadScratch(0, 0);
             offer->mood[1] = OFFER_ALL_MOODS;
-            g_btl_talk_depth--;
             offer->kinds |= OFFER_CONTACTED;
+            g_btl_talk_depth--;
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
             BtlSeqPlay(TALK_SCRIPT(g_btl_summon_line[SUMMON_LINE_PART]));
@@ -219,7 +219,7 @@ void BtlTalkSceneSummon(void)
         BtlHudHide();
         BtlEnemiesReset();
         BtlPartyReset();
-        g_btl_phase = 2;
+        g_btl_phase = 0;
         return;
         }
         return;
@@ -235,9 +235,8 @@ void BtlTalkSceneSummon(void)
         break;
 
     case SUMMON_OFFER:
-        BtlMenuOpen2((const u_char *)
-            (((g_btl_actors[g_btl_actor_slot].c.key - 1) * 0x10 | 8)
-             + 0x800C6DAC));
+        i = (g_btl_actors[g_btl_actor_slot].c.key - 1) * 0x10;
+        BtlMenuOpen2(g_btl_demand_menus + (i | 8));
         BtlIndicatorIcon();
         while ((choice = BtlMenuChoice()) < 0) {
             BtlMenuAsideToggle();
@@ -308,9 +307,11 @@ void BtlTalkSceneSummon(void)
         BtlTextOpen(g_btl_talk_pick_gift_script, 0x28, 0x88);
         BtlBoxOpen(0x11, 0xA0, 0x88, 0);
         do {
-            choice = g_btl_stock_choice;
-            if (choice != -0x100 && choice != -1) {
-                pick = g_persona_stock[choice];
+            /* The stock index dies before the menu answer is read. Sharing
+               their local changes the loop flag's saved register. */
+            int selected = g_btl_stock_choice;
+            if (selected != -0x100 && selected != -1) {
+                pick = g_persona_stock[selected];
                 BtlTalkEndEffect();
                 BtlBoxClose();
                 BtlHudShow();
@@ -426,7 +427,4 @@ pop:
     g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
     g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkscenesummon", BtlTalkSceneSummon);
-#endif
 

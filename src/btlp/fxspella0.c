@@ -13,7 +13,6 @@
  * arms the hit.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
@@ -81,7 +80,6 @@ BtlObj *BtlFxStartA0(void)
     return o;
 }
 
-#ifdef NON_MATCHING
 void BtlFxStepA0(BtlObj *o)
 {
     BtlObj *n;
@@ -116,8 +114,8 @@ void BtlFxStepA0(BtlObj *o)
             g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[1];
             cell = 0;
             layer = 0;
-            row = 0;
             do {
+                row = 0;
                 y0 = FX_A0_TOP;
                 do {
                     col = 0;
@@ -147,7 +145,6 @@ void BtlFxStepA0(BtlObj *o)
                     row++;
                 } while (row < FX_GRID_H);
                 layer++;
-                row = 0;
             } while (layer < FX_A0_LAYERS);
             BtlObjSetMotion(n, o->motion);
             BtlObjSetKind(n, o->kind);
@@ -201,6 +198,3 @@ void BtlFxStepA0(BtlObj *o)
         return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspella0", BtlFxStepA0);
-#endif

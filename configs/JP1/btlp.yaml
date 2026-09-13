@@ -63,6 +63,8 @@ segments:
       - [0x8C, rodata, btlp_rodata0]
       - [0xE4, .rodata, talkpair]
       - [0xF4, rodata, btlp_rodata0a]
+      # BtlTalkSceneSummon's ten-entry switch table, emitted by the C.
+      - [0xFC, .rodata, talkscenesummon]
       - [0x124, .rodata, talkscenetrade]
       - [0x2DC, .rodata, talkscenepanic]
       # BtlTalkSceneCharm's thresholds and switch table, which the C emits
@@ -114,6 +116,10 @@ segments:
       # same unit and joins this segment when its routine comes out of asm.
       - [0x1144, .rodata, memberact]
       - [0x11B0, rodata, btlp_rodata6b1]
+      # BtlFxStepA0's switch table, which fxspella0.c emits itself, and the
+      # word of padding behind it that belongs to nobody.
+      - [0x141C, .rodata, fxspella0]
+      - [0x1430, rodata, btlp_rodata6b1_fxa0]
       # 0x1990 is where the leading rodata block ends and text begins.
       - [0x1990, asm, btlp_pre]
       - [0x1AD4, c, drawfront]
