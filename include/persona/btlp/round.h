@@ -233,6 +233,9 @@ extern void BtlPartySetAttr(u_long bits);
 extern void BtlPartyClearAttr(u_long bits);
 extern u_long BtlPickableMask(void);
 
+/* Redraws the attack lines after a fighter has moved or gone. */
+extern void BtlRefreshAttacks(void);
+
 /* Markers: whether they are all still, whether any is up, and taking them
    down again. */
 extern int  BtlMarkersIdle(void);

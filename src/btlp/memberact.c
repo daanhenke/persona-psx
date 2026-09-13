@@ -171,7 +171,6 @@ extern BtlObjDef g_btl_summon_def;
 extern BtlObj *D_800F4894;
 
 extern void BtlApplyPersona(BtlActor *a);
-extern void BtlRefreshAttacks(void);
 extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern int  BtlBindGfx(u_int kind, int index, u_char **image);
 extern void BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,

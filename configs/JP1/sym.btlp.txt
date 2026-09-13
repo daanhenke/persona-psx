@@ -1383,7 +1383,7 @@ BtlActorMotion04              = 0x8008CDA0; // type:func size:0xE8
 BtlMemberMotion11             = 0x8008CE88; // type:func size:0x1A4
 BtlMemberMotion0D             = 0x8008D02C; // type:func size:0x2C4
 BtlMemberMotion0E             = 0x8008D2F0; // type:func size:0x390
-func_8008D680                 = 0x8008D680; // type:func size:0x130
+BtlAngleTo                    = 0x8008D680; // type:func size:0x130
 
 //--------------------------------------------------------
 //--- PA: 0x029410   VA: 0x8008D7B0   subsegment: c, clock
@@ -3334,6 +3334,7 @@ g_btl_edit_bars               = 0x800DC8F4; // size:0x348
 g_btl_ail_level_marks         = 0x800DD000;
 g_btl_wave_cos                = 0x800DE0C8; // type:s32 size:0x800
 g_btl_wave_sin                = 0x800DE8C8; // type:s32 size:0x800
+g_btl_atan                    = 0x800DF0C8; // type:u16 size:0x400
 g_btl_marker_scripts          = 0x800DF4E4; // type:u32 size:0x40
 g_btl_shadow_defs             = 0x800DF5A4;
 g_btl_obj_defs                = 0x800DF664; // size:0x70

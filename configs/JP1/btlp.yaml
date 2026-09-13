@@ -333,6 +333,9 @@ segments:
       # The motions a fighter takes a blow in.
       - [0x28820, c, hitmotion]
       - [0x28C8C, asm, btlp_48_a_x1]
+      # A fighter going out of the fight, and the angle helper after it.
+      - [0x28F50, c, leavefield]
+      - [0x292E0, c, angle]
       - [0x29410, c, clock]
       - [0x29548, c, tintclut]
       - [0x297D8, c, btlinit2]
