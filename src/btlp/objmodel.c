@@ -35,10 +35,6 @@
 /* Draw into the arena's ordering table rather than the depth-sorted one. */
 #define BTL_OBJ_ARENA_OT 4
 
-/* Clear, and the shift moves the object in the world before the camera sees
-   it; set, and it moves each cell in the object's own frame. */
-#define BTL_OBJ_SHIFT_SCREEN 0x40000
-
 /* Where the screen's centre is, for the first projection. */
 #define BTL_SCREEN_CX 0xA0
 #define BTL_SCREEN_CY 0x78

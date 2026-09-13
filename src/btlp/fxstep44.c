@@ -17,9 +17,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* The mark a copy carries. */
-#define FX_COPY_MARK 0xFF
-
 /* Two turns round the six places, out of the second script table. */
 #define FX_44_RING  6
 #define FX_44_COUNT 12

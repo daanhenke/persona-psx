@@ -1449,6 +1449,34 @@ updates in a row the image stores `+0x18` then `+0x10` were written
   written, 90.52% with the ternary clamp, 96.77% with the experience read into
   a local ahead of the hit stores, and exact with the last two updates swapped.
 
+## The table read written first keeps its address in a register
+
+A loop that multiplies a table entry by a call's result -
+`(rand() % 16) * g_btl_wave_cos[i * 0x38]` - with the call written first has
+the table's address folded into the load (`lui at` / `addu at, at, s2` /
+`lw v1, %lo(g_btl_wave_cos)(at)`). Where the image takes the address into a
+register ahead of the arithmetic on the call's result (`lui v0` / `addiu v0` /
+`addu v1, s2, v0` / `lw v1, 0x0(v1)`), and the remainder's bias moves to a
+register of its own because of it, the table read was the first operand:
+`g_btl_wave_cos[i * 0x38] * (rand() % 16)`. A local for the call's remainder,
+a local for the angle, or a pointer into the table all leave it further off.
+
+- [fxspell39.c](/src/btlp/fxspell39.c) - `BtlOpenFxScatter`: 94.61% to exact.
+
+## A store both arms end with is written in both arms
+
+Where the image makes a store just after an if/else joins but ahead of the
+next call's argument set-up - `sw zero, 0x28(sp)` before
+`lui a0, %hi(g_btl_fx_def)` - the source ended both arms with it, and gcc
+merged the two identical tails into the one store at the head of the join.
+Written once after the if, it is expanded together with the call and the
+scheduler puts it among the argument stores instead.
+
+- [fxspell38.c](/src/btlp/fxspell38.c) - `BtlFxStep38`: 94.91% as first
+  written, 98.80% with the cell's scripts copied ahead of its mark (which also
+  pulls the running x step up among the copies, where the image has it), and
+  exact with `pos[2] = 0` written in both arms.
+
 ## Reuse the first loop's locals in the second
 
 When a routine's second loop needs a lane and a row of its own, the image may

@@ -42,9 +42,6 @@
 #define FX_4C_SCRIPT 2
 #define FX_4C_SHEET  3
 
-/* The mark the sheet's own cells carry. */
-#define FX_COPY_MARK 0xFF
-
 void BtlFxStep4C(BtlObj *o)
 {
     BtlObj *n;

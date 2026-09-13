@@ -86,6 +86,11 @@ extern signed char g_btl_fx_shift[];
 #define FX_MARK_HEAD 0x10
 #define FX_MARK_REST 0x11
 
+/* The mark a record made by a set's step handler carries - a copy, a spark, a
+   cell of a sheet - so that the same handler, run on it, tells it from the
+   head that made it. */
+#define FX_COPY_MARK 0xFF
+
 /* The cells of one side's sheet, laid out the way BtlPlaceMember lays out
    fighters, and which of a set each cell stands for. */
 #define FX_GRID_W   5
@@ -143,11 +148,13 @@ extern u_char g_btl_fx_nine_order[];
 
 /* When each cell of a sheet arrives, in halves of a frame - a shuffle of the
    twenty-five, which is what scatters the sheet rather than sweeping it.
-   Every one of the four routines that reads it does so by the record's mark
-   rather than the cell's number, so the table is declared from FX_MARK_HEAD
-   below where its entries begin: the sixteen bytes in front belong to other
-   data and nothing reaches them through this name. */
+   Four of the routines that read it do so by a record's mark rather than the
+   cell's number, and reach it through g_btl_fx_grid_order, declared from
+   FX_MARK_HEAD below where the entries begin: the sixteen bytes in front
+   belong to other data and nothing reaches them through that name. The ones
+   that count cells from nought read the same bytes as g_btl_fx_cell_order. */
 extern u_char g_btl_fx_grid_order[FX_MARK_HEAD + FX_GRID_W * FX_GRID_H];
+extern u_char g_btl_fx_cell_order[FX_GRID_W * FX_GRID_H];
 
 extern BtlObj *BtlStartMoveFx(int index);
 extern BtlObj *BtlOpenFxObj(int slot, int timer);

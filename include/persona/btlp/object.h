@@ -205,6 +205,11 @@ typedef struct BtlObj {
    over a party member - and cleared off everything that is not. */
 #define BTL_OBJ_PICKED 0x400000
 
+/* Clear, and a record's shift moves it in the world before the camera sees it;
+   set, and it moves what is drawn instead - the projected point of a flat
+   record, each cell in its own frame for a model. */
+#define BTL_OBJ_SHIFT_SCREEN 0x40000
+
 /* Taken out of the drawing pass without being freed. Set on an object, its
    shadow, its ailment marker and the marker's own attached piece together. */
 #define BTL_OBJ_HIDDEN    0x40000000

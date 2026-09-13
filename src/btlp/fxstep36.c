@@ -43,9 +43,6 @@
 #define FX_36_FADE 2
 #define FX_36_DONE 0x80
 
-/* The mark a piece going round carries. */
-#define FX_COPY_MARK 0xFF
-
 /* The pieces round the circle, how far apart they start on the wave tables,
    the colour they are walked to, and the disc's attributes and size. */
 #define FX_36_PIECES     8

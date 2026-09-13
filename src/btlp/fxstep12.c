@@ -23,9 +23,6 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* The mark a copy carries - it is stepped, but does nothing of its own. */
-#define FX_COPY_MARK 0xFF
-
 /* What a step handler leaves behind once the hit is armed. */
 #define FX_STEP_DONE 0x80
 

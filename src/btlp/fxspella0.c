@@ -129,8 +129,7 @@ void BtlFxStepA0(BtlObj *o)
                         n->attached = prev;
                         n->attr |= FX_OBJ_ATTR;
                         n->timer =
-                            (g_btl_fx_grid_order[FX_MARK_HEAD
-                                                 + cell % FX_A0_CELLS]
+                            (g_btl_fx_cell_order[cell % FX_A0_CELLS]
                              + cell / FX_A0_CELLS * FX_A0_CELLS * 2) / 2;
                         n->step_x = (x - n->x) / FX_A0_REACH;
                         n->step_y = (y - n->y) / FX_A0_REACH;

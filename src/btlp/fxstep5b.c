@@ -18,9 +18,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
 
-/* The mark a spark carries. */
-#define FX_COPY_MARK 0xFF
-
 /* One spark every fourth frame, out of the second script table. */
 #define FX_5B_EVERY 3
 #define FX_5B_TABLE 1

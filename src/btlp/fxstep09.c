@@ -23,8 +23,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 
-/* The mark a landed copy carries, and the one the head of a pair carries. */
-#define FX_COPY_MARK 0xFF
+/* The mark the head of a pair carries. */
 #define FX_09_HEAD   0x20
 
 /* How fast the arc starts across the field and how fast it falls, both of

@@ -29,10 +29,6 @@
 #define BTL_OBJ_SEMITRANS 1
 #define SPRT_SEMITRANS    2
 
-/* Clear, and the shift moves the object in the world before the camera sees
-   it; set, and it moves the projected point instead. */
-#define BTL_OBJ_SHIFT_SCREEN 0x40000
-
 /* Set to keep the object out of the depth sort and put it in the one entry at
    the end of the table. */
 #define BTL_OBJ_NO_DEPTH 2
