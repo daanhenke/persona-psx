@@ -17,8 +17,6 @@
 #include <persona/common/persona.h>
 #include <persona/btlp/stats.h>
 
-extern void BtlEnemyDeriveStats(BtlStats *s);
-
 void BtlLoadPersonas(void)
 {
     const PersonaDef *def;

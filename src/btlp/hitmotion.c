@@ -49,8 +49,6 @@
 #define HIT_HOLD 30
 
 /* Two of a member's ten scripts: the one it stands in, and its flinch. */
-#define MEMBER_SCRIPT_MODEL 0x28
-#define MEMBER_SCRIPT_PICK  10
 #define SCRIPT_STAND        0
 #define SCRIPT_HIT          8
 

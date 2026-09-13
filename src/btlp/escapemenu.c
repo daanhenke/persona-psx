@@ -37,8 +37,6 @@
 
 /* Stride of g_btl_member_scripts, by Char key and by the actor's
    script_pick, and the entry of the ten a member leaves on. */
-#define MEMBER_SCRIPT_MODEL 0x28
-#define MEMBER_SCRIPT_PICK  10
 #define SCRIPT_LEAVE        0
 
 /* How the three lines are put up, and the three of them: the question, the

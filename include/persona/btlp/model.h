@@ -15,6 +15,12 @@
 /* Ten script indices per shape, four shapes per member. */
 extern u_char g_btl_member_scripts[];
 
+/* A member's run of g_btl_member_scripts starts at its key times
+   MEMBER_SCRIPT_MODEL, and each shape its script_pick chooses lies
+   MEMBER_SCRIPT_PICK further along. */
+#define MEMBER_SCRIPT_MODEL 0x28
+#define MEMBER_SCRIPT_PICK  10
+
 #include <decomp/types.h>
 
 typedef struct {

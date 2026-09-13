@@ -69,6 +69,11 @@ typedef struct {
 
 extern BtlStats g_btl_personas[];
 
+/* What each rank a Persona climbs wants, and the routine that works a
+   record's derived numbers out again. */
+extern u_short g_btl_persona_rank_exp[];
+extern void    BtlEnemyDeriveStats(BtlStats *s);
+
 /* The Persona board's spell lines, a name and the byte that ends it to a
    row. BtlPersonaSwapUpdate fills them for the Persona it offers. */
 extern u_char g_btl_persona_spell_lines[][11];

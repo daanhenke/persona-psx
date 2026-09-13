@@ -112,8 +112,6 @@ void BtlChoiceSpawn(int set)
 /* Stride of g_btl_member_scripts, by model and by the actor's script_pick,
    and the two of the ten a summon takes: the pose the Persona comes out of,
    and the one the member is left standing in. */
-#define MEMBER_SCRIPT_MODEL 0x28
-#define MEMBER_SCRIPT_PICK  10
 #define SCRIPT_SUMMON 3
 #define SCRIPT_STAND  4
 
@@ -624,7 +622,6 @@ extern u_char   D_800E49BF;
 
 extern BtlObj *g_btl_persona_obj;
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
-extern void    BtlEnemyDeriveStats(BtlStats *s);
 extern int     BtlActorSlotByKey(int key);
 extern void    func_800A6D3C(BtlActor *a, int move);
 extern BtlObj *func_80084E10(int kind, long *pos);

@@ -35,8 +35,6 @@
 
 /* Three of a member's ten scripts: the one it stands in, the one it stands in
    once badly hurt, and its flinch. */
-#define MEMBER_SCRIPT_MODEL 0x28
-#define MEMBER_SCRIPT_PICK  10
 #define SCRIPT_STAND        0
 #define SCRIPT_WEAK         6
 #define SCRIPT_HIT          8

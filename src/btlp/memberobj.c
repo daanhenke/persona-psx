@@ -15,6 +15,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 
 /* The group the party and the enemies share. */
@@ -26,10 +27,6 @@
 #define MEMBER_Y_STEP 20
 #define MEMBER_Y_BASE 0x3C
 
-/* Stride of g_btl_member_scripts, by model and by script_pick. */
-#define MEMBER_SCRIPT_MODEL 0x28
-#define MEMBER_SCRIPT_PICK  10
-
 /* The shadow: three quarters of the height, and lifted. */
 #define SHADOW_SCALE_Y 0xC00
 #define SHADOW_LIFT    (-0x320)
@@ -37,7 +34,6 @@
 
 extern BtlObjDef     g_btl_member_def;
 extern u_char       *g_btl_member_gfx[];
-extern const u_char  g_btl_member_scripts[];
 
 BtlObj *BtlSpawnMemberObj(int model, int col, int row, short p7, int slot)
 {

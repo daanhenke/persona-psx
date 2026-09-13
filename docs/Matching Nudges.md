@@ -1317,6 +1317,10 @@ image's store order - the scheduler reverses a pair as readily as it keeps one.
   and only writing the kind first fixed both.
 - [fxstep86.c](/src/btlp/fxstep86.c) - the target's own word cleared before its
   record is reached for, though the image stores it after the record's load.
+- [fxspell42.c](/src/btlp/fxspell42.c) - `BtlFxStart43`: the first record's
+  attribute stored before the template is rewritten for the second record.
+  The other way round, the template's address and the 0xE argument also trade
+  saved registers; 96.21% to exact.
 
 ## One routine can want both arm shapes
 
@@ -1490,6 +1494,22 @@ move them.
 
 - [fxsheet.c](/src/btlp/fxsheet.c) - `BtlFxStart05`: 99.67% to exact, a swap
   of s2 and s3 with the caller-saved spills and stack slots already right.
+
+## Take the row of a two-dimensional table first when its base and the column trade registers
+
+Where the image forms `table + SCRIPT + key * 40` in one register and then adds
+`pick * 10` to it, with the table's address and the pick in each other's
+argument registers, the source took the row as a pointer and indexed the
+column off it:
+
+    row = &g_btl_member_scripts[SCRIPT_RISE + key * MEMBER_SCRIPT_MODEL];
+    script = row[o->actor->script_pick * MEMBER_SCRIPT_PICK];
+
+All six orders of the three terms summed into one index, the sum taken into an
+`int` or a `u_char` local, and `(table + SCRIPT)[...]` leave the two registers
+swapped or worse.
+
+- [fxspell42.c](/src/btlp/fxspell42.c) - `BtlFxStart42`: 99.47% to exact.
 
 ## Reuse the first loop's locals in the second
 
