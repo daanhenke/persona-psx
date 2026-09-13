@@ -62,6 +62,59 @@ extern u_char *g_btl_actor_gfx;
 #define BTL_MARK_MOTION 0xC
 #define BTL_MARK_TIMER  0x78
 
+
+/* What an ailment does to the fighter's turn, one handler per Char.status and
+   twenty-four of them, so the table is indexed straight by the code. Entry
+   nought - a healthy fighter - is empty and BtlAilmentTakeTurn skips the call
+   for it; the rest are named for the label g_status_names draws, in the order
+   the codes run:
+
+     1 HAPPY  2 PANIC   3 CHARM  4 FREEZE  5 SHOCK  6 BIND    7 SLEEP
+     8 CLOSE  9 BLIND  10 UNLUCK 11 TERROR 12 GUILT 13 POISON 14 PALYZE
+    15 STONE 16 SICK   17 DEAD   18 CLOAK  19 PUPPET 20 COUNTR 21 BARSAK
+    22 MAD   23 WOLF
+
+   A handler is handed the fighter and a byte to leave its answer in, and most
+   of them are two instructions: the seven ailments that stop a fighter acting
+   write nought there and the eight that do not touch the turn at all write
+   nothing. Nothing calls one by hand - they are reached only through the
+   table - which is why eight of them were sitting under one data label. */
+extern void (*g_btl_ailment_turn[])();
+
+extern void BtlAilmentTurnHappy();
+extern void BtlAilmentTurnPanic();
+extern void BtlAilmentTurnCharm();
+extern void BtlAilmentTurnFreeze();
+extern void BtlAilmentTurnShock();
+extern void BtlAilmentTurnBind();
+extern void BtlAilmentTurnSleep();
+extern void BtlAilmentTurnClose();
+extern void BtlAilmentTurnBlind();
+extern void BtlAilmentTurnUnluck();
+extern void BtlAilmentTurnTerror();
+extern void BtlAilmentTurnGuilt();
+extern void BtlAilmentTurnPoison();
+extern void BtlAilmentTurnParalyse();
+extern void BtlAilmentTurnStone();
+extern void BtlAilmentTurnSick();
+extern void BtlAilmentTurnDead();
+extern void BtlAilmentTurnCloak();
+extern void BtlAilmentTurnPuppet();
+extern void BtlAilmentTurnCounter();
+extern void BtlAilmentTurnBarsak();
+extern void BtlAilmentTurnMad();
+extern void BtlAilmentTurnWolf();
+
+/* Hands the fighter's turn to whichever of the above its ailment picks, and
+   then acts on the byte the handler left. */
+extern void BtlAilmentTakeTurn(BtlActor *a, u_char *act);
+
+/* Which palette entry a fighter's whitening starts from, one byte per Char
+   key - nought for most and one for the four keys whose first entry has to be
+   left alone. BtlActorClutFirst is the only reader. */
+extern const u_char g_btl_key_clut_first[];
+extern int BtlActorClutFirst(const BtlActor *a);
+
 extern int  BtlStatusStops(const BtlActor *a);
 extern void BtlShowAilmentMarks(int show);
 extern int  BtlInflictStatus(BtlActor *a, int status);

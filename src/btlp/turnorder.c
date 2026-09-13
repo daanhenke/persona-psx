@@ -22,11 +22,12 @@
 /* The rows for encounter 17 and up are past the early ones, and the base
    below is where the bias the compiler folded lands - encounter 17 is its
    first row, so the index is not adjusted and the name is the run the
-   address happens to fall in. */
+   address happens to fall in. That run is the ailment table, reached as bytes
+   here because the address lands in the middle of one of its entries. */
 extern u_char g_btl_turn_script[];
-extern u_char g_btl_affinity_scale[];
+extern u_char g_btl_ailment_turn[];
 
-#define g_btl_turn_script_late (g_btl_affinity_scale + 0x9E)
+#define g_btl_turn_script_late (g_btl_ailment_turn + 0x1E)
 
 #define BTL_TURN_SCRIPT_ROW  14
 #define BTL_TURN_SCRIPT_LATE 0x11

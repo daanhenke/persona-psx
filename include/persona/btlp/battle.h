@@ -45,6 +45,13 @@ extern u_short g_btl_tpage[];
    as the fight opens and written back as it closes. */
 extern u_char g_btl_moon;
 
+/* What the moon does to a fighter's derived numbers: one entry per phase, and
+   the stat is divided by it - so a quarter at the two extremes, a thirty-second
+   next to them, and nothing at all on the two phases whose entry is zero, which
+   the caller tests for before it divides. The second half of the cycle is the
+   first negated. */
+extern const int g_btl_moon_divisor[];
+
 /* The debug HUD, and the two switches beside it in the main executable: one
    ends an ordinary fight the moment it starts, the other is raised by the
    fight that leads into another. Retail leaves the first zero. */
