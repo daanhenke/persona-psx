@@ -121,7 +121,43 @@ routine's, so confirm anything it suggests with a sweep on the real unit.
 - **`BtlStageCommand`'s `run:` block** is placed by sched2. combine and sched
   leave `g_btl_step = 0` ahead of the table index's `sll`; after reload sched2
   moves the `sll` first, and dbr then copies it into step 5's delay slot. The
-  image's sched2 leaves them alone. Still open.
+  image's sched2 leaves them alone. Still open - see the trace below for why
+  ours moves it.
+
+### How the scheduler decides
+
+gcc 2.6.0's own `sched.c` is in the release tarball that
+[decompals/old-gcc](https://github.com/decompals/old-gcc)'s Dockerfiles fetch;
+unpack it under `build/` to read it. The rules, as it implements them:
+
+- It works one basic block at a time, **backwards from the end**, placing each
+  chosen insn in front of the ones already placed.
+- An insn's **priority** is the longest dependency path leading to it inside
+  the block, each step weighted by the latency of the insn depended on. On the
+  r3000 costs this cc1 uses, a load takes 2 cycles and a store or anything else
+  1, so only loads ever lengthen a path.
+- Ready insns are sorted by priority, then by their relation to the insn just
+  placed (depends on it with a latency above one, depends on it otherwise,
+  independent - the independent ones go nearest), then by **original insn
+  order**, so a pure tie leaves the source's order alone.
+- Within the top priority group, `schedule_select` takes the insn with **the
+  greater potential hazard** - one using a function unit, so a load or a store,
+  ahead of a register operation.
+- The first pass, before reload, also lifts an insn that first sets a pseudo
+  to the top priority. sched2, after reload, does not.
+
+The `.sched` and `.sched2` dumps print every decision: `;; ready list at T-n`,
+`launching N before M`, `blocking insn N`, `insn N has a greater potential
+hazard`. For `BtlStageCommand`'s `run:` block the first pass keeps the image's
+order because the `sll` sets a new pseudo; sched2 sees the `sll` and the store
+tied at priority 1, and the store's potential hazard puts it next to the load -
+our order.
+
+Two settings are ruled out. `-mcpu` only changes a load's latency (the default
+here is the r3000's 2); the other CPUs reorder these blocks differently, not
+into the image's order. And the original did run both passes: with
+`-fno-schedule-insns2`, units that already match change by hundreds of lines
+even with label names normalised.
 
 ### What cut-down compiles have settled
 

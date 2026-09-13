@@ -161,7 +161,8 @@ int BtlPlaceFallenStep(void)
         }
     }
     if (keys & PAD_DOWN) {
-        next = (unsigned short)g_btl_place_row + 1;
+        next = (unsigned short)g_btl_place_row;
+        next = next + 1;
         next &= -((short)next < GRID_H);
         g_btl_place_row = next;
     }
@@ -174,7 +175,8 @@ int BtlPlaceFallenStep(void)
         }
     }
     if (keys & PAD_RIGHT) {
-        next = (unsigned short)g_btl_place_col + 1;
+        next = (unsigned short)g_btl_place_col;
+        next = next + 1;
         next &= -((short)next < GRID_W);
         g_btl_place_col = next;
     }
