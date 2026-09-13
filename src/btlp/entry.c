@@ -27,10 +27,7 @@
 /* The rest of the control scheme's masks. The four directions and the help key
    are the same under either scheme; these are the ones it moves. */
 extern u_short g_btl_key_select;
-extern u_short g_btl_key_square;
 extern u_short g_btl_key_r1;
-extern u_short g_btl_key_r2;
-extern u_short g_btl_key_page;
 extern u_short g_btl_key_end;
 
 /* Which of the two schemes the player picked, in the options block. */
@@ -62,24 +59,24 @@ extern int    g_state_prev;
    Once they have all been taken the run's own memory is reused, first as the
    battle's one-shade CLUT and then as the TIM scratch. */
 #define g_load_stage (*(u_char **)0x80140000)
-extern u_char *D_80140004;
-extern u_char *D_80140010;
-extern u_char *D_80140014;
-extern u_char *D_80140018;
-extern u_char *D_8014001C;
-extern u_char *D_80140020;
-extern u_char *D_80140024;
-extern u_char *D_80140028;
-extern u_char *D_8014002C;
-extern u_char *D_80140030;
-extern u_char *D_80140038;
-extern u_char *D_8014003C;
-extern u_char *D_80140040;
-extern u_char *D_80140044;
-extern u_char *D_80140048;
-extern u_char *D_8014004C;
-extern u_char *D_80140050;
-extern u_char *D_80140054;
+extern u_char *g_load_stage_1;
+extern u_char *g_load_stage_4;
+extern u_char *g_load_stage_5;
+extern u_char *g_load_stage_6;
+extern u_char *g_load_stage_7;
+extern u_char *g_load_stage_8;
+extern u_char *g_load_stage_9;
+extern u_char *g_load_stage_10;
+extern u_char *g_load_stage_11;
+extern u_char *g_load_stage_12;
+extern u_char *g_load_stage_14;
+extern u_char *g_load_stage_15;
+extern u_char *g_load_stage_16;
+extern u_char *g_load_stage_17;
+extern u_char *g_load_stage_18;
+extern u_char *g_load_stage_19;
+extern u_char *g_load_stage_20;
+extern u_char *g_load_stage_21;
 
 /* Once the run has been consumed its memory becomes the battle's own buffer. */
 #define BTL_LOAD_BUF ((u_char *)0x80140000)
@@ -136,7 +133,6 @@ extern u_char *D_800F4AC4;
 extern u_char *D_800F5CAC;
 extern u_char *D_800F5D68;
 extern u_char *D_800F5D6C;
-extern u_char *g_btl_gfx_next;
 extern u_char *g_btl_hud_packed;
 extern u_char *g_btl_frame_packed;
 extern u_char *g_btl_box_pack;
@@ -171,12 +167,6 @@ extern u_char D_800E010C[];
 extern u_char D_800E1FD8[];
 extern u_char D_800CFAAC[];
 extern u_char D_800CFABC[];
-
-/* The access lamp and the three objects beside it. */
-extern BtlObj *D_800EC604;
-extern BtlObj *D_800EC608;
-extern BtlObj *D_800EC60C;
-extern BtlObj *D_800EC610;
 
 extern u_char g_btl_mesh_show;
 extern u_char g_btl_arena_show;
@@ -402,10 +392,10 @@ void ovl_btlp_entry(void)
     g_btl_open_banks[0].seq  = (u_long *)BTL_WORK_B;
     *bank = g_load_stage;
     g_btl_open_banks[2].vb   = *seq_end;
-    g_btl_open_banks[3].vb   = D_80140010;
-    g_btl_open_banks[4].vb   = D_80140014;
+    g_btl_open_banks[3].vb   = g_load_stage_4;
+    g_btl_open_banks[4].vb   = g_load_stage_5;
     g_btl_open_banks[0].nsep = g_btl_bgm_kinds[g_btl_bgm_index];
-    memmove(BTL_WORK_A, D_80140004, *BTL_LOAD_VH_END - D_80140004);
+    memmove(BTL_WORK_A, g_load_stage_1, *BTL_LOAD_VH_END - g_load_stage_1);
     memmove(BTL_WORK_B, *BTL_LOAD_VH_END,
             *seq_end - *BTL_LOAD_VH_END);
 
@@ -429,17 +419,17 @@ void ovl_btlp_entry(void)
 
     enc = (int)g_load_stage;
     g_btl_tim_buf = (u_char *)enc;
-    BtlUploadPackedTim(D_80140018, 0x1F, 0x20, 0, 0, 7);
-    BtlUploadPackedTim(D_8014001C, 0x1F, 0x27, 0, 0x80, 5);
-    BtlUploadPackedTim(D_80140020, 0x19, 0x1E, 0, 0, 1);
+    BtlUploadPackedTim(g_load_stage_6, 0x1F, 0x20, 0, 0, 7);
+    BtlUploadPackedTim(g_load_stage_7, 0x1F, 0x27, 0, 0x80, 5);
+    BtlUploadPackedTim(g_load_stage_8, 0x19, 0x1E, 0, 0, 1);
     if (g_btl_debug == 0) {
-        BtlUploadPackedTim(D_80140024, 0x18, 0x17, 2, 0x80, 1);
+        BtlUploadPackedTim(g_load_stage_9, 0x18, 0x17, 2, 0x80, 1);
     }
     D_800F4D6C = D_800F4D94;
-    BtlUploadPackedTim(D_80140028, 0x15, 0x15, 0, 0, 1);
-    BtlUploadPackedTim(D_8014002C, 0x16, 0x16, 0, 0, 1);
+    BtlUploadPackedTim(g_load_stage_10, 0x15, 0x15, 0, 0, 1);
+    BtlUploadPackedTim(g_load_stage_11, 0x16, 0x16, 0, 0, 1);
     if (g_btl_debug == 0) {
-        BtlUploadPackedTim(D_80140030, 0x18, 0x40, 0, 0, 0x20);
+        BtlUploadPackedTim(g_load_stage_12, 0x18, 0x40, 0, 0, 0x20);
     }
     if (g_btl_debug != 0) {
         BtlDebugWait("TEXTURE SET\n");
@@ -449,15 +439,15 @@ void ovl_btlp_entry(void)
     if (g_state_prev == 0) {
         bg = BTL_BG_DNG;
     }
-    memmove(bg, *BTL_LOAD_BG, D_80140054 - *BTL_LOAD_BG);
+    memmove(bg, *BTL_LOAD_BG, g_load_stage_21 - *BTL_LOAD_BG);
     D_800F5D68         = bg;
-    D_800F5D6C         = bg + (int)D_80140038 - (int)*BTL_LOAD_BG;
-    D_800F4ABC         = bg + (int)D_8014003C - (int)*BTL_LOAD_BG;
-    D_800F4AC4         = bg + (int)D_80140040 - (int)*BTL_LOAD_BG;
-    g_btl_hud_packed   = bg + (int)D_80140044 - (int)*BTL_LOAD_BG;
-    g_btl_frame_packed = bg + (int)D_80140048 - (int)*BTL_LOAD_BG;
-    g_btl_box_pack     = bg + (int)D_8014004C - (int)*BTL_LOAD_BG;
-    g_btl_panel_pack   = bg + (int)D_80140050 - (int)*BTL_LOAD_BG;
+    D_800F5D6C         = bg + (int)g_load_stage_14 - (int)*BTL_LOAD_BG;
+    D_800F4ABC         = bg + (int)g_load_stage_15 - (int)*BTL_LOAD_BG;
+    D_800F4AC4         = bg + (int)g_load_stage_16 - (int)*BTL_LOAD_BG;
+    g_btl_hud_packed   = bg + (int)g_load_stage_17 - (int)*BTL_LOAD_BG;
+    g_btl_frame_packed = bg + (int)g_load_stage_18 - (int)*BTL_LOAD_BG;
+    g_btl_box_pack     = bg + (int)g_load_stage_19 - (int)*BTL_LOAD_BG;
+    g_btl_panel_pack   = bg + (int)g_load_stage_20 - (int)*BTL_LOAD_BG;
 
     BtlBuildMesh();
     if (g_btl_debug != 0) {
@@ -554,24 +544,24 @@ moon_orders_done:
     pos[0] = 0x1000000;
     pos[1] = 0x200000;
     pos[2] = 0;
-    D_800EC608 =
+    g_btl_hud_lamp_lit =
         BtlObjAlloc(g_btl_shadow_defs, 0, NULL, 2, 0xF, pos, 0x1F, 0x20);
     lamp = BtlObjAlloc(g_btl_shadow_defs, 0, NULL, 2, 0xE, pos, 0x1F, 0x20);
     lamp->rgb_to[0]       = 0x30;
     lamp->rgb_to[1]       = 0x30;
     lamp->rgb_to[2]       = 0x30;
-    D_800EC604          = lamp;
-    D_800EC608->rgb_to[0] = 0xFF;
-    D_800EC608->rgb_to[1] = 0xFF;
-    D_800EC608->rgb_to[2] = 0xFF;
+    g_btl_hud_lamp          = lamp;
+    g_btl_hud_lamp_lit->rgb_to[0] = 0xFF;
+    g_btl_hud_lamp_lit->rgb_to[1] = 0xFF;
+    g_btl_hud_lamp_lit->rgb_to[2] = 0xFF;
     lamp->fade         = 0xFF;
-    D_800EC608->fade   = 0xFF;
+    g_btl_hud_lamp_lit->fade   = 0xFF;
 
     pos[1] = 0x380000;
-    D_800EC60C =
+    g_btl_hud_board_upper =
         BtlObjAlloc(g_btl_shadow_defs, 1, NULL, 2, 0x11, pos, 0x1F, 0x20);
     pos[1] = 0x680000;
-    D_800EC610 =
+    g_btl_hud_board_lower =
         BtlObjAlloc(g_btl_shadow_defs, 1, NULL, 2, 0x16, pos, 0x1F, 0x20);
     if (g_btl_debug != 0) {
         BtlDebugWait("ACCESS LAMP SET\n");

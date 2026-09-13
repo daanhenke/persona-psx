@@ -38,7 +38,7 @@ int BtlPickShowPage(int page)
     }
 
     for (i = 0; i < BTL_PICK_SLOTS; i++) {
-        g_btl_pick_objs[i]->attached->unk60 =
+        g_btl_pick_objs[i]->attached->next_script =
             g_btl_pick_page_gfx[page * BTL_PICK_SLOTS + i][0];
         g_btl_pick_objs[i]->children = g_btl_pick_live[g_btl_pick_page][i];
         BtlObjSetMotion(g_btl_pick_objs[i], PICK_PAGE_MOTION);

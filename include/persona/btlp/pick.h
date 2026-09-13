@@ -37,6 +37,10 @@ extern u_char       g_btl_no_help;
 
 extern void BtlPickSpawn(void);
 extern void BtlPickRefresh(void);
+/* The grid the pick cursors stand on, put up and taken down. pickgrid.c. */
+extern void BtlSpawnPickGrid(void);
+extern void BtlDespawnPickGrid(void);
+
 /* Puts every pick cursor back on its fighter. pickgrid.c. */
 extern void BtlRefreshPickCursors(void);
 extern int  BtlPickUpdate(short *row);
@@ -54,5 +58,10 @@ extern int BtlPickEnemyLit(short *slot);
 
 /* The enemy that cursor is on, which the analysis view reads as well. */
 extern short g_btl_enemy_slot;
+
+/* The same pick over the party, and the slot it leaves its cursor on.
+   pickmember.c. */
+extern int   BtlPickMember(short *slot);
+extern short g_btl_target_slot;
 
 #endif

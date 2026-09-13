@@ -41,15 +41,23 @@ typedef struct BtlEffectRow {
     /* 0xC */ BtlEffectRowData u;
 } BtlEffectRow;                 /* 0x10 bytes */
 
+/* A number row goes on past the common part with the bounds its value is
+   stepped between. */
+typedef struct {
+    /* 0x00 */ BtlEffectRow row;
+    /* 0x10 */ long         min;
+    /* 0x14 */ long         max;
+} BtlEffectNumberRow;           /* 0x18 bytes */
+
 typedef struct BtlEffect {
     /* 0x00 */ BtlEffectRow *next;
                                 /* the rows this effect is made of, -1 when it
                                    has none. BtlEffectOpen walks the chain for
                                    row zero.                                */
-    /* 0x04 */ short   mark;    /* the row byte and the kind beside it, written
-                                   as one halfword: -0x100 leaves kind zero and
-                                   the row 0xFF, so the record is no longer the
-                                   first row of anything                    */
+    /* 0x04 */ short   answer;  /* what the effect has been answered with:
+                                   BTL_EFFECT_MARK until something is
+                                   decided, then whatever its cursor handler
+                                   writes - the cell chosen, or -1        */
     /* 0x06 */ u_short grid;    /* columns in the low byte, rows in the
                                    high one; the cursor wraps inside it */
     /* 0x08 */ u_short flags;   /* 0x8000 drawn, 0x20 running, 11..12 shift */
@@ -120,8 +128,13 @@ extern const u_char g_btl_hex_glyphs[16];
 /* Taken away when an effect ends. */
 #define BTL_EFFECT_RUNNING 0x20
 
-/* Written over the outgoing effect's mark when another takes over; spelt
-   negative, which is how it reaches the halfword in one instruction. */
+/* A bit of the kind byte: set while the effect is not taking the pad for its
+   grid cursor, which is the whole time a number row is being edited. */
+#define BTL_EFFECT_NOPAD 0x10
+
+/* The answer an effect holds while nothing has been decided, written as it
+   opens and as another takes over; spelt negative, which is how it reaches
+   the halfword in one instruction. */
 #define BTL_EFFECT_MARK (-0x100)
 
 /* Bits 11 and 12 of the flags choose how far the effect is shifted. */
@@ -131,6 +144,9 @@ extern const u_char g_btl_hex_glyphs[16];
 #define BTL_EFFECT_SHIFT_8X   2
 
 extern BtlEffect *g_btl_effect[];
+
+/* The row each slot's cursor is on. */
+extern BtlEffectRow *g_btl_effect_step[];
 
 /* Which slot the pad is talking to, the one before it, and the one a caller
    put aside. BTL_EFFECT_FREE means none. */

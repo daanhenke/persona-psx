@@ -57,9 +57,7 @@
 #define SCRIPT_HIT          8
 
 
-/* Set on a member that has flinched, and the act kind that has the whole side
-   acting at once. */
-#define ACTOR_FLINCHED 0x2000
+/* The act kind that has the whole side acting at once. */
 #define ACT_KIND_SIDE  2
 
 void BtlMemberMotion0F(BtlObj *o)
@@ -128,7 +126,7 @@ void BtlActorMotion04(BtlObj *o)
                                       + o->actor->script_pick
                                             * MEMBER_SCRIPT_PICK];
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[script]);
-        o->actor->flags |= ACTOR_FLINCHED;
+        o->actor->flags |= BTL_ACTOR_FLINCHED;
         o->motion = 0;
     }
     o->phase = 0;
@@ -166,7 +164,7 @@ void BtlMemberMotion11(BtlObj *o)
         if (o->timer != 0) {
             break;
         }
-        if ((o->actor->flags & ACTOR_FLINCHED) == 0) {
+        if ((o->actor->flags & BTL_ACTOR_FLINCHED) == 0) {
             if (o->attr & HIT_OTHER_SIDE) {
                 script = g_btl_models[o->kind].spawn;
             } else {

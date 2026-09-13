@@ -36,7 +36,6 @@
 #define BTL_EFFECT_DX   (-0x10)
 #define BTL_EFFECT_DY   (-1)
 
-extern BtlEffect    *g_btl_effect_step[];
 extern short         g_btl_effect_ox;
 extern short         g_btl_effect_oy;
 
@@ -58,7 +57,7 @@ void BtlEffectMoveCursor(int slot)
 
     e = g_btl_effect[slot];
     if (slot == g_btl_effect_cur
-        && (step = (BtlEffectRow *)g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
+        && (step = g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
         if ((e->kind & BTL_EFFECT_NOPAD) == 0) {
             grid = e->grid;
             keep = e->sel;
@@ -102,7 +101,7 @@ void BtlEffectMoveCursor(int slot)
             for (;;) {
                 if (row->row == (u_char)sel) {
                     keep = sel;
-                    g_btl_effect_step[g_btl_effect_cur] = (BtlEffect *)row;
+                    g_btl_effect_step[g_btl_effect_cur] = row;
                     break;
                 }
                 row = row->next;
@@ -111,7 +110,7 @@ void BtlEffectMoveCursor(int slot)
                 }
             }
             e->sel = keep;
-            step = (BtlEffectRow *)g_btl_effect_step[g_btl_effect_cur];
+            step = g_btl_effect_step[g_btl_effect_cur];
         }
         g_btl_effect_cursor_fn[step->kind & 0xF]();
         BtlCursorPlace(e->curx + g_btl_effect_ox + step->x * BTL_EFFECT_CELL

@@ -81,8 +81,8 @@ void BtlObjMotion09(BtlObj *obj)
     obj->draw |= OBJ_DRAW_XFORM;
     if ((obj->rot.vy & (OBJ_TURN - 1)) == OBJ_SPIN_END) {
         BtlObjFree(obj);
-        if (obj->unk58 != 0) {
-            *(long *)obj->unk58 = 0;
+        if (obj->ref != NULL) {
+            *obj->ref = NULL;
         }
     } else {
         obj->rot.vy -= OBJ_SPIN_X;

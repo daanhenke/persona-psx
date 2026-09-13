@@ -71,4 +71,13 @@ extern void BtlStandPreset(int preset);
 extern void BtlPlacePreset(int preset);
 extern int  BtlMarkMovedMembers(void);
 
+/* Whether a member may stand at a cell: its four neighbours must be empty,
+   the same rule the field keeps. */
+extern int  BtlFormationCellFree(short col, short row);
+
+/* Stands every member who went down back on the grid, one at a time, and
+   the one frame of the cursor that does it. placefallen.c. */
+extern void BtlPlaceFallen(void);
+extern int  BtlPlaceFallenStep(void);
+
 #endif

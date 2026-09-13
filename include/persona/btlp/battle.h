@@ -67,6 +67,34 @@ extern u_char g_btl_debug_no_flee;
 /* And one that keeps a fight to the party side alone. */
 extern u_char g_btl_debug_party_only;
 
+/* All thirty-two of those switches, one byte each, as the debug page's flag
+   editor flips them; the named ones above are members of it. */
+extern u_char g_btl_debug_flags[];
+
+/* The test party's names, ten glyphs a key. The fighter editor copies one
+   in as it changes who a member is. */
+extern const u_char g_btl_test_party_names[][10];
+
+/* The code that raises g_btl_debug_hud, one pad mask a step with a zero at
+   the end, and how far into it the player is. */
+extern u_short g_btl_cheat_pad[];
+extern int     g_btl_cheat_step;
+
+/* While the HUD is up and square is held, every hit deals 9999. */
+extern u_char g_btl_debug_max_damage;
+
+/* The HUD's four objects, which the overlay's entry puts up and
+   BtlDrawDebugHud shows only while g_btl_debug_hud is raised: the access
+   lamp, the lamp lit while the CD is busy, and the two boards. */
+extern BtlObj *g_btl_hud_lamp;
+extern BtlObj *g_btl_hud_lamp_lit;
+extern BtlObj *g_btl_hud_board_upper;
+extern BtlObj *g_btl_hud_board_lower;
+
+/* How many times confirm went down while the escape question stood; the
+   HUD shows it. */
+extern u_char g_btl_escape_presses;
+
 extern short g_btl_offer_slot;
 extern BtlActor g_btl_actors[];
 extern short g_btl_actor_slot;
@@ -95,6 +123,16 @@ extern u_char  g_btl_half_rate;   /* draw every other field rather than every */
 extern u_short g_btl_tick;        /* frames drawn since the battle opened     */
 extern int     g_btl_screen_dist;
 extern int     g_btl_draw_dist;   /* the copy the frame takes of it           */
+extern VECTOR  g_btl_cam_shift;   /* the camera matrix's translation; its vz
+                                     is g_btl_draw_dist                       */
+extern VECTOR  g_btl_view_scale;  /* what the camera matrix is scaled by, one
+                                     to one at 0x1000; the intro shrinks it   */
+extern u_short g_btl_sprite_count; /* counted as the frame is built, with the */
+extern u_short g_btl_poly_count;   /* largest counts seen kept beside them    */
+extern u_short g_btl_sprite_peak;
+extern u_short g_btl_poly_peak;
+extern u_char *g_btl_gfx_base;     /* the artwork arena, and its next free    */
+extern u_char *g_btl_gfx_next;     /* byte                                    */
 extern u_char  g_btl_interlace;   /* goes into both display environments      */
 extern u_char  g_btl_blank_on_load; /* blank the screen while VRAM is written */
 extern u_char  g_btl_auto_confirm;  /* holds confirm down for the next read   */

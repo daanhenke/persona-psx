@@ -28,6 +28,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/board.h>
+#include <persona/btlp/debug.h>
 #include <persona/btlp/input.h>
 #include <persona/btlp/menu.h>
 #include <persona/btlp/number.h>
@@ -37,9 +38,27 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/stage.h>
 
+#define DEBUG_ROWS 15
+
 /* One routine per row, zero where the row is handled in place or does
    nothing. */
-extern int (*g_btl_debug_actions[])(void);
+int (*g_btl_debug_actions[DEBUG_ROWS])(void) = {
+    0,
+    0,
+    BtlDebugMemberAilment,
+    BtlDebugEnemyAilment,
+    BtlDebugSummon,
+    0,
+    0,
+    0,
+    BtlDebugEditMember,
+    0,
+    BtlDebugEditFlags,
+    0,
+    0,
+    0,
+    0,
+};
 
 /* The two digits the board shows the music index with. */
 extern u_char g_btl_debug_hex[];

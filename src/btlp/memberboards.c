@@ -97,7 +97,7 @@ void BtlOpenMemberBoards(void)
         *picture = i + BOARD_FIRST_PICTURE;
         obj = BtlBoardOpen((BtlBoardDef *)(picture - BOARD_PICTURE_AT), pos);
         g_btl_member_boards[i] = obj;
-        obj->unk58 = (long)&g_btl_member_boards[i];
+        obj->ref = &g_btl_member_boards[i];
         BtlObjSetTimer(g_btl_member_boards[i], i * BOARD_DELAY);
         BtlObjSetAttr(g_btl_member_boards[i], BTL_OBJ_HIDDEN);
         BtlObjFree(BtlObjLast(g_btl_member_boards[i]));

@@ -43,15 +43,12 @@
 #define BTL_SHADOW_X2  0x140000
 
 extern u_char    g_btl_member_scripts[];
-extern u_char   *g_btl_gfx_next;
 extern u_char   *g_btl_enemy_gfx_start;
 
 extern u_short  BtlLoadMemberGfx(int member, int actor);
 extern BtlObj  *BtlSpawnMemberObj(int key, int col, int row, int gfx,
                                   int member);
 extern BtlObj  *BtlSpawnActorObj(int model, const long *pos);
-extern void     BtlApplyPersona(BtlActor *a);
-extern void     BtlRecalcStats(BtlActor *a);
 extern void     BtlPartyResetGfx(void);
 
 #ifdef NON_MATCHING

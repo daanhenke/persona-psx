@@ -42,7 +42,7 @@ void BtlEffectRelease(int slot)
 void BtlEffectSelect(int slot)
 {
     if (g_btl_effect_cur != BTL_EFFECT_FREE) {
-        g_btl_effect[g_btl_effect_cur]->mark = BTL_EFFECT_MARK;
+        g_btl_effect[g_btl_effect_cur]->answer = BTL_EFFECT_MARK;
     }
     g_btl_effect_prev = g_btl_effect_cur;
     g_btl_effect_cur = slot;

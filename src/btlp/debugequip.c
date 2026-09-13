@@ -23,8 +23,12 @@
 #include <persona/common/item.h>
 
 /* One bit per Char key, and the group each of the seven slots takes. */
-extern const u_short g_btl_char_bit[];
-extern const u_short g_btl_equip_kind[];
+u_short g_btl_char_bit[10] = {
+    0x000, 0x001, 0x002, 0x004, 0x008, 0x010, 0x020, 0x040, 0x080, 0x100,
+};
+u_short g_btl_equip_kind[8] = {
+    0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x00,
+};
 
 /* The equipment range of the item table: the walks never leave it. */
 #define EQUIP_FIRST 0xA3

@@ -191,9 +191,9 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->attached = 0;
             obj->shadow = 0;
             obj->unk54 = 0;
-            obj->unk58 = 0;
+            obj->ref = NULL;
             obj->mark = 0;
-            obj->unk60 = 0;
+            obj->next_script = NULL;
             obj->script = (BtlSeqStep *)defs->scripts;
             obj->last = ((const BtlSeqStep *)defs->scripts)->value;
             obj->rot.vx = 0;

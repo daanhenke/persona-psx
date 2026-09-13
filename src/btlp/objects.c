@@ -87,15 +87,8 @@
 #define BTL_MESH_COLS 0x14
 #define BTL_MESH_TOP  0x80000000
 
-extern u_short   g_btl_sprite_count;
-extern u_short   g_btl_poly_count;
-extern u_short   g_btl_sprite_peak;
-extern u_short   g_btl_poly_peak;
 extern int       g_btl_screen_dist;
 extern MATRIX    g_btl_cam_matrix;
-extern VECTOR    g_btl_cam_shift;
-extern VECTOR    g_btl_intro_x;
-extern long      g_btl_intro_y;
 extern u_short   g_btl_tick;
 extern signed char g_btl_shake_offsets[];
 extern u_char    g_btl_debug_grid;
@@ -171,7 +164,7 @@ void BtlDrawObjects(void)
         g_btl_cam_shift.vy = 0;
     }
     RotMatrix(&g_btl_cam_rot, &g_btl_cam_matrix);
-    ScaleMatrix(&g_btl_cam_matrix, &g_btl_intro_x);
+    ScaleMatrix(&g_btl_cam_matrix, &g_btl_view_scale);
     TransMatrix(&g_btl_cam_matrix, &g_btl_cam_shift);
     group = 0;
     do {
@@ -202,8 +195,8 @@ void BtlDrawObjects(void)
                 g_btl_obj_x = o->x >> 16;
                 g_btl_obj_y = o->y >> 16;
                 if ((u_int)(o->draw - BTL_DRAW_FLAT) < 2) {
-                    if (g_btl_intro_x.vx == BTL_SCALE_ONE
-                        && g_btl_intro_y == BTL_SCALE_ONE
+                    if (g_btl_view_scale.vx == BTL_SCALE_ONE
+                        && g_btl_view_scale.vy == BTL_SCALE_ONE
                         && (o->attr & BTL_OBJ_FLAT_BARS) == 0) {
                         o->draw = BTL_DRAW_FLAT;
                     } else {

@@ -18,6 +18,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/load.h>
 
 /* Slots 5 to 9 are the party's; -1 is a free one and 0x8000 the answer when
    none of them can be had. */
@@ -41,7 +42,6 @@
 
 extern u_short   g_btl_member_file[];
 extern int       g_btl_gfx_sector;
-extern u_char   *g_btl_gfx_next;
 extern u_long   *g_btl_slot_clut[];
 extern u_char   *g_btl_actor_clut;
 extern u_char   *g_btl_actor_clut_to;
@@ -87,11 +87,11 @@ u_short BtlLoadMemberGfx(int member, int actor)
     while (g_cd_busy != CD_IDLE) {
         BtlDrawFrame();
     }
-    memcpy(g_btl_gfx_next, (u_char *)BTL_STAGE[1],
-           (int)BTL_STAGE[2] - (int)BTL_STAGE[1]);
+    memcpy(g_btl_gfx_next, (u_char *)g_load_stage_1,
+           (int)g_load_stage_2 - (int)g_load_stage_1);
     BtlBindGfx(0, member, &g_btl_gfx_next);
 
-    tim = BTL_STAGE[0];
+    tim = (u_long *)g_load_stage;
     len = ((u_short *)tim)[1];
     g_btl_actors[actor].clut_len = len;
     ((u_short *)tim)[1] = 0;

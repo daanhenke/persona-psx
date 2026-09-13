@@ -30,13 +30,11 @@
 /* Handed back when the record already holds a slot. */
 #define BTL_EFFECT_TAKEN 0x100
 
-extern BtlEffect *g_btl_effect_step[];
-
 #ifdef NON_MATCHING
 int BtlEffectOpen(BtlEffect *e)
 {
     BtlEffect **p;
-    BtlEffect **step;
+    BtlEffectRow **step;
     BtlEffectRow *node;
     BtlEffect  *none;
     int         i;
@@ -80,7 +78,7 @@ int BtlEffectOpen(BtlEffect *e)
     goto done;
 
 opened:
-    e->mark = BTL_EFFECT_MARK;
+    e->answer = BTL_EFFECT_MARK;
     e->unk28 = 100;
     e->scale_x = 0x10;
     e->scale_y = 0x40;

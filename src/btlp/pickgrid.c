@@ -12,7 +12,7 @@
  * script table rewritten before each allocation - eighteen tables laid out
  * one after another at g_btl_grid_scripts - so one entry of the table draws
  * every cell and each cell still runs its own animation. Each cell also keeps
- * the address of g_btl_grid_tail in unk58, which is how the frame tick finds
+ * the address of g_btl_grid_tail in ref, which is how the frame tick finds
  * the end of the chain.
  *
  * The grid is built once: g_btl_grid_tail holding a record is what says it is
@@ -145,7 +145,7 @@ void BtlSpawnPickGrid(void)
                 y += GRID_STEP;
                 col++;
                 script += 2;
-                obj->unk58 = (long)&g_btl_grid_tail;
+                obj->ref = &g_btl_grid_tail;
                 obj->rot.vy = GRID_CELL_ROT_Y;
                 obj->rot.vz = GRID_CELL_ROT_Z;
                 obj->motion = GRID_MOTION;

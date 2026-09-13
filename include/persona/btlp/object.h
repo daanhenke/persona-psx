@@ -82,12 +82,13 @@ typedef struct BtlObj {
                                           BtlFxStep27 keeps the spark it just
                                           opened here, and reaches back through
                                           it to finish setting the spark up  */
-    /* 0x58 */ long           unk58;
+    /* 0x58 */ struct BtlObj **ref; /* the word the record is registered in,
+                                          cleared as a motion gives it up   */
     /* 0x5C */ struct BtlObj *mark;    /* the ailment marker floating on
                                           this one: the frame tick keeps it
                                           and its attached piece on this
                                           record's x, y and z            */
-    /* 0x60 */ const u_long  *unk60;  /* BtlPickShowPage is the only thing
+    /* 0x60 */ const u_long  *next_script;  /* BtlPickShowPage is the only thing
                                           that writes it, with one of the
                                           page's two script pointers      */
     /* 0x64 */ BtlSeqStep    *script;  /* animation script                 */
@@ -290,6 +291,9 @@ extern void BtlObjSetScaleTo(BtlObj *obj, long scale);
 extern void BtlObjSetRgbNow(BtlObj *obj, short r, short g, short b);
 extern void BtlObjSetAttr(BtlObj *obj, u_long bits);
 extern void BtlObjClearAttr(BtlObj *obj, u_long bits);
+
+/* Tints a fighter for the ailment it is under. statustint.c. */
+extern void BtlObjStatusTint(BtlObj *obj);
 extern void BtlObjSetScale(BtlObj *obj, long x, long y, long z);
 extern void BtlObjSetPhase(BtlObj *obj, u_char phase);
 extern void BtlObjSetTimer(BtlObj *obj, short frames);

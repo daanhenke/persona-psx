@@ -31,7 +31,9 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/input.h>
+#include <persona/btlp/menu.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/pick.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/stage.h>
 #include <persona/btlp/text.h>
@@ -49,15 +51,12 @@
 #define HOLD_Y 0x94
 
 /* The slot the cursor is on, which starts where the turn is. */
-extern short g_btl_target_slot;
 
 extern u_char       D_800CF94C[];
 extern const u_char g_btl_tint_pick_r;
 
 extern void BtlTintActorClut(int actor, int r, int g, int b);
-extern int  BtlPickMember(short *slot);
 extern void BtlOpenItemBoard(void);
-extern void func_800C56CC(int slot);
 
 
 int BtlPickTargetMember(BtlActor *a)
@@ -86,7 +85,7 @@ int BtlPickTargetMember(BtlActor *a)
                 goto sweep;
             }
             BtlRetractMarkers();
-            func_800C56CC(g_btl_actor_turn);
+            BtlSingleOutMember(g_btl_actor_turn);
             BtlOpenItemBoard();
         }
         BtlEnemiesResetGfx();
@@ -150,14 +149,14 @@ int BtlPickTargetParty(BtlActor *a)
             break;
         }
         if ((g_btl_pad1_edge & g_btl_key_cancel) != 0) {
-            func_800C56CC(g_btl_actor_turn);
+            BtlSingleOutMember(g_btl_actor_turn);
             BtlRetractMarkers();
             BtlOpenItemBoard();
             BtlEnemiesResetGfx();
             return -1;
         }
         if ((g_btl_pad1_edge & g_btl_key_abort) != 0) {
-            func_800C56CC(g_btl_actor_turn);
+            BtlSingleOutMember(g_btl_actor_turn);
             BtlEnemiesResetGfx();
             return -2;
         }

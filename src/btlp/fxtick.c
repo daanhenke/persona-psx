@@ -53,7 +53,7 @@ void BtlFxObjTick(BtlObj *o)
         o->rot.vz = *dist;
         if (!(o->attr & BTL_OBJ_ANIMATING))
         {
-            BtlObjSetScript(o, (BtlSeqStep *)o->unk60);
+            BtlObjSetScript(o, (BtlSeqStep *)o->next_script);
         }
     }
 }

@@ -9,6 +9,7 @@
 #define PERSONA_BTLP_MENU_H
 
 #include <decomp/types.h>
+#include <persona/btlp/object.h>
 
 /* One entry: the text, and where it goes. */
 typedef struct {
@@ -30,6 +31,15 @@ typedef struct {
    from a picker. */
 #define BTL_MENU_WAIT (-0x100)
 #define BTL_PICK_WAIT (-0x100)
+
+/* Where a menu item's cursor goes, relative to the board it is on. */
+typedef struct {
+    short x;
+    short y;
+} BtlMenuSpot;
+
+/* The cells the menu cursor is drawn with, which each menu places. */
+extern BtlGfxCell g_btl_menu_cursor[];
 
 /* The two menus whose cursor walks a table of neighbours: the debug board's,
    and the placement menu's layout picker. Both answer an item on a confirm,
@@ -59,6 +69,10 @@ extern void BtlRefreshTacticsLines(void);
 #define PICK_SE_MOVE 3
 
 extern void BtlPartyResetGfx(void);
+
+/* Lights one member at full colour with their marker chosen, and sends the
+   rest of the living party toward the background with theirs. */
+extern void BtlSingleOutMember(int slot);
 
 extern BtlMenuCell g_btl_menu_cells[];
 

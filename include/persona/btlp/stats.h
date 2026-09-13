@@ -69,6 +69,10 @@ typedef struct {
 
 extern BtlStats g_btl_personas[];
 
+/* The Persona board's spell lines, a name and the byte that ends it to a
+   row. BtlPersonaSwapUpdate fills them for the Persona it offers. */
+extern u_char g_btl_persona_spell_lines[][11];
+
 /* A cast Persona's experience, and its rank-up. personagrow.c. */
 extern void BtlPersonaGrow(BtlStats *p);
 

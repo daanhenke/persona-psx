@@ -13,6 +13,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/battle.h>
 
 /* The phase the opening move runs in. */
 #define BTL_INTRO_MOVING 4
@@ -24,9 +25,6 @@
 
 extern u_char  g_btl_intro_step;
 extern short   g_btl_intro_dist;
-extern int     g_btl_intro_x;
-extern int     g_btl_intro_y;
-extern int     g_btl_intro_z;
 extern BtlObj *g_btl_intro_obj;
 
 void BtlTickObjects(void)
@@ -72,11 +70,11 @@ void BtlTickObjects(void)
         if (*dist == BTL_INTRO_END) {
             g_btl_intro_step = 0;
         } else {
-            x = &g_btl_intro_x;
+            x = &g_btl_view_scale.vx;
             *dist = *dist - BTL_INTRO_CLOSE;
             *x = *x - BTL_INTRO_STEP;
-            g_btl_intro_y -= BTL_INTRO_STEP;
-            g_btl_intro_z -= BTL_INTRO_STEP;
+            g_btl_view_scale.vy -= BTL_INTRO_STEP;
+            g_btl_view_scale.vz -= BTL_INTRO_STEP;
         }
     }
 }

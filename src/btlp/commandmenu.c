@@ -27,7 +27,16 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/battle.h>
+#include <persona/btlp/board.h>
+#include <persona/btlp/debug.h>
+#include <persona/btlp/input.h>
+#include <persona/btlp/menu.h>
+#include <persona/btlp/pick.h>
 #include <persona/btlp/round.h>
+#include <persona/btlp/sound.h>
+#include <persona/btlp/stage.h>
+#include <persona/btlp/status.h>
 #include <persona/btlp/talk.h>
 
 INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlConfigMenu);
@@ -49,4 +58,91 @@ int BtlRunTalkScene(void)
     return outcome;
 }
 
-INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlOrdersMenu);
+/* The steps of the orders menu: taking an order, carrying it out once the
+   markers have settled, and the tactics board the order can lead to. */
+#define ORDERS_PICK    0
+#define ORDERS_APPLY   1
+#define ORDERS_TACTICS 2
+#define ORDERS_JOIN    3
+
+/* The three standing orders, in the order the board lists them. */
+#define ORDER_STAY  0
+#define ORDER_LEAVE 1
+#define ORDER_JOIN  2
+
+int BtlOrdersMenu(void)
+{
+    int order;
+
+    if ((g_btl_pad1 & g_btl_key_cancel) && g_btl_debug_hud != 0) {
+        BtlDebugMenu();
+        return 0;
+    }
+    BtlRetractMarkers();
+    BtlOpenOrdersBoard();
+    for (;;) {
+        BtlDrawFrame();
+        switch (g_btl_step) {
+        case ORDERS_PICK:
+            order = BtlOrdersMenuUpdate();
+            if (order == BTL_PICK_WAIT) {
+                break;
+            }
+            if (order == -1) {
+                if (BtlMarkersIdle() != 0) {
+                    BtlSePlay(1, 2);
+                    BtlCloseOrdersBoard();
+                    BtlRefreshMarkers();
+                    return 0;
+                }
+                break;
+            }
+            if (BtlMarkersIdle() == 0) {
+                break;
+            }
+            BtlSePlay(1, 1);
+            BtlCloseOrdersBoard();
+            BtlRefreshMarkers();
+            if (order != ORDER_JOIN) {
+                BtlPickSettle();
+            }
+            g_btl_step++;
+            break;
+
+        case ORDERS_APPLY:
+            if (BtlMarkersIdle() == 0) {
+                break;
+            }
+            switch (order) {
+            case ORDER_STAY:
+                BtlTalkersStay();
+                break;
+            case ORDER_LEAVE:
+                BtlTalkersLeaveField();
+                break;
+            case ORDER_JOIN:
+                BtlTalkersJoin();
+                break;
+            }
+            BtlShowAilmentMarks(0);
+            return 1;
+
+        case ORDERS_TACTICS:
+            order = BtlTacticsMenuUpdate();
+            if (order == BTL_PICK_WAIT) {
+                break;
+            }
+            BtlCloseTacticsBoard();
+            BtlRefreshMarkers();
+            g_btl_step++;
+            break;
+
+        case ORDERS_JOIN:
+            if (BtlMarkersIdle() == 0) {
+                break;
+            }
+            BtlTalkersJoin();
+            return 1;
+        }
+    }
+}

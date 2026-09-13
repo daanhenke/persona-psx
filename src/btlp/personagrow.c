@@ -44,8 +44,6 @@
 extern int     g_btl_enemy_level;
 extern u_short g_btl_persona_rank_exp[GROW_RANKS];
 extern u_char  g_btl_persona_growth[][GROW_COLUMNS * GROW_COLUMNS];
-extern u_char  g_char_hp_growth[];
-extern u_char  g_char_stat_growth[];
 extern int     g_level_exp_1[];
 
 #define GROW_CLAMP(v, max) ((v) != 0 ? ((v) < (max) + 1 ? (v) : (max)) : 1)

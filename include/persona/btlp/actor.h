@@ -231,6 +231,10 @@ extern u_char g_btl_counter_order;
    tested; the two are always checked together. */
 #define BTL_ACTOR_OUT 0x4000
 
+/* Set on a member that has flinched: its flinch is the script it stands in
+   until something clears it. */
+#define BTL_ACTOR_FLINCHED 0x2000
+
 /* The ward moves 0x8C..0x8F leave behind, one bit each and mutually
    exclusive: BtlFxFinish8C clears all four before it sets the one its own
    move grants, and the round clears all four together when `ward_turns` runs
@@ -276,5 +280,11 @@ extern void BtlShowEnemyStatus(int slot);
    wrapping, and answer -1 when no slot is left. */
 extern int BtlUnreadyMemberNext(int slot);
 extern int BtlUnreadyMemberPrev(int slot);
+
+/* A member's record brought up to date with the equipped Persona, and the
+   fight's own stats derived from the record again. applypersona.c and
+   recalc.c. */
+extern void BtlApplyPersona(BtlActor *a);
+extern void BtlRecalcStats(BtlActor *a);
 
 #endif

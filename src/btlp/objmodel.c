@@ -52,13 +52,11 @@
 #define BTL_FRAME_BYTES 0xE660
 #define BTL_ARENA_OT    0xD6C0
 
-extern u_short   g_btl_poly_count;
 extern int       g_btl_screen_dist;
 extern MATRIX    g_btl_cam_matrix;
 extern MATRIX    g_btl_obj_matrix;
 extern SVECTOR   g_btl_cam_rot;
 extern SVECTOR   g_btl_obj_quad[];
-extern VECTOR    g_btl_intro_x;
 
 #ifdef NON_MATCHING
 void BtlDrawObjModel(BtlObj *o)
@@ -116,7 +114,7 @@ void BtlDrawObjModel(BtlObj *o)
     }
     RotMatrix(&o->rot, &g_btl_obj_matrix);
     ScaleMatrix(&g_btl_obj_matrix, (VECTOR *)&o->scale_x);
-    ScaleMatrix(&g_btl_obj_matrix, &g_btl_intro_x);
+    ScaleMatrix(&g_btl_obj_matrix, &g_btl_view_scale);
     TransMatrix(&g_btl_obj_matrix, &at);
     SetGeomOffset(0, 0);
     SetRotMatrix(&g_btl_obj_matrix);

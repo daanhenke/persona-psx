@@ -32,10 +32,17 @@ typedef struct {
 extern BtlObj *BtlBoardOpen(const BtlBoardDef *parts, const long *pos);
 extern void    BtlBoardShut(BtlObj *board);
 
-/* The two boards a menu outside boards.c puts up: the debug page, and the
-   status view an analysis is shown on. */
+/* The boards a menu outside boards.c puts up: the debug page, the switch
+   board of its flag editor, and the status view an analysis is shown on. */
 extern void BtlOpenDebugBoard(void);
 extern void BtlCloseDebugBoard(void);
+extern void BtlOpenFlagBoard(void);
+extern void BtlCloseFlagBoard(void);
+
+/* The standing orders board and the tactics board. menuboards.c. */
+extern void BtlOpenOrdersBoard(void);
+extern void BtlCloseOrdersBoard(void);
+extern void BtlCloseTacticsBoard(void);
 extern void BtlOpenStatusBoard(void);
 extern void BtlCloseStatusBoard(void);
 
@@ -44,5 +51,14 @@ extern void BtlCloseStatusBoard(void);
 extern BtlObj *BtlOpenEditBoard(void);
 extern void    BtlShutEditBoard(void);
 extern void    BtlFillEditBoard(BtlActor *a);
+
+/* The names of the seven things the fighter is wearing, ten bytes each, as
+   the editor's board shows them. equipnames.c. */
+extern void    BtlEditEquipNames(BtlActor *a);
+
+/* The board the editor's equipment page stands over, put up and taken
+   down. board1d.c. */
+extern void    BtlOpenBoard1D(void);
+extern void    BtlCloseBoard1D(void);
 
 #endif

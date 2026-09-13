@@ -20,10 +20,10 @@
 #include <decomp/libc.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/load.h>
 
 /* The file was read to the shared staging buffer. Its first word is the TIM,
    its second the model image, built to no fixed address. */
-extern u_long *g_load_stage[];
 
 /* Where the model image is copied so BtlBindGfx can fix it up in place. */
 #define PERSONA_IMAGE ((u_char *)0x801D8400)
@@ -100,9 +100,9 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
 
     which = gfx;
     g_btl_persona_image = PERSONA_IMAGE;
-    memcpy(PERSONA_IMAGE, g_load_stage[1], PERSONA_IMAGE_BYTES);
+    memcpy(PERSONA_IMAGE, g_load_stage_1, PERSONA_IMAGE_BYTES);
     BtlBindGfx(GFX_EFFECT, gfx, &g_btl_persona_image);
-    g_btl_persona_tim = BtlUploadTim(g_load_stage[0], PERSONA_PAGE,
+    g_btl_persona_tim = BtlUploadTim((u_long *)g_load_stage, PERSONA_PAGE,
                                      PERSONA_SLOT, PERSONA_ABR, 0, 1);
 
     /* Spelt out in both arms so gcc cross-jumps the shared tail; hoisting the

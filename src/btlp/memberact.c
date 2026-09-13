@@ -25,6 +25,7 @@
 #include <persona/common/item.h>
 #include <persona/btlp/text.h>
 #include <persona/btlp/round.h>
+#include <persona/btlp/load.h>
 
 /* The two prompts. Each is two pictures out of g_btl_pick_defs standing one
    above the other, with the shared frame of g_btl_obj_defs in front of each;
@@ -129,8 +130,6 @@ extern int D_800F4BA0;
 /* Where the artwork is read to, and the two addresses the loader leaves at
    the head of it: the tim in the first and the graphics in the second. */
 #define SUMMON_STAGE ((u_long *)0x80140000)
-extern u_char *g_load_stage;
-extern u_char *D_80140004;
 
 /* Where the graphics are staged and bound, and the page the tim goes to. */
 #define SUMMON_GFX_STAGE 0x801D9400
@@ -170,7 +169,6 @@ extern BtlObjDef g_btl_summon_def;
 /* Written as each copy is made and read by nothing else in the overlay. */
 extern BtlObj *D_800F4894;
 
-extern void BtlApplyPersona(BtlActor *a);
 extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern int  BtlBindGfx(u_int kind, int index, u_char **image);
 extern void BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
@@ -624,7 +622,6 @@ extern u_char   D_800E49BF;
 
 extern BtlObj *g_btl_persona_obj;
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
-extern void    BtlRecalcStats(BtlActor *a);
 extern void    BtlEnemyDeriveStats(BtlStats *s);
 extern int     BtlActorSlotByKey(int key);
 extern void    func_800A6D3C(BtlActor *a, int move);
@@ -1029,7 +1026,7 @@ void BtlMemberMotion05(BtlObj *o)
         }
         BtlSePlay(BTL_BGM_SLOT, 0);
         g_btl_fx_gfx = (u_char *)SUMMON_GFX_STAGE;
-        memcpy((u_char *)SUMMON_GFX_STAGE, D_80140004, SUMMON_GFX_BYTES);
+        memcpy((u_char *)SUMMON_GFX_STAGE, g_load_stage_1, SUMMON_GFX_BYTES);
         BtlBindGfx(SUMMON_GFX_KIND, SUMMON_GFX_INDEX, &g_btl_fx_gfx);
         BtlUploadTim((u_long *)g_load_stage, SUMMON_TIM_PAGE, SUMMON_TIM_SLOT,
                      1, 0, 1);

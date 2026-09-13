@@ -24,11 +24,10 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
 #include <persona/common/spell.h>
+#include <persona/btlp/load.h>
 
 /* What the loader left at 0x80140000: one address per run it read. The effect
    takes the second of them and the tim from the first. */
-extern u_char *g_load_stage;
-extern u_char *D_80140004;
 
 /* Where the effect's artwork is staged, and how much of it there is. */
 #define FX_GFX_STAGE 0x801D9400
@@ -60,7 +59,7 @@ BtlObj *BtlStartMoveFx(int index)
     g_btl_fx_gfx = (u_char *)FX_GFX_STAGE;
     /* One local carries both of the loader's addresses in turn, which is what
        gives the block move a copy of the first rather than the load itself. */
-    stage = D_80140004;
+    stage = g_load_stage_1;
     memcpy((u_char *)FX_GFX_STAGE, stage, FX_GFX_BYTES);
     BtlBindGfx(FX_KIND_GFX, index, &g_btl_fx_gfx);
     stage = g_load_stage;

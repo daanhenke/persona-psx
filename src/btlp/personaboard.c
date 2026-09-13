@@ -78,7 +78,6 @@
 
 /* The cells the board is drawn from, and the text written into them. */
 extern BtlGfxText g_btl_persona_cells[];
-extern u_char     g_btl_persona_spell_lines[][11];
 extern u_char     g_btl_persona_name[];
 extern u_char     g_btl_persona_level_cells[];
 extern u_char     g_btl_persona_sp_cells[];

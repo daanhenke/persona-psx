@@ -63,7 +63,6 @@ extern u_char    g_btl_grid[];
 extern u_char    g_btl_encounters[];
 extern u_short   g_btl_enemy_gfx_offsets[];
 extern int       g_btl_enemy_gfx_base;
-extern u_char   *g_btl_gfx_next;
 extern u_char   *g_btl_enemy_gfx_start;
 extern volatile int g_cd_busy;
 

@@ -54,7 +54,6 @@
 
 extern BtlModel  g_btl_models[];
 extern u_long   *g_btl_slot_clut[];
-extern u_char   *g_btl_gfx_next;
 extern u_char   *g_btl_enemy_clut;
 extern u_char   *g_btl_enemy_clut_to;
 extern u_char   *g_btl_enemy_clut_base;

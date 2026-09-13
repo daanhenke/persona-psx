@@ -108,4 +108,10 @@ typedef struct {
    holds. */
 #define CHAR_NO_ENTRY 0xFF
 
+/* What each level adds. g_char_hp_growth has a row of fifty per character
+   from key 2 on; g_char_stat_growth has five such rows per key, one for
+   each stat. A level reads its column halved, so two levels share one. */
+extern u_char g_char_hp_growth[];
+extern u_char g_char_stat_growth[];
+
 #endif

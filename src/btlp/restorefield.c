@@ -46,7 +46,6 @@
 
 extern void BtlPickSettle(void);
 extern void BtlPlaceMember(int slot, short col, short row);
-extern void func_800A735C(void);
 
 
 void BtlRestoreField(void)
@@ -134,6 +133,6 @@ void BtlRestoreField(void)
     while (g_btl_intro_obj->rgb[0] != 0) {
         BtlDrawFrame();
     }
-    func_800A735C();
+    BtlPlaceFallen();
     BtlRefreshMarkers();
 }

@@ -237,6 +237,9 @@ segments:
       - [0x14D88, c, effecttext]
       - [0x14DD8, c, effectdraw]
       - [0x14E80, asm, btlp_27]
+      # The answer an effect gives, and two of its cursor handlers.
+      - [0x15234, c, effectprompt]
+      - [0x155FC, asm, btlp_27_0]
       - [0x15798, c, effectcursor]
       - [0x15A84, c, seqvalue]
       - [0x15B38, c, insert]
@@ -340,7 +343,8 @@ segments:
       - [0x29548, c, tintclut]
       - [0x297D8, c, btlinit2]
       - [0x2983C, c, packedtim]
-      - [0x298C8, asm, btlp_50]
+      # The debug HUD.
+      - [0x298C8, c, debughud]
       - [0x29EB4, c, cheat]
       - [0x29F90, c, placeform]
       - [0x2A13C, c, debugstep]
@@ -414,7 +418,8 @@ segments:
       - [0x3AB14, c, escapemenu]
       - [0x3B298, c, analyse]
       - [0x3B384, c, debugmenu]
-      - [0x3B618, asm, btlp_61_a]
+      # The debug page's fighter editor.
+      - [0x3B618, c, debugedit]
       - [0x3C0F8, c, debugequip]
       - [0x3C2BC, c, debugailment]
       - [0x3C9B4, asm, btlp_61_b]
@@ -422,6 +427,9 @@ segments:
       - [0x3F01C, asm, btlp_61_x1]
       - [0x3F404, c, pickupdate]
       - [0x3F5F8, asm, btlp_62]
+      # The Persona board's two pages: the spell list and the swap.
+      - [0x3F798, c, personamenu]
+      - [0x3FC80, asm, btlp_62_0]
       - [0x403C0, c, place]
       - [0x4046C, asm, btlp_63]
       # The placement menu's cursors.
@@ -429,6 +437,12 @@ segments:
       # The two menus whose cursor walks a table of neighbours.
       - [0x40B48, c, menunav]
       - [0x41534, asm, btlp_63_x1]
+      # Putting the fallen back on the field.
+      - [0x42FBC, c, placefallen]
+      - [0x43538, asm, btlp_63_x2]
+      # The debug page's switch board.
+      - [0x437C8, c, debugflags]
+      - [0x43A40, asm, btlp_63_x2_a]
       - [0x43C18, c, markerspawn]
       - [0x43F2C, c, markerrefresh]
       - [0x43F9C, asm, btlp_64]
@@ -436,7 +450,8 @@ segments:
       - [0x446A4, c, editboard]
       - [0x44D9C, asm, btlp_64_x1]
       - [0x450A0, c, board1d]
-      - [0x45128, asm, btlp_64_a]
+      # The equipment names the fighter editor's board shows.
+      - [0x45128, c, equipnames]
       - [0x451BC, c, board22]
       - [0x4521C, asm, btlp_64_b]
       - [0x45508, c, board23]
@@ -463,6 +478,9 @@ segments:
       - [0x48754, c, persona]
       - [0x4879C, c, markeridle]
       - [0x48834, asm, btlp_68]
+      # Two more of the motions a display record can be put through.
+      - [0x48A00, c, objmotion4]
+      - [0x48CC0, asm, btlp_68_0]
       - [0x48F4C, c, objmotion8]
       - [0x49138, asm, btlp_68_a]
       - [0x49548, c, objmotion12]
@@ -597,6 +615,9 @@ segments:
       - [0x605AC, c, cursor2]
       - [0x60648, c, targetcursor]
       - [0x607E0, asm, btlp_69_x5]
+      # Bringing the party back to how the field shows it between turns.
+      - [0x60AB4, c, partyresetgfx]
+      - [0x60EB4, asm, btlp_69_x5_0]
       - [0x611A4, c, dimsides]
       - [0x6132C, asm, btlp_69_x5_a]
       - [0x615F0, c, pickable]
@@ -613,9 +634,20 @@ segments:
       - [0x68270, data, btlp_data1]
       - [0x68B44, .data, loadenemy]
       - [0x68B5C, data, btlp_data2]
+      # The debug page's row handlers, which debugmenu.c emits.
+      - [0x6B990, .data, debugmenu]
+      # The fighter editor's stat cursor: neighbours and spots.
+      - [0x6B9CC, .data, debugedit]
+      # What the equipment stepper matches an item against.
+      - [0x6B9EC, .data, debugequip]
+      - [0x6BA10, data, btlp_data2_d]
+      # The Persona board's neighbour table and cursor spots.
+      - [0x6BB0C, .data, personamenu]
       # The two menus' neighbour tables and spots, which menunav.c emits.
       - [0x6BB48, .data, menunav]
-      - [0x6BC70, data, btlp_data2_x0]
+      # The flag editor's line for each switch, which debugflags.c emits.
+      - [0x6BC70, .data, debugflags]
+      - [0x6BCF0, data, btlp_data2_x0]
       # The editor board's seven parts, which editboard.c emits itself.
       - [0x6BD90, .data, editboard]
       - [0x6BDC8, data, btlp_data2_x1]

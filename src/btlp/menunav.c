@@ -94,12 +94,6 @@
 #define SPELL_TURN_BACK 7
 #define SPELL_TURN_NEXT 6
 
-/* Where an item's cursor goes. */
-typedef struct {
-    short x;
-    short y;
-} BtlMenuSpot;
-
 extern short      g_btl_debug_row;
 extern short      g_btl_preset_row;
 extern short      g_btl_orders_row;
@@ -109,7 +103,6 @@ extern int        g_btl_spell_slot;
 extern u_char     g_btl_orders_line0[];
 extern u_char     g_btl_orders_line1[];
 extern u_char     g_btl_orders_line2[];
-extern BtlGfxCell g_btl_menu_cursor[CURSOR_CELLS];
 
 u_char g_btl_debug_nav[DEBUG_ITEMS][4] = {
     { 0x0C, 0x03, 0x02, 0x01 }, { 0x0D, 0x04, 0x00, 0x02 },

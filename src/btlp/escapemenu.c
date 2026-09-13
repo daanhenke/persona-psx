@@ -55,11 +55,6 @@ extern u_char D_800CFA58;
 
 /* Three ways the roll is ruled out before it is made: the fight is one that
    may not be left, the field says so, and the level gap. */
-extern u_char D_8004E260;
-
-/* How many times the key was pressed while the question stood, kept where
-   something else can read it. */
-extern u_char D_800CCA35;
 
 /* The chance the roll starts from, by how far the party's agility and luck
    are ahead: the first row whose edge the party reaches gives the chance.
@@ -131,7 +126,7 @@ int BtlEscapeMenu(void)
             got = 0;
             BtlOpenMessage(0, 0, &D_800CFA2C, ESCAPE_MSG_WIDTH,
                            ESCAPE_MSG_STYLE);
-            if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE || D_8004E260 != 0) {
+            if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE || g_btl_debug_flags[0] != 0) {
                 got = 1;
             } else if (g_btl_no_escape != 0
                        || g_btl_enemy_level - g_btl_party_level >= 10
@@ -187,7 +182,7 @@ int BtlEscapeMenu(void)
             if (g_btl_delay != 0) {
                 if ((g_btl_pad1_edge & g_btl_key_confirm) != 0) {
                     presses++;
-                    D_800CCA35 = presses;
+                    g_btl_escape_presses = presses;
                 }
                 break;
             }

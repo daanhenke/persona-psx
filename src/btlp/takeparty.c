@@ -56,7 +56,6 @@ extern const u_char g_btl_test_party_keys[][5];
 extern const u_char g_btl_test_party_keys2[][5];
 extern const u_char g_btl_test_party_personas[][5];
 extern const u_char g_btl_test_party_personas2[][5];
-extern const u_char g_btl_test_party_names[][10];
 extern u_char   g_btl_test_party;
 extern u_char   g_options[];
 extern u_char   g_formation_preset[];
