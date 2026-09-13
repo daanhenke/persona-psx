@@ -49,13 +49,6 @@
 #include <persona/btlp/spellfx.h>
 #include <persona/btlp/text.h>
 
-/* The pad's four directions, and the neighbour-table column each one reads. */
-#define PAD_DIRS  0xF000
-#define PAD_UP    0x1000
-#define PAD_RIGHT 0x2000
-#define PAD_DOWN  0x4000
-#define PAD_LEFT  0x8000
-
 #define NAV_UP    0
 #define NAV_DOWN  1
 #define NAV_LEFT  2

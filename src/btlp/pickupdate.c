@@ -30,15 +30,6 @@
 #define PICK_DOWN 1
 #define PICK_SIDE 2
 
-/* The pad bits BtlMenuKey answers with. Spelled out here rather than read from
-   the control scheme's table, which is what the original does - the four
-   directions are the part of that table neither scheme changes. */
-#define PAD_UP    0x1000
-#define PAD_DOWN  0x4000
-#define PAD_LEFT  0x8000
-#define PAD_RIGHT 0x2000
-#define PAD_ANY_DIRECTION 0xF000
-
 /* The click. */
 #define PICK_CLICK_BANK 1
 #define PICK_CLICK_SE   0
@@ -72,7 +63,7 @@ int BtlPickUpdate(short *row)
     dir  = -1;
     keys = BtlMenuKey();
 
-    if ((keys & PAD_ANY_DIRECTION) != 0) {
+    if ((keys & PAD_DIRS) != 0) {
         BtlSePlay(PICK_CLICK_BANK, PICK_CLICK_SE);
     }
     if ((keys & PAD_UP) != 0) {

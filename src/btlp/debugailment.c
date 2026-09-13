@@ -32,9 +32,6 @@
 #include <persona/btlp/stage.h>
 #include <persona/btlp/status.h>
 
-#define PAD_UP   0x1000
-#define PAD_DOWN 0x4000
-
 /* How many codes and levels the editor steps through. */
 #define EDIT_CODES  24
 #define EDIT_LEVELS 3

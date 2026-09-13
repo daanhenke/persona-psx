@@ -52,12 +52,23 @@ extern u_short g_btl_key_r2;
 extern u_short g_btl_key_square;
 extern u_short g_btl_key_page;
 
-/* The direction bits BtlMenuKey hands back, which are the pad's own rather
-   than the control scheme's. */
-#define PAD_UP    0x1000
-#define PAD_RIGHT 0x2000
-#define PAD_DOWN  0x4000
-#define PAD_LEFT  0x8000
+/* PadRead's own bits, which BtlMenuKey hands back and the debug pages read
+   directly rather than through the control scheme's table: the shoulders,
+   the four face buttons, start, and the four directions. */
+#define PAD_L2       0x0001
+#define PAD_R2       0x0002
+#define PAD_L1       0x0004
+#define PAD_R1       0x0008
+#define PAD_TRIANGLE 0x0010
+#define PAD_CIRCLE   0x0020
+#define PAD_CROSS    0x0040
+#define PAD_SQUARE   0x0080
+#define PAD_START    0x0800
+#define PAD_UP       0x1000
+#define PAD_RIGHT    0x2000
+#define PAD_DOWN     0x4000
+#define PAD_LEFT     0x8000
+#define PAD_DIRS     (PAD_UP | PAD_RIGHT | PAD_DOWN | PAD_LEFT)
 
 extern int BtlMenuKey(void);
 

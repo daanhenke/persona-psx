@@ -159,7 +159,8 @@ typedef struct BtlActor {
                                       decides whether the turn is spent  */
     /* 0xD8 */ u_char  unkD8;      /* stops a member's marker being taken away
                                       as the turn ends, and is cleared there  */
-    /* 0xD9 */ u_char  padD9[2];
+    /* 0xD9 */ u_char  place_col;  /* the cell a member was put on in the */
+    /* 0xDA */ u_char  place_row;  /* placement menu, and fell on         */
     /* 0xDB */ u_char  unkDB;      /* both cleared for every member once a
                                       negotiation is over                  */
     /* 0xDC */ u_char  unkDC;

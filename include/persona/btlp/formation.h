@@ -78,10 +78,41 @@ extern int  BtlMarkMovedMembers(void);
    the same rule the field keeps. */
 extern int  BtlFormationCellFree(short col, short row);
 
+/* The same rule, and the cell itself empty, on a copy of the grid with every
+   member down where it stood put back on its cell. cellfree.c. */
+extern BtlFormation g_btl_formation_fallen;
+extern int  BtlFormationCellFreeOfFallen(short col, short row);
+
 /* Whether a stored layout has never been written to, and whether it places as
    many fighters as the live grid holds. formationpreset.c. */
 extern int  BtlFormationPresetEmpty(int slot);
 extern int  BtlFormationPresetFits(int slot);
+
+/* The placement cursor shared by placing the fallen and moving a member: the
+   grid's anchor and where it is drawn for a cell, in pixels and gaps, the
+   cell the cursor is on and what it holds, the member being placed, and the
+   pick grid's voice slot with the sequences it plays. */
+#define PLACE_X      0xE7
+#define PLACE_Y      0x77
+#define PLACE_XPITCH 16
+#define PLACE_YPITCH 8
+
+#define PLACE_SE_SLOT 2
+#define PLACE_SE_OPEN 2
+#define PLACE_SE_SHUT 3
+#define PLACE_SE_PUT  4
+
+struct BtlObj;
+struct BtlActor;
+
+extern struct BtlObj *g_btl_grid_anchor;
+extern short          g_btl_place_member;
+extern short          g_btl_place_cell;
+extern short          g_btl_place_col;
+extern short          g_btl_place_row;
+
+/* One frame of moving a standing member in the placement menu. placestep.c. */
+extern int BtlPlaceMoveStep(struct BtlActor *a);
 
 /* Stands every member who went down back on the grid, one at a time, and
    the one frame of the cursor that does it. placefallen.c. */

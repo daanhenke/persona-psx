@@ -20,11 +20,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/text.h>
 
-#define PAD_UP     0x1000
-#define PAD_DOWN   0x4000
-#define PAD_CIRCLE 0x20
-#define PAD_CROSS  0x40
-
 /* Thirty-two switches, eight to a row. */
 #define FLAG_COUNT 32
 #define FLAG_COLS  8

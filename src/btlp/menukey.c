@@ -19,20 +19,6 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/input.h>
 
-/* PadRead's bits, in the order the walk takes them. */
-#define PAD_UP       0x1000
-#define PAD_DOWN     0x4000
-#define PAD_LEFT     0x8000
-#define PAD_RIGHT    0x2000
-#define PAD_TRIANGLE 0x0010
-#define PAD_CROSS    0x0040
-#define PAD_SQUARE   0x0080
-#define PAD_CIRCLE   0x0020
-#define PAD_L1       0x0004
-#define PAD_L2       0x0001
-#define PAD_R1       0x0008
-#define PAD_R2       0x0002
-
 /* Frames before a held key repeats, and between repeats after that. */
 #define MENU_KEY_DELAY  15
 #define MENU_KEY_REPEAT 3

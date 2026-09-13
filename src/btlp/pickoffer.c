@@ -24,10 +24,6 @@
 #include <persona/btlp/input.h>
 #include <persona/btlp/sound.h>
 
-/* PadRead's two sideways bits, as BtlMenuKey hands them back. */
-#define PAD_LEFT  0x8000
-#define PAD_RIGHT 0x2000
-
 /* The clicks, and the motion the named enemies are put on. */
 #define PICK_SE_BANK    1
 #define PICK_SE_CONFIRM 1

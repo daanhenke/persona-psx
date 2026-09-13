@@ -28,18 +28,6 @@
 #include <persona/btlp/status.h>
 #include <persona/btlp/text.h>
 
-#define PAD_DIRS  0xF000
-#define PAD_UP    0x1000
-#define PAD_RIGHT 0x2000
-#define PAD_DOWN  0x4000
-#define PAD_LEFT  0x8000
-
-/* Where the grid's anchor is drawn for a cell, in pixels, and the gaps. */
-#define PLACE_X      0xE7
-#define PLACE_Y      0x77
-#define PLACE_XPITCH 16
-#define PLACE_YPITCH 8
-
 /* What the chosen member's marker is lit with, the name slot of the line,
    and where the line goes. */
 #define MARK_CHOSEN  0x1000000
@@ -55,19 +43,8 @@
 #define PLACE_GRID_IN  30
 #define PLACE_GRID_OUT 60
 
-/* The pick grid's voice slot and the sequences it plays. */
-#define PLACE_SE_SLOT 2
-#define PLACE_SE_OPEN 2
-#define PLACE_SE_SHUT 3
-#define PLACE_SE_PUT  4
-
 extern BtlObj  *g_btl_pick_cursors[];
-extern BtlObj  *g_btl_grid_anchor;
 extern u_char   g_btl_place_line[];
-extern short    g_btl_place_member;
-extern short    g_btl_place_cell;
-extern short    g_btl_place_col;
-extern short    g_btl_place_row;
 
 /* 99.26%, registers only: the slot counter, the marker and the record offset
    take s2, s1 and s0 in the image and a rotation of those here. Declaring them

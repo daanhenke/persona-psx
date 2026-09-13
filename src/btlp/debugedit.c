@@ -40,17 +40,6 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/stage.h>
 
-#define PAD_L2     0x1
-#define PAD_R2     0x2
-#define PAD_L1     0x4
-#define PAD_R1     0x8
-#define PAD_CIRCLE 0x20
-#define PAD_SQUARE 0x80
-#define PAD_START  0x800
-#define PAD_UP     0x1000
-#define PAD_DOWN   0x4000
-#define PAD_DIRS   0xF000
-
 /* The three pages. */
 #define EDIT_PICK  0
 #define EDIT_STATS 1

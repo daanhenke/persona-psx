@@ -31,10 +31,6 @@
 #include <persona/btlp/stats.h>
 #include <persona/btlp/text.h>
 
-#define PAD_UP   0x1000
-#define PAD_DOWN 0x4000
-#define PAD_DIRS 0xF000
-
 /* The three ways the spell cursor's table can be walked. */
 #define NAV_UP   0
 #define NAV_DOWN 1
