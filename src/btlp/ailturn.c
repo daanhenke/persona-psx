@@ -43,10 +43,6 @@
    the whole of what picks between the two pickers. */
 #define AIL_OTHER_SIDE 0x200
 
-/* What a redirected turn is run as, and what a fleeing one is. */
-#define AIL_ACT_AIMED 2
-#define AIL_ACT_FLEE  0xE
-
 /* Charm clears these two off a fighter it turns round. */
 #define AIL_CHARM_CLEAR 0x18000
 

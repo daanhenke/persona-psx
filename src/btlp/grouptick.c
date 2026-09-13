@@ -25,7 +25,7 @@
 
 /* Still assembly: what an effect record that follows the negotiation gets
    instead of the move's own step. */
-extern void func_800BFE14();
+extern void BtlTalkFxObjTick();
 
 /* The four groups' motion tables. Nothing calls an entry by hand. */
 extern void (*g_btl_persona_motion[])();
@@ -53,7 +53,7 @@ extern long g_btl_persona_hover[];
 void BtlTickEffects(BtlObj *o)
 {
     if ((o->attr & BTL_OBJ_ATTR_2000) != 0) {
-        func_800BFE14();
+        BtlTalkFxObjTick();
     } else {
         BtlFxObjTick(o);
     }

@@ -4,7 +4,7 @@
  *
  * A start handler out of g_btl_spell_fx, and the one seven of the moves in
  * fxspell92.c borrow. Five records built off the fighter aimed at, standing
- * where g_btl_fx_spread's first five entries put them: the four corners of a
+ * where g_btl_fx_spread_90's five entries put them: the four corners of a
  * box round the fighter, and then the fighter's own position. The one on the
  * fighter is made last, is the head of the chain and is the one answered, and
  * it is the only one that arrives at once - the four corners are held six
@@ -36,8 +36,8 @@ BtlObj *BtlFxStart90(void)
     after = 0;
     on = g_btl_actors[g_btl_fx_target].obj;
     do {
-        pos[0] = on->x + g_btl_fx_spread[i][0];
-        pos[1] = on->y + g_btl_fx_spread[i][1];
+        pos[0] = on->x + g_btl_fx_spread_90[i][0];
+        pos[1] = on->y + g_btl_fx_spread_90[i][1];
         pos[2] = 0;
         o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, 0, FX_OBJ_DRAW, 0, pos,
                         FX_OBJ_CD, FX_OBJ_CE);

@@ -65,11 +65,6 @@ extern BtlObj            *g_btl_formation_board;
 extern const BtlBoardDef  g_btl_formation_board_defs[];
 extern const long         g_btl_formation_board_pos[];
 
-/* Whether a slot has ever been written to, and whether what is in it places
-   the same number of fighters as the party. Both still assembly. */
-extern int BtlFormationPresetEmpty(int slot);
-extern int BtlFormationPresetFits(int slot);
-
 void BtlOpenFormationBoard(void)
 {
     u_char *line;

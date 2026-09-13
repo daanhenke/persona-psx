@@ -1,7 +1,11 @@
 /* Persona 1 (JP) - the negotiation board's loops, and the stock list on it.
  * BTLP only.
+ *   0x80076AFC BtlTalkBoardDone
  *   0x80076B0C BtlRunTalkBoard     0x80076BB8 BtlPlayTalkSeq
  *   0x80076C70 BtlRefreshStockList 0x80076D14 BtlBuildStockList
+ *
+ * BtlTalkBoardDone is the flag BtlRunTalkBoard waits on, for the callers
+ * outside the loop.
  *
  * BtlRunTalkBoard puts the negotiation board up and turns frames over until
  * BtlTalkBoardStep says it is done: the board's effect is opened, selected and
@@ -81,6 +85,11 @@ extern void BtlUpdateVoices(void);
 extern int  BtlSeqState(void);
 extern int  BtlSeqAnswer(void);
 extern void BtlIndicatorBar(void);
+
+int BtlTalkBoardDone(void)
+{
+    return g_btl_talk_board_done;
+}
 
 void BtlRunTalkBoard(void)
 {

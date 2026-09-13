@@ -29,11 +29,6 @@
    store on this side and a halfword load on that one. */
 extern u_long g_btl_counter_targets;
 
-/* What a redirected turn is run as, and what Barsak leaves when it finds
-   nothing worth swinging at. */
-#define AIL_ACT_AIMED 2
-#define AIL_ACT_NONE  4
-
 /* The wards that make a fighter not worth swinging at, alongside the affinity
    turning the element aside. */
 #define AIL_BARSAK_WARDED 0x1900

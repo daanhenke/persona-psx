@@ -22,10 +22,6 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
-/* The two fights that have a shape to change into. */
-#define BTL_ENCOUNTER_TRIO 0x20
-#define BTL_ENCOUNTER_PAIR 0x22
-
 /* The shapes, as the actor's form byte spells them, and the character key
    each one fights as. */
 #define MORPH_PAIR_SECOND 0x25

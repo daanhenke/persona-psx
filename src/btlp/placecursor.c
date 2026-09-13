@@ -45,12 +45,9 @@
 
 extern BtlObj *g_btl_pick_cursors[];
 
-/* 96.31%: the image works the layout's start out afresh for every row, from
-   a hoisted twenty-four times the layout and the layout itself, and steps a
-   pointer along the row; gcc here hoists the whole product and indexes every
-   cell. The row pointer assigned inside the loop - BtlPlacePreset's nearest
-   spelling - hoists the table back into the row instead. */
-#ifdef NON_MATCHING
+/* The layout is reached as (g_btl_formation_preset + preset)->cell[k], which
+   the image strength-reduces into a pointer stepped along the row; indexing
+   the table, or the cells as one run, hoists the whole product instead. */
 void BtlStandPreset(int preset)
 {
     BtlObj *o;
@@ -65,7 +62,7 @@ void BtlStandPreset(int preset)
     do {
         col = 0;
         do {
-            cell = (g_btl_formation_preset + k)[preset * GRID_CELLS];
+            cell = (g_btl_formation_preset + preset)->cell[k];
             if (cell != CELL_EMPTY) {
                 o = g_btl_actors[cell].obj;
                 if (g_btl_actors[cell].c.key != 0) {
@@ -95,15 +92,12 @@ void BtlStandPreset(int preset)
     BtlRefreshPickCursors();
     BtlBuildMarkers();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placecursor", BtlStandPreset);
-#endif
 
-/* 91.95%, two instructions out: the image loads the layout table's address
-   before it works out where the layout starts in it, and gcc here the other
-   way round. The table and the layout's start written as locals before the
-   loops, as one sum ahead of the inner loop, and the table assigned and then
-   stepped all move the hoisting further from the image. */
+/* 98.52%, registers only: every instruction is where the image has it, but
+   the column counter and the running cell trade registers (a2 and a3, t0 and
+   t1). The layout reached as (g_btl_formation_preset + preset)->cell[k] - the
+   spelling that matched BtlStandPreset - is what put the table's address
+   ahead of the layout's start, as the image has it. */
 #ifdef NON_MATCHING
 void BtlPlacePreset(int preset)
 {
@@ -128,8 +122,7 @@ void BtlPlacePreset(int preset)
         col = 0;
         do {
             x = (col * PRESET_XPITCH + PRESET_X) << 16;
-            p = g_btl_formation_preset + preset * GRID_CELLS;
-            cell = p[k];
+            cell = (g_btl_formation_preset + preset)->cell[k];
             if (cell != CELL_EMPTY) {
                 g_btl_pick_cursors[cell]->x = x;
                 g_btl_pick_cursors[cell]->y = y;

@@ -21,6 +21,11 @@
    image reads it with lh everywhere, so short is the one it was written as. */
 extern short g_btl_encounter;
 
+/* The two fights that have a shape to change into (morph.c). In both, and in
+   0x21 between them, the first enemy also acts twice a round (orderturns.c). */
+#define BTL_ENCOUNTER_TRIO 0x20
+#define BTL_ENCOUNTER_PAIR 0x22
+
 /* Set while the party is only being placed on the field - a formation screen
    rather than a fight. Most of the round is skipped under it. */
 extern u_char g_btl_place_party;

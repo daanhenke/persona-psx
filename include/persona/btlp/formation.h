@@ -12,16 +12,19 @@
  * work area and hands it back when the fight ends.
  */
 
-extern u_char g_btl_formation[];
-
-/* The eight layouts the player can store, immediately before the live grid. */
-extern u_char g_btl_formation_preset[];
-
-/* The grid copied whole: the original moves it as one object, seven words at
-   a time, rather than a cell at a time. */
+/* One whole grid. The saved copy is moved as one object, seven words at a
+   time, rather than a cell at a time. */
 typedef struct {
     u_char cell[GRID_CELLS];
 } BtlFormation;
+
+extern u_char g_btl_formation[];
+
+/* The eight layouts the player can store, immediately before the live grid.
+   Every reader in a loop reaches a layout as (g_btl_formation_preset +
+   n)->cell[k]; indexing the table folds the row into the symbol's address and
+   builds it somewhere else (formationpreset.c, placecursor.c). */
+extern BtlFormation g_btl_formation_preset[];
 
 extern BtlFormation g_btl_formation_saved;
 
@@ -74,6 +77,11 @@ extern int  BtlMarkMovedMembers(void);
 /* Whether a member may stand at a cell: its four neighbours must be empty,
    the same rule the field keeps. */
 extern int  BtlFormationCellFree(short col, short row);
+
+/* Whether a stored layout has never been written to, and whether it places as
+   many fighters as the live grid holds. formationpreset.c. */
+extern int  BtlFormationPresetEmpty(int slot);
+extern int  BtlFormationPresetFits(int slot);
 
 /* Stands every member who went down back on the grid, one at a time, and
    the one frame of the cursor that does it. placefallen.c. */
