@@ -22,7 +22,6 @@
  * everything away again and leaves the battle where it was.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libsnd.h>
 #include <rand.h>
 #include <persona/btlp/actor.h>
@@ -132,19 +131,12 @@ extern void  BtlRefreshMoodGauges(void);
 extern void  BtlMenuDismiss(void);
 extern int   BtlMenuState(void);
 
-#ifdef NON_MATCHING
-/* One word out: the sequence's address is the entry, plus the scratch base,
-   plus the directory offset, and the image adds the offset to the other two
-   where gcc here adds the other two to the offset. Parenthesising the sum,
-   indexing, a pointer or an int temporary for it, and every order of the three
-   terms leave it there or cost a word. odiff also reports the scratch base and
-   g_btl_talk_stage-1 under other names; those are names, not bytes.
-
-   The rest is a few saved registers each doing several jobs, as the image has
-   them: i counts, holds the moon test, takes the menu's answer and builds the
-   line's address, and n counts the live offers and then picks the opening
-   line. Given variables of their own, gcc keeps them in short-lived registers
-   and the copy between them disappears. */
+/* A few saved registers each do several jobs here, as the image has them: i
+   counts, holds the moon test, takes the menu's answer and builds the line's
+   address, and n counts the live offers and then picks the opening line. Given
+   variables of their own, gcc keeps them in short-lived registers and the copy
+   between them disappears. odiff reports the scratch base and
+   g_btl_talk_stage-1 under other names; those are names, not bytes. */
 int BtlBeginTalking(void)
 {
     const BtlMember *m;
@@ -157,7 +149,6 @@ int BtlBeginTalking(void)
     int              slot;
     int              value;
     int              i;
-    u_long           dir;
 
     m = g_btl_member;
     for (i = 0; i < BTL_PARTY; i++) {
@@ -332,9 +323,13 @@ int BtlBeginTalking(void)
                 BtlDrawFrame();
             }
 
-            dir = *(u_long *)BTL_SCRATCH;
-            BtlSeqPlay(BTL_SCRATCH + dir
-                       + *(u_long *)(BTL_SCRATCH + dir + *line * 4));
+            /* The directory's offset is spelled out at both uses rather than
+               read into a local. gcc still loads it once, but through a local
+               it adds the entry and the base to the offset, where the image
+               adds the offset to them. */
+            BtlSeqPlay(BTL_SCRATCH + *(u_long *)BTL_SCRATCH
+                       + *(u_long *)(BTL_SCRATCH + *(u_long *)BTL_SCRATCH
+                                     + *line * 4));
 
             g_btl_talking = 1;
             g_btl_phase = 1;
@@ -351,6 +346,3 @@ int BtlBeginTalking(void)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/begintalk", BtlBeginTalking);
-#endif

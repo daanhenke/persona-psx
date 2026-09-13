@@ -203,10 +203,8 @@ void BtlTalkSceneDemand(void)
                     break;
             }
 
-            offset = BTL_SCRATCH_W[0];
-            p      = (const u_char*)BTL_SCRATCH_W +
-                *(u_long*)((char*)BTL_SCRATCH_W + offset + (base->rows[g_btl_demand_kind].entry[0]) * 4);
-            BtlSeqPlay(p + offset);
+            BtlSeqPlay((u_char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] +
+                *(u_long*)((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] + (base->rows[g_btl_demand_kind].entry[0]) * 4));
             BtlSeqRun();
             /* Both arms work the member's row out the same way; only the blood
                demand steps two menus on. Written out rather than folded. */
@@ -354,12 +352,12 @@ void BtlTalkSceneDemand(void)
                         {
                             g_btl_actors[g_btl_actor_slot].c.hp = 1;
                         }
-                        used = offer->used;
+                        n    = offer->used;
                         e    = g_btl_enemies;
                         i    = 0;
                         do
                         {
-                            if (((used >> i) & 1) != 0 && e->c.hp <= weight)
+                            if (((n >> i) & 1) != 0 && e->c.hp <= weight)
                             {
                                 weight = e->c.hp;
                                 worst  = i;
@@ -367,13 +365,13 @@ void BtlTalkSceneDemand(void)
                             i++;
                             e++;
                         } while (i < 9);
-                        e     = &g_btl_enemies[worst];
-                        take += e->c.hp;
-                        if (e->c.hp_max < take)
+                        e    = &g_btl_enemies[worst];
+                        used = take + e->c.hp;
+                        if (e->c.hp_max < used)
                         {
-                            take = e->c.hp_max;
+                            used = e->c.hp_max;
                         }
-                        e->c.hp = take;
+                        e->c.hp = used;
                         i       = 2;
                     }
                     else
@@ -393,10 +391,8 @@ void BtlTalkSceneDemand(void)
             {
                 BtlHighlightBegin(gauge);
             }
-            offset = BTL_SCRATCH_W[0];
-            p      = (const u_char*)BTL_SCRATCH_W +
-                *(u_long*)((char*)BTL_SCRATCH_W + offset + (base->rows[g_btl_demand_kind].entry[i]) * 4);
-            BtlSeqPlay(p + offset);
+            BtlSeqPlay((u_char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] +
+                *(u_long*)((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[0] + (base->rows[g_btl_demand_kind].entry[i]) * 4));
             if (weight > TALK_VOICE_MIN - 1)
             {
                 BtlQueueVoice(gauge & 0xFF, 0);
@@ -405,7 +401,7 @@ void BtlTalkSceneDemand(void)
             {
                 BtlTalkPerform();
             }
-            g_btl_offer[g_btl_offer_slot].mood[gauge] += weight;
+            (g_btl_offer + g_btl_offer_slot)->mood[gauge] += weight;
             BtlRefreshMoodGauges();
             if (BtlOfferRank(g_btl_offer_slot) == 1)
             {
