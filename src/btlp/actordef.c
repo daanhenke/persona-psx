@@ -45,7 +45,7 @@ void BtlActorFromDef(BtlActor *a, int key)
     a->c.unk10 = d->exp;
     a->c.unk3A = d->unk0C;
     a->c.unk3C = d->unk0E;
-    *(int *)a->c.pad1C = d->unk10;
+    a->c.unk1C = d->unk10;
     a->drop = d->drop;
     a->price = (u_short)d->price;
 

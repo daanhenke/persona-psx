@@ -60,4 +60,15 @@ extern void BtlPlaceMember(int slot, short col, short row);
 extern void BtlPlaceFormation(void);
 extern void BtlFormationCloseUp(void);
 
+/* The placement menu's previews: one stored layout stood on the fighters
+   themselves or shown on the menu's cursors, and the members who have moved
+   since the menu opened on g_btl_formation_before. Layout PRESET_LIVE is the
+   live grid, which sits where a ninth stored layout would. placecursor.c. */
+#define PRESET_LIVE 8
+
+extern u_char g_btl_formation_before[GRID_CELLS];
+extern void BtlStandPreset(int preset);
+extern void BtlPlacePreset(int preset);
+extern int  BtlMarkMovedMembers(void);
+
 #endif

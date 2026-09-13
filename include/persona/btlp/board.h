@@ -15,6 +15,7 @@
 #define PERSONA_BTLP_BOARD_H
 
 #include <decomp/types.h>
+#include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
 /* One record of a board: the template it comes from, the index that picks the
@@ -37,5 +38,11 @@ extern void BtlOpenDebugBoard(void);
 extern void BtlCloseDebugBoard(void);
 extern void BtlOpenStatusBoard(void);
 extern void BtlCloseStatusBoard(void);
+
+/* The debug character editor's board: put up, taken down, and filled in from
+   one fighter. editboard.c. */
+extern BtlObj *BtlOpenEditBoard(void);
+extern void    BtlShutEditBoard(void);
+extern void    BtlFillEditBoard(BtlActor *a);
 
 #endif

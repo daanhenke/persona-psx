@@ -123,8 +123,12 @@ typedef struct BtlActor {
     /* 0xC7 */ u_char  mark_kind;  /* which marker goes up over the fighter;
                                       5 is the one that says the action it
                                       was given cannot be made             */
-    /* 0xC8 */ u_char  unkC8;      /* put back to zero alongside Char.unk5D
-                                      when the gun turns out to be unusable */
+    /* 0xC8 */ u_char  tactic;     /* which of the tactics page's three
+                                      columns the member is set to; the page
+                                      cycles it with left and right, the save
+                                      keeps it, and it is put back to zero
+                                      alongside Char.unk5D when the gun turns
+                                      out to be unusable                    */
     /* 0xC9 */ u_char  action;     /* what the round is doing for this
                                       fighter this turn - the switch
                                       BtlStageRound opens the turn with.
@@ -157,7 +161,11 @@ typedef struct BtlActor {
     /* 0xDB */ u_char  unkDB;      /* both cleared for every member once a
                                       negotiation is over                  */
     /* 0xDC */ u_char  unkDC;
-    /* 0xDD */ u_char  padDD[2];
+    /* 0xDD */ u_char  padDD[1];
+    /* 0xDE */ u_char  unkDE;      /* raised on the slowest combatant by the
+                                      round and only ever lasts it: the round's
+                                      end clears it and attribute bit 0x40 with
+                                      it                                     */
     /* 0xDF */ u_char  unkDF;
     /* 0xE0 */ u_char  offered;    /* set for each enemy an offer involved
                                       once that offer is done with; the
@@ -169,7 +177,9 @@ typedef struct BtlActor {
                                       down, clearing all four bits together
                                       when it reaches nought. Cleared with
                                       the run above as a record is filled   */
-    /* 0xE8 */ u_char  padE8[2];
+    /* 0xE8 */ u_char  timed_a;    /* rounds BTL_ACTOR_TIMED_A has left, and */
+    /* 0xE9 */ u_char  timed_b;    /* BTL_ACTOR_TIMED_B; the round's end counts
+                                      both down and drops the flag at nought */
     /* 0xEA */ u_char  ail_turns;  /* how long the ailment at Char.status is
                                       meant to last. BtlInflictStatus sets it
                                       from the ailment - ten turns for the
@@ -231,6 +241,11 @@ extern u_char g_btl_counter_order;
 #define BTL_ACTOR_WARD_8E 0x800
 #define BTL_ACTOR_WARD_8F 0x1000
 #define BTL_ACTOR_WARDS   0x1E00
+
+/* Two more conditions that wear off by the round, each with a counter of its
+   own at `timed_a` and `timed_b`. Nothing read so far says what either is. */
+#define BTL_ACTOR_TIMED_A 0x100000
+#define BTL_ACTOR_TIMED_B 0x200000
 
 extern BtlActor g_btl_actors[];
 

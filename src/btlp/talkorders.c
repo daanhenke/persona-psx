@@ -70,7 +70,7 @@ void BtlTalkersJoin(void)
                    != BTL_STATUS_DOWN
             && (g_btl_actors[g_btl_actor_turn].flags & BTL_ACTOR_OUT) == 0
             && a->marker < 2) {
-            switch (a->unkC8) {
+            switch (a->tactic) {
             case 0:
                 a->marker = 4;
                 BtlReadyItemAction(a, &g_item_defs[a->c.equip[0]]);

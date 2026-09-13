@@ -68,7 +68,7 @@ int BtlAnyMemberTargetable(void)
 {
     /* Eight bytes of locals the routine reserves and never writes. */
     long unused[2];
-    int  status;
+    short status;
     int  i;
 
     i = 0;

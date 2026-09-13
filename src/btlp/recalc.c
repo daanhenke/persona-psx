@@ -55,8 +55,8 @@ void BtlRecalcStats(BtlActor *a)
         if ((a->c.unk5D & 0xF) == BTL_CMD_SHOOT) {
             a->c.unk5D &= 0xF0;
         }
-        if (a->unkC8 == 1) {
-            a->unkC8 = 0;
+        if (a->tactic == 1) {
+            a->tactic = 0;
         }
     }
 

@@ -37,6 +37,8 @@ extern u_char       g_btl_no_help;
 
 extern void BtlPickSpawn(void);
 extern void BtlPickRefresh(void);
+/* Puts every pick cursor back on its fighter. pickgrid.c. */
+extern void BtlRefreshPickCursors(void);
 extern int  BtlPickUpdate(short *row);
 extern void BtlPickHighlight(int chosen);
 extern int  BtlPickShowPage(int page);

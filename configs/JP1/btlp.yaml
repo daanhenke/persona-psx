@@ -224,6 +224,9 @@ segments:
       - [0x124A4, c, facedraw]
       - [0x1271C, c, face2]
       - [0x1275C, asm, btlp_24_x2]
+      # The negotiation board's loops, and the stock list on it.
+      - [0x1276C, c, stocklist]
+      - [0x12AB0, asm, btlp_24_x2_a]
       - [0x13110, c, effect]
       - [0x13194, c, effectopen]
       - [0x13358, c, effect2]
@@ -351,6 +354,8 @@ segments:
       - [0x2F6B8, c, statusstops]
       - [0x2F6E4, c, readymarkers]
       - [0x2F800, asm, btlp_57]
+      # The reach grid: which fighters a move can land on.
+      - [0x301B0, c, reach]
       - [0x30934, c, enemy2]
       - [0x30984, asm, btlp_57_x1]
       - [0x30B54, c, itembag]
@@ -363,6 +368,9 @@ segments:
       - [0x31918, asm, btlp_57_x1_c]
       - [0x31DE0, c, ailwolf]
       - [0x31DE8, asm, btlp_57_x1_d]
+      - [0x31F38, c, pickother]
+      - [0x32170, c, roundtick]
+      - [0x323C0, asm, btlp_57_x1_e]
       - [0x33310, c, personawon]
       # The event-flag trio the battle keeps for itself, then the turn-order
       # helpers, the scripted opening and the two scenes that close a round.
@@ -407,9 +415,17 @@ segments:
       - [0x3F5F8, asm, btlp_62]
       - [0x403C0, c, place]
       - [0x4046C, asm, btlp_63]
+      # The placement menu's cursors.
+      - [0x40798, c, placecursor]
+      # The two menus whose cursor walks a table of neighbours.
+      - [0x40B48, c, menunav]
+      - [0x41534, asm, btlp_63_x1]
       - [0x43C18, c, markerspawn]
       - [0x43F2C, c, markerrefresh]
       - [0x43F9C, asm, btlp_64]
+      # The debug character editor's board.
+      - [0x446A4, c, editboard]
+      - [0x44D9C, asm, btlp_64_x1]
       - [0x450A0, c, board1d]
       - [0x45128, asm, btlp_64_a]
       - [0x451BC, c, board22]
@@ -588,6 +604,12 @@ segments:
       - [0x68270, data, btlp_data1]
       - [0x68B44, .data, loadenemy]
       - [0x68B5C, data, btlp_data2]
+      # The two menus' neighbour tables and spots, which menunav.c emits.
+      - [0x6BB48, .data, menunav]
+      - [0x6BC70, data, btlp_data2_x0]
+      # The editor board's seven parts, which editboard.c emits itself.
+      - [0x6BD90, .data, editboard]
+      - [0x6BDC8, data, btlp_data2_x1]
       # The two choice prompts' pictures, positions and arrays, which
       # memberact.c emits itself.
       - [0x6C040, .data, memberact]

@@ -1307,3 +1307,73 @@ way round you choose.
 
 Read each occurrence's own branch in the image - a `j` between the arms means
 write them out, no `j` means the ternary.
+
+## A local of the global's own width keeps the load and the copy apart
+
+Where the image loads a global, tests the fresh load, and puts a copy into
+another register in the branch's delay slot for the arithmetic after, the local
+wants the global's width. An `int` local takes the load straight into its own
+register and the delay slot comes out empty; a `short` local of a `short`
+global leaves the sign-extended load for the tests and the narrow copy for the
+sums.
+
+- [menunav.c](/src/btlp/menunav.c) - `BtlSpellMenuUpdate`, 98.88% to exact on
+  `short row`.
+
+It does not carry over to a byte field read through a `(signed char)` cast:
+`signed char`, `short` and `int` locals all leave
+[pickother.c](/src/btlp/pickother.c) one instruction out.
+
+## Index a table in two dimensions when the base goes in before the second index
+
+`g_btl_reach[lane * 15 + row]`, `g_btl_reach[row + lane * 15]` and
+`(g_btl_reach + lane * 15)[row]` all compile to the same code, adding the base
+last. Declared `[5][15]` and indexed `[lane][row]`, the base goes onto the
+scaled first index and the second is added to that, which is the image's order.
+
+- [reach.c](/src/btlp/reach.c) - `BtlMarkMoveArea`, 97.21% to exact.
+
+## Reuse the first loop's locals in the second
+
+When a routine's second loop needs a lane and a row of its own, the image may
+be keeping them in the registers the first loop's `left` and `first` had. Using
+those same locals keeps `left` alive past the first loop, and that is what lets
+cse test the hoisted `left` instead of the loop's copy - the image's `slti` on
+the lane moves out of the loop.
+
+- [reach.c](/src/btlp/reach.c) - `BtlMarkEnemiesAround` 91.97% and
+  `BtlMarkPartyAround` 91.67%, both to exact.
+
+## A cast on the call keeps the zero-extension
+
+`keys = (u_short)BtlMenuKey();` into an `int` gives the image's
+`andi s0, v0, 0xffff`. A `u_short keys` local is folded away, because every
+later use only tests bits.
+
+- [menunav.c](/src/btlp/menunav.c) - `BtlPresetMenuUpdate`, 99.55% to exact.
+
+## Return the assignment
+
+An `addu v0, s0, zero` just before a global is stored from `s0` is the routine
+answering what it stored: `return g_btl_edit_board = o;`.
+
+- [editboard.c](/src/btlp/editboard.c) - `BtlOpenEditBoard`, 98.82% to exact.
+
+## Work in ints before narrowing
+
+A width written into a `u_short` field and then read back for the next
+position gets the arithmetic done on the field's type - `ori 0xffc0` and an add
+- where the image has `addiu -0x40`. Keep each width in an `int` local, store
+it, and build the positions from the locals.
+
+- [editboard.c](/src/btlp/editboard.c) - `BtlFillEditBoard`, which also needed
+  its digit cells as separate symbols; 94.44% to exact.
+
+## Arms that end the same way share their tail through a goto
+
+Two arms that end in the same call and return come out as one cross-jumped
+tail in the image. Written with that tail in each arm gcc keeps both copies;
+written `if ... else if ... else goto past;` with the tail once after them, it
+emits the one.
+
+- [menunav.c](/src/btlp/menunav.c) - `BtlSpellMenuUpdate`, 93.51% to 98.88%.

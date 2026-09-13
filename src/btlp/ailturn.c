@@ -39,11 +39,6 @@
 #include <persona/btlp/sides.h>
 #include <persona/btlp/status.h>
 
-/* Still assembly: the second pair of random pickers, one for each side. The
-   overlay carries two of each, the way it carries two of BtlOpenFxObj. */
-extern int func_800962D8(int mark);
-extern int func_800963F4(int mark);
-
 /* The attribute bit that says the record belongs to the other side, which is
    the whole of what picks between the two pickers. */
 #define AIL_OTHER_SIDE 0x200
@@ -70,7 +65,7 @@ void BtlAilmentTurnCharm(BtlActor *a, u_char *act)
 
     o = a->obj;
     if ((o->attr & AIL_OTHER_SIDE) == 0) {
-        slot = func_800962D8(o->mark_num);
+        slot = BtlPickOtherMember(o->mark_num);
         if (slot >= 0) {
             a->targets = 1 << slot;
             a->order = slot;
@@ -78,7 +73,7 @@ void BtlAilmentTurnCharm(BtlActor *a, u_char *act)
             return;
         }
     } else {
-        slot = func_800963F4(o->mark_num);
+        slot = BtlPickOtherEnemy(o->mark_num);
         if (slot >= 0) {
             a->targets = 1 << slot;
             a->order = slot;

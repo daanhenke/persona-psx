@@ -100,7 +100,7 @@ void BtlRefreshTacticsLines(void)
             row[TACTICS_COLUMN].clut    = TACTICS_CLUT_LIVE;
             row[TACTICS_COLUMN * 2].clut = TACTICS_CLUT_LIVE;
             row[TACTICS_COLUMN * 3].clut = TACTICS_CLUT_LIVE;
-            row[(g_btl_actors[i].unkC8 + 1) * TACTICS_COLUMN].clut = TACTICS_CLUT_PICKED;
+            row[(g_btl_actors[i].tactic + 1) * TACTICS_COLUMN].clut = TACTICS_CLUT_PICKED;
         } else {
             row[0].text                 = g_btl_name_empty;
             row[0].clut                 = TACTICS_CLUT_EMPTY;

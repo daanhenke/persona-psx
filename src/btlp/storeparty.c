@@ -56,7 +56,7 @@ void BtlStoreParty(void)
         /* The destination is worked out before the flag is stored; the
            other way round gcc schedules the store first. */
         c = &g_chars[g_party[i]];
-        g_save_actor_flag[i] = g_btl_actors[i].unkC8;
+        g_save_actor_flag[i] = g_btl_actors[i].tactic;
         memcpy(c, &g_btl_actors[i].c, sizeof(Char));
     }
     memcpy(g_formation_preset, g_btl_formation_preset,

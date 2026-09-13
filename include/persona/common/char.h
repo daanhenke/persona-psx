@@ -26,7 +26,9 @@ typedef struct {
                                      shape as the one it puts on money      */
     /* 0x18 */ int     unk18;     /* the curve's own entry for that level, and
                                      zero once the level is 99                */
-    /* 0x1C */ u_char  pad1C[4];
+    /* 0x1C */ int     unk1C;     /* the debug editor draws it as seven digits
+                                     beside unk10 and unk18; an enemy's record
+                                     takes its definition's +0x10 here      */
     /* 0x20 */ u_short equip[7];  /* inventory entries; 0 for an empty slot.
                                      [0] is the weapon, [1] the gun and [2]
                                      its ammunition - the gun's two numbers
@@ -70,7 +72,9 @@ typedef struct {
                                   /* The status screen draws stat_base as the
                                      bar and highlights stat - stat_base on top
                                      of it, and clamps both at 99. */
-    /* 0x56 */ u_char  pad56[1];
+    /* 0x56 */ u_char  unk56;     /* the debug editor writes the level into it
+                                     along with `level` and draws it beside
+                                     it                                      */
     /* 0x57 */ u_char  entry;     /* which list slot is active, 0xFF for none;
                                      CharRecalcStats reads list[entry] */
     /* 0x58 */ u_char  list[3];   /* 0xFF marks an empty entry              */

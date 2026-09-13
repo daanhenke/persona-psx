@@ -128,7 +128,7 @@ void BtlTakeParty(void)
         }
         party++;
         a->flags = 0;
-        a->unkC8 = g_options[OPTION_MEMBER + i];
+        a->tactic = g_options[OPTION_MEMBER + i];
         i++;
         a++;
     } while (i < BTL_PARTY);

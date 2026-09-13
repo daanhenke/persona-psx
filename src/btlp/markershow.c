@@ -142,7 +142,7 @@ void BtlRestoreMarkers(void)
             && g_btl_actors[i].marker == MARKER_PARKED) {
             g_btl_actors[i].flags &= ~MARKER_FLAG;
             g_btl_actors[i].marker = 0;
-            BtlShowMarker(i, 0, -(g_btl_actors[i].unkC8 == 0) & 3);
+            BtlShowMarker(i, 0, -(g_btl_actors[i].tactic == 0) & 3);
         }
         i++;
     } while (i < BTL_MARKERS);

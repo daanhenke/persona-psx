@@ -147,7 +147,6 @@ extern int     g_btl_gfx_sector;
 extern int     g_btl_slot_sound_base;
 extern int     g_btl_sound_base;
 extern short   D_800F4C86;
-extern u_char  D_800F4DC8[];
 extern long    D_800F4BF0[];
 extern u_short D_800F4D68;
 extern u_short D_800F4D6C;
@@ -481,7 +480,7 @@ void ovl_btlp_entry(void)
     i          = 0;
     D_800F4C86 = GetClut(g_btl_clut_line.x, g_btl_clut_line.y);
 
-    cell = D_800F4DC8;
+    cell = (u_char *)g_btl_reach;
     do {
         i++;
         *cell = 0;

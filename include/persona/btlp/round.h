@@ -134,6 +134,10 @@ extern u_char g_btl_boss20_shown;
    party side can be reached at all. */
 extern int BtlPickAiTarget(BtlActor *a, int target);
 extern int BtlAnyMemberTargetable(void);
+/* A fighter on one side picked at random, never the slot handed in; -1 when
+   there is nobody else. What charm turns a fighter round with. */
+extern int BtlPickOtherMember(int slot);
+extern int BtlPickOtherEnemy(int slot);
 
 /* The round, step by step. g_btl_turn walks g_btl_turn_order as far as
    g_btl_turns; g_btl_actor_turn is whose turn is being played out. */
@@ -253,11 +257,34 @@ extern void BtlTalkersLeaveField(void);
 extern void BtlReadyItemAction(BtlActor *a, const ItemDef *item);
 extern void BtlReadySpellAction(BtlActor *a);
 
-/* Paints the cells a move reaches onto the reach grid, from the shape and the
-   flags the item or spell carries, and answers with the first cell it covers
-   or -1 when it covers none. Everything that aims a move goes through it. */
+/* The reach grid: five lanes across and fifteen rows deep, indexed
+   [lane][row]. The enemies stand in rows 0..4 and the party from
+   REACH_PARTY_ROW on; the rows from REACH_GAP_ROW up to it are the empty
+   ground between the two sides. reach.c says how a shape is laid on it. */
+#define REACH_LANES     5
+#define REACH_ROWS      15
+#define REACH_CELLS     (REACH_LANES * REACH_ROWS)
+#define REACH_GAP_ROW   5
+#define REACH_PARTY_ROW 10
+
+extern u_char g_btl_reach[REACH_LANES][REACH_ROWS];
+extern u_char g_btl_reach_lines[][9];
+extern u_char g_btl_reach_bursts[][5];
+
+/* Lights the cells a move reaches and marks every fighter on the side it is
+   aimed at who stands on one as pickable, answering with the deepest row it
+   marked or -1 when it marked nobody. BtlMarkMoveArea throws a member's line
+   at the enemies, from the shape and flags the item or spell carries; the two
+   Around routines centre a burst on one fighter. BtlPickAiTarget is the
+   enemy's line at the party. Everything that aims a move goes through one. */
 extern int BtlMarkMoveArea(BtlActor *a, int shape, int flags);
-extern void BtlClearTalkMarks(void);
+extern int BtlMarkEnemiesAround(BtlActor *at, int shape);
+extern int BtlMarkPartyAround(BtlActor *at, int shape);
+/* The target bits for whoever the party's routines marked; BtlPickableMask is
+   the enemies'. */
+extern u_long BtlPartyPickableMask(void);
+/* Counts every fighter's timers down as a round ends. roundtick.c. */
+extern void BtlCountDownRound(void);
 extern void BtlBoxDismiss(void);
 
 /* Which move one enemy makes with its turn. */

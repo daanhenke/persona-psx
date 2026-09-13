@@ -58,7 +58,6 @@ extern void BtlTintActorClut(int actor, int r, int g, int b);
 extern int  BtlPickMember(short *slot);
 extern void BtlOpenItemBoard(void);
 extern void func_800C56CC(int slot);
-extern int  func_80094C40(void);
 
 
 int BtlPickTargetMember(BtlActor *a)
@@ -146,7 +145,7 @@ int BtlPickTargetParty(BtlActor *a)
     for (;;) {
         if ((g_btl_pad1_edge & g_btl_key_confirm) != 0) {
             a->order = g_btl_actor_turn;
-            a->targets = func_80094C40();
+            a->targets = BtlPartyPickableMask();
             BtlEnemiesResetGfx();
             break;
         }

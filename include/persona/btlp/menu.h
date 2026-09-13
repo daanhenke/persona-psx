@@ -31,6 +31,24 @@ typedef struct {
 #define BTL_MENU_WAIT (-0x100)
 #define BTL_PICK_WAIT (-0x100)
 
+/* The two menus whose cursor walks a table of neighbours: the debug board's,
+   and the placement menu's layout picker. Both answer an item on a confirm,
+   -1 on a cancel and BTL_PICK_WAIT otherwise. menunav.c. */
+extern int BtlDebugUpdate(void);
+extern int BtlPresetMenuUpdate(int on_field);
+/* The orders menu's picker, which answers -1 for either way out, and the
+   tactics page, which answers 0 on a cancel and -2 on the abort key. */
+extern int BtlOrdersMenuUpdate(void);
+extern int BtlTacticsMenuUpdate(void);
+/* The debug board's spell list, a page of ten at a time on `board`, which
+   is set turning when the cursor steps off either end. Answers the spell
+   on a confirm, -1 on a cancel. */
+struct BtlObj;
+extern int BtlSpellMenuUpdate(struct BtlObj *board);
+/* Redraws the tactics page's rows from each member's BtlActor.tactic.
+   menuboards.c. */
+extern void BtlRefreshTacticsLines(void);
+
 /* What a picker answers besides a slot: the second key backs out, the third
    abandons the whole thing. */
 #define BTL_PICK_CANCEL (-1)

@@ -29,6 +29,7 @@
 #include <rand.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/round.h>
 #include <persona/common/spell.h>
 
 /* Move ids that are spells: this many from the first, plus the free ones. */
@@ -77,14 +78,10 @@
    and without them the routine is four instructions short. */
 #define BTL_MOVE(a) (*(volatile u_char *)&(a)->move)
 
-extern int  BtlPickAiTarget(BtlActor *a, int reach);
-extern int  BtlPickableMask(void);
 extern void BtlSetPickable(void);
 extern int  BtlFrontMemberOrder(BtlActor *by);
 extern int  BtlPickRandomMember(void);
 extern int  BtlPickRandomEnemy(void);
-extern void func_80094A20(BtlActor *at, int reach);
-extern int  func_80094C40(void);
 
 void BtlAimMove(BtlActor *a)
 {
@@ -145,7 +142,7 @@ void BtlAimMove(BtlActor *a)
         }
         BtlSetPartyPickable();
         a->order = BtlPickRandomMember();
-        a->targets = func_80094C40();
+        a->targets = BtlPartyPickableMask();
         return;
     }
 
@@ -161,7 +158,7 @@ void BtlAimMove(BtlActor *a)
     case AIM_SIDE2:
         BtlPickAiTarget(a, g_spell_data[a->move].target);
         a->order = BtlFrontMemberOrder(a);
-        a->targets = func_80094C40();
+        a->targets = BtlPartyPickableMask();
         break;
     }
     return;
@@ -211,14 +208,14 @@ swing:
     case REACH_SIDE:
         BtlSetPartyPickable();
         a->order = BtlPickRandomMember();
-        a->targets = func_80094C40();
+        a->targets = BtlPartyPickableMask();
         break;
     default:
         BtlSetPartyPickable();
         slot = BtlPickRandomMember();
-        func_80094A20(&g_btl_actors[slot], g_spell_data[a->move].target);
+        BtlMarkPartyAround(&g_btl_actors[slot], g_spell_data[a->move].target);
         a->order = slot;
-        a->targets = func_80094C40();
+        a->targets = BtlPartyPickableMask();
         break;
     }
 }

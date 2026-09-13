@@ -9,13 +9,9 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <persona/btlp/battle.h>
-
-extern u_char D_800F4DC8[];
-
-#define BTL_DEBUG_GRID_BYTES 0x4B
-
+#include <persona/btlp/round.h>
 
 void BtlLoadDebugGrid(void)
 {
-    memcpy(g_btl_debug_grid_cells, D_800F4DC8, BTL_DEBUG_GRID_BYTES);
+    memcpy(g_btl_debug_grid_cells, g_btl_reach, REACH_CELLS);
 }

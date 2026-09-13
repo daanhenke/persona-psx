@@ -47,6 +47,7 @@ extern u_short g_btl_key_right;
 extern u_short g_btl_key_confirm;
 extern u_short g_btl_key_cancel;
 extern u_short g_btl_key_abort;
+extern u_short g_btl_key_r1;
 
 /* The two sideways bits BtlMenuKey hands back, which are the pad's own rather
    than the control scheme's. */

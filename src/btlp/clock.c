@@ -33,24 +33,31 @@ extern u_char g_playtime_sec;
 extern u_char g_playtime_frame;
 
 extern u_char g_btl_frame_due;
-extern u_char g_btl_vsync_count;
+extern volatile u_char g_btl_vsync_count;
 extern int    g_btl_frame_queued;
 extern int    g_btl_frame_ticks;
 
 #ifdef NON_MATCHING
 void BtlClockTick(void)
 {
-    g_btl_vsync_count++;
+    u_char *hours;
+    union {
+        u_int frames;
+        int waiting;
+    } tick;
+
+    hours = &g_playtime;
+    tick.waiting = ++g_playtime_frame < CLOCK_WRAP;
+    ++g_btl_vsync_count;
     g_btl_frame_ticks++;
-    if (++g_playtime_frame >= CLOCK_WRAP) {
+    if (!tick.waiting) {
         g_playtime_frame = 0;
         if (++g_playtime_sec >= CLOCK_WRAP) {
             g_playtime_sec = 0;
             if (++g_playtime_min >= CLOCK_WRAP) {
                 g_playtime_min = 0;
-                g_playtime++;
-                if (g_playtime > CLOCK_MAX_HOURS) {
-                    g_playtime = CLOCK_MAX_HOURS;
+                if (++*hours > CLOCK_MAX_HOURS) {
+                    *hours = CLOCK_MAX_HOURS;
                     g_playtime_min = CLOCK_WRAP - 1;
                     g_playtime_sec = CLOCK_WRAP - 1;
                     g_playtime_frame = CLOCK_WRAP - 1;
@@ -66,4 +73,3 @@ void BtlClockTick(void)
 #else
 INCLUDE_ASM("btlp/nonmatchings/clock", BtlClockTick);
 #endif
-

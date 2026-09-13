@@ -45,10 +45,6 @@ extern int (*g_btl_debug_actions[])(void);
 extern u_char g_btl_debug_hex[];
 #define DEBUG_HEX_DIGITS 2
 
-/* Runs the cursor over the grid. Answers the row on a confirm, -1 on a
-   cancel and BTL_PICK_WAIT while nothing has been decided - the same contract
-   BtlPickUpdate keeps. */
-extern int BtlDebugUpdate(void);
 
 /* The scene's music index, which this page is the only thing that edits.
 

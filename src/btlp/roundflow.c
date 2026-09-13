@@ -1078,7 +1078,7 @@ void BtlStageRound(void)
                 if ((g_btl_combatants[slowest].flags & 0x40) == 0) {
                     g_btl_combatants[slowest].unkD4 = 1;
                 } else {
-                    g_btl_combatants[slowest].padDD[1] = 1;
+                    g_btl_combatants[slowest].unkDE = 1;
                     g_btl_combatants[slowest].unkD4 = 0;
                 }
             }
@@ -1361,7 +1361,7 @@ void BtlStageRound(void)
                     g_btl_actors[slot].unkDB = 0;
                     slot++;
                 } while (slot < BTL_PARTY);
-                BtlClearTalkMarks();
+                BtlCountDownRound();
                 BtlTalkResume();
                 BtlPartyResetGfx();
                 BtlEnemiesResetGfx();
