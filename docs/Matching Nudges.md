@@ -855,6 +855,12 @@ to a `lui`/`addiu` pair apiece.
 - `g_btl_turn_script`, `g_btl_opening_lines`, `g_btl_member_actions`,
   `g_btl_enemy_lines`, `g_btl_enemy_actions` and `g_btl_enemy_line_next` were
   one 0x10B8-byte `D_800CE5BC`.
+- A loop over `table[i + 5]` folds the five into its strength-reduced counter
+  (`ori s1, zero, 0x68` and `%lo(table)`). An image that keeps the offset in
+  the symbol (`%lo(table+0x28)`) with the counter starting at `i * 8` is
+  reading a table of its own that begins there. `g_btl_fx_spread` was
+  `g_btl_fx_spread_90` and `g_btl_fx_spread_91`: [fxspell91.c](/src/btlp/fxspell91.c),
+  `BtlFxStart91`, 99.74% to exact.
 
 The same applies to sizes: `g_btl_enemies` was sized to one record where the
 table is nine, and every reference past the first came out as a fresh
@@ -1333,6 +1339,46 @@ last. Declared `[5][15]` and indexed `[lane][row]`, the base goes onto the
 scaled first index and the second is added to that, which is the image's order.
 
 - [reach.c](/src/btlp/reach.c) - `BtlMarkMoveArea`, 97.21% to exact.
+- The same goes for a row read in a loop: `g_btl_hit_rolls[hits][i]` inside
+  the loop, not `row = g_btl_hit_rolls[hits]` taken first, which works the
+  row out ahead of the table's address. [hitroll.c](/src/btlp/hitroll.c) -
+  `BtlRollHits`, 94.59% to exact.
+
+## A row read inside a loop is reached through pointer arithmetic on the table
+
+When the image loads a loop's compare constant (`ori a1, zero, 0xff`) *before*
+it builds the row's address (`lui`/`addiu` of the table, then the scaled row),
+the row was an address worked out inside the loop and strength-reduced after
+invariant motion. `(table + slot)->cell[i]` does that; `table[slot].cell[i]`,
+`(table + slot * 25)[i]`, a row pointer taken before the loop, or indexing the
+cells as one long run all fold the row into the symbol's address and build it
+ahead of the constant.
+
+- [formationpreset.c](/src/btlp/formationpreset.c) - `BtlFormationPresetEmpty`
+  57.89% and `BtlFormationPresetFits` 86.21%, both to exact.
+- [placecursor.c](/src/btlp/placecursor.c) - `BtlStandPreset`, guarded at
+  96.31%, to exact; `BtlPlacePreset` 91.95% to 98.52%.
+
+## A byte local: a copy before the int tests, and a frame in a leaf
+
+A status read with `lb` into one register and copied into another
+(`addu v1, a1, zero`) before a range test, in a leaf that sets up an 8-byte
+frame it never uses, is a `signed char` local. The int comparisons work on a
+widened copy of the byte pseudo, and the pseudo's slot is the frame. An `int`
+local with the cast on the load gives neither; a spare array gives the frame
+but not the copy.
+
+- [enemy2.c](/src/btlp/enemy2.c) - `BtlBattleOutcome`, 93.61% to exact.
+
+## Initialise the counter in the `for`, not ahead of the test before the loop
+
+A loop whose entry test is `blez` on the bound, with the counter zeroed in a
+delay slot above it, has the zero in its own `for (i = 0; ...)`. Zeroing the
+counter ahead of an `if` that comes before the loop and writing `for (; ...)`
+gives a `slt`/`beqz` entry test instead - and, in `BtlBoardOpen`, an 8-byte
+smaller frame.
+
+- [boardopen.c](/src/btlp/boardopen.c) - `BtlBoardOpen`, 96.91% to exact.
 
 ## Reuse the first loop's locals in the second
 

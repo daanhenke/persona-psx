@@ -29,7 +29,9 @@ typedef struct {
     /* 0x7 */ u_char p8;
 } BtlBoardDef;                         /* 8 bytes */
 
-extern BtlObj *BtlBoardOpen(const BtlBoardDef *parts, const long *pos);
+/* Not const: a first record of index 9 is rewritten to the editor picture
+   D_800CCA24 picks, in the table itself, as the board goes up. boardopen.c. */
+extern BtlObj *BtlBoardOpen(BtlBoardDef *parts, const long *pos);
 extern void    BtlBoardShut(BtlObj *board);
 
 /* The boards a menu outside boards.c puts up: the debug page, the switch

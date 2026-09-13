@@ -251,7 +251,6 @@ segments:
       - [0x14E80, asm, btlp_27]
       # The answer an effect gives, and two of its cursor handlers.
       - [0x15234, c, effectprompt]
-      - [0x155FC, asm, btlp_27_0]
       - [0x15798, c, effectcursor]
       - [0x15A84, c, seqvalue]
       - [0x15B38, c, insert]
@@ -379,7 +378,8 @@ segments:
       # The reach grid: which fighters a move can land on.
       - [0x301B0, c, reach]
       - [0x30934, c, enemy2]
-      - [0x30984, asm, btlp_57_x1]
+      # How many times a swing lands.
+      - [0x30AC0, c, hitroll]
       - [0x30B54, c, itembag]
       - [0x30C68, c, packgrid]
       - [0x30E30, c, ailtaketurn]
@@ -438,7 +438,8 @@ segments:
       - [0x3EA80, c, targetpick]
       - [0x3F01C, asm, btlp_61_x1]
       - [0x3F404, c, pickupdate]
-      - [0x3F5F8, asm, btlp_62]
+      # One frame of the two-option prompt.
+      - [0x3F5F8, c, choiceupdate]
       # The Persona board's two pages: the spell list and the swap.
       - [0x3F798, c, personamenu]
       - [0x3FC80, asm, btlp_62_0]
@@ -454,7 +455,8 @@ segments:
       - [0x43538, asm, btlp_63_x2]
       # The debug page's switch board.
       - [0x437C8, c, debugflags]
-      - [0x43A40, asm, btlp_63_x2_a]
+      # Putting a board up and taking it down.
+      - [0x43A40, c, boardopen]
       - [0x43C18, c, markerspawn]
       - [0x43F2C, c, markerrefresh]
       - [0x43F9C, asm, btlp_64]
@@ -489,9 +491,8 @@ segments:
       - [0x48588, c, numberright]
       - [0x48754, c, persona]
       - [0x4879C, c, markeridle]
-      - [0x48834, asm, btlp_68]
-      # Two more of the motions a display record can be put through.
-      - [0x48A00, c, objmotion4]
+      # Three more of the motions a display record can be put through.
+      - [0x48834, c, objmotion4]
       - [0x48CC0, asm, btlp_68_0]
       - [0x48F4C, c, objmotion8]
       - [0x49138, asm, btlp_68_a]
@@ -627,12 +628,9 @@ segments:
       - [0x6050C, c, unready2]
       - [0x605AC, c, cursor2]
       - [0x60648, c, targetcursor]
-      - [0x607E0, asm, btlp_69_x5]
-      # Bringing the party back to how the field shows it between turns.
-      - [0x60AB4, c, partyresetgfx]
-      - [0x60EB4, asm, btlp_69_x5_0]
+      # Bringing both sides back to how the field shows them between turns.
+      - [0x607E0, c, partyresetgfx]
       - [0x611A4, c, dimsides]
-      - [0x6132C, asm, btlp_69_x5_a]
       - [0x615F0, c, pickable]
       - [0x61780, c, partyattr]
       - [0x61924, c, formationpreset]

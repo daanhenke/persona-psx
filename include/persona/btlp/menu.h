@@ -69,6 +69,8 @@ extern void BtlRefreshTacticsLines(void);
 #define PICK_SE_MOVE 3
 
 extern void BtlPartyResetGfx(void);
+/* The same for one member, whatever state it is in. partyresetgfx.c. */
+extern void BtlMemberResetGfx(int slot);
 
 /* Lights one member at full colour with their marker chosen, and sends the
    rest of the living party toward the background with theirs. */

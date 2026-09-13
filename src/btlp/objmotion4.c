@@ -1,9 +1,18 @@
-/* Persona 1 (JP) - two more of the motions a display record can be put
+/* Persona 1 (JP) - three more of the motions a display record can be put
  * through.  BTLP only.
+ *   0x800ACBD4 BtlObjMotion03
  *   0x800ACDA0 BtlObjMotion04  0x800ACF64 BtlObjMotion05
  *
- * Entries 4 and 5 of g_btl_obj_motion, named for the motion they answer to the
- * way the rest of the table is (see objmotion8.c).
+ * Entries 3, 4 and 5 of g_btl_obj_motion, named for the motion they answer to
+ * the way the rest of the table is (see objmotion8.c).
+ *
+ * 03 is the grow a board is put up with: the width first and then the height,
+ * each gaining a third of itself a frame until it passes full size. Once its
+ * timer is out the record is shown, unless it is flagged to stay hidden while
+ * it grows; once the width is full it is shown unless flagged to stay hidden
+ * after, and a record flagged to be relit is walked to its blue at once and
+ * has its shadow turned off. The height reaching full size ends the motion.
+ * With g_btl_fast_anim raised the record is put at full size at once.
  *
  * 04 shrinks a record away in two phases, the height first and then the
  * width, each losing a third of itself a frame until it is down to scale_to.
@@ -47,6 +56,75 @@
 #define OBJ_LIT  0x80
 #define OBJ_DIM  0x20
 #define OBJ_SNAP 0xFF
+
+/* The grow: full size, its two phases, the two flags that keep the record
+   hidden while it grows and once it has, and the draw a relit record keeps
+   its shadow under. */
+#define GROW_FULL        0x1000
+#define GROW_WIDTH       0
+#define GROW_HEIGHT      1
+#define GROW_HIDE_DURING 0x400
+#define GROW_HIDE_AFTER  0x800
+#define GROW_SHADOW_DRAW 9
+
+void BtlObjMotion03(BtlObj *obj)
+{
+    if (g_btl_fast_anim != 0) {
+        obj->attr &= ~BTL_OBJ_HIDDEN;
+        obj->scale_x = GROW_FULL;
+        obj->scale_y = GROW_FULL;
+        obj->motion = 0;
+        obj->phase = 0;
+        obj->draw &= ~OBJ_DRAW_XFORM;
+        if (obj->attr & OBJ_RELIGHT) {
+            obj->rgb_to[0] = 0;
+            obj->rgb_to[1] = 0;
+            obj->rgb_to[2] = OBJ_LIT;
+            obj->fade = OBJ_SNAP;
+            obj->attr |= BTL_OBJ_NO_SHADOW;
+        }
+        return;
+    }
+
+    obj->draw |= OBJ_DRAW_XFORM;
+    switch (obj->phase) {
+    case GROW_WIDTH:
+        if (obj->timer != 0) {
+            break;
+        }
+        if ((obj->attr & GROW_HIDE_DURING) == 0) {
+            obj->attr &= ~BTL_OBJ_HIDDEN;
+        }
+        obj->scale_x += obj->scale_x / 3;
+        if (obj->scale_x > GROW_FULL) {
+            obj->scale_x = GROW_FULL;
+            if ((obj->attr & GROW_HIDE_AFTER) == 0) {
+                obj->attr &= ~BTL_OBJ_HIDDEN;
+            }
+            if (obj->attr & OBJ_RELIGHT) {
+                obj->rgb_to[2] = OBJ_LIT;
+                obj->fade = OBJ_SNAP;
+                obj->rgb_to[0] = 0;
+                obj->rgb_to[1] = 0;
+                if (obj->draw != GROW_SHADOW_DRAW) {
+                    obj->attr |= BTL_OBJ_NO_SHADOW;
+                }
+            }
+            obj->phase++;
+        }
+        break;
+
+    case GROW_HEIGHT:
+        obj->scale_y += obj->scale_y / 3;
+        if (obj->scale_y > GROW_FULL) {
+            obj->scale_y = GROW_FULL;
+            obj->motion = 0;
+            obj->phase = 0;
+            obj->draw &= ~OBJ_DRAW_XFORM;
+        }
+        break;
+    }
+}
 
 void BtlObjMotion04(BtlObj *obj)
 {

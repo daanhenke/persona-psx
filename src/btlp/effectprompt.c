@@ -1,15 +1,15 @@
-/* Persona 1 (JP) - the answer an effect gives, and two of its cursor
+/* Persona 1 (JP) - the answer an effect gives, and three of its cursor
  * handlers.  BTLP only.
  *   0x800795D4 BtlEffectAnswer  0x80079600 BtlEffectCursorConfirm
- *   0x800796A0 BtlEffectCursorNumber
+ *   0x800796A0 BtlEffectCursorNumber  0x8007999C BtlEffectCursorList
  *
  * An effect that asks something keeps its answer in the halfword at +4:
  * BTL_EFFECT_MARK while nothing has been decided, and whatever its cursor
  * handler writes once something has. BtlEffectAnswer is how the talk board
  * reads it.
  *
- * The two handlers are entries 1 and 2 of g_btl_effect_cursor_fn, and run for
- * the effect the pad is talking to. BtlEffectCursorConfirm clears the answer
+ * The three handlers are entries 1 to 3 of g_btl_effect_cursor_fn, and run
+ * for the effect the pad is talking to. BtlEffectCursorConfirm clears the answer
  * every frame and then answers the cell the cursor is on for a confirm, or -1
  * for a cancel.
  *
@@ -122,6 +122,52 @@ void BtlEffectCursorNumber(void)
             *(long *)step->row.text = 0;
             *(long *)step->row.text = value;
             break;
+        }
+    } else if (BtlInputKeys() & g_btl_key_confirm) {
+        e->kind |= BTL_EFFECT_NOPAD;
+    }
+}
+
+/* BtlEffectCursorList picks a place in the list of words at the step's text,
+   which ends at LIST_END, and keeps it in u.list.first. A confirm starts the
+   pick; while it runs the answer is cleared every frame, up and down move
+   along the list without leaving it, and a confirm answers the place and a
+   cancel -1, either of them ending the pick. */
+#define LIST_END (-1)
+
+void BtlEffectCursorList(void)
+{
+    BtlEffect    *e;
+    BtlEffectRow *step;
+    int           place;
+
+    e = g_btl_effect[g_btl_effect_cur];
+    step = g_btl_effect_step[g_btl_effect_cur];
+    e->answer = BTL_EFFECT_MARK;
+    if (e->kind & BTL_EFFECT_NOPAD) {
+        if (BtlInputKeys() & g_btl_key_up) {
+            BtlSePlay(1, 0);
+            place = step->u.list.first - 1;
+            if (place < 0) {
+                place = 0;
+            }
+            step->u.list.first = place;
+        }
+        if (BtlInputKeys() & g_btl_key_down) {
+            BtlSePlay(1, 0);
+            if (((long *)step->text)[step->u.list.first + 1] != LIST_END) {
+                step->u.list.first++;
+            }
+        }
+        if (BtlInputKeys() & g_btl_key_confirm) {
+            BtlSePlay(1, 1);
+            e->answer = step->u.list.first;
+            e->kind &= ~BTL_EFFECT_NOPAD;
+        }
+        if (BtlInputKeys() & g_btl_key_cancel) {
+            BtlSePlay(1, 2);
+            e->answer = ANSWER_CANCEL;
+            e->kind &= ~BTL_EFFECT_NOPAD;
         }
     } else if (BtlInputKeys() & g_btl_key_confirm) {
         e->kind |= BTL_EFFECT_NOPAD;

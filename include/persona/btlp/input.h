@@ -52,10 +52,12 @@ extern u_short g_btl_key_r2;
 extern u_short g_btl_key_square;
 extern u_short g_btl_key_page;
 
-/* The two sideways bits BtlMenuKey hands back, which are the pad's own rather
+/* The direction bits BtlMenuKey hands back, which are the pad's own rather
    than the control scheme's. */
-#define PAD_LEFT  0x8000
+#define PAD_UP    0x1000
 #define PAD_RIGHT 0x2000
+#define PAD_DOWN  0x4000
+#define PAD_LEFT  0x8000
 
 extern int BtlMenuKey(void);
 

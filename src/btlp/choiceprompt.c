@@ -4,7 +4,7 @@
  *
  * A prompt is two objects standing one above the other, each a picture out of
  * g_btl_pick_defs with a frame in front of it. BtlChoiceSpawn builds one set
- * and leaves the two frames in that set's array; func_800A3998 is what reads
+ * and leaves the two frames in that set's array; BtlChoiceUpdate is what reads
  * the pad and keeps the set's row.
  *
  * There are two sets, built from the same routine with different pictures -
@@ -18,31 +18,14 @@
  * shuts with - phase one, down to a hundredth, motion four.
  */
 #include <decomp/types.h>
+#include <persona/btlp/choice.h>
 #include <persona/btlp/object.h>
-
-/* Options to a prompt. */
-#define CHOICE_OPTIONS 2
-
-/* How bright the option that is up is drawn, and the other one. */
-#define CHOICE_LIT  0xFF
-#define CHOICE_DARK 0x60
-
-/* One frame to get there. */
-#define CHOICE_FADE 0xFF
 
 /* What a prompt shuts with: unity in BtlObjSetScaleTo's units, and the motion
    that walks down to it. */
 #define CHOICE_SHUT_SCALE 0x100
 #define CHOICE_SHUT_PHASE 1
 #define CHOICE_SHUT_MOTION 4
-
-/* Builds one set and leaves its two frames in that set's array. Still asm. */
-extern void BtlChoiceSpawn(int set);
-
-extern BtlObj *g_btl_choice0_objs[];
-extern BtlObj *g_btl_choice1_objs[];
-extern short   g_btl_choice0_row;
-extern short   g_btl_choice1_row;
 
 /* The frame is what the set keeps, so the colour goes on the piece behind it -
    and it is read back through the array each time rather than held, which is

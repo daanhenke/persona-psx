@@ -30,6 +30,7 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <persona/btlp/board.h>
+#include <persona/btlp/choice.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
 
@@ -57,8 +58,6 @@ extern const u_char g_btl_preset_name[];
 extern const u_char g_btl_preset_last_line[];
 extern const u_char g_btl_name_empty[];
 
-/* Which row the choice above the board is on. */
-extern short g_btl_choice0_row;
 
 /* The board itself, and what it is built from. */
 extern BtlObj            *g_btl_formation_board;

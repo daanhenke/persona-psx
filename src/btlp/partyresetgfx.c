@@ -1,5 +1,13 @@
-/* Persona 1 (JP) - putting the party back as the field shows it.  BTLP only.
- *   0x800C4E54 BtlPartyResetGfx
+/* Persona 1 (JP) - putting both sides back as the field shows them.
+ * BTLP only.
+ *   0x800C4B80 BtlEnemiesResetGfx  0x800C4E54 BtlPartyResetGfx
+ *   0x800C5254 BtlMemberResetGfx
+ *
+ * BtlEnemiesResetGfx does for every occupied enemy slot what the party's does
+ * for a member, with the enemy's own palettes and scripts: its flinch while it
+ * is flagged as having flinched, the script it was spawned on otherwise. It
+ * has no weak stance and no shadow to show, and it clears g_btl_reach too.
+ * BtlMemberResetGfx is the party's for one member, whatever its state.
  *
  * The counterpart of BtlDimParty, and what a pick or a menu calls once it is
  * done with the party. Every member still in the fight gets its palette back
@@ -40,6 +48,52 @@
 extern u_char *g_btl_actor_clut;
 extern u_char *g_btl_actor_clut_to;
 extern u_char *g_btl_actor_clut_base;
+extern u_char *g_btl_enemy_clut;
+extern u_char *g_btl_enemy_clut_to;
+extern u_char *g_btl_enemy_clut_base;
+
+void BtlEnemiesResetGfx(void)
+{
+    BtlObj *o;
+    short   level;
+    u_char  fade;
+    u_char  script;
+    u_char *cell;
+    int     i;
+
+    for (i = 0; i < BTL_ENEMIES; i++) {
+        if (g_btl_combatants[i].c.key != 0) {
+            o = g_btl_combatants[i].obj;
+            memcpy(g_btl_enemy_clut + i * CLUT_BYTES,
+                   g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            memcpy(g_btl_enemy_clut_to + i * CLUT_BYTES,
+                   g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            if (o->actor->flags & BTL_ACTOR_FLINCHED) {
+                script = g_btl_models[o->kind].hit;
+            } else {
+                script = g_btl_models[o->kind].spawn;
+            }
+            BtlObjSetScript(o, (BtlSeqStep *)o->scripts[script]);
+            level = RESET_LEVEL;
+            fade = RESET_FADE;
+            o->motion = 0;
+            o->fade = fade;
+            o->rgb_to[0] = level;
+            o->rgb_to[1] = level;
+            o->rgb_to[2] = level;
+            o->attr &= ~BTL_OBJ_PICKED;
+            o->mark->fade = fade;
+            o->mark->rgb_to[0] = level;
+            o->mark->rgb_to[1] = level;
+            o->mark->rgb_to[2] = level;
+            BtlObjStatusTint(o);
+        }
+    }
+    cell = (u_char *)g_btl_reach;
+    for (i = 0; i < REACH_CELLS; i++) {
+        *cell++ = 0;
+    }
+}
 
 void BtlPartyResetGfx(void)
 {
@@ -101,4 +155,38 @@ void BtlPartyResetGfx(void)
     for (i = 0; i < REACH_CELLS; i++) {
         *cell++ = 0;
     }
+}
+
+void BtlMemberResetGfx(int slot)
+{
+    BtlObj *o;
+    u_char *row;
+
+    o = g_btl_actors[slot].obj;
+    memcpy(g_btl_actor_clut + slot * CLUT_BYTES,
+           g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
+    memcpy(g_btl_actor_clut_to + slot * CLUT_BYTES,
+           g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
+    if (o->actor->c.hp_max / 4 >= o->actor->c.hp) {
+        row = &g_btl_member_scripts[SCRIPT_WEAK + o->kind * MEMBER_SCRIPT_MODEL];
+    } else if (o->actor->flags & BTL_ACTOR_FLINCHED) {
+        row = &g_btl_member_scripts[SCRIPT_HIT + o->kind * MEMBER_SCRIPT_MODEL];
+    } else {
+        row = &g_btl_member_scripts[SCRIPT_STAND + o->kind * MEMBER_SCRIPT_MODEL];
+    }
+    BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+        row[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+    o->motion = 0;
+    o->phase = 0;
+    o->fade = RESET_FADE;
+    o->rgb_to[0] = RESET_LEVEL;
+    o->rgb_to[1] = RESET_LEVEL;
+    o->rgb_to[2] = RESET_LEVEL;
+    o->attr &= ~BTL_OBJ_PICKED;
+    o->mark->fade = RESET_FADE;
+    o->mark->rgb_to[0] = RESET_LEVEL;
+    o->mark->rgb_to[1] = RESET_LEVEL;
+    o->mark->rgb_to[2] = RESET_LEVEL;
+    BtlObjClearAttr(o->shadow, BTL_OBJ_HIDDEN);
+    BtlObjStatusTint(o);
 }

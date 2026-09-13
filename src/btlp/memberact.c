@@ -17,6 +17,7 @@
 #include <persona/main/cd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/choice.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/pack.h>
 #include <persona/btlp/object.h>
@@ -58,8 +59,6 @@
 
 extern const BtlObjDef g_btl_pick_defs[];
 extern const BtlObjDef g_btl_obj_defs[];
-extern BtlObj         *g_btl_choice0_objs[];
-extern BtlObj         *g_btl_choice1_objs[];
 
 long g_btl_choice_pos[CHOICE_SETS][4] = {
     {0x280000, 0x180000, 0, 0},
@@ -238,7 +237,7 @@ extern u_char g_btl_member_voice[];
 
 extern int  BtlMarkMoveArea(BtlActor *a, int area, int spread);
 extern int  BtlSlowestOrder(void);
-extern int  func_80094E60(int hits);
+extern int  BtlRollHits(int hits);
 extern void BtlReadVoiceBank(int entry);
 extern void BtlOpenVoiceBank(void);
 extern void BtlMemberStrike(BtlObj *o);
@@ -302,7 +301,7 @@ void BtlMemberMotion02(BtlObj *o)
             g_btl_hit_slot = slot + SWING_FIRST_ENEMY;
             a->order = g_btl_hit_slot;
         }
-        g_btl_hits_left = func_80094E60(g_btl_swing_item->hits);
+        g_btl_hits_left = BtlRollHits(g_btl_swing_item->hits);
         scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
                                         + o->kind * MEMBER_SCRIPT_MODEL];
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[

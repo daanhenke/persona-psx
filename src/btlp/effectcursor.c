@@ -23,9 +23,6 @@
 #include <persona/btlp/input.h>
 #include <persona/btlp/sound.h>
 
-/* Set on an effect that is not taking the pad. */
-#define BTL_EFFECT_NOPAD 0x10
-
 /* The bank and sound every move makes. */
 #define BTL_EFFECT_CLICK_BANK 1
 #define BTL_EFFECT_CLICK_SE   0

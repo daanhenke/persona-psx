@@ -221,6 +221,10 @@ typedef struct BtlActor {
    still a target, and an easy one. */
 #define BTL_STATUS_STONE 0xF
 
+/* The one beside it that also leaves a fighter unable to act, which the
+   battle's outcome counts the same way. */
+#define BTL_STATUS_PALYZE 0xE
+
 /* Where a fighter's own order is kept while a counter-attack borrows it, so
    the turn it interrupted can be put back. The target mask beside it at
    0x800F5AAC is not here: it is written as a whole word and read back as a

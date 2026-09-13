@@ -72,6 +72,10 @@ extern u_char g_btl_debug_no_flee;
 /* And one that keeps a fight to the party side alone. */
 extern u_char g_btl_debug_party_only;
 
+/* And one that keeps a wiped party from losing: BtlBattleOutcome raises
+   g_btl_party_lost only while it is zero, which it is on disc. */
+extern u_char g_btl_debug_no_defeat;
+
 /* All thirty-two of those switches, one byte each, as the debug page's flag
    editor flips them; the named ones above are members of it. */
 extern u_char g_btl_debug_flags[];
