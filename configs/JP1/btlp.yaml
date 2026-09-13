@@ -563,7 +563,6 @@ segments:
       - [0x55890, c, fxspell32]
       - [0x559B8, c, fxstack]
       - [0x55A50, c, fxspell33]
-      - [0x55B50, asm, btlp_69_c_k_a]
       - [0x55EB8, c, fxspell34]
       - [0x55F0C, c, fxstep36]
       - [0x56318, c, fxspell38]
