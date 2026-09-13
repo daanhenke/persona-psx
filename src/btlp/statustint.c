@@ -12,7 +12,6 @@
  * included, goes back to white at the ordinary rate.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
@@ -26,37 +25,46 @@
 #define BTL_TINT_NOW   0xFF
 #define BTL_TINT_WALK  8
 
-extern const u_char g_btl_tint_ail4[];
-extern const u_char g_btl_tint_ail5[];
+extern u_char g_btl_tint_ail4[];
+extern u_char g_btl_tint_ail5[];
 
-#ifdef NON_MATCHING
 void BtlObjStatusTint(BtlObj *obj)
 {
-    BtlObj *shadow;
-    int     blue;
+    int     red;
+    union {
+        BtlActor *actor;
+        u_long mask;
+    } work;
 
     obj->fade = BTL_TINT_NOW;
     obj->attr &= ~BTL_OBJ_NO_SHADOW;
-    switch (*(signed char *)&obj->actor->c.status) {
-    case BTL_AIL_TINT_A:
+    work.actor = obj->actor;
+    switch ((signed char)work.actor->c.status) {
+    case BTL_AIL_TINT_A: {
+        BtlObj *shadow;
+        red = g_btl_tint_ail4[0];
         shadow = obj->shadow;
-        obj->rgb_to[0] = g_btl_tint_ail4[0];
+        obj->rgb_to[0] = red;
         obj->rgb_to[1] = g_btl_tint_ail4[1];
-        blue = g_btl_tint_ail4[2];
-        goto tinted;
-    case BTL_AIL_TINT_B:
-        shadow = obj->shadow;
-        obj->rgb_to[0] = g_btl_tint_ail5[0];
-        obj->rgb_to[1] = g_btl_tint_ail5[1];
-        blue = g_btl_tint_ail5[2];
-    tinted:
-        /* Both ailments finish the same way and the original shares the tail;
-           the goto is what keeps the last store and the shadow in one block. */
-        obj->rgb_to[2] = blue;
-        shadow->attr &= ~BTL_OBJ_HIDDEN;
+        obj->rgb_to[2] = g_btl_tint_ail4[2];
+        work.mask = ~BTL_OBJ_HIDDEN;
+        shadow->attr &= work.mask;
         break;
+    }
+    case BTL_AIL_TINT_B: {
+        BtlObj *shadow;
+        red = g_btl_tint_ail5[0];
+        shadow = obj->shadow;
+        obj->rgb_to[0] = red;
+        obj->rgb_to[1] = g_btl_tint_ail5[1];
+        obj->rgb_to[2] = g_btl_tint_ail5[2];
+        work.mask = ~BTL_OBJ_HIDDEN;
+        shadow->attr &= work.mask;
+        break;
+    }
     case BTL_STATUS_LIFTED:
-        obj->attr |= BTL_OBJ_NO_SHADOW;
+        /* The original rereads the flags after the initial shadow clear. */
+        obj->attr = *(volatile u_long *)&obj->attr | BTL_OBJ_NO_SHADOW;
         obj->shadow->attr |= BTL_OBJ_HIDDEN;
         obj->rgb_to[0] = BTL_TINT_WHITE;
         obj->rgb_to[1] = BTL_TINT_WHITE;
@@ -72,7 +80,4 @@ void BtlObjStatusTint(BtlObj *obj)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/statustint", BtlObjStatusTint);
-#endif
 

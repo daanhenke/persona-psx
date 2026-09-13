@@ -11,7 +11,6 @@
  * The rate doubles when the field is being drawn every other frame, so the
  * breathing takes the same time either way.
  */
-#include <decomp/include_asm.h>
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -28,13 +27,6 @@
 #define PULSE_RATE 0x10
 #define PULSE_FAST 0x20
 
-/* Forty-three of the forty-eight instructions. What is left is the rate: the
-   image keeps it in a saved argument register alongside the walked-to colour
-   and sets it in each arm, and every spelling tried here - the rate as a local
-   set before the half-rate flag or after it, the flag read at the test
-   instead, the fade written in each arm of the test - leaves the two in each
-   other's registers. */
-#ifdef NON_MATCHING
 void BtlPulsePicked(BtlObj *o)
 {
     int rate;
@@ -49,25 +41,28 @@ void BtlPulsePicked(BtlObj *o)
             o->attr &= ~BTL_OBJ_PICKED;
             return;
         }
-        half = g_btl_half_rate;
-        to = PULSE_DIM;
+        /* Keep the rate initialization in this arm's own block. */
+        do {
+            rate = PULSE_RATE;
+            half = g_btl_half_rate;
+            to = PULSE_DIM;
+        } while (0);
     } else {
         if (*(long *)&o->rgb[0] == PULSE_LIT_PAIR && o->rgb[2] == PULSE_LIT) {
             o->attr |= BTL_OBJ_PICKED;
             return;
         }
-        half = g_btl_half_rate;
-        to = PULSE_LIT;
+        do {
+            rate = PULSE_RATE;
+            half = g_btl_half_rate;
+            to = PULSE_LIT;
+        } while (0);
     }
     o->rgb_to[0] = to;
     o->rgb_to[1] = to;
     o->rgb_to[2] = to;
     if (half != 0) {
-        o->fade = PULSE_FAST;
-    } else {
-        o->fade = PULSE_RATE;
+        rate = PULSE_FAST;
     }
+    o->fade = rate;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/pulsepick", BtlPulsePicked);
-#endif
