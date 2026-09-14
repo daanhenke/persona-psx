@@ -24,6 +24,7 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/stage.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/gfx.h>
 
 /* The rest of the control scheme's masks. The four directions and the help key
    are the same under either scheme; these are the ones it moves. */
@@ -183,7 +184,6 @@ extern void BtlDebugWaitArgs(const char *fmt, int a, int b, int c);
 extern void BtlClockTick(void);
 extern void BtlUploadPackedTim(u_char *src, int tx, int ty, int cx, int cy,
                                int n);
-extern void BtlUploadTim(u_char *src, int tx, int ty, int cx, int cy, int n);
 extern void BtlBuildMesh(void);
 extern void BtlTakeParty(void);
 extern void BtlLoadPersonas(void);
@@ -193,10 +193,8 @@ extern void BtlSpawnParty(void);
 extern void BtlSpawnEnemies(int encounter);
 extern void BtlShowAilmentMarks(int on);
 extern void BtlAverageSides(void);
-extern void BtlUnpack(u_char *dest, const u_char *src);
 extern void BtlSpawnMarkers(void);
 extern void BtlPickSpawn(void);
-extern int  BtlBindGfx(u_int kind, int index, u_char **image);
 
 /* The one-shade CLUT the battle lays over the stage buffer before uploading
    it: entry nought transparent, every other entry the same grey. */
@@ -598,7 +596,7 @@ moon_orders_done:
     BtlShowAilmentMarks(1);
     BtlAverageSides();
     BtlUnpack(BTL_LOAD_BUF, D_800E010C);
-    BtlUploadTim(BTL_LOAD_BUF, 0xD, 0x1D, 0, 0x80, 1);
+    BtlUploadTim((u_long *)BTL_LOAD_BUF, 0xD, 0x1D, 0, 0x80, 1);
     DrawSync(0);
 
     /* An ambush and a pincer each open with their own line; anything else opens

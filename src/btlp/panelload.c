@@ -19,6 +19,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/gfx.h>
 
 /* One set of primitives per frame buffer, and four corner triangles each. */
 #define PANEL_BUFFERS 2
@@ -58,7 +59,6 @@ extern VECTOR   g_btl_panel_scale;
 extern short    g_btl_panel_rgb[];
 extern int      g_btl_panel_state;
 
-extern void BtlUnpack(u_char *dst, const u_char *src);
 extern void BtlHighlightInitPrims(void);
 
 #ifdef NON_MATCHING

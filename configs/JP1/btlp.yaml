@@ -487,7 +487,7 @@ segments:
       - [0x43A40, c, boardopen]
       - [0x43C18, c, markerspawn]
       - [0x43F2C, c, markerrefresh]
-      - [0x43F9C, asm, btlp_64]
+      - [0x43F9C, c, markerbuild]
       # The debug character editor's board.
       - [0x446A4, c, editboard]
       - [0x44D9C, asm, btlp_64_x1]

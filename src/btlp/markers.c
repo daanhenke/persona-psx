@@ -21,20 +21,10 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
-/* Markers to a row, and how wide one is. */
-#define MARKER_ROW 5
-
-/* The two places a row can start from. */
-#define MARKER_X_NEAR (-0xC)
-#define MARKER_X_FAR  (-0x2D)
-
-/* Pixels per grid column, once the doubled column has been halved. */
-#define MARKER_X_STEP 4
-
 void BtlPlaceMemberMarkers(int row, int near)
 {
-    BtlMarker *mark;
-    int        slot;
+    BtlGfxCell *mark;
+    int         slot;
 
     mark = &g_btl_member_marker[row * MARKER_ROW];
     slot = 0;

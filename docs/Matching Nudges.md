@@ -1953,3 +1953,96 @@ had been declared `u_char`; as `int`, both callers in nextturn.c lose the mask
 and the `-1`, and roundflow.c's definition compiles exactly as before.
 
 - [nextturn.c](/src/btlp/nextturn.c), [roundflow.c](/src/btlp/roundflow.c).
+
+## A prologue that biases a table's address is a pointer walked by hand
+
+"Index a record array rather than walking it" has a reverse. Where the image
+sets up `addiu s4, t3, 0x64` in the prologue, reads every field at a negative
+offset from it, and keeps the unbiased address spilled to the stack beside it,
+the source walked the record with `a++` from before the loop. Taken afresh each
+turn - `a = &g_btl_actors[i]` - gcc works it out again from the byte offset
+instead of keeping a register of its own. The same goes for a row of text
+records stepped five at a time.
+
+    i = 0;
+    row = g_btl_marker_rows[0];
+    a = g_btl_actors;
+    for (; i < BTL_PARTY; i++, a++, row += MARKER_ROWS) {
+
+The order of the three assignments is the image's preheader order.
+
+- [markerbuild.c](/src/btlp/markerbuild.c) - `BtlBuildMarkers`, 87.58% taken
+  each turn, 90.08% walked, and 96.26% once the assignments were in the
+  preheader's order.
+
+## A store after an equality test is indexed by the older counter
+
+After `if (i != j) { ... } else { mark[j].u = SELF; }`, cse knows `i == j` in
+the else arm and rewrites the store as `mark[i].u` - `i` is the older
+register, so it is the one kept. That address is now a value of the *outer*
+loop: gcc strength-reduces `i * 8` into a stack slot and a saved register of its
+own, and uses it to eliminate `j` from the inner loop as well. The `.cse` dump
+shows the substitution directly.
+
+The image kept `j` (`beq s6, a0`) and wrote the self cell through the same
+walker as the others (`sb zero, 0(a1)`). Walking the cell pointer leaves no
+index for cse to substitute:
+
+    for (j = 0; j < BTL_PARTY; j++, mark++) {
+        ...
+        if (i != j) { mark->u = CELL_OTHER; } else { mark->u = CELL_SELF; }
+
+- [markerbuild.c](/src/btlp/markerbuild.c) - `BtlBuildMarkers`, 90.08% to
+  94.70%, the frame eight bytes smaller and a saved register gone.
+
+## A signed compare against an end address counts beside an eliminated walk
+
+A loop that exits on `slt a0, a1` against an end pointer, with a count
+incremented in the branch's delay slot and used after the loop, was not a
+pointer walk - a pointer compare is `sltu` - and not the counter itself, which
+gcc cannot eliminate while it is still wanted afterwards. It is a second
+counter beside the one the loop tests:
+
+    n = 0;
+    for (j = 0; j < NAME_CELLS; j++) {
+        if (g_btl_actors[i].c.name[j] == GLYPH_END) break;
+        n++;
+    }
+
+- [markerbuild.c](/src/btlp/markerbuild.c) - the name's glyph count, 96.26% to
+  96.69%; a hand-walked pointer came out at 93.46%.
+
+## A constant reload puts back at each use is a local of its own
+
+`ori t3, zero, 0x22` at one use and `ori t2, zero, 0x22` at the next, in the
+reload registers rather than `v0`/`v1`, is a pseudo that never got a hard
+register and is rematerialised from its constant every time it is needed. gcc's
+loop pass only makes one of those for a literal when lifetime times savings
+clears the loop's instruction count - the `.loop` dump prints each verdict as
+`savings N ... not desirable`. A local assigned once before the loop always
+lives long enough:
+
+    low = GAUGE_LOW;
+    ...
+        row[ROW_NAME].clut = low;
+
+With the literal, the two colour stores in the dying arm share one `li` and
+jump2 folds them into the escape arm's identical tail; through the local they
+are reloaded separately and the arms stay apart, as the image has them. Every
+other reload register in the routine swapped back into place with it.
+
+- [markerbuild.c](/src/btlp/markerbuild.c) - `BtlBuildMarkers`, 96.69% to
+  98.07%.
+
+## Which store comes first decides where its constant is loaded
+
+With the stores already in the image's order, a constant loaded a few
+instructions early and into its own register is the scheduler reading the
+source order of the *first* store that uses it. `row[ROW_NAME].clut` written
+straight after `row[ROW_NAME].x` put `ori v1, zero, 0x20` ahead of the whole
+run, where the image has it; written after the count it is loaded beside its
+stores into `v0`. The same held for the dying label's first colour, and for
+which of five blank cells is cleared first.
+
+- [markerbuild.c](/src/btlp/markerbuild.c) - `BtlBuildMarkers`, 98.07% to
+  exact over three such placements.

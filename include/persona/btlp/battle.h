@@ -197,14 +197,23 @@ extern BtlObj *g_btl_marker_obj[];
 /* The markers' scripts, by kind. Entries 12 to 15 are the cast circle's. */
 extern BtlSeqStep *g_btl_marker_scripts[];
 
-/* Where each marker is drawn. Two rows of five, one row per side; only the x
-   is ever written, and only for a member still in the fight. */
-typedef struct {
-    /* 0x0 */ short  x;
-    /* 0x2 */ u_char pad2[6];
-} BtlMarker;                    /* 8 bytes */
+/* Where each marker places the party on its small copy of the grid: five
+   cells to a row, one row per member's marker. BtlBuildMarkers writes x, y
+   and which cell of the picture stands there; BtlPlaceMemberMarkers moves
+   only x. */
+extern BtlGfxCell g_btl_member_marker[];
+#define MARKER_ROW    5
 
-extern BtlMarker g_btl_member_marker[];
+/* The two places a row's x can start from, and pixels per grid column once
+   the doubled column has been halved. */
+#define MARKER_X_NEAR (-0xC)
+#define MARKER_X_FAR  (-0x2D)
+#define MARKER_X_STEP 4
+
+/* The name each member's marker shows, eight glyph bytes a member, and what an
+   empty slot shows instead. */
+extern u_char       g_btl_member_names[][8];
+extern const u_char g_btl_name_empty[];
 extern void      BtlPlaceMemberMarkers(int row, int near);
 extern void    BtlBuildMarkers(void);
 /* The middle argument is whether the marker goes up or comes down, and

@@ -21,6 +21,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/load.h>
+#include <persona/btlp/gfx.h>
 
 /* The file was read to the shared staging buffer. Its first word is the TIM,
    its second the model image, built to no fixed address. */
@@ -83,9 +84,6 @@ extern u_char       *g_btl_persona_image;
 extern u_long       *g_btl_persona_tim;
 extern const u_long **g_btl_effect_gfx;
 
-extern int     BtlBindGfx(u_int kind, int index, u_char **image);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int nclut);
 
 #ifdef NON_MATCHING
 BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)

@@ -14,6 +14,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/gfx.h>
 
 /* Where each image is expanded to. */
 #define HUD_STAGE   ((u_char *)0x80140000)
@@ -47,8 +48,6 @@ extern int    g_btl_hud_scale;
 extern int    g_btl_hud_scale_y;
 extern int    g_btl_hud_scale_z;
 extern u_char g_btl_hud_state;
-
-extern void BtlUnpack(u_char *dst, const u_char *src);
 
 void BtlHudLoad(void)
 {

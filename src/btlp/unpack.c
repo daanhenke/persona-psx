@@ -22,6 +22,7 @@
  * uploader, is in packedtim.c.
  */
 #include <decomp/types.h>
+#include <persona/btlp/gfx.h>
 
 /* The end marker, and the code that is a long zero run rather than a short
    one. */

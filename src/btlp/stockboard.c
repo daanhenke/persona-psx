@@ -53,7 +53,7 @@ void BtlOpenStockBoard(void)
     g_btl_stock_lines[1][0] = BTL_TEXT_END;
     g_btl_stock_lines[2][0] = BTL_TEXT_END;
     p = &g_btl_personas[equipped];
-    memcpy(g_btl_stock_lines[0], p->unk1F, STOCK_NAME_CELLS);
+    memcpy(g_btl_stock_lines[0], p->name, STOCK_NAME_CELLS);
     /* Both lists are packed by a count of the lines written, indexed rather
        than walked: gcc turns the index into the pointer the image steps, and
        only then does the pointer's start come after the loop's constants. */
@@ -61,7 +61,7 @@ void BtlOpenStockBoard(void)
     for (i = 0; i < STOCK_ENTRIES; i++) {
         id = g_btl_actors[g_btl_actor_turn].c.list[i];
         if (id != STOCK_EMPTY && id != equipped) {
-            memcpy(g_btl_stock_lines[n], g_btl_personas[id].unk1F,
+            memcpy(g_btl_stock_lines[n], g_btl_personas[id].name,
                    STOCK_NAME_CELLS);
             n++;
         }

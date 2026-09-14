@@ -23,6 +23,7 @@
  * saying what the party is doing.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/board.h>
 #include <persona/btlp/object.h>
@@ -57,8 +58,6 @@ extern BtlObj *g_btl_status_board;
 
 /* The board's lines, and the two things a row's first column is filled from. */
 extern BtlGfxText  g_btl_tactics_lines[];
-extern u_char      g_btl_member_names[][8];
-extern const u_char g_btl_name_empty[];
 
 void BtlRefreshTacticsLines(void);
 

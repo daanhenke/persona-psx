@@ -28,6 +28,7 @@
 #include <persona/btlp/text.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/load.h>
+#include <persona/btlp/gfx.h>
 
 /* The two prompts. Each is two pictures out of g_btl_pick_defs standing one
    above the other, with the shared frame of g_btl_obj_defs in front of each;
@@ -108,8 +109,6 @@ void BtlChoiceSpawn(int set)
     } while (i < CHOICE_OPTIONS);
 }
 
-
-
 /* Stride of g_btl_member_scripts, by model and by the actor's script_pick,
    and the two of the ten a summon takes: the pose the Persona comes out of,
    and the one the member is left standing in. */
@@ -172,9 +171,6 @@ extern u_char   *g_btl_unused_gfx;
 extern BtlObj *D_800F4894;
 
 extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
-extern int  BtlBindGfx(u_int kind, int index, u_char **image);
-extern void BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                         int upload);
 extern short g_btl_scene_rgb[];
 
 /* Of the ten script indices a shape carries, the swing takes four: the run

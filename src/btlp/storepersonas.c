@@ -33,7 +33,7 @@ void BtlStorePersonas(void)
         d->unk10 = s->unk10;
         d->unk12 = s->unk12;
         d->key   = s->key;
-        memcpy(d->unk19, s->unk1F, 10);
+        memcpy(d->unk19, s->name, 10);
         d->unk23 = s->unk29;
         d->level = s->level;
         d->kind  = s->kind;
@@ -77,7 +77,7 @@ void BtlGivePersona(Char *c, int key)
             d->unk10 = def->unk04;
             d->unk12 = def->unk06;
             d->key = key;
-            memcpy(d->unk1F, def->unk08, 10);
+            memcpy(d->name, def->unk08, 10);
             d->unk29 = def->unk12;
             d->level = def->level;
             d->kind = def->kind;

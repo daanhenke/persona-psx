@@ -19,6 +19,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/load.h>
+#include <persona/btlp/gfx.h>
 
 /* Slots 5 to 9 are the party's; -1 is a free one and 0x8000 the answer when
    none of them can be had. */
@@ -49,9 +50,6 @@ extern u_char   *g_btl_actor_clut_base;
 extern volatile int g_cd_busy;
 
 extern void    CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
-extern int     BtlBindGfx(u_int kind, int index, u_char **image);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int put);
 
 u_short BtlLoadMemberGfx(int member, int actor)
 {

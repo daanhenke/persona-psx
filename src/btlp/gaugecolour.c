@@ -23,15 +23,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <persona/common/char.h>
-
-/* Where the colour sits in a cell. */
-#define GAUGE_CLUT_AT 9
-
-/* The three colours, and the fraction below which the low one is used. */
-#define GAUGE_FULL 0x24
-#define GAUGE_OK   0x20
-#define GAUGE_LOW  0x22
-#define GAUGE_LOW_AT 4
+#include <persona/btlp/board.h>
 
 #ifdef NON_MATCHING
 void BtlSetGaugeColour(const Char *c, u_char *hp, u_char *sp)

@@ -50,8 +50,6 @@
 #define BOARD_SP_BAR 0x48
 #define BOARD_SPRITES 0xB4
 
-extern void BtlSetGaugeColour(const Char *c, u_char *hp, u_char *sp);
-
 extern BtlBoardDef  g_btl_member_board_defs[];
 extern u_char       g_btl_member_board_sprites[][BOARD_SPRITES];
 extern BtlGfxList  *g_btl_member_board_gfx[];

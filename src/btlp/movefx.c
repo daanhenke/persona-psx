@@ -25,6 +25,7 @@
 #include <persona/btlp/spellfx.h>
 #include <persona/common/spell.h>
 #include <persona/btlp/load.h>
+#include <persona/btlp/gfx.h>
 
 /* What the loader left at 0x80140000: one address per run it read. The effect
    takes the second of them and the tim from the first. */
@@ -43,9 +44,6 @@
 #define FX_SE_BANK  4
 
 extern void    BtlCloseMessage(int slot);
-extern int     BtlBindGfx(u_int kind, int index, u_char **image);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int upload);
 
 BtlObj *BtlStartMoveFx(int index)
 {

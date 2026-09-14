@@ -19,6 +19,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/gfx.h>
 
 /* Species whose artwork is bound in place rather than uploaded. */
 #define BTL_SPECIES_FLAT0 0xBB
@@ -58,9 +59,6 @@ extern u_char   *g_btl_enemy_clut_to;
 extern u_char   *g_btl_enemy_clut_base;
 
 extern u_short GetClut(int x, int y);
-extern int     BtlBindGfx(u_int kind, int index, u_char **image);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int put);
 
 int BtlLoadEnemyGfx(int species, int actor, u_long *tim, u_char *image,
                     int bytes)

@@ -35,7 +35,7 @@ void BtlLoadPersonas(void)
         d->unk10 = s->unk10;
         d->unk12 = s->unk12;
         d->key   = s->key;
-        memcpy(d->unk1F, s->unk19, 10);
+        memcpy(d->name, s->unk19, 10);
         d->unk29 = s->unk23;
         d->level = s->level;
         d->kind  = s->kind;

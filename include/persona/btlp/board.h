@@ -68,4 +68,14 @@ extern void    BtlEditEquipNames(BtlActor *a);
 extern void    BtlOpenBoard1D(void);
 extern void    BtlCloseBoard1D(void);
 
+/* Colours a fighter's two bars by how much is left - full, ordinary, or low at
+   a quarter or under - on the clut byte of the cell or text row each points
+   at. Either may be left out. gaugecolour.c. */
+#define GAUGE_CLUT_AT 9
+#define GAUGE_FULL    0x24
+#define GAUGE_OK      0x20
+#define GAUGE_LOW     0x22
+#define GAUGE_LOW_AT  4
+extern void BtlSetGaugeColour(const Char *c, u_char *hp, u_char *sp);
+
 #endif

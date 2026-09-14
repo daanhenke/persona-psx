@@ -32,6 +32,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/spellfx.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/gfx.h>
 
 /* Where a strike set is unpacked to, and how its TIM is put up. */
 #define STRIKE_TIM      ((u_char *)0x80140000)
@@ -77,11 +78,6 @@
 #define IMPACT_ATTR     0xC0000
 #define IMPACT_FRAME    8
 #define IMPACT_LOOP     0xFE00
-
-extern void BtlUnpack(u_char *dst, const u_char *src);
-extern int  BtlBindGfx(u_int kind, int index, u_char **image);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int put);
 
 /* The two templates filled in afresh before each allocation. */
 BtlObjDef g_btl_strike_def = {0, 0};

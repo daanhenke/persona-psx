@@ -88,7 +88,6 @@ extern const BtlBoardDef  g_btl_persona_board_defs[];
 
 /* Still assembly: what walks a gauge's cells to the colour the value deserves.
    The first bar is not drawn here, so it is handed nothing. */
-extern void BtlSetGaugeColour(const Char *c, u_char *hp, u_char *sp);
 
 #ifdef NON_MATCHING
 void BtlOpenPersonaBoard(void)
@@ -99,7 +98,7 @@ void BtlOpenPersonaBoard(void)
     int       i;
 
     p = &g_btl_personas[BtlActorPersona(g_btl_actor_turn)];
-    memcpy(g_btl_persona_name, p->unk1F, PERSONA_NAME_CELLS);
+    memcpy(g_btl_persona_name, p->name, PERSONA_NAME_CELLS);
     BtlDrawNumber(g_btl_persona_level_cells, p->level, PERSONA_LEVEL_W);
     BtlDrawNumber(D_800F5B3C, p->unk29, PERSONA_NUMBER_W);
     BtlDrawNumberAlt(g_btl_persona_sp_cells,

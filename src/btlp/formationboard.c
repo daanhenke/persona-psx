@@ -28,6 +28,7 @@
  * pointer has already reached, which is why it costs no arithmetic of its own.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <decomp/libc.h>
 #include <persona/btlp/board.h>
 #include <persona/btlp/choice.h>
@@ -56,7 +57,6 @@ extern BtlGfxText   g_btl_formation_rows[];
 extern u_char       g_btl_formation_lines[][PRESET_NAME_CELLS + 1];
 extern const u_char g_btl_preset_name[];
 extern const u_char g_btl_preset_last_line[];
-extern const u_char g_btl_name_empty[];
 
 
 /* The board itself, and what it is built from. */

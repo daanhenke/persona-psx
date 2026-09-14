@@ -46,7 +46,7 @@ typedef struct {
                                     record keeps it at +0x18. An offer's
                                     wanted list is matched against it and the
                                     actor's object takes its graphics by it */
-    /* 0x1F */ u_char  unk1F[10];
+    /* 0x1F */ u_char  name[10]; /* packed glyph bytes, as Char.name */
     /* 0x29 */ u_char  unk29;
     /* 0x2A */ u_char  level;
     /* 0x2B */ u_char  kind;     /* the save record's +0x25; a demon species

@@ -10,6 +10,7 @@
  * hold several images and each call binds the next one along.
  */
 #include <decomp/types.h>
+#include <persona/btlp/gfx.h>
 
 /* Which slot the image is bound to. */
 #define GFX_MEMBER  0

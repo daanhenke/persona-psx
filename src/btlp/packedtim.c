@@ -21,6 +21,7 @@
  * how a run longer than 32 is spelt.
  */
 #include <decomp/types.h>
+#include <persona/btlp/gfx.h>
 
 #define UNPACK_END_HI  0x7F
 #define UNPACK_END_LO  0xFF
@@ -43,15 +44,6 @@
 #define UNPACK_REF_SIGN 0xFC00
 
 extern u_long *g_btl_tim_buf;
-
-/* BtlUploadTim narrows `y` itself; declaring it short here would make this
-   sign-extend the argument before passing it on, which the original does not. */
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int nclut);
-
-/* The decompressor is a unit of its own; see unpack.c. */
-extern void BtlUnpack(u_char *dst, const u_char *src);
-
 
 /* `y` is an int here even though BtlUploadTim narrows it: this only forwards
    the argument, and declaring it short adds the sign extension. */

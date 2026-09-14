@@ -25,6 +25,7 @@
 #include <persona/btlp/box.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/gfx.h>
 
 /* Scratch the graphics are unpacked into: the palette first, the frame's tiles
    0x200 bytes in. Reached by hardcoded address rather than through a symbol. */
@@ -62,7 +63,6 @@ extern u_char  g_btl_box_step;
 extern u_char  g_btl_box_hold;
 extern u_short g_btl_box_flags;
 
-extern void BtlUnpack(u_char *dst, const u_char *src);
 /* Reading the graphics in is the one thing that does not happen every time the
    box opens; bit 0x20 of the flags is what remembers it has been done. */
 void BtlBoxLoad(void)

@@ -21,6 +21,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/gfx.h>
 
 /* Slots 5 to 9 are the party's. */
 #define BTL_MEMBER_SLOT0 5
@@ -44,8 +45,6 @@ extern u_char *g_btl_actor_clut_to;
 extern u_char *g_btl_actor_clut_base;
 
 extern void    BtlReadSectors(u_long *dest, int sector, int sectors);
-extern u_long *BtlUploadTim(u_long *tim, int page, int slot, int abr, int y,
-                            int put);
 
 #ifdef NON_MATCHING
 short BtlReloadMemberGfx(int member, int actor)
