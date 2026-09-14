@@ -23,7 +23,9 @@ typedef struct {
     /* 0x0D */ u_char target;     /* which set of targets it can reach; the AI
                                      hands this to BtlPickAiTarget          */
     /* 0x0E */ u_char cost;       /* SP, weighed against Char.sp            */
-    /* 0x0F */ u_char pad0F;
+    /* 0x0F */ u_char ailment;    /* the ailment the move puts on, zero for
+                                     none; the ailment moves' finish hands it
+                                     to BtlInflictStatus                    */
     /* 0x10 */ u_char aim;        /* how the move is aimed, in the low nibble:
                                      1 and 8 at the one fighter the AI picks,
                                      2 and 4 at the front of that side and

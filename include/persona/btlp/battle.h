@@ -76,6 +76,10 @@ extern u_char g_btl_debug_party_only;
    g_btl_party_lost only while it is zero, which it is on disc. */
 extern u_char g_btl_debug_no_defeat;
 
+/* And one that keeps the ailment moves off the party: their finish steps
+   over a member while it is set, and it is zero on disc. */
+extern u_char g_btl_debug_party_immune;
+
 /* All thirty-two of those switches, one byte each, as the debug page's flag
    editor flips them; the named ones above are members of it. */
 extern u_char g_btl_debug_flags[];

@@ -28,7 +28,6 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
 
-extern void func_800C42B4(void);
 extern void func_800C2FDC(BtlObj *o);
 
 /* The moves the step treats specially beyond the shared motion: one fades to

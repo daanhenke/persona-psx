@@ -116,6 +116,19 @@ extern signed char g_btl_fx_shift[];
 #define FX_STEP_TINT_B     0xC0
 #define FX_STEP_TINT_FADE  8
 
+/* What the first phase of the plain and the ailment moves' finish calls
+   before the targets are walked. Still in asm. */
+extern void func_800C42B4(void);
+
+/* A fighter's palette is this many colours, and this washes a colour white. */
+#define FX_CLUT_COLORS 0x100
+#define FX_CLUT_WHITE  0xFFFF
+
+/* Which fighters' palettes are being washed and faded back, one bit a slot,
+   and the palettes themselves, FX_CLUT_COLORS entries to a fighter. */
+extern u_short  g_btl_clut_fading;
+extern u_short *g_btl_actor_clut;
+
 /* The cells of one side's sheet, laid out the way BtlPlaceMember lays out
    fighters, and which of a set each cell stands for. */
 #define FX_GRID_W   5

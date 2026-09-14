@@ -179,6 +179,9 @@ extern u_short g_btl_key_end;
 extern BtlObj *g_btl_hud_obj;
 extern BtlObj *g_btl_effect_obj;
 
+/* The fighter the effect object stands on, set beside it. */
+extern struct BtlActor *g_btl_effect_actor;
+
 /* One line per ailment, and the scripts a fighter changing shape runs. */
 extern u_char *g_btl_ailment_lines[];
 extern u_char  g_btl_morph_scripts[];

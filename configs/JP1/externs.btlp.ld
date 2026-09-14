@@ -184,6 +184,7 @@ g_btl_debug_no_defeat = 0x8004E268;
 g_pad_config = 0x801F2AC7;
 g_map_unk4 = 0x801F5354;
 g_map_room = 0x801F5355;
+g_btl_debug_party_immune = 0x8004E266;
 D_8004E267 = 0x8004E267;
 /* Names used by the C round flow and overlay entry. */
 g_spell_data = 0x80047D20;

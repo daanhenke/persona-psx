@@ -86,7 +86,7 @@ segments:
       - [0x58C, .rodata, insert]
       - [0x5A8, rodata, btlp_rodata4]
       - [0x634, .rodata, windowstep]
-      - [0x668, rodata, btlp_rodata4a]  # the assembler pads .rodata to 8
+      - [0x668, pad, btlp_pad_668]  # the assembler pads .rodata to 8
       - [0x66C, .rodata, menuupdate]
       # ovl_btlp_entry's own strings - every debug line it announces a step
       # with, and the ten pack names it looks up on the disc. The C emits them
@@ -116,7 +116,7 @@ segments:
       # BtlRollDefeatDrop's rate table, which the C emits itself, and the word of
       # padding behind it that belongs to nobody.
       - [0xD80, .rodata, defeatdrop]
-      - [0xD94, rodata, btlp_rodata6a1]
+      - [0xD94, pad, btlp_pad_d94]
       # BtlHoldForMarkers's switch table, which the C emits itself.
       - [0xD98, .rodata, holdmarkers]
       - [0xDB0, rodata, btlp_rodata6b]
@@ -128,7 +128,7 @@ segments:
       # BtlFxStepA0's switch table, which fxspella0.c emits itself, and the
       # word of padding behind it that belongs to nobody.
       - [0x141C, .rodata, fxspella0]
-      - [0x1430, rodata, btlp_rodata6b1_fxa0]
+      - [0x1430, pad, btlp_pad_1430]
       # BtlTalkFxObjTick's switch table, which fxtalktick.c emits itself.
       - [0x1434, .rodata, fxtalktick]
       # BtlFxMotionUnused's switch table, then BtlFxStep01's - which stays
@@ -138,9 +138,9 @@ segments:
       - [0x14F4, .rodata, fxmotion]
       - [0x1564, rodata, btlp_rodata6b1_fxa1]
       - [0x15D4, .rodata, fxstep01]
-      - [0x15E8, rodata, btlp_rodata6b1_fxa1b]
+      - [0x15E8, pad, btlp_pad_15e8]
       - [0x15EC, .rodata, fxfinish53]
-      - [0x1630, rodata, btlp_rodata6b1_fxa1c]
+      - [0x1630, pad, btlp_pad_1630]
       # BtlFxFinish5F's three switch tables with the word of padding behind
       # the first and the last - the unit's .rodata comes out 0x290 with
       # both inside it.

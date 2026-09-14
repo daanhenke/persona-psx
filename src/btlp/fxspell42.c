@@ -66,11 +66,8 @@
 #define FX_42_MSG_TIME  0x3C
 #define FX_42_MISSED    3
 
-/* The whitening: a palette is 256 entries and entry nought is not written.
-   Then how long the fighter is left to fade back, and how fast and how long
-   the record dims. */
-#define FX_42_CLUT     0x100
-#define FX_42_WHITE    0xFFFF
+/* How long a washed fighter - every entry of its palette but nought - is
+   left to fade back, and how fast and how long the record dims. */
 #define FX_42_BRIGHT   0x1E
 #define FX_42_DIM_FADE 8
 #define FX_42_DIM      0x1E
@@ -78,9 +75,6 @@
 /* What a Persona is started over with, and the actor flag its turn leaves. */
 #define FX_42_FIRST_SLOTS 1
 #define FX_42_PERSONA_ACT 0x10000000
-
-extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
 
 /* The message move 0x6B and 0x6C put up when they miss. */
 extern u_char g_btl_msg_revive_failed[];
@@ -178,9 +172,9 @@ void BtlFxStep42(BtlObj *o)
         g_btl_clut_fading |= 1 << g_btl_fx_target;
         i = 1;
         do {
-            g_btl_actor_clut[g_btl_fx_target * FX_42_CLUT + i] = FX_42_WHITE;
+            g_btl_actor_clut[g_btl_fx_target * FX_CLUT_COLORS + i] = FX_CLUT_WHITE;
             i++;
-        } while (i < FX_42_CLUT);
+        } while (i < FX_CLUT_COLORS);
         o->timer = FX_42_BRIGHT;
         o->phase++;
         break;
