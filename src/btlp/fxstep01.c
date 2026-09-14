@@ -154,8 +154,8 @@ void BtlFxStep01(BtlObj *o)
             }
             if (o->kind == FX_01_GRAB) {
                 o->actor->obj->attr |= BTL_OBJ_CARRIED;
-                o->actor->unkC5 = o->actor->obj->motion;
-                o->actor->unkC6 = o->actor->obj->phase;
+                o->actor->resume_motion = o->actor->obj->motion;
+                o->actor->resume_phase = o->actor->obj->phase;
                 o->actor->hit_amount = 0;
                 o->actor->obj->motion = FX_01_GRAB_MOTION;
                 o->actor->obj->phase = 0;

@@ -16,6 +16,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
+#include <persona/btlp/clut.h>
 
 /* The ailment this move leaves, and the motion a fighter takes it on. */
 #define FX_86_STATUS 0xE
@@ -39,8 +40,6 @@
 #define FX_86_HOLD 0x1E
 
 extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
-
 
 void BtlFxStep86(BtlObj *o)
 {

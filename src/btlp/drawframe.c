@@ -22,8 +22,7 @@
 #include <persona/btlp/pick.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
-
-extern u_long *g_btl_actor_clut;
+#include <persona/btlp/clut.h>
 
 /* What the reverb goes back to. */
 #define BTL_REVERB_TYPE  4
@@ -74,7 +73,7 @@ void BtlDrawFrame(void)
         SetDispMask(0);
     }
     if (g_btl_closing == 0) {
-        LoadImage(&g_btl_clut_block, g_btl_actor_clut);
+        LoadImage(&g_btl_clut_block, (u_long *)g_btl_actor_clut);
     }
     DrawSync(0);
     if (g_btl_blank_on_load != 0) {

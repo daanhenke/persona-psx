@@ -365,7 +365,8 @@ segments:
       - [0x26BE0, c, grouptick]
       - [0x26DE8, c, whitenclut]
       - [0x26E64, c, pulsepick]
-      - [0x26FF4, asm, btlp_48_a]
+      - [0x26FF4, c, hurtmotion]
+      - [0x277D0, asm, btlp_48_a]
       # The motions a fighter takes a blow in.
       - [0x28820, c, hitmotion]
       # A member's record walking on and off in a scene.

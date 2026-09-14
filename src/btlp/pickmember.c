@@ -23,6 +23,7 @@
 #include <persona/btlp/input.h>
 #include <persona/btlp/menu.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/clut.h>
 
 /* PadRead's two sideways bits, as BtlMenuKey hands them back. */
 
@@ -39,14 +40,7 @@
 
 /* Nothing decided this frame. */
 
-extern u_char  *g_btl_actor_clut;
-extern u_char  *g_btl_actor_clut_base;
 /* Three variables, not an array - the original reaches each on its own. */
-extern const u_char g_btl_tint_pick_r;
-extern const u_char g_btl_tint_pick_g;
-extern const u_char g_btl_tint_pick_b;
-
-extern void  BtlTintActorClut(int actor, int r, int g, int b);
 
 int BtlPickMember(short *slot)
 {
@@ -74,13 +68,13 @@ int BtlPickMember(short *slot)
         if (g_btl_actors[i].c.key != 0) {
             obj = g_btl_actors[i].obj;
             if (i == *slot) {
-                BtlTintActorClut(i, g_btl_tint_pick_r, g_btl_tint_pick_g,
-                                 g_btl_tint_pick_b);
+                BtlTintActorClut(i, g_btl_tint_pick_r[0], g_btl_tint_pick_g[0],
+                                 g_btl_tint_pick_b[0]);
                 BtlObjSetMotion(obj, PICK_MOTION);
             } else {
                 if (g_btl_actors[i].pickable != 0) {
-                    memcpy(g_btl_actor_clut + i * CLUT_BYTES,
-                           g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+                    memcpy((u_char *)g_btl_actor_clut + i * CLUT_BYTES,
+                           (u_char *)g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
                     BtlObjSetMotion(obj, 0);
                     BtlObjSetRgb(obj, PICK_LIT, PICK_LIT, PICK_LIT);
                 } else {

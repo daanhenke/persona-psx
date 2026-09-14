@@ -20,6 +20,7 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/clut.h>
 
 /* The attribute bit on an enemy that carries a fall sound of its own. */
 #define LEAVE_OWN_SOUND 0x800
@@ -46,11 +47,8 @@ typedef struct {
     u_char b[0x200];
 } BtlClutBlock;
 
-#define ACTOR_CLUT(base, slot) ((BtlClutBlock *)((base) + (slot) * 0x200))
+#define ACTOR_CLUT(base, slot) ((BtlClutBlock *)((u_char *)(base) + (slot) * 0x200))
 
-extern u_char *g_btl_actor_clut;
-extern u_char *g_btl_actor_clut_to;
-extern u_char *g_btl_actor_clut_base;
 extern u_char  g_btl_grid[];
 
 void BtlMemberMotion0E(BtlObj *o)

@@ -108,7 +108,7 @@ void BtlLoadEnemyStats(int slot, int key)
     a->unkD3 = 0;
     a->unkD4 = 0;
     a->unkDF = 0;
-    a->unkC5 = 0;
-    a->unkC6 = 0;
+    a->resume_motion = 0;
+    a->resume_phase = 0;
     BtlDeriveBattleStats(a);
 }

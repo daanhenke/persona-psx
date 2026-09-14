@@ -29,6 +29,7 @@
 #include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
+#include <persona/btlp/clut.h>
 
 /* A palette is 0x200 bytes, one page per actor. */
 #define CLUT_BYTES 0x200
@@ -43,13 +44,6 @@
 #define RESET_LEVEL 0x80
 #define RESET_FADE  8
 
-extern u_char *g_btl_actor_clut;
-extern u_char *g_btl_actor_clut_to;
-extern u_char *g_btl_actor_clut_base;
-extern u_char *g_btl_enemy_clut;
-extern u_char *g_btl_enemy_clut_to;
-extern u_char *g_btl_enemy_clut_base;
-
 void BtlEnemiesResetGfx(void)
 {
     BtlObj *o;
@@ -62,10 +56,10 @@ void BtlEnemiesResetGfx(void)
     for (i = 0; i < BTL_ENEMIES; i++) {
         if (g_btl_combatants[i].c.key != 0) {
             o = g_btl_combatants[i].obj;
-            memcpy(g_btl_enemy_clut + i * CLUT_BYTES,
-                   g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
-            memcpy(g_btl_enemy_clut_to + i * CLUT_BYTES,
-                   g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            memcpy((u_char *)g_btl_enemy_clut + i * CLUT_BYTES,
+                   (u_char *)g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            memcpy((u_char *)g_btl_enemy_clut_to + i * CLUT_BYTES,
+                   (u_char *)g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
             if (o->actor->flags & BTL_ACTOR_FLINCHED) {
                 script = g_btl_models[o->kind].hit;
             } else {
@@ -107,10 +101,10 @@ void BtlPartyResetGfx(void)
             && (signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
             && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
             o = g_btl_actors[i].obj;
-            memcpy(g_btl_actor_clut + i * CLUT_BYTES,
-                   g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
-            memcpy(g_btl_actor_clut_to + i * CLUT_BYTES,
-                   g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            memcpy((u_char *)g_btl_actor_clut + i * CLUT_BYTES,
+                   (u_char *)g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+            memcpy((u_char *)g_btl_actor_clut_to + i * CLUT_BYTES,
+                   (u_char *)g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
             if (o->actor->c.hp_max / 4 >= o->actor->c.hp) {
                 row = &g_btl_member_scripts[SCRIPT_WEAK
                                             + o->kind * MEMBER_SCRIPT_MODEL];
@@ -161,10 +155,10 @@ void BtlMemberResetGfx(int slot)
     u_char *row;
 
     o = g_btl_actors[slot].obj;
-    memcpy(g_btl_actor_clut + slot * CLUT_BYTES,
-           g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
-    memcpy(g_btl_actor_clut_to + slot * CLUT_BYTES,
-           g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
+    memcpy((u_char *)g_btl_actor_clut + slot * CLUT_BYTES,
+           (u_char *)g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
+    memcpy((u_char *)g_btl_actor_clut_to + slot * CLUT_BYTES,
+           (u_char *)g_btl_actor_clut_base + slot * CLUT_BYTES, CLUT_BYTES);
     if (o->actor->c.hp_max / 4 >= o->actor->c.hp) {
         row = &g_btl_member_scripts[SCRIPT_WEAK + o->kind * MEMBER_SCRIPT_MODEL];
     } else if (o->actor->flags & BTL_ACTOR_FLINCHED) {

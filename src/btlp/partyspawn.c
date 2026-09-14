@@ -159,8 +159,8 @@ void BtlSpawnParty(void)
                 a->unkDF = 0;
                 *(int *)&a->pad6C[0] = 0;
                 a->marker = 0;
-                a->unkC5 = 0;
-                a->unkC6 = 0;
+                a->resume_motion = 0;
+                a->resume_phase = 0;
                 BtlDeriveBattleStats(a);
             }
             i++;

@@ -26,6 +26,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/stage.h>
+#include <persona/btlp/clut.h>
 
 /* The encounters each scene belongs to. */
 #define SCENE_ROUND_OVER_ENCOUNTER 0xF
@@ -79,9 +80,6 @@
 #define BTL_STEP_MORPHED 9
 
 extern u_short g_btl_clut_fading;
-extern u_char *g_btl_actor_clut;
-extern u_char *g_btl_actor_clut_to;
-extern u_char *g_btl_actor_clut_base;
 extern u_char  g_btl_grid[];
 
 extern u_char g_btl_line_enc15a[];
@@ -96,7 +94,6 @@ extern u_char g_btl_line_enc16a[];
 extern u_char g_btl_line_enc16b[];
 extern u_char g_btl_line_enc16c[];
 extern u_char g_btl_line_enc16d[];
-
 
 void BtlRoundOverScene(void)
 {
@@ -154,7 +151,7 @@ void BtlRoundOverScene(void)
 
         /* Its own counter, not the one the frame waits use. */
         for (n = 1; n < BTL_CLUT_ENTRIES; n++) {
-            ((u_short *)g_btl_actor_clut_to)[obj->mark_num * BTL_CLUT_ENTRIES
+            g_btl_actor_clut_to[obj->mark_num * BTL_CLUT_ENTRIES
                                              + n] = BTL_CLUT_WHITE;
         }
         g_btl_clut_fading |= 1 << obj->mark_num;
@@ -183,8 +180,8 @@ void BtlRoundOverScene(void)
         obj->scale_y = SCENE_SCALE_GONE;
         obj->attr |= BTL_OBJ_ATTR_4000;
         obj->z += (int)0xFF9C0000;
-        memcpy(g_btl_actor_clut + obj->mark_num * BTL_CLUT_BYTES,
-               g_btl_actor_clut_base + obj->mark_num * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_actor_clut + obj->mark_num * BTL_CLUT_BYTES,
+               (u_char *)g_btl_actor_clut_base + obj->mark_num * BTL_CLUT_BYTES,
                BTL_CLUT_BYTES);
         BtlSePlay(SCENE_SOUND_SLOT, SCENE_SE_GROW);
 

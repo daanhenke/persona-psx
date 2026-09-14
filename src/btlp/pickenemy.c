@@ -27,6 +27,7 @@
 #include <persona/btlp/menu.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/clut.h>
 
 /* The motion the picked enemy is put on. */
 #define PICK_MOTION 10
@@ -39,15 +40,7 @@
 /* One actor's palette. */
 #define CLUT_BYTES 0x200
 
-extern u_char *g_btl_enemy_clut;
-extern u_char *g_btl_enemy_clut_base;
 /* Three variables, not an array - the original reaches each on its own. */
-extern const u_char g_btl_tint_pick_r;
-extern const u_char g_btl_tint_pick_g;
-extern const u_char g_btl_tint_pick_b;
-
-extern void BtlTintActorClut(int actor, int r, int g, int b);
-
 
 int BtlPickEnemy(short *slot)
 {
@@ -78,8 +71,8 @@ int BtlPickEnemy(short *slot)
         if (g_btl_combatants[i].c.key != 0) {
             obj = g_btl_combatants[i].obj;
             if (i == *slot) {
-                BtlTintActorClut(i + BTL_PARTY, g_btl_tint_pick_r,
-                                 g_btl_tint_pick_g, g_btl_tint_pick_b);
+                BtlTintActorClut(i + BTL_PARTY, g_btl_tint_pick_r[0],
+                                 g_btl_tint_pick_g[0], g_btl_tint_pick_b[0]);
                 BtlObjSetMotion(obj, PICK_MOTION);
             } else {
                 /* Both arms are written out whole, colour and fade and all.
@@ -87,8 +80,8 @@ int BtlPickEnemy(short *slot)
                    the stores and the call - and what is left in each arm is
                    the colour, which is where the image materialises it. */
                 if (g_btl_combatants[i].pickable != 0) {
-                    memcpy(g_btl_enemy_clut + i * CLUT_BYTES,
-                           g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+                    memcpy((u_char *)g_btl_enemy_clut + i * CLUT_BYTES,
+                           (u_char *)g_btl_enemy_clut_base + i * CLUT_BYTES, CLUT_BYTES);
                     BtlObjSetMotion(obj, 0);
                     BtlObjSetPhase(obj, 0);
                     obj->rgb_to[0] = PICK_LIT;

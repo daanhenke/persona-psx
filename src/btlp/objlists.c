@@ -20,7 +20,6 @@
  * nothing. Nothing calls it.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
@@ -93,11 +92,6 @@ void BtlDrawObjQuads(BtlObj *o)
     g_btl_drmode_next++;
 }
 
-/* 99.62%, and only registers are left: the image copies both scratch
-   addresses into fresh saved registers ahead of the 3D loop, where this
-   copies only one, so the two come out in each other's. The frame, every slot
-   and every instruction are the image's. */
-#ifdef NON_MATCHING
 void BtlDrawObjLines(BtlObj *o)
 {
     const BtlGfxLine *l;
@@ -106,6 +100,7 @@ void BtlDrawObjLines(BtlObj *o)
     VECTOR   pos;
     /* Sized to the frame the image reserves, not to the two it reads. */
     long     scratch[6];
+    long    *p;
 
     l = ((const BtlGfxLineList *)o->last)->lines;
     if ((o->attr & BTL_OBJ_LINES_3D) != 0) {
@@ -141,12 +136,18 @@ void BtlDrawObjLines(BtlObj *o)
                 g_btl_obj_quad[0].vy = l->y0;
                 g_btl_obj_quad[1].vx = l->x1;
                 g_btl_obj_quad[1].vy = l->y1;
+                /* The interpolation slot through a pointer taken here, and a
+                   block boundary behind it: together they are what copies
+                   both scratch addresses into saved registers of their own
+                   ahead of the loop, the way the image has them. Neither
+                   does it alone. */
+                p = &scratch[1];
+                do {
+                } while (0);
                 RotTransPers(&g_btl_obj_quad[0],
-                             (long *)&g_btl_lineg2_next->x0, &scratch[1],
-                             &scratch[0]);
+                             (long *)&g_btl_lineg2_next->x0, p, &scratch[0]);
                 RotTransPers(&g_btl_obj_quad[1],
-                             (long *)&g_btl_lineg2_next->x1, &scratch[1],
-                             &scratch[0]);
+                             (long *)&g_btl_lineg2_next->x1, p, &scratch[0]);
                 g_btl_lineg2_next->r0 = l->rgb[0];
                 g_btl_lineg2_next->g0 = l->rgb[1];
                 g_btl_lineg2_next->b0 = l->rgb[2];
@@ -198,9 +199,6 @@ void BtlDrawObjLines(BtlObj *o)
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/objlists", BtlDrawObjLines);
-#endif
 
 void BtlObjPlaceUnused(BtlObj *o)
 {

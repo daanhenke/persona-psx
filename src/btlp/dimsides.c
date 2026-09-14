@@ -32,13 +32,10 @@
 #include <decomp/libc.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/clut.h>
 
 /* A palette is 0x200 bytes, one page per actor. */
 #define CLUT_BYTES 0x200
-
-extern u_char *g_btl_actor_clut;
-extern u_char *g_btl_actor_clut_to;
-extern u_char *g_btl_actor_clut_base;
 
 /* The member singled out: its motion, how bright it and its marker are drawn
    and how fast they get there, the fade the others are dimmed at, and the bit
@@ -111,10 +108,10 @@ void BtlSingleOutMember(int slot)
             && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
             o = g_btl_actors[i].obj;
             if (i != slot) {
-                memcpy(g_btl_actor_clut + i * CLUT_BYTES,
-                       g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
-                memcpy(g_btl_actor_clut_to + i * CLUT_BYTES,
-                       g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+                memcpy((u_char *)g_btl_actor_clut + i * CLUT_BYTES,
+                       (u_char *)g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
+                memcpy((u_char *)g_btl_actor_clut_to + i * CLUT_BYTES,
+                       (u_char *)g_btl_actor_clut_base + i * CLUT_BYTES, CLUT_BYTES);
                 o->motion = 0;
                 o->fade = SINGLE_DIM_FADE;
                 o->rgb_to[0] = DIM_LEVEL;

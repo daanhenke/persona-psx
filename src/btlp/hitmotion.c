@@ -95,8 +95,8 @@ void BtlMemberMotion0F(BtlObj *o)
         }
         if (g_btl_act_kind == ACT_KIND_SIDE
             || g_btl_actor_turn == o->mark_num) {
-            o->motion = o->actor->unkC5;
-            o->phase = o->actor->unkC6;
+            o->motion = o->actor->resume_motion;
+            o->phase = o->actor->resume_phase;
         } else {
             o->motion = 0;
             o->phase = 0;

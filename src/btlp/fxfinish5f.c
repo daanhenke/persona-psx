@@ -177,8 +177,8 @@ void BtlFxFinish5F(BtlObj *o)
                 a->c.hp += amount;
                 a->hit_amount = amount;
                 a->c.hp = a->c.hp > a->c.hp_max ? a->c.hp_max : a->c.hp;
-                a->unkC5 = a->obj->motion;
-                a->unkC6 = a->obj->phase;
+                a->resume_motion = a->obj->motion;
+                a->resume_phase = a->obj->phase;
                 a->obj->motion = FX_5F_HEAL_MOTION;
                 a->obj->phase = 0;
                 BtlSePlay(FX_5F_SE_SLOT, FX_5F_SE_HEAL);
@@ -196,8 +196,8 @@ void BtlFxFinish5F(BtlObj *o)
                 a->c.hp += amount;
                 a->hit_amount = amount;
                 a->c.hp = a->c.hp > a->c.hp_max ? a->c.hp_max : a->c.hp;
-                a->unkC5 = a->obj->motion;
-                a->unkC6 = a->obj->phase;
+                a->resume_motion = a->obj->motion;
+                a->resume_phase = a->obj->phase;
                 a->obj->motion = FX_5F_HEAL_MOTION;
                 a->obj->phase = 0;
                 BtlSePlay(FX_5F_SE_SLOT, FX_5F_SE_HEAL);
@@ -265,8 +265,8 @@ void BtlFxFinish5F(BtlObj *o)
                     if (amount != 0) {
                         self->unkD0++;
                         a->hit_amount = amount;
-                        a->unkC5 = a->obj->motion;
-                        a->unkC6 = a->obj->phase;
+                        a->resume_motion = a->obj->motion;
+                        a->resume_phase = a->obj->phase;
                         a->obj->motion = FX_5F_HEAL_MOTION;
                         a->obj->phase = 0;
                         BtlSePlay(FX_5F_SE_SLOT, FX_5F_SE_HEAL);
@@ -281,8 +281,8 @@ void BtlFxFinish5F(BtlObj *o)
                     self->unkD0++;
                     a->c.hp += amount;
                     a->hit_amount = amount;
-                    a->unkC5 = a->obj->motion;
-                    a->unkC6 = a->obj->phase;
+                    a->resume_motion = a->obj->motion;
+                    a->resume_phase = a->obj->phase;
                     a->obj->motion = FX_5F_HEAL_MOTION;
                     a->obj->phase = 0;
                     BtlSePlay(FX_5F_SE_SLOT, FX_5F_SE_HEAL);

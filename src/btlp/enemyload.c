@@ -20,6 +20,7 @@
 #include <persona/btlp/model.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/clut.h>
 
 /* Species whose artwork is bound in place rather than uploaded. */
 #define BTL_SPECIES_FLAT0 0xBB
@@ -53,10 +54,6 @@
 #define BTL_CLUT_Y 0x1E5
 
 extern BtlModel  g_btl_models[];
-extern u_long   *g_btl_slot_clut[];
-extern u_char   *g_btl_enemy_clut;
-extern u_char   *g_btl_enemy_clut_to;
-extern u_char   *g_btl_enemy_clut_base;
 
 extern u_short GetClut(int x, int y);
 
@@ -163,31 +160,31 @@ load:
         BtlBindGfx(1, species, &g_btl_gfx_next);
         clut = BtlUploadTim(tim, slot, actor + BTL_ENEMY_SLOT0, 1, 0, 1);
         g_btl_slot_clut[slot] = clut;
-        memcpy(g_btl_enemy_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
+        memcpy((u_char *)g_btl_enemy_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
                BTL_CLUT_BYTES);
         /* Each later copy reloads the palette from the slot table. */
-        memcpy(g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
                (u_char *)g_btl_slot_clut[found & 0xFFFF],
                BTL_CLUT_BYTES);
-        memcpy(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES,
                (u_char *)g_btl_slot_clut[found & 0xFFFF],
                BTL_CLUT_BYTES);
         g_btl_slot_clut[found & 0xFFFF] =
-            (u_long *)(g_btl_enemy_clut + actor * BTL_CLUT_BYTES);
+            (u_long *)((u_char *)g_btl_enemy_clut + actor * BTL_CLUT_BYTES);
     } else {
         /* This species already holds the slot: take its palette as it stands
            and only ask the GPU where the CLUT ended up. */
         found &= BTL_SLOT_MASK;
         g_btl_clut[actor + BTL_ENEMY_SLOT0] = GetClut(0, actor + BTL_CLUT_Y);
-        memcpy(g_btl_enemy_clut + actor * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_enemy_clut + actor * BTL_CLUT_BYTES,
                (u_char *)g_btl_slot_clut[found], BTL_CLUT_BYTES);
-        memcpy(g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_enemy_clut_to + actor * BTL_CLUT_BYTES,
                (u_char *)g_btl_slot_clut[found], BTL_CLUT_BYTES);
         /* The last of the three works its destination out first, and into
            the local the slot search finished with rather than one of its own;
            spelled inline like the two above it the sum lands in the wrong
            register. */
-        wide = (short *)(g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES);
+        wide = (short *)((u_char *)g_btl_enemy_clut_base + actor * BTL_CLUT_BYTES);
         memcpy((u_char *)wide, (u_char *)g_btl_slot_clut[found],
                BTL_CLUT_BYTES);
     }

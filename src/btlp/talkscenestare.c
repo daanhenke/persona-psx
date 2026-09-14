@@ -22,6 +22,7 @@
 #include <persona/btlp/offer.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/model.h>
 
 /* Three arguments where the definition takes two: this unit passes the
    pause BtlTextSetState already sets for itself, and the register that
@@ -96,7 +97,6 @@ extern void BtlTextSetState(short state, int timer, int pause);
 #define BTL_PHASE_WON       2
 #define BTL_PHASE_SURPRISED 4
 
-extern u_char        g_btl_talk_motion[];
 extern u_char       *g_btl_actor_gfx;
 extern const u_char *g_btl_talk_menace_script;
 extern const u_char *g_btl_talk_lost_script;

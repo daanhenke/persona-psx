@@ -19,6 +19,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/clut.h>
 
 /* What a spell does, indexed by the same id g_spell_data is. Record zero is
    the empty one, so the table is as long as the spell list plus its head. The
@@ -127,7 +128,6 @@ extern void BtlFxReopenVoices(void);
 /* Which fighters' palettes are being washed and faded back, one bit a slot,
    and the palettes themselves, FX_CLUT_COLORS entries to a fighter. */
 extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
 
 /* The cells of one side's sheet, laid out the way BtlPlaceMember lays out
    fighters, and which of a set each cell stands for. */

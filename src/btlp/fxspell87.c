@@ -25,6 +25,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
+#include <persona/btlp/clut.h>
 
 /* The flags that say the hit does not reach: warded, or out of the fight. */
 #define FX_87_WARDED 0x1880
@@ -46,7 +47,6 @@
 #define FX_87_HOLD   0x20
 
 extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
 
 BtlObj *BtlFxStart87(void)
 {

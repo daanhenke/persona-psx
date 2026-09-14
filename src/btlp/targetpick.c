@@ -37,6 +37,7 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/stage.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/clut.h>
 
 /* Set on the marker of whoever is being aimed at, and cleared off the rest. */
 #define MARK_CHOSEN 0x1000000
@@ -53,11 +54,8 @@
 /* The slot the cursor is on, which starts where the turn is. */
 
 extern u_char       D_800CF94C[];
-extern const u_char g_btl_tint_pick_r;
 
-extern void BtlTintActorClut(int actor, int r, int g, int b);
 extern void BtlOpenItemBoard(void);
-
 
 int BtlPickTargetMember(BtlActor *a)
 {
@@ -119,7 +117,7 @@ int BtlPickTargetParty(BtlActor *a)
     BtlSetPartyPickable();
     i = 0;
     marks = g_btl_marker_obj;
-    tint = &g_btl_tint_pick_r;
+    tint = g_btl_tint_pick_r;
     do {
         marks[i]->attr &= ~(MARK_CHOSEN | BTL_OBJ_PICKED);
         marks[i]->rgb[0] = TARGET_LIT;
@@ -180,7 +178,7 @@ int BtlPickTargetEnemies(BtlActor *a)
        up ahead of the loop and the image has them in that order. */
     i = 0;
     motion = TARGET_MOTION;
-    tint = &g_btl_tint_pick_r;
+    tint = g_btl_tint_pick_r;
     do {
         if (g_btl_combatants[i].pickable != 0) {
             g_btl_combatants[i].obj->motion = motion;

@@ -11,6 +11,7 @@
  * top of its five bits, and the semi-transparency bit goes back on.
  */
 #include <decomp/types.h>
+#include <persona/btlp/clut.h>
 #include <decomp/libc.h>
 
 /* One actor's palette: 0x100 entries. */
@@ -27,10 +28,6 @@
 #define CLUT_G_UNIT 0x0020
 #define CLUT_B_UNIT 0x0400
 #define CLUT_STP    0x8000
-
-extern u_short *g_btl_actor_clut;
-extern u_short *g_btl_actor_clut_to;
-extern u_short *g_btl_actor_clut_base;
 
 void BtlTintActorClut(int actor, int r, int g, int b)
 {

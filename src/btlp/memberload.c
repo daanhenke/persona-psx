@@ -20,6 +20,7 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/load.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/clut.h>
 
 /* Slots 5 to 9 are the party's; -1 is a free one and 0x8000 the answer when
    none of them can be had. */
@@ -43,10 +44,6 @@
 
 extern u_short   g_btl_member_file[];
 extern int       g_btl_gfx_sector;
-extern u_long   *g_btl_slot_clut[];
-extern u_char   *g_btl_actor_clut;
-extern u_char   *g_btl_actor_clut_to;
-extern u_char   *g_btl_actor_clut_base;
 extern volatile int g_cd_busy;
 
 extern void    CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
@@ -95,13 +92,13 @@ u_short BtlLoadMemberGfx(int member, int actor)
     ((u_short *)tim)[1] = 0;
     clut = BtlUploadTim(tim, slot, actor, 0, 0, 1);
     g_btl_slot_clut[slot] = clut;
-    memcpy(g_btl_actor_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
+    memcpy((u_char *)g_btl_actor_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
            BTL_CLUT_BYTES);
     /* And again into the two the fades work between, so the actor starts out
        at rest with nothing to walk toward. */
-    memcpy(g_btl_actor_clut_to + actor * BTL_CLUT_BYTES,
+    memcpy((u_char *)g_btl_actor_clut_to + actor * BTL_CLUT_BYTES,
            (u_char *)g_btl_slot_clut[slot], BTL_CLUT_BYTES);
-    memcpy(g_btl_actor_clut_base + actor * BTL_CLUT_BYTES,
+    memcpy((u_char *)g_btl_actor_clut_base + actor * BTL_CLUT_BYTES,
            (u_char *)g_btl_slot_clut[slot], BTL_CLUT_BYTES);
     return slot & BTL_SLOT_MASK;
 }

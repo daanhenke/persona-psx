@@ -123,8 +123,11 @@ typedef struct BtlActor {
     /* 0xC3 */ u_char  order_kept;
     /* 0xC4 */ u_char  script_pick; /* chooses between two of the model's
                                        scripts when the actor is set going */
-    /* 0xC5 */ u_char  unkC5;      /* both cleared as a record is filled     */
-    /* 0xC6 */ u_char  unkC6;
+    /* 0xC5 */ u_char  resume_motion; /* the motion and phase the object was on
+                                        when something took it over, put back
+                                        once that is done; both cleared as a
+                                        record is filled                   */
+    /* 0xC6 */ u_char  resume_phase;
     /* 0xC7 */ u_char  mark_kind;  /* which marker goes up over the fighter;
                                       5 is the one that says the action it
                                       was given cannot be made             */

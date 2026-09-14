@@ -21,6 +21,10 @@ extern u_char g_btl_member_scripts[];
 #define MEMBER_SCRIPT_MODEL 0x28
 #define MEMBER_SCRIPT_PICK  10
 
+/* The same layout again for the scripts a member reacts to a blow and to a
+   demon's words in. */
+extern u_char g_btl_talk_motion[];
+
 #include <decomp/types.h>
 
 typedef struct {
@@ -28,7 +32,7 @@ typedef struct {
     /* 0x01 */ u_char talk;       /* the reaction every other kind takes   */
     /* 0x02 */ u_char pad02[2];
     /* 0x04 */ u_char hit;        /* the flinch an enemy is put on         */
-    /* 0x05 */ u_char pad05;
+    /* 0x05 */ u_char hurt;       /* the reaction a blow puts an enemy in  */
     /* 0x06 */ u_char react3;
     /* 0x07 */ u_char react0;
     /* 0x08 */ u_char react1;

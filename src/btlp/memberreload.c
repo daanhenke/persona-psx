@@ -22,6 +22,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/sound.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/clut.h>
 
 /* Slots 5 to 9 are the party's. */
 #define BTL_MEMBER_SLOT0 5
@@ -39,10 +40,6 @@
 
 extern u_short g_btl_member_file[];
 extern int     g_btl_gfx_sector;
-extern u_long *g_btl_slot_clut[];
-extern u_char *g_btl_actor_clut;
-extern u_char *g_btl_actor_clut_to;
-extern u_char *g_btl_actor_clut_base;
 
 extern void    BtlReadSectors(u_long *dest, int sector, int sectors);
 
@@ -81,13 +78,13 @@ short BtlReloadMemberGfx(int member, int actor)
     ((u_short *)tim)[1] = 0;
     clut = BtlUploadTim(tim, i, actor, 0, 0, 1);
     g_btl_slot_clut[i] = clut;
-    memcpy(g_btl_actor_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
+    memcpy((u_char *)g_btl_actor_clut + actor * BTL_CLUT_BYTES, (u_char *)clut,
            BTL_CLUT_BYTES);
     /* And again into the two the fades work between, so the actor starts out
        at rest with nothing to walk toward. */
-    memcpy(g_btl_actor_clut_to + actor * BTL_CLUT_BYTES,
+    memcpy((u_char *)g_btl_actor_clut_to + actor * BTL_CLUT_BYTES,
            (u_char *)g_btl_slot_clut[i], BTL_CLUT_BYTES);
-    memcpy(g_btl_actor_clut_base + actor * BTL_CLUT_BYTES,
+    memcpy((u_char *)g_btl_actor_clut_base + actor * BTL_CLUT_BYTES,
            (u_char *)g_btl_slot_clut[i], BTL_CLUT_BYTES);
     return i;
 }

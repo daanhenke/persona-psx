@@ -13,13 +13,13 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/clut.h>
 
 /* A palette is 256 entries; entry nought is not written. */
 #define CLUT_ENTRIES 0x100
 #define CLUT_WHITE   0xFFFF
 
 extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
 
 void BtlWhitenActorClut(BtlObj *o)
 {

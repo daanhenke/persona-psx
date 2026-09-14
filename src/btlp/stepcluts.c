@@ -17,6 +17,7 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/clut.h>
 
 /* All fourteen, party and enemies alike. */
 #define BTL_ACTORS 14
@@ -38,8 +39,6 @@
 #define CLUT_STP    0x8000
 
 extern u_short  g_btl_clut_fading;
-extern u_short *g_btl_actor_clut;
-extern u_short *g_btl_actor_clut_to;
 
 void BtlStepCluts(void)
 {

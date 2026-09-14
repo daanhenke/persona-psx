@@ -26,6 +26,7 @@
 #include <persona/btlp/pack.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/clut.h>
 
 /* The slot the scripted scenes' sound is opened in. */
 #define SCENE_SOUND_SLOT 3
@@ -65,9 +66,6 @@
 #define OPEN_SCALE_STEP  32
 
 extern u_short  g_btl_clut_fading;
-extern u_char  *g_btl_actor_clut_to;
-extern u_char  *g_btl_actor_clut_base;
-
 
 void BtlOpenEnemyEntrance(void)
 {
@@ -134,7 +132,7 @@ void BtlOpenEnemyWhiten(void)
         /* Its own counter, not the one the frame waits use: the image keeps
            it in a temporary, which only happens if it is a second variable. */
         for (n = 1; n < BTL_CLUT_ENTRIES; n++) {
-            ((u_short *)g_btl_actor_clut_to)[obj->mark_num * BTL_CLUT_ENTRIES
+            g_btl_actor_clut_to[obj->mark_num * BTL_CLUT_ENTRIES
                                              + n] = BTL_CLUT_WHITE;
         }
         g_btl_clut_fading |= 1 << obj->mark_num;
@@ -151,8 +149,8 @@ void BtlOpenEnemyWhiten(void)
         obj->scale_y = OPEN_SCALE_SMALL;
         BtlObjSetScript(obj, obj->scripts[OPEN_SCRIPT_WHITEN]);
 
-        memcpy(g_btl_actor_clut_to + obj->mark_num * BTL_CLUT_BYTES,
-               g_btl_actor_clut_base + obj->mark_num * BTL_CLUT_BYTES,
+        memcpy((u_char *)g_btl_actor_clut_to + obj->mark_num * BTL_CLUT_BYTES,
+               (u_char *)g_btl_actor_clut_base + obj->mark_num * BTL_CLUT_BYTES,
                BTL_CLUT_BYTES);
         g_btl_clut_fading |= 1 << obj->mark_num;
 

@@ -2061,6 +2061,49 @@ the pool read and the address's last add, which is the image's
 - [objlists.c](/src/btlp/objlists.c) - `BtlDrawObjLines`, 95.80% to 99.19% for
   the two loops together.
 
+## A table declared `const` lets its loads move ahead of stores
+
+gcc marks a `const` global's memory as unchanging, and the scheduler then
+treats a load from it as independent of any store. Where the image loads a
+table only after a run of stores through a record - six grey colours, then
+the three bytes of the tint the call takes - the table was plain data. Declared
+`const`, the three loads were scheduled in front of the stores and the last
+store landed in the call's delay slot; declared `u_char`, which is also what
+its place in `.data` says it is, the order is the image's.
+
+- [hurtmotion.c](/src/btlp/hurtmotion.c) - `BtlActorMotion07`, 97.30% to exact
+  on `g_btl_tint_pick_r`, `_g` and `_b` losing their `const` in
+  [clut.h](/include/persona/btlp/clut.h).
+
+In the same routine the marker record is the variable the hit number was held
+in: two phases of a switch, the number in one and the marker in the other,
+and one saved register for both. Given a variable of its own the marker is
+never live across a call, so it lands in `t1` instead (97.22% to 97.30%, every
+register row gone). The talk-motion script is reached through a row pointer,
+`row = &g_btl_talk_motion[kind * MEMBER_SCRIPT_MODEL]` and then
+`row[pick * MEMBER_SCRIPT_PICK]`, the way the stance rows already were (94.60%
+to 96.01%).
+
+## A scratch slot through a pointer, and a block boundary behind it
+
+`BtlDrawObjLines` passes its two scratch slots to `RotTransPers` twice a turn.
+The image copies both slots' addresses into fresh saved registers ahead of the
+loop; ours copied one, and the quad's address and the flag's slot traded
+registers for it. The permuter's answer, which no hand ordering reached, is the
+interpolation slot taken into a pointer inside the loop with an empty block
+straight after:
+
+    p = &scratch[1];
+    do {
+    } while (0);
+    RotTransPers(&g_btl_obj_quad[0], (long *)&next->x0, p, &scratch[0]);
+
+The pointer without the block leaves the routine where it was (99.62%); the
+block is what makes the assignment a set of its own for the loop pass.
+
+- [objlists.c](/src/btlp/objlists.c) - 99.62% to exact, after the clear split
+  on the counter above took it from 99.26%.
+
 The same routine's frame came right in two steps of section 11's kind: a
 `long scratch[6]` where two of the longs are read, and in `BtlObjPlaceUnused`
 an unused `long unused[2]` declared *below* the transform's flag, which moves
