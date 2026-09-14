@@ -2169,3 +2169,63 @@ A loop whose counter only indexes (`for (i = 0; i < 10; i++) t[15 + i] = c`)
 comes out of gcc 2.6 reversed. The image counts down to `bgez`, with the
 lifted constant loaded *before* the counter's set-up. Written counting down,
 the set-up comes first. `BtlOpenBoard1F`'s first loop, 94.01% to 95.10%.
+
+## Doubling an index: `<< 1` and `* 2` are not the same frame
+
+Two reads out of one paired table, `t[(n & 7) * 2]` and `t[(n & 7) * 2 + 1]`,
+buy eight bytes of frame that nothing ever reaches - drop either read and they
+go. Written `t[(n & 7) << 1]` and `t[((n & 7) << 1) + 1]` the routine is the
+same instruction for instruction and the frame is right.
+
+Nothing else moves, so the tell is `addiu sp, sp, -N` alone in the diff with
+every other row matching. The permuter cannot see it (see *The permuter does
+not weigh the frame*), so it has to be read off the `.frame` comment in the
+`.c.s` build output:
+
+    grep -A1 '^BtlFxStep6E:' build/nm/JP1/src/btlp/fxspell72.c.s
+    #     .frame  $sp,64,$31    # vars= 24, regs= 2/0, args= 32, extra= 0
+
+One `long pos[3]` is `vars= 16`. Anything more is a slot the routine does not
+use. [fxspell72.c](/src/btlp/fxspell72.c), `BtlFxStep6E`, 99.98% to exact;
+[fxspell27.c](/src/btlp/fxspell27.c) reads the first copy of the same table
+and gained the same six rows.
+
+## A counter shared between two phases is pinned by the phase with the call
+
+A step handler that counts something in one phase and walks the voice slots in
+another usually wants two counters, not one. The voice walk calls out of the
+loop, so its counter has to be callee-saved; share one variable between the
+two and the first phase's counter is dragged into the saved register with it,
+and whichever variable the image kept there is pushed into a temp.
+
+The tell is a pair of rows swapping a saved register and a temp between two
+loop counters, with everything else matching. Giving the voice walk the
+*slot* variable rather than a third name is what the image does - the slot is
+dead by then.
+
+    for (slot = 0; slot < FX_72_VOICES; slot++) {
+        BtlSoundClose(slot + FX_72_VOICE);
+    }
+
+[fxspell72.c](/src/btlp/fxspell72.c), `BtlFxStep72`, 99.62% to 99.88%;
+[fxstepe8.c](/src/btlp/fxstepe8.c), `BtlFxStepE8`, 99.57% to 99.88%.
+
+## Two induction variables cannot be stepped in the image's order
+
+A walk that indexes two tables at once - `g_btl_actors[slot]` and
+`g_btl_enemies[k]`, stepped together - is reduced to two pointers, and the
+order their `addiu`s come out in is not free. The loop dump (`cc1 -dL`, see
+[RTL Dumps](RTL%20Dumps.md)) spells out the rule:
+
+- each induction variable gets a class of its own, and the classes are
+  processed in the **reverse** of the order their increments appear, which is
+  the order the two pointers are **set up** in before the loop;
+- each class's update is planted in front of **its own** variable's increment,
+  so the order of the two updates is the order of `slot++` and `k++`.
+
+Setting up and stepping therefore always come out in opposite orders. An image
+with both in the same order was written against **one** induction variable.
+Reaching the second table off the first one's index does put them in step, but
+`combine_givs` then folds the first table's addresses onto the second's
+multiply and the register loses the offset it should start at - which is its
+own pair of rows. `BtlFxStep72` and `BtlFxStepE8` both stop here, two rows out.

@@ -43,10 +43,10 @@
 
 extern void BtlFxReopenVoices(void);
 
-/* 99.60%: nothing structural left, only which of the walk's two counters gets
-   the saved register - the image keeps the slot there and the count in a temp,
-   and gcc here does the opposite whichever order they are declared or set up
-   in. */
+/* 99.88%: the two induction pointers the walk is reduced to are incremented
+   in the other order - the image steps the enemy's before the actor's. The
+   same residual as BtlFxStep72, and its comment carries the loop dump's
+   account of why two induction variables cannot put the two in step. */
 #ifdef NON_MATCHING
 void BtlFxStepE8(BtlObj *o)
 {
@@ -104,8 +104,8 @@ void BtlFxStepE8(BtlObj *o)
                 break;
             }
             if (g_btl_no_escape == 0) {
-                for (i = 0; i < FX_E8_VOICES; i++) {
-                    BtlSoundClose(i + FX_E8_VOICE);
+                for (slot = 0; slot < FX_E8_VOICES; slot++) {
+                    BtlSoundClose(slot + FX_E8_VOICE);
                 }
             }
             o->motion = 0;

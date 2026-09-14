@@ -48,6 +48,11 @@ extern u_char *g_btl_unused_gfx;
    each allocation from the staged artwork's own script table. */
 extern BtlObjDef g_btl_fx_def;
 
+/* A second one of the same, in the overlay's own workspace rather than beside
+   the tables. Only BtlFxStep6E fills it in, the way the overlay carries a
+   second BtlOpenFxObj and a second copy of the ring's cells. */
+extern BtlObjDef g_btl_fx_def2;
+
 /* The colour a fighter is put on while an effect stands over it. */
 extern u_char g_btl_tint_fx_r;
 extern u_char g_btl_tint_fx_g;
@@ -183,6 +188,10 @@ extern long g_btl_fx_spread_90[][2];
 extern long g_btl_fx_spread_91[][2];
 
 extern u_char g_btl_fx_ring_cells[];
+
+/* The overlay's second copy of that table, byte for byte the same one.
+   BtlFxStep6E reads this one and BtlFxStep27 the first. */
+extern u_char g_btl_fx_ring_cells2[];
 extern u_char g_btl_fx_nine_order[];
 
 /* When each cell of a sheet arrives, in halves of a frame - a shuffle of the

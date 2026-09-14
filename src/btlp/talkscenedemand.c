@@ -389,12 +389,15 @@ void BtlTalkSceneDemand(void)
                     break;
             }
 
-            /* Carry the row index into the response local before loading it;
-               indexing the global directly changes the address registers. */
+            /* Keep the row index separate from the loaded response so gcc uses
+               the original load register. Indexing the global directly also
+               changes the address registers. */
             entry = g_btl_demand_kind;
-            entry = (base->rows + entry)->entry[i + 5];
-            gauge  = entry & 0xFF;
-            weight = entry >> 8;
+            {
+                u_int response = (base->rows + entry)->entry[i + 5];
+                gauge = response & 0xFF;
+                weight = response >> 8;
+            }
         take_line:
             slot = i - 2;
             BtlTalkTakeLine(slot, g_btl_demand_kind, gauge, weight, g_btl_demand_item);

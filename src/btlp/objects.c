@@ -27,7 +27,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
-#include <inline.h>
+#include <decomp/gte.h>
 #include <libgpu.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
@@ -79,8 +79,6 @@
 #define BTL_GRID_LIT   0xFF
 #define BTL_GRID_DIM   0x40
 
-/* What an ordering table entry keeps of a primitive's address. */
-#define BTL_OT_ADDR 0xFFFFFF
 
 /* The mesh: nine rows of twenty squares, walked with a bit a square. */
 #define BTL_MESH_ROWS 9
@@ -114,7 +112,7 @@ void BtlDrawObjects(void)
     u_long *ot;
     u_char *cells;
     u_char *base;
-    short  *hold;
+    SVECTOR *face;
     const short *m;
     const short *far;
     POLY_FT4 *poly;
@@ -126,12 +124,9 @@ void BtlDrawObjects(void)
     int     col;
     int     x0;
     int     x1;
-    int     y0;
-    int     y1;
-    int     y_tl;
-    int     y_tr;
-    int     y_bl;
-    u_int   mask;
+    short   y_tl;
+    short   y_tr;
+    short   y_bl;
     u_int   lit;
     u_int   dim;
     u_int   addr;
@@ -227,46 +222,42 @@ void BtlDrawObjects(void)
     SetTransMatrix(&g_btl_cam_matrix);
     SetGeomOffset(BTL_SCREEN_CX, BTL_SCREEN_CY);
 
-    hold = &held;
     if (g_btl_debug_hud != 0 && g_btl_debug_grid != 0) {
         row = 0;
         base = g_btl_debug_grid_cells;
-        y0 = BTL_GRID_Y0;
-        y1 = BTL_GRID_Y1;
+        face = g_btl_arena_face;
         lit = BTL_GRID_LIT;
         dim = BTL_GRID_DIM;
-        mask = BTL_OT_ADDR;
         do {
             col = 0;
-            /* One y per corner of the quad rather than one per edge. The two
-               far corners share a value and the two near ones share another,
-               but the original keeps all four apart - and the near-right one
-               on the stack, which is what `hold` reads back. */
-            y_tl = y1;
-            y_tr = y1;
-            y_bl = y0;
-            held = y0;
+            /* Keep four halfword corner values. Deriving them from the row lets
+               gcc strength-reduce the two shared vertical coordinates. */
+            y_tl = row * BTL_GRID_H + BTL_GRID_Y1;
+            y_tr = row * BTL_GRID_H + BTL_GRID_Y1;
+            y_bl = row * BTL_GRID_H + BTL_GRID_Y0;
+            held = row * BTL_GRID_H + BTL_GRID_Y0;
             x1 = BTL_GRID_X1;
             x0 = BTL_GRID_X0;
             cells = base;
-            do {
+        grid_cell:
+            {
                 if (cells[row] != 0) {
-                    g_btl_arena_face[0].vx = x0;
-                    g_btl_arena_face[0].vy = y_tl;
-                    g_btl_arena_face[0].vz = 0;
-                    g_btl_arena_face[1].vx = x1;
-                    g_btl_arena_face[1].vy = y_tr;
-                    g_btl_arena_face[1].vz = 0;
-                    g_btl_arena_face[2].vx = x0;
-                    g_btl_arena_face[2].vy = y_bl;
-                    g_btl_arena_face[2].vz = 0;
-                    g_btl_arena_face[3].vx = x1;
+                    face[0].vx = x0;
+                    face[0].vy = y_tl;
+                    face[0].vz = 0;
+                    face[1].vx = x1;
+                    face[1].vy = y_tr;
+                    face[1].vz = 0;
+                    face[2].vx = x0;
+                    face[2].vy = y_bl;
+                    face[2].vz = 0;
+                    face[3].vx = x1;
                     /* The block boundary is load-bearing: it is what puts
                        the projection's registers where the original has
                        them. Do not unwrap it. */
                     do {
-                        g_btl_arena_face[3].vz = 0;
-                        g_btl_arena_face[3].vy = *hold;
+                        face[3].vz = 0;
+                        face[3].vy = held;
                         gte_ldv3(&g_btl_arena_face[0], &g_btl_arena_face[1],
                                  &g_btl_arena_face[2]);
                         gte_rtpt();
@@ -289,22 +280,31 @@ void BtlDrawObjects(void)
                     g_btl_polyg4_next->r3 = lit;
                     g_btl_polyg4_next->g3 = lit;
                     g_btl_polyg4_next->b3 = 0;
-                    ot = (u_long *)(g_btl_prim_pool
-                                    + g_btl_frame * BTL_FRAME_BYTES
-                                    + BTL_ARENA_OT);
-                    setaddr(g_btl_polyg4_next, getaddr(ot) & mask);
-                    addr = (u_int)g_btl_polyg4_next & mask;
-                    g_btl_polyg4_next++;
-                    setaddr(ot, addr);
+                    {
+                        /* Keep the primitive across tag writes, which can
+                           otherwise make gcc reload the global pointer. */
+                        POLY_G4* quad = g_btl_polyg4_next;
+                        ot = (u_long *)(g_btl_prim_pool
+                                        + g_btl_frame * BTL_FRAME_BYTES
+                                        + BTL_ARENA_OT);
+                        setaddr(quad, getaddr(ot));
+                        addr = (u_int)quad;
+                        g_btl_polyg4_next = quad + 1;
+                        setaddr(ot, addr);
+                    }
                 }
                 cells += BTL_GRID_ROWS;
                 x1 += BTL_GRID_W;
                 col++;
                 x0 += BTL_GRID_W;
-            } while (col < BTL_GRID_COLS);
-            y0 += BTL_GRID_H;
+            }
+            /* Keep the cell pointer separate from the row offset. A loop here
+               lets gcc fold both into one induction variable. */
+            if (col < BTL_GRID_COLS)
+            {
+                goto grid_cell;
+            }
             row++;
-            y1 += BTL_GRID_H;
         } while (row < BTL_GRID_ROWS);
     }
 
@@ -323,8 +323,8 @@ void BtlDrawObjects(void)
     g_btl_polyft4_next = (POLY_FT4 *)(g_btl_prim_pool
                                       + g_btl_frame * BTL_FRAME_BYTES
                                       + BTL_MESH_AT);
-    row = 0;
     if (g_btl_mesh_show != 0) {
+        int meshRow = 0;
         hidden = g_btl_mesh_hidden;
         do {
             col = 0;
@@ -367,9 +367,9 @@ void BtlDrawObjects(void)
                 bit >>= 1;
             } while (col < BTL_MESH_COLS);
             m += 12;
-            row++;
+            meshRow++;
             hidden++;
-        } while (row < BTL_MESH_ROWS);
+        } while (meshRow < BTL_MESH_ROWS);
     }
 }
 #else

@@ -102,9 +102,9 @@ void BtlFxStep27(BtlObj *o)
             pos[0] = 0;
             pos[1] = (g_btl_actor_turn < BTL_PARTY) ? -FX_27_OFF : FX_27_OFF;
             pos[2] = 0;
-            pos[0] = (g_btl_fx_ring_cells[(o->steps & FX_27_CELLS) * 2]
+            pos[0] = (g_btl_fx_ring_cells[(o->steps & FX_27_CELLS) << 1]
                           * FX_27_COL_W - FX_27_LEFT) << 16;
-            row = g_btl_fx_ring_cells[(o->steps & FX_27_CELLS) * 2 + 1]
+            row = g_btl_fx_ring_cells[((o->steps & FX_27_CELLS) << 1) + 1]
                       * FX_27_ROW_H;
             pos[1] = ((g_btl_actor_turn < BTL_PARTY) ? row - FX_27_HIGH
                                                      : row + FX_27_LOW) << 16;
