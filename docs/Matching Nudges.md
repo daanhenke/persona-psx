@@ -1827,3 +1827,34 @@ it, leaving every offset alone.
 `--a->c.ail_level` on a `u_char` folds the constant to 255 and emits
 `addiu v0, v0, 0xff`; the image's `addiu v0, v0, -1` is the same decrement
 through `*(signed char *)&a->c.ail_level`.
+
+## Two equality tests where the image reloads the field
+
+`(u_int)(o->kind - 0x3F) >= 2` reuses the `o->kind` an earlier index already
+loaded. Written `o->kind != 0x3F && o->kind != 0x40`, fold turns the pair into
+the same range test but through a saved copy of the operand, which is expanded
+as a load of its own - and that is the image's second `lhu` of the field, with
+the first load's register free to take the spell byte.
+
+- [fxfinish37.c](/src/btlp/fxfinish37.c) - `BtlFxFinish37`, 98.70% to 99.27%.
+
+## A byte tested twice through a local read inside the block
+
+Where the image loads a byte once, range-tests the unsigned value and then
+sign-extends the same register in the branch's delay slot for a second test,
+the byte was read into a local between the tests' guard and the tests. Written
+straight off the field, the second test loads it again with `lb`.
+
+    if ((rand() & FX_37_ROLL) < FX_37_MARK_ROLL) {
+        m = a->c.status;
+        if ((u_int)(m - STATUS_PALYZE) >= 2 && (signed char)m != STATUS_SICK) {
+
+- [fxfinish37.c](/src/btlp/fxfinish37.c) - 0xEE's roll; 98.70% to 99.39%.
+
+## A clamp needs a local that does not live across a call
+
+A clamp written into a local that is also a loop counter somewhere else in the
+routine puts the clamp in a saved register; the image's clamp works in `v1`.
+A local of its own, dead at every call, gets the temporary.
+
+- [fxfinish37.c](/src/btlp/fxfinish37.c) - the ailment chance; 97.28% to 97.75%.
