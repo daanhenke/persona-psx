@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - the breathing on whatever is being aimed at.  BTLP only.
- *   0x8008B204 BtlPulsePicked
+ *   0x8008B204 BtlPulsePicked   0x8008B2C4 BtlActorMotion0B
  *
  * Called once a frame on every record of the marker group. A record that is
  * held is left alone; anything else is walked between full brightness and a
@@ -10,6 +10,9 @@
  *
  * The rate doubles when the field is being drawn every other frame, so the
  * breathing takes the same time either way.
+ *
+ * BtlActorMotion0B is the same walk as a fighter's motion, with yellow at the
+ * top instead of white.
  */
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
@@ -61,6 +64,52 @@ void BtlPulsePicked(BtlObj *o)
     o->rgb_to[0] = to;
     o->rgb_to[1] = to;
     o->rgb_to[2] = to;
+    if (half != 0) {
+        rate = PULSE_FAST;
+    }
+    o->fade = rate;
+}
+
+/* The yellow a fighter's blink walks up to, the pair of its first two
+   channels, and the third channel at the top. */
+#define BLINK_LIT_PAIR 0x00FF00FF
+#define BLINK_LIT_B    0
+
+void BtlActorMotion0B(BtlObj *o)
+{
+    int rate;
+    int half;
+
+    if ((o->attr & BTL_OBJ_HELD) != 0) {
+        return;
+    }
+    if ((o->attr & BTL_OBJ_PICKED) != 0) {
+        if (*(long *)&o->rgb[0] == PULSE_DIM_PAIR && o->rgb[2] == PULSE_DIM) {
+            o->attr &= ~BTL_OBJ_PICKED;
+            return;
+        }
+        /* The same block as BtlPulsePicked's, for the same reason. */
+        do {
+            rate = PULSE_RATE;
+            half = g_btl_half_rate;
+        } while (0);
+        o->rgb_to[0] = PULSE_DIM;
+        o->rgb_to[1] = PULSE_DIM;
+        o->rgb_to[2] = PULSE_DIM;
+    } else {
+        if (*(long *)&o->rgb[0] == BLINK_LIT_PAIR && o->rgb[2] == BLINK_LIT_B) {
+            o->attr |= BTL_OBJ_PICKED;
+            return;
+        }
+        /* The same block as BtlPulsePicked's, for the same reason. */
+        do {
+            rate = PULSE_RATE;
+            half = g_btl_half_rate;
+        } while (0);
+        o->rgb_to[0] = PULSE_LIT;
+        o->rgb_to[1] = PULSE_LIT;
+        o->rgb_to[2] = BLINK_LIT_B;
+    }
     if (half != 0) {
         rate = PULSE_FAST;
     }

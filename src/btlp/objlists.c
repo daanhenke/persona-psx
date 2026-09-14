@@ -26,21 +26,8 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define PRIM_SEMITRANS    2
-
 /* Set to project the lines through the camera rather than lay them flat. */
 #define BTL_OBJ_LINES_3D 0x100000
-
-/* Where the screen's centre is, for the projection. */
-#define BTL_SCREEN_CX 0xA0
-#define BTL_SCREEN_CY 0x78
-
-extern MATRIX  g_btl_cam_matrix;
-extern MATRIX  g_btl_obj_matrix;
-extern VECTOR  g_btl_obj_shift;
-extern SVECTOR g_btl_obj_quad[];
 
 void BtlDrawObjQuads(BtlObj *o)
 {

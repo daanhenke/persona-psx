@@ -25,6 +25,7 @@
  * square, which is read back out of the object rather than kept.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
@@ -82,7 +83,6 @@ extern const u_long *g_btl_grid_scripts[][2];
 
 extern BtlObj *g_btl_grid_anchor;
 extern BtlObj *g_btl_grid_back;
-extern BtlObj *g_btl_grid_tail;
 extern BtlObj *g_btl_pick_cursors[];
 
 void BtlRefreshPickCursors(void);

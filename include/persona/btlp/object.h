@@ -91,7 +91,8 @@ typedef struct {
     /* 0x04 */ short  x1;
     /* 0x06 */ short  y1;
     /* 0x08 */ short  rgb[6];
-    /* 0x14 */ u_char pad14[0xC];
+    /* 0x14 */ short  rgb_to[6]; /* what the colours walk toward where the
+                                  record is faded                        */
 } BtlGfxLine;                          /* 0x20 bytes */
 
 typedef struct {
@@ -327,6 +328,25 @@ extern u_short  g_btl_obj_first[];
 extern u_short  g_btl_obj_count[];
 extern BtlObj  *g_btl_obj_prev;    /* left by BtlObjLast, one short of the end */
 
+/* What every drawer shares: the attribute bit each turns into its primitive's
+   semi-transparency, and the bit it sets in the primitive's code; where the
+   screen's centre is, for a projection; where the depth-sorted part of the
+   ordering table starts, and the bias a group 2 object takes into it. */
+#define BTL_OBJ_SEMITRANS 1
+#define PRIM_SEMITRANS    2
+#define BTL_SCREEN_CX     0xA0
+#define BTL_SCREEN_CY     0x78
+#define BTL_ORDER_BASE    500
+#define BTL_ORDER_MARK    498
+#define BTL_GROUP_MARK    2
+
+/* The GTE scratch the drawers share: the camera's matrix, the object's own and
+   the shift it is built with, and the quad the corners go through. */
+extern MATRIX  g_btl_cam_matrix;
+extern MATRIX  g_btl_obj_matrix;
+extern VECTOR  g_btl_obj_shift;
+extern SVECTOR g_btl_obj_quad[];
+
 /* The eight drawing handlers and the tick, indexed by BtlObj.draw. */
 extern void (*g_btl_obj_draw[])(BtlObj *o);
 extern void (*g_btl_obj_tick[])(BtlObj *obj);
@@ -356,6 +376,13 @@ extern void BtlObjSetScaleTo(BtlObj *obj, long scale);
 extern void BtlObjSetRgbNow(BtlObj *obj, short r, short g, short b);
 extern void BtlObjSetAttr(BtlObj *obj, u_long bits);
 extern void BtlObjClearAttr(BtlObj *obj, u_long bits);
+
+/* Walks one colour channel toward its target by at most `step`. approach.c. */
+extern void BtlApproach(short *cur, const short *target, int step);
+
+/* The breathing on a picked record, between full brightness and a sixteenth
+   of it. pulsepick.c. */
+extern void BtlPulsePicked(BtlObj *o);
 
 /* Tints a fighter for the ailment it is under. statustint.c. */
 extern void BtlObjStatusTint(BtlObj *obj);

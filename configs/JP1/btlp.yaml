@@ -361,11 +361,11 @@ segments:
       - [0x26184, c, stepscripts]
       - [0x26570, c, tickobjects]
       - [0x2670C, c, popup]
-      - [0x26870, asm, btlp_48]
+      - [0x26870, c, tickmarker]
       - [0x26BE0, c, grouptick]
       - [0x26DE8, c, whitenclut]
       - [0x26E64, c, pulsepick]
-      - [0x26F24, asm, btlp_48_a]
+      - [0x26FF4, asm, btlp_48_a]
       # The motions a fighter takes a blow in.
       - [0x28820, c, hitmotion]
       # A member's record walking on and off in a scene.

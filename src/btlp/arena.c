@@ -14,6 +14,7 @@
  * row at v 0xE0 and the flats the one at 0xD0.
  */
 #include <decomp/types.h>
+#include <persona/btlp/object.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
 #include <inline.h>
@@ -49,8 +50,6 @@
    takes a twenty-wide cell each way. */
 #define ARENA_BACK_COLS 6
 #define ARENA_BACK_ROWS 10
-
-extern void BtlApproach(short *cur, const short *target, int step);
 
 extern SVECTOR   g_btl_arena_face[];
 extern SVECTOR   g_btl_arena_quad[];

@@ -18,16 +18,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define SPRT_SEMITRANS    2
-
-/* Each frame owns half the primitive pool, and its ordering table sits at the
-   end of it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_SPRT_OT     0xE65C
-
-
 void BtlDrawObjPieces(BtlObj *o)
 {
     const BtlGfxCell *cell;
@@ -38,8 +28,8 @@ void BtlDrawObjPieces(BtlObj *o)
 
     i = 0;
     cell = ((const BtlGfxList *)o->last)->cells;
-    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                    + BTL_SPRT_OT);
+    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                    + BTL_OT_END);
     /* The list is reached through the object every time rather than held in a
        local: the count is re-read from it on each turn of the loop. */
     if (((const BtlGfxList *)o->last)->count != 0) {
@@ -48,15 +38,15 @@ void BtlDrawObjPieces(BtlObj *o)
                something already to hand is how the original gets one: both
                arms below do the same thing on purpose. */
             if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                g_btl_sprt_next->code |= SPRT_SEMITRANS;
+                g_btl_sprt_next->code |= PRIM_SEMITRANS;
             } else if (getaddr(ot) || i) {
                 if (cell) {
-                    g_btl_sprt_next->code &= ~SPRT_SEMITRANS;
+                    g_btl_sprt_next->code &= ~PRIM_SEMITRANS;
                 } else {
-                    g_btl_sprt_next->code &= ~SPRT_SEMITRANS;
+                    g_btl_sprt_next->code &= ~PRIM_SEMITRANS;
                 }
             } else {
-                g_btl_sprt_next->code &= ~SPRT_SEMITRANS;
+                g_btl_sprt_next->code &= ~PRIM_SEMITRANS;
             }
             g_btl_sprt_next->x0 = g_btl_obj_x + cell->x;
             g_btl_sprt_next->y0 = g_btl_obj_y + cell->y;

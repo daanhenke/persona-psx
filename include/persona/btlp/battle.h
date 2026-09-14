@@ -194,6 +194,9 @@ extern void BtlHudShow(void);
 /* One marker object per party slot, plus the shared one past them. */
 extern BtlObj *g_btl_marker_obj[];
 
+/* The placement grid's last record; holding one is what says the grid is up. */
+extern BtlObj *g_btl_grid_tail;
+
 /* The markers' scripts, by kind. Entries 12 to 15 are the cast circle's. */
 extern BtlSeqStep *g_btl_marker_scripts[];
 

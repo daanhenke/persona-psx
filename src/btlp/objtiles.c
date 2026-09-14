@@ -19,17 +19,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define TILE_SEMITRANS    2
-
-/* Each frame owns half the primitive pool, and its ordering table sits at the
-   end of it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_TILE_OT     0xE65C
-
-extern TILE    *g_btl_tile_next;
-
 void BtlDrawObjTiles(BtlObj *o)
 {
     const BtlGfxCell *cell;
@@ -45,9 +34,9 @@ void BtlDrawObjTiles(BtlObj *o)
         i = 0;
         do {
             if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                g_btl_tile_next->code |= TILE_SEMITRANS;
+                g_btl_tile_next->code |= PRIM_SEMITRANS;
             } else {
-                g_btl_tile_next->code &= ~TILE_SEMITRANS;
+                g_btl_tile_next->code &= ~PRIM_SEMITRANS;
             }
             g_btl_tile_next->x0 = g_btl_obj_x + cell->x;
             g_btl_tile_next->y0 = g_btl_obj_y + cell->y;
@@ -59,8 +48,8 @@ void BtlDrawObjTiles(BtlObj *o)
             SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
             cell++;
             i++;
-            ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                            + BTL_TILE_OT);
+            ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                            + BTL_OT_END);
             addPrim(ot, g_btl_tile_next);
             addPrim(ot, g_btl_drmode_next);
             g_btl_tile_next++;

@@ -22,16 +22,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define SPRT_SEMITRANS    2
-
-/* Each frame owns half the primitive pool, and its ordering table sits at the
-   end of it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_SPRT_OT     0xE65C
-
-
 void BtlDrawObjText(BtlObj *o)
 {
     const BtlGfxText *line;
@@ -45,8 +35,8 @@ void BtlDrawObjText(BtlObj *o)
 
     i = 0;
     line = (const BtlGfxText *)((const BtlGfxList *)o->last)->cells;
-    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                    + BTL_SPRT_OT);
+    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                    + BTL_OT_END);
     /* The list is reached through the object every time rather than held in a
        local: the count is re-read from it on each turn of the loop. */
     if (((const BtlGfxList *)o->last)->count != 0) {
@@ -57,9 +47,9 @@ void BtlDrawObjText(BtlObj *o)
                         break;
                     }
                     if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                        g_btl_sprt_next->code |= SPRT_SEMITRANS;
+                        g_btl_sprt_next->code |= PRIM_SEMITRANS;
                     } else {
-                        g_btl_sprt_next->code &= ~SPRT_SEMITRANS;
+                        g_btl_sprt_next->code &= ~PRIM_SEMITRANS;
                     }
                     /* The cell width goes through a local, shared by the pen
                        step, the column and the sprite's own width. */

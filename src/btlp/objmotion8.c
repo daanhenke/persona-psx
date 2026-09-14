@@ -30,6 +30,7 @@
  * an angle or a scale is worth anything.
  */
 #include <decomp/types.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
 /* The bit of `draw` that says the record is drawn through its angles and
@@ -60,7 +61,6 @@
 /* The grey a record under either scale is walked to. */
 #define OBJ_GREY 0x80
 
-extern BtlObj *g_btl_grid_tail;
 extern BtlObj *g_btl_pick_cursors[];
 
 void BtlObjMotion08(BtlObj *obj)

@@ -24,35 +24,12 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define POLY_SEMITRANS    2
-
 /* Take the camera's rotation instead of the object's, so the model always
    faces front however the camera has swung. */
 #define BTL_OBJ_FACE_CAMERA 8
 
 /* Draw into the arena's ordering table rather than the depth-sorted one. */
 #define BTL_OBJ_ARENA_OT 4
-
-/* Where the screen's centre is, for the first projection. */
-#define BTL_SCREEN_CX 0xA0
-#define BTL_SCREEN_CY 0x78
-
-/* Where the ordering table starts from, and the bias a group 2 object takes. */
-#define BTL_ORDER_BASE 500
-#define BTL_ORDER_MARK 498
-#define BTL_GROUP_MARK 2
-
-/* Each frame owns half the primitive pool; the arena's table sits inside it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_ARENA_OT    0xD6C0
-
-extern int       g_btl_screen_dist;
-extern MATRIX    g_btl_cam_matrix;
-extern MATRIX    g_btl_obj_matrix;
-extern SVECTOR   g_btl_cam_rot;
-extern SVECTOR   g_btl_obj_quad[];
 
 #ifdef NON_MATCHING
 void BtlDrawObjModel(BtlObj *o)
@@ -154,9 +131,9 @@ void BtlDrawObjModel(BtlObj *o)
             g_btl_polyft4_next->u3 = g_btl_polyft4_next->u1;
             g_btl_polyft4_next->v3 = g_btl_polyft4_next->v2;
             if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                g_btl_polyft4_next->code |= POLY_SEMITRANS;
+                g_btl_polyft4_next->code |= PRIM_SEMITRANS;
             } else {
-                g_btl_polyft4_next->code &= ~POLY_SEMITRANS;
+                g_btl_polyft4_next->code &= ~PRIM_SEMITRANS;
             }
             g_btl_polyft4_next->r0 = o->rgb[0];
             g_btl_polyft4_next->g0 = o->rgb[1];
@@ -166,12 +143,12 @@ void BtlDrawObjModel(BtlObj *o)
             g_btl_polyft4_next->tpage =
                 g_btl_tpage[o->unkCD + (((const u_short *)o->last)[1] & 7)];
             if ((o->attr & BTL_OBJ_ARENA_OT) == 0) {
-                off = g_btl_frame * BTL_FRAME_BYTES
-                      - (off * 4 - BTL_FRAME_BYTES);
+                off = g_btl_frame * BTL_FRAME_STRIDE
+                      - (off * 4 - BTL_FRAME_STRIDE);
             } else {
                 /* Two steps on purpose - folding them changes the registers. */
-                off = BTL_ARENA_OT;
-                off = g_btl_frame * BTL_FRAME_BYTES + off;
+                off = BTL_OT;
+                off = g_btl_frame * BTL_FRAME_STRIDE + off;
             }
             ot = (u_long *)(g_btl_prim_pool + off);
             cell++;

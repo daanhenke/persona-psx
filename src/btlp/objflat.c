@@ -25,32 +25,9 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define SPRT_SEMITRANS    2
-
 /* Set to keep the object out of the depth sort and put it in the one entry at
    the end of the table. */
 #define BTL_OBJ_NO_DEPTH 2
-
-/* Where the screen's centre is, for the projection. */
-#define BTL_SCREEN_CX 0xA0
-#define BTL_SCREEN_CY 0x78
-
-/* Where the ordering table starts from, and the bias a group 2 object takes. */
-#define BTL_ORDER_BASE 500
-#define BTL_ORDER_MARK 498
-#define BTL_GROUP_MARK 2
-
-/* Each frame owns half the primitive pool, and its ordering table sits at the
-   end of it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_PRIM_OT     0xE65C
-
-extern int      g_btl_screen_dist;
-extern MATRIX   g_btl_cam_matrix;
-extern MATRIX   g_btl_obj_matrix;
-extern SVECTOR  g_btl_obj_quad[];
 
 void BtlDrawObjFlat(BtlObj *o)
 {
@@ -107,11 +84,11 @@ void BtlDrawObjFlat(BtlObj *o)
         sxy.vy = sxy.vy + shift;
     }
     if ((o->attr & BTL_OBJ_NO_DEPTH) != 0) {
-        ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                        + BTL_PRIM_OT);
+        ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                        + BTL_OT_END);
     } else {
-        ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                        + BTL_FRAME_BYTES - off * 4);
+        ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                        + BTL_FRAME_STRIDE - off * 4);
     }
     /* Keep the sprite counter in its own block: the shift temporary above
        then uses v1 without changing the loop's register allocation. */
@@ -123,9 +100,9 @@ void BtlDrawObjFlat(BtlObj *o)
     if (*(const u_char *)o->last != 0) {
         do {
             if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                g_btl_sprt_next->code |= SPRT_SEMITRANS;
+                g_btl_sprt_next->code |= PRIM_SEMITRANS;
             } else {
-                g_btl_sprt_next->code &= ~SPRT_SEMITRANS;
+                g_btl_sprt_next->code &= ~PRIM_SEMITRANS;
             }
             g_btl_sprt_next->x0 = sxy.vx + cell->x;
             /* Read back through a pointer: that is what keeps the projected y

@@ -16,20 +16,6 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
 
-/* The object's own semi-transparency bit, and where it lands in a primitive. */
-#define BTL_OBJ_SEMITRANS 1
-#define POLY_SEMITRANS    2
-
-/* Each frame owns half the primitive pool, and its ordering table sits at the
-   end of it. */
-#define BTL_FRAME_BYTES 0xE660
-#define BTL_PRIM_OT     0xE65C
-
-extern POLY_F4 *g_btl_polyf4_next;
-extern MATRIX   g_btl_obj_matrix;
-extern VECTOR   g_btl_obj_shift;
-extern SVECTOR  g_btl_obj_quad[];
-
 void BtlDrawObjTilesRot(BtlObj *o)
 {
     const BtlGfxCell *cell;
@@ -54,8 +40,8 @@ void BtlDrawObjTilesRot(BtlObj *o)
     SetRotMatrix(&g_btl_obj_matrix);
     SetTransMatrix(&g_btl_obj_matrix);
     cell = ((const BtlGfxList *)o->last)->cells;
-    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
-                    + BTL_PRIM_OT);
+    ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                    + BTL_OT_END);
     /* The list is reached through the object every time rather than held in a
        local: the count is re-read from it on each turn of the loop. */
     if (((const BtlGfxList *)o->last)->count != 0) {
@@ -75,9 +61,9 @@ void BtlDrawObjTilesRot(BtlObj *o)
                           (long *)&g_btl_polyf4_next->x2,
                           (long *)&g_btl_polyf4_next->x3, &scratch[0], &scratch[1]);
             if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
-                g_btl_polyf4_next->code |= POLY_SEMITRANS;
+                g_btl_polyf4_next->code |= PRIM_SEMITRANS;
             } else {
-                g_btl_polyf4_next->code &= ~POLY_SEMITRANS;
+                g_btl_polyf4_next->code &= ~PRIM_SEMITRANS;
             }
             g_btl_polyf4_next->r0 = o->rgb[0];
             g_btl_polyf4_next->g0 = o->rgb[1];
