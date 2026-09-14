@@ -2132,3 +2132,40 @@ here it is the plain spelling that pays the extra load.
   a `u_int`, once the carried fighter's resume was also written in the image's
   order (motion, phase, then the attribute bit) - that alone was 98.05% to
   99.63%.
+
+## Cell tables are two-dimensional
+
+A board's number, name and label cells, filled a row per entry inside a loop,
+are `u_char cells[][N]` in the source. The image reaches each row through the
+symbol (`lui at, %hi(cells); addu at, at, s0; sb ..., %lo(cells)(at)`) with a
+strength-reduced `i * N` in a saved register, and loads the base afresh for the
+row it hands a call. Written flat, a blank as `cells[i * N] = 0xFF` loads the
+symbol into a register of its own. The `.loop` dump then pairs it with the
+call's identical load (`move-insn savings 2 ... moved`), and the base is lifted
+out and walked as a pointer with a saved register more. Written as
+`cells[i][0] = 0xFF`, the store goes through the reference and never loads the
+base. The call's load is left alone (`savings 1 not desirable`).
+
+Copies into such a row are an inlined `memcpy(cells[i], src, N)`. A struct
+assignment through a cast forces the source's constant into a register, and
+the loop lifts that too.
+
+- [board23.c](/src/btlp/board23.c) - `BtlOpenBoard23`, 53.25% to exact: the
+  key stored before the count (60.52%), the copies as `memcpy` (83.62%), the
+  row loop's copy arm first (93.94%), and the cells as two-dimensional tables.
+- [board1d.c](/src/btlp/board1d.c) - `BtlOpenBoard1F`, 81.67% to 94.01% on
+  the same change. From there it was three steps to the byte:
+  - the first loop counting up (95.10%);
+  - `row = i + 20` worked out from the counter rather than stepped beside it,
+    which put the steps at the bottom of the loop in the image's order;
+  - the level column's clut written through a local in both arms (99.95%).
+    The two stores still merge, and the extra reference ranks that row's
+    register where the image has it.
+
+  The last two rows are `text[row - 5]`, a negative addend splat can only name
+  as `D_800DCFF1`.
+
+A loop whose counter only indexes (`for (i = 0; i < 10; i++) t[15 + i] = c`)
+comes out of gcc 2.6 reversed. The image counts down to `bgez`, with the
+lifted constant loaded *before* the counter's set-up. Written counting down,
+the set-up comes first. `BtlOpenBoard1F`'s first loop, 94.01% to 95.10%.

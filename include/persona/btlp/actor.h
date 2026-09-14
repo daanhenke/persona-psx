@@ -31,7 +31,8 @@ typedef struct BtlActor {
     /* 0x74 */ int     unk74;      /* what the negotiation's parting gift adds
                                       its experience to, once Char.unk14 is
                                       under the cap                          */
-    /* 0x78 */ u_char  pad78[4];
+    /* 0x78 */ int     unk78;      /* drawn beside unk74 on the board a won
+                                      fight is shown on                    */
     /* 0x7C */ u_short drop;       /* PersonaData.drop, copied in as the record
                                       is filled from a Persona: the item this
                                       fighter leaves behind and how freely   */
@@ -145,14 +146,19 @@ typedef struct BtlActor {
                                       what BtlStepCluts walks               */
     /* 0xCB */ u_char  padCB[1];
     /* 0xCC */ u_char  unkCC;      /* the five below are cleared as a record  */
-    /* 0xCD */ u_char  padCD[3];   /* is filled, and nothing has read them    */
+    /* 0xCD */ u_char  level_up;   /* is filled. BtlBattleResults raises it as
+                                      the fight's experience takes the level
+                                      up, and board 0x1F lights a mark for
+                                      it                                   */
+    /* 0xCE */ u_char  unk56_up;   /* the same for Char.unk56               */
+    /* 0xCF */ u_char  unkCF;
     /* 0xD0 */ u_char  unkD0;      /* counted up on the acting fighter by two
                                       of the effect handlers - move 0x4C's,
                                       when the fight is one that may be run
                                       from, and the ward the 0x8C family
                                       leaves; nothing has been found that
                                       reads it                              */
-    /* 0xD1 */ u_char  padD1[1];
+    /* 0xD1 */ u_char  unkD1;
     /* 0xD2 */ u_char  unkD2;
     /* 0xD3 */ u_char  unkD3;
     /* 0xD4 */ u_char  unkD4;

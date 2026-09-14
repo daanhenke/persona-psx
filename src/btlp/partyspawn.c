@@ -144,12 +144,12 @@ void BtlSpawnParty(void)
                 a->stage[4] = 0;
                 a->stage[5] = 0;
                 a->stage[6] = 0;
-                a->padCD[0] = 0;
-                a->padCD[1] = 0;
+                a->level_up = 0;
+                a->unk56_up = 0;
                 a->unk74 = 0;
-                *(int *)&a->pad78[0] = 0;
-                a->padCD[3] = 0;
-                a->padCD[4] = 0;
+                a->unk78 = 0;
+                a->unkD0 = 0;
+                a->unkD1 = 0;
                 a->unkD2 = 0;
                 a->unkD3 = 0;
                 a->unkD4 = 0;

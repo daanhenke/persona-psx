@@ -494,8 +494,7 @@ segments:
       - [0x43F9C, c, markerbuild]
       # The debug character editor's board.
       - [0x446A4, c, editboard]
-      - [0x44D9C, asm, btlp_64_x1]
-      - [0x450A0, c, board1d]
+      - [0x44D9C, c, board1d]
       # The equipment names the fighter editor's board shows.
       - [0x45128, c, equipnames]
       - [0x451BC, c, board22]

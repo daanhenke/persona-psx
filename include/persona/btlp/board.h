@@ -68,15 +68,11 @@ extern void    BtlEditEquipNames(BtlActor *a);
 extern void    BtlOpenBoard1D(void);
 extern void    BtlCloseBoard1D(void);
 
-/* A name and a label as a board's cells take them, copied whole: ten and six
-   glyph bytes, 0xFF ending the row. */
+/* A name as a board's cells take it, copied whole: ten glyph bytes, 0xFF
+   ending the row. */
 typedef struct {
     u_char b[10];
 } BtlNameCells;
-
-typedef struct {
-    u_char b[6];
-} BtlLabelCells;
 
 /* The label each arcana is shown by, by the 1-based PersonaData.arcana: eight
    bytes a row, of which a board takes the first six. */

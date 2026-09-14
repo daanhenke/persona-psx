@@ -66,6 +66,14 @@ extern ItemDef g_item_defs[];
 #define g_items         ((u_short *)0x801F267C)
 #define g_items_pending ((u_short *)(0x800EAE4C + WORK_BIAS))
 
+/* The party's money, eight bytes before g_items in the same work area. The
+   negotiation's gift reads it through the linker symbol; the won-fight
+   board reaches the same word by its literal address (lui/ori), which is
+   what G_MONEY is for. The battle compares it signed; ADV's MoneyAdd reads
+   it unsigned and keeps its own spelling. */
+extern int g_money;
+#define G_MONEY (*(int*)0x801F2674)
+
 /* A third list, in the battle only: the items worth offering, staged out of
    g_items. BtlBuildUsableItems walks the whole inventory and copies across
    every entry whose ItemDef carries USABLE_MARK, and BtlCommitUsableItems

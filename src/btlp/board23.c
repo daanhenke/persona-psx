@@ -9,16 +9,13 @@
  * a row nobody took is blanked. Then the board goes up; the close takes it
  * down.
  *
- * BtlOpenBoard23 is 60.52%. The count comes right with the key stored ahead of
- * the count. What is left is the row loop: the image indexes the three cell
- * tables by symbol plus a stepped offset (i * 6, i * 10, i * 2), walks only
- * the entry's key through a pointer, and builds each whole copy's address from
- * the symbol at every byte. gcc here lifts `g_persona_data + 0x1C` and the
- * tables' bases into four more saved registers and walks them all. Neither a
- * pointer for the key nor the blank held in a local moves it.
+ * The board's cells are two-dimensional tables, a row of cells per entry, and
+ * that is load-bearing: a blank written as `counts[i][0]` reaches the table
+ * through its symbol, where `counts[i * 2]` loads the symbol into a register
+ * of its own, which pairs with the call's and lifts both out of the loop.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
+#include <decomp/libc.h>
 #include <persona/common/persona.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/board.h>
@@ -32,9 +29,11 @@
 /* A row nobody took, and a blanked cell run. */
 #define BOARD23_FREE    0xFF
 
-/* The count's width, and the cells a count takes. */
-#define BOARD23_COUNT_WIDTH 1
+/* The cells of a row's label, name and count, and the count's width. */
+#define BOARD23_LABEL_CELLS 6
+#define BOARD23_NAME_CELLS  10
 #define BOARD23_COUNT_CELLS 2
+#define BOARD23_COUNT_WIDTH 1
 
 /* One kind and how many of it are on the field. */
 typedef struct {
@@ -47,11 +46,10 @@ extern BtlBoardDef        g_btl_board23_defs[];
 extern const long         g_btl_board23_pos[];
 
 extern BtlKindCount       g_btl_board23_kinds[];
-extern BtlLabelCells      g_btl_board23_arcana[];
-extern BtlNameCells       g_btl_board23_names[];
-extern u_char             g_btl_board23_counts[];
+extern u_char             g_btl_board23_arcana[][BOARD23_LABEL_CELLS];
+extern u_char             g_btl_board23_names[][BOARD23_NAME_CELLS];
+extern u_char             g_btl_board23_counts[][BOARD23_COUNT_CELLS];
 
-#ifdef NON_MATCHING
 void BtlOpenBoard23(void)
 {
     int i;
@@ -76,25 +74,24 @@ void BtlOpenBoard23(void)
         }
     }
     for (i = 0; i < BOARD23_ROWS; i++) {
-        if (g_btl_board23_kinds[i].key == BOARD23_FREE) {
-            g_btl_board23_arcana[i].b[0] = BOARD23_FREE;
-            g_btl_board23_names[i].b[0] = BOARD23_FREE;
-            g_btl_board23_counts[i * BOARD23_COUNT_CELLS] = BOARD23_FREE;
-        } else {
-            g_btl_board23_arcana[i] = *(BtlLabelCells *)g_btl_arcana_labels[
-                g_persona_data[g_btl_board23_kinds[i].key].arcana];
-            g_btl_board23_names[i] = *(BtlNameCells *)
-                g_persona_data[g_btl_board23_kinds[i].key].name;
-            BtlDrawNumberAlt(&g_btl_board23_counts[i * BOARD23_COUNT_CELLS],
+        if (g_btl_board23_kinds[i].key != BOARD23_FREE) {
+            memcpy(g_btl_board23_arcana[i], g_btl_arcana_labels[
+                g_persona_data[g_btl_board23_kinds[i].key].arcana],
+                BOARD23_LABEL_CELLS);
+            memcpy(g_btl_board23_names[i],
+                g_persona_data[g_btl_board23_kinds[i].key].name,
+                BOARD23_NAME_CELLS);
+            BtlDrawNumberAlt(g_btl_board23_counts[i],
                              g_btl_board23_kinds[i].count,
                              BOARD23_COUNT_WIDTH);
+        } else {
+            g_btl_board23_arcana[i][0] = BOARD23_FREE;
+            g_btl_board23_names[i][0] = BOARD23_FREE;
+            g_btl_board23_counts[i][0] = BOARD23_FREE;
         }
     }
     g_btl_board23 = BtlBoardOpen(g_btl_board23_defs, g_btl_board23_pos);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/board23", BtlOpenBoard23);
-#endif
 
 void BtlCloseBoard23(void)
 {

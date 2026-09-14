@@ -92,7 +92,6 @@
 /* g_cd_busy while a read is outstanding. */
 #define CD_IDLE (-1)
 
-extern int           g_money;
 extern volatile int  g_cd_busy;
 extern u_char        g_btl_banks[];
 extern const short   g_btl_gift_odds[][GIFT_KINDS];
@@ -310,7 +309,7 @@ void BtlTalkSceneGift(void)
                         e->obj->scripts[g_btl_models[e->c.key].talk]);
         BtlRunFrames(GIFT_HIT_PAUSE);
         BtlObjSetScript(e->obj,
-                        e->obj->scripts[g_btl_models[e->c.key].pad02[0]]);
+                        e->obj->scripts[g_btl_models[e->c.key].unk02]);
         slot = g_btl_actor_slot;
         a = &g_btl_actors[slot];
         BtlSoundOpen(g_btl_banks, GIFT_HIT_SND, a->c.key);

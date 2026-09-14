@@ -1123,19 +1123,19 @@ void BtlStageRound(void)
                             n = actor->persona_rank;
                             if (n == 3) {
                                 kind = 0;
-                                if (actor->padCD[2] == 0) {
+                                if (actor->unkCF == 0) {
                                     kind = 0x0F;
                                     amount = actor->c.hp / 8;
                                 }
                             } else if (n < 4) {
-                                if (actor->padCD[2] != 0) {
+                                if (actor->unkCF != 0) {
                                     amount = actor->c.hp_max / 8;
                                 } else {
                                     amount = actor->c.hp / 8;
                                 }
                                 kind = 7;
                             } else if (n == 4) {
-                                if (actor->padCD[2] == 0) {
+                                if (actor->unkCF == 0) {
                                     amount = actor->c.hp / 2;
                                 } else {
                                     amount = actor->c.hp_max / 2;
@@ -1146,14 +1146,14 @@ void BtlStageRound(void)
                             /* The same three ranks, the other way up. */
                             n = actor->persona_rank;
                             if (n == 3) {
-                                if (actor->padCD[2] == 0) {
+                                if (actor->unkCF == 0) {
                                     amount = actor->c.hp / 2;
                                 } else {
                                     amount = actor->c.hp_max / 2;
                                 }
                                 kind = 7;
                             } else if (n < 4) {
-                                if (actor->padCD[2] == 0) {
+                                if (actor->unkCF == 0) {
                                     amount = actor->c.hp / 8;
                                 } else {
                                     amount = actor->c.hp_max / 8;
@@ -1161,7 +1161,7 @@ void BtlStageRound(void)
                                 kind = 7;
                             } else if (n == 4) {
                                 kind = 0;
-                                if (actor->padCD[2] == 0) {
+                                if (actor->unkCF == 0) {
                                     kind = 0x0F;
                                     amount = actor->c.hp / 8;
                                 }
@@ -1186,14 +1186,14 @@ void BtlStageRound(void)
                                     amount = actor->c.hp_max / 8;
                                 }
                             } else {
-                                n = actor->padCD[4] + 1;
-                                actor->padCD[4] = n;
-                                if (actor->padCD[4] == 0) {
-                                    actor->padCD[4] = 1;
+                                n = actor->unkD1 + 1;
+                                actor->unkD1 = n;
+                                if (actor->unkD1 == 0) {
+                                    actor->unkD1 = 1;
                                 } else if ((u_char)n > 0x7F) {
-                                    actor->padCD[4] = 0x7F;
+                                    actor->unkD1 = 0x7F;
                                 }
-                                amount = actor->padCD[4];
+                                amount = actor->unkD1;
                                 kind = 7;
                             }
                         }

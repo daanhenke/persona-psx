@@ -409,14 +409,14 @@ void BtlFxResolveHit(BtlObj *o)
             a->flags &= ~FX_HIT_MARKS;
             if ((a->flags & FX_HIT_MARK_GUARD) == 0) {
                 a->flags |= FX_HIT_MARK_A;
-                a->padCD[2] = instant;
+                a->unkCF = instant;
             }
             break;
         case FX_HIT_KIND_B:
             a->flags &= ~FX_HIT_MARKS;
             if ((a->flags & FX_HIT_MARK_GUARD) == 0) {
                 a->flags |= FX_HIT_MARK_B;
-                a->padCD[2] = instant;
+                a->unkCF = instant;
             }
             break;
         }
