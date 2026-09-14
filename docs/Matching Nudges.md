@@ -671,6 +671,12 @@ Take its findings as hints about *shape* - it is very good at spotting that a
 value wants a second variable, or that a local is doing two jobs - and measure
 them with objcmp rather than trusting the score.
 
+Worse than that: by default its differ **normalises stack offsets away
+entirely**, so a candidate whose frame is eight bytes too long scores zero and
+it stops. That is how `BtlFxStep6E` came back "solved" while `odiff` still had
+six rows on the frame instructions. `--stack-diffs` makes it count them; give
+it that flag whenever the residual is, or might be, the frame.
+
 ## Let the compiler share the successful loop exits
 
 In `BtlChooseEnemyMove`, six searches finish by enabling a move. A `goto` from

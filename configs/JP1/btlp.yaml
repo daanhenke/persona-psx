@@ -416,7 +416,7 @@ segments:
       - [0x30F78, c, ailpanic]
       - [0x314D0, c, ailturn]
       - [0x316F4, c, ailcounter]
-      - [0x31918, asm, btlp_57_x1_c]
+      - [0x31918, c, ailmad]
       - [0x31DE0, c, ailwolf]
       - [0x31DE8, c, orderturns]
       - [0x31F38, c, pickother]

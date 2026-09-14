@@ -176,7 +176,10 @@ typedef struct BtlActor {
     /* 0xDB */ u_char  unkDB;      /* both cleared for every member once a
                                       negotiation is over                  */
     /* 0xDC */ u_char  unkDC;
-    /* 0xDD */ u_char  padDD[1];
+    /* 0xDD */ u_char  pick_saved; /* where BtlAilmentTurnMad puts the
+                                     pickable list aside while it tries a
+                                     shape on one candidate after another,
+                                     and puts it back from            */
     /* 0xDE */ u_char  unkDE;      /* raised on the slowest combatant by the
                                       round and only ever lasts it: the round's
                                       end clears it and attribute bit 0x40 with
