@@ -2108,3 +2108,27 @@ The same routine's frame came right in two steps of section 11's kind: a
 `long scratch[6]` where two of the longs are read, and in `BtlObjPlaceUnused`
 an unused `long unused[2]` declared *below* the transform's flag, which moves
 the flag up to the image's slot where a larger scratch would not.
+
+## A field tested, shifted and masked from one load is an unsigned local
+
+Setting a bit in a bitmap by species, the image loads the halfword once and
+uses that one register for the range test (`sltiu`), the word index (`srl`) and
+the bit number (`andi`). Three plain `o->kind` reads get a second `lhu` for the
+bit number. A local that holds it is right only in the right width:
+
+    kind = o->kind;
+    if (kind < KIND_PERSONAS) {
+        g_btl_persona_won[kind >> 5] |= 1 << (kind & 0x1F);
+    }
+
+- `u_int kind` is exact.
+- `int kind` turns the test and the shift signed (`slti`, `sra`).
+- `u_short kind` adds an `andi 0xffff` ahead of the test.
+
+The opposite of section "A field the image reads twice, and gcc reads once":
+here it is the plain spelling that pays the extra load.
+
+- [deathmotion.c](/src/btlp/deathmotion.c) - 98.28% with an `int`, exact with
+  a `u_int`, once the carried fighter's resume was also written in the image's
+  order (motion, phase, then the attribute bit) - that alone was 98.05% to
+  99.63%.

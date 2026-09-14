@@ -170,6 +170,10 @@ extern u_char g_btl_talk_outcome;
 /* Set when the round is to be given up on rather than played out. */
 extern u_char g_btl_leave_round;
 extern u_char g_btl_hold_markers;
+/* The object the held scene waits on, and the flag raised once it has
+   been held, so a boss only stops the round for it the once. */
+extern BtlObj *g_btl_hold_obj;
+extern u_char  g_btl_hold_done;
 extern u_char g_btl_pick_slowest;
 
 /* The scripted scene a step can stop to play. */
@@ -307,11 +311,12 @@ extern int BtlChooseEnemyMove(BtlActor *a);
 
 /* What the fight is running up as it goes. Written where damage is applied
    and read by BtlBattleResults; BtlStageOpen clears the lot at the start of
-   a battle. Which tally is which is not worked out yet - they are here so
-   there is one place to name them once it is. */
-extern int   D_800F4D5C;
-extern int   D_800F4E20;
-extern int   D_800F4AA4;
+   a battle. A fallen enemy adds its hp maximum, and its Persona record's
+   experience, +0x10 (what lands on Char +0x1C) and money. */
+extern int   g_btl_won_hp;
+extern int   g_btl_won_exp;
+extern int   g_btl_won_unk10;
+extern int   g_btl_won_money;
 /* The four counters the fight resolves a hit through, set together as one is
    armed and walked down as it lands. `left` is how many are still to come,
    `walk` the slot the target search has reached and `mask` its bit, and
@@ -323,7 +328,6 @@ extern short g_btl_hit_mask;
 extern short g_btl_hit_slot;
 
 extern int   D_800F5A60;
-extern int   D_800F5D58;
 
 /* The item the fight leaves behind, as an id into g_item_defs. Cleared as the
    battle opens, written by BtlRollDefeatDrop as a demon goes down and read

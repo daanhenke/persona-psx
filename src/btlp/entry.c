@@ -25,6 +25,7 @@
 #include <persona/btlp/stage.h>
 #include <persona/btlp/text.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/formation.h>
 
 /* The rest of the control scheme's masks. The four directions and the help key
    are the same under either scheme; these are the ones it moves. */
@@ -166,7 +167,6 @@ extern u_char g_btl_mesh_show;
 extern u_char g_btl_arena_show;
 extern u_char g_btl_intro_step;
 extern u_char g_btl_debug;
-extern u_char g_btl_formation[];
 
 extern BtlObjDef g_btl_shadow_defs[];
 

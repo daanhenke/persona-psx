@@ -68,6 +68,26 @@ extern void    BtlEditEquipNames(BtlActor *a);
 extern void    BtlOpenBoard1D(void);
 extern void    BtlCloseBoard1D(void);
 
+/* A name and a label as a board's cells take them, copied whole: ten and six
+   glyph bytes, 0xFF ending the row. */
+typedef struct {
+    u_char b[10];
+} BtlNameCells;
+
+typedef struct {
+    u_char b[6];
+} BtlLabelCells;
+
+/* The label each arcana is shown by, by the 1-based PersonaData.arcana: eight
+   bytes a row, of which a board takes the first six. */
+extern u_char g_btl_arcana_labels[][8];
+
+/* The board of the kinds of enemy in the fight, which R1 on the command picker
+   holds up until a key comes: filled in and put up, and taken down.
+   board23.c. */
+extern void    BtlOpenBoard23(void);
+extern void    BtlCloseBoard23(void);
+
 /* Colours a fighter's two bars by how much is left - full, ordinary, or low at
    a quarter or under - on the clut byte of the cell or text row each points
    at. Either may be left out. gaugecolour.c. */

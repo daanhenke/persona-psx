@@ -76,6 +76,10 @@ extern u_char g_btl_debug_party_only;
    g_btl_party_lost only while it is zero, which it is on disc. */
 extern u_char g_btl_debug_no_defeat;
 
+/* And one that lets a fallen member's Persona take the turn for it every
+   time rather than one time in four. Zero on disc. */
+extern u_char g_btl_debug_act_for;
+
 /* And one that keeps the ailment moves off the party: their finish steps
    over a member while it is set, and it is zero on disc. */
 extern u_char g_btl_debug_party_immune;
@@ -196,6 +200,18 @@ extern BtlObj *g_btl_marker_obj[];
 
 /* The placement grid's last record; holding one is what says the grid is up. */
 extern BtlObj *g_btl_grid_tail;
+
+/* The enemies' field, nine cells a row, holding the key standing on each
+   cell or 0xFF for none. */
+extern u_char g_btl_grid[];
+
+/* Fills enemy slot `slot`'s record from a species. */
+extern void BtlLoadEnemyStats(int slot, int species);
+
+/* The story flags, a bit an id. btlflags.c. */
+extern int  BtlEventFlagTest(int id);
+extern void BtlEventFlagSet(int id);
+extern void BtlEventFlagClear(int id);
 
 /* The markers' scripts, by kind. Entries 12 to 15 are the cast circle's. */
 extern BtlSeqStep *g_btl_marker_scripts[];

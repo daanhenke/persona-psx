@@ -59,7 +59,6 @@
 #define CD_IDLE (-1)
 
 extern BtlModel  g_btl_models[];
-extern u_char    g_btl_grid[];
 extern u_char    g_btl_encounters[];
 extern u_short   g_btl_enemy_gfx_offsets[];
 extern int       g_btl_enemy_gfx_base;
@@ -71,7 +70,6 @@ extern short   BtlLoadEnemyGfx(int species, int slot, u_long *tim,
                                u_char *image, int bytes);
 extern BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx,
                              int depth);
-extern void    BtlLoadEnemyStats(int slot, int species);
 extern BtlObj *BtlSpawnActorObj(int model, const long *pos);
 extern void    BtlPlaceMember(int member, int col, int row);
 extern void    BtlSpawnFixedEnemies(void);

@@ -17,8 +17,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
-
-extern u_char g_btl_grid[];
+#include <persona/btlp/battle.h>
 
 /* Nine cells to a row and five rows, and the value an empty cell carries. The
    last cell is the one the wipe counts down from. */

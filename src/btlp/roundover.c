@@ -80,7 +80,6 @@
 #define BTL_STEP_MORPHED 9
 
 extern u_short g_btl_clut_fading;
-extern u_char  g_btl_grid[];
 
 extern u_char g_btl_line_enc15a[];
 extern u_char g_btl_line_enc15b[];

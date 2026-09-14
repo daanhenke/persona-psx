@@ -88,9 +88,7 @@ extern BtlOpeningLine *g_btl_opening_lines[];
 extern void BtlFaceLoad(int who, int always);
 extern void BtlFaceLoadFile(int file);
 extern void BtlFaceOpen(short x, short y, short scale);
-extern int  BtlEventFlagTest(int id);
 extern void BtlSetInsert(int which, const u_char *src);
-
 
 #ifdef NON_MATCHING
 void BtlOpenDialogue(void)

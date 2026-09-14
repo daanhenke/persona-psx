@@ -113,12 +113,12 @@ void BtlStageOpen(void)
                 g_btl_chain_battle = 1;
             }
 
-            D_800F4D5C = 0;
+            g_btl_won_hp = 0;
             g_btl_round = 0;
-            D_800F4E20 = 0;
-            D_800F4AA4 = 0;
+            g_btl_won_exp = 0;
+            g_btl_won_unk10 = 0;
             D_800F5A60 = 0;
-            D_800F5D58 = 0;
+            g_btl_won_money = 0;
             g_btl_drop_item = 0;
 
             BtlOpenEnemyEntrance();

@@ -14,6 +14,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/battle.h>
 
 /* The opcodes, in the order the walk tests them. */
 #define SEQ_OP     0xFF00  /* the high byte is what names the opcode */
@@ -45,9 +46,7 @@
 
 extern BtlObjDef  g_btl_obj_child_def;
 extern u_char     g_btl_half_rate;
-extern u_char     g_btl_se_off;
 extern u_char     g_btl_seq_catchup;
-
 
 void BtlStepObjScripts(void)
 {

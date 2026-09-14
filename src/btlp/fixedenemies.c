@@ -29,8 +29,6 @@ extern const u_char g_btl_fixed_enemies[];
 extern const u_char g_btl_fixed_enemies_alt[];
 extern BtlActor    *g_btl_combatants;
 
-extern void BtlLoadEnemyStats(int slot, int species);
-
 void BtlSpawnFixedEnemies(void)
 {
     const u_char *roster;

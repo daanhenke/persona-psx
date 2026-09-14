@@ -56,11 +56,6 @@ typedef struct {
 #define EDIT_BAR_X  (-0x40)
 #define EDIT_STAT_MAX 99
 
-/* The fighter's name, copied whole. */
-typedef struct {
-    u_char b[10];
-} BtlEditName;
-
 extern const BtlObjDef g_btl_shadow_defs[];
 extern const BtlObjDef g_btl_lone_defs[];
 extern const BtlObjDef D_800DF88C[];
@@ -72,7 +67,7 @@ extern BtlEditBar g_btl_edit_bars[];
 
 /* Where the board reads everything it draws: the name, and a run of digit
    cells per number, each named for the field it shows. */
-extern BtlEditName g_btl_edit_name;
+extern BtlNameCells g_btl_edit_name;
 extern u_char g_btl_edit_level_cells[];
 extern u_char g_btl_edit_unk56_cells[];
 extern u_char g_btl_edit_hp_cells[];
@@ -166,7 +161,7 @@ void BtlFillEditBoard(BtlActor *a)
 {
     int w0, w1, w2, w3, w4;
 
-    g_btl_edit_name = *(BtlEditName *)a->c.name;
+    g_btl_edit_name = *(BtlNameCells *)a->c.name;
 
     BtlDrawNumber(g_btl_edit_level_cells, a->c.level, 2);
     BtlDrawNumber(g_btl_edit_unk56_cells, a->c.unk56, 2);

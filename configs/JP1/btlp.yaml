@@ -96,6 +96,9 @@ segments:
       - [0x684, rodata, btlp_rodata5]
       - [0x7B4, .rodata, bindgfx]
       - [0x7C8, rodata, btlp_rodata6]
+      # BtlActorMotion08's two switch tables: the phases, and the enemies that
+      # fall their own way.
+      - [0x7E4, .rodata, deathmotion]
       # BtlMemberMotion0D's two switch tables, which membermotion0d.c emits.
       - [0x8AC, .rodata, membermotion0d]
       - [0x8D8, rodata, btlp_rodata6_round]
@@ -366,7 +369,7 @@ segments:
       - [0x26DE8, c, whitenclut]
       - [0x26E64, c, pulsepick]
       - [0x26FF4, c, hurtmotion]
-      - [0x277D0, asm, btlp_48_a]
+      - [0x277D0, c, deathmotion]
       # The motions a fighter takes a blow in.
       - [0x28820, c, hitmotion]
       # A member's record walking on and off in a scene.
@@ -496,8 +499,7 @@ segments:
       # The equipment names the fighter editor's board shows.
       - [0x45128, c, equipnames]
       - [0x451BC, c, board22]
-      - [0x4521C, asm, btlp_64_b]
-      - [0x45508, c, board23]
+      - [0x4521C, c, board23]
       - [0x45530, c, pickspawn]
       - [0x45668, c, pickrefresh]
       - [0x45828, c, pickpage]

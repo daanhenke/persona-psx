@@ -34,12 +34,6 @@ extern u_char  g_btl_line_hold09[];
 extern u_char  g_btl_line_hold10[];
 extern u_char  g_btl_line_hold13[];
 
-/* The object the pause waits on, and the flag it raises for whatever comes
-   next. */
-extern BtlObj *D_800F5B18;
-extern u_char  D_800CCA31;
-
-
 void BtlHoldForMarkers(void)
 {
     int i;
@@ -82,10 +76,10 @@ void BtlHoldForMarkers(void)
         BtlDrawFrame();
     } while (i < HOLD_SETTLE);
 
-    D_800F5B18->phase = 0;
-    D_800CCA31 = 1;
+    g_btl_hold_obj->phase = 0;
+    g_btl_hold_done = 1;
     g_btl_hold_markers = 0;
-    while (D_800F5B18->motion != 0) {
+    while (g_btl_hold_obj->motion != 0) {
         BtlDrawFrame();
     }
 }

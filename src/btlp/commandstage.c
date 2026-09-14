@@ -96,10 +96,6 @@ extern void BtlCloseConfigBoard(void);
 extern int  BtlConfigMenu(void);
 extern int  BtlCommandEntry(void);
 
-/* The two halves of the R1 display, which is held up until a key comes. */
-extern void func_800A95BC(void);
-extern void BtlCloseBoard23(void);
-
 
 #ifdef NON_MATCHING
 void BtlStageCommand(void)
@@ -146,7 +142,7 @@ void BtlStageCommand(void)
             if (g_btl_pad1_edge & g_btl_key_r1) {
                 BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
                 BtlCloseMessage(0);
-                func_800A95BC();
+                BtlOpenBoard23();
                 BtlDrawFrame();
                 while ((g_btl_pad1_edge
                         & (g_btl_key_r1 | g_btl_key_cancel | g_btl_key_abort))

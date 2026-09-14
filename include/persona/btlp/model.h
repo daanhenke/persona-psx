@@ -30,7 +30,8 @@ extern u_char g_btl_talk_motion[];
 typedef struct {
     /* 0x00 */ u_char spawn;      /* armed when the actor is first put out */
     /* 0x01 */ u_char talk;       /* the reaction every other kind takes   */
-    /* 0x02 */ u_char pad02[2];
+    /* 0x02 */ u_char pad02;
+    /* 0x03 */ u_char death;      /* the fall an enemy is put on           */
     /* 0x04 */ u_char hit;        /* the flinch an enemy is put on         */
     /* 0x05 */ u_char hurt;       /* the reaction a blow puts an enemy in  */
     /* 0x06 */ u_char react3;

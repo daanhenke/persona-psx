@@ -29,12 +29,9 @@ switchdataD_80010564       = 0x80010564;
 switchdataD_800105c4       = 0x800105C4;
 switchdataD_800105f0       = 0x800105F0;
 
-
-
 //================================================
 //=== .text section
 //================================================
-
 
 //---------------------------------------------------------
 //--- PA: 0x000800   VA: 0x80010800   subsegment: asm, main
@@ -3036,6 +3033,7 @@ g_btl_test_party           = 0x8004E269;
 g_btl_debug_idle           = 0x8004E26A;
 g_btl_debug_no_flee        = 0x8004E26B;
 g_btl_debug_skip           = 0x8004E26D;
+g_btl_debug_act_for        = 0x8004E273;
 g_btl_debug_grid           = 0x8004E27F;
 D_8004E304                 = 0x8004E304; // type:u32 size:0x780
 D_8004EA84                 = 0x8004EA84; // type:u32 size:0x1BC
