@@ -16,6 +16,7 @@
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/box.h>
+#include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/input.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/pack.h>
@@ -128,10 +129,6 @@ extern u_char *D_800F6130;
 extern int     D_800F49D8;
 extern int     D_800F4BA0;
 extern int     D_800F4BAC;
-extern u_char *D_800F4ABC;
-extern u_char *D_800F4AC4;
-extern u_char *D_800F5D68;
-extern u_char *D_800F5D6C;
 extern u_char *g_btl_hud_packed;
 extern u_char *g_btl_frame_packed;
 extern u_char *g_btl_box_pack;
@@ -433,10 +430,10 @@ void ovl_btlp_entry(void)
         bg = BTL_BG_DNG;
     }
     memmove(bg, *BTL_LOAD_BG, g_load_stage_21 - *BTL_LOAD_BG);
-    D_800F5D68         = bg;
-    D_800F5D6C         = bg + (int)g_load_stage_14 - (int)*BTL_LOAD_BG;
-    D_800F4ABC         = bg + (int)g_load_stage_15 - (int)*BTL_LOAD_BG;
-    D_800F4AC4         = bg + (int)g_load_stage_16 - (int)*BTL_LOAD_BG;
+    g_btl_strike_tim0         = bg;
+    g_btl_strike_tim1         = bg + (int)g_load_stage_14 - (int)*BTL_LOAD_BG;
+    g_btl_strike_gfx0         = bg + (int)g_load_stage_15 - (int)*BTL_LOAD_BG;
+    g_btl_strike_gfx1         = bg + (int)g_load_stage_16 - (int)*BTL_LOAD_BG;
     g_btl_hud_packed   = bg + (int)g_load_stage_17 - (int)*BTL_LOAD_BG;
     g_btl_frame_packed = bg + (int)g_load_stage_18 - (int)*BTL_LOAD_BG;
     g_btl_box_pack     = bg + (int)g_load_stage_19 - (int)*BTL_LOAD_BG;

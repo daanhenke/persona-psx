@@ -44,6 +44,7 @@ SsSepOpen = 0x80019188;
 SsSepPlay = 0x8001CE58;
 SsSepStop = 0x8001D4A8;
 SsSetMarkCallback = 0x8001B7D0;
+SsSepSetVol = 0x8001D2A8;
 SsSeqGetVol = 0x8001D2E0;
 SsSetMVol = 0x80018754;
 SsSetMono = 0x8001DAD0;

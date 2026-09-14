@@ -682,11 +682,11 @@ void BtlStageRound(void)
                                 goto read_bank;
                             }
                             if (g_btl_pack_ready == 0) {
-                                BtlRefreshEnemyAttacks();
+                                BtlReadyTurnNow();
                             }
                         } else {
                         read_bank:
-                            BtlReadPackEntry(
+                            BtlReadMemberBank(
                                 1, g_btl_actors[g_btl_actor_turn].c.key);
                         }
                         action = actor->action;
@@ -751,14 +751,14 @@ void BtlStageRound(void)
                         default:
                             goto step_on;
                         }
-                        BtlStartAction();
+                        BtlOpenMemberBank();
                     } else {
                         actor->pickable = 1;
                         if (actor->c.status != 0) {
                             obj->mark->attr &= ~BTL_OBJ_HIDDEN;
                         }
                         if (g_btl_pack_ready == 0) {
-                            BtlRefreshEnemyAttacks();
+                            BtlReadyTurnNow();
                         }
                         action = actor->action;
                         switch (obj->kind) {
@@ -1393,7 +1393,7 @@ INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageRound);
  */
 #define AI_SKIP_AILMENTS 0x0060C0FCUL
 
-u_char BtlChooseEnemyMove(BtlActor *a)
+int BtlChooseEnemyMove(BtlActor *a)
 {
     SVECTOR unused;
     const u_char *odds;

@@ -8,27 +8,12 @@
  */
 #include <decomp/types.h>
 #include <decomp/libc.h>
+#include <persona/btlp/number.h>
+#include <persona/btlp/pack.h>
 #include <persona/btlp/sound.h>
 
-/* Where the header and the sequence are moved to, and how much of each. */
-#define BTL_PACK_VH_HOME  0x8016FCF0
-#define BTL_PACK_SEQ_HOME 0x80171848
-#define BTL_PACK_VH_SIZE  0x1B58
-#define BTL_PACK_SEQ_SIZE 0xBB8
-
-/* The slot this one takes, and how many sub-sequences its SEQ holds. */
-#define BTL_PACK_SLOT 3
+/* How many sub-sequences a demon's SEQ holds. */
 #define BTL_PACK_SEPS 10
-
-extern u_char *g_btl_pack_vh;
-extern u_char *g_btl_pack_vb;
-extern u_long *g_btl_pack_seq;
-
-extern int BtlDrawNumberAlt(u_char *dst, int value, int width);
-
-/* A three-cell number field the layout table draws; what it counts is
-   not settled, only that this is where it goes. */
-extern u_char g_btl_number_cells[];
 
 void BtlOpenPackBank(void)
 {
@@ -43,5 +28,5 @@ void BtlOpenPackBank(void)
     bank.nsep = BTL_PACK_SEPS;
     BtlSoundOpen(&bank, BTL_PACK_SLOT, 0);
 
-    BtlDrawNumberAlt(g_btl_number_cells, 1, BTL_PACK_SLOT);
+    BtlDrawNumberAlt(g_btl_bank_kind_cells, BTL_BANK_DEMON, BTL_BANK_CELLS);
 }

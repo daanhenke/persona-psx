@@ -130,6 +130,10 @@ extern u_char g_btl_boss22_shown;
 extern u_char g_btl_boss20_shape;
 extern u_char g_btl_boss20_shown;
 
+/* Raised the first time the round-over scene plays, so a battle only sees it
+   once. */
+extern u_char g_btl_round_over_done;
+
 /* Where the AI looks for a target for one move, and whether anyone on the
    party side can be reached at all. */
 extern int BtlPickAiTarget(BtlActor *a, int target);
@@ -209,12 +213,15 @@ extern u_char g_btl_line_enc11d[];
 
 /* Where a turn comes in the round, and setting one going. */
 extern int  BtlSlowestOrder(void);
-extern void BtlStartAction(void);
 extern void BtlAimEnemyMove(BtlActor *a);
 extern void BtlHoldForMarkers(void);
-extern void BtlReadPackEntry(int blocking, int entry);
-extern void BtlRefreshEnemyAttacks(void);
+extern void BtlReadyTurnNow(void);
 extern void BtlAimMove(BtlActor *a);
+
+/* Aims a fighter's turn the way a scripted placement says. scriptedaction.c. */
+extern void BtlAimScriptedMember(BtlActor *a);
+extern void BtlAimScriptedEnemy(BtlActor *a);
+
 extern int  BtlOrderTurns(u_char *order, int n);
 extern int  BtlResetTurnOrder(void);
 extern void BtlSetPickable(void);
@@ -236,8 +243,10 @@ extern void BtlPartySetAttr(u_long bits);
 extern void BtlPartyClearAttr(u_long bits);
 extern u_long BtlPickableMask(void);
 
-/* Redraws the attack lines after a fighter has moved or gone. */
-extern void BtlRefreshAttacks(void);
+/* Gives the next fighter whose turn is to come its action and starts its bank
+   reading in the background; BtlReadyTurnNow does the same from the turn being
+   played, and waits. nextturn.c. */
+extern void BtlReadyNextTurn(void);
 
 /* Markers: whether they are all still, whether any is up, and taking them
    down again. */
@@ -294,7 +303,7 @@ extern void BtlCountDownRound(void);
 extern void BtlBoxDismiss(void);
 
 /* Which move one enemy makes with its turn. */
-extern u_char BtlChooseEnemyMove(BtlActor *a);
+extern int BtlChooseEnemyMove(BtlActor *a);
 
 /* What the fight is running up as it goes. Written where damage is applied
    and read by BtlBattleResults; BtlStageOpen clears the lot at the start of

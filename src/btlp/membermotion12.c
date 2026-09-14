@@ -65,7 +65,7 @@ void BtlMemberMotion13(BtlObj *o)
         o->x += o->step_x;
         o->y += o->step_y;
         if (--o->steps == 0) {
-            BtlRefreshAttacks();
+            BtlReadyNextTurn();
             o->motion = 0;
             o->phase = 0;
             o->x2 = o->x;

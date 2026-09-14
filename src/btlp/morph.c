@@ -21,6 +21,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/round.h>
 
 /* The shapes, as the actor's form byte spells them, and the character key
    each one fights as. */
@@ -36,7 +37,6 @@
 
 
 extern void BtlActorFromDef(BtlActor *a, int key);
-extern void BtlRefreshAttacks(void);
 
 void BtlMorphPair(BtlObj *obj);
 void BtlMorphTrio(BtlObj *obj);
@@ -68,7 +68,7 @@ void BtlMorphPair(BtlObj *obj)
             obj->actor->c.key = MORPH_PAIR_KEY_A;
             BtlActorFromDef(obj->actor, MORPH_PAIR_KEY_A);
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         obj->phase = obj->phase + 1;
         break;
     case 1:
@@ -104,7 +104,7 @@ void BtlMorphTrio(BtlObj *obj)
             BtlActorFromDef(obj->actor, MORPH_TRIO_KEY_A);
             break;
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         obj->phase = obj->phase + 1;
         break;
     case 1:

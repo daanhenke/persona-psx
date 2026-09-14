@@ -18,6 +18,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/choice.h>
+#include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/pack.h>
 #include <persona/btlp/object.h>
@@ -461,7 +462,7 @@ void BtlMemberMotion02(BtlObj *o)
                 a->action = 0xFF;
             }
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         BtlSoundClose(6);
         if ((o->attr & BTL_OBJ_CARRIED) != 0) {
             scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
@@ -546,7 +547,7 @@ void BtlMemberMotion02(BtlObj *o)
             a->order = g_btl_counter_order;
             a->targets = g_btl_counter_targets;
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         BtlSoundClose(6);
         o->motion = 0;
         o->phase = 0;
@@ -620,8 +621,6 @@ extern BtlObj *g_btl_persona_obj;
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 extern int     BtlActorSlotByKey(int key);
 extern void    func_800A6D3C(BtlActor *a, int move);
-extern BtlObj *func_80084E10(int kind, long *pos);
-extern BtlObj *func_80084A14(int kind, int col, int row);
 
 /* The cast: what a member's turn runs through when the move is a spell and
  * the Persona has to come out to make it.
@@ -719,7 +718,7 @@ void BtlMemberMotion06(BtlObj *o)
                 scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
             BtlSePlay(3, rand() % 3 + 3);
         } else if (g_btl_act_kind != 3) {
-            func_80084E10(0, &o->x)->z += CAST_LIFT;
+            BtlSpawnImpact(0, &o->x)->z += CAST_LIFT;
         }
         if ((signed char)g_btl_actors[g_btl_actor_turn].c.status == CAST_AIL_08
             && ((rand() & 1) != 0
@@ -776,7 +775,7 @@ void BtlMemberMotion06(BtlObj *o)
         g_btl_scene_rgb[2] = SUMMON_SCENE_DIM;
         o->fade = CAST_ARENA_FADE;
         g_btl_arena_fade = CAST_ARENA_FADE;
-        g_btl_hud_obj = func_80084A14(0, o->col2, o->row);
+        g_btl_hud_obj = BtlSpawnCastCircle(0, o->col2, o->row);
         if (g_btl_act_kind == 3) {
             BtlObjSetAttr(g_btl_hud_obj, CAST_HUD_ATTR);
         }
@@ -797,7 +796,7 @@ void BtlMemberMotion06(BtlObj *o)
             BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
                 scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK] + 1]);
             if (g_btl_encounter == 3 && o->kind != 3) {
-                func_80084E10(
+                BtlSpawnImpact(
                     0, &g_btl_actors[BtlActorSlotByKey(3)].obj->x)
                     ->z += CAST_LIFT;
             }
@@ -807,7 +806,7 @@ void BtlMemberMotion06(BtlObj *o)
             do {
                 if (g_btl_actors[i].c.key != 0
                     && g_btl_actors[i].c.key != o->kind) {
-                    func_80084E10(1, &g_btl_actors[i].obj->x)->z += CAST_LIFT;
+                    BtlSpawnImpact(1, &g_btl_actors[i].obj->x)->z += CAST_LIFT;
                 }
                 i++;
             } while (i < BTL_PARTY);
@@ -901,7 +900,7 @@ void BtlMemberMotion06(BtlObj *o)
             a->move = g_btl_act_move;
             a->action = 0;
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         o->phase++;
         break;
     case 8:
@@ -936,7 +935,7 @@ void BtlMemberMotion06(BtlObj *o)
             return;
         }
         BtlBoxDismiss();
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         BtlSoundClose(6);
         o->motion = 0;
         o->phase = 0;
@@ -977,7 +976,7 @@ void BtlMemberMotion05(BtlObj *o)
     switch (o->phase) {
     case 0:
         if (o->actor->flags & SUMMON_DONE) {
-            BtlRefreshAttacks();
+            BtlReadyNextTurn();
             o->motion = 0;
             o->phase = 0;
         } else {
@@ -1057,7 +1056,7 @@ void BtlMemberMotion05(BtlObj *o)
             trail->attr |= attr;
             i++;
         } while (i < TRAIL_RECORDS);
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
         o->timer = SUMMON_HOLD;
         o->phase++;
         break;

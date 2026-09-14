@@ -30,6 +30,7 @@
 #include <libsnd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/number.h>
 #include <persona/btlp/object.h>
@@ -41,7 +42,7 @@
 /* The number's kind as it is spawned, the kind a number record ends up with,
    and the height a member's is put at. */
 #define HIT_NUMBER_SPAWN 0x24
-#define HIT_NUMBER_KIND  0x12
+#define HIT_NUMBER_KIND  MARK_KIND_RISING
 #define HIT_NUMBER_Z     (-0x300000)
 #define HIT_NUMBER_ALONE 0xFF
 

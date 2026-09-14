@@ -26,6 +26,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/sound.h>
 
@@ -63,7 +64,6 @@ extern BtlObjDef   g_btl_obj_defs[];
 extern BtlObj     *g_btl_marker_obj[];
 extern BtlObj     *g_btl_marker_shown[];
 extern BtlSeqStep  g_btl_marker_stand[];
-extern BtlSeqStep *g_btl_marker_scripts[];
 extern u_char      g_btl_talk_outcome;
 
 extern void BtlPlaceMemberMarkers(int slot, int row);

@@ -42,6 +42,26 @@ extern u_long *g_btl_pack_seq;
 /* Set once a bank is resident, and cleared when one is asked for. */
 extern u_char g_btl_pack_ready;
 
+/* A party member's bank: an entry of the battle's pack picked by the member's
+   key, read to the same buffer and opened into the same slot. */
+extern u_short g_btl_member_bank_sectors[];
+
+/* Where BtlOpenPackBank and BtlOpenMemberBank move the header and the sequence
+   to, how much of each, and the slot both open the bank into. */
+#define BTL_PACK_VH_HOME  0x8016FCF0
+#define BTL_PACK_SEQ_HOME 0x80171848
+#define BTL_PACK_VH_SIZE  0x1B58
+#define BTL_PACK_SEQ_SIZE 0xBB8
+#define BTL_PACK_SLOT     3
+
+/* Two three-cell fields on the debug HUD: the slot whose bank was last asked
+   for, and which kind of bank was opened last. */
+extern u_char g_btl_bank_slot_cells[];
+extern u_char g_btl_bank_kind_cells[];
+#define BTL_BANK_MEMBER 0
+#define BTL_BANK_DEMON  1
+#define BTL_BANK_CELLS  3
+
 extern void BtlReadSectors(u_long *dest, int sector, int sectors);
 extern void BtlReadSectorsAsync(u_long *dest, int sector, int sectors);
 
@@ -49,5 +69,9 @@ extern void BtlLoadPackEntry(int entry);
 extern void BtlLoadPackBank(int entry);
 extern void BtlReadPackBank(int wait, int entry);
 extern void BtlOpenPackBank(void);
+
+extern void BtlLoadMemberBank(int key);
+extern void BtlReadMemberBank(int wait, int key);
+extern void BtlOpenMemberBank(void);
 
 #endif

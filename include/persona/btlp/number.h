@@ -51,9 +51,4 @@ extern void    BtlHexDigits(signed char *dst, int value, int digits);
 extern int     BtlDrawNumber(u_char *dst, int value, int width);
 extern int     BtlDrawNumberAlt(u_char *dst, int value, int width);
 
-/* Puts `value` up over a fighter as a number of its own, up to four digits,
-   centred on `pos`. hitmotion.c spawns it with kind 0x24. */
-struct BtlObj;
-extern struct BtlObj *BtlSpawnHitNumber(u_int value, long *pos, int kind);
-
 #endif

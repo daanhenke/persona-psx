@@ -47,6 +47,26 @@ typedef struct {
     /* 0x4 */ const u_long **scripts;
 } BtlObjDef;                           /* 8 bytes */
 
+/* One cell of an object's artwork: where it sits relative to the object, which
+   corner of the texture page it comes from, and how big it is. The untextured
+   kinds read only the corner and the size. */
+typedef struct {
+    /* 0x0 */ short  x;
+    /* 0x2 */ short  y;
+    /* 0x4 */ u_char u;
+    /* 0x5 */ u_char v;
+    /* 0x6 */ u_char w;
+    /* 0x7 */ u_char h;
+} BtlGfxCell;                          /* 8 bytes */
+
+/* What BtlObj.last points at while a script step is showing artwork: how many
+   cells the frame is made of, and where they are. Every one of the eight
+   g_btl_obj_draw handlers walks one of these. */
+typedef struct {
+    /* 0x0 */ u_int            count;
+    /* 0x4 */ const BtlGfxCell *cells;
+} BtlGfxList;                          /* 8 bytes */
+
 struct BtlActor;
 
 typedef struct BtlObj {
@@ -108,7 +128,12 @@ typedef struct BtlObj {
     /* 0x78 */ long           scale_x;  /* unity is 0x100 in both of these  */
     /* 0x7C */ long           scale_y;
     /* 0x80 */ long           scale_z;  /* unity is 0x1000 in this one      */
-    /* 0x84 */ u_char         pad84[0x2C];
+    /* 0x84 */ u_char         pad84[4];
+    /* 0x88 */ BtlGfxCell     cells[4]; /* artwork a record carries itself:
+                                          the hit number writes its digits
+                                          here                           */
+    /* 0xA8 */ BtlGfxList     frame;   /* and the frame `last` points at
+                                          them through                   */
     /* 0xB0 */ u_char         col2;    /* the grid column, doubled          */
     /* 0xB1 */ char           row;     /* the grid row                      */
     /* 0xB2 */ u_short        kind;    /* BTL_OBJ_HEAD marks a list head    */
@@ -234,26 +259,6 @@ typedef struct BtlObj {
    set and the one above it clear. Tested together, never on their own. */
 #define BTL_OBJ_BUSY_MASK 0x18000000
 #define BTL_OBJ_BUSY      0x10000000
-
-/* One cell of an object's artwork: where it sits relative to the object, which
-   corner of the texture page it comes from, and how big it is. The untextured
-   kinds read only the corner and the size. */
-typedef struct {
-    /* 0x0 */ short  x;
-    /* 0x2 */ short  y;
-    /* 0x4 */ u_char u;
-    /* 0x5 */ u_char v;
-    /* 0x6 */ u_char w;
-    /* 0x7 */ u_char h;
-} BtlGfxCell;                          /* 8 bytes */
-
-/* What BtlObj.last points at while a script step is showing artwork: how many
-   cells the frame is made of, and where they are. Every one of the eight
-   g_btl_obj_draw handlers walks one of these. */
-typedef struct {
-    /* 0x0 */ u_int            count;
-    /* 0x4 */ const BtlGfxCell *cells;
-} BtlGfxList;                          /* 8 bytes */
 
 /* What the two text kinds find there instead: a line of character codes and
    where to put it. The run ends either after `count` codes or at the first

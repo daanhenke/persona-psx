@@ -78,9 +78,6 @@
 /* The step BtlStageRound is sent to once the shape has changed. */
 #define BTL_STEP_MORPHED 9
 
-/* Raised the first time the scene plays, so a battle only sees it once. */
-extern u_char g_btl_round_over_done;
-
 extern u_short g_btl_clut_fading;
 extern u_char *g_btl_actor_clut;
 extern u_char *g_btl_actor_clut_to;

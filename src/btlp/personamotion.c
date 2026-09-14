@@ -37,6 +37,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
 #include <persona/btlp/sound.h>
@@ -88,10 +89,6 @@
 /* Raised once the summon's sound bank is in and cleared as it is done with.
    The attack will not start without it. */
 extern u_char g_btl_persona_ready;
-
-/* Puts an impact down at a position and hands the record back. Only this unit
-   and the two motions beside it in the block reach it. */
-extern BtlObj *func_80084E10(int kind, const long *pos);
 
 /* The two halves of an attack, both still in asm beside this unit. */
 extern void func_800B12D0(BtlObj *o);
@@ -175,7 +172,7 @@ void BtlPersonaMotion03(BtlObj *o)
                            the image takes it from. */
                         if (g_btl_actors[i].c.key != 0
                             && g_btl_actors[i].c.key != o->actor->c.key) {
-                            func_80084E10(0, &g_btl_actors[i].obj->x)->z
+                            BtlSpawnImpact(0, &g_btl_actors[i].obj->x)->z
                                 += PERSONA_SHOCK_Z;
                         }
                     }

@@ -1480,6 +1480,8 @@ scheduler puts it among the argument stores instead.
   written, 98.80% with the cell's scripts copied ahead of its mark (which also
   pulls the running x step up among the copies, where the image has it), and
   exact with `pos[2] = 0` written in both arms.
+- [fieldmarks.c](/src/btlp/fieldmarks.c) - `BtlSpawnCastCircle`, 98.25% to
+  exact on the same `pos[2] = 0`.
 
 ## A copy written ahead of a test, where the image has it in the branch's delay slot
 
@@ -1893,3 +1895,61 @@ over the party. With a counter of its own the third loop's counter and its
 record walker trade s0 and s1; counting in `slot` too is exact.
 
 - [fxresolve.c](/src/btlp/fxresolve.c) - 99.53% to exact.
+
+## A conditional in a table's subscript is folded into both arms
+
+`table[c ? a : b]` is not one lookup. gcc's fold distributes the table's
+constant address over the conditional, `c ? table + a : table + b`, so the
+address has two uses inside the loop and is lifted into a saved register - a
+register too many, and the join's first instruction stolen into the first arm's
+`j` delay slot. The image loads the index in the arms and reads the table once,
+at the join, with a plain `lui at` / `addu at, at, v0`.
+
+Taking the index into a local with an `if`/`else` keeps the single lookup but
+moves the store's address after the join, where it is worked out again. The
+image works the store's offset out *before* the test - `addu v1, s0, zero` in
+its delay slot - which only the conditional inside the statement does. Assigning
+the local inside the subscript gets both:
+
+    g_btl_actors[slot].action = g_btl_tactic_actions[tactic =
+        g_btl_talk_outcome != 0 ? g_btl_actors[slot].mark_kind
+                                : g_btl_actors[slot].c.unk5D & TURN_TACTIC];
+
+A `(u_char)` conversion around the conditional stops the fold as well, but costs
+an `andi 0xff` at the join; `(int)` is stripped and folds like the bare form.
+
+- [nextturn.c](/src/btlp/nextturn.c) - `BtlReadyNextTurn` and `BtlReadyTurnNow`,
+  97.00% as a bare conditional or an `if`/`else`, 99.30% with the conversion,
+  exact with the assignment.
+
+## A loop that runs backwards wants a second stepped value
+
+When the image counts a loop up (`slti a1, a1, 4`) and the build counts it down
+(`bgez a1`) from the far end of the array, gcc reversed it. Writing an offset as
+`i * 8` leaves the counter as the loop's only stepped value, and that loop gets
+reversed; stepping the offset by hand - `x += 8` - kept this one's direction.
+With two stepped values the order they are written in then decides which one
+fills the branch's delay slot, and where the counter's `i = 0` lands in the
+preheader.
+
+    i = 0;
+    x = (digits - 8) * 4;
+    do {
+        o->cells[i].x = x;
+        i++;
+        x += NUMBER_GLYPH;
+    } while (i < NUMBER_CELLS);
+
+- [fieldmarks.c](/src/btlp/fieldmarks.c) - `BtlSpawnHitNumber`: 95.42% with
+  `i * 8`, 97.96% with `x` stepped, 99.82% with `i = 0` ahead of `x`, and exact
+  with `i++` between the store and the step.
+
+## A call's answer used without a mask was an int
+
+`andi a1, v0, 0xff` straight after a call, and `addiu v0, v0, 0xff` for
+`pick - 1`, where the image has neither, mean the caller's prototype returns a
+narrower type than the one the image was built against. `BtlChooseEnemyMove`
+had been declared `u_char`; as `int`, both callers in nextturn.c lose the mask
+and the `-1`, and roundflow.c's definition compiles exactly as before.
+
+- [nextturn.c](/src/btlp/nextturn.c), [roundflow.c](/src/btlp/roundflow.c).

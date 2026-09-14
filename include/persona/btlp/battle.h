@@ -194,6 +194,9 @@ extern void BtlHudShow(void);
 /* One marker object per party slot, plus the shared one past them. */
 extern BtlObj *g_btl_marker_obj[];
 
+/* The markers' scripts, by kind. Entries 12 to 15 are the cast circle's. */
+extern BtlSeqStep *g_btl_marker_scripts[];
+
 /* Where each marker is drawn. Two rows of five, one row per side; only the x
    is ever written, and only for a member still in the fight. */
 typedef struct {

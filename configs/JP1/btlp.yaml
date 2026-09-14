@@ -331,7 +331,7 @@ segments:
       - [0x1FD98, c, memberreload]
       - [0x200BC, c, memberobj]
       - [0x20274, c, personaspawn]
-      - [0x20530, asm, btlp_41]
+      - [0x20530, c, fieldmarks]
       - [0x20AF0, c, actorobj]
       - [0x20BA4, asm, btlp_42]
       - [0x21324, c, talkleave]
@@ -389,7 +389,8 @@ segments:
       - [0x2DBD4, c, voiceopen]
       - [0x2DD48, c, packload]
       - [0x2DE14, c, packbank]
-      - [0x2DFFC, asm, btlp_54]
+      - [0x2DFFC, c, memberbank]
+      - [0x2E2E4, c, nextturn]
       - [0x2E9E8, c, packopen]
       - [0x2EA8C, c, damage]
       - [0x2EF68, c, averagesides]
@@ -669,8 +670,17 @@ segments:
       - [0x67180, data, btlp_talkanswer_tail]
       - [0x68268, .data, cursorplace]
       - [0x68270, data, btlp_data1]
+      # The marks' templates, the miss word and the impact spark, which
+      # fieldmarks.c emits.
+      - [0x687E8, .data, fieldmarks]
+      - [0x68898, data, btlp_data1_a]
       - [0x68B44, .data, loadenemy]
       - [0x68B5C, data, btlp_data2]
+      # The two action tables and the six round flags behind them, which
+      # nextturn.c emits; the flags start off a word boundary, so they
+      # cannot be a section of their own.
+      - [0x6A108, .data, nextturn]
+      - [0x6A124, data, btlp_data2_nt]
       # The debug page's row handlers, which debugmenu.c emits.
       - [0x6B990, .data, debugmenu]
       # The fighter editor's stat cursor: neighbours and spots.

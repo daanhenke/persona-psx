@@ -102,7 +102,7 @@ void BtlMemberMotion0E(BtlObj *o)
             }
             g_btl_formation[o->row * GRID_W + (o->col2 >> 1)] = CELL_EMPTY;
         }
-        BtlRefreshAttacks();
+        BtlReadyNextTurn();
     hide:
         o->attr |= BTL_OBJ_HIDDEN;
         o->shadow->attr |= BTL_OBJ_HIDDEN;
