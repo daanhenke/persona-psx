@@ -2724,8 +2724,8 @@ BtlFxFinish53                 = 0x800C10E0; // type:func size:0x708
 BtlFxFinish5F                 = 0x800C17E8; // type:func size:0xBE4
 BtlFxFinish37                 = 0x800C23CC; // type:func size:0x988
 BtlFxFinish8C                 = 0x800C2D54; // type:func size:0x288
-func_800C2FDC                 = 0x800C2FDC; // type:func size:0x12D8
-func_800C42B4                 = 0x800C42B4; // type:func size:0x1D4
+BtlFxResolveHit               = 0x800C2FDC; // type:func size:0x12D8
+BtlFxReopenVoices             = 0x800C42B4; // type:func size:0x1D4
 
 //---------------------------------------------------------
 //--- PA: 0x0600E8   VA: 0x800C4488   subsegment: c, objset

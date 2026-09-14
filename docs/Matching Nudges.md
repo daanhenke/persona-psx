@@ -1858,3 +1858,38 @@ routine puts the clamp in a saved register; the image's clamp works in `v1`.
 A local of its own, dead at every call, gets the temporary.
 
 - [fxfinish37.c](/src/btlp/fxfinish37.c) - the ailment chance; 97.28% to 97.75%.
+
+## Two `beq` and a `j` to the rest is a switch, not an if chain
+
+Where the image tests a value against two constants with `beq` each and then
+jumps away to the code for everything else, the source was a `switch` with two
+cases and a default. Written as `if ... else if ... else` the first test comes
+out as `bne` over its own arm, and the arms that share a tail stop sharing it.
+The same held three times in one routine: the kind of spell, the reaction the
+affinity answered, and the two flags a kind leaves behind.
+
+- [fxresolve.c](/src/btlp/fxresolve.c) - `BtlFxResolveHit`; 93.18% to 96.44%
+  for the three together.
+
+## A double worked out in two statements
+
+A frame eight bytes too big with a spilled pseudo, and a spell byte loaded
+ahead of the call that converts the caster's squared stat: the source kept the
+square in a `double` local and scaled it in a second statement, with `react`
+cleared after that. As one expression the byte is loaded first and needs a
+saved register of its own across the conversion.
+
+    damage = power * power;
+    amount = damage * ((g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0)
+             / (a->unk3C * 6);
+    react = 0;
+
+- [fxresolve.c](/src/btlp/fxresolve.c) - 96.44% to 98.40%, the frame right.
+
+## A last loop that counts in the first loops' local
+
+`BtlFxReopenVoices` counts two walks over the sound slots in `slot` and a third
+over the party. With a counter of its own the third loop's counter and its
+record walker trade s0 and s1; counting in `slot` too is exact.
+
+- [fxresolve.c](/src/btlp/fxresolve.c) - 99.53% to exact.

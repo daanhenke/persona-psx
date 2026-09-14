@@ -41,7 +41,7 @@
 #define FX_E8_MOTION 0xE
 #define FX_E8_GOING  0x800
 
-extern void func_800C42B4(void);
+extern void BtlFxReopenVoices(void);
 
 /* 99.60%: nothing structural left, only which of the walk's two counters gets
    the saved register - the image keeps the slot there and the count in a temp,
@@ -63,7 +63,7 @@ void BtlFxStepE8(BtlObj *o)
             }
             if (g_btl_no_escape == 0) {
                 BtlSoundClose(FX_E8_MUSIC);
-                func_800C42B4();
+                BtlFxReopenVoices();
             }
             n = BtlOpenFxGrid(FX_E8_SHEET);
             BtlObjSetKind(n, o->kind);

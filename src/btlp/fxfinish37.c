@@ -98,7 +98,7 @@ void BtlFxFinish37(BtlObj *o)
     a = &g_btl_actors[g_btl_hit_slot];
     switch (o->phase) {
     case FX_STEP_DONE:
-        func_800C42B4();
+        BtlFxReopenVoices();
         o->phase++;
         return;
     case FX_37_APPLY:

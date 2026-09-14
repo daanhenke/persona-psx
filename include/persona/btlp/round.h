@@ -320,6 +320,7 @@ extern int   D_800F5D58;
    battle opens, written by BtlRollDefeatDrop as a demon goes down and read
    back once the fight is over, so the last kill's prize is the one kept. */
 extern u_short g_btl_drop_item;
+extern void    BtlRollDefeatDrop(struct BtlActor *by, struct BtlActor *dead);
 
 /* The object the opening is played on, and how far the camera has pulled
    back for it. */

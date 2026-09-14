@@ -118,7 +118,7 @@ extern signed char g_btl_fx_shift[];
 
 /* What the first phase of the plain and the ailment moves' finish calls
    before the targets are walked. Still in asm. */
-extern void func_800C42B4(void);
+extern void BtlFxReopenVoices(void);
 
 /* A fighter's palette is this many colours, and this washes a colour white. */
 #define FX_CLUT_COLORS 0x100

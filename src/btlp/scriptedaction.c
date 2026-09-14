@@ -61,13 +61,6 @@ extern u_char            D_800CE460[];
 /* The action code a member takes when the flag below is already up. */
 #define BTL_ACTION_SCRIPTED 6
 
-/* Three flags of the fighter's own. The first is turned over into the second
-   the moment the scripted turn is handed out, and the third is the same trade
-   one encounter makes on its own. */
-#define BTL_ACTOR_SCRIPT_READY 0x20000000
-#define BTL_ACTOR_SCRIPT_DONE  0x40000000
-#define BTL_ACTOR_SCRIPT_ALT   0x04000000
-
 /* The four encounters with a case of their own, and the fighters they watch. */
 #define BTL_SCRIPT_HUD_ENCOUNTER   0
 #define BTL_SCRIPT_HUD_KEY         1

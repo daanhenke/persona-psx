@@ -132,10 +132,10 @@ void BtlSpawnParty(void)
                 BtlRecalcStats(a);
 
                 /* Everything the battle keeps on a member, back to nothing. */
-                *(int *)&a->pad68[8] = 0;
+                *(int *)&a->pad6C[4] = 0;
                 a->flags = 0;
                 a->unkCC = 0;
-                *(int *)&a->pad68[0] = 0;
+                a->damage_dealt = 0;
                 a->stage[0] = 0;
                 a->stage[1] = 0;
                 a->stage[2] = 0;
@@ -157,7 +157,7 @@ void BtlSpawnParty(void)
                 a->unkDC = 0;
                 a->unkDB = 0;
                 a->unkDF = 0;
-                *(int *)&a->pad68[4] = 0;
+                *(int *)&a->pad6C[0] = 0;
                 a->marker = 0;
                 a->unkC5 = 0;
                 a->unkC6 = 0;

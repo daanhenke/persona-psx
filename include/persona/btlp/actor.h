@@ -24,7 +24,10 @@ typedef struct BtlActor {
     /* 0x00 */ Char    c;
     /* 0x60 */ BtlObj *obj;       /* what is drawn for this actor */
     /* 0x64 */ u_long  flags;
-    /* 0x68 */ u_char  pad68[0xC];
+    /* 0x68 */ int     damage_dealt; /* what this fighter's spells have taken
+                                      off everyone they hit, a kill counting
+                                      only as far as nought               */
+    /* 0x6C */ u_char  pad6C[8];
     /* 0x74 */ int     unk74;      /* what the negotiation's parting gift adds
                                       its experience to, once Char.unk14 is
                                       under the cap                          */
@@ -282,6 +285,16 @@ extern u_char g_btl_counter_order;
    given. */
 #define BTL_MARKER_UP    3
 #define BTL_MARKER_MOVED 2
+
+/* Three flags of the fighter's own. The first is turned over into the second
+   the moment the scripted turn is handed out, and the third is the same trade
+   one encounter makes on its own. A spell cast under the second always lands
+   and takes all of the target's hp; under the third it lands for half, or a
+   quarter from fighter 0xB8, and under the first an enemy's spell is not
+   rolled for at all. */
+#define BTL_ACTOR_SCRIPT_READY 0x20000000
+#define BTL_ACTOR_SCRIPT_DONE  0x40000000
+#define BTL_ACTOR_SCRIPT_ALT   0x04000000
 
 extern BtlActor g_btl_actors[];
 

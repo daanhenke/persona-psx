@@ -815,9 +815,9 @@ void BtlMemberMotion06(BtlObj *o)
         BtlCloseMessage(0);
         {
             BtlActor *actor = o->actor;
-            int count = *(int *)&actor->pad68[8];
+            int count = *(int *)&actor->pad6C[4];
             g_btl_seq_catchup = 1;
-            *(int *)&actor->pad68[8] = count + 1;
+            *(int *)&actor->pad6C[4] = count + 1;
         }
         D_800F5A60++;
         if (D_8004E264 == 0 && g_btl_act_kind == 0) {

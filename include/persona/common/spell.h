@@ -16,7 +16,9 @@ typedef struct {
     /* 0x0A */ u_char kind;       /* what it does; the enemy AI masks with
                                      SPELL_KIND_MASK and treats four of the
                                      results as always worth casting */
-    /* 0x0B */ u_char pad0B;
+    /* 0x0B */ u_char power;      /* the spell's own weight in its damage,
+                                     halved and five added before the
+                                     caster's squared stat is scaled by it */
     /* 0x0C */ u_char element;    /* what the recovery moves' finish hands
                                      BtlApplyAffinity for the fighter it has
                                      reached                                */

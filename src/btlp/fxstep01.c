@@ -28,7 +28,7 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
 
-extern void func_800C2FDC(BtlObj *o);
+extern void BtlFxResolveHit(BtlObj *o);
 
 /* The moves the step treats specially beyond the shared motion: one fades to
    black, one opens two more layers over its head, and one takes hold of the
@@ -198,13 +198,13 @@ void BtlFxFinish01(BtlObj *o)
 
     switch (o->phase) {
     case FX_STEP_DONE:
-        func_800C42B4();
+        BtlFxReopenVoices();
         o->actor->hit_amount = 0;
         o->attr &= ~BTL_OBJ_CARRIED;
         o->phase++;
         return;
     case FX_01_RESOLVE:
-        func_800C2FDC(o);
+        BtlFxResolveHit(o);
         return;
     case FX_01_NEXT:
         if (o->timer != 0) {

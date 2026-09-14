@@ -644,7 +644,7 @@ segments:
       - [0x5D448, c, fxfinish5f]
       - [0x5E02C, c, fxfinish37]
       - [0x5E9B4, c, fxfinish8c]
-      - [0x5EC3C, asm, btlp_69_e_a]
+      - [0x5EC3C, c, fxresolve]
       - [0x600E8, c, objset]
       - [0x60200, c, objset2]
       - [0x602FC, c, objset3]
