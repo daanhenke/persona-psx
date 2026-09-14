@@ -106,11 +106,10 @@ void BtlDrawObjQuads(BtlObj *o)
     g_btl_drmode_next++;
 }
 
-/* 99.26%, and only the registers are left: the image keeps `o` in s2 and the
-   counter in s1, where this has them the other way round, and it copies the
-   two scratch addresses into fresh saved registers ahead of the 3D loop where
-   this copies only one. The frame, every slot and every instruction are the
-   image's. */
+/* 99.62%, and only registers are left: the image copies both scratch
+   addresses into fresh saved registers ahead of the 3D loop, where this
+   copies only one, so the two come out in each other's. The frame, every slot
+   and every instruction are the image's. */
 #ifdef NON_MATCHING
 void BtlDrawObjLines(BtlObj *o)
 {
@@ -181,8 +180,14 @@ void BtlDrawObjLines(BtlObj *o)
         i = 0;
         if (((const BtlGfxLineList *)o->last)->count != 0) {
             do {
+                /* The clear wants a block boundary in front of it, the way
+                   objpieces.c's does: both arms below do the same thing, and
+                   testing the counter is what puts it and the record in the
+                   image's registers. */
                 if ((o->attr & BTL_OBJ_SEMITRANS) != 0) {
                     g_btl_lineg2_next->code |= PRIM_SEMITRANS;
+                } else if (i) {
+                    g_btl_lineg2_next->code &= ~PRIM_SEMITRANS;
                 } else {
                     g_btl_lineg2_next->code &= ~PRIM_SEMITRANS;
                 }
