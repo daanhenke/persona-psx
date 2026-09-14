@@ -355,7 +355,7 @@ segments:
       - [0x249A4, c, objmodel]
       - [0x24F60, c, objtiles]
       - [0x251A4, c, objtilesrot]
-      - [0x254A0, asm, btlp_47]
+      - [0x254A0, c, objlists]
       - [0x25E6C, c, stepcluts]
       - [0x26090, c, wave]
       - [0x26184, c, stepscripts]

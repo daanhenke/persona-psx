@@ -1340,9 +1340,9 @@ BtlDrawObjTilesRot            = 0x80089544; // type:func size:0x2FC
 //------------------------------------------------------------
 //--- PA: 0x0254A0   VA: 0x80089840   subsegment: asm, btlp_47
 //------------------------------------------------------------
-func_80089840                 = 0x80089840; // type:func size:0x3C0
-func_80089C00                 = 0x80089C00; // type:func size:0x514
-func_8008A114                 = 0x8008A114; // type:func size:0xF8
+BtlDrawObjQuads               = 0x80089840; // type:func size:0x3C0
+BtlDrawObjLines               = 0x80089C00; // type:func size:0x514
+BtlObjPlaceUnused             = 0x8008A114; // type:func size:0xF8
 
 //------------------------------------------------------------
 //--- PA: 0x025E6C   VA: 0x8008A20C   subsegment: c, stepcluts

@@ -2046,3 +2046,22 @@ which of five blank cells is cleared first.
 
 - [markerbuild.c](/src/btlp/markerbuild.c) - `BtlBuildMarkers`, 98.07% to
   exact over three such placements.
+
+## An ordering table's address written into `addPrim`, not taken first
+
+`addPrim(ot, p)` is `setaddr(p, getaddr(ot)), setaddr(ot, p)`. With `ot` a
+local assigned the statement before, the whole address is worked out ahead of
+the primitive's tag; written straight into the call, the tag is loaded between
+the pool read and the address's last add, which is the image's
+`lw v1, pool / lw a0, 0(a1) / addu v0, v0, v1 / ori v1, 0xD6C0`.
+
+    addPrim((u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE + BTL_OT),
+            g_btl_lineg2_next);
+
+- [objlists.c](/src/btlp/objlists.c) - `BtlDrawObjLines`, 95.80% to 99.19% for
+  the two loops together.
+
+The same routine's frame came right in two steps of section 11's kind: a
+`long scratch[6]` where two of the longs are read, and in `BtlObjPlaceUnused`
+an unused `long unused[2]` declared *below* the transform's flag, which moves
+the flag up to the image's slot where a larger scratch would not.

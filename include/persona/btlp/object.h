@@ -67,6 +67,38 @@ typedef struct {
     /* 0x4 */ const BtlGfxCell *cells;
 } BtlGfxList;                          /* 8 bytes */
 
+/* What kinds 8 and 9 find at BtlObj.last instead: rectangles in the object's
+   own space, each corner coloured on its own. The colours are halfwords the
+   drawer reads a byte each. */
+typedef struct {
+    /* 0x00 */ short  x;
+    /* 0x02 */ short  y;
+    /* 0x04 */ short  w;
+    /* 0x06 */ short  h;
+    /* 0x08 */ short  rgb[12];
+    /* 0x20 */ u_char pad20[0x18];
+} BtlGfxQuad;                          /* 0x38 bytes */
+
+typedef struct {
+    /* 0x0 */ u_int             count;
+    /* 0x4 */ const BtlGfxQuad *quads;
+} BtlGfxQuadList;                      /* 8 bytes */
+
+/* And what kinds 10 and 11 find: a line's two ends and a colour for each. */
+typedef struct {
+    /* 0x00 */ short  x0;
+    /* 0x02 */ short  y0;
+    /* 0x04 */ short  x1;
+    /* 0x06 */ short  y1;
+    /* 0x08 */ short  rgb[6];
+    /* 0x14 */ u_char pad14[0xC];
+} BtlGfxLine;                          /* 0x20 bytes */
+
+typedef struct {
+    /* 0x0 */ u_int             count;
+    /* 0x4 */ const BtlGfxLine *lines;
+} BtlGfxLineList;                      /* 8 bytes */
+
 struct BtlActor;
 
 typedef struct BtlObj {
