@@ -100,7 +100,7 @@ void BtlOpenPersonaBoard(void)
     p = &g_btl_personas[BtlActorPersona(g_btl_actor_turn)];
     memcpy(g_btl_persona_name, p->name, PERSONA_NAME_CELLS);
     BtlDrawNumber(g_btl_persona_level_cells, p->level, PERSONA_LEVEL_W);
-    BtlDrawNumber(D_800F5B3C, p->unk29, PERSONA_NUMBER_W);
+    BtlDrawNumber(D_800F5B3C, p->sp_cost, PERSONA_NUMBER_W);
     BtlDrawNumberAlt(g_btl_persona_sp_cells,
                      g_btl_actors[g_btl_actor_turn].c.sp, PERSONA_SP_W);
     BtlDrawNumberAlt(g_btl_persona_sp_max_cells,

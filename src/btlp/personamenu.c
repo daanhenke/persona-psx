@@ -31,12 +31,6 @@
 #include <persona/btlp/stats.h>
 #include <persona/btlp/text.h>
 
-/* The three ways the spell cursor's table can be walked. */
-#define NAV_UP   0
-#define NAV_DOWN 1
-#define NAV_SIDE 2
-#define NAV_WAYS 3
-
 /* The board's lines: a spell's name and the byte that ends it. */
 #define SPELL_LINE 11
 #define LINE_EMPTY 0xFF
@@ -46,16 +40,12 @@
 #define SWAP_ROWS  2
 #define SWAP_NONE  0xFF
 
-/* The cursor's cells and how far left of a spot it stands. */
-#define CURSOR_CELLS 14
-#define CURSOR_NUDGE 7
-
 /* Where the help line goes, and the answer to the abort key. */
 #define HELP_X     0x10
 #define HELP_Y     0x8C
 #define PICK_ABORT (-2)
 
-u_char g_btl_persona_spell_nav[BTL_STATS_SPELLS][NAV_WAYS] = {
+u_char g_btl_persona_spell_nav[BTL_STATS_SPELLS][BTL_NAV_WAYS] = {
     { 6, 2, 1 }, { 5, 3, 0 }, { 0, 4, 3 }, { 1, 5, 2 },
     { 2, 6, 5 }, { 3, 1, 4 }, { 4, 0, 6 },
 };
@@ -89,16 +79,16 @@ int BtlPersonaSpellUpdate(short *row)
         BtlSePlay(1, 0);
     }
     if (keys & PAD_UP) {
-        dir = NAV_UP;
+        dir = BTL_NAV_UP;
     }
     if (keys & PAD_DOWN) {
-        dir = NAV_DOWN;
+        dir = BTL_NAV_DOWN;
     }
     if (keys & PAD_LEFT) {
-        dir = NAV_SIDE;
+        dir = BTL_NAV_SIDE;
     }
     if (keys & PAD_RIGHT) {
-        dir = NAV_SIDE;
+        dir = BTL_NAV_SIDE;
     }
     while (dir >= 0) {
         *row = g_btl_persona_spell_nav[*row][dir];
@@ -106,8 +96,8 @@ int BtlPersonaSpellUpdate(short *row)
             break;
         }
     }
-    for (cell = g_btl_menu_cursor, i = 0; i < CURSOR_CELLS; i++, cell++) {
-        cell->x = g_btl_persona_spell_spots[*row].x - CURSOR_NUDGE;
+    for (cell = g_btl_menu_cursor, i = 0; i < BTL_CURSOR_CELLS; i++, cell++) {
+        cell->x = g_btl_persona_spell_spots[*row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_persona_spell_spots[*row].y;
     }
     if (g_btl_no_help == 0) {
@@ -185,8 +175,8 @@ int BtlPersonaSwapUpdate(short *row)
         }
     }
 
-    for (cell = g_btl_menu_cursor, i = 0; i < CURSOR_CELLS; i++, cell++) {
-        cell->x = g_btl_persona_swap_spots[*row].x - CURSOR_NUDGE;
+    for (cell = g_btl_menu_cursor, i = 0; i < BTL_CURSOR_CELLS; i++, cell++) {
+        cell->x = g_btl_persona_swap_spots[*row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_persona_swap_spots[*row].y;
     }
     if (g_btl_pad1_edge & g_btl_key_confirm) {

@@ -222,8 +222,10 @@ void BtlActorMotion08(BtlObj *o)
             if ((o->attr & BTL_OBJ_CARRIED) == 0) {
                 odds = ACT_FOR_ODDS;
                 persona = &g_btl_personas[BtlActorPersona(o->mark_num)];
-                affinity = (g_persona_defs[persona->key].unk1C
-                            >> ((g_btl_actors[o->mark_num].c.key - 1) * 2)) & 3;
+                affinity = (g_persona_defs[persona->key].bond
+                            >> ((g_btl_actors[o->mark_num].c.key - 1)
+                                * PERSONA_BOND_BITS))
+                           & PERSONA_BOND_MASK;
                 if (g_btl_debug_act_for != 0) {
                     odds = 1;
                 }

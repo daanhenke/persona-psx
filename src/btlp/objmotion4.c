@@ -252,7 +252,6 @@ extern BtlSeqStep  D_800DA2C8[];
 extern BtlSeqStep  D_800DA2E8[];
 extern BtlSeqStep  D_800DA2F8[];
 extern BtlSeqStep *g_btl_marker_back_scripts[];
-extern BtlObj     *g_btl_marker_shown[];
 
 void BtlObjMotion02(BtlObj *obj)
 {

@@ -800,7 +800,7 @@ void BtlMemberMotion06(BtlObj *o)
         }
         D_800F5A60++;
         if (D_8004E264 == 0 && g_btl_act_kind == 0) {
-            a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].unk29;
+            a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].sp_cost;
         }
         g_btl_persona_ready = 0;
         g_btl_persona_obj = BtlSpawnPersona(a->padCB[0], o->col2, o->row,

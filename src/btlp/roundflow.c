@@ -528,11 +528,12 @@ void BtlStageRound(void)
                            != BTL_STATUS_DOWN
                     && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
                     p = &g_btl_personas[BtlActorPersona(i)];
-                    bits = (g_persona_defs[p->key].unk1C
-                            >> ((g_btl_actors[i].c.key - 1) * 2))
-                           & 3;
+                    bits = (g_persona_defs[p->key].bond
+                            >> ((g_btl_actors[i].c.key - 1)
+                                * PERSONA_BOND_BITS))
+                           & PERSONA_BOND_MASK;
                     if (p->slots > 5 && g_btl_actors[i].c.blocked == 0
-                        && bits == 3) {
+                        && bits == PERSONA_BOND_FULL) {
                         kind = 0;
                         switch (p->unk41 & 0xF0) {
                         case 0x10:
@@ -1122,7 +1123,7 @@ void BtlStageRound(void)
                         || (signed char)actor->c.status == 0x10
                         || (((signed char)actor->c.status == 4
                              || (signed char)actor->c.status == 5)
-                            && (signed char)actor->c.ail_level == 2)
+                            && (signed char)actor->c.ail_level == CHAR_AIL_LEVEL_MAX)
                         || (actor->flags & 0x34C0000) != 0)) {
                     if (i < BTL_PARTY) {
                         if (n < 0xC) {
@@ -1194,13 +1195,13 @@ void BtlStageRound(void)
                             kind = 7;
                             break;
                         case 4:
-                            if ((signed char)actor->c.ail_level == 2) {
+                            if ((signed char)actor->c.ail_level == CHAR_AIL_LEVEL_MAX) {
                                 kind = 7;
                                 amount = actor->c.hp_max / 16;
                             }
                             break;
                         case 5:
-                            if ((signed char)actor->c.ail_level == 2) {
+                            if ((signed char)actor->c.ail_level == CHAR_AIL_LEVEL_MAX) {
                                 kind = 7;
                                 amount = actor->c.hp_max / 16;
                             }

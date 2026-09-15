@@ -42,7 +42,6 @@
 
 extern const BtlBoardDef g_btl_list_board_defs[];
 extern const long        g_btl_spell_board_pos[];
-extern BtlObj           *g_btl_list_board;
 
 /* Whether the entry in this slot is one the fight can offer. */
 #define BtlItemOffered(id, count)                           \

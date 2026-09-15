@@ -82,7 +82,6 @@ extern u_char D_800F4814;
 
 extern BtlObj *g_btl_member_boards[];
 
-extern u_short g_btl_key_select;
 extern u_short g_btl_key_r1;
 
 extern void BtlPickSettle(void);

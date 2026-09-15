@@ -31,12 +31,12 @@ void BtlLoadPersonas(void)
         d->exp = s->unk00;
         d->rank_exp = s->unk04;
         d->rank_left = s->unk08;
-        d->unk0C = s->unk0C;
+        d->bond = s->bond;
         d->unk10 = s->unk10;
         d->unk12 = s->unk12;
         d->key   = s->key;
         memcpy(d->name, s->unk19, 10);
-        d->unk29 = s->unk23;
+        d->sp_cost = s->sp_cost;
         d->level = s->level;
         d->kind  = s->kind;
         d->stat[0] = s->stat[0];

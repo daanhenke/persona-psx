@@ -40,13 +40,8 @@
 #include <persona/btlp/round.h>
 #include <persona/btlp/stats.h>
 #include <persona/btlp/status.h>
+#include <persona/common/persona.h>
 #include <persona/common/spell.h>
-
-/* How well the Persona and the character have to get on: two bits a character
-   key in the Persona's +0x0C, and the third degree is the lowest that acts. */
-#define MAD_AGREE_BITS  2
-#define MAD_AGREE_MASK  3
-#define MAD_AGREE_LEAST 2
 
 /* The two runs of move ids a maddened fighter will cast, each as the first id
    and how many follow it. */
@@ -91,9 +86,11 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
     int        damage;
 
     p = &g_btl_personas[BtlActorPersona(a->obj->mark_num)];
-    if (a->c.blocked != 0 || a->c.entry == 0xFF || a->c.sp < p->unk29
-        || ((p->unk0C >> ((a->c.key - 1) * MAD_AGREE_BITS)) & MAD_AGREE_MASK)
-               < MAD_AGREE_LEAST) {
+    if (a->c.blocked != 0 || a->c.entry == CHAR_NO_ENTRY
+        || a->c.sp < p->sp_cost
+        || ((p->bond >> ((a->c.key - 1) * PERSONA_BOND_BITS))
+            & PERSONA_BOND_MASK)
+               < PERSONA_BOND_WILLING) {
         *act = AIL_ACT_NONE;
         return;
     }

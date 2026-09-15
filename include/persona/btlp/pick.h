@@ -64,4 +64,14 @@ extern short g_btl_enemy_slot;
 extern int   BtlPickMember(short *slot);
 extern short g_btl_target_slot;
 
+/* The pickers the item command runs - a member with a cursor, the whole party
+   and the enemy side - and the one a move is aimed with, which the cast and
+   most items use. Each answers -2, -1 or the pick. targetpick.c, and the last
+   in asm. */
+struct BtlActor;
+extern int BtlPickTargetMember(struct BtlActor *a);
+extern int BtlPickTargetParty(struct BtlActor *a);
+extern int BtlPickTargetEnemies(struct BtlActor *a);
+extern int BtlPickMoveTarget(struct BtlActor *a, int move);
+
 #endif

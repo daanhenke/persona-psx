@@ -42,11 +42,7 @@
 /* The motion a refused member is put on. */
 #define REFUSE_MOTION 4
 
-extern const u_char g_btl_msg_persona_blocked[];
-extern const u_char g_btl_msg_persona_alone[];
-extern const u_char g_btl_msg_persona_held[];
 extern short        g_btl_swap_row;
-extern BtlObj      *g_btl_marker_shown[];
 
 int BtlCommandChangePersona(void)
 {

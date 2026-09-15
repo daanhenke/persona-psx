@@ -24,7 +24,6 @@
 /* The motion a marker stands on when it is not doing anything. */
 #define MARKER_IDLE 0
 
-extern int g_btl_marker_shown[];
 
 int BtlMarkersIdle(void)
 {
@@ -47,7 +46,7 @@ int BtlMarkersHidden(void)
     int  i;
 
     i     = 0;
-    shown = g_btl_marker_shown;
+    shown = (int *)g_btl_marker_shown;
     do {
         if (*shown != 0) {
             return 0;

@@ -119,6 +119,12 @@ segments:
       # BtlHoldForMarkers's switch table, which the C emits itself.
       - [0xD98, .rodata, holdmarkers]
       - [0xDB0, rodata, btlp_rodata6b]
+      # BtlCommandAttack's and BtlCommandItem's switch tables, which commands.c
+      # emits itself - the word of padding behind the first inside the unit,
+      # the word behind the last belonging to nobody.
+      - [0xFBC, .rodata, commands]
+      - [0x1000, pad, btlp_pad_1000]
+      - [0x1004, rodata, btlp_rodata6b_a]
       # BtlMemberMotion06's and BtlMemberMotion05's switch tables, which
       # memberact.c emits itself. The table in front of them belongs to the
       # same unit and joins this segment when its routine comes out of asm.
@@ -464,7 +470,8 @@ segments:
       - [0x3B618, c, debugedit]
       - [0x3C0F8, c, debugequip]
       - [0x3C2BC, c, debugailment]
-      - [0x3C9B4, asm, btlp_61_b]
+      # The attack, cast and item commands g_btl_command_fn hands a member to.
+      - [0x3C9B4, c, commands]
       - [0x3EA80, c, targetpick]
       # The commands that change a Persona and that refuse.
       - [0x3F01C, c, commandpersona]
@@ -688,6 +695,10 @@ segments:
       # What the equipment stepper matches an item against.
       - [0x6B9EC, .data, debugequip]
       - [0x6BA10, data, btlp_data2_d]
+      # The spell and item boards' cursor spots, the item board's neighbour
+      # table and the item command's abort word, which commands.c emits.
+      - [0x6BA7C, .data, commands]
+      - [0x6BAF0, data, btlp_data2_d_a]
       # The Persona board's neighbour table and cursor spots.
       - [0x6BB0C, .data, personamenu]
       # The two menus' neighbour tables and spots, which menunav.c emits.

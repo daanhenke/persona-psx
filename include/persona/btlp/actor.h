@@ -111,7 +111,8 @@ typedef struct BtlActor {
                                       BtlChooseEnemyMove for an enemy, and read
                                       by BtlAimMove to work out what it hits */
     /* 0xBC */ u_char  ail_line;   /* which of g_btl_ailment_lines is put up
-                                      when the ailment stops the turn       */
+                                      when the ailment stops the turn. The
+                                      item command leaves the item's id here */
     /* 0xBD */ u_char  turn_move;  /* the move the turn plays out, copied from
                                       `move` beside turn_slot - nought for a
                                       plain attack. The enemy motions take
@@ -264,6 +265,12 @@ typedef struct BtlActor {
 /* The one beside it that also leaves a fighter unable to act, which the
    battle's outcome counts the same way. */
 #define BTL_STATUS_PALYZE 0xE
+
+/* Three more that stop a member's command: GUILT a swing outright and a cast
+   once it has any level, CLOSE and BLIND a cast at their last. */
+#define BTL_STATUS_CLOSE 8
+#define BTL_STATUS_BLIND 9
+#define BTL_STATUS_GUILT 0xC
 
 /* Where a fighter's own order is kept while a counter-attack borrows it, so
    the turn it interrupted can be put back. The target mask beside it at

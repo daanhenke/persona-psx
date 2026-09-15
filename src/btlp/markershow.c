@@ -62,7 +62,6 @@
 
 extern BtlObjDef   g_btl_obj_defs[];
 extern BtlObj     *g_btl_marker_obj[];
-extern BtlObj     *g_btl_marker_shown[];
 extern BtlSeqStep  g_btl_marker_stand[];
 extern u_char      g_btl_talk_outcome;
 

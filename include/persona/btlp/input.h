@@ -50,6 +50,7 @@ extern u_short g_btl_key_abort;
 extern u_short g_btl_key_r1;
 extern u_short g_btl_key_r2;
 extern u_short g_btl_key_square;
+extern u_short g_btl_key_select;
 extern u_short g_btl_key_page;
 
 /* PadRead's own bits, which BtlMenuKey hands back and the debug pages read

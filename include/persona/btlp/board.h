@@ -39,6 +39,11 @@ extern void    BtlBoardShut(BtlObj *board);
 extern void BtlOpenStockBoard(void);
 extern void BtlCloseStockBoard(void);
 
+/* The Persona board the cast command picks a spell on, put up and taken down.
+   personaboard.c. */
+extern void BtlOpenPersonaBoard(void);
+extern void BtlClosePersonaBoard(void);
+
 /* The boards a menu outside boards.c puts up: the debug page, the switch
    board of its flag editor, and the status view an analysis is shown on. */
 extern void BtlOpenDebugBoard(void);

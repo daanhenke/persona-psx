@@ -51,12 +51,6 @@
 #define HOLD_X 0x10
 #define HOLD_Y 0x94
 
-/* The slot the cursor is on, which starts where the turn is. */
-
-extern u_char       D_800CF94C[];
-
-extern void BtlOpenItemBoard(void);
-
 int BtlPickTargetMember(BtlActor *a)
 {
     int pick;
@@ -211,7 +205,7 @@ int BtlHoldMessage(void)
     for (;;) {
         switch (g_btl_step) {
         case 0:
-            BtlOpenMessage(0, 0, D_800CF94C, HOLD_X, HOLD_Y);
+            BtlOpenMessage(0, 0, g_btl_msg_no_gun, HOLD_X, HOLD_Y);
             g_btl_step++;
             break;
         case 1:

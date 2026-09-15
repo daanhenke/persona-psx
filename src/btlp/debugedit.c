@@ -65,10 +65,7 @@
 
 #define EDIT_CLAMP(v, max) ((v) != 0 ? ((v) < (max) + 1 ? (v) : (max)) : 1)
 
-/* The cursor: how many cells it is drawn with, how far left of a stat's spot
-   it stands, and where it stands on the equipment page. */
-#define EDIT_CURSOR_CELLS 14
-#define EDIT_CURSOR_NUDGE 7
+/* Where the cursor stands on the equipment page. */
 #define EDIT_EQUIP_X      (-0x3F)
 #define EDIT_EQUIP_Y      (-0x28)
 #define EDIT_EQUIP_PITCH  12
@@ -254,8 +251,8 @@ int BtlDebugEditMember(void)
             BtlApplyPersona(a);
             BtlRecalcStats(a);
             BtlFillEditBoard(a);
-            for (i = 0, cell = g_btl_menu_cursor; i < EDIT_CURSOR_CELLS; i++, cell++) {
-                cell->x = g_btl_edit_stat_spots[g_btl_edit_stat_row].x - EDIT_CURSOR_NUDGE;
+            for (i = 0, cell = g_btl_menu_cursor; i < BTL_CURSOR_CELLS; i++, cell++) {
+                cell->x = g_btl_edit_stat_spots[g_btl_edit_stat_row].x - BTL_CURSOR_NUDGE;
                 cell->y = g_btl_edit_stat_spots[g_btl_edit_stat_row].y;
             }
             if (g_btl_pad1_edge & g_btl_key_cancel) {
@@ -317,7 +314,7 @@ int BtlDebugEditMember(void)
                 BtlShutEditBoard();
                 g_btl_step = EDIT_PICK;
             }
-            for (i = 0, cell = g_btl_menu_cursor; i < EDIT_CURSOR_CELLS; i++, cell++) {
+            for (i = 0, cell = g_btl_menu_cursor; i < BTL_CURSOR_CELLS; i++, cell++) {
                 cell->x = EDIT_EQUIP_X;
                 cell->y = g_btl_edit_equip_row * EDIT_EQUIP_PITCH + EDIT_EQUIP_Y;
             }

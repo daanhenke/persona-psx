@@ -29,7 +29,6 @@
 
 /* The rest of the control scheme's masks. The four directions and the help key
    are the same under either scheme; these are the ones it moves. */
-extern u_short g_btl_key_select;
 extern u_short g_btl_key_r1;
 extern u_short g_btl_key_end;
 

@@ -15,6 +15,7 @@
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
+#include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 
 #define BTL_MARKERS      5
@@ -72,7 +73,6 @@ BtlMarkerDef g_btl_marker_defs[BTL_MARKER_PARTS] = {
     {g_btl_lone_defs, 0, 3, 0x1F, 0x20},
 };
 extern BtlObj            *g_btl_marker_obj[];
-extern BtlObj            *g_btl_marker_shown[];
 
 #ifdef NON_MATCHING
 void BtlSpawnMarkers(void)

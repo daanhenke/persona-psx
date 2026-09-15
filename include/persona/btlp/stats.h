@@ -32,7 +32,7 @@ typedef struct {
     /* 0x08 */ long    rank_left; /* and how much the next rank still wants;
                                     BtlPersonaGrow carries what is over
                                     into the rank after                    */
-    /* 0x0C */ u_long  unk0C;
+    /* 0x0C */ u_long  bond;     /* PersonaDef.bond: see PERSONA_BOND_BITS  */
     /* 0x10 */ u_short unk10;
     /* 0x12 */ u_short unk12;
     /* 0x14 */ u_short unk14;    /* BtlApplyPersona copies these two onto the
@@ -47,7 +47,7 @@ typedef struct {
                                     wanted list is matched against it and the
                                     actor's object takes its graphics by it */
     /* 0x1F */ u_char  name[10]; /* packed glyph bytes, as Char.name */
-    /* 0x29 */ u_char  unk29;
+    /* 0x29 */ u_char  sp_cost;  /* what a cast takes off the member's SP  */
     /* 0x2A */ u_char  level;
     /* 0x2B */ u_char  kind;     /* the save record's +0x25; a demon species
                                     is paired with one of these through

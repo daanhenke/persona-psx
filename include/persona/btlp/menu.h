@@ -41,6 +41,18 @@ typedef struct {
 /* The cells the menu cursor is drawn with, which each menu places. */
 extern BtlGfxCell g_btl_menu_cursor[];
 
+/* The cells a menu stands the cursor with, and how far left of an item's spot
+   it goes. */
+#define BTL_CURSOR_CELLS 14
+#define BTL_CURSOR_NUDGE 7
+
+/* The three ways a two-column menu's neighbour table is walked: up, down, and
+   across to the other column. */
+#define BTL_NAV_UP   0
+#define BTL_NAV_DOWN 1
+#define BTL_NAV_SIDE 2
+#define BTL_NAV_WAYS 3
+
 /* The two menus whose cursor walks a table of neighbours: the debug board's,
    and the placement menu's layout picker. Both answer an item on a confirm,
    -1 on a cancel and BTL_PICK_WAIT otherwise. menunav.c. */
@@ -55,6 +67,10 @@ extern int BtlTacticsMenuUpdate(void);
    on a confirm, -1 on a cancel. */
 struct BtlObj;
 extern int BtlSpellMenuUpdate(struct BtlObj *board);
+/* Where that list's cursor is, and the spots it stands on, a page of ten.
+   commands.c keeps the spots. */
+extern short       g_btl_spell_row;
+extern BtlMenuSpot g_btl_spell_spots[];
 /* Redraws the tactics page's rows from each member's BtlActor.tactic.
    menuboards.c. */
 extern void BtlRefreshTacticsLines(void);
@@ -80,8 +96,47 @@ extern int (*g_btl_command_fn[])(void);
 extern int BtlCommandChangePersona(void);
 extern int BtlCommandRefuse(void);
 
-/* One frame of the Persona swap board. personamenu.c. */
-extern int BtlPersonaSwapUpdate(short *row);
+/* The attack, the cast and the item, which the list's first rows run.
+   commands.c. The cast puts the debug board's spell list up in place of the
+   Persona board while g_btl_cast_debug is raised - the debug HUD up and
+   SELECT, SQUARE and R2 held as the command starts - and abandons the pick
+   once g_btl_cast_abort is; the item command keeps its row, the id in use and
+   an abort of its own, and walks its board by the table here. */
+extern int         BtlCommandAttack(void);
+extern int         BtlCommandCast(void);
+extern int         BtlCommandItem(void);
+extern u_char      g_btl_cast_debug;
+extern int         g_btl_cast_abort;
+extern u_char      g_btl_cast_spells[];
+extern short       g_btl_item_row;
+extern int         g_btl_item_used;
+extern int         g_btl_item_abort;
+extern signed char g_btl_item_nav[][BTL_NAV_WAYS];
+extern BtlMenuSpot g_btl_item_spots[];
+
+/* The lines a command turns a member away with. */
+extern const u_char g_btl_msg_out_of_reach[];
+extern const u_char g_btl_msg_guilt[];
+extern const u_char g_btl_msg_no_gun[];
+extern const u_char g_btl_msg_no_ammo[];
+extern const u_char g_btl_msg_short_sp[];
+extern const u_char g_btl_msg_persona_unwilling[];
+extern const u_char g_btl_msg_lifted[];
+extern const u_char g_btl_msg_closed[];
+extern const u_char g_btl_msg_puppet[];
+extern const u_char g_btl_msg_blind[];
+extern const u_char g_btl_msg_no_items[];
+extern const u_char g_btl_msg_persona_blocked[];
+extern const u_char g_btl_msg_cast_sealed[];
+extern const u_char g_btl_msg_persona_alone[];
+extern const u_char g_btl_msg_persona_held[];
+extern const u_char g_btl_msg_spell_untamed[];
+
+/* One frame of each page of the Persona board, and the row its spell page is
+   on. personamenu.c. */
+extern int   BtlPersonaSpellUpdate(short *row);
+extern int   BtlPersonaSwapUpdate(short *row);
+extern short g_btl_persona_spell_row;
 
 /* The list board the spell and item boards share: which of the two it is
    showing, the first spell slot on its page, and where the menu has got to
@@ -95,6 +150,16 @@ extern void     BtlBuildSpellLines(int spell);
 extern void     BtlBuildItemLines(u_short *from);
 extern u_short *BtlNextUsableItem(u_short *slot);
 extern u_short *BtlPrevUsableItem(u_short *slot);
+/* The board itself, the item page's entries and the one past them, the first
+   usable item, the item and spell pages put up, and the item board and the
+   shared board taken down. itemboard.c and usableitems.c. */
+extern BtlObj   *g_btl_list_board;
+extern u_short   g_btl_item_slots[];
+extern u_short  *BtlFirstUsableItem(void);
+extern void      BtlOpenItemBoard(void);
+extern void      BtlCloseItemBoard(void);
+extern void      BtlOpenSpellBoard(void);
+extern void      BtlCloseListBoard(void);
 
 /* Lights one member at full colour with their marker chosen, and sends the
    rest of the living party toward the background with theirs. */

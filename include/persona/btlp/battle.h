@@ -62,6 +62,8 @@ extern const int g_btl_moon_divisor[];
    fight that leads into another. Retail leaves the first zero. */
 extern u_char g_btl_debug_hud;
 extern u_char g_btl_debug_skip;
+/* Lets a member cast whatever their SP. */
+extern u_char g_btl_debug_free_sp;
 extern u_char g_btl_chain_battle;
 
 /* Two more of the same, read only by the enemy AI: one makes every enemy
@@ -209,6 +211,8 @@ extern void BtlHudShow(void);
 
 /* One marker object per party slot, plus the shared one past them. */
 extern BtlObj *g_btl_marker_obj[];
+/* The marker still moving over each member, NULL once it has come to rest. */
+extern BtlObj *g_btl_marker_shown[];
 
 /* The placement grid's last record; holding one is what says the grid is up. */
 extern BtlObj *g_btl_grid_tail;

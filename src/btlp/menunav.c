@@ -54,10 +54,6 @@
 #define NAV_LEFT  2
 #define NAV_RIGHT 3
 
-/* The cursor's artwork, and how far left of the item it is drawn. */
-#define CURSOR_CELLS 14
-#define CURSOR_LEFT  7
-
 #define DEBUG_ITEMS  15
 #define PRESET_ITEMS 9
 #define ORDERS_ITEMS 3
@@ -91,7 +87,6 @@ extern short      g_btl_debug_row;
 extern short      g_btl_preset_row;
 extern short      g_btl_orders_row;
 extern short      g_btl_tactics_row;
-extern short      g_btl_spell_row;
 extern u_char     g_btl_orders_line0[];
 extern u_char     g_btl_orders_line1[];
 extern u_char     g_btl_orders_line2[];
@@ -190,11 +185,11 @@ int BtlDebugUpdate(void)
     row = g_btl_debug_row;
     cell = g_btl_menu_cursor;
     do {
-        cell->x = g_btl_debug_spots[row].x - CURSOR_LEFT;
+        cell->x = g_btl_debug_spots[row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_debug_spots[row].y;
         i++;
         cell++;
-    } while (i < CURSOR_CELLS);
+    } while (i < BTL_CURSOR_CELLS);
 
     if (g_btl_pad1_edge & g_btl_key_confirm) {
         return g_btl_debug_row;
@@ -233,11 +228,11 @@ int BtlPresetMenuUpdate(int on_field)
     row = g_btl_preset_row;
     cell = g_btl_menu_cursor;
     do {
-        cell->x = g_btl_preset_spots[row].x - CURSOR_LEFT;
+        cell->x = g_btl_preset_spots[row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_preset_spots[row].y;
         i++;
         cell++;
-    } while (i < CURSOR_CELLS);
+    } while (i < BTL_CURSOR_CELLS);
 
     if (g_btl_pad1 & g_btl_key_r1) {
         BtlStandPreset(PRESET_LIVE);
@@ -289,11 +284,11 @@ int BtlOrdersMenuUpdate(void)
     row = g_btl_orders_row;
     cell = g_btl_menu_cursor;
     do {
-        cell->x = g_btl_orders_spots[row].x - CURSOR_LEFT;
+        cell->x = g_btl_orders_spots[row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_orders_spots[row].y;
         i++;
         cell++;
-    } while (i < CURSOR_CELLS);
+    } while (i < BTL_CURSOR_CELLS);
 
     if (g_btl_pad1_edge & g_btl_key_confirm) {
         BtlCloseMessage(0);
@@ -338,11 +333,11 @@ int BtlTacticsMenuUpdate(void)
     row = g_btl_tactics_row;
     cell = g_btl_menu_cursor;
     do {
-        cell->x = g_btl_tactics_spots[row].x - CURSOR_LEFT;
+        cell->x = g_btl_tactics_spots[row].x - BTL_CURSOR_NUDGE;
         cell->y = g_btl_tactics_spots[row].y;
         i++;
         cell++;
-    } while (i < CURSOR_CELLS);
+    } while (i < BTL_CURSOR_CELLS);
     BtlRefreshTacticsLines();
 
     if (g_btl_pad1_edge & g_btl_key_cancel) {

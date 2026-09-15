@@ -2387,3 +2387,131 @@ holding the answer first, the local's register gets a copy of it.
 
 - [enemymotion2.c](/src/btlp/enemymotion2.c) - all four strikes in
   `BtlEnemyStrike`.
+
+## A mask loop one instruction short hoists its `1`
+
+`1 << (i + BTL_PARTY)` needs its `1` in a register, and the loop pass lifts that
+load out of the loop when threshold × savings × lifetime reaches the loop's
+instruction count. For a loop with no call in it the line fell between 27 and
+28. Walking the combatants through a local copy of the pointer -
+`e = g_btl_combatants; ... e[i].c.key` - left the target mask's loop at 27 real
+instructions, the `1` went out, and its long life then carried every other `1`
+in the routine into a saved register with it. Indexing the global directly
+adds the pointer's load to the loop:
+
+    for (; i < BTL_ENEMIES; i++) {
+        if (g_btl_combatants[i].c.key != 0 && g_btl_combatants[i].pickable != 0) {
+            g_btl_actors[g_btl_actor_turn].targets |= 1 << (i + BTL_PARTY);
+        }
+    }
+
+28 instructions, `not desirable` in the `.loop` dump, and the `1` is loaded at
+its use as the image has it. The same sum decides the routine's own loop: a
+constant with five uses a lifetime apiece is hoisted at 574 instructions and
+left alone at 651, so a hoist that disagrees with the image can come right
+from fixing something unrelated that moves the count.
+
+- [commands.c](/src/btlp/commands.c) - `BtlCommandAttack`'s two target masks,
+  97.78% to 99.42%, the frame and the saved registers with them;
+  `BtlCommandCast`'s `2` and `BtlCommandItem`'s `1` came right that way.
+
+## A set a delay slot already made is dropped only from the front of a block
+
+    i = 0;
+    least = TARGET_HP_MAX;
+    for (; i < BTL_ENEMIES; i++) {
+
+The image's weakest-enemy arm never clears its counter: the delay slot of the
+compare in front of it has already done so on the way in. reorg deletes a set it
+finds redundant while it scans a branch target for something to fill the slot
+with, and the scan stops at the instruction it takes - here `least`'s `lui` - so
+the counter has to come first. Written in the `for`, after `least`, it stays.
+
+- [commands.c](/src/btlp/commands.c) - `BtlCommandAttack`, 99.42% to 99.61%.
+
+## A line picked in two arms is two calls
+
+The image puts a gun's two refusals up with `a1 = 0` in each arm - one in a delay
+slot, one in line - and the call itself shared. That is two whole calls:
+
+    if (equip[1] != 0) {
+        if (equip[2] != 0) { item = ...; goto aim; }
+        BtlOpenMessage(0, 0, g_btl_msg_no_ammo, COMMAND_MSG_X, COMMAND_MSG_Y);
+        g_btl_step = 6;
+        break;
+    }
+    BtlOpenMessage(0, 0, g_btl_msg_no_gun, COMMAND_MSG_X, COMMAND_MSG_Y);
+    g_btl_step = 6;
+    break;
+
+jump2 folds the identical tails back together from the call upward and stops at
+the line's pointer, so each arm keeps the arguments in front of it. The line
+chosen into a local with one call leaves them in the shared block.
+
+- [commands.c](/src/btlp/commands.c) - `BtlCommandAttack`, 99.61% to 99.98%.
+
+## A picker's cancel written before its abort
+
+Where the image answers a picker with
+
+    beq  v1, -2, abort
+    bne  v1, -1, chosen
+    j    done
+    abort: ...
+    chosen: ...
+
+the switch had the cancel's case first:
+
+    switch (pick) {
+    case BTL_PICK_CANCEL:
+        break;
+    case BTL_PICK_ABORT:
+        g_btl_item_abort = 1;
+        break;
+    default:
+        ...
+    }
+
+gcc moves the compare tree in front of the bodies. The cancel's empty body is a
+jump out, which jump threads into the tree's `beq`; that `beq` over the `j` to
+the default then becomes a `bne` to the default and a `j` out, with the abort's
+body left after it. With the abort's case first its body follows the tree and
+the `-1` test comes after it. Where both answers end the same way - here
+`BtlSePlay(1, 2); g_btl_step = 1;`, the abort setting its flag first - write the
+tail in both: cross-jumping folds the cancel's copy into the abort's, which is
+where the image has the call, its arguments ahead of the flag's store.
+
+- [commands.c](/src/btlp/commands.c) - `BtlCommandCast`'s step 2 and the four
+  pick arms of `BtlCommandItem`; 98.13% and 99.10% to 99.99% with the next
+  section.
+
+## A cursor loop's counter set before its pointer
+
+    for (i = 0, cell = g_btl_menu_cursor; i < CURSOR_CELLS; i++, cell++) {
+        cell->x = g_btl_item_spots[g_btl_item_row].x - CURSOR_NUDGE;
+        cell->y = g_btl_item_spots[g_btl_item_row].y;
+    }
+
+puts `i = 0` at the head of the block every way out of the frame's switch jumps
+to, and reorg copies it into the delay slots of those jumps - the dozen
+`addu a0, zero, zero` the image has there. With the pointer first the slots
+stay empty. `g_btl_menu_cursor[i]` is no better: the loop is not reduced to a
+pointer at all and stores through `%lo(g_btl_menu_cursor)(at)`.
+
+- [commands.c](/src/btlp/commands.c) - the loops that end each frame of
+  `BtlCommandCast` and `BtlCommandItem`.
+
+## A walk tested through the variable its value goes into later
+
+    for (i = 0; i < BTL_STATS_SPELLS; i++) {
+        spell = g_btl_personas[persona].spell[i];
+        if (spell != 0) {
+            g_btl_cast_spells[n++] = g_btl_personas[persona].spell[i];
+        }
+    }
+
+The store still reads the slot again, as the image does, but the test is now in
+`spell`'s pseudo and takes the register `spell` is given after the loop, `a2`.
+Tested in place the byte comes out in `v0`.
+
+- [commands.c](/src/btlp/commands.c) - `BtlCommandCast`, 99.99% to exact.

@@ -27,7 +27,9 @@ typedef struct {
                                    seven equipment groups it belongs to, which
                                    g_btl_equip_kind gives per slot          */
     /* 0x08 */ u_char name[10];   /* packed glyph bytes, ten cells wide */
-    /* 0x12 */ u_char pad12[1];
+    /* 0x12 */ u_char move;     /* the move a used item makes, aimed through
+                                   BtlPickMoveTarget; 0 for the few the item
+                                   command aims itself                      */
     /* 0x13 */ u_char bonus01;  /* high nibble stat[0], low nibble stat[1] */
     /* 0x14 */ u_char bonus23;  /* high nibble stat[2], low nibble stat[3] */
     /* 0x15 */ u_char bonus4;   /* high nibble stat[4]                     */
@@ -51,6 +53,10 @@ typedef struct {
 } ItemDef;                      /* 0x20 bytes */
 
 extern ItemDef g_item_defs[];
+
+/* One help line per item id, which the battle's item board puts up for the
+   entry the cursor is on. */
+extern const u_char *g_item_help[];
 
 /* The two inventory lists.
  *

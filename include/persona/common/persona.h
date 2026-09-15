@@ -13,11 +13,20 @@
 
 #define PERSONA_STATS 5
 
+/* A Persona's bond with each member, two bits a member by Char.key less one.
+   Under PERSONA_BOND_WILLING it will not be cast for that member, nor reached
+   for by a maddened one; PERSONA_BOND_FULL is as far as it goes. */
+#define PERSONA_BOND_BITS    2
+#define PERSONA_BOND_MASK    3
+#define PERSONA_BOND_WILLING 2
+#define PERSONA_BOND_FULL    3
+
 typedef struct {
     /* 0x00 */ u_long  unk00;
     /* 0x04 */ u_long  unk04;
     /* 0x08 */ u_long  unk08;
-    /* 0x0C */ u_long  unk0C;     /* built from the definition record's +0x1C */
+    /* 0x0C */ u_long  bond;      /* PersonaDef.bond, copied in as the record
+                                     is built                                */
     /* 0x10 */ u_short unk10;     /* CharRecalcStats copies this pair into the
                                      carrier's Char+0x3A and +0x3C, or writes
                                      1 into both when no Persona is equipped */
@@ -25,7 +34,7 @@ typedef struct {
     /* 0x14 */ u_char  pad14[4];
     /* 0x18 */ u_char  key;       /* identifies the record; 0 while unused */
     /* 0x19 */ u_char  unk19[10]; /* straight out of the definition's +0x08 */
-    /* 0x23 */ u_char  unk23;
+    /* 0x23 */ u_char  sp_cost;   /* PersonaDef.sp_cost, copied the same way */
     /* 0x24 */ u_char  level;
     /* 0x25 */ u_char  kind;      /* the battle pairs a demon species with a
                                      Persona through this                    */
@@ -116,13 +125,15 @@ typedef struct {
     /* 0x06 */ u_short unk06;
     /* 0x08 */ u_char  unk08[10]; /* kept whole, on the battle's record at
                                      +0x1F and the save game's at +0x19     */
-    /* 0x12 */ u_char  unk12;
+    /* 0x12 */ u_char  sp_cost;   /* SP a cast through this Persona takes    */
     /* 0x13 */ u_char  level;
     /* 0x14 */ u_char  kind;      /* pairs a demon species with this Persona */
     /* 0x15 */ u_char  stat[PERSONA_STATS];
     /* 0x1A */ u_char  resist;
     /* 0x1B */ u_char  pad1B[1];
-    /* 0x1C */ u_long  unk1C;     /* lands on the record's +0x0C             */
+    /* 0x1C */ u_long  bond;      /* how far the Persona answers each member,
+                                     PERSONA_BOND_BITS a member. It lands on
+                                     the record's +0x0C and on BtlStats.bond */
     /* 0x20 */ u_char  raw[PERSONA_SPELLS];
                                   /* the spell list as it came off the disc  */
     /* 0x27 */ u_char  pad27[1];
