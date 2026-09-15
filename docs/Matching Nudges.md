@@ -163,6 +163,7 @@ local reused for two unrelated things often will. Both directions come up.
 - [itemcell.c:51](/src/common/ui/itemcell.c#L51), [itemrowuse.c:12](/src/common/ui/itemrowuse.c#L12) - one scratch carries the id test in and the glyph bank out.
 - [formationrepair.c:20](/src/common/game/formationrepair.c#L20) - one counter serves both loops, which only happens if it is the same variable.
 - [pickmember.c:74](/src/btlp/pickmember.c#L74) - the mask is a local so it stays in a register across the loop.
+- [commandmenu.c](/src/btlp/commandmenu.c) - the formation walk's cell counter is the `i` the party walks use; a `cell` of its own put every loop counter a register over (99.35% to 99.65%).
 
 The reverse is also a lever: in `BtlBuildOffers` a *shared* temp put the value in
 `v0`, clobbering a speculatively-loaded `1` so it had to be re-materialised;
@@ -250,6 +251,16 @@ Include the arms with no body too (`case X: break;`): a missing low case makes
 gcc subtract before the range test, which shows up as `addiu v1,v0,-1` and a
 `sltiu` against the wrong bound. Identical trailing code in two arms is merged
 by the compiler on its own - you do not write the shared tail yourself.
+
+The same holds for a switch too small for a table. gcc balances the compare
+tree over the nodes it has, so an empty arm for a far-off value is still a node
+and still moves the splits. `BtlCommandEntry`'s yes/no/cancel prompt tests
+`-1`, then `bltz` to the frame, then `0`, then `1`; without
+`case BTL_MENU_WAIT: break;` the `bltz` is gone and the tree tests `0` and
+`bgtz` instead.
+
+- [commandmenu.c](/src/btlp/commandmenu.c) - 97.69% to 98.46% on that arm
+  alone.
 
 The padding after a jump table belongs to nobody: gcc emits the entries and the
 next subsegment starts later, so the gap needs a bare `rodata` segment of its
@@ -363,6 +374,8 @@ Read the size off the `.frame` directive in the built `.s`
   eight; `BtlStageClose` was 0x68C against 0x694 until the eight bytes were
   there.
 - [cursorplace.c](/src/btlp/cursorplace.c) - the same thing at 56 bytes.
+- [commandmenu.c](/src/btlp/commandmenu.c) - sixteen bytes, as a `u_char
+  unused[16]`, in `BtlCommandEntry`.
 
 ### 12. Unguarding can break the link
 
@@ -470,6 +483,20 @@ puts it back is taking the byte into an `int` of its own first:
 - [personamotion.c](/src/btlp/personamotion.c) - `BtlPersonaMotion02`, exact on
   that alone. This is the opposite direction to the `sltiu` case in section 8:
   read which one the image has and pick the spelling for it.
+
+## The global again, not a byte local stored into it
+
+Where the image masks a value, masks it again with `andi a2,v0,0xff`, and then
+both stores the result into a short global and passes it on, the source did
+not hold it in a `u_char` of its own: gcc knows such a local's upper bits and
+drops the second mask. It stored the value and passed the global:
+
+    g_btl_pick_help_row2 = g_btl_actors[turn].c.unk5D & BTL_CMD_ROW;
+    BtlShowMarker(turn, 0, g_btl_pick_help_row2);
+
+- [commandmenu.c](/src/btlp/commandmenu.c) - `BtlCommandEntry`, both paths
+  that step back to a member; a `u_char kind` was one instruction short in
+  each.
 
 ## Two arms that differ only in a constant share their tail
 

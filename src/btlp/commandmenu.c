@@ -26,10 +26,13 @@
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
+#include <libsnd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/board.h>
+#include <persona/btlp/choice.h>
 #include <persona/btlp/debug.h>
+#include <persona/btlp/formation.h>
 #include <persona/btlp/input.h>
 #include <persona/btlp/menu.h>
 #include <persona/btlp/pick.h>
@@ -38,10 +41,356 @@
 #include <persona/btlp/stage.h>
 #include <persona/btlp/status.h>
 #include <persona/btlp/talk.h>
+#include <persona/btlp/text.h>
 
 INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlConfigMenu);
 
-INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlCommandEntry);
+/* BtlCommandEntry's steps. It opens on the next member without a command and
+   the picker over them; the rest are the ways out of it. */
+#define ENTRY_NEXT    0 /* the next member without a command                */
+#define ENTRY_PICK    1 /* the picker over that member                        */
+#define ENTRY_DONE    2 /* nobody is left: keep the commands and leave        */
+#define ENTRY_UNDO    3 /* whether the formation goes back to how it stood    */
+#define ENTRY_UNDONE  4 /* it has: the moved members' markers are taken down  */
+#define ENTRY_CONFIRM 5 /* whether the commands stand                         */
+#define ENTRY_REVISE  6 /* they do not: back to the last member               */
+#define ENTRY_CLEAR   7 /* the third key: every command is taken back         */
+#define ENTRY_CLEARED 8 /* and the picker comes back once the markers are in  */
+
+/* What a command answers besides the abort: it came to nothing, or the member
+   has an order. */
+#define COMMAND_NONE 0
+#define COMMAND_MADE 1
+
+/* Where the question about the formation goes; the confirmation takes the
+   help line's place. */
+#define ENTRY_UNDO_Y 0xBC
+
+int BtlCommandEntry(void)
+{
+    int    i;
+    int    prev;
+    int    choice;
+    int    row;
+    int    col;
+    int    cell;
+    u_char kind;
+    /* Sixteen bytes of the frame the image reserves and never touches; with
+       nothing here the routine opens 0x68 bytes down against the image's
+       0x78, and every register save is out by the difference. */
+    u_char unused[16];
+
+    for (i = 0; i < BTL_PARTY; i++) {
+        if (g_btl_actors[i].c.key != 0
+            && (signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
+            && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
+            && g_btl_actors[i].marker == 0) {
+            break;
+        }
+    }
+    if (i >= BTL_PARTY) {
+        BtlPickSettle();
+        BtlShowAilmentMarks(0);
+        BtlPartyResetGfx();
+        g_btl_step = ENTRY_DONE;
+    }
+    if (SsIsEos(g_btl_seq[0], 0) == 0) {
+        SsSepStop(g_btl_seq[0], 2);
+        BtlSePlay(0, 0);
+    }
+    BtlPickShowPage(1);
+    g_btl_actor_turn = -1;
+
+    for (;;) {
+        switch (g_btl_step) {
+        case ENTRY_NEXT:
+            g_btl_actor_turn = BtlUnreadyMemberNext(g_btl_actor_turn);
+            if (g_btl_actor_turn >= 0) {
+                g_btl_pick_help_row2 = g_btl_actors[g_btl_actor_turn].c.unk5D & BTL_CMD_ROW;
+                BtlSingleOutMember(g_btl_actor_turn);
+                g_btl_step++;
+                break;
+            }
+            for (i = 0; i < BTL_PARTY; i++) {
+                g_btl_marker_obj[i]->attr &= ~BTL_MARK_CHOSEN;
+            }
+            BtlPickSettle();
+            BtlPartyResetGfx();
+            if (g_btl_confirm == 0) {
+                BtlOpenMessage(0, 0, g_btl_msg_commands_ok, PICK_HELP_X, PICK_HELP_Y);
+                BtlOpenChoice1();
+                g_btl_choice1_row = 0;
+                g_btl_step = ENTRY_CONFIRM;
+            } else {
+                g_btl_step = ENTRY_DONE;
+            }
+            break;
+
+        case ENTRY_PICK:
+            choice = BtlPickUpdate(&g_btl_pick_help_row2);
+        pick:
+            switch (choice) {
+            case BTL_PICK_WAIT:
+                break;
+
+            case BTL_PICK_CANCEL:
+                if (g_btl_actor_turn < 0) {
+                    g_btl_actor_turn = 0;
+                }
+                prev = g_btl_actor_turn;
+                g_btl_actor_turn = BtlUnreadyMemberPrev(prev);
+                if (g_btl_actor_turn >= 0) {
+                    if (g_btl_marker_shown[g_btl_actor_turn] == NULL && BtlMarkersIdle() != 0) {
+                        if (g_btl_actor_turn >= 0
+                            && g_btl_actors[g_btl_actor_turn].revive_mark == BTL_REVIVE_CARRIED) {
+                            g_btl_actors[g_btl_actor_turn].revive_mark = 0;
+                            for (i = 0; i < g_btl_actor_turn; i++) {
+                                if (g_btl_actors[i].revive_mark == BTL_REVIVE_CARRIED
+                                    && g_btl_actors[i].revive_slot
+                                           == g_btl_actors[g_btl_actor_turn].revive_slot) {
+                                    break;
+                                }
+                            }
+                            if (i >= g_btl_actor_turn) {
+                                g_btl_actors[g_btl_actors[g_btl_actor_turn].revive_slot].revive_mark = 0;
+                            }
+                        }
+                        BtlPartyResetGfx();
+                        BtlSingleOutMember(g_btl_actor_turn);
+                        g_btl_pick_help_row2 = g_btl_actors[g_btl_actor_turn].c.unk5D & BTL_CMD_ROW;
+                        if (g_btl_actors[g_btl_actor_turn].marker == BTL_MARKER_ORDERED) {
+                            BtlShowMarker(g_btl_actor_turn, 0, g_btl_pick_help_row2);
+                            g_btl_actors[g_btl_actor_turn].marker = 0;
+                        }
+                        g_btl_actors[g_btl_actor_turn].flags &= ~BTL_ACTOR_FLINCHED;
+                        break;
+                    }
+                    g_btl_actor_turn = BtlUnreadyMemberNext(g_btl_actor_turn);
+                    break;
+                }
+                if (g_btl_pick_objs[0]->motion == 0) {
+                    if (g_btl_formation_moved != 0) {
+                        BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
+                        BtlPartyResetGfx();
+                        g_btl_marker_obj[prev]->attr &= ~BTL_MARK_CHOSEN;
+                        BtlOpenMessage(0, 0, g_btl_msg_undo_formation, PICK_HELP_X, ENTRY_UNDO_Y);
+                        g_btl_choice1_row = 0;
+                        BtlRetractMarkers();
+                        BtlPickSettle();
+                        BtlOpenChoice1();
+                        g_btl_step = ENTRY_UNDO;
+                        break;
+                    }
+                    g_btl_actor_turn = -1;
+                    if (g_btl_pick_objs[0]->motion == 0) {
+                        g_btl_marker_obj[prev]->attr &= ~BTL_MARK_CHOSEN;
+                        BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
+                        BtlRestoreMarkers();
+                        BtlPickShowPage(0);
+                        BtlPartyResetGfx();
+                        return 0;
+                    }
+                    break;
+                }
+                g_btl_actor_turn = BtlUnreadyMemberNext(g_btl_actor_turn);
+                break;
+
+            case BTL_PICK_ABORT:
+                if (BtlMarkersHidden() != 0 && BtlMarkersIdle() != 0) {
+                    g_btl_marker_obj[g_btl_actor_turn]->attr &= ~BTL_MARK_CHOSEN;
+                    g_btl_step = ENTRY_CLEAR;
+                }
+                break;
+
+            default:
+                if (g_btl_marker_shown[g_btl_actor_turn] == NULL && BtlMarkersIdle() != 0) {
+                    BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
+                    g_btl_actors[g_btl_actor_turn].c.unk5D =
+                        (g_btl_actors[g_btl_actor_turn].c.unk5D & BTL_CMD_KEPT) | g_btl_pick_help_row2;
+                    g_btl_actors[g_btl_actor_turn].mark_kind = g_btl_pick_help_row2;
+                    g_btl_step = ENTRY_NEXT;
+                    switch (g_btl_command_fn[g_btl_pick_help_row2]()) {
+                    case COMMAND_MADE:
+                        g_btl_step = ENTRY_NEXT;
+                        g_btl_actors[g_btl_actor_turn].marker = BTL_MARKER_ORDERED;
+                        BtlShowMarker(g_btl_actor_turn, 1, g_btl_pick_help_row2);
+                        break;
+                    case COMMAND_NONE:
+                        g_btl_step = ENTRY_PICK;
+                        g_btl_actors[g_btl_actor_turn].marker = 0;
+                        break;
+                    default:
+                        g_btl_marker_obj[g_btl_actor_turn]->attr &= ~BTL_MARK_CHOSEN;
+                        g_btl_actors[g_btl_actor_turn].marker = 0;
+                        g_btl_step = ENTRY_CLEAR;
+                        break;
+                    }
+                }
+                break;
+            }
+            break;
+
+        case ENTRY_DONE:
+            if ((g_btl_actor_turn < 0 || g_btl_marker_shown[g_btl_actor_turn] == NULL)
+                && BtlMarkersIdle() != 0 && g_btl_pick_objs[0]->motion == 0) {
+                for (i = 0; i < BTL_PARTY; i++) {
+                    if ((g_btl_actors[i].flags & BTL_ACTOR_REFUSED) == 0) {
+                        kind = g_btl_actors[i].c.unk5D & BTL_CMD_ROW;
+                        g_btl_actors[i].c.unk5D = kind | (kind << 4);
+                        g_btl_actors[i].move_kept = g_btl_actors[i].move;
+                        g_btl_actors[i].ail_line_kept = g_btl_actors[i].ail_line;
+                        g_btl_actors[i].order_kept = g_btl_actors[i].order;
+                        g_btl_actors[i].targets_kept = g_btl_actors[i].targets;
+                    }
+                }
+                BtlShowAilmentMarks(0);
+                BtlPickShowPage(0);
+                return 1;
+            }
+            break;
+
+        case ENTRY_UNDO:
+            choice = BtlChoiceUpdate(&g_btl_choice1_row);
+            switch (choice) {
+            case BTL_MENU_WAIT:
+                break;
+            case -1:
+            case 1:
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
+                BtlCloseMessage(0);
+                BtlCloseChoice1();
+                BtlRefreshMarkers();
+                BtlPickRefresh();
+                g_btl_actor_turn = BtlUnreadyMemberNext(g_btl_actor_turn);
+                BtlSingleOutMember(g_btl_actor_turn);
+                g_btl_step = ENTRY_PICK;
+                break;
+            case 0:
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
+                for (row = 0, i = 0; row < GRID_H; row++) {
+                    for (col = 0; col < GRID_W; col++) {
+                        g_btl_formation[i] = g_btl_formation_before[i];
+                        if (g_btl_formation[i] != CELL_EMPTY) {
+                            BtlPlaceMember(g_btl_formation[i], col, row);
+                            g_btl_actors[g_btl_formation[i]].flags &= ~BTL_ACTOR_REFUSED;
+                        }
+                        i++;
+                    }
+                }
+                g_btl_formation_moved = 0;
+                BtlBuildMarkers();
+                BtlCloseMessage(0);
+                BtlCloseChoice1();
+                BtlRefreshMarkers();
+                BtlPickRefresh();
+                BtlPickHighlight(g_btl_pick_help_row);
+                BtlPartyResetGfx();
+                g_btl_step++;
+                break;
+            }
+            break;
+
+        case ENTRY_UNDONE:
+            if (BtlMarkersIdle() != 0) {
+                BtlPickShowPage(0);
+                for (i = 0; i < BTL_PARTY; i++) {
+                    if (g_btl_actors[i].c.key != 0
+                        && (signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
+                        && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
+                        && g_btl_actors[i].marker == BTL_MARKER_MOVED) {
+                        g_btl_actors[i].marker = 0;
+                        g_btl_actors[i].flags &= ~BTL_ACTOR_FLINCHED;
+                        g_btl_actors[i].flags &= BTL_ACTOR_REFUSED;
+                        BtlShowMarker(i, 0, BTL_MARK_KIND_REFUSED);
+                    }
+                }
+                return 0;
+            }
+            break;
+
+        case ENTRY_CONFIRM:
+            choice = BtlChoiceUpdate(&g_btl_choice1_row);
+            if (choice != BTL_MENU_WAIT) {
+                if (choice == 0) {
+                    BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
+                    BtlCloseChoice1();
+                    BtlCloseMessage(0);
+                    g_btl_step = ENTRY_DONE;
+                } else {
+                    BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
+                    BtlCloseChoice1();
+                    BtlCloseMessage(0);
+                    BtlPickRefresh();
+                    BtlPickHighlight(g_btl_pick_help_row2);
+                    g_btl_step++;
+                    if (choice == BTL_PICK_ABORT) {
+                        g_btl_step++;
+                    }
+                }
+            }
+            break;
+
+        case ENTRY_REVISE:
+            g_btl_actor_turn = BtlUnreadyMemberPrev(BTL_PARTY);
+            if (g_btl_marker_shown[g_btl_actor_turn] == NULL && BtlMarkersIdle() != 0) {
+                BtlSingleOutMember(g_btl_actor_turn);
+                g_btl_pick_help_row2 = g_btl_actors[g_btl_actor_turn].c.unk5D & BTL_CMD_ROW;
+                if (g_btl_actors[g_btl_actor_turn].marker == BTL_MARKER_ORDERED) {
+                    BtlShowMarker(g_btl_actor_turn, 0, g_btl_pick_help_row2);
+                    g_btl_actors[g_btl_actor_turn].marker = 0;
+                }
+                g_btl_actors[g_btl_actor_turn].flags &= ~BTL_ACTOR_FLINCHED;
+                if (g_btl_actors[g_btl_actor_turn].revive_mark == BTL_REVIVE_CARRIED) {
+                    g_btl_actors[g_btl_actor_turn].revive_mark = 0;
+                    for (i = 0; i < g_btl_actor_turn; i++) {
+                        if (g_btl_actors[i].revive_mark == BTL_REVIVE_CARRIED
+                            && g_btl_actors[i].revive_slot
+                                   == g_btl_actors[g_btl_actor_turn].revive_slot) {
+                            break;
+                        }
+                    }
+                    if (i >= g_btl_actor_turn) {
+                        g_btl_actors[g_btl_actors[g_btl_actor_turn].revive_slot].revive_mark = 0;
+                    }
+                }
+                g_btl_step = ENTRY_PICK;
+            }
+            break;
+
+        case ENTRY_CLEAR:
+            if (BtlMarkersHidden() != 0 && BtlMarkersIdle() != 0
+                && g_btl_pick_objs[0]->motion == 0) {
+                for (i = 0; i < BTL_PARTY; i++) {
+                    if (g_btl_actors[i].marker == BTL_MARKER_ORDERED) {
+                        BtlShowMarker(i, 0, g_btl_pick_help_row2);
+                        g_btl_actors[i].marker = 0;
+                    }
+                    if (g_btl_actors[i].revive_mark == BTL_REVIVE_CARRIED) {
+                        g_btl_actors[i].revive_mark = 0;
+                        g_btl_actors[g_btl_actors[i].revive_slot].revive_mark = 0;
+                    }
+                }
+                g_btl_actor_turn = -1;
+                choice = BTL_PICK_CANCEL;
+                if (g_btl_formation_moved != 0) {
+                    g_btl_step++;
+                    break;
+                }
+                g_btl_step = ENTRY_PICK;
+                goto pick;
+            }
+            break;
+
+        case ENTRY_CLEARED:
+            if (BtlMarkersHidden() != 0 && BtlMarkersIdle() != 0) {
+                g_btl_step = ENTRY_PICK;
+                goto pick;
+            }
+            break;
+        }
+        BtlDrawFrame();
+    }
+}
 
 /* The answer is taken before the wait, not after: the scene is finished with
    by then and the field is only being let catch up. */

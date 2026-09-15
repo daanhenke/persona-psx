@@ -38,7 +38,9 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/board.h>
+#include <persona/btlp/formation.h>
 #include <persona/btlp/input.h>
+#include <persona/btlp/menu.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/pick.h>
 #include <persona/btlp/round.h>
@@ -64,35 +66,23 @@ extern int (*g_btl_pick_command[])(void);
 #define MARKER_WAITING 2
 
 /* Put on a member whose command could not be made, with the shake script. */
-#define MARKER_REFUSED  5
+#define MARKER_REFUSED  BTL_MARK_KIND_REFUSED
 #define MOTION_REFUSED  4
-
-/* The picker's noises: one for a key that does something, two for a key that
-   closes something, three for the cursor. */
-#define PICK_SE_SLOT    1
-#define PICK_SE_CHOSE   1
-#define PICK_SE_CLOSED  2
 
 /* The last of the five member boards, which is the one that finishes moving
    last. */
 #define MEMBER_BOARDS_LAST 4
 
-/* Cleared as the stage opens; nothing here reads it again. */
-extern u_char D_800F4814;
-
 extern BtlObj *g_btl_member_boards[];
 
 extern u_short g_btl_key_r1;
 
-extern void BtlPickSettle(void);
 extern void BtlOpenMemberBoards(void);
 extern void BtlCloseMemberBoards(void);
 extern void BtlOpenBoard15(void);
 extern void BtlCloseBoard15(void);
 extern void BtlOpenConfigBoard(void);
 extern void BtlCloseConfigBoard(void);
-extern int  BtlConfigMenu(void);
-extern int  BtlCommandEntry(void);
 
 
 #ifdef NON_MATCHING
@@ -110,7 +100,7 @@ void BtlStageCommand(void)
        constants, gcc materialises each of the three tests on its own and the
        routine comes out a saved register and four instructions short. */
     two = PICK_TALK;
-    D_800F4814 = 0;
+    g_btl_formation_moved = 0;
     BtlShowAilmentMarks(1);
     if (g_btl_talk_outcome == BTL_TALK_JOIN) {
         choice = 0;
@@ -126,7 +116,7 @@ void BtlStageCommand(void)
             }
             if (BtlMarkersHidden() && g_btl_member_boards[0] == NULL
                 && (g_btl_pad1_edge & g_btl_key_select)) {
-                BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
                 BtlCloseMessage(0);
                 BtlPickSettle();
                 BtlRetractMarkers();
@@ -138,7 +128,7 @@ void BtlStageCommand(void)
                 break;
             }
             if (g_btl_pad1_edge & g_btl_key_r1) {
-                BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
                 BtlCloseMessage(0);
                 BtlOpenBoard23();
                 BtlDrawFrame();
@@ -151,7 +141,7 @@ void BtlStageCommand(void)
                 break;
             }
             if (BtlMarkersHidden() && (g_btl_pad1_edge & g_btl_key_r2)) {
-                BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
                 BtlCloseMessage(0);
                 BtlPickSettle();
                 BtlRetractMarkers();
@@ -160,13 +150,13 @@ void BtlStageCommand(void)
                 break;
             }
             if (BtlMarkersHidden() && (g_btl_pad1_edge & g_btl_key_square)) {
-                BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
+                BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
                 BtlCloseMessage(0);
                 BtlPickSettle();
                 BtlRetractMarkers();
                 BtlOpenConfigBoard();
                 if (BtlConfigMenu() != -2) {
-                    BtlSePlay(PICK_SE_SLOT, PICK_SE_CLOSED);
+                    BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
                     BtlCloseConfigBoard();
                 }
                 BtlPickRefresh();
@@ -184,7 +174,7 @@ void BtlStageCommand(void)
             if (choice < 0) {
                 break;
             }
-            BtlSePlay(PICK_SE_SLOT, PICK_SE_CHOSE);
+            BtlSePlay(PICK_SE_BANK, PICK_SE_CHOSE);
             /* Step 5 comes back in here once its markers have settled, and
                steps 2, 3 and 4 leave through the two labels below it. The
                image jumps to all four; written out in each arm instead, none
@@ -265,7 +255,7 @@ void BtlStageCommand(void)
                 == 0) {
                 break;
             }
-            BtlSePlay(PICK_SE_SLOT, PICK_SE_CLOSED);
+            BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
             BtlCloseMemberBoards();
             goto closed;
 
@@ -275,7 +265,7 @@ void BtlStageCommand(void)
                 == 0) {
                 break;
             }
-            BtlSePlay(PICK_SE_SLOT, PICK_SE_CLOSED);
+            BtlSePlay(PICK_SE_BANK, PICK_SE_CLOSED);
             BtlCloseBoard15();
         closed:
             BtlPickRefresh();

@@ -70,6 +70,13 @@ extern void BtlFormationCloseUp(void);
 #define PRESET_LIVE 8
 
 extern u_char g_btl_formation_before[GRID_CELLS];
+
+/* Whether the formation has been changed since g_btl_formation_before was
+   taken. BtlPlaceMenu raises it as it hands back a formation a member was
+   moved in, and the command entry offers to put the old one back on a cancel
+   from the first member while it is raised. BtlStageCommand and that undo
+   clear it. */
+extern u_char g_btl_formation_moved;
 extern void BtlStandPreset(int preset);
 extern void BtlPlacePreset(int preset);
 extern int  BtlMarkMovedMembers(void);

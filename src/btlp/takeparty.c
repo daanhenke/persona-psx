@@ -21,6 +21,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/common/char.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/menu.h>
 
 #define BTL_PARTY 5
 
@@ -59,8 +60,6 @@ extern const u_char g_btl_test_party_personas2[][5];
 extern u_char   g_btl_test_party;
 extern u_char   g_options[];
 extern u_char   g_formation_preset[];
-extern u_char   g_btl_confirm;
-extern u_char   g_btl_msg_speed;
 
 extern void PersonaCreate(Char *c, int persona);
 

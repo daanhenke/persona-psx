@@ -80,9 +80,37 @@ extern void BtlRefreshTacticsLines(void);
 #define BTL_PICK_CANCEL (-1)
 #define BTL_PICK_ABORT  (-2)
 
-/* The click a picker makes when the cursor moves. */
-#define PICK_SE_BANK 1
-#define PICK_SE_MOVE 3
+/* The picker's noises, all on one voice slot: one for a key that does
+   something, two for a key that closes something, three for the cursor. */
+#define PICK_SE_BANK   1
+#define PICK_SE_CHOSE  1
+#define PICK_SE_CLOSED 2
+#define PICK_SE_MOVE   3
+
+/* Char.unk5D holds the row of the command list a member was given in its low
+   nibble, and the one kept for "the same again" in the high. */
+#define BTL_CMD_ROW  0x0F
+#define BTL_CMD_KEPT 0xF0
+
+/* The battle's copy of the option that skips asking whether the commands
+   stand. BtlTakeParty takes it from the options and BtlStoreParty hands it
+   back. */
+extern u_char g_btl_confirm;
+
+/* The two questions the command entry asks: whether the commands stand, and
+   whether the formation goes back to how it stood. */
+extern const u_char g_btl_msg_commands_ok[];
+extern const u_char g_btl_msg_undo_formation[];
+
+/* The menus the round opens with: the settings page, the walk that gives each
+   member a command, the negotiation run to its end, and the party's standing
+   orders. The first answers -2 on the abort key; the walk answers 1 once
+   every member has a command and 0 when the player backs out of it.
+   commandmenu.c. */
+extern int BtlConfigMenu(void);
+extern int BtlCommandEntry(void);
+extern int BtlRunTalkScene(void);
+extern int BtlOrdersMenu(void);
 
 extern void BtlPartyResetGfx(void);
 /* The same for one member, whatever state it is in. partyresetgfx.c. */

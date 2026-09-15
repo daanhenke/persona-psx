@@ -255,8 +255,12 @@ extern const u_char g_btl_name_empty[];
 extern void      BtlPlaceMemberMarkers(int row, int near);
 extern void    BtlBuildMarkers(void);
 /* The middle argument is whether the marker goes up or comes down, and
-   the last is which of the seven it is - not a level. */
+   the last is which of the seven it is - not a level. Kind 5 is the one a
+   member whose command cannot be made is shown with. */
+#define BTL_MARK_KIND_REFUSED 5
 extern void    BtlShowMarker(int slot, int on, int kind);
+/* Puts back up the markers parked while a board was over them. markershow.c. */
+extern void    BtlRestoreMarkers(void);
 extern void    BtlEnemiesResetGfx(void);
 extern void    BtlEffectDrop(void);
 

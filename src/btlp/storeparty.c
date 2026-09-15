@@ -21,6 +21,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/common/char.h>
 #include <persona/btlp/formation.h>
+#include <persona/btlp/menu.h>
 #include <persona/common/formation.h>
 #include <persona/common/status.h>
 
@@ -28,10 +29,6 @@
    as the one they are standing in. */
 #define FORM_PRESETS 8
 #define FORM_LIVE    8
-
-/* The three settings the battle reads through copies of its own. */
-extern u_char g_btl_confirm;
-extern u_char g_btl_msg_speed;
 
 /* One byte per party slot, taken off the actor. Reached through the linker
    rather than by address: as a constant gcc folds it into the walk over

@@ -333,10 +333,12 @@ extern u_char g_btl_counter_order;
    BTL_ACTOR_TIMED_A does not hold. */
 #define BTL_ACTOR_F5 0x2000000
 
-/* BtlActor.marker: up over the fighter, and what a member who has moved is
-   given. */
-#define BTL_MARKER_UP    3
-#define BTL_MARKER_MOVED 2
+/* BtlActor.marker: up over the fighter, what a member who has moved is given,
+   and what one who has been given a command carries until the round takes it
+   or the command is taken back. */
+#define BTL_MARKER_UP      3
+#define BTL_MARKER_MOVED   2
+#define BTL_MARKER_ORDERED 1
 
 /* BtlActor.revive_mark: on a fallen member a revival can raise where they
    stood, and on the member carrying that revival. */
