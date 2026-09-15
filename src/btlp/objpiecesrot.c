@@ -80,7 +80,7 @@ void BtlDrawObjPiecesRot(BtlObj *o)
             i++;
             g_btl_polyft4_next->b0 = o->rgb[2];
             g_btl_polyft4_next->clut = g_btl_clut[o->unkCE];
-            g_btl_polyft4_next->tpage = g_btl_tpage[o->unkCD];
+            g_btl_polyft4_next->tpage = g_btl_tpage[o->tpage];
             ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
                             + BTL_OT_END);
             addPrim(ot, g_btl_polyft4_next);

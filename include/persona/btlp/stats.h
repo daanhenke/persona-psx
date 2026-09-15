@@ -53,7 +53,9 @@ typedef struct {
                                     is paired with one of these through
                                     g_btl_kin_persona                       */
     /* 0x2C */ u_char  stat[5];
-    /* 0x31 */ u_char  unk31;
+    /* 0x31 */ u_char  resist;   /* the row of affinities the Persona answers
+                                    an element with; BtlApplyPersona puts it
+                                    on Char.resist                          */
     /* 0x32 */ u_char  slots;                    /* entries of the order to walk */
     /* 0x33 */ u_char  spell[BTL_STATS_SPELLS];  /* the packed list             */
     /* 0x3A */ u_char  raw[BTL_STATS_SPELLS];    /* as it came off the disc     */

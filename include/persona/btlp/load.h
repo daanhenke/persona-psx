@@ -12,4 +12,7 @@ extern u_char *g_load_stage;
 extern u_char *g_load_stage_1;
 extern u_char *g_load_stage_2;
 
+/* The buffer itself, which the battle's artwork reads all land in. */
+#define BTL_LOAD_STAGE ((u_long *)0x80140000)
+
 #endif

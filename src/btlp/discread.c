@@ -12,7 +12,6 @@
 #include <persona/main/cd.h>
 #include <persona/btlp/battle.h>
 
-extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 
 void BtlReadSectors(u_long *dest, int sector, int sectors)
 {

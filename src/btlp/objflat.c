@@ -126,7 +126,7 @@ void BtlDrawObjFlat(BtlObj *o)
     }
     /* The list picks the texture page too, three bits of it. */
     SetDrawMode(g_btl_drmode_next, 0, 0,
-                g_btl_tpage[o->unkCD + (((const u_short *)o->last)[1] & 7)], 0);
+                g_btl_tpage[o->tpage + (((const u_short *)o->last)[1] & 7)], 0);
     addPrim(ot, g_btl_drmode_next);
     g_btl_drmode_next++;
 }

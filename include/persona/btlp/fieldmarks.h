@@ -25,6 +25,10 @@ extern u_char *g_btl_strike_gfx1;
 #define HIT_NUMBER_STILL 0x20
 
 extern BtlObj *BtlSpawnStrike(int set, int model, const long *pos);
+
+/* The same for an enemy's move rather than its plain blow: the move's own
+   art out of the set. */
+extern BtlObj *BtlSpawnMoveStrike(int move, int set, const long *pos);
 extern BtlObj *BtlSpawnCastCircle(int side, int col2, int row);
 
 /* Puts `value` up over a fighter as a number of its own, up to four digits,

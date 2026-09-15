@@ -141,7 +141,7 @@ void BtlDrawObjModel(BtlObj *o)
             g_btl_polyft4_next->clut = g_btl_clut[o->unkCE];
             /* The list picks the texture page too, three bits of it. */
             g_btl_polyft4_next->tpage =
-                g_btl_tpage[o->unkCD + (((const u_short *)o->last)[1] & 7)];
+                g_btl_tpage[o->tpage + (((const u_short *)o->last)[1] & 7)];
             if ((o->attr & BTL_OBJ_ARENA_OT) == 0) {
                 off = g_btl_frame * BTL_FRAME_STRIDE
                       - (off * 4 - BTL_FRAME_STRIDE);

@@ -22,18 +22,9 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/spellfx.h>
-
-/* The species table, and the record this motion leaves behind. Both are the
-   0x30-byte record g_btl_models is the other view of; only a byte well inside
-   it is wanted here, so it is walked as bytes. */
-extern const u_char  g_btl_species[];
-extern const u_char *g_btl_species_now;
-#define BTL_SPECIES_BYTES 0x30
-
-/* Where the per-species answer sits in that record. */
-#define SPECIES_ATTACK 0x16
 
 /* The four routines, and the plain swing a move with no effect falls back
    on. */
@@ -57,18 +48,18 @@ void BtlEnemyMotion06(BtlObj *o)
     int       which;
 
     a = o->actor;
-    g_btl_species_now = &g_btl_species[o->kind * BTL_SPECIES_BYTES];
+    g_btl_species_now = &g_btl_species[o->kind];
 
-    if (g_btl_spell_fx[a->unkBD].start == 0) {
+    if (g_btl_spell_fx[a->turn_move].start == 0) {
         a->move = ENEMY_MOVE_SWING;
         which = 0;
     } else {
-        if (a->unkBD == ENEMY_MOVE_PLAIN2 || a->unkBD == ENEMY_MOVE_PLAIN) {
+        if (a->turn_move == ENEMY_MOVE_PLAIN2 || a->turn_move == ENEMY_MOVE_PLAIN) {
             which = 0;
-        } else if ((u_int)(a->unkBD - ENEMY_MOVE_SPLIT) < ENEMY_MOVE_SPAN) {
+        } else if ((u_int)(a->turn_move - ENEMY_MOVE_SPLIT) < ENEMY_MOVE_SPAN) {
             which = 1;
         } else {
-            which = (g_btl_species_now + a->unkBA)[SPECIES_ATTACK];
+            which = g_btl_species_now->attack[a->turn_slot];
         }
         if (o->kind == ENEMY_SPECIES_FIXED) {
             which = ENEMY_ATTACK_FIXED;

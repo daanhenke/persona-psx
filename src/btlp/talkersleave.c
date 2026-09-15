@@ -48,7 +48,7 @@ void BtlTalkersLeave(void)
     g_btl_talk_target = BtlPickTalkTarget(g_btl_offer[g_btl_offer_slot].used);
     e = &g_btl_enemies[g_btl_talk_target];
     BtlSoundOpen(g_btl_slot_banks, BTL_LEAVE_BANK,
-                 (e->obj->unkCD >> 1) - BTL_LEAVE_BIAS);
+                 (e->obj->tpage >> 1) - BTL_LEAVE_BIAS);
     BtlDrawFrame();
     e->obj->motion = BTL_MOTION_LEAVE;
     e->obj->timer = 0;

@@ -167,6 +167,11 @@ extern RECT    g_btl_clut_block;    /* where the party's palettes are put     */
    them and an object swung round a point steps an angle through them. */
 extern const int g_btl_wave_sin[];
 extern const int g_btl_wave_cos[];
+
+/* The angle from the origin to (dx, dy), in the wave tables' 512ths - what
+   a record's `angle` is set from when it is turned toward something.
+   angle.c. */
+extern int BtlAngleTo(int dx, int dy);
 #define BTL_WAVE_MASK 0x1FF
 #define BTL_WAVE_TURN 0x200
 

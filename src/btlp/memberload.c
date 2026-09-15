@@ -15,6 +15,7 @@
 #include <decomp/types.h>
 #include <decomp/libc.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/sound.h>
@@ -46,7 +47,6 @@ extern u_short   g_btl_member_file[];
 extern int       g_btl_gfx_sector;
 extern volatile int g_cd_busy;
 
-extern void    CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 
 u_short BtlLoadMemberGfx(int member, int actor)
 {

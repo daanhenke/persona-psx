@@ -36,8 +36,8 @@
 #define TURN_KEY_FIRST 0xAA
 #define TURN_KEY_LAST  0xAF
 
-/* A member under this flag makes action 4 whatever its tactic says. */
-#define TURN_FORCED        0x8000000
+/* What a member under BTL_ACTOR_REFUSED is given, whatever its tactic
+   says. */
 #define TURN_FORCED_ACTION 4
 
 /* An enemy whose pick gives this action has no move to make. */
@@ -91,7 +91,7 @@ void BtlReadyNextTurn(void)
             if (g_btl_place_party != 0) {
                 BtlAimScriptedMember(&g_btl_actors[slot]);
             } else {
-                if ((g_btl_actors[slot].flags & TURN_FORCED) != 0) {
+                if ((g_btl_actors[slot].flags & BTL_ACTOR_REFUSED) != 0) {
                     g_btl_actors[slot].action = TURN_FORCED_ACTION;
                 } else {
                     /* Assigned inside the subscript: a bare conditional
@@ -114,7 +114,7 @@ void BtlReadyNextTurn(void)
                 g_btl_actors[slot].action = g_btl_enemy_pick_actions[pick];
                 g_btl_actors[slot].move =
                     g_persona_data[g_btl_actors[slot].c.key].spell[pick - 1];
-                g_btl_actors[slot].obj->unkD3 = pick - 1;
+                g_btl_actors[slot].obj->spell_slot = pick - 1;
                 if (g_btl_actors[slot].action == TURN_ACTION_ATTACK) {
                     g_btl_actors[slot].move = 0;
                     BtlAimMove(a);
@@ -159,7 +159,7 @@ void BtlReadyTurnNow(void)
             if (g_btl_place_party != 0) {
                 BtlAimScriptedMember(&g_btl_actors[slot]);
             } else {
-                if ((g_btl_actors[slot].flags & TURN_FORCED) != 0) {
+                if ((g_btl_actors[slot].flags & BTL_ACTOR_REFUSED) != 0) {
                     g_btl_actors[slot].action = TURN_FORCED_ACTION;
                 } else {
                     /* Assigned inside the subscript: a bare conditional
@@ -182,7 +182,7 @@ void BtlReadyTurnNow(void)
                 g_btl_actors[slot].action = g_btl_enemy_pick_actions[pick];
                 g_btl_actors[slot].move =
                     g_persona_data[g_btl_actors[slot].c.key].spell[pick - 1];
-                g_btl_actors[slot].obj->unkD3 = pick - 1;
+                g_btl_actors[slot].obj->spell_slot = pick - 1;
                 if (g_btl_actors[slot].action == TURN_ACTION_ATTACK) {
                     g_btl_actors[slot].move = 0;
                     BtlAimMove(a);

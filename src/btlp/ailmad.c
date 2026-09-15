@@ -125,7 +125,7 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
             }
             damage = 0;
             if (BtlApplyAffinity(&damage, s->element,
-                                 g_btl_combatants[slot].c.unk5C) >= 0
+                                 g_btl_combatants[slot].c.resist) >= 0
                 && (g_btl_combatants[slot].flags & MAD_WARDED) == 0) {
                 a->order   = slot + BTL_PARTY;
                 a->targets = 1 << (slot + BTL_PARTY);
@@ -142,7 +142,7 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
         for (i = 0; i < BTL_ENEMIES; i++) {
             if (g_btl_combatants[i].pickable != 0
                 && (BtlApplyAffinity(&damage, s->element,
-                                     g_btl_combatants[i].c.unk5C) < 0
+                                     g_btl_combatants[i].c.resist) < 0
                     || (g_btl_combatants[i].flags & MAD_WARDED) != 0)) {
                 refused++;
             }
@@ -170,14 +170,14 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
             }
             damage = 0;
             if (BtlApplyAffinity(&damage, s->element,
-                                 g_btl_combatants[slot].c.unk5C) >= 0
+                                 g_btl_combatants[slot].c.resist) >= 0
                 && (g_btl_combatants[i].flags & MAD_WARDED) == 0) {
                 BtlMarkEnemiesAround(&g_btl_combatants[slot], s->target);
                 refused = 0;
                 for (i = 0; i < BTL_ENEMIES; i++) {
                     if (g_btl_combatants[i].pickable != 0
                         && (BtlApplyAffinity(&damage, s->element,
-                                             g_btl_combatants[i].c.unk5C) < 0
+                                             g_btl_combatants[i].c.resist) < 0
                             || (g_btl_combatants[i].flags & MAD_WARDED) != 0)) {
                         refused++;
                     }

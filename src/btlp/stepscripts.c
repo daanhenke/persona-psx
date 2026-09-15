@@ -102,7 +102,7 @@ void BtlStepObjScripts(void)
                 } else if ((s->flags & SEQ_OP) == SEQ_SPAWN) {
                     *child = (const u_long **)o->scripts[o->children];
                     BtlObjAlloc((BtlObjDef *)(child - 1), o->group, o,
-                                SEQ_CHILD_A3, 0, &o->x, o->unkCD, o->unkCE);
+                                SEQ_CHILD_A3, 0, &o->x, o->tpage, o->unkCE);
                     if (o->kind == BTL_OBJ_PARENT) {
                         o->children++;
                     }

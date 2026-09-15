@@ -15,6 +15,7 @@
  */
 #include <decomp/types.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
 
 typedef struct {
     /* 0x00 */ u_short file_id;    /* which SE set is in this slot           */
@@ -38,7 +39,6 @@ extern AdvBank *g_adv_banks[];
 
 extern void  AdvSelectFile(short kind, short id);
 extern void  AdvRunFrame(void);
-extern void  CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern short SsVabOpenHead(u_char *addr, short vabid);
 extern short SsVabTransBody(u_char *addr, short vabid);
 extern short SsVabTransCompleted(short immediateFlag);

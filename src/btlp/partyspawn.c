@@ -149,8 +149,8 @@ void BtlSpawnParty(void)
                 a->unk74 = 0;
                 a->unk78 = 0;
                 a->unkD0 = 0;
-                a->unkD1 = 0;
-                a->unkD2 = 0;
+                a->wound = 0;
+                a->build = 0;
                 a->unkD3 = 0;
                 a->unkD4 = 0;
                 a->counter = 0;

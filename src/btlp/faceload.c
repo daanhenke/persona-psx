@@ -19,6 +19,7 @@
  */
 #include <decomp/types.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
@@ -61,7 +62,6 @@ extern int      g_cd_busy;
    and the image passes the register straight through, so the declaration this
    translation unit was built against had no narrowing in it. */
 extern void AdvResolveSceneLoc(short kind, int index, void *unused);
-extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 
 void BtlFaceLoad(int who, int always)
 {

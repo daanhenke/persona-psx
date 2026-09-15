@@ -42,7 +42,7 @@ void BtlStorePersonas(void)
         d->stat[2] = s->stat[2];
         d->stat[3] = s->stat[3];
         d->stat[4] = s->stat[4];
-        d->unk2B = s->unk31;
+        d->resist = s->resist;
         d->slots = s->slots;
         memcpy(d->spell, s->spell, PERSONA_SPELLS);
         memcpy(d->raw, s->raw, PERSONA_SPELLS);
@@ -86,7 +86,7 @@ void BtlGivePersona(Char *c, int key)
             d->stat[2] = def->stat[2];
             d->stat[3] = def->stat[3];
             d->stat[4] = def->stat[4];
-            d->unk31 = def->unk1A;
+            d->resist = def->resist;
             d->slots = 1;
             memcpy(d->raw, def->raw, BTL_STATS_SPELLS);
             d->unk41 = def->raw[BTL_STATS_SPELLS - 1];

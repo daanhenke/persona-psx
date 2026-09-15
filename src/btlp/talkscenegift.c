@@ -309,7 +309,7 @@ void BtlTalkSceneGift(void)
                         e->obj->scripts[g_btl_models[e->c.key].talk]);
         BtlRunFrames(GIFT_HIT_PAUSE);
         BtlObjSetScript(e->obj,
-                        e->obj->scripts[g_btl_models[e->c.key].unk02]);
+                        e->obj->scripts[g_btl_models[e->c.key].stand]);
         slot = g_btl_actor_slot;
         a = &g_btl_actors[slot];
         BtlSoundOpen(g_btl_banks, GIFT_HIT_SND, a->c.key);

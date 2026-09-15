@@ -140,7 +140,7 @@ int BtlInitObjects(void)
  * are the shift the object starts with, sixteen places up.
  */
 BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
-                    int index, const long *pos, int unkCD, int unkCE)
+                    int index, const long *pos, int tpage, int unkCE)
 {
     BtlObj *obj;
     BtlObj *tail;
@@ -190,7 +190,7 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->scale_to = 0;
             obj->attached = 0;
             obj->shadow = 0;
-            obj->unk54 = 0;
+            obj->child = 0;
             obj->ref = NULL;
             obj->mark = 0;
             obj->next_script = NULL;
@@ -218,13 +218,13 @@ BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after, int draw,
             obj->rgb_to[1] = BTL_ALLOC_RGB;
             obj->rgb_to[2] = BTL_ALLOC_RGB;
             obj->fade = 0;
-            obj->unkCD = unkCD;
+            obj->tpage = tpage;
             obj->unkCE = unkCE;
             obj->group = group;
             obj->draw = draw;
             obj->motion = 0;
             obj->mark_num = 0;
-            obj->unkD3 = 0;
+            obj->spell_slot = 0;
             obj->phase = 0;
             return obj;
         }

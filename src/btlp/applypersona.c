@@ -85,7 +85,7 @@ void BtlApplyPersona(BtlActor *a)
             a->persona_stat[3] = p->stat[3];
             a->persona_stat[4] = p->stat[4];
             off = 0;
-            a->c.unk5C = p->unk31;
+            a->c.resist = p->resist;
             key = p->key;
             /* Walked by byte offset against a plain constant: an index would be
                scaled each time round, and sizeof would make the bound
@@ -108,7 +108,7 @@ void BtlApplyPersona(BtlActor *a)
             a->persona_stat[2] = 0;
             a->persona_stat[3] = 0;
             a->persona_stat[4] = 0;
-            a->c.unk5C = 0;
+            a->c.resist = 0;
             a->persona_rank = 0;
         }
 

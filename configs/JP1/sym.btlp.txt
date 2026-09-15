@@ -2107,7 +2107,7 @@ BtlPersonaSpell15             = 0x800B1D08; // type:func size:0x924
 //--- PA: 0x04E28C   VA: 0x800B262C   subsegment: asm, btlp_69_a_b
 //----------------------------------------------------------------
 BtlEnemyMotion02              = 0x800B262C; // type:func size:0x12C0
-func_800B38EC                 = 0x800B38EC; // type:func size:0x119C
+BtlEnemyStrike                = 0x800B38EC; // type:func size:0x119C
 
 //---------------------------------------------------------------
 //--- PA: 0x0506E8   VA: 0x800B4A88   subsegment: c, enemymotion6
@@ -2156,7 +2156,7 @@ BtlStartMoveFx                = 0x800B6528; // type:func size:0x1D4
 //--------------------------------------------------------------
 //--- PA: 0x05235C   VA: 0x800B66FC   subsegment: asm, btlp_69_b
 //--------------------------------------------------------------
-func_800B66FC                 = 0x800B66FC; // type:func size:0x4B4
+BtlSpawnMoveStrike            = 0x800B66FC; // type:func size:0x4B4
 
 //---------------------------------------------------------
 //--- PA: 0x052810   VA: 0x800B6BB0   subsegment: c, fxtick
@@ -3666,7 +3666,9 @@ g_btl_menu_cells              = 0x800F4B60; // size:0x18
 g_btl_prim_used               = 0x800F4B78;
 g_btl_board0F                 = 0x800F4B7C; // size:0x4
 g_btl_hud_vab_marks           = 0x800F4B80; // type:u8 size:0x10
+g_btl_move_gfx_base           = 0x800F4BA0;
 g_btl_counter_order           = 0x800F4BA4; // type:u8 size:0x1
+g_btl_persona_gfx_base        = 0x800F4BAC;
 g_btl_board23_names           = 0x800F4BB4; // type:u8 size:0x1E
 g_btl_persona_won             = 0x800F4BD4;
 g_btl_marker_hp_cells         = 0x800F4BF4; // type:u8 size:0xF

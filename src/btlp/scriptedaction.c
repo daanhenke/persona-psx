@@ -153,7 +153,7 @@ void BtlAimScriptedEnemy(BtlActor *a)
     a->targets = 1 << slot;
     a->move    = rec->move;
     a->flags  |= rec->flags;
-    a->obj->unkD3 = 0;
+    a->obj->spell_slot = 0;
 
     if (g_btl_encounter == BTL_SCRIPT_ALL_ENCOUNTER) {
         a->targets  = BTL_SCRIPT_ALL_TARGETS;

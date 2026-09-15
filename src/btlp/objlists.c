@@ -87,7 +87,7 @@ void BtlDrawObjQuads(BtlObj *o)
             g_btl_polyg4_next++;
         } while (i < ((const BtlGfxQuadList *)o->last)->count);
     }
-    SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
+    SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->tpage], 0);
     addPrim(ot, g_btl_drmode_next);
     g_btl_drmode_next++;
 }

@@ -18,6 +18,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/actor.h>
@@ -65,7 +66,6 @@ extern int       g_btl_enemy_gfx_base;
 extern u_char   *g_btl_enemy_gfx_start;
 extern volatile int g_cd_busy;
 
-extern void    CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern short   BtlLoadEnemyGfx(int species, int slot, u_long *tim,
                                u_char *image, int bytes);
 extern BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx,
@@ -152,14 +152,14 @@ void BtlSpawnEnemies(int set)
                                    &g_btl_combatants[rec].obj->x);
             g_btl_combatants[rec].obj->mark = obj;
             g_btl_combatants[rec].obj->mark->shift_x =
-                (int)*(signed char *)&g_btl_models[species].pad0A[4] << 16;
+                (int)g_btl_models[species].mark_x << 16;
             g_btl_combatants[rec].obj->mark->shift =
-                (int)*(signed char *)&g_btl_models[species].pad0A[5] << 16;
+                (int)g_btl_models[species].mark_y << 16;
             g_btl_combatants[rec].obj->mark->attached->shift_x =
-                (*(signed char *)&g_btl_models[species].pad0A[4]
+                (g_btl_models[species].mark_x
                  + BTL_MARK_OFFSET) << 16;
             g_btl_combatants[rec].obj->mark->attached->shift =
-                (int)*(signed char *)&g_btl_models[species].pad0A[5] << 16;
+                (int)g_btl_models[species].mark_y << 16;
 
             if (species == BTL_SPECIES_SHOVE) {
                 BtlPlaceMember(BTL_SHOVE_MEMBER, BTL_SHOVE_COL, 0);

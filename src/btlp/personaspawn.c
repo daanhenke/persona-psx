@@ -139,7 +139,7 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
         obj->attr |= g_btl_persona_gfx[which].attr;
         if (layer != 0) {
             obj->attr |= BTL_OBJ_TRAIL;
-            obj->unkCD = PERSONA_TRAIL_CD;
+            obj->tpage = PERSONA_TRAIL_CD;
             prev->attached = obj;
         } else {
             first = obj;

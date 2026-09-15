@@ -119,9 +119,6 @@ void BtlChoiceSpawn(int set)
    motion give up before it starts. */
 #define SUMMON_DONE 0x200000
 
-/* Where the pack the summon's two files live in starts. Not the base
-   BtlSummonActorPersona reads a Persona's own artwork with. */
-extern int D_800F4BA0;
 
 /* The last entries of the Persona pack's sector table are the summon's own
    artwork rather than a Persona's, and entry 0xFD of the sound pack is the
@@ -129,9 +126,6 @@ extern int D_800F4BA0;
 #define SUMMON_FILE 0x16F
 #define SUMMON_BGM  0xFD
 
-/* Where the artwork is read to, and the two addresses the loader leaves at
-   the head of it: the tim in the first and the graphics in the second. */
-#define SUMMON_STAGE ((u_long *)0x80140000)
 
 /* Where the graphics are staged and bound, and the page the tim goes to. */
 #define SUMMON_GFX_STAGE 0x801D9400
@@ -170,7 +164,6 @@ extern u_char   *g_btl_unused_gfx;
 /* Written as each copy is made and read by nothing else in the overlay. */
 extern BtlObj *D_800F4894;
 
-extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern short g_btl_scene_rgb[];
 
 /* Of the ten script indices a shape carries, the swing takes four: the run
@@ -230,12 +223,6 @@ extern u_char D_800CFA00;
    the fighter speaks the swing from, one per hand. */
 extern u_char g_btl_member_voice[];
 
-extern int  BtlMarkMoveArea(BtlActor *a, int area, int spread);
-extern int  BtlSlowestOrder(void);
-extern int  BtlRollHits(int hits);
-extern void BtlReadVoiceBank(int entry);
-extern void BtlOpenVoiceBank(void);
-extern void BtlMemberStrike(BtlObj *o);
 
 #ifdef NON_MATCHING
 /* The swing: entry 2 of g_btl_member_motion, and entry 0x0C as well.
@@ -438,7 +425,7 @@ void BtlMemberMotion02(BtlObj *o)
                              g_btl_actors[g_btl_hit_slot].c.key);
             } else {
                 BtlSoundOpen(g_btl_slot_banks, 6,
-                             (g_btl_actors[g_btl_hit_slot].obj->unkCD >> 1)
+                             (g_btl_actors[g_btl_hit_slot].obj->tpage >> 1)
                                  - SWING_FIRST_ENEMY);
             }
             o->phase++;
@@ -452,7 +439,7 @@ void BtlMemberMotion02(BtlObj *o)
             a->counter = 0;
             a->order = g_btl_counter_order;
             a->targets = g_btl_counter_targets;
-            if (a->unkD7 != 0) {
+            if (a->counter_turn != 0) {
                 a->action = 0;
             } else {
                 a->action = 0xFF;
@@ -573,8 +560,6 @@ INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberStrike);
    table, where the moves' artwork starts in the same table, and the base
    sector BtlSummonActorPersona reads a Persona's artwork with. */
 #define CAST_FILE       0x171
-#define MOVE_FILE_FIRST 0x72
-extern int D_800F4BAC;
 
 /* The page the cast's tim goes to, and the one step the arena fades by. */
 #define CAST_TIM_PAGE   0x1C
@@ -607,7 +592,6 @@ extern int D_800F4BAC;
 extern u_char   g_btl_seq_catchup;
 extern u_char   g_btl_act_speed;
 extern u_char   g_btl_act_move;
-extern u_char  *g_btl_move_lines[];
 extern u_char   D_800CF7EC[];
 extern u_char   D_800CFA10[];
 extern u_char   D_8004E264;
@@ -699,13 +683,13 @@ void BtlMemberMotion06(BtlObj *o)
         do {
             if (g_btl_personas[BtlActorPersona(o->mark_num)].raw[i]
                 == a->move) {
-                o->unkD3 = i;
+                o->spell_slot = i;
                 break;
             }
             i++;
         } while (i < BTL_STATS_SPELLS);
         if (i >= BTL_STATS_SPELLS) {
-            o->unkD3 = 0;
+            o->spell_slot = 0;
         }
         scripts = &g_btl_member_scripts[SCRIPT_SUMMON
                                         + o->kind * MEMBER_SCRIPT_MODEL];
@@ -738,11 +722,11 @@ void BtlMemberMotion06(BtlObj *o)
             }
             i++;
         } while (i < BTL_PARTY);
-        CdIntToPos(g_btl_persona_sectors[CAST_FILE] + D_800F4BA0, &loc);
+        CdIntToPos(g_btl_persona_sectors[CAST_FILE] + g_btl_move_gfx_base, &loc);
         CdReadFileToAddrAsync((CdlFILE *)&loc,
                               g_btl_persona_sectors[CAST_FILE + 1]
                                   - g_btl_persona_sectors[CAST_FILE],
-                              SUMMON_STAGE);
+                              BTL_LOAD_STAGE);
         o->phase++;
         break;
     case 1:
@@ -751,12 +735,12 @@ void BtlMemberMotion06(BtlObj *o)
         }
         BtlUploadTim((u_long *)g_load_stage, CAST_TIM_PAGE, CAST_TIM_SLOT, 1,
                      0, 1);
-        CdIntToPos(g_btl_persona_sectors[o->actor->padCB[0]] + D_800F4BAC,
+        CdIntToPos(g_btl_persona_sectors[o->actor->padCB[0]] + g_btl_persona_gfx_base,
                    &loc);
         CdReadFileToAddrAsync((CdlFILE *)&loc,
                               g_btl_persona_sectors[o->actor->padCB[0] + 1]
                                   - g_btl_persona_sectors[o->actor->padCB[0]],
-                              SUMMON_STAGE);
+                              BTL_LOAD_STAGE);
         o->phase++;
         break;
     case 2:
@@ -820,7 +804,7 @@ void BtlMemberMotion06(BtlObj *o)
         }
         g_btl_persona_ready = 0;
         g_btl_persona_obj = BtlSpawnPersona(a->padCB[0], o->col2, o->row,
-                                            o->unkD3);
+                                            o->spell_slot);
         g_btl_persona_obj->actor = o->actor;
         BtlObjSetAttr(g_btl_persona_obj, CAST_PERSONA_ATTR);
         BtlObjSetScale(g_btl_persona_obj, CAST_SCALE_XY, CAST_SCALE_XY,
@@ -830,14 +814,14 @@ void BtlMemberMotion06(BtlObj *o)
         o->phase++;
         break;
     case 4:
-        CdIntToPos(g_btl_persona_sectors[MOVE_FILE_FIRST + o->actor->move]
-                       + D_800F4BA0, &loc);
+        CdIntToPos(g_btl_persona_sectors[BTL_MOVE_FILE_FIRST + o->actor->move]
+                       + g_btl_move_gfx_base, &loc);
         CdReadFileToAddrAsync((CdlFILE *)&loc,
-                              g_btl_persona_sectors[MOVE_FILE_FIRST
+                              g_btl_persona_sectors[BTL_MOVE_FILE_FIRST
                                                     + o->actor->move + 1]
-                                  - g_btl_persona_sectors[MOVE_FILE_FIRST
+                                  - g_btl_persona_sectors[BTL_MOVE_FILE_FIRST
                                                           + o->actor->move],
-                              SUMMON_STAGE);
+                              BTL_LOAD_STAGE);
         o->phase++;
         break;
     case 5:
@@ -982,11 +966,11 @@ void BtlMemberMotion05(BtlObj *o)
                                             + o->kind * MEMBER_SCRIPT_MODEL];
             BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
                 scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
-            CdIntToPos(g_btl_persona_sectors[SUMMON_FILE] + D_800F4BA0, &loc);
+            CdIntToPos(g_btl_persona_sectors[SUMMON_FILE] + g_btl_move_gfx_base, &loc);
             CdReadFileToAddrAsync((CdlFILE *)&loc,
                                   g_btl_persona_sectors[SUMMON_FILE + 1]
                                       - g_btl_persona_sectors[SUMMON_FILE],
-                                  SUMMON_STAGE);
+                                  BTL_LOAD_STAGE);
             g_btl_scene_rgb[0] = SUMMON_SCENE_DIM;
             g_btl_scene_rgb[1] = SUMMON_SCENE_DIM;
             g_btl_scene_rgb[2] = SUMMON_SCENE_DIM;

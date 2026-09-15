@@ -74,7 +74,7 @@ void BtlDrawObjText(BtlObj *o)
             i++;
         } while (i < ((const BtlGfxList *)o->last)->count);
     }
-    SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
+    SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->tpage], 0);
     /* Not addPrim: the table's head is read out first, and into the counter,
        which is finished with by here. A local of its own does not do - it is
        reusing this one that puts the value in the register the original has. */

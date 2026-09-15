@@ -50,7 +50,6 @@
 #define FX_37_ENEMY_VOICE  2
 
 /* The ailments the four toggling moves lift or put on. */
-#define FX_37_COUNTR 0x14
 #define FX_37_BARSAK 0x15
 #define FX_37_MAD    0x16
 #define FX_37_WOLF   0x17
@@ -104,7 +103,7 @@ void BtlFxFinish37(BtlObj *o)
     case FX_37_APPLY:
         voice = g_btl_hit_slot < BTL_PARTY
                     ? g_btl_hit_slot + FX_37_MEMBER_VOICE
-                    : (a->obj->unkCD >> 1) + FX_37_ENEMY_VOICE;
+                    : (a->obj->tpage >> 1) + FX_37_ENEMY_VOICE;
         if (g_btl_effect_obj == NULL || g_btl_effect_actor != a) {
             switch (o->kind) {
             case 0x44:
@@ -142,7 +141,7 @@ void BtlFxFinish37(BtlObj *o)
                 if (a->marker == BTL_MARKER_UP || !BtlStatusStops(a)) {
                     a->action = 0;
                 }
-                if (BtlInflictStatus(a, FX_37_COUNTR)) {
+                if (BtlInflictStatus(a, BTL_STATUS_COUNTER)) {
                     BtlSePlay(FX_37_SE_SLOT, FX_37_SE_HIT);
                 }
                 self->unkD0++;
@@ -167,7 +166,7 @@ void BtlFxFinish37(BtlObj *o)
                 } else {
                     n = BtlApplyAffinity(&amount,
                                          g_spell_data[o->kind].element,
-                                         a->c.unk5C);
+                                         a->c.resist);
                 }
                 if (g_spell_data[o->kind].element == FX_37_STAT_ELEMENT
                     && a->stat[4] == FX_37_STAT_SURE) {
@@ -307,7 +306,7 @@ void BtlFxFinish37(BtlObj *o)
         for (; g_btl_hit_walk < BTL_ACTORS;
              g_btl_hit_walk++, g_btl_hit_mask <<= 1) {
             if ((g_btl_actors[g_btl_actor_turn].targets
-                 & (u_short)g_btl_hit_mask) != 0
+                 & g_btl_hit_mask) != 0
                 && g_btl_actors[g_btl_hit_walk].c.key != 0
                 && (signed char)g_btl_actors[g_btl_hit_walk].c.status
                        != BTL_STATUS_DOWN

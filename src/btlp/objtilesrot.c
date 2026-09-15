@@ -68,7 +68,7 @@ void BtlDrawObjTilesRot(BtlObj *o)
             g_btl_polyf4_next->r0 = o->rgb[0];
             g_btl_polyf4_next->g0 = o->rgb[1];
             g_btl_polyf4_next->b0 = o->rgb[2];
-            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
+            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->tpage], 0);
             cell++;
             i++;
             addPrim(ot, g_btl_polyf4_next);

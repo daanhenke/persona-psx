@@ -45,7 +45,7 @@ void BtlDrawObjTiles(BtlObj *o)
             g_btl_tile_next->r0 = o->rgb[0];
             g_btl_tile_next->g0 = o->rgb[1];
             g_btl_tile_next->b0 = o->rgb[2];
-            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
+            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->tpage], 0);
             cell++;
             i++;
             ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE

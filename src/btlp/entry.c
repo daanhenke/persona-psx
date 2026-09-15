@@ -129,8 +129,6 @@ extern u_char D_801F1D8A, D_801F1DA3, D_801F1DA4;
 extern u_char *D_800F6130;
 
 extern int     D_800F49D8;
-extern int     D_800F4BA0;
-extern int     D_800F4BAC;
 extern u_char *g_btl_hud_packed;
 extern u_char *g_btl_frame_packed;
 extern u_char *g_btl_box_pack;
@@ -355,9 +353,9 @@ void ovl_btlp_entry(void)
     CdSearchFileLoc(file, "\\B\\P.BIN;1");
     g_btl_gfx_sector = CdPosToInt(&file[0].pos);
     CdSearchFileLoc(file, "\\B\\G.BIN;1");
-    D_800F4BAC = CdPosToInt(&file[0].pos);
+    g_btl_persona_gfx_base = CdPosToInt(&file[0].pos);
     CdSearchFileLoc(file, "\\B\\M.BIN;1");
-    D_800F4BA0 = CdPosToInt(&file[0].pos);
+    g_btl_move_gfx_base = CdPosToInt(&file[0].pos);
     CdSearchFileLoc(file, "\\B\\DS.BIN;1");
     g_btl_pack_bank_base = CdPosToInt(&file[0].pos);
     CdSearchFileLoc(file, "\\B\\DD.BIN;1");

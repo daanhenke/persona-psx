@@ -93,7 +93,7 @@ void BtlDrawObjTextRot(BtlObj *o)
                 g_btl_polyft4_next->clut = g_btl_clut[line->clut];
                 ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
                                 + BTL_OT_END);
-                g_btl_polyft4_next->tpage = g_btl_tpage[o->unkCD];
+                g_btl_polyft4_next->tpage = g_btl_tpage[o->tpage];
                 addPrim(ot, g_btl_polyft4_next);
                 g_btl_polyft4_next++;
                 g_btl_poly_count++;

@@ -66,7 +66,7 @@ void BtlAilmentTurnBarsak(BtlActor *a, u_char *act)
             damage = 0;
             if (g_btl_combatants[i].pickable != 0) {
                 if (BtlApplyAffinity(&damage, g_item_defs[a->c.equip[0]].element,
-                                     g_btl_combatants[i].c.unk5C) >= 0
+                                     g_btl_combatants[i].c.resist) >= 0
                     && (g_btl_combatants[i].flags & AIL_BARSAK_WARDED) == 0) {
                     i++;
                     continue;

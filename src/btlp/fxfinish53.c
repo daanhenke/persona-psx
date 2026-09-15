@@ -140,7 +140,7 @@ void BtlFxFinish53(BtlObj *o)
             g_btl_hit_walk = 0;
             do {
                 if ((g_btl_actors[g_btl_actor_turn].targets
-                     & (u_short)g_btl_hit_mask) != 0
+                     & g_btl_hit_mask) != 0
                     && g_btl_actors[g_btl_hit_walk].c.key != 0
                     && (signed char)g_btl_actors[g_btl_hit_walk].c.status
                            != BTL_STATUS_DOWN
@@ -175,7 +175,7 @@ void BtlFxFinish53(BtlObj *o)
         for (; g_btl_hit_walk < BTL_ACTORS;
              g_btl_hit_walk++, g_btl_hit_mask <<= 1) {
             if ((g_btl_actors[g_btl_actor_turn].targets
-                 & (u_short)g_btl_hit_mask) != 0
+                 & g_btl_hit_mask) != 0
                 && g_btl_actors[g_btl_hit_walk].c.key != 0
                 && (signed char)g_btl_actors[g_btl_hit_walk].c.status
                        != BTL_STATUS_DOWN

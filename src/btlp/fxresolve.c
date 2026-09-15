@@ -150,7 +150,7 @@ void BtlFxResolveHit(BtlObj *o)
     if ((self->flags & BTL_ACTOR_SCRIPT_DONE) != 0
         || (g_btl_fx_move == FX_HIT_PIERCE
             && BtlApplyAffinity(&amount, g_spell_data[FX_HIT_PIERCE].element,
-                                a->c.unk5C) != 0)) {
+                                a->c.resist) != 0)) {
         hit = 1;
     }
     if (SsVabTransCompleted(SS_IMMEDIATE) == 0) {
@@ -319,7 +319,7 @@ void BtlFxResolveHit(BtlObj *o)
             amount += rand() & 3;
         }
         react = BtlApplyAffinity(&amount, g_spell_data[g_btl_fx_move].element,
-                                 a->c.unk5C);
+                                 a->c.resist);
     }
     if (self->obj->motion != 3 && (signed char)self->c.status == STATUS_CLOSE
         && (signed char)self->c.ail_level > 0) {
@@ -464,7 +464,7 @@ void BtlFxResolveHit(BtlObj *o)
                 a->c.hp = 1;
             }
         } else {
-            voice = (a->obj->unkCD >> 1) + 2;
+            voice = (a->obj->tpage >> 1) + 2;
             BtlOfferScoreEnemy(g_btl_hit_slot - BTL_PARTY, amount);
         }
         if (a->c.hp <= 0) {
@@ -510,7 +510,7 @@ void BtlFxResolveHit(BtlObj *o)
         break;
     case FX_HIT_FREEZE:
         amount = 0;
-        chance = BtlApplyAffinity(&amount, FX_HIT_ICE, a->c.unk5C) / 4;
+        chance = BtlApplyAffinity(&amount, FX_HIT_ICE, a->c.resist) / 4;
         if (chance >= 0 && (rand() & FX_HIT_ROLL) < chance
             && (u_int)(a->c.status - STATUS_STONE) >= 2) {
             a->c.status = STATUS_FREEZE;

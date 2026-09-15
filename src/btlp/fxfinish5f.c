@@ -84,7 +84,7 @@ void BtlFxFinish5F(BtlObj *o)
     case FX_5F_APPLY:
         amount = 0;
         BtlApplyAffinity(&amount, g_spell_data[g_btl_fx_move].element,
-                         a->c.unk5C);
+                         a->c.resist);
         if ((signed char)a->c.status != BTL_STATUS_NOINPUT) {
             switch (o->kind) {
             case 0xF3:
@@ -372,7 +372,7 @@ void BtlFxFinish5F(BtlObj *o)
         for (; g_btl_hit_walk < BTL_ACTORS;
              g_btl_hit_walk++, g_btl_hit_mask <<= 1) {
             if ((g_btl_actors[g_btl_actor_turn].targets
-                 & (u_short)g_btl_hit_mask) != 0
+                 & g_btl_hit_mask) != 0
                 && g_btl_actors[g_btl_hit_walk].c.key != 0
                 && (signed char)g_btl_actors[g_btl_hit_walk].c.status
                        != BTL_STATUS_DOWN

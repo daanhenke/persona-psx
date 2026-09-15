@@ -44,7 +44,7 @@ void BtlLoadPersonas(void)
         d->stat[2] = s->stat[2];
         d->stat[3] = s->stat[3];
         d->stat[4] = s->stat[4];
-        d->unk31 = s->unk2B;
+        d->resist = s->resist;
         d->slots = s->slots;
         memcpy(d->spell, s->spell, BTL_STATS_SPELLS);
         memcpy(d->raw, s->raw, BTL_STATS_SPELLS);

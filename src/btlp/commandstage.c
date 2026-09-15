@@ -66,7 +66,6 @@ extern int (*g_btl_pick_command[])(void);
 /* Put on a member whose command could not be made, with the shake script. */
 #define MARKER_REFUSED  5
 #define MOTION_REFUSED  4
-#define BTL_ACTOR_SHAKE 0x08000000
 
 /* The picker's noises: one for a key that does something, two for a key that
    closes something, three for the cursor. */
@@ -228,7 +227,7 @@ void BtlStageCommand(void)
                            != BTL_STATUS_DOWN
                     && (a->flags & BTL_ACTOR_OUT) == 0
                     && g_btl_actors[slot].marker == two) {
-                    a->flags |= BTL_ACTOR_SHAKE;
+                    a->flags |= BTL_ACTOR_REFUSED;
                     g_btl_actors[slot].obj->motion = MOTION_REFUSED;
                     BtlShowMarker(slot, 1, MARKER_REFUSED);
                 }

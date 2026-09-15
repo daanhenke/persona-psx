@@ -79,7 +79,7 @@ typedef struct {
                                      CharRecalcStats reads list[entry] */
     /* 0x58 */ u_char  list[3];   /* 0xFF marks an empty entry              */
     /* 0x5B */ u_char  pad5B[1];
-    /* 0x5C */ u_char  unk5C;     /* the equipped Persona's +0x31, put here by
+    /* 0x5C */ u_char  resist;    /* the equipped Persona's +0x31, put here by
                                      the battle's BtlApplyPersona          */
     /* 0x5D */ u_char  unk5D;     /* the battle clears its low nibble when it
                                      holds 3 and the character has no gun or

@@ -60,7 +60,7 @@ BtlObj *BtlObjClone(BtlObj *obj)
     def.attr = 0;
     def.scripts = (const u_long **)obj->script;
     copy = BtlObjAlloc(&def, obj->group, obj, obj->draw, 0, &obj->x,
-                       obj->unkCD, obj->unkCE);
+                       obj->tpage, obj->unkCE);
     copy->last = obj->last;
     return copy;
 }

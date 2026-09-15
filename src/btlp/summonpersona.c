@@ -20,6 +20,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/pack.h>
 #include <persona/btlp/stats.h>
 
 /* Where the Persona's file is read to - the staging buffer the spawn takes
@@ -40,7 +41,6 @@
 #define SUMMON_SCALE_XY 0x100
 #define SUMMON_SCALE_Z  0x1000
 
-extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 
 /* Where every Persona's artwork starts, in sectors from the head of the pack.
@@ -98,8 +98,6 @@ u_short g_btl_persona_sectors[] = {
     0x18B3, 0x18BC, 0x18DD, 0x0000
 };
 
-/* Where the pack the Personas live in starts. */
-extern int D_800F4BAC;
 
 extern short   g_btl_scene_rgb[];
 extern short   g_btl_arena_fade;
@@ -113,7 +111,7 @@ BtlObj *BtlSummonActorPersona(BtlActor *a)
 
     obj = a->obj;
     gfx = g_btl_personas[BtlActorPersona(obj->mark_num)].key;
-    CdIntToPos(g_btl_persona_sectors[gfx] + D_800F4BAC, &loc);
+    CdIntToPos(g_btl_persona_sectors[gfx] + g_btl_persona_gfx_base, &loc);
     CdReadFileToAddrAsync((CdlFILE *)&loc,
                           g_btl_persona_sectors[gfx + 1] - g_btl_persona_sectors[gfx],
                           SUMMON_STAGE);

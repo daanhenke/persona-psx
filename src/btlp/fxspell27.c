@@ -111,10 +111,10 @@ void BtlFxStep27(BtlObj *o)
             pos[2] = 0;
             spark = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, 0, FX_OBJ_DRAW, 0,
                                 pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->unk54 = (long)spark;
+            o->child = spark;
             spark->kind = o->kind;
-            ((BtlObj *)o->unk54)->mark_num = FX_MARK_REST;
-            ((BtlObj *)o->unk54)->motion = FX_27_SPARK_MOTION;
+            o->child->mark_num = FX_MARK_REST;
+            o->child->motion = FX_27_SPARK_MOTION;
             o->steps++;
             if (o->timer != 0) {
                 break;

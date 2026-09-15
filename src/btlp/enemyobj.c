@@ -20,14 +20,6 @@
 /* Group 4 is the enemy side. */
 #define BTL_ENEMY_GROUP 4
 
-/* The species table and g_btl_models are two views of one 0x30-byte record:
-   the attribute word an object of this species starts with, and then the
-   model. Only the first word is wanted here. */
-typedef struct {
-    /* 0x00 */ u_long attr;
-    /* 0x04 */ u_char pad04[0x2C];
-} BtlSpecies;                       /* 0x30 bytes */
-
 /* Where the grid puts a square, in whole pixels before the 16.16 shift. */
 #define BTL_GRID_X    15
 #define BTL_GRID_Y    20
@@ -56,8 +48,6 @@ typedef struct {
 #define BTL_DEPTH_STEP  5
 
 extern BtlObjDef         g_btl_enemy_def;
-extern BtlModel          g_btl_models[];
-extern const BtlSpecies  g_btl_species[];
 extern u_char           *g_btl_species_gfx[];
 
 #ifdef NON_MATCHING
@@ -95,7 +85,7 @@ placed:
     pos[0] = (col * BTL_GRID_X + BTL_GRID_LEFT) << 16;
     pos[1] = (row * BTL_GRID_Y + BTL_GRID_TOP) << 16;
     slot = depth + BTL_DEPTH_STEP;
-    pos[2] = (int)*(signed char *)&g_btl_models[species].pad0A[1] << 16;
+    pos[2] = (int)g_btl_models[species].depth << 16;
 
     obj = BtlObjAlloc(&g_btl_enemy_def, BTL_ENEMY_GROUP, 0, 5, 0, pos,
                       gfx, slot);
@@ -119,9 +109,9 @@ placed:
     shadow->attr |= BTL_SHADOW_ATTR;
     obj->shadow = shadow;
 
-    if (g_btl_models[species].pad0A[0] != 0) {
+    if (g_btl_models[species].extra != 0) {
         g_btl_enemy_def.scripts = *(const u_long ***)
-            (g_btl_models[species].pad0A[0] * 4
+            (g_btl_models[species].extra * 4
              + (int)g_btl_species_gfx[species]);
         shadow = BtlObjAlloc(&g_btl_enemy_def, BTL_ENEMY_GROUP, shadow, 5, 0,
                              pos, gfx, slot);

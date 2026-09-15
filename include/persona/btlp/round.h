@@ -320,12 +320,28 @@ extern int   g_btl_won_money;
 /* The four counters the fight resolves a hit through, set together as one is
    armed and walked down as it lands. `left` is how many are still to come,
    `walk` the slot the target search has reached and `mask` its bit, and
-   `slot` whichever fighter is being resolved right now. armhit.c arms them
-   and BtlMemberMotion02 walks them. */
-extern short g_btl_hits_left;
-extern short g_btl_hit_walk;
-extern short g_btl_hit_mask;
-extern short g_btl_hit_slot;
+   `slot` whichever fighter is being resolved right now. armhit.c arms them,
+   and the two swings and the finishes walk them. The mask is a bit pattern,
+   and every reader loads it unsigned. */
+extern short   g_btl_hits_left;
+extern short   g_btl_hit_walk;
+extern u_short g_btl_hit_mask;
+extern short   g_btl_hit_slot;
+
+/* How many times a swing lands, rolled from the weapon's or the move's hit
+   rating. hitroll.c. */
+extern int BtlRollHits(int hits);
+
+/* The blow a swing lands through, once per hit: a member's and an enemy's. */
+extern void BtlMemberStrike(BtlObj *o);
+extern void BtlEnemyStrike(BtlObj *o);
+
+/* Slips a fighter's turn in straight after the one being played, which is
+   what a counter-attack does. insertturn.c. */
+extern void BtlInsertTurn(int actor);
+
+/* The line each move announces itself with as it is made, by move id. */
+extern u_char *g_btl_move_lines[];
 
 extern int   D_800F5A60;
 

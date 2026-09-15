@@ -16,6 +16,7 @@
  */
 #include <decomp/types.h>
 #include <libcd.h>
+#include <persona/main/cd.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
 
@@ -27,7 +28,6 @@ extern int     g_btl_scratch_loaded;
 extern u_long *g_btl_scratch_end;
 extern int     g_cd_busy;
 
-extern void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *addr);
 extern void LoadFileToAddr(CdlFILE *file, u_long *addr);
 
 void BtlLoadScratch(int index, int from_table)

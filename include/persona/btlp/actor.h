@@ -101,15 +101,22 @@ typedef struct BtlActor {
                                       the round: a roll off Char.stat[3] most
                                       of the time, stat[4] on a good one, and
                                       both added on a very good one       */
-    /* 0xBA */ u_char  unkBA;      /* taken off the object as an interruption
-                                      is set up                            */
+    /* 0xBA */ u_char  turn_slot;  /* which of the fighter's spells the turn
+                                      casts, copied off the object's
+                                      spell_slot as the round hands the turn
+                                      out; the enemy motions pick the
+                                      species' tables for the move by it   */
     /* 0xBB */ u_char  move;       /* the move this fighter is making. Set from
                                       the menu for a member and by
                                       BtlChooseEnemyMove for an enemy, and read
                                       by BtlAimMove to work out what it hits */
     /* 0xBC */ u_char  ail_line;   /* which of g_btl_ailment_lines is put up
                                       when the ailment stops the turn       */
-    /* 0xBD */ u_char  unkBD;      /* cleared and then copied from unkBA    */
+    /* 0xBD */ u_char  turn_move;  /* the move the turn plays out, copied from
+                                      `move` beside turn_slot - nought for a
+                                      plain attack. The enemy motions take
+                                      the blow's aim and count from its
+                                      g_spell_data entry                   */
     /* 0xBE */ u_char  move_kept;  /* move and ail_line kept the same way and
                                       restored together with the two above  */
     /* 0xBF */ u_char  ail_line_kept;
@@ -158,8 +165,13 @@ typedef struct BtlActor {
                                       from, and the ward the 0x8C family
                                       leaves; nothing has been found that
                                       reads it                              */
-    /* 0xD1 */ u_char  unkD1;
-    /* 0xD2 */ u_char  unkD2;
+    /* 0xD1 */ u_char  wound;      /* rounds the wound at BTL_ACTOR_WOUND has
+                                      run: each round's end takes one more
+                                      than this in hp and counts it up, to
+                                      at most 0x7F                         */
+    /* 0xD2 */ u_char  build;      /* how often enemy move 0xDC has landed,
+                                      one to eight; each count adds an
+                                      eighth to the blow                   */
     /* 0xD3 */ u_char  unkD3;
     /* 0xD4 */ u_char  unkD4;
     /* 0xD5 */ u_char  counter;     /* a counter-attack is armed: the fighter
@@ -167,8 +179,11 @@ typedef struct BtlActor {
                                       before its own turn resumes. Cleared
                                       with unkCC as a turn ends           */
     /* 0xD6 */ u_char  counter_slot; /* whose blow it is answering       */
-    /* 0xD7 */ u_char  unkD7;      /* read as the counter is put away, and
-                                      decides whether the turn is spent  */
+    /* 0xD7 */ u_char  counter_turn; /* raised when the counter was armed on
+                                        a fighter whose own turn was still
+                                        to come, so that putting the
+                                        counter away gives the turn back
+                                        rather than spending it          */
     /* 0xD8 */ u_char  unkD8;      /* stops a member's marker being taken away
                                       as the turn ends, and is cleared there  */
     /* 0xD9 */ u_char  place_col;  /* the cell a member was put on in the */
@@ -232,6 +247,8 @@ typedef struct BtlActor {
                                       plain white and loses its shadow, and
                                       a random pick steps over it        */
 #define BTL_STATUS_NOINPUT 0x13    /* PUPPET */
+#define BTL_STATUS_COUNTER 0x14    /* COUNTR: a blow that lands gives the
+                                      fighter a turn of its own at once  */
 
 /* The four a contact can end in, one scene each. BtlTalkEndStatus puts the
    code on every demon the offer involved. */
@@ -257,6 +274,16 @@ extern u_char g_btl_counter_order;
 /* An actor flag with the same effect as BTL_STATUS_DOWN everywhere it is
    tested; the two are always checked together. */
 #define BTL_ACTOR_OUT 0x4000
+
+/* Set on a member whose command could not be made - the round shakes it and
+   gives it action 4 whatever its tactic says - and cleared again as its
+   ailment decides the turn. A fighter under it is not given the turn a
+   counter-attack would slip into the order. */
+#define BTL_ACTOR_REFUSED 0x8000000
+
+/* The wound enemy move 0xE3 leaves: at every round's end the fighter loses
+   one more hp than the round before, counted in `wound`. */
+#define BTL_ACTOR_WOUND 0x1000000
 
 /* Set on a member that has flinched: its flinch is the script it stands in
    until something clears it. */

@@ -73,7 +73,7 @@ int BtlLoadEnemyGfx(int species, int actor, u_long *tim, u_char *image,
         return BTL_SLOT_FLAT;
     }
 
-    size = *(signed char *)&g_btl_models[species].pad0A[7];
+    size = g_btl_models[species].gfx_size;
 
     switch (size) {
     case 0:

@@ -63,7 +63,7 @@ void BtlMemberMotion0E(BtlObj *o)
         o->actor->flags |= BTL_ACTOR_OUT;
         if (o->attr & BTL_OBJ_OTHER_SIDE) {
             if (o->attr & LEAVE_OWN_SOUND) {
-                BtlSePlay((o->unkCD >> 1) + LEAVE_SOUND_SIZE, 1);
+                BtlSePlay((o->tpage >> 1) + LEAVE_SOUND_SIZE, 1);
             } else {
                 BtlSePlay(LEAVE_SOUND, 1);
             }

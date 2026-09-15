@@ -256,8 +256,8 @@ void BtlActorMotion08(BtlObj *o)
         memcpy((u_char *)g_btl_actor_clut + o->mark_num * BTL_CLUT_BYTES,
                (u_char *)g_btl_actor_clut_base + o->mark_num * BTL_CLUT_BYTES,
                BTL_CLUT_BYTES);
-        g_btl_tpage[o->unkCD] &= ~DEATH_TPAGE_ABR;
-        g_btl_tpage[o->unkCD] |= DEATH_TPAGE_SUB;
+        g_btl_tpage[o->tpage] &= ~DEATH_TPAGE_ABR;
+        g_btl_tpage[o->tpage] |= DEATH_TPAGE_SUB;
         o->rgb_to[0] = 0;
         o->rgb_to[1] = 0;
         o->rgb_to[2] = 0;

@@ -56,7 +56,7 @@ void BtlActorFromDef(BtlActor *a, int key)
     a->stat[STAT_DEXTERITY] = d->stat[STAT_DEXTERITY];
     a->stat[STAT_AGILITY] = d->stat[STAT_AGILITY];
     a->stat[STAT_LUCK] = d->stat[STAT_LUCK];
-    a->c.unk5C = d->unk2D;
+    a->c.resist = d->resist;
 
     a->c.melee_atk = (d->stat[STAT_STRENGTH] + d->stat[STAT_DEXTERITY] / 2
                       + d->level / ACTOR_LEVEL_DIV) * ACTOR_SCALE_NUM

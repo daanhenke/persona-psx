@@ -249,18 +249,18 @@ void BtlFxStep6E(BtlObj *o)
             pos[2] = z + FX_6E_ABOVE;
             piece = BtlObjAlloc(&g_btl_fx_def2, FX_OBJ_GROUP, 0, FX_OBJ_DRAW,
                                 0, pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->unk54 = (long)piece;
+            o->child = piece;
             piece->kind = o->kind;
-            ((BtlObj *)o->unk54)->scripts   = o->scripts;
-            ((BtlObj *)o->unk54)->mark_num  = FX_6E_PIECE_MARK;
-            ((BtlObj *)o->unk54)->fade      = FX_6E_PIECE_FADE;
-            ((BtlObj *)o->unk54)->motion    = FX_6E_PIECE_MOTION;
-            ((BtlObj *)o->unk54)->rgb_to[0] = FX_GREY;
-            ((BtlObj *)o->unk54)->rgb_to[1] = FX_GREY;
-            ((BtlObj *)o->unk54)->rgb_to[2] = FX_GREY;
-            ((BtlObj *)o->unk54)->rgb[0]    = 0;
-            ((BtlObj *)o->unk54)->rgb[1]    = 0;
-            ((BtlObj *)o->unk54)->rgb[2]    = 0;
+            o->child->scripts   = o->scripts;
+            o->child->mark_num  = FX_6E_PIECE_MARK;
+            o->child->fade      = FX_6E_PIECE_FADE;
+            o->child->motion    = FX_6E_PIECE_MOTION;
+            o->child->rgb_to[0] = FX_GREY;
+            o->child->rgb_to[1] = FX_GREY;
+            o->child->rgb_to[2] = FX_GREY;
+            o->child->rgb[0]    = 0;
+            o->child->rgb[1]    = 0;
+            o->child->rgb[2]    = 0;
             o->timer = FX_6E_STAND;
             o->phase++;
             break;
@@ -271,18 +271,18 @@ void BtlFxStep6E(BtlObj *o)
             o->rgb_to[0] = 0;
             o->rgb_to[1] = 0;
             o->rgb_to[2] = 0;
-            ((BtlObj *)o->unk54)->rgb_to[0] = 0;
-            ((BtlObj *)o->unk54)->rgb_to[1] = 0;
-            ((BtlObj *)o->unk54)->rgb_to[2] = 0;
+            o->child->rgb_to[0] = 0;
+            o->child->rgb_to[1] = 0;
+            o->child->rgb_to[2] = 0;
             o->fade = FX_6E_FADE;
-            ((BtlObj *)o->unk54)->fade = FX_6E_FADE;
+            o->child->fade = FX_6E_FADE;
             o->phase++;
             break;
         case 3:
             if (o->rgb[0] != 0) {
                 break;
             }
-            BtlObjFree((BtlObj *)o->unk54);
+            BtlObjFree(o->child);
             o->phase = FX_STEP_DONE;
             o->attr |= BTL_OBJ_HIDDEN;
             o->children = (u_char)g_btl_spell_fx[g_btl_fx_move].group;
@@ -323,9 +323,9 @@ void BtlFxStep6E(BtlObj *o)
             pos[2] = FX_6E_DEPTH;
             piece = BtlObjAlloc(&g_btl_fx_def2, FX_OBJ_GROUP, 0, FX_OBJ_DRAW,
                                 0, pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->unk54 = (long)piece;
+            o->child = piece;
             piece->kind = o->kind;
-            ((BtlObj *)o->unk54)->mark_num = FX_6E_SPARK_MARK;
+            o->child->mark_num = FX_6E_SPARK_MARK;
             o->steps++;
             break;
         default:

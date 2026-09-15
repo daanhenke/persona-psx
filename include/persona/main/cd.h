@@ -35,6 +35,9 @@ extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
 extern void     CdReadToAddr(int size, u_long *dest);
 extern int      CdReadPolled(int size, u_long *dest, int mode);
 extern void     LoadFileToAddrAsync(const char *name, void *dest);
+/* Reads `sectors` sectors from where `file` points into `dest` without
+   waiting; g_cd_busy says when it is done. cdfileload.c. */
+extern void     CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 /* The completion callback the two async reads install. It is a unit of its own
    in the image, between them, so both need it declared here. */
 extern void     CdReadDoneCallback(u_char status);

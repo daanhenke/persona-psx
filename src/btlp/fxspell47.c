@@ -30,7 +30,7 @@
 /* The blend bits set on that page, and what the record carries so the drawing
    side reads them. */
 #define FX_47_TRANS   0x60
-#define FX_47_UNKCD   1
+#define FX_47_TPAGE   1
 
 BtlObj *BtlFxStart47(void)
 {
@@ -54,7 +54,7 @@ BtlObj *BtlFxStart47(void)
         o->attached = prev;
         if (i != 0) {
             g_btl_tpage[FX_47_SLOT] = g_btl_tpage[FX_47_FROM] | FX_47_TRANS;
-            o->unkCD = FX_47_UNKCD;
+            o->tpage = FX_47_TPAGE;
         }
         prev = o;
     } while (--i >= 0);

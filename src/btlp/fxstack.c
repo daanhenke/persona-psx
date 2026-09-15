@@ -43,7 +43,7 @@ BtlObj *BtlOpenFxStack(int slot)
         o->mark_num = i;
         if (i != 0) {
             g_btl_tpage[FX_STACK_PAGE] = g_btl_tpage[FX_TPAGE_SLOT] | TPAGE_ABR;
-            o->unkCD = FX_STACK_PAGE;
+            o->tpage = FX_STACK_PAGE;
         }
         i--;
         after = o;

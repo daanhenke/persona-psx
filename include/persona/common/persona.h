@@ -33,7 +33,7 @@ typedef struct {
                                   /* the same five the character has, drawn as
                                      bars on the status screen and clamped at
                                      99 there */
-    /* 0x2B */ u_char  unk2B;
+    /* 0x2B */ u_char  resist;
     /* 0x2C */ u_char  slots;     /* how far into the spell order to read     */
     /* 0x2D */ u_char  spell[PERSONA_SPELLS];
                                   /* learned in order; 0 for a slot the
@@ -92,12 +92,17 @@ typedef struct {
     /* 0x26 */ u_char level;
     /* 0x27 */ u_char arcana;     /* 1-based, into a table of six-cell labels */
     /* 0x28 */ u_char stat[PERSONA_STATS];
-    /* 0x2D */ u_char unk2D;      /* lands on Char.unk5C                     */
+    /* 0x2D */ u_char resist;     /* lands on Char.resist                    */
     /* 0x2E */ u_char spell[6];    /* what a fighter built from this record can
                                      cast, kept whole on the actor at +0xAF.
                                      BtlChooseEnemyMove indexes g_spell_data
                                      with each of them.                     */
-    /* 0x34 */ u_char pad34[4];
+    /* 0x34 */ u_char pad34[1];
+    /* 0x35 */ u_char attack;     /* the blow a demon of this Persona strikes
+                                     with when it is not casting: which strike
+                                     art goes up and which voice bank speaks
+                                     it, and two short of its element       */
+    /* 0x36 */ u_char pad36[2];
 } PersonaData;                    /* 0x38 bytes */
 
 extern PersonaData g_persona_data[];
@@ -115,7 +120,7 @@ typedef struct {
     /* 0x13 */ u_char  level;
     /* 0x14 */ u_char  kind;      /* pairs a demon species with this Persona */
     /* 0x15 */ u_char  stat[PERSONA_STATS];
-    /* 0x1A */ u_char  unk1A;
+    /* 0x1A */ u_char  resist;
     /* 0x1B */ u_char  pad1B[1];
     /* 0x1C */ u_long  unk1C;     /* lands on the record's +0x0C             */
     /* 0x20 */ u_char  raw[PERSONA_SPELLS];

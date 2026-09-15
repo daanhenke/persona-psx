@@ -75,7 +75,7 @@ void BtlLoadEnemyStats(int slot, int key)
     a->c.stat[STAT_DEXTERITY] = d->stat[STAT_DEXTERITY];
     a->c.stat[STAT_AGILITY] = d->stat[STAT_AGILITY];
     a->c.stat[STAT_LUCK] = d->stat[STAT_LUCK];
-    a->c.unk5C = d->unk2D;
+    a->c.resist = d->resist;
     a->c.gun_atk = 0;
     a->c.gun_hit = 0;
 
@@ -104,7 +104,7 @@ void BtlLoadEnemyStats(int slot, int key)
     a->stage[5] = 0;
     a->stage[6] = 0;
     a->ward_turns = 0;
-    a->unkD2 = 0;
+    a->build = 0;
     a->unkD3 = 0;
     a->unkD4 = 0;
     a->unkDF = 0;

@@ -803,17 +803,17 @@ void BtlStageRound(void)
                                 break;
                             case 0xE:
                                 BtlSoundOpen(g_btl_slot_banks, 6,
-                                             (actor->obj->unkCD >> 1) - 5);
+                                             (actor->obj->tpage >> 1) - 5);
                                 break;
                             case 2:
                                 actor->move = 0;
-                                actor->unkBD = 0;
+                                actor->turn_move = 0;
                                 BtlAimEnemyMove(actor);
                                 BtlOpenPackBank();
                                 break;
                             case 6:
-                                actor->unkBD = actor->move;
-                                actor->unkBA = actor->obj->unkD3;
+                                actor->turn_move = actor->move;
+                                actor->turn_slot = actor->obj->spell_slot;
                                 if (g_btl_place_party == 0) {
                                     BtlAimMove(actor);
                                 }
@@ -1034,7 +1034,7 @@ void BtlStageRound(void)
                 || (g_btl_encounter == 0x1E
                     && g_btl_enemies[6].c.key != 0x9B)) {
                 BtlSoundOpen(g_btl_slot_banks, 6,
-                             (g_btl_enemies[0].obj->unkCD >> 1) - 5);
+                             (g_btl_enemies[0].obj->tpage >> 1) - 5);
                 i = BTL_PARTY;
                 SsVabTransCompleted(1);
                 slot = BTL_PARTY;
@@ -1130,7 +1130,7 @@ void BtlStageRound(void)
                         }
                     } else if (n < 0xC) {
                         BtlSoundOpen(g_btl_slot_banks, n,
-                                     (actor->obj->unkCD >> 1) - 5);
+                                     (actor->obj->tpage >> 1) - 5);
                     }
                     SsVabTransCompleted(1);
 
@@ -1210,19 +1210,19 @@ void BtlStageRound(void)
                             amount = actor->c.hp_max / 16;
                             break;
                         default:
-                            if ((actor->flags & 0x1000000) != 0) {
-                                t = actor->unkD1 + 1;
-                                actor->unkD1 = t;
-                                if (actor->unkD1 != 0) {
+                            if ((actor->flags & BTL_ACTOR_WOUND) != 0) {
+                                t = actor->wound + 1;
+                                actor->wound = t;
+                                if (actor->wound != 0) {
                                     if ((u_char)t > 0x7F) {
                                         t = 0x7F;
-                                        actor->unkD1 = t;
+                                        actor->wound = t;
                                     }
                                 } else {
                                     t = 1;
-                                    actor->unkD1 = t;
+                                    actor->wound = t;
                                 }
-                                amount = actor->unkD1;
+                                amount = actor->wound;
                                 kind = 7;
                             } else {
                                 kind = 0;

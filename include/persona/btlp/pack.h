@@ -28,6 +28,16 @@ extern int     g_btl_pack_base;
    beyond where the graphics ids stop. */
 extern u_short g_btl_persona_sectors[];
 
+/* Where the two graphics packs that table indexes start on the disc, found
+   by name as the overlay opens: \B\G.BIN holds each Persona's own artwork
+   and \B\M.BIN the moves', the cast's and the summon's. entry.c. */
+extern int g_btl_persona_gfx_base;
+extern int g_btl_move_gfx_base;
+
+/* The moves' artwork starts this far into the sector table, so a move's
+   entry is its id past it. */
+#define BTL_MOVE_FILE_FIRST 0x72
+
 /* The demon voice banks. */
 extern u_short g_btl_pack_bank_sectors[];
 extern int     g_btl_pack_bank_base;

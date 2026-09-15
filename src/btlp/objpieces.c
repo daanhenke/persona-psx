@@ -58,7 +58,7 @@ void BtlDrawObjPieces(BtlObj *o)
             g_btl_sprt_next->g0 = o->rgb[1];
             g_btl_sprt_next->b0 = o->rgb[2];
             g_btl_sprt_next->clut = g_btl_clut[o->unkCE];
-            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->unkCD], 0);
+            SetDrawMode(g_btl_drmode_next, 0, 0, g_btl_tpage[o->tpage], 0);
             cell++;
             i++;
             addPrim(ot, g_btl_sprt_next);

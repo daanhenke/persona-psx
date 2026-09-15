@@ -2292,3 +2292,98 @@ each insn are the dependencies that decided its place.
 - [roundflow.c](/src/btlp/roundflow.c) - `BtlStageRound`, act kinds 2 and 3:
   98.90% to 99.18% on the struct store, and to the jump tables alone (every
   other row matching) on the targets-before-move order.
+
+## A search whose found arm sits ahead of its entry test is a `while` in an `if`
+
+Where the image walks a target mask with the block that records the hit
+placed *before* the walk's entry test - reached by a `beqz` from the last test
+in the loop, and ending in a `j` past the loop - the source was
+
+    if ((short)g_btl_hit_walk < BTL_ACTORS) {
+        while ((short)g_btl_hit_walk < BTL_ACTORS) {
+            if (<the slot qualifies>) { g_btl_hit_slot = walk; done = 1; break; }
+            <step>
+        }
+        if ((short)g_btl_hit_walk < BTL_ACTORS) continue;
+    }
+
+Two passes put it there. `expand_end_loop` rolls a loop's first exit to its
+end: for a `while` that is only the test, which jump.c then duplicates in front
+of the loop and cse folds into the `if` around it. `find_and_verify_loops` then
+finds the found arm - skipped by a conditional branch and ending in a jump out
+of the loop - and moves it to the last barrier before the loop. Written as a
+`do/while`, the `break` is the first exit, so the whole search is rolled
+instead: a `j` into the body, the step placed above it, and the found arm left
+inline.
+
+- [enemymotion2.c](/src/btlp/enemymotion2.c) - `BtlEnemyMotion02`'s phase 0x13,
+  96.99% to 99.60%. `BtlMemberMotion02`'s image has the same shape.
+
+## A constant known in a register is handed out for the constant
+
+cse puts a pseudo it has just set to a constant into that constant's class, and
+a later use of the constant is given the class's first register. So
+
+    done = 1;
+    ...
+    a->targets |= 1 << a->order;
+
+shifts `done`'s register, where the image keeps a `1` of its own that the loop
+hoists into a temp. A block boundary between the two hides the set:
+
+    done = 1;
+    do {
+    } while (0);
+
+- [enemymotion2.c](/src/btlp/enemymotion2.c) - `BtlEnemyMotion02`, the last
+  register row. Setting `done` later instead fixes the shift but moves the
+  delay slot, because reorg pulls the first safe insn of the arm into it.
+
+## Which of two copies is canonical is decided by their last uses
+
+When cse sees `b = a`, `b` becomes the register it substitutes for both only if
+`b`'s last use comes after `a`'s. A stat taken through a base -
+
+    n = a->melee_atk;
+    atk = n;
+    if (stage) atk = n + n * (stage + 1) / 8;
+
+- makes `atk` canonical, because it lives on to the damage call: the multiply
+reads `atk`'s saved register and a copy of the base comes out in a temp. The
+image multiplies the base in a0 and copies it into the saved register. What it
+had was the base variable used again later - for the affinity's answer, which
+also sits in a0 - so the base outlives the stat and stays canonical. The saved
+registers of two unrelated values came right with it.
+
+- [enemymotion2.c](/src/btlp/enemymotion2.c) - `BtlEnemyStrike`, 99.70% to
+  exact with the counter below. The permuter found the family first, by reusing
+  the base as a loop counter: right lifetime, wrong register.
+
+## A byte counted and clamped through a local of its own
+
+    n = a->build + 1;
+    a->build = n;
+    if (a->build != 0) {
+        if (n > 8) { n = 8; a->build = n; }
+    } else {
+        n = 1; a->build = n;
+    }
+
+reloads the byte for the zero test, tests the truncated local for the top, and
+writes both clamps through the local's register. Constants stored directly
+come out in `v0`; the image has them in the local's `v1`. The round's end
+counts a wound the same way.
+
+- [enemymotion2.c](/src/btlp/enemymotion2.c) - `BtlEnemyStrike`;
+  [roundflow.c](/src/btlp/roundflow.c) - the wound.
+
+## A spawned record read back through the field that keeps it
+
+    o->child = BtlSpawnStrike(1, model, pos);
+    o->child->z -= STRIKE_LIFT;
+
+cse knows the field holds the call's answer and works in `v0`. With a local
+holding the answer first, the local's register gets a copy of it.
+
+- [enemymotion2.c](/src/btlp/enemymotion2.c) - all four strikes in
+  `BtlEnemyStrike`.

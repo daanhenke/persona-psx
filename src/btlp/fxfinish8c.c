@@ -43,7 +43,7 @@ void BtlFxFinish8C(BtlObj *o)
         g_btl_hit_mask = 1;
         do {
             if ((g_btl_actors[g_btl_actor_turn].targets
-                 & (u_short)g_btl_hit_mask) != 0
+                 & g_btl_hit_mask) != 0
                 && g_btl_actors[g_btl_hit_walk].c.key != 0
                 && (signed char)g_btl_actors[g_btl_hit_walk].c.status
                        != BTL_STATUS_DOWN

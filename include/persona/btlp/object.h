@@ -131,10 +131,11 @@ typedef struct BtlObj {
     /* 0x48 */ struct BtlObj *next;
     /* 0x4C */ struct BtlObj *attached; /* carried along by every setter    */
     /* 0x50 */ struct BtlObj *shadow;   /* kept on this one's position      */
-    /* 0x54 */ long           unk54;   /* both cleared as a record is taken.
-                                          BtlFxStep27 keeps the spark it just
-                                          opened here, and reaches back through
-                                          it to finish setting the spark up  */
+    /* 0x54 */ struct BtlObj *child;   /* a record this one opened and still
+                                          reaches: the spark BtlFxStep27 sets
+                                          up, the piece BtlFxStep6E fades, the
+                                          strike art a blow puts up. Cleared
+                                          as a record is taken              */
     /* 0x58 */ struct BtlObj **ref; /* the word the record is registered in,
                                           cleared as a motion gives it up   */
     /* 0x5C */ struct BtlObj *mark;    /* the ailment marker floating on
@@ -183,13 +184,13 @@ typedef struct BtlObj {
     /* 0xC0 */ short          rgb[3];  /* the colour actually drawn         */
     /* 0xC6 */ short          rgb_to[3]; /* the colour it is walking toward */
     /* 0xCC */ u_char         fade;    /* how far it walks in one frame     */
-    /* 0xCD */ u_char         unkCD;   /* BtlObjAlloc fills it from its
+    /* 0xCD */ u_char         tpage;   /* which of g_btl_tpage the record is
+                                          drawn with, from BtlObjAlloc's
                                           seventh argument - 0x18 for an
-                                          actor, 0x1F for a shadow. The only
-                                          thing that reads it is
-                                          BtlTalkersLeave, which picks the
-                                          group's goodbye bank with
-                                          (unkCD >> 1) - 5              */
+                                          actor, 0x1F for a shadow. The
+                                          pages come in pairs, so a
+                                          fighter's sound bank is
+                                          (tpage >> 1) - 5               */
     /* 0xCE */ u_char         unkCE;   /* BtlObjAlloc fills it from its last
                                           argument; an ailment marker gets the
                                           ailment code plus 0x40           */
@@ -213,8 +214,10 @@ typedef struct BtlObj {
                                           BTL_MEMBERS and an enemy's is not,
                                           which is how BtlApplyPersona tells
                                           the two apart                  */
-    /* 0xD3 */ u_char         unkD3;   /* the acting fighter takes a copy of
-                                          this as its turn is set up      */
+    /* 0xD3 */ u_char         spell_slot; /* which of the fighter's spells
+                                             the turn casts; the actor takes
+                                             a copy into turn_slot as the
+                                             turn is set up               */
     /* 0xD4 */ u_char         phase;   /* how far into that motion          */
     /* 0xD5 */ u_char         padD5[3];
 } BtlObj;                              /* 0xD8 bytes */
@@ -364,9 +367,9 @@ extern int BtlObjChainAtMotion(BtlObj *obj, u_char motion);
 
 /* Takes the first free record of `group`, links it after `after`, and gives it
    the template's attribute word and script table. The three numbers after the
-   position land in BtlObj.draw, unkCD and unkCE. */
+   position land in BtlObj.draw, tpage and unkCE. */
 extern BtlObj *BtlObjAlloc(const BtlObjDef *defs, int group, BtlObj *after,
-                           int draw, int index, const long *pos, int unkCD,
+                           int draw, int index, const long *pos, int tpage,
                            int unkCE);
 
 /* Setters. Each walks BtlObj.attached, so a change reaches the whole
