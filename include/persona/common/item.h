@@ -49,7 +49,10 @@ typedef struct {
                                    against the number left                  */
     /* 0x1B */ u_char hits;     /* what 0x80094E60 turns into the number of
                                    times the swing lands                    */
-    /* 0x1C */ u_char pad1C[4];
+    /* 0x1C */ u_char ailment;  /* what a blow with it may leave on the
+                                   target, one time in eight; BtlMemberStrike
+                                   rolls it                                 */
+    /* 0x1D */ u_char pad1D[3];
 } ItemDef;                      /* 0x20 bytes */
 
 extern ItemDef g_item_defs[];

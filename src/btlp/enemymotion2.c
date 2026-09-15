@@ -37,6 +37,7 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/spellfx.h>
 #include <persona/btlp/status.h>
+#include <persona/btlp/strike.h>
 #include <persona/btlp/text.h>
 
 /* The enemy moves with a rule of their own. */
@@ -77,31 +78,6 @@
 #define ENEMY_GRID_LEFT (-60)
 #define ENEMY_GRID_Y    20
 #define ENEMY_GRID_TOP  (-140)
-
-/* The voice slot a blow is sounded in, and the motions it leaves each side
-   on. */
-#define STRIKE_VOICE        6
-#define STRIKE_SE_SLOT      2
-#define STRIKE_SE_MISS      8
-#define STRIKE_SE_CRITICAL  9
-#define STRIKE_SE_NULL      0xA
-#define STRIKE_SE_REPEL     0xB
-#define STRIKE_MOTION_HURT  7
-#define STRIKE_MOTION_DOWN  8
-#define STRIKE_MOTION_HEAL  0xF
-#define STRIKE_MOTION_REEL  0x10
-#define STRIKE_MOTION_MISS  0x11
-
-/* The wards that keep a blow off altogether. */
-#define STRIKE_BLOCKED (BTL_ACTOR_WARD_8E | BTL_ACTOR_WARD_8F | BTL_ACTOR_5E)
-
-/* The most a blow takes, and how far the strike art is lifted. */
-#define STRIKE_CAP  9999
-#define STRIKE_LIFT 0x180000
-
-/* A member hit where it stands is marked further down the field than the
-   square it is on. */
-#define STRIKE_MEMBER_DROP 0xC80000
 
 void BtlEnemyMotion02(BtlObj *o)
 {

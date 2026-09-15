@@ -12,19 +12,27 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <decomp/libc.h>
+#include <rand.h>
 #include <libcd.h>
 #include <libsnd.h>
 #include <persona/main/cd.h>
+#include <persona/common/status.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/cast.h>
 #include <persona/btlp/choice.h>
+#include <persona/btlp/clut.h>
+#include <persona/btlp/damage.h>
 #include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/model.h>
+#include <persona/btlp/offer.h>
 #include <persona/btlp/pack.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/sides.h>
 #include <persona/btlp/sound.h>
+#include <persona/btlp/spellfx.h>
 #include <persona/btlp/stats.h>
+#include <persona/btlp/strike.h>
 #include <persona/common/item.h>
 #include <persona/btlp/text.h>
 #include <persona/btlp/round.h>
@@ -540,7 +548,261 @@ void BtlMemberMotion02(BtlObj *o)
 INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion02);
 #endif
 
-INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberStrike);
+/* The motion a member fires a gun on, which swings the other hand's numbers. */
+#define STRIKE_GUN_MOTION 0xC
+
+/* The strike art a swing takes when the fighter's pick is neither hand. */
+#define STRIKE_BARE_MODEL 7
+
+/* The phase BtlMemberMotion02 ends a turn in, which a member downed by its
+   own blow comes back to. */
+#define STRIKE_PHASE_DOWN 0xA
+
+/* A member's blow: the enemy twin is BtlEnemyStrike, and the two differ only
+ * in what they read. The hand the swing is from picks the numbers and the
+ * weapon's element; a debug byte lets every blow land for the most; and a
+ * blow that lands may leave the weapon's own ailment behind, and on an
+ * enemy counts toward the offer and the drop.
+ */
+void BtlMemberStrike(BtlObj *o)
+{
+    long      pos[3];
+    int       damage;
+    BtlActor *a;
+    BtlActor *t;
+    BtlObj   *p;
+    BtlObj   *miss;
+    int       model;
+    int       n;
+    int       atk;
+    int       hit;
+    int       def;
+    int       element;
+    int       crit;
+    int       i;
+
+    crit = 0;
+    t = &g_btl_actors[g_btl_hit_slot];
+    a = o->actor;
+    if (SsVabTransCompleted(SS_IMMEDIATE) == 0) {
+        return;
+    }
+    switch (a->script_pick) {
+    case 1:
+        model = g_btl_member_voice[o->kind * MEMBER_SCRIPT_MODEL];
+        break;
+    case 2:
+        model = g_btl_member_voice[o->kind * MEMBER_SCRIPT_MODEL + 1];
+        break;
+    default:
+        model = STRIKE_BARE_MODEL;
+        break;
+    }
+    if (o->motion != STRIKE_GUN_MOTION) {
+        hit = a->melee_hit;
+        atk = a->melee_atk;
+        element = g_item_defs[a->c.equip[0]].element;
+    } else {
+        hit = a->gun_hit;
+        atk = a->gun_atk;
+        element = g_item_defs[a->c.equip[1]].element;
+    }
+    def = g_btl_actors[g_btl_hit_slot].defence;
+
+    n = atk;
+    if ((signed char)a->stage[3] != 0) {
+        atk = n + n * ((signed char)a->stage[3] + 1) / 8;
+    }
+    if ((signed char)a->stage[0] != 0) {
+        atk -= n * (signed char)a->stage[0] / 8;
+    }
+    n = hit;
+    if ((signed char)a->stage[5] != 0) {
+        hit = n + n * ((signed char)a->stage[5] * 2 + 2) / 8;
+    }
+    if ((signed char)a->stage[2] != 0) {
+        hit -= n * (signed char)a->stage[2] / 8;
+    }
+    n = def;
+    if ((signed char)t->stage[4] != 0) {
+        def = n + n * ((signed char)t->stage[4] * 2 + 2) / 8;
+    }
+    if ((signed char)t->stage[1] != 0) {
+        def -= n * (signed char)t->stage[1] / 8;
+    }
+
+    if (t->unkD3 == 0 && (a->flags & BTL_ACTOR_SCRIPT_READY) == 0
+        && ((a->flags & BTL_ACTOR_SCRIPT_DONE) != 0 || g_btl_debug_flags[2] != 0
+            || BtlRollHit(g_btl_party_counted, hit, (signed char)a->c.status,
+                          g_btl_enemy_counted,
+                          g_btl_actors[g_btl_hit_slot].evade,
+                          (signed char)g_btl_actors[g_btl_hit_slot].c.status)
+                   != 0)) {
+        damage = BtlDamageBase(atk, def);
+        if ((signed char)a->c.status == STATUS_CHARM) {
+            damage /= STATUS_CHARM - (signed char)a->c.ail_level;
+        }
+        if (BtlRollCritical(a, &g_btl_actors[g_btl_hit_slot]) != 0) {
+            crit = 1;
+            damage *= 3;
+        }
+        damage += rand() & 3;
+        if ((g_btl_actors[g_btl_hit_slot].flags & STRIKE_BLOCKED) != 0) {
+            n = BTL_REACT_NULL;
+        } else if (g_btl_debug_flags[2] != 0) {
+            n = 0;
+            damage = STRIKE_CAP;
+        } else {
+            n = BtlApplyAffinity(&damage, element,
+                                 g_btl_actors[g_btl_hit_slot].c.resist);
+        }
+        damage = damage < 0 ? 0 : damage > STRIKE_CAP ? STRIKE_CAP : damage;
+        if ((a->flags & BTL_ACTOR_SCRIPT_DONE) != 0) {
+            n = 0;
+            damage = g_btl_actors[g_btl_hit_slot].c.hp;
+        }
+
+        switch (n) {
+        case BTL_REACT_REPEL:
+            BtlSePlay(STRIKE_SE_SLOT, STRIKE_SE_REPEL);
+            pos[0] = (g_btl_actors[g_btl_hit_slot].obj->col2 * SWING_X_STEP
+                      + SWING_X_BASE) << 16;
+            pos[1] = (g_btl_actors[g_btl_hit_slot].obj->row * SWING_Y_STEP
+                      + SWING_Y_BASE) << 16;
+            if (g_btl_hit_slot < BTL_PARTY) {
+                pos[1] += STRIKE_MEMBER_DROP;
+            }
+            pos[2] = 0;
+            o->child = BtlSpawnStrike(0, model, pos);
+            o->child->z -= STRIKE_LIFT;
+            g_btl_actors[g_btl_hit_slot].hit_amount = damage;
+            g_btl_actors[g_btl_hit_slot].c.hp += damage;
+            g_btl_actors[g_btl_hit_slot].c.hp =
+                g_btl_actors[g_btl_hit_slot].c.hp
+                        > g_btl_actors[g_btl_hit_slot].c.hp_max
+                    ? g_btl_actors[g_btl_hit_slot].c.hp_max
+                    : g_btl_actors[g_btl_hit_slot].c.hp;
+            g_btl_actors[g_btl_hit_slot].obj->motion = STRIKE_MOTION_HEAL;
+            break;
+        case BTL_REACT_NULL:
+            o->attr |= BTL_OBJ_CARRIED;
+            BtlSoundClose(STRIKE_VOICE);
+            BtlSoundOpen(g_btl_banks, STRIKE_VOICE, a->c.key);
+            SsVabTransCompleted(SS_WAIT_COMPLETED);
+            BtlSePlay(STRIKE_SE_SLOT, STRIKE_SE_NULL);
+            g_btl_clut_fading |= 1 << g_btl_hit_slot;
+            i = 1;
+            do {
+                g_btl_actor_clut[g_btl_hit_slot * FX_CLUT_COLORS + i] =
+                    FX_CLUT_WHITE;
+                i++;
+            } while (i < FX_CLUT_COLORS);
+            o->child = BtlSpawnStrike(1, model, &o->x);
+            o->child->z -= STRIKE_LIFT;
+            if ((signed char)a->c.status == BTL_STATUS_NOINPUT) {
+                damage = 0;
+            }
+            a->hit_amount = damage;
+            a->c.hp -= damage;
+            if (g_btl_debug_flags[1] != 0 && a->c.hp <= 0) {
+                a->c.hp = 1;
+            }
+            if (a->c.hp <= 0 && (signed char)a->c.status != BTL_STATUS_NOINPUT) {
+                o->actor->resume_motion = o->motion;
+                o->actor->resume_phase = STRIKE_PHASE_DOWN;
+                a->c.hp = 0;
+                o->motion = STRIKE_MOTION_DOWN;
+                BtlSePlay(STRIKE_VOICE, 1);
+            } else {
+                o->actor->resume_motion = o->motion;
+                o->actor->resume_phase = o->phase + 1;
+                o->motion = STRIKE_MOTION_REEL;
+                BtlSePlay(STRIKE_VOICE, 0);
+            }
+            o->phase = 0xFF;
+            break;
+        default:
+            if ((g_btl_actors[g_btl_hit_slot].flags & BTL_ACTOR_FLINCHED) != 0) {
+                damage /= 2;
+            }
+            pos[0] = (g_btl_actors[g_btl_hit_slot].obj->col2 * SWING_X_STEP
+                      + SWING_X_BASE) << 16;
+            pos[1] = (g_btl_actors[g_btl_hit_slot].obj->row * SWING_Y_STEP
+                      + SWING_Y_BASE) << 16;
+            if (g_btl_hit_slot < BTL_PARTY) {
+                pos[1] += STRIKE_MEMBER_DROP;
+            }
+            pos[2] = 0;
+            o->child = BtlSpawnStrike(0, model, pos);
+            o->child->z -= STRIKE_LIFT;
+            g_btl_actors[g_btl_hit_slot].hit_amount = damage;
+            g_btl_actors[g_btl_hit_slot].c.hp -= damage;
+            a->damage_dealt += damage;
+            if (g_btl_hit_slot >= BTL_PARTY) {
+                BtlOfferScoreEnemy(g_btl_hit_slot - BTL_PARTY, damage);
+            }
+            if (damage != 0) {
+                if (crit != 0) {
+                    BtlSePlay(STRIKE_SE_SLOT, STRIKE_SE_CRITICAL);
+                }
+                if (g_btl_debug_flags[1] != 0 && g_btl_hit_slot < BTL_PARTY
+                    && g_btl_actors[g_btl_hit_slot].c.hp <= 0) {
+                    g_btl_actors[g_btl_hit_slot].c.hp = 1;
+                }
+                if (g_btl_actors[g_btl_hit_slot].c.hp <= 0) {
+                    a->damage_dealt += g_btl_actors[g_btl_hit_slot].c.hp;
+                    g_btl_actors[g_btl_hit_slot].c.hp = 0;
+                    g_btl_actors[g_btl_hit_slot].obj->motion = STRIKE_MOTION_DOWN;
+                    BtlSePlay(STRIKE_VOICE, 1);
+                    BtlRollDefeatDrop(a, t);
+                } else {
+                    g_btl_actors[g_btl_hit_slot].obj->motion = STRIKE_MOTION_HURT;
+                    BtlSePlay(STRIKE_VOICE, 0);
+                    if (a->script_pick == 2) {
+                        if (g_item_defs[a->c.equip[2]].ailment != 0
+                            && (rand() & 7) == 0) {
+                            BtlInflictStatus(&g_btl_actors[g_btl_hit_slot],
+                                             g_item_defs[a->c.equip[2]].ailment);
+                        }
+                    } else if (g_item_defs[a->c.equip[0]].ailment != 0
+                               && (rand() & 7) == 0) {
+                        BtlInflictStatus(&g_btl_actors[g_btl_hit_slot],
+                                         g_item_defs[a->c.equip[0]].ailment);
+                    }
+                    if (crit != 0 && damage >= t->c.hp_max / 4
+                        && rand() % 3 == 0) {
+                        BtlInflictStatus(t, STATUS_TERROR);
+                    }
+                }
+                g_btl_actors[g_btl_hit_slot].obj->phase = 0;
+            } else {
+                o->timer = STRIKE_HOLD;
+            }
+            break;
+        }
+    } else {
+        BtlSePlay(STRIKE_SE_SLOT, STRIKE_SE_MISS);
+        pos[0] = g_btl_actors[g_btl_hit_slot].obj->x;
+        pos[1] = g_btl_actors[g_btl_hit_slot].obj->y;
+        pos[2] = -STRIKE_LIFT;
+        o->child = BtlSpawnStrike(0, model, pos);
+        g_btl_actors[g_btl_hit_slot].obj->motion = STRIKE_MOTION_MISS;
+        o->timer = STRIKE_HOLD;
+        pos[2] = (g_btl_models[g_btl_actors[g_btl_hit_slot].obj->kind].number_z
+                  << 16)
+                 + g_btl_actors[g_btl_hit_slot].obj->z;
+        miss = BtlSpawnMiss(pos);
+        miss->mark_num = 0xFF;
+        for (p = g_btl_obj_pool; p != 0; p = p->next) {
+            if (p->kind == MARK_KIND_STILL && p->mark_num == o->mark_num) {
+                BtlObjMoveBefore(p, miss);
+                break;
+            }
+        }
+        miss->mark_num = o->mark_num;
+    }
+    o->phase++;
+}
 
 /* The ailments that stop a cast before it starts. None of them is named
    anywhere else in the tree, so they are spelt by their codes: 0x0C once it
