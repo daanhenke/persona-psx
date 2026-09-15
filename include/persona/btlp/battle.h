@@ -314,6 +314,9 @@ extern void BtlFaceClose(void);
 extern void BtlPanelClose(void);
 extern void BtlEnemiesReset(void);
 extern void BtlIndicatorClear(void);
+/* One frame of whichever form it is in, which the panel's own draw opens
+   with. indicator.c. */
+extern void BtlDrawIndicator(void);
 extern void BtlEndTalking(void);
 extern void BtlSeqClear(void);
 extern void BtlBoxClose(void);

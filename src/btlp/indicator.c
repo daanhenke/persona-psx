@@ -17,6 +17,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/hud.h>
 
 #define BTL_INDICATOR_OFF  0
 #define BTL_INDICATOR_BAR  1
@@ -53,8 +54,6 @@ extern u_short g_btl_indicator_phase;
 
 extern short  g_btl_indicator_cells[];
 extern short  g_btl_indicator_ramp[];
-extern u_short g_btl_hud_x;
-extern u_short g_btl_hud_y;
 extern char  *g_btl_prim_next;
 extern u_long g_btl_ot[][3];
 extern int    g_btl_ot_index;
@@ -120,11 +119,11 @@ void BtlDrawIndicator(void)
         SetShadeTex(&sprt, 1);
         sprt.v0 = BTL_ICON_V;
         sprt.w  = BTL_ICON_W;
-        x       = g_btl_hud_x;
+        x       = (u_short)g_btl_hud.x;
         sprt.x0 = x + BTL_ICON_DX;
         sprt.h  = BTL_ICON_H;
         u       = (g_btl_indicator_phase & BTL_ICON_BLINK) + BTL_ICON_U;
-        sprt.y0 = g_btl_hud_y + BTL_ICON_DY;
+        sprt.y0 = (u_short)g_btl_hud.y + BTL_ICON_DY;
         sprt.u0 = u;
         sprt.clut = GetClut(0, BTL_ICON_CLUT);
         SetDrawMode(&mode, 0, 0,

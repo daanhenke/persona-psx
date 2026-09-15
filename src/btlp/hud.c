@@ -13,8 +13,7 @@
  */
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
-
-#define BTL_HUD_DRAWN 0x8000
+#include <persona/btlp/hud.h>
 
 #define BTL_HUD_SETTLED 0
 #define BTL_HUD_ZOOM_IN 1
@@ -24,16 +23,6 @@
 /* How long the panel sits at full size before the phase settles. */
 #define BTL_HUD_HOLD_FRAMES 15
 
-/* Full size, in the twelve-fraction-bit fixed point the rest of the overlay
-   scales with. */
-#define BTL_HUD_FULL 0x1000
-
-extern short  g_btl_hud_flags;
-extern u_char g_btl_hud_state;
-extern int    g_btl_hud_scale;
-extern int    g_btl_hud_scale_y;
-extern int    g_btl_hud_scale_z;
-extern u_char g_btl_hud_hold;
 
 void BtlHudShow(void)
 {

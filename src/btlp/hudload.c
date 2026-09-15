@@ -15,6 +15,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/text.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/hud.h>
 
 /* Where each image is expanded to. */
 #define HUD_STAGE   ((u_char *)0x80140000)
@@ -36,18 +37,6 @@ extern const u_char *g_btl_hud_packed;
 extern const u_char *g_btl_frame_packed;
 extern const u_char  g_btl_extra_packed[];
 
-extern short  g_btl_hud_x;
-extern short  g_btl_hud_y;
-extern int    g_btl_hud_tx;
-extern int    g_btl_hud_ty;
-extern int    g_btl_hud_tz;
-extern short  g_btl_hud_rx;
-extern short  g_btl_hud_ry;
-extern short  g_btl_hud_rz;
-extern int    g_btl_hud_scale;
-extern int    g_btl_hud_scale_y;
-extern int    g_btl_hud_scale_z;
-extern u_char g_btl_hud_state;
 
 void BtlHudLoad(void)
 {
@@ -64,16 +53,16 @@ void BtlHudLoad(void)
     BtlQueueVramLoad(EXTRA_STAGE + 0x200, 0x350, 0x180, 0x20, 0x18);
     BtlQueueVramLoad(EXTRA_STAGE, 0, 499, 0x100, 1);
 
-    g_btl_hud_x = HUD_HOME_X;
+    g_btl_hud.x = HUD_HOME_X;
     g_btl_hud_state = 0;
-    g_btl_hud_y = HUD_HOME_Y;
+    g_btl_hud.y = HUD_HOME_Y;
     if (g_btl_hud_scale == 0) {
-        g_btl_hud_rx = 0;
-        g_btl_hud_ry = 0;
-        g_btl_hud_rz = 0;
-        g_btl_hud_tx = 0;
-        g_btl_hud_ty = 0;
-        g_btl_hud_tz = HUD_HOME_Z;
+        g_btl_hud.rot.vx = 0;
+        g_btl_hud.rot.vy = 0;
+        g_btl_hud.rot.vz = 0;
+        g_btl_hud.trans.vx = 0;
+        g_btl_hud.trans.vy = 0;
+        g_btl_hud.trans.vz = HUD_HOME_Z;
         g_btl_hud_scale = 0;
         g_btl_hud_scale_y = 0;
         g_btl_hud_scale_z = 0;
