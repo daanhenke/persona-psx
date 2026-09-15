@@ -31,7 +31,6 @@
    singled out and pulsing, and otherwise coloured by its member. */
 #define MARKER_FRAME_BIT 0x800000
 #define MARKER_WHITE     0x2000000
-#define MARKER_SINGLED   0x1000000
 
 #define MARKER_WHITE_RGB 0xFF
 #define MARKER_LIT       0x80
@@ -80,7 +79,7 @@ void BtlTickMarker(BtlObj *o)
             o->rgb_to[1] = MARKER_WHITE_RGB;
             o->rgb_to[2] = MARKER_WHITE_RGB;
             o->fade = MARKER_FADE;
-        } else if ((o->attr & MARKER_SINGLED) != 0) {
+        } else if ((o->attr & BTL_MARK_CHOSEN) != 0) {
             BtlPulsePicked(o);
         } else {
             if (g_btl_actors[o->mark_num].c.key != 0

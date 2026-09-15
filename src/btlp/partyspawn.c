@@ -154,8 +154,8 @@ void BtlSpawnParty(void)
                 a->unkD3 = 0;
                 a->unkD4 = 0;
                 a->counter = 0;
-                a->unkDC = 0;
-                a->unkDB = 0;
+                a->revive_mark = 0;
+                a->revive_slot = 0;
                 a->unkDF = 0;
                 *(int *)&a->pad6C[0] = 0;
                 a->marker = 0;

@@ -28,9 +28,7 @@
 #include <persona/btlp/status.h>
 #include <persona/btlp/text.h>
 
-/* What the chosen member's marker is lit with, the name slot of the line,
-   and where the line goes. */
-#define MARK_CHOSEN  0x1000000
+/* The name slot of the line, and where the line goes. */
 #define PLACE_INSERT 4
 #define PLACE_LINE_X 0x10
 #define PLACE_LINE_Y 0x10
@@ -79,12 +77,12 @@ void BtlPlaceFallen(void)
                 BtlSetInsert(PLACE_INSERT, a->c.name);
                 BtlOpenMessage(0, 0, g_btl_place_line, PLACE_LINE_X,
                                PLACE_LINE_Y);
-                g_btl_marker_obj[i]->attr |= MARK_CHOSEN;
+                g_btl_marker_obj[i]->attr |= BTL_MARK_CHOSEN;
                 g_btl_place_member = i;
                 while (BtlPlaceFallenStep() < 0) {
                     BtlDrawFrame();
                 }
-                g_btl_marker_obj[i]->attr &= ~MARK_CHOSEN;
+                g_btl_marker_obj[i]->attr &= ~BTL_MARK_CHOSEN;
                 BtlPartyResetGfx();
             }
         }

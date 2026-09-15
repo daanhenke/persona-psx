@@ -600,7 +600,6 @@ extern u_char   D_800E49BF;
 extern BtlObj *g_btl_persona_obj;
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 extern int     BtlActorSlotByKey(int key);
-extern void    func_800A6D3C(BtlActor *a, int move);
 
 /* The cast: what a member's turn runs through when the move is a spell and
  * the Persona has to come out to make it.
@@ -648,7 +647,7 @@ void BtlMemberMotion06(BtlObj *o)
             break;
         }
         g_btl_hit_slot = a->order;
-        func_800A6D3C(a, a->move);
+        BtlAimMemberMove(a, a->move);
         if (o->phase == 0xA) {
             return;
         }

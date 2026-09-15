@@ -2515,3 +2515,71 @@ The store still reads the slot again, as the image does, but the test is now in
 Tested in place the byte comes out in `v0`.
 
 - [commands.c](/src/btlp/commands.c) - `BtlCommandCast`, 99.99% to exact.
+
+## Which variable takes the first saved register is a priority sum
+
+When two variables have each other's saved registers across a whole routine,
+count their references. gcc's global allocator hands registers out in order of
+`floor_log2(refs) * refs / live_length`, and the `.lreg` dump prints both
+numbers as `Register N used X times across Y insns`; `crosses N calls` tells
+you it wants a saved register at all. In `BtlPickMoveTarget` the pick's answer
+scored 50000 (46 references over 46 insns) and the loop counter 30622 (123
+over 241), so the answer went first and took s0; the counter never conflicted
+with it and took s0 as well, and the `-2` the first pick loop hoists landed in
+s1. The image has the counter in s0, the answer in s1 and that `-2` in s0.
+
+Two changes put it in that order. The placement step's answer kept in the same
+variable as every other pick, so it is live across the counter's frame wait
+and the two conflict; and the loops with long bodies - the reach tint, both
+side walks, the area walk - counted with a second variable, which leaves `i`
+with the short sweeps and waits and a priority above the answer's:
+
+    for (j = 0; j < BTL_ENEMIES; j++) { /* the reach tint */ }
+    ...
+    for (i = 0; i < PLACE_HIDE_FRAMES; i++) {
+        BtlDrawFrame();
+    }
+
+A separate local for the placement answer halved the register rows and still
+lost; 5000 permuter iterations found only a symptom of the same sum (copying
+the move into the answer to lengthen its life).
+
+- [pickmove.c](/src/btlp/pickmove.c) - `BtlPickMoveTarget`, 99.35% to 99.98%.
+
+## A switch makes its compare constants after its bodies
+
+Two constants a loop hoists with the same priority go to the lower pseudo
+number, which is the order they were expanded in. A switch expands its bodies
+first and the compare tree after them, so a case that sets a flag gets its `1`
+ahead of the `-1` and `-2` the tree compares with; written as `if`s the tests
+come first and the two registers swap. The layout then wants the `-1` case
+first - the tree's last test inverts into a `bne` that falls into its body -
+and a `case BTL_PICK_WAIT` that does nothing, which is what emits the
+`slti pick, -1` bound check between the two equality tests:
+
+    switch (pick) {
+    case BTL_PICK_WAIT:
+        break;
+    case -1:
+        return -1;
+    case -2:
+        g_btl_pick_abort = 1;
+        return -2;
+    }
+    BtlDrawFrame();
+
+- [pickmove.c](/src/btlp/pickmove.c) - the enemy pick in `BtlPickMoveTarget`,
+  99.98% to exact.
+
+## Constants a revival writes last come out in the order they are read
+
+    g_btl_actors[g_btl_target_slot].unkDC = FALLEN_STOOD;
+    a->unkDB = g_btl_target_slot;
+    a->unkDC = FALLEN_CARRIED;
+
+loads the slot byte ahead of the `-1` and leaves the `unkDB` store for the
+jump's delay slot, as the image has them. With the two stores the other way
+round the load follows the `-1` into the same register.
+
+- [pickmove.c](/src/btlp/pickmove.c) - `BtlPickMoveTarget`'s revival, 99.19%
+  to 99.35%.

@@ -41,9 +41,6 @@
 #define EDIT_ENEMIES 9
 #define EDIT_TURNS   2
 
-/* What the chosen member's marker is lit with. */
-#define MARK_CHOSEN 0x1000000
-
 /* The marker brought up to date with the record's ailment. */
 #define EDIT_SHOW_MARK(a)                                                     \
     BtlObjSetScript((a)->obj->mark,                                           \
@@ -110,7 +107,7 @@ int BtlDebugMemberAilment(void)
             if (g_btl_pad1_edge & g_btl_key_confirm) {
                 a->ail_turns = EDIT_TURNS;
                 BtlSePlay(1, 1);
-                g_btl_marker_obj[slot]->attr &= ~MARK_CHOSEN;
+                g_btl_marker_obj[slot]->attr &= ~BTL_MARK_CHOSEN;
                 BtlPartyResetGfx();
                 BtlShowAilmentMarks(1);
                 g_btl_step--;

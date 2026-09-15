@@ -189,9 +189,15 @@ typedef struct BtlActor {
                                       as the turn ends, and is cleared there  */
     /* 0xD9 */ u_char  place_col;  /* the cell a member was put on in the */
     /* 0xDA */ u_char  place_row;  /* placement menu, and fell on         */
-    /* 0xDB */ u_char  unkDB;      /* both cleared for every member once a
-                                      negotiation is over                  */
-    /* 0xDC */ u_char  unkDC;
+    /* 0xDB */ u_char  revive_slot; /* the fallen member a revival this
+                                       fighter carries is for; cleared with
+                                       revive_mark for every member once a
+                                       negotiation is over                 */
+    /* 0xDC */ signed char revive_mark;
+                                   /* BTL_REVIVE_STOOD on a fallen member who
+                                      can be raised where they stood, and
+                                      BTL_REVIVE_CARRIED on the fighter whose
+                                      revival is aimed at them            */
     /* 0xDD */ u_char  pick_saved; /* where BtlAilmentTurnMad puts the
                                      pickable list aside while it tries a
                                      shape on one candidate after another,
@@ -331,6 +337,11 @@ extern u_char g_btl_counter_order;
    given. */
 #define BTL_MARKER_UP    3
 #define BTL_MARKER_MOVED 2
+
+/* BtlActor.revive_mark: on a fallen member a revival can raise where they
+   stood, and on the member carrying that revival. */
+#define BTL_REVIVE_STOOD   1
+#define BTL_REVIVE_CARRIED (-1)
 
 /* Three flags of the fighter's own. The first is turned over into the second
    the moment the scripted turn is handed out, and the third is the same trade

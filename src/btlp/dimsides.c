@@ -5,7 +5,7 @@
  *
  * BtlSingleOutMember puts one member in front of the rest of the party. Every
  * other live member has its palettes put back from the base copy and is sent
- * dark with its marker, and its marker frame loses MARKER_SINGLED; the member
+ * dark with its marker, and its marker frame loses BTL_MARK_CHOSEN; the member
  * singled out is put on motion 10, lit at once with its marker, and its frame
  * gains the bit.
  *
@@ -44,7 +44,6 @@
 #define SINGLE_LIT      0x80
 #define SINGLE_LIT_FADE 0xFF
 #define SINGLE_DIM_FADE 4
-#define MARKER_SINGLED  0x1000000
 
 /* How dark a fighter in the background is drawn, and how fast it gets
    there. */
@@ -121,7 +120,7 @@ void BtlSingleOutMember(int slot)
                 o->mark->rgb_to[0] = DIM_LEVEL;
                 o->mark->rgb_to[1] = DIM_LEVEL;
                 o->mark->rgb_to[2] = DIM_LEVEL;
-                g_btl_marker_obj[i]->attr &= ~MARKER_SINGLED;
+                g_btl_marker_obj[i]->attr &= ~BTL_MARK_CHOSEN;
             } else {
                 o->motion = SINGLE_MOTION;
                 o->fade = SINGLE_LIT_FADE;
@@ -133,7 +132,7 @@ void BtlSingleOutMember(int slot)
                 o->mark->rgb_to[0] = SINGLE_LIT;
                 o->mark->rgb_to[1] = SINGLE_LIT;
                 o->mark->rgb_to[2] = SINGLE_LIT;
-                g_btl_marker_obj[i]->attr |= MARKER_SINGLED;
+                g_btl_marker_obj[i]->attr |= BTL_MARK_CHOSEN;
             }
         }
     }

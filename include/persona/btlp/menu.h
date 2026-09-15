@@ -131,6 +131,7 @@ extern const u_char g_btl_msg_cast_sealed[];
 extern const u_char g_btl_msg_persona_alone[];
 extern const u_char g_btl_msg_persona_held[];
 extern const u_char g_btl_msg_spell_untamed[];
+extern const u_char g_btl_msg_none_down[];
 
 /* One frame of each page of the Persona board, and the row its spell page is
    on. personamenu.c. */

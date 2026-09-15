@@ -15,9 +15,6 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 
-/* What unkDC holds on a member who is down where it stood. */
-#define FALLEN_STOOD 1
-
 /* 90.97%: every test is the image's but the one above the cell, whose return
    the image lays out in line - a beq on to the test below, then the jump to
    the return - where gcc here shares it with the two before. The last test
@@ -64,7 +61,7 @@ int BtlFormationCellFreeOfFallen(short col, short row)
     a = g_btl_actors;
     for (i = 0; i < BTL_PARTY; i++, a++) {
         if (a->c.key != 0 && (signed char)a->c.status == BTL_STATUS_DOWN
-            && (signed char)a->unkDC == FALLEN_STOOD) {
+            && a->revive_mark == BTL_REVIVE_STOOD) {
             g_btl_formation_fallen.cell[a->place_row * GRID_W + a->place_col] =
                 i;
         }

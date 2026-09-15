@@ -4,7 +4,7 @@
  * The same pass BtlRefreshPickCursors makes, with one more answer. A member
  * who is there, is not down and is not out gets their cursor put on their
  * object's grid square at full brightness. A member who fails that is looked
- * at again: one who is there, is down, and carries unkDC still gets a cursor,
+ * at again: one who is there, is down, and carries a revive mark still gets a cursor,
  * on the same square but at half brightness - that is the fallen member a
  * revival can still be aimed at. Anyone else has no cursor shown.
  *
@@ -14,6 +14,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
+#include <persona/btlp/pick.h>
 
 #define BTL_PICK_CURSORS 5
 
@@ -25,8 +26,6 @@
 /* Where a cursor sits for a given grid square. */
 #define PICK_CURSOR_X(col2) ((((col2) >> 1) * 0x10) + 0xE8)
 #define PICK_CURSOR_Y(row)  (((row) * 8) + 0x78)
-
-extern BtlObj *g_btl_pick_cursors[];
 
 void BtlPlacePickCursors(void)
 {
@@ -48,7 +47,7 @@ void BtlPlacePickCursors(void)
             g_btl_pick_cursors[i]->rgb_to[2] = PICK_CURSOR_LIVE;
         } else if (a->c.key != 0
                    && (signed char)a->c.status == BTL_STATUS_DOWN
-                   && (signed char)a->unkDC != 0) {
+                   && a->revive_mark != 0) {
             g_btl_pick_cursors[i]->x = PICK_CURSOR_X(a->obj->col2) << 16;
             g_btl_pick_cursors[i]->y = PICK_CURSOR_Y(a->obj->row) << 16;
             g_btl_pick_cursors[i]->attr &= ~BTL_OBJ_HIDDEN;

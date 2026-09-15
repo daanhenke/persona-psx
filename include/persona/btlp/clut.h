@@ -17,6 +17,11 @@
 #define BTL_CLUT_ENTRIES 0x100
 #define BTL_CLUT_BYTES   0x200
 
+/* One palette whole, as bytes, for a copy made by assignment. */
+typedef struct {
+    u_char b[BTL_CLUT_BYTES];
+} BtlClutBlock;
+
 /* Each fighter's palette as it is drawn, as it is walking toward, and as it
    was loaded, one block of BTL_CLUT_ENTRIES colours to a slot - the party's
    from g_btl_actor_clut and the enemies' from g_btl_enemy_clut. */

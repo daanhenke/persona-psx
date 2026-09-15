@@ -74,4 +74,21 @@ extern int BtlPickTargetParty(struct BtlActor *a);
 extern int BtlPickTargetEnemies(struct BtlActor *a);
 extern int BtlPickMoveTarget(struct BtlActor *a, int move);
 
+/* How the fighters a pick can reach are drawn: lit and set moving on
+   BTL_TARGET_MOTION - the one under the cursor on the motion after it - and the
+   rest dimmed to BTL_TARGET_DIM, walking there at BTL_TARGET_FADE. */
+#define BTL_TARGET_LIT           0x80
+#define BTL_TARGET_MOTION        10
+#define BTL_TARGET_MOTION_CURSOR 11
+#define BTL_TARGET_DIM           0x20
+#define BTL_TARGET_FADE          8
+
+/* The fallen-member picker a revival runs, the abort the move pick leaves for
+   the command that ran it, and the party's pick cursors stood on their
+   members' squares. pickdown.c, pickmove.c and pickplace.c. */
+extern int     BtlPickDownMember(short *slot);
+extern int     g_btl_pick_abort;
+extern BtlObj *g_btl_pick_cursors[];
+extern void    BtlPlacePickCursors(void);
+
 #endif

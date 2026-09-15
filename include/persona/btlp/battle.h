@@ -211,6 +211,9 @@ extern void BtlHudShow(void);
 
 /* One marker object per party slot, plus the shared one past them. */
 extern BtlObj *g_btl_marker_obj[];
+/* Set on a member's marker to light it: the member a pick is aimed at, or the
+   one singled out from the rest of the party. */
+#define BTL_MARK_CHOSEN 0x1000000
 /* The marker still moving over each member, NULL once it has come to rest. */
 extern BtlObj *g_btl_marker_shown[];
 

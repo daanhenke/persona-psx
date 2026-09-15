@@ -39,13 +39,6 @@
 #define SWING_AIM_SIDE    4
 #define SWING_AIM_WEAKEST 8
 
-/* What the enemies the swing reaches are drawn at, and what the rest are
-   dimmed to. */
-#define TARGET_MOTION 10
-#define TARGET_DIM    0x20
-#define TARGET_FADE   8
-#define TARGET_LIT    0x80
-
 /* More hp than any enemy has, to start the search for the weakest from. */
 #define TARGET_HP_MAX 99999
 
@@ -120,15 +113,15 @@ int BtlCommandAttack(void)
                 for (i = 0; i < BTL_ENEMIES; i++) {
                     if (g_btl_combatants[i].c.key != 0) {
                         if (g_btl_combatants[i].pickable != 0) {
-                            g_btl_combatants[i].obj->motion = TARGET_MOTION;
+                            g_btl_combatants[i].obj->motion = BTL_TARGET_MOTION;
                             BtlTintActorClut(i + BTL_PARTY, g_btl_tint_pick_r[0],
                                              g_btl_tint_pick_r[1],
                                              g_btl_tint_pick_r[2]);
                         } else {
-                            g_btl_combatants[i].obj->rgb_to[0] = TARGET_DIM;
-                            g_btl_combatants[i].obj->rgb_to[1] = TARGET_DIM;
-                            g_btl_combatants[i].obj->rgb_to[2] = TARGET_DIM;
-                            g_btl_combatants[i].obj->fade = TARGET_FADE;
+                            g_btl_combatants[i].obj->rgb_to[0] = BTL_TARGET_DIM;
+                            g_btl_combatants[i].obj->rgb_to[1] = BTL_TARGET_DIM;
+                            g_btl_combatants[i].obj->rgb_to[2] = BTL_TARGET_DIM;
+                            g_btl_combatants[i].obj->fade = BTL_TARGET_FADE;
                         }
                     }
                 }
@@ -139,10 +132,10 @@ int BtlCommandAttack(void)
                 least = TARGET_HP_MAX;
                 for (; i < BTL_ENEMIES; i++) {
                     if (g_btl_combatants[i].c.key != 0) {
-                        g_btl_combatants[i].obj->rgb_to[0] = TARGET_DIM;
-                        g_btl_combatants[i].obj->rgb_to[1] = TARGET_DIM;
-                        g_btl_combatants[i].obj->rgb_to[2] = TARGET_DIM;
-                        g_btl_combatants[i].obj->fade = TARGET_FADE;
+                        g_btl_combatants[i].obj->rgb_to[0] = BTL_TARGET_DIM;
+                        g_btl_combatants[i].obj->rgb_to[1] = BTL_TARGET_DIM;
+                        g_btl_combatants[i].obj->rgb_to[2] = BTL_TARGET_DIM;
+                        g_btl_combatants[i].obj->fade = BTL_TARGET_FADE;
                         if (g_btl_combatants[i].pickable != 0) {
                             g_btl_combatants[i].pickable = 0;
                             if ((u_int)g_btl_combatants[i].c.hp < least) {
@@ -155,11 +148,11 @@ int BtlCommandAttack(void)
                 BtlTintActorClut(g_btl_enemy_slot + BTL_PARTY,
                                  g_btl_tint_pick_r[0], g_btl_tint_pick_r[1],
                                  g_btl_tint_pick_r[2]);
-                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[0] = TARGET_LIT;
-                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[1] = TARGET_LIT;
-                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[2] = TARGET_LIT;
+                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[0] = BTL_TARGET_LIT;
+                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[1] = BTL_TARGET_LIT;
+                g_btl_combatants[g_btl_enemy_slot].obj->rgb_to[2] = BTL_TARGET_LIT;
                 g_btl_combatants[g_btl_enemy_slot].obj->fade = 0xFF;
-                g_btl_combatants[g_btl_enemy_slot].obj->motion = TARGET_MOTION;
+                g_btl_combatants[g_btl_enemy_slot].obj->motion = BTL_TARGET_MOTION;
                 g_btl_combatants[g_btl_enemy_slot].pickable = 1;
                 g_btl_step = 3;
                 break;

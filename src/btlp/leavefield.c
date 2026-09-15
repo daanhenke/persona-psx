@@ -43,12 +43,9 @@
 /* Cells of the enemies' grid to a row. */
 #define ENEMY_GRID_W 9
 
-/* One actor's palette, as the copy moves it. */
-typedef struct {
-    u_char b[0x200];
-} BtlClutBlock;
-
-#define ACTOR_CLUT(base, slot) ((BtlClutBlock *)((u_char *)(base) + (slot) * 0x200))
+/* One actor's palette in one of the tables, as the copy moves it. */
+#define ACTOR_CLUT(base, slot) \
+    ((BtlClutBlock *)((u_char *)(base) + (slot) * BTL_CLUT_BYTES))
 
 void BtlMemberMotion0E(BtlObj *o)
 {

@@ -39,14 +39,6 @@
 #include <persona/btlp/text.h>
 #include <persona/btlp/clut.h>
 
-/* Set on the marker of whoever is being aimed at, and cleared off the rest. */
-#define MARK_CHOSEN 0x1000000
-
-/* How bright everything is drawn while a target is being chosen, and the
-   motion a member is put on once they are one. */
-#define TARGET_LIT    0x80
-#define TARGET_MOTION 10
-
 /* Where the held line goes. */
 #define HOLD_X 0x10
 #define HOLD_Y 0x94
@@ -85,10 +77,10 @@ int BtlPickTargetMember(BtlActor *a)
     sweep:
         i = 0;
         do {
-            g_btl_marker_obj[i]->attr &= ~MARK_CHOSEN;
+            g_btl_marker_obj[i]->attr &= ~BTL_MARK_CHOSEN;
             i++;
         } while (i < BTL_PARTY);
-        g_btl_marker_obj[g_btl_target_slot]->attr |= MARK_CHOSEN;
+        g_btl_marker_obj[g_btl_target_slot]->attr |= BTL_MARK_CHOSEN;
         BtlDrawFrame();
     }
 
@@ -113,18 +105,18 @@ int BtlPickTargetParty(BtlActor *a)
     marks = g_btl_marker_obj;
     tint = g_btl_tint_pick_r;
     do {
-        marks[i]->attr &= ~(MARK_CHOSEN | BTL_OBJ_PICKED);
-        marks[i]->rgb[0] = TARGET_LIT;
-        marks[i]->rgb[1] = TARGET_LIT;
-        marks[i]->rgb[2] = TARGET_LIT;
+        marks[i]->attr &= ~(BTL_MARK_CHOSEN | BTL_OBJ_PICKED);
+        marks[i]->rgb[0] = BTL_TARGET_LIT;
+        marks[i]->rgb[1] = BTL_TARGET_LIT;
+        marks[i]->rgb[2] = BTL_TARGET_LIT;
         if (g_btl_actors[i].pickable != 0) {
             g_btl_actors[i].obj->attr &= ~BTL_OBJ_PICKED;
-            g_btl_actors[i].obj->rgb[0] = TARGET_LIT;
-            g_btl_actors[i].obj->rgb[1] = TARGET_LIT;
-            g_btl_actors[i].obj->rgb[2] = TARGET_LIT;
-            g_btl_actors[i].obj->motion = TARGET_MOTION;
+            g_btl_actors[i].obj->rgb[0] = BTL_TARGET_LIT;
+            g_btl_actors[i].obj->rgb[1] = BTL_TARGET_LIT;
+            g_btl_actors[i].obj->rgb[2] = BTL_TARGET_LIT;
+            g_btl_actors[i].obj->motion = BTL_TARGET_MOTION;
             BtlTintActorClut(i, tint[0], tint[1], tint[2]);
-            marks[i]->attr |= MARK_CHOSEN;
+            marks[i]->attr |= BTL_MARK_CHOSEN;
         }
         i++;
         /* Taken again at the bottom of every turn: assigned only before the
@@ -171,7 +163,7 @@ int BtlPickTargetEnemies(BtlActor *a)
     /* The counter first, then the motion and the colours: all three are set
        up ahead of the loop and the image has them in that order. */
     i = 0;
-    motion = TARGET_MOTION;
+    motion = BTL_TARGET_MOTION;
     tint = g_btl_tint_pick_r;
     do {
         if (g_btl_combatants[i].pickable != 0) {

@@ -694,7 +694,7 @@ void BtlStageRound(void)
                                               [member * MEMBER_SCRIPT_MODEL];
                                 if (g_btl_act_kind == 0) {
                                     g_btl_marker_obj[g_btl_actor_turn]->attr
-                                        |= 0x1000000;
+                                        |= BTL_MARK_CHOSEN;
                                     if ((signed char)actor->c.status != 0) {
                                         obj->mark->attr &= ~BTL_OBJ_HIDDEN;
                                     }
@@ -974,7 +974,7 @@ void BtlStageRound(void)
 
                 slot = g_btl_actor_turn;
                 if (slot < BTL_PARTY) {
-                    g_btl_marker_obj[slot]->attr &= ~0x1000000;
+                    g_btl_marker_obj[slot]->attr &= ~BTL_MARK_CHOSEN;
                     if (actor->marker != 0 && (actor->flags & 0x2000) == 0
                         && g_btl_act_kind == 0 && actor->unkD8 == 0) {
                         BtlShowMarker(slot, 0, actor->c.unk5D & 0xF);
@@ -1359,8 +1359,8 @@ void BtlStageRound(void)
                 g_btl_boss22_shown = 0;
                 g_btl_boss20_shown = 0;
                 do {
-                    g_btl_actors[i].unkDC = 0;
-                    g_btl_actors[i].unkDB = 0;
+                    g_btl_actors[i].revive_mark = 0;
+                    g_btl_actors[i].revive_slot = 0;
                     i++;
                 } while (i < BTL_PARTY);
                 BtlCountDownRound();

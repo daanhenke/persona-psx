@@ -124,7 +124,11 @@ segments:
       # the word behind the last belonging to nobody.
       - [0xFBC, .rodata, commands]
       - [0x1000, pad, btlp_pad_1000]
-      - [0x1004, rodata, btlp_rodata6b_a]
+      # BtlPickMoveTarget's and BtlAimMemberMove's switch tables, which
+      # pickmove.c emits itself - the word of padding behind the first inside
+      # the unit.
+      - [0x1004, .rodata, pickmove]
+      - [0x1100, rodata, btlp_rodata6b_b]
       # BtlMemberMotion06's and BtlMemberMotion05's switch tables, which
       # memberact.c emits itself. The table in front of them belongs to the
       # same unit and joins this segment when its routine comes out of asm.
@@ -488,7 +492,9 @@ segments:
       - [0x40798, c, placecursor]
       # The two menus whose cursor walks a table of neighbours.
       - [0x40B48, c, menunav]
-      - [0x41534, asm, btlp_63_x1]
+      # Aiming a member's move: the pick the commands hand it to, and the aim
+      # made again as the turn comes.
+      - [0x41534, c, pickmove]
       # Putting the fallen back on the field.
       - [0x42FBC, c, placefallen]
       # One frame of moving a member in the placement menu.

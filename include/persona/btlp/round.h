@@ -328,6 +328,10 @@ extern short   g_btl_hit_walk;
 extern u_short g_btl_hit_mask;
 extern short   g_btl_hit_slot;
 
+/* A member's move aimed again, at g_btl_hit_slot, as the turn plays it out.
+   pickmove.c. */
+extern void BtlAimMemberMove(BtlActor *a, int move);
+
 /* How many times a swing lands, rolled from the weapon's or the move's hit
    rating. hitroll.c. */
 extern int BtlRollHits(int hits);
