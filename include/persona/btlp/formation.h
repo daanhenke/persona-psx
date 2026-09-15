@@ -126,4 +126,27 @@ extern int BtlPlaceMoveStep(struct BtlActor *a);
 extern void BtlPlaceFallen(void);
 extern int  BtlPlaceFallenStep(void);
 
+/* The placement menu, and the frame of its grid cursor it runs - choosing a
+   member to pick up, or carrying one. The cursor answers 0 as a member is
+   picked up or put down, -1 on a cancel, -2 once the player is done moving
+   and BTL_PICK_WAIT otherwise. placemenu.c, and the cursor in asm. */
+extern int BtlPlaceMenu(void);
+extern int BtlPlaceGridUpdate(int carrying);
+
+/* Raised by the third key anywhere in the placement menu: every step it
+   passes through on the way back takes it as its own abort. */
+extern int g_btl_place_abort;
+
+/* The placement menu's lines: nobody left who can move, a stored layout
+   refused while a member is down or has already moved, whether the new
+   formation is kept, and whether a stored layout is written over. */
+extern const u_char g_btl_msg_nobody_to_move[];
+extern const u_char g_btl_msg_place_blocked[];
+extern const u_char g_btl_msg_keep_formation[];
+extern const u_char g_btl_msg_overwrite_layout[];
+
+/* The board the stored layouts are chosen on. formationboard.c. */
+extern void BtlOpenFormationBoard(void);
+extern void BtlCloseFormationBoard(void);
+
 #endif

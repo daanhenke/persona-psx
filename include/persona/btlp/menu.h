@@ -58,6 +58,9 @@ extern BtlGfxCell g_btl_menu_cursor[];
    -1 on a cancel and BTL_PICK_WAIT otherwise. menunav.c. */
 extern int BtlDebugUpdate(void);
 extern int BtlPresetMenuUpdate(int on_field);
+/* The stored layout the second menu's cursor is on; PRESET_LIVE is the live
+   grid. */
+extern short g_btl_preset_row;
 /* The orders menu's picker, which answers -1 for either way out, and the
    tactics page, which answers 0 on a cancel and -2 on the abort key. */
 extern int BtlOrdersMenuUpdate(void);

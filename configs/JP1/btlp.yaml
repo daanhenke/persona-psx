@@ -128,7 +128,9 @@ segments:
       # the word of padding behind it that belongs to nobody.
       - [0xF5C, .rodata, commandmenu]
       - [0xF80, pad, btlp_pad_f80]
-      - [0xF84, rodata, btlp_rodata6b_a]
+      # BtlPlaceMenu's switch table, which placemenu.c emits itself.
+      - [0xF84, .rodata, placemenu]
+      - [0xFA4, rodata, btlp_rodata6b_a]
       # BtlCommandAttack's and BtlCommandItem's switch tables, which commands.c
       # emits itself - the word of padding behind the first inside the unit,
       # the word behind the last belonging to nobody.

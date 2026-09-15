@@ -126,7 +126,7 @@ g_item_help                   = 0x8004AE1C;
 g_persona_defs                = 0x8004B0A8; // size:0x2C
 g_level_exp                   = 0x8004C200; // type:s32 size:0x4
 g_level_exp_1                 = 0x8004C204;
-g_btl_formation_preset        = 0x8004E0D0;
+g_btl_formation_preset        = 0x8004E0D0; // size:0xC8
 g_btl_formation               = 0x8004E198; // size:0x1C
 g_btl_debug_flags             = 0x8004E260; // type:u8 size:0x3
 g_btl_debug_party_only        = 0x8004E263;
@@ -1803,7 +1803,7 @@ BtlPickUpdate                 = 0x800A37A4; // type:func size:0x1F4
 BtlChoiceUpdate               = 0x800A3998; // type:func size:0x1A0
 BtlPersonaSpellUpdate         = 0x800A3B38; // type:func size:0x230
 BtlPersonaSwapUpdate          = 0x800A3D68; // type:func size:0x2B8
-func_800A4020                 = 0x800A4020; // type:func size:0x740
+BtlPlaceGridUpdate            = 0x800A4020; // type:func size:0x740
 
 //--------------------------------------------------------
 //--- PA: 0x0403C0   VA: 0x800A4760   subsegment: c, place
@@ -3245,6 +3245,10 @@ g_btl_flag_name13             = 0x800CF7C8; // type:u8 size:0x10
 g_btl_flag_name14             = 0x800CF7D8; // type:u8 size:0x8
 g_btl_flag_name_unused        = 0x800CF7E0; // type:u8 size:0xC
 g_btl_msg_ailment             = 0x800CF7FC;
+g_btl_msg_nobody_to_move      = 0x800CF80C; // size:0x18
+g_btl_msg_place_blocked       = 0x800CF824; // size:0x18
+g_btl_msg_keep_formation      = 0x800CF83C; // size:0x10
+g_btl_msg_overwrite_layout    = 0x800CF84C; // size:0x10
 g_btl_msg_out_of_reach        = 0x800CF85C;
 g_btl_msg_short_sp            = 0x800CF86C;
 g_btl_msg_persona_unwilling   = 0x800CF880;
@@ -3631,6 +3635,7 @@ g_btl_turn                    = 0x800F472C; // type:u8 size:0x1
 g_btl_turns                   = 0x800F4730; // type:u8 size:0x1
 g_btl_pack_ready              = 0x800F4734;
 g_btl_turn_order              = 0x800F4740; // type:u8 size:0xE
+g_btl_place_abort             = 0x800F477C; // type:s32 size:0x4
 g_btl_edit_stat_row           = 0x800F4780; // type:s16 size:0x2
 g_btl_cast_abort              = 0x800F47B4; // type:s32 size:0x4
 g_btl_cast_spells             = 0x800F47B8; // type:u8 size:0x8

@@ -261,6 +261,9 @@ and still moves the splits. `BtlCommandEntry`'s yes/no/cancel prompt tests
 
 - [commandmenu.c](/src/btlp/commandmenu.c) - 97.69% to 98.46% on that arm
   alone.
+- [placemenu.c](/src/btlp/placemenu.c) - `BtlPlaceMenu`'s opening choice,
+  99.16% to 99.98%: `[-2..-1, 0, 1]` splits on `0`, and the wait node in
+  front of them moves the split onto the range, `bgez` first.
 
 The padding after a jump table belongs to nobody: gcc emits the entries and the
 next subsegment starts later, so the gap needs a bare `rodata` segment of its
@@ -795,6 +798,9 @@ them.
   line alone.
 - [targetpick.c](/src/btlp/targetpick.c) - the same in all three pickers,
   where the counter also has to come before the constants the loop hoists.
+- [placemenu.c](/src/btlp/placemenu.c) - `for (i = 0, blocked = 0; ...)`;
+  with `blocked = 0` written above the loop the two clears come out the other
+  way round.
 
 Writing the walker out by hand as a `BtlActor *` alongside the index gets the
 registers right and then emits its own increment on the wrong side of the
@@ -846,6 +852,31 @@ Written as `return 1;` inside the loop it is three words out, and gcc folds
 - [targetpick.c](/src/btlp/targetpick.c), [opendialogue.c](/src/btlp/opendialogue.c) -
   BtlOpeningLineWanted is exact only with the early returns inside the switch
   and the shared answer after it.
+
+## An exit written out at each site keeps its call
+
+`BtlPlaceMenu` leaves the same way from six places: the moved-members check,
+then 1 with the flag raised or 0. The image keeps the `jal`, the `bnez` and
+the `j` to the epilogue at every site and shares only the flag store, which
+sits past the loop. Written with one exit and a `goto` to it,
+
+    if (BtlMarkMovedMembers() == 0) { return 0; }
+    goto moved;
+
+gcc cross-jumps the whole tail - the call and the resets in front of it - into
+one copy. Written out at each site,
+
+    if (BtlMarkMovedMembers() != 0) {
+        g_btl_formation_moved = 1;
+        return 1;
+    }
+    return 0;
+
+only the store and the answer are shared, which is the image's layout.
+
+- [placemenu.c](/src/btlp/placemenu.c) - 95.35% to 99.16% on that alone. It
+  also took away the constant 1 gcc had lifted into `s7` for the whole loop,
+  and the extra saved register that cost.
 
 ## A frame drawn before the count, or after it
 
