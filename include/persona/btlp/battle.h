@@ -80,6 +80,13 @@ extern u_char g_btl_debug_no_defeat;
    time rather than one time in four. Zero on disc. */
 extern u_char g_btl_debug_act_for;
 
+/* And two that make a Persona take its owner's turn whenever it is able to:
+   each stands in for the odds of one of the two ways a Persona can take
+   over, the first for the one whose odds grow as its owner's HP falls to a
+   quarter, the second for the one that stops at an eighth. Zero on disc. */
+extern u_char g_btl_debug_act_kind1;
+extern u_char g_btl_debug_act_kind2;
+
 /* And one that keeps the ailment moves off the party: their finish steps
    over a member while it is set, and it is zero on disc. */
 extern u_char g_btl_debug_party_immune;

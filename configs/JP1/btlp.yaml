@@ -101,14 +101,10 @@ segments:
       - [0x7E4, .rodata, deathmotion]
       # BtlMemberMotion0D's two switch tables, which membermotion0d.c emits.
       - [0x8AC, .rodata, membermotion0d]
-      - [0x8D8, rodata, btlp_rodata6_round]
-      # Only BtlChooseEnemyMove's table, because it is the one routine in
-      # roundflow.c that is already out of asm. The unit's rodata really starts
-      # at 0x8D8 - BtlStageRound's five tables and the word behind them sit in
-      # btlp_rodata6 until that routine matches, and this becomes
-      # `[0x8D8, .rodata, roundflow]` when it does. The C already emits exactly
-      # 0x3FC bytes there, which is the whole 0x8D8..0xCD4 span.
-      - [0xA50, .rodata, roundflow]
+      # roundflow.c's tables: BtlStageRound's five, the word behind them, and
+      # BtlChooseEnemyMove's. The C emits exactly the 0x3FC bytes of the
+      # 0x8D8..0xCD4 span.
+      - [0x8D8, .rodata, roundflow]
       - [0xCD4, rodata, btlp_rodata6a]
       # BtlAilmentTakeTurn's switch table, which ailtaketurn.c emits itself, and
       # the word of padding behind it that belongs to nobody.

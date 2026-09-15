@@ -2235,3 +2235,60 @@ Reaching the second table off the first one's index does put them in step, but
 `combine_givs` then folds the first table's addresses onto the second's
 multiply and the register loses the offset it should start at - which is its
 own pair of rows. `BtlFxStep72` and `BtlFxStepE8` both stop here, two rows out.
+
+The way through is to take the second table's element address into a pointer
+of its own, off the first one's index:
+
+    for (...; slot++) {
+        ...
+        objp = &g_btl_enemies[slot - BTL_PARTY].obj;
+        (*objp)->motion = 8;
+        (*objp)->phase = 0;
+    }
+
+`objp` is a giv the loop sets, not an address inside a `mem`, and
+`combine_givs` never folds one register giv into another. There is one
+induction variable, both registers start where the image starts them, and the
+steps come out in the set-up order. [roundflow.c](/src/btlp/roundflow.c),
+`BtlStageRound`'s boss walk, the last two rows of its loop.
+
+## A store the scheduler lets sink is pinned by a global it takes for a structure
+
+`sched` places insns as late as their dependencies allow, and its dependencies
+use gcc 2.6's aliasing rule: a store to a struct field at a varying address
+(`actor->flags`) and a store to a plain global are assumed not to overlap -
+unless the struct side is a byte. So in
+
+    actor->action = 6;
+    g_btl_act_move = actor->move;
+    actor->flags |= 0x10000000;
+    g_btl_act_speed = actor->order;
+    g_btl_act_targets = actor->targets;
+
+the `flags` load, `or` and store sink below every global store, while the
+byte stores around them keep their places. No order of the statements changes
+that. The image's `flags` store sits between `g_btl_act_move` and
+`g_btl_act_targets`, which takes a dependency the rule does not give - and
+writing one of the globals as a structure member gives it back, without
+changing a byte of the code or the relocation:
+
+    typedef struct { u_long value; } BtlLongCell;
+    ((BtlLongCell *)&g_btl_act_targets)->value = actor->targets;
+
+A struct member at a fixed address is not the "plain global" the rule exempts,
+so the `flags` store must precede it. Written the other way - a cast that
+makes the `flags` store itself a non-struct reference - pins the store but
+drags every later load below it.
+
+The same arms needed the read of the turn ahead of the byte store it would
+otherwise follow. `actor->targets = 1 << g_btl_actor_turn;` written before
+`actor->move = 0x61;` reads `g_btl_actor_turn` first; the targets store is
+still free to sink below the move's, and the move's constant is loaded last,
+which is what keeps the tail the two arms cross-jump into as short as the
+image's. Both are visible in `.sched` / `.sched2` (see
+[RTL Dumps](RTL%20Dumps.md)): the `REG_DEP_OUTPUT` and `REG_DEP_ANTI` links on
+each insn are the dependencies that decided its place.
+
+- [roundflow.c](/src/btlp/roundflow.c) - `BtlStageRound`, act kinds 2 and 3:
+  98.90% to 99.18% on the struct store, and to the jump tables alone (every
+  other row matching) on the targets-before-move order.

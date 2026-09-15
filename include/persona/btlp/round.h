@@ -145,7 +145,7 @@ extern int BtlPickOtherEnemy(int slot);
 
 /* The round, step by step. g_btl_turn walks g_btl_turn_order as far as
    g_btl_turns; g_btl_actor_turn is whose turn is being played out. */
-extern u_char g_btl_turn;
+extern signed char g_btl_turn;
 extern u_char g_btl_turns;
 extern u_char g_btl_turn_order[];
 extern short  g_btl_actor_turn;
@@ -190,9 +190,8 @@ extern BtlObj *g_btl_effect_obj;
 /* The fighter the effect object stands on, set beside it. */
 extern struct BtlActor *g_btl_effect_actor;
 
-/* One line per ailment, and the scripts a fighter changing shape runs. */
+/* One line per ailment. */
 extern u_char *g_btl_ailment_lines[];
-extern u_char  g_btl_morph_scripts[];
 extern u_char  g_btl_msg_ailment[];
 extern u_char  g_btl_seq_hud_up[];
 
@@ -209,6 +208,7 @@ extern u_char g_btl_line_enc05c[];
 extern u_char g_btl_line_enc05d[];
 extern u_char g_btl_line_enc05e[];
 extern u_char g_btl_line_enc05f[];
+extern u_char g_btl_line_enc05g[];
 extern u_char g_btl_line_enc08[];
 extern u_char g_btl_line_enc11a[];
 extern u_char g_btl_line_enc11b[];

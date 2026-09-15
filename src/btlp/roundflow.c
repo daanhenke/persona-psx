@@ -391,7 +391,6 @@ void BtlStageClose(void)
     }
 }
 
-#ifdef NON_MATCHING
 /* The round itself, and the largest routine in the overlay.
  *
  * One loop and one switch, and the step it switches on is the only thing that
@@ -403,19 +402,37 @@ void BtlStageClose(void)
  * Steps three and eight share a body: the first is a member's turn playing
  * out, the second an enemy's, and once the script is running they are the
  * same wait.
+ *
+ * Every local is declared up here and the counters are shared between the
+ * steps: `i` is every walk's index, `j` every frame wait and the fighter the
+ * stat walk starts from, and `n` a count, a flag and a sound slot in turn.
+ * gcc 2.6 gives one variable one register for its whole life, and only shared
+ * this way do the image's saved registers come out. The declaration order is
+ * the frame's: the four that never get a register take their stack slots in
+ * the order they are declared here.
  */
+
+/* See step one: a taken-over turn saves its targets through this. */
+typedef struct {
+    u_long value;
+} BtlLongCell;
+
 void BtlStageRound(void)
 {
-    /* Thirty-two bytes the image reserves and never writes. */
-    SVECTOR unused[4];
-
-    /* Only these four outlive the step that sets them, which is why they are
-       the only ones the routine puts on the stack. The cancel flag comes first:
-       it takes the slot right above the reserved bytes in the image. */
+    /* Sixteen bytes the image reserves and never writes. */
+    SVECTOR unused[2];
+    int slowest;
+    int member;
     int cancelled;
     BtlActor *actor;
     BtlObj *obj;
     u_char action;
+    int i;
+    int j;
+    int n;
+    int last;
+    int kind;
+    int amount;
 
     cancelled = 0;
     for (;;) {
@@ -425,30 +442,26 @@ void BtlStageRound(void)
 
         switch (g_btl_step) {
         case 0: {
-            int first;
-            int last;
-            int slot;
-            int i;
-            int n;
-            int hit;
-            int amount;
             int r;
+            int bits;
+            BtlStats *p;
+
             /* Whose stats are worked out again: one side, or both. Written as
                a switch, which is what the image tests - it jumps to each arm
                rather than branching past it. */
             switch (g_btl_battle_kind) {
             case 1:
-                first = 0;
+                j = 0;
                 last = BTL_PARTY;
                 break;
 
             case 2:
-                first = BTL_PARTY;
+                j = BTL_PARTY;
                 last = BTL_ACTORS;
                 break;
 
             default:
-                first = 0;
+                j = 0;
                 last = BTL_ACTORS;
                 break;
             }
@@ -468,32 +481,28 @@ void BtlStageRound(void)
                 n = BtlResetTurnOrder();
             } else {
                 n = 0;
-                if (first < last) {
-                    do {
-                        if (g_btl_actors[first].c.key != 0
-                            && (signed char)g_btl_actors[first].c.status
-                                   != BTL_STATUS_DOWN
-                            && (g_btl_actors[first].flags & BTL_ACTOR_OUT)
-                                   == 0) {
-                            BtlDeriveBattleStats(&g_btl_actors[first]);
-                            g_btl_turn_order[n] = first;
-                            n++;
-                            /* Mostly the third stat, sometimes the fourth,
-                               and on a rare roll both added. */
-                            r = rand();
-                            if ((u_int)(r & 0xFF) < 0xCE) {
-                                i = g_btl_actors[first].stat[3];
-                            } else if ((u_int)(r & 0xFF) < 0xEF) {
-                                i = g_btl_actors[first].stat[4];
-                            } else {
-                                i = g_btl_actors[first].stat[3]
-                                    + g_btl_actors[first].stat[4];
-                            }
-                            g_btl_actors[first].initiative = i;
-                            g_btl_actors[first].action = 0xFF;
+                for (i = j; i < last; i++) {
+                    if (g_btl_actors[i].c.key != 0
+                        && (signed char)g_btl_actors[i].c.status
+                               != BTL_STATUS_DOWN
+                        && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
+                        BtlDeriveBattleStats(&g_btl_actors[i]);
+                        g_btl_turn_order[n] = i;
+                        n++;
+                        /* Mostly the third stat, sometimes the fourth, and on
+                           a rare roll both added. */
+                        r = rand();
+                        if ((u_int)(r & 0xFF) < 0xCE) {
+                            g_btl_actors[i].initiative = g_btl_actors[i].stat[3];
+                        } else if ((u_int)(r & 0xFF) < 0xEF) {
+                            g_btl_actors[i].initiative = g_btl_actors[i].stat[4];
+                        } else {
+                            g_btl_actors[i].initiative
+                                = g_btl_actors[i].stat[3]
+                                  + g_btl_actors[i].stat[4];
                         }
-                        first++;
-                    } while (first < last);
+                        g_btl_actors[i].action = 0xFF;
+                    }
                 }
                 n = BtlOrderTurns(g_btl_turn_order, n);
             }
@@ -507,91 +516,104 @@ void BtlStageRound(void)
             }
 
             /* Whether a Persona takes the turn away from its owner. */
-            slot = 0;
-            hit = 0;
             g_btl_act_kind = 0;
             g_btl_act_actor = 0;
             g_btl_step++;
-            i = 0;
             bzero(g_btl_debug_grid_cells, 0x4B);
+            i = 0;
+            n = 0;
             do {
-                if (g_btl_actors[slot].c.key != 0
-                    && (signed char)g_btl_actors[slot].c.status
+                if (g_btl_actors[i].c.key != 0
+                    && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
-                    && (g_btl_actors[slot].flags & BTL_ACTOR_OUT) == 0) {
-                    n = BtlActorPersona(slot);
-                    if (g_btl_personas[n].slots > 5
-                        && g_btl_actors[slot].c.blocked == 0
-                        && ((g_persona_defs[g_btl_personas[n].key].unk1C
-                             >> ((g_btl_actors[slot].c.key - 1) * 2))
-                            & 3) == 3) {
-                        amount = 0;
-                        if ((g_btl_personas[n].unk41 & 0xF0) == 0x10) {
-                            r = g_btl_actors[slot].c.hp_max;
-                            if (r / 16 < g_btl_actors[slot].c.hp) {
-                                if (r / 8 < g_btl_actors[slot].c.hp) {
-                                    if (g_btl_actors[slot].c.hp <= r / 4) {
-                                        amount = 0x10;
-                                    }
-                                } else {
-                                    amount = 8;
-                                }
-                            } else {
-                                amount = 4;
+                    && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
+                    p = &g_btl_personas[BtlActorPersona(i)];
+                    bits = (g_persona_defs[p->key].unk1C
+                            >> ((g_btl_actors[i].c.key - 1) * 2))
+                           & 3;
+                    if (p->slots > 5 && g_btl_actors[i].c.blocked == 0
+                        && bits == 3) {
+                        kind = 0;
+                        switch (p->unk41 & 0xF0) {
+                        case 0x10:
+                            if (g_btl_actors[i].c.hp_max / 16
+                                >= g_btl_actors[i].c.hp) {
+                                kind = 4;
+                            } else if (g_btl_actors[i].c.hp_max / 8
+                                       >= g_btl_actors[i].c.hp) {
+                                kind = 8;
+                            } else if (g_btl_actors[i].c.hp_max / 4
+                                       >= g_btl_actors[i].c.hp) {
+                                kind = 0x10;
                             }
-                            if ((signed char)g_btl_actors[slot].c.status
+                            if (g_btl_debug_act_kind1 != 0) {
+                                kind = 1;
+                            }
+                            if ((signed char)g_btl_actors[i].c.status
                                     != BTL_STATUS_NOINPUT
-                                && amount != 0
-                                && (rand() & (amount - 1)) == 0) {
+                                && kind != 0
+                                && (rand() & (kind - 1)) == 0) {
+                                n = 1;
                                 g_btl_act_kind = 1;
-                                hit = 1;
-                                g_btl_act_actor = slot;
+                                g_btl_act_actor = i;
                             }
-                        } else if ((g_btl_personas[n].unk41 & 0xF0) == 0x30) {
-                            r = g_btl_actors[slot].c.hp_max;
-                            if (r / 16 < g_btl_actors[slot].c.hp) {
-                                if (g_btl_actors[slot].c.hp <= r / 8) {
-                                    amount = 8;
-                                }
-                            } else {
-                                amount = 4;
+                            break;
+
+                        case 0x30:
+                            if (g_btl_actors[i].c.hp_max / 16
+                                >= g_btl_actors[i].c.hp) {
+                                kind = 4;
+                            } else if (g_btl_actors[i].c.hp_max / 8
+                                       >= g_btl_actors[i].c.hp) {
+                                kind = 8;
                             }
-                            if ((signed char)g_btl_actors[slot].c.status
+                            if (g_btl_debug_act_kind2 != 0) {
+                                kind = 1;
+                            }
+                            if ((signed char)g_btl_actors[i].c.status
                                     != BTL_STATUS_NOINPUT
-                                && amount != 0
-                                && (rand() & (amount - 1)) == 0) {
+                                && kind != 0
+                                && (rand() & (kind - 1)) == 0) {
+                                n = 1;
                                 g_btl_act_kind = 2;
-                                hit = 1;
-                                g_btl_act_actor = slot;
+                                g_btl_act_actor = i;
                             }
+                            break;
                         }
                     }
                 }
-                slot++;
-            } while (slot < BTL_PARTY && hit == 0);
+                i++;
+            } while (i < BTL_PARTY && n == 0);
 
             if (g_btl_place_party != 0) {
                 g_btl_act_kind = 0;
             }
             g_btl_round++;
             /* and straight on into the turn it just settled */
-
         }
         case 1: {
-            int member;
-            int slot;
-            int i;
-            int n;
+            short slot;
+            int t;
+            u_char *scripts;
+            u_char *line;
+
             if (g_cd_busy == -1) {
                 BtlShowAilmentMarks(0);
                 if (BtlAnyStanding() == 0
                     || (g_btl_debug_hud != 0
                         && (g_btl_pad1 & g_btl_key_end) != 0)
                     || BtlBattleOutcome() == 0) {
-                    goto round_over;
-                } else if ((int)g_btl_turn < (int)(u_int)g_btl_turns) {
+                    g_btl_step = 6;
+                } else if ((signed char)g_btl_turn < g_btl_turns) {
                     /* Whose turn this is, and how it came to be theirs. */
                     switch (g_btl_act_kind) {
+                    case 0:
+                        g_btl_actor_turn = g_btl_turn_order[g_btl_turn];
+                        actor = &g_btl_actors[g_btl_actor_turn];
+                        member = actor->c.key;
+                        obj = actor->obj;
+                        break;
+
                     case 1:
                         slot = g_btl_act_actor;
                         actor = &g_btl_actors[slot];
@@ -602,222 +624,221 @@ void BtlStageRound(void)
                         actor->flags |= 0x10000000;
                         BtlSetPickable();
                         g_btl_act_move = actor->move;
-                        g_btl_act_targets = actor->targets;
                         g_btl_act_speed = actor->order;
+                        g_btl_act_targets = actor->targets;
                         actor->order = BtlSlowestOrder() + 5;
                         actor->targets = BtlPickableMask();
                         actor->move = 0x6E;
                         break;
-                    case 0:
-                        slot = g_btl_turn_order[g_btl_turn];
+
+                    case 2:
+                        /* The owner's turn is put aside and the Persona's move
+                           turned on the fighter itself. Two details are
+                           load-bearing. The saved targets go through a struct:
+                           gcc's scheduler lets a store to a struct field sink
+                           past stores to plain globals, and only a global it
+                           takes for a structure pins the flags update above
+                           the saves, where the image has it. And the targets
+                           are worked out before the move is set, which reads
+                           the turn ahead of the move's store. */
+                        slot = g_btl_act_actor;
                         actor = &g_btl_actors[slot];
-                        g_btl_actor_turn = g_btl_turn_order[g_btl_turn];
+                        g_btl_actor_turn = slot;
                         member = actor->c.key;
                         obj = actor->obj;
+                        actor->action = 6;
+                        g_btl_act_move = actor->move;
+                        actor->flags |= 0x10000000;
+                        g_btl_act_speed = actor->order;
+                        ((BtlLongCell *)&g_btl_act_targets)->value
+                            = actor->targets;
+                        actor->order = g_btl_actor_turn;
+                        actor->targets = 1 << g_btl_actor_turn;
+                        actor->move = 0x61;
                         break;
-                    case 2:
-                        slot = g_btl_act_actor;
-                        g_btl_actor_turn = slot;
-                        member = g_btl_actors[slot].c.key;
-                        obj = g_btl_actors[slot].obj;
-                        g_btl_act_move = g_btl_actors[slot].move;
-                        g_btl_actors[slot].action = 6;
-                        i = (u_char)g_btl_actor_turn;
-                        g_btl_act_speed = g_btl_actors[slot].order;
-                        g_btl_act_targets = g_btl_actors[slot].targets;
-                        g_btl_actors[slot].flags |= 0x10000000;
-                        g_btl_actors[slot].order = i;
-                        i = 0x61;
-                        actor = &g_btl_actors[slot];
-                        actor->move = i;
-                        actor->targets = 1 << (g_btl_actor_turn & 0x1F);
-                        break;
+
                     case 3:
+                        /* Step two again, with the Persona's other move. */
                         slot = g_btl_act_actor;
-                        g_btl_actor_turn = slot;
-                        member = g_btl_actors[slot].c.key;
-                        obj = g_btl_actors[slot].obj;
-                        g_btl_act_move = g_btl_actors[slot].move;
-                        g_btl_actors[slot].action = 6;
-                        i = (u_char)g_btl_actor_turn;
-                        g_btl_act_speed = g_btl_actors[slot].order;
-                        g_btl_act_targets = g_btl_actors[slot].targets;
-                        g_btl_actors[slot].flags |= 0x10000000;
-                        g_btl_actors[slot].order = i;
-                        i = 0x6C;
                         actor = &g_btl_actors[slot];
-                        actor->move = i;
-                        actor->targets = 1 << (g_btl_actor_turn & 0x1F);
+                        g_btl_actor_turn = slot;
+                        member = actor->c.key;
+                        obj = actor->obj;
+                        actor->action = 6;
+                        g_btl_act_move = actor->move;
+                        actor->flags |= 0x10000000;
+                        g_btl_act_speed = actor->order;
+                        ((BtlLongCell *)&g_btl_act_targets)->value
+                            = actor->targets;
+                        actor->order = g_btl_actor_turn;
+                        actor->targets = 1 << g_btl_actor_turn;
+                        actor->move = 0x6C;
                         break;
                     }
 
-                    if (g_btl_act_kind == 0) {
-                        slot = g_btl_actor_turn;
-                        if (g_btl_actors[slot].c.key == 0
-                            || (signed char)g_btl_actors[slot].c.status
-                                   == BTL_STATUS_DOWN
-                            || (g_btl_actors[slot].flags & BTL_ACTOR_OUT)
-                                   != 0) {
-                            g_btl_step = 1;
-                            g_btl_turn++;
-                            break;
-                        }
-                    }
+                    if (g_btl_act_kind != 0
+                        || (g_btl_actors[g_btl_actor_turn].c.key != 0
+                            && (signed char)g_btl_actors[g_btl_actor_turn]
+                                       .c.status
+                                   != BTL_STATUS_DOWN
+                            && (g_btl_actors[g_btl_actor_turn].flags
+                                & BTL_ACTOR_OUT)
+                                   == 0)) {
+                        BtlDeriveBattleStats(actor);
+                        if (g_btl_actor_turn < BTL_PARTY) {
+                            if (g_btl_act_kind != 0
+                                || (actor->flags & 0x22000) == 0) {
+                                actor->pickable = 1;
+                                scripts = &g_btl_member_scripts
+                                              [member * MEMBER_SCRIPT_MODEL];
+                                if (g_btl_act_kind == 0) {
+                                    g_btl_marker_obj[g_btl_actor_turn]->attr
+                                        |= 0x1000000;
+                                    if ((signed char)actor->c.status != 0) {
+                                        obj->mark->attr &= ~BTL_OBJ_HIDDEN;
+                                    }
+                                }
+                                if (g_btl_act_kind != 0) {
+                                    BtlReadMemberBank(
+                                        1,
+                                        g_btl_actors[g_btl_actor_turn].c.key);
+                                } else if (g_btl_pack_ready == 0) {
+                                    BtlReadyTurnNow();
+                                }
+                                action = actor->action;
+                                switch (action) {
+                                case 2:
+                                    if (actor->counter != 0
+                                        && g_btl_msg_speed != 2) {
+                                        BtlOpenMessage(1, 1, g_btl_msg_ailment,
+                                                       0x10, 0xC);
+                                        g_btl_msg_timer
+                                            = g_btl_msg_speed == 0 ? 0xB4
+                                                                   : 0x1E;
+                                    }
+                                    if (actor->script_pick == 2) {
+                                        BtlReloadMemberGfx(member,
+                                                           g_btl_actor_turn);
+                                        if (actor->c.equip[0] != 0
+                                            && actor->c.equip[0] != 0xA3
+                                            && actor->c.equip[0] != 0xAF) {
+                                            actor->script_pick = 1;
+                                        } else {
+                                            actor->script_pick = 0;
+                                        }
+                                        BtlObjSetScript(
+                                            obj,
+                                            (BtlSeqStep *)obj->scripts
+                                                [scripts[actor->script_pick
+                                                         * MEMBER_SCRIPT_PICK]]);
+                                    }
+                                    BtlOpenMemberBank();
+                                    break;
 
-                    BtlDeriveBattleStats(actor);
-                    if (g_btl_actor_turn < BTL_PARTY) {
-                        if (g_btl_act_kind == 0
-                            && (actor->flags & 0x22000) != 0) {
-                            g_btl_step = 3;
-                            break;
-                        }
-                        actor->pickable = 1;
-                        if (g_btl_act_kind == 0) {
-                            g_btl_marker_obj[g_btl_actor_turn]->attr
-                                |= 0x1000000;
-                            if (actor->c.status != 0) {
-                                obj->mark->attr &= ~BTL_OBJ_HIDDEN;
+                                case 0xC:
+                                    if (actor->script_pick != 2) {
+                                        BtlReloadMemberGfx(member + 10,
+                                                           g_btl_actor_turn);
+                                        actor->script_pick = 2;
+                                        BtlObjSetScript(
+                                            obj,
+                                            (BtlSeqStep *)obj->scripts
+                                                [scripts[2 * MEMBER_SCRIPT_PICK]]);
+                                    }
+                                    obj->children = obj->kind == 3 ? 0x24 : 0x22;
+                                case 6:
+                                open_bank:
+                                    BtlOpenMemberBank();
+                                    break;
+
+                                case 3:
+                                    if (g_btl_place_party == 0
+                                        && g_btl_msg_speed != 2) {
+                                        line = g_btl_ailment_lines[actor->ail_line];
+                                        BtlOpenMessage(5, 1, line, 0x10, 0xC);
+                                        g_btl_msg_timer
+                                            = g_btl_msg_speed == 0 ? 0xB4
+                                                                   : 0x1E;
+                                    }
+                                    /* Shares step six's bank call rather than
+                                       repeating it: that copy is the one the
+                                       image keeps. */
+                                    goto open_bank;
+
+                                case 0xE:
+                                    break;
+                                }
+                                g_btl_step++;
+                            } else {
+                                g_btl_step = 3;
                             }
-                            if (g_btl_act_kind != 0) {
-                                goto read_bank;
+                        } else {
+                            actor->pickable = 1;
+                            if ((signed char)actor->c.status != 0) {
+                                obj->mark->attr &= ~BTL_OBJ_HIDDEN;
                             }
                             if (g_btl_pack_ready == 0) {
                                 BtlReadyTurnNow();
                             }
-                        } else {
-                        read_bank:
-                            BtlReadMemberBank(
-                                1, g_btl_actors[g_btl_actor_turn].c.key);
+                            action = actor->action;
+                            switch (obj->kind) {
+                            case 0xB1:
+                                obj->children = 0x15;
+                                break;
+                            case 0x95:
+                            case 0x96:
+                            case 0xBA:
+                                obj->children = 0x10;
+                                break;
+                            case 0x97:
+                                obj->children = 0xE;
+                                break;
+                            case 0xB5:
+                                obj->children = 0xD;
+                                break;
+                            }
+                            switch (action) {
+                            case 4:
+                                actor->flags |= 0x2000;
+                                break;
+                            case 0xE:
+                                BtlSoundOpen(g_btl_slot_banks, 6,
+                                             (actor->obj->unkCD >> 1) - 5);
+                                break;
+                            case 2:
+                                actor->move = 0;
+                                actor->unkBD = 0;
+                                BtlAimEnemyMove(actor);
+                                BtlOpenPackBank();
+                                break;
+                            case 6:
+                                actor->unkBD = actor->move;
+                                actor->unkBA = actor->obj->unkD3;
+                                if (g_btl_place_party == 0) {
+                                    BtlAimMove(actor);
+                                }
+                                BtlAimEnemyMove(actor);
+                                BtlOpenPackBank();
+                                if (g_btl_place_party != 0) {
+                                    actor->action = 0xFF;
+                                }
+                                break;
+                            case 5:
+                                BtlOpenPackBank();
+                                break;
+                            }
+                            g_btl_step++;
                         }
-                        action = actor->action;
-                        switch (action) {
-                        case 2:
-                            if (actor->counter != 0 && g_btl_msg_speed != 2) {
-                                BtlOpenMessage(1, 1, g_btl_msg_ailment, 0x10,
-                                               0xC);
-                                g_btl_msg_timer = 0x1E;
-                                if (g_btl_msg_speed == 0) {
-                                    g_btl_msg_timer = 0xB4;
-                                }
-                            }
-                            if (actor->script_pick == 2) {
-                                BtlReloadMemberGfx(member, g_btl_actor_turn);
-                                if (actor->c.equip[0] == 0
-                                    || actor->c.equip[0] == 0xA3
-                                    || actor->c.equip[0] == 0xAF) {
-                                    actor->script_pick = 0;
-                                } else {
-                                    actor->script_pick = 1;
-                                }
-                                BtlObjSetScript(
-                                    obj,
-                                    (BtlSeqStep *)obj->scripts
-                                        [g_btl_member_scripts
-                                             [actor->script_pick * 10
-                                              + member * 0x28]]);
-                            }
-                            break;
-                        case 3:
-                            if (g_btl_place_party == 0
-                                && g_btl_msg_speed != 2) {
-                                BtlOpenMessage(
-                                    5, 1, g_btl_ailment_lines[actor->ail_line],
-                                    0x10, 0xC);
-                                g_btl_msg_timer = 0x1E;
-                                if (g_btl_msg_speed == 0) {
-                                    g_btl_msg_timer = 0xB4;
-                                }
-                            }
-                            break;
-                        case 6:
-                            break;
-                        case 0xC:
-                            if (actor->script_pick != 2) {
-                                BtlReloadMemberGfx(member + 10,
-                                                   g_btl_actor_turn);
-                                actor->script_pick = 2;
-                                BtlObjSetScript(
-                                    obj,
-                                    (BtlSeqStep *)obj->scripts
-                                        [g_btl_morph_scripts[member * 0x28]]);
-                            }
-                            n = 0x22;
-                            if (obj->kind == 3) {
-                                n = 0x24;
-                            }
-                            obj->children = n;
-                            break;
-                        case 0xE:
-                        default:
-                            goto step_on;
-                        }
-                        BtlOpenMemberBank();
                     } else {
-                        actor->pickable = 1;
-                        if (actor->c.status != 0) {
-                            obj->mark->attr &= ~BTL_OBJ_HIDDEN;
-                        }
-                        if (g_btl_pack_ready == 0) {
-                            BtlReadyTurnNow();
-                        }
-                        action = actor->action;
-                        switch (obj->kind) {
-                        case 0x95:
-                        case 0x96:
-                        case 0xBA:
-                            n = 0x10;
-                            break;
-                        case 0x97:
-                            n = 0xE;
-                            break;
-                        case 0xB1:
-                            n = 0x15;
-                            break;
-                        case 0xB5:
-                            n = 0xD;
-                            break;
-                        default:
-                            goto enemy_action;
-                        }
-                        obj->children = n;
-                    enemy_action:
-                        switch (action) {
-                        case 2:
-                            actor->move = 0;
-                            actor->unkBD = 0;
-                            BtlAimEnemyMove(actor);
-                        case 5:
-                            BtlOpenPackBank();
-                            break;
-                        case 4:
-                            actor->flags |= 0x2000;
-                            break;
-                        case 6:
-                            actor->unkBD = actor->move;
-                            actor->unkBA = actor->obj->unkD3;
-                            if (g_btl_place_party == 0) {
-                                BtlAimMove(actor);
-                            }
-                            BtlAimEnemyMove(actor);
-                            BtlOpenPackBank();
-                            if (g_btl_place_party != 0) {
-                                actor->action = 0xFF;
-                            }
-                            break;
-                        case 0xE:
-                            BtlSoundOpen(g_btl_slot_banks, 6,
-                                         (actor->obj->unkCD >> 1) - 5);
-                        }
+                        g_btl_step = 1;
+                        g_btl_turn++;
                     }
-                step_on:
-                    g_btl_step++;
                 } else {
                     g_btl_delay = 0;
                     g_btl_step = 4;
                 }
             }
             break;
-
         }
         case 2: {
             if (g_btl_delay == 0 && SsVabTransCompleted(0) != 0) {
@@ -831,216 +852,213 @@ void BtlStageRound(void)
                 g_btl_step++;
             }
             break;
-
         }
         case 3:
         case 8: {
             int slot;
-            int i;
-            int n;
+
             BtlHoldForMarkers();
-            if (obj->motion != 0
-                || (obj->attr & BTL_OBJ_BUSY_MASK) != BTL_OBJ_BUSY) {
-                if (g_btl_scene_wanted != 0) {
-                    i = 0;
-                    BtlObjSetAttr(g_btl_hud_obj, BTL_OBJ_HIDDEN);
-                    BtlHudLoad();
-                    BtlHudShow();
+            if (obj->motion == 0
+                && (obj->attr & BTL_OBJ_BUSY_MASK) != BTL_OBJ_BUSY) {
+                BtlDrawFrame();
+                BtlDrawFrame();
+                g_btl_actors[g_btl_actor_turn].unkCC = 0;
+                g_btl_actors[g_btl_actor_turn].counter = 0;
+                if (g_btl_effect_obj != NULL) {
+                    BtlObjSetMotion(g_btl_effect_obj, 4);
+                    BtlObjSetPhase(g_btl_effect_obj, 0);
+                    j = 0;
+                    g_btl_effect_obj = NULL;
+                    g_btl_scene_rgb[0] = 0x80;
+                    g_btl_scene_rgb[1] = 0x80;
+                    g_btl_scene_rgb[2] = 0x80;
                     do {
-                        i++;
+                        j++;
                         BtlDrawFrame();
-                    } while (i < 60);
-                    BtlSeqPlay(g_btl_seq_hud_up);
-                    BtlSeqRun();
-                    BtlHudHide();
-                    g_btl_scene_hud = 0;
-                    g_btl_scene_wanted = 0;
+                    } while (j < 0x78);
                 }
-                break;
-            }
-            BtlDrawFrame();
-            BtlDrawFrame();
-            g_btl_actors[g_btl_actor_turn].unkCC = 0;
-            g_btl_actors[g_btl_actor_turn].counter = 0;
-            if (g_btl_effect_obj != NULL) {
-                BtlObjSetMotion(g_btl_effect_obj, 4);
-                i = 0;
-                BtlObjSetPhase(g_btl_effect_obj, 0);
-                g_btl_effect_obj = NULL;
-                g_btl_scene_rgb[0] = 0x80;
-                g_btl_scene_rgb[1] = 0x80;
-                g_btl_scene_rgb[2] = 0x80;
+
+                switch ((short)(g_btl_encounter - 2)) {
+                case 0:
+                    if (obj->kind == 2 && g_btl_scene_pending != 0) {
+                        BtlPlayScene(0, g_btl_line_enc02);
+                        g_btl_scene_pending = 0;
+                    }
+                    break;
+                case 1:
+                    if (obj->kind == 1) {
+                        BtlPlayScene(3, g_btl_line_enc03a);
+                    }
+                    if (obj->kind == 4) {
+                        BtlPlayScene(3, g_btl_line_enc03b);
+                        j = 0;
+                        do {
+                            j++;
+                            BtlDrawFrame();
+                        } while (j < 60);
+                        BtlPlayScene(0, g_btl_line_enc03c);
+                    }
+                    if (obj->kind == 0x6E) {
+                        BtlPlayScene(3, g_btl_line_enc03d);
+                    }
+                    break;
+                case 2:
+                    if (obj->mark_num == 6) {
+                        BtlPlayScene(7, g_btl_line_enc04);
+                    }
+                    break;
+                case 3:
+                    if (g_btl_place_party != 0) {
+                        if ((signed char)g_btl_turn == 0) {
+                            BtlPlayScene(0x27, g_btl_line_enc05a);
+                            j = 0;
+                            do {
+                                j++;
+                                BtlDrawFrame();
+                            } while (j < 60);
+                            BtlPlayScene(5, g_btl_line_enc05b);
+                        }
+                        if ((signed char)g_btl_turn == 1) {
+                            BtlPlayScene(0x27, g_btl_line_enc05c);
+                            j = 0;
+                            do {
+                                j++;
+                                BtlDrawFrame();
+                            } while (j < 60);
+                            BtlPlayScene(0x29, g_btl_line_enc05d);
+                            j = 0;
+                            do {
+                                j++;
+                                BtlDrawFrame();
+                            } while (j < 60);
+                            BtlPlayScene(4, g_btl_line_enc05e);
+                            j = 0;
+                            do {
+                                j++;
+                                BtlDrawFrame();
+                            } while (j < 60);
+                            BtlPlayScene(0x29, g_btl_line_enc05f);
+                        }
+                        if ((signed char)g_btl_turn == 2) {
+                            BtlPlayScene(0x29, g_btl_line_enc05g);
+                            goto placed;
+                        }
+                    }
+                    break;
+                case 6:
+                    if (g_btl_place_party != 0) {
+                        if ((signed char)g_btl_turn == 0) {
+                            BtlPlayScene(4, g_btl_line_enc08);
+                        }
+                    placed:
+                        g_btl_place_party = 0;
+                        BtlRefreshMarkers();
+                    }
+                    break;
+                case 15:
+                case 16:
+                    if ((signed char)g_btl_turn == 1) {
+                        BtlPlayScene(8, g_btl_line_enc11a);
+                    }
+                    if ((signed char)g_btl_turn == 4) {
+                        BtlPlayScene(7, g_btl_line_enc11b);
+                    }
+                    if (g_btl_encounter == 0x11 && (signed char)g_btl_turn == 5
+                        && (BtlPlayScene(3, g_btl_line_enc11c),
+                            g_btl_encounter == 0x12)
+                        && (signed char)g_btl_turn == 6) {
+                        BtlPlayScene(7, g_btl_line_enc11d);
+                    }
+                }
+
+                slot = g_btl_actor_turn;
+                if (slot < BTL_PARTY) {
+                    g_btl_marker_obj[slot]->attr &= ~0x1000000;
+                    if (actor->marker != 0 && (actor->flags & 0x2000) == 0
+                        && g_btl_act_kind == 0 && actor->unkD8 == 0) {
+                        BtlShowMarker(slot, 0, actor->c.unk5D & 0xF);
+                        actor->marker = 0;
+                    }
+                    actor->unkD8 = 0;
+                }
+                BtlBuildMarkers();
+                BtlPartyResetGfx();
+                if (g_btl_encounter != 0xF) {
+                    BtlEnemiesResetGfx();
+                }
+                BtlSoundClose(6);
+                BtlSoundClose(4);
+                if (action != 0 && action != 4 && action != 0xE) {
+                    BtlSoundClose(3);
+                }
+                if (g_btl_act_kind == 0) {
+                    g_btl_turn++;
+                } else {
+                    g_btl_actors[g_btl_act_actor].flags &= ~0x10000000;
+                }
+                if (g_btl_act_kind != 3) {
+                    g_btl_act_kind = 0;
+                }
+                if (g_btl_encounter == 7) {
+                    g_btl_step = 6;
+                } else {
+                    g_btl_step = 1;
+                }
+            } else if (g_btl_scene_wanted != 0) {
+                BtlObjSetAttr(g_btl_hud_obj, BTL_OBJ_HIDDEN);
+                j = 0;
+                BtlHudLoad();
+                BtlHudShow();
                 do {
-                    i++;
+                    j++;
                     BtlDrawFrame();
-                } while (i < 0x78);
+                } while (j < 60);
+                BtlSeqPlay(g_btl_seq_hud_up);
+                BtlSeqRun();
+                BtlHudHide();
+                g_btl_scene_hud = 0;
+                g_btl_scene_wanted = 0;
             }
-
-            switch ((short)(g_btl_encounter - 2)) {
-            case 0:
-                if (obj->kind == 2 && g_btl_scene_pending != 0) {
-                    BtlPlayScene(0, g_btl_line_enc02);
-                    g_btl_scene_pending = 0;
-                }
-                break;
-            case 1:
-                if (obj->kind == 1) {
-                    BtlPlayScene(3, g_btl_line_enc03a);
-                }
-                if (obj->kind == 4) {
-                    BtlPlayScene(3, g_btl_line_enc03b);
-                    i = 0;
-                    do {
-                        i++;
-                        BtlDrawFrame();
-                    } while (i < 60);
-                    BtlPlayScene(0, g_btl_line_enc03c);
-                }
-                if (obj->kind == 0x6E) {
-                    BtlPlayScene(3, g_btl_line_enc03d);
-                }
-                break;
-            case 2:
-                if (obj->mark_num == 6) {
-                    BtlPlayScene(7, g_btl_line_enc04);
-                }
-                break;
-            case 3:
-                if (g_btl_place_party != 0) {
-                    if (g_btl_turn == 0) {
-                        BtlPlayScene(0x27, g_btl_line_enc05a);
-                        i = 0;
-                        do {
-                            i++;
-                            BtlDrawFrame();
-                        } while (i < 60);
-                        BtlPlayScene(5, g_btl_line_enc05b);
-                    }
-                    if (g_btl_turn == 1) {
-                        BtlPlayScene(0x27, g_btl_line_enc05c);
-                        i = 0;
-                        do {
-                            i++;
-                            BtlDrawFrame();
-                        } while (i < 60);
-                        BtlPlayScene(0x29, g_btl_line_enc05d);
-                        i = 0;
-                        do {
-                            i++;
-                            BtlDrawFrame();
-                        } while (i < 60);
-                        BtlPlayScene(4, g_btl_line_enc05e);
-                        i = 0;
-                        do {
-                            i++;
-                            BtlDrawFrame();
-                        } while (i < 60);
-                        BtlPlayScene(0x29, g_btl_line_enc05f);
-                    }
-                    if (g_btl_turn == 2) {
-                        BtlPlayScene(0x29, g_btl_line_enc08);
-                        goto placed;
-                    }
-                }
-                break;
-            case 6:
-                if (g_btl_place_party != 0) {
-                    if (g_btl_turn == 0) {
-                        BtlPlayScene(4, g_btl_line_enc08);
-                    }
-                placed:
-                    g_btl_place_party = 0;
-                    BtlRefreshMarkers();
-                }
-                break;
-            case 15:
-            case 16:
-                if (g_btl_turn == 1) {
-                    BtlPlayScene(8, g_btl_line_enc11a);
-                }
-                if (g_btl_turn == 4) {
-                    BtlPlayScene(7, g_btl_line_enc11b);
-                }
-                if (g_btl_encounter == 0x11 && g_btl_turn == 5
-                    && (BtlPlayScene(3, g_btl_line_enc11c),
-                        g_btl_encounter == 0x12)
-                    && g_btl_turn == 6) {
-                    BtlPlayScene(7, g_btl_line_enc11d);
-                }
-            }
-
-            slot = g_btl_actor_turn;
-            if (slot < BTL_PARTY) {
-                g_btl_marker_obj[slot]->attr &= ~0x1000000;
-                if (actor->marker != 0 && (actor->flags & 0x2000) == 0
-                    && g_btl_act_kind == 0 && actor->unkD8 == 0) {
-                    BtlShowMarker(slot, 0, actor->c.unk5D & 0xF);
-                    actor->marker = 0;
-                }
-                actor->unkD8 = 0;
-            }
-            BtlBuildMarkers();
-            BtlPartyResetGfx();
-            if (g_btl_encounter != 0xF) {
-                BtlEnemiesResetGfx();
-            }
-            BtlSoundClose(6);
-            BtlSoundClose(4);
-            if (action != 0 && action != 4 && action != 0xE) {
-                BtlSoundClose(3);
-            }
-            if (g_btl_act_kind == 0) {
-                g_btl_turn++;
-            } else {
-                g_btl_actors[g_btl_act_actor].flags &= ~0x10000000;
-            }
-            if (g_btl_act_kind != 3) {
-                g_btl_act_kind = 0;
-            }
-            if (g_btl_encounter != 7) {
-                g_btl_step = 1;
-                break;
-            }
-            goto round_over;
-
+            break;
         }
         case 4: {
-            int slowest;
-            int slotsnd;
             int slot;
-            int i;
-            int n;
-            int amount;
-            int kind;
+            int t;
+            BtlObj **objp;
+
             if (g_btl_delay != 0 || BtlMarkersHidden() == 0) {
                 break;
             }
             /* The two fights whose boss leaves the field rather than dying. */
-            if ((g_btl_encounter == 0x1D && g_btl_actors[11].c.key != 0x9A)
+            if ((g_btl_encounter == 0x1D && g_btl_enemies[6].c.key != 0x9A)
                 || (g_btl_encounter == 0x1E
-                    && g_btl_actors[11].c.key != 0x9B)) {
-                slotsnd = BTL_PARTY;
+                    && g_btl_enemies[6].c.key != 0x9B)) {
                 BtlSoundOpen(g_btl_slot_banks, 6,
-                             (g_btl_actors[BTL_PARTY].obj->unkCD >> 1) - 5);
+                             (g_btl_enemies[0].obj->unkCD >> 1) - 5);
+                i = BTL_PARTY;
                 SsVabTransCompleted(1);
                 slot = BTL_PARTY;
                 do {
-                    slotsnd++;
+                    i++;
                     if (g_btl_actors[slot].c.key != 0
                         && (signed char)g_btl_actors[slot].c.status
                                != BTL_STATUS_DOWN
                         && (g_btl_actors[slot].flags & BTL_ACTOR_OUT) == 0) {
                         g_btl_actors[slot].c.hp = 0;
-                        g_btl_actors[slot].obj->motion = 8;
-                        g_btl_actors[slot].obj->phase = 0;
+                        /* The enemy's object through a pointer of its own,
+                           so the walk has one induction variable and steps
+                           its two addresses in the image's order. */
+                        objp = &g_btl_enemies[slot - BTL_PARTY].obj;
+                        (*objp)->motion = 8;
+                        (*objp)->phase = 0;
                     }
                     slot++;
-                } while (slotsnd < 0xB);
-                i = 0;
+                } while (i < 0xB);
+                j = 0;
                 do {
-                    i++;
+                    j++;
                     BtlDrawFrame();
-                } while (i < 60);
+                } while (j < 60);
                 BtlSoundClose(6);
             }
 
@@ -1056,243 +1074,252 @@ void BtlStageRound(void)
                     }
                     i++;
                 } while (i < BTL_ENEMIES);
-                if ((g_btl_combatants[slowest].flags & 0x40) == 0) {
-                    g_btl_combatants[slowest].unkD4 = 1;
-                } else {
+                if ((g_btl_combatants[slowest].flags & 0x40) != 0) {
                     g_btl_combatants[slowest].unkDE = 1;
                     g_btl_combatants[slowest].unkD4 = 0;
+                } else {
+                    g_btl_combatants[slowest].unkD4 = 1;
                 }
             }
 
-            slot = 0;
+            i = 0;
             g_btl_actor_turn = -1;
-            slotsnd = 7;
+            n = 7;
+            /* Walked by hand beside the index: the liveness tests ask of the
+               index, everything else of the pointer. */
+            actor = g_btl_actors;
             do {
-                actor = &g_btl_actors[slot];
-                {
-                    /* A palsy drains a share of the whole reserve. The two
-                       tests below each ask whether the record is used again
-                       rather than sharing one - which is what the image
-                       does. */
-                    if (actor->c.key != 0
-                        && (signed char)actor->c.status != BTL_STATUS_DOWN
-                        && (actor->flags & BTL_ACTOR_OUT) == 0
-                        && (signed char)actor->c.status == 0x0E) {
-                        amount = actor->c.sp - actor->c.sp_max / 16;
-                        actor->c.sp = amount;
-                        n = amount;
-                        if (n < 0) {
-                            n = 0;
-                        } else if (n > 999) {
-                            n = 999;
+                /* A palsy drains a share of the whole reserve. The two tests
+                   below each ask whether the record is used again rather than
+                   sharing one - which is what the image does. */
+                if (g_btl_actors[i].c.key != 0
+                    && (signed char)g_btl_actors[i].c.status
+                           != BTL_STATUS_DOWN
+                    && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
+                    && (signed char)actor->c.status == 0x0E) {
+                    int sp;
+                    int clamped;
+
+                    sp = actor->c.sp - actor->c.sp_max / 16;
+                    actor->c.sp = sp;
+                    if (sp >= 0) {
+                        clamped = sp;
+                        if (clamped > 999) {
+                            clamped = 999;
                         }
-                        actor->c.sp = n;
+                    } else {
+                        clamped = 0;
                     }
+                    actor->c.sp = clamped;
+                }
 
-                    if (actor->c.key != 0
-                        && (signed char)actor->c.status != BTL_STATUS_DOWN
-                        && (actor->flags & BTL_ACTOR_OUT) == 0
-                        && (actor->unkD4 != 0
-                            || (signed char)actor->c.status == 0x0D
-                            || (signed char)actor->c.status == 0x10
-                            || ((u_int)((signed char)actor->c.status - 4) < 2
-                                && actor->c.ail_level == 2)
-                            || (actor->flags & 0x34C0000) != 0)) {
-                        if (slot < BTL_PARTY) {
-                            if (slotsnd < 0xC) {
-                                BtlSoundOpen(g_btl_banks, slotsnd,
-                                             actor->c.key);
-                            }
-                        } else if (slotsnd < 0xC) {
-                            BtlSoundOpen(g_btl_slot_banks, slotsnd,
-                                         (actor->obj->unkCD >> 1) - 5);
+                if (g_btl_actors[i].c.key != 0
+                    && (signed char)g_btl_actors[i].c.status
+                           != BTL_STATUS_DOWN
+                    && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
+                    && (actor->unkD4 != 0
+                        || (signed char)actor->c.status == 0x0D
+                        || (signed char)actor->c.status == 0x10
+                        || (((signed char)actor->c.status == 4
+                             || (signed char)actor->c.status == 5)
+                            && (signed char)actor->c.ail_level == 2)
+                        || (actor->flags & 0x34C0000) != 0)) {
+                    if (i < BTL_PARTY) {
+                        if (n < 0xC) {
+                            BtlSoundOpen(g_btl_banks, n, actor->c.key);
                         }
-                        SsVabTransCompleted(1);
+                    } else if (n < 0xC) {
+                        BtlSoundOpen(g_btl_slot_banks, n,
+                                     (actor->obj->unkCD >> 1) - 5);
+                    }
+                    SsVabTransCompleted(1);
 
-                        kind = 0;
-                        amount = 0;
-                        /* Tested the way the image tests it: each in turn,
-                           and the first that is set wins. */
-                        if (actor->unkD4 != 0) {
-                            amount = actor->c.hp;
+                    /* Tested the way the image tests it: each in turn, and the
+                       first that is set wins. */
+                    if (actor->unkD4 != 0) {
+                        amount = actor->c.hp;
+                        kind = 7;
+                    } else if ((actor->flags & 0x400000) != 0) {
+                        kind = 7;
+                        amount = actor->c.hp / 2;
+                    } else if ((actor->flags & 0x40000) != 0) {
+                        switch (actor->persona_rank) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            amount = (actor->unkCF != 0 ? actor->c.hp_max
+                                                        : actor->c.hp) / 8;
                             kind = 7;
-                        } else if ((actor->flags & 0x400000) != 0) {
+                            break;
+                        case 4:
+                            amount = (actor->unkCF != 0 ? actor->c.hp_max
+                                                        : actor->c.hp) / 2;
                             kind = 7;
-                            amount = actor->c.hp / 2;
-                        } else if ((actor->flags & 0x40000) != 0) {
-                            n = actor->persona_rank;
-                            if (n == 3) {
-                                kind = 0;
-                                if (actor->unkCF == 0) {
-                                    kind = 0x0F;
-                                    amount = actor->c.hp / 8;
-                                }
-                            } else if (n < 4) {
-                                if (actor->unkCF != 0) {
-                                    amount = actor->c.hp_max / 8;
-                                } else {
-                                    amount = actor->c.hp / 8;
-                                }
-                                kind = 7;
-                            } else if (n == 4) {
-                                if (actor->unkCF == 0) {
-                                    amount = actor->c.hp / 2;
-                                } else {
-                                    amount = actor->c.hp_max / 2;
-                                }
-                                kind = 7;
+                            break;
+                        case 3:
+                            kind = 0;
+                            if (actor->unkCF == 0) {
+                                kind = 0x0F;
+                                amount = actor->c.hp / 8;
                             }
-                        } else if ((actor->flags & 0x80000) != 0) {
-                            /* The same three ranks, the other way up. */
-                            n = actor->persona_rank;
-                            if (n == 3) {
-                                if (actor->unkCF == 0) {
-                                    amount = actor->c.hp / 2;
-                                } else {
-                                    amount = actor->c.hp_max / 2;
-                                }
-                                kind = 7;
-                            } else if (n < 4) {
-                                if (actor->unkCF == 0) {
-                                    amount = actor->c.hp / 8;
-                                } else {
-                                    amount = actor->c.hp_max / 8;
-                                }
-                                kind = 7;
-                            } else if (n == 4) {
-                                kind = 0;
-                                if (actor->unkCF == 0) {
-                                    kind = 0x0F;
-                                    amount = actor->c.hp / 8;
-                                }
+                            break;
+                        }
+                    } else if ((actor->flags & 0x80000) != 0) {
+                        /* The same three ranks, the other way up. */
+                        switch (actor->persona_rank) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            amount = (actor->unkCF != 0 ? actor->c.hp_max
+                                                        : actor->c.hp) / 8;
+                            kind = 7;
+                            break;
+                        case 3:
+                            amount = (actor->unkCF != 0 ? actor->c.hp_max
+                                                        : actor->c.hp) / 2;
+                            kind = 7;
+                            break;
+                        case 4:
+                            kind = 0;
+                            if (actor->unkCF == 0) {
+                                kind = 0x0F;
+                                amount = actor->c.hp / 8;
                             }
-                        } else {
-                            i = (signed char)actor->c.status;
-                            if (i == 5 || i == 4) {
-                                if (actor->c.ail_level == 2) {
-                                    kind = 7;
-                                    amount = actor->c.hp_max / 16;
-                                }
-                            } else if (i == 0x0D) {
+                            break;
+                        }
+                    } else {
+                        switch ((signed char)actor->c.status) {
+                        case 0x10:
+                            amount = actor->c.hp_max / 8;
+                            kind = 7;
+                            break;
+                        case 4:
+                            if ((signed char)actor->c.ail_level == 2) {
                                 kind = 7;
                                 amount = actor->c.hp_max / 16;
-                            } else if (i == 0x10) {
+                            }
+                            break;
+                        case 5:
+                            if ((signed char)actor->c.ail_level == 2) {
                                 kind = 7;
-                                amount = actor->c.sp_max / 8;
-                            } else if ((actor->flags & 0x1000000) == 0) {
+                                amount = actor->c.hp_max / 16;
+                            }
+                            break;
+                        case 0x0D:
+                            kind = 7;
+                            amount = actor->c.hp_max / 16;
+                            break;
+                        default:
+                            if ((actor->flags & 0x1000000) != 0) {
+                                t = actor->unkD1 + 1;
+                                actor->unkD1 = t;
+                                if (actor->unkD1 != 0) {
+                                    if ((u_char)t > 0x7F) {
+                                        t = 0x7F;
+                                        actor->unkD1 = t;
+                                    }
+                                } else {
+                                    t = 1;
+                                    actor->unkD1 = t;
+                                }
+                                amount = actor->unkD1;
+                                kind = 7;
+                            } else {
                                 kind = 0;
                                 if ((actor->flags & BTL_ACTOR_F5) != 0) {
                                     kind = 0x0F;
                                     amount = actor->c.hp_max / 8;
                                 }
-                            } else {
-                                n = actor->unkD1 + 1;
-                                actor->unkD1 = n;
-                                if (actor->unkD1 == 0) {
-                                    actor->unkD1 = 1;
-                                } else if ((u_char)n > 0x7F) {
-                                    actor->unkD1 = 0x7F;
-                                }
-                                amount = actor->unkD1;
-                                kind = 7;
-                            }
-                        }
-
-                        switch (kind) {
-                        case 7:
-                            if (amount != 0) {
-                                actor->c.hp -= amount;
-                                actor->hit_amount = amount;
-                                if (actor->c.hp < 1) {
-                                    actor->c.hp = 0;
-                                    actor->obj->motion = 8;
-                                    if (slotsnd < 0xC) {
-                                        BtlSePlay(slotsnd, 1);
-                                    }
-                                } else {
-                                    actor->obj->motion = 7;
-                                    actor->obj->children = 0;
-                                    if (slotsnd < 0xC) {
-                                        BtlSePlay(slotsnd, 0);
-                                    }
-                                }
                             }
                             break;
-                        case 0x0F:
-                            BtlSePlay(2, 0xB);
-                            actor->hit_amount = amount;
-                            amount += actor->c.hp;
-                            actor->c.hp = amount;
-                            n = amount;
-                            if (actor->c.hp_max < n) {
-                                n = actor->c.hp_max;
-                            }
-                            actor->c.hp = n;
-                            actor->obj->motion = 0x0F;
-                            break;
                         }
-                        slotsnd++;
-                        BtlDrawFrame();
-                        BtlDrawFrame();
-                        BtlDrawFrame();
-                        BtlDrawFrame();
                     }
+
+                    switch (kind) {
+                    case 0x0F:
+                        BtlSePlay(2, 0xB);
+                        actor->hit_amount = amount;
+                        actor->c.hp = amount + actor->c.hp;
+                        t = actor->c.hp;
+                        if (actor->c.hp_max < t) {
+                            t = actor->c.hp_max;
+                        }
+                        actor->c.hp = t;
+                        actor->obj->motion = 0x0F;
+                        break;
+                    case 7:
+                        if (amount != 0) {
+                            actor->c.hp -= amount;
+                            actor->hit_amount = amount;
+                            if (actor->c.hp < 1) {
+                                actor->c.hp = 0;
+                                actor->obj->motion = 8;
+                                if (n < 0xC) {
+                                    BtlSePlay(n, 1);
+                                }
+                            } else {
+                                actor->obj->motion = 7;
+                                actor->obj->children = 0;
+                                if (n < 0xC) {
+                                    BtlSePlay(n, 0);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    n++;
+                    BtlDrawFrame();
+                    BtlDrawFrame();
+                    BtlDrawFrame();
+                    BtlDrawFrame();
                 }
-                slot++;
-            } while (slot < BTL_ACTORS);
+                i++;
+                actor++;
+            } while (i < BTL_ACTORS);
 
             g_btl_delay = 0x20;
             do {
                 BtlDrawFrame();
             } while (g_btl_delay != 0);
 
-            i = 7;
-            if (slotsnd > 7) {
-                do {
-                    BtlSoundClose(i);
-                    i++;
-                } while (i < slotsnd);
+            for (i = 7; i < n; i++) {
+                BtlSoundClose(i);
             }
             i = 0;
             BtlHoldForMarkers();
             do {
+                g_btl_actors[i].flags &= 0xF7FC5FFF;
                 i++;
-                g_btl_actors[i - 1].flags &= 0xF7FC5FFF;
             } while (i < BTL_ACTORS);
 
-            slot = 0;
             i = 0;
             do {
-                if ((g_btl_actors[slot].c.key == 0
-                     || (signed char)g_btl_actors[slot].c.status
+                if ((g_btl_actors[i].c.key == 0
+                     || (signed char)g_btl_actors[i].c.status
                             == BTL_STATUS_DOWN
-                     || (g_btl_actors[slot].flags & BTL_ACTOR_OUT) != 0)
-                    && g_btl_actors[slot].marker != 0) {
-                    g_btl_actors[slot].marker = 0;
-                    BtlShowMarker(slot, 0, g_btl_actors[slot].c.unk5D & 0xF);
+                     || (g_btl_actors[i].flags & BTL_ACTOR_OUT) != 0)
+                    && g_btl_actors[i].marker != 0) {
+                    g_btl_actors[i].marker = 0;
+                    BtlShowMarker(i, 0, g_btl_actors[i].c.unk5D & 0xF);
                 }
-                slot++;
-            } while (slot < BTL_PARTY);
+                i++;
+            } while (i < BTL_PARTY);
 
+            /* The way out of the round. The turn and the scene step both end
+               the round the same way, and share this block in the image. */
             if (BtlAnyStanding() == 0
                 || (g_btl_debug_hud != 0 && (g_btl_pad1 & g_btl_key_end) != 0)
                 || BtlBattleOutcome() == 0) {
-                goto round_over;
+                g_btl_step = 6;
+                break;
             }
-            if ((u_int)(g_btl_encounter - 0x1D) < 2) {
+            if ((u_int)((u_short)g_btl_encounter - 0x1D) < 2) {
                 BtlLoadPackBank(0xC5);
             }
             BtlPackEnemyGrid();
             BtlAfterTalk();
-            goto step_on;
-
-            /* The way out of the round. It is written here rather than where
-               it is decided: the image puts the block at this end of the
-               switch, and both the turn and the tally jump forward to it. */
-        round_over:
-            g_btl_step = 6;
+            g_btl_step++;
             break;
-
         }
         case 5: {
             if (BtlMarkersHidden() != 0 && BtlActorsIdle() != 0) {
@@ -1305,7 +1332,6 @@ void BtlStageRound(void)
                 g_btl_step = 9;
             }
             break;
-
         }
         case 6: {
             BtlHideMarkers();
@@ -1313,7 +1339,6 @@ void BtlStageRound(void)
             BtlRoundOverScene();
             BtlLastEnemyScene();
             break;
-
         }
         case 7: {
             if (BtlMarkersHidden() != 0) {
@@ -1321,12 +1346,8 @@ void BtlStageRound(void)
                 return;
             }
             break;
-
         }
         case 9: {
-            int slot;
-            int i;
-
             if (BtlMarkersIdle() != 0 && BtlMarkersHidden() != 0) {
                 i = 0;
                 BtlBoxDismiss();
@@ -1334,14 +1355,13 @@ void BtlStageRound(void)
                 BtlDrawFrame();
                 BtlDrawFrame();
                 bzero(g_btl_debug_grid_cells, 0x4B);
-                slot = 0;
                 g_btl_boss22_shown = 0;
                 g_btl_boss20_shown = 0;
                 do {
-                    g_btl_actors[slot].unkDC = 0;
-                    g_btl_actors[slot].unkDB = 0;
-                    slot++;
-                } while (slot < BTL_PARTY);
+                    g_btl_actors[i].unkDC = 0;
+                    g_btl_actors[i].unkDB = 0;
+                    i++;
+                } while (i < BTL_PARTY);
                 BtlCountDownRound();
                 BtlTalkResume();
                 BtlPartyResetGfx();
@@ -1350,12 +1370,12 @@ void BtlStageRound(void)
                 /* Three ways a negotiation can leave the round, and the
                    default is the one that hands back to the menu. */
                 switch (g_btl_talk_outcome) {
-                case 2:
-                    BtlTalkersLeaveField();
-                    g_btl_step = 0;
-                    break;
                 case 1:
                     BtlTalkersStay();
+                    g_btl_step = 0;
+                    break;
+                case 2:
+                    BtlTalkersLeaveField();
                     g_btl_step = 0;
                     break;
                 case 3:
@@ -1377,9 +1397,6 @@ void BtlStageRound(void)
         BtlDrawFrame();
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageRound);
-#endif
 
 /* One enemy's turn, chosen fresh each time it comes round.
  *
@@ -1388,10 +1405,13 @@ INCLUDE_ASM("btlp/nonmatchings/roundflow", BtlStageRound);
  * then are the six spells the fighter knows tested for whether they could be
  * cast at all, and whatever survives is weighed against the mood's odds.
  *
- * The unused copy of the ailment mask before the jump table remains in the
- * overlay's raw rodata; this unit emits the switch table itself.
+ * The ailment mask is also a word of rodata of its own, between the round's
+ * jump tables and this routine's. Nothing reads it, but the image has it, so
+ * the unit defines it here - which is where gcc puts it, between the two.
  */
 #define AI_SKIP_AILMENTS 0x0060C0FCUL
+
+const u_long g_btl_ai_skip_ailments = AI_SKIP_AILMENTS;
 
 int BtlChooseEnemyMove(BtlActor *a)
 {
