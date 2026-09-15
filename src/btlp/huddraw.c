@@ -92,6 +92,13 @@ typedef struct {
 #define HUD_CORNER_X(j) ((j) % 2)
 #define HUD_CORNER_Y(j) ((j) / 2)
 
+/* 92.98%. The two passes, the cell walk and every primitive are the image's;
+   what is left is which saved register each of the two bases takes - the image
+   keeps the record in s1 and the scratchpad in s2, this the other way round -
+   and a handful of instructions the scheduler puts on the far side of a store.
+   Declaring the two in either order, assigning them at their declaration or in
+   the body, reaching the record through a pointer or by name, and spelling the
+   scratchpad through the macro all leave the pair as they are. */
 #ifdef NON_MATCHING
 void BtlHudDraw(void)
 {
