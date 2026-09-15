@@ -323,7 +323,7 @@ segments:
       - [0x17B88, c, windowtype]
       - [0x17EE0, c, windowstep]
       - [0x1819C, c, seqstate3]
-      - [0x182C4, asm, btlp_32_x1]
+      - [0x182C4, c, seqwindowdraw]
       - [0x1869C, c, text]
       - [0x188C0, asm, btlp_32_x3]
       - [0x1900C, c, text3]

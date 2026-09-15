@@ -96,7 +96,7 @@ extern void BtlPanelSetImage(int on, u_char image);
 extern void BtlPushRecent(int gauge);
 
 /* The scene's own tables live at a per-scene offset the scratch header holds. */
-#define TALK_BASE ((char*)BTL_SCRATCH_W + BTL_SCRATCH_W[2])
+#define TALK_BASE ((char *)BTL_SCRATCH_W + g_btl_scratch_size)
 
 #ifdef NON_MATCHING
 void BtlTalkSceneDemand(void)

@@ -25,23 +25,8 @@
 #define BTL_SEQ_RUNNING  4
 #define BTL_SEQ_FINISHED 8
 
-/* Where this window sits, and where its glyphs are staged. Unlike the second
-   window it has a fixed corner of VRAM rather than one of two pages. */
-#define BTL_SEQ_X      0x20
-#define BTL_SEQ_Y      0xAC
-#define BTL_SEQ_VRAM_X 0x380
-#define BTL_SEQ_VRAM_Y 0x100
-
-/* Its palettes go beside the glyphs, four rows of sixteen colours. */
-#define BTL_SEQ_CLUT_Y 0x180
-#define BTL_SEQ_CLUT_W 0x10
-#define BTL_SEQ_CLUT_H 4
-
 extern void BtlUpdateVoices(void);
 
-/* The sequencer's own message window record, and the routine both windows
-   are stepped through. Not g_btl_seq, which is the SPU sequence handles. */
-extern BtlWindow g_btl_seq_window;
 /* Defined in the unit before this one; the prototype is what
    decides how the arguments are converted. */
 extern void BtlSeqWaitDone(void);

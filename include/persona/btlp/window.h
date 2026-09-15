@@ -72,6 +72,23 @@ typedef struct BtlWindow {
 extern u_char g_btl_glyph_cells[];
 extern int    g_btl_glyph_next;
 
+/* The sequencer's own window. Not g_btl_seq, which is the SPU sequence
+   handles. */
+extern BtlWindow g_btl_seq_window;
+
+/* Where the sequencer's window sits, and where its glyphs are staged. Unlike
+   the second window it has a fixed corner of VRAM rather than one of two
+   pages. */
+#define BTL_SEQ_X      0x20
+#define BTL_SEQ_Y      0xAC
+#define BTL_SEQ_VRAM_X 0x380
+#define BTL_SEQ_VRAM_Y 0x100
+
+/* Its palettes go beside the glyphs, four rows of sixteen colours. */
+#define BTL_SEQ_CLUT_Y 0x180
+#define BTL_SEQ_CLUT_W 0x10
+#define BTL_SEQ_CLUT_H 4
+
 /* One frame of a window: type the next character, move it, run its
    timer. The second argument holds the typing where it is. */
 extern short BtlWindowStep(BtlWindow *w, int pause);
