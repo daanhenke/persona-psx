@@ -343,7 +343,9 @@ segments:
       - [0x198A8, c, menudraw]
       - [0x19C08, c, hudload]
       - [0x19DFC, c, hud]
-      - [0x19FD4, asm, btlp_34]
+      # The status panel drawn: sprites at full size, quads through the GTE
+      # while it zooms.
+      - [0x19FD4, c, huddraw]
       - [0x1AB68, c, indicator]
       - [0x1AEB8, c, openmessage]
       - [0x1B028, c, boxmessage]
