@@ -2583,3 +2583,119 @@ round the load follows the `-1` into the same register.
 
 - [pickmove.c](/src/btlp/pickmove.c) - `BtlPickMoveTarget`'s revival, 99.19%
   to 99.35%.
+
+## The low byte of an int global: mask it, do not cast it
+
+`(u_char)g_btl_talk_reaction` and `*(u_char *)&g_btl_talk_reaction` expand the
+same way: the narrowing goes through a register loaded with the symbol's
+address, and the byte is read as `0(reg)`. When the same global is read again
+nearby, cse hands the later reads that register too, so the image's
+`lui/lbu %lo(sym)` pairs come out as one `la` and a run of `lbu 0(a1)` - and
+because the reads now go through a register, cse can no longer tell a store to
+another global from a store to this one, and reloads what it should have kept.
+The RTL dump shows the `(set (reg) (symbol_ref ...))` already there at expand.
+
+    g_btl_talk_said = g_btl_talk_reaction & 0xFF;
+    BtlTalkPersonaBonus(g_btl_talk_reaction & 0xFF);
+
+reads the whole word and lets combine narrow it back to a direct `lbu`. The
+tail of the same routine does want the register - two byte reads either side of
+a call, kept in s0 - and there the cast is right.
+
+- [talkscenemenu.c](/src/btlp/talkscenemenu.c) - `BtlTalkSceneMenu`, 97.02% to
+  97.90%.
+
+## `&record[i].array[k]` does not fold its constant
+
+C turns `&a[k]` into `a + k`, so the address of an element of an array inside
+a record of another array is built as the record's address plus the field's
+offset in one register, and `k * 2` added to that afterwards. The image loads
+`sym + field + 2k` as one constant and adds the record's offset to it, which is
+what comes out when the element's address is taken in the first record and the
+slot's offset added by hand:
+
+    off = g_btl_offer_slot * sizeof(BtlOffer);
+    g_btl_mood_bar[1] = (short *)((char *)&g_btl_offer[0].mood[1] + off);
+
+- [talkscenemenu.c](/src/btlp/talkscenemenu.c) - `BtlTalkSceneMenu`'s mood
+  bars, 97.90% to 98.50%.
+
+## A loop that counts up can come out counting down
+
+Strength reduction reverses a loop whose counter does nothing but index and
+count, and the reversed counter is made in the loop's preheader *after* the
+constants hoisted out of the body. So an image that loads the constant first
+and the counter second -
+
+    ori  v1, zero, 0x1
+    ori  s1, zero, 0x8
+    ori  v0, zero, 0xBFC
+
+- was written counting up, `for (i = 0; i < BTL_ENEMIES; i++)`. Written as the
+count-down the image shows, the counter's own initialiser comes out ahead of
+the constant. Where the counter is not needed after the loop at all it is
+eliminated and only the walked offset is left.
+
+- [talkscenemenu.c](/src/btlp/talkscenemenu.c) - the three pickable and recent
+  loops in `BtlTalkSceneMenu`, 95.04% to 95.52%.
+
+## Three case values make a tree, two make a chain
+
+gcc splits a switch's case list once it holds more than two values, so
+`case 0: case 1: case 2:` comes out as a `slti` against the middle one. An
+image that tests 0, 1 and 2 in turn and lays the bodies out after the tests is
+a two-value switch behind a test of its own:
+
+    if (mode == 0) {
+        continue;
+    }
+    switch (mode) {
+    case 1: ...
+    case 2: ...
+    default: ...
+    }
+
+- [frontslots.c](/src/btlp/frontslots.c) - `BtlFrontSlotsTick`, 85.08% to
+  exact.
+
+## A field gcc reads twice, and the image reads once
+
+The mirror of the entry above: `if (e->flags & BIT) table[(e->flags >> 9) & 3](e)`
+reloads the flags for the index, because the branch splits the two reads into
+blocks cse does not join. The image loads them once and shifts them in the
+branch's delay slot, which is a local:
+
+    flags = e->flags;
+    if ((flags & BTL_EFFECT_FRAMED) != 0) {
+        g_btl_effect_frames[(flags >> 9) & 3](e);
+    }
+
+- [effects.c](/src/btlp/effects.c) - `BtlDrawEffects`, 98.61% to exact but for
+  a table's name.
+
+## A sum stored into a short wants a short accumulator
+
+`line = line * 4 + g_btl_talk_picked` into an `int` sign-extends the short it
+adds (`lh`); the image adds it with `lhu`, which is what a `short` accumulator
+gets, since only its low sixteen bits survive. Read the load's extension off
+the image before choosing the local's type.
+
+- [talkscenemenu.c](/src/btlp/talkscenemenu.c) - `BtlTalkSceneMenu`'s act
+  line, 98.88% to 99.19%.
+
+## A copy that walks its source in place is `*p++`, not `p[i]`
+
+A byte copy out of a table entry, `for (i = 0; i < 4; i++) odds[i] = p[i];`,
+has loop.c strength-reduce `p + i` into a new register, set up from `p` before
+the loop (`addu v1, a1, a0`). The image adds the offset into the entry
+pointer's own register and walks that (`addu a1, a1, a0` then `addiu a1, a1, 1`),
+which is a pointer that is itself the induction variable. Advance the one
+pointer and post-increment it; giving the walk a second variable, or indexing
+the advanced pointer, both keep the extra register:
+
+    e += i * sizeof(BtlReaction) + 1;
+    for (i = 0; i < BTL_MOODS; i++) {
+        odds[i] = *e++;
+    }
+
+- [talkloop.c](/src/btlp/talkloop.c) - `BtlPickReaction`, 99.92% to exact.

@@ -66,7 +66,7 @@ typedef struct {
     /* 0x2 */ u_char  mood[2];   /* which gauge the act moves               */
     /* 0x4 */ u_char  amount[2]; /* by how much                             */
     /* 0x6 */ u_short line[2];   /* the directory slot of what is said      */
-} BtlTalkChoice;                 /* 10 bytes */
+} BtlTalkActChoice;                 /* 10 bytes */
 
 /* The scratch area is reached by address, the way BtlOpenChoice reaches it and
    the way the rest of the work area is reached. */
@@ -95,7 +95,7 @@ void BtlTalkSceneAct(void)
 {
     u_char        *script;
     u_long         dir;
-    BtlTalkChoice *rec;
+    BtlTalkActChoice *rec;
     int            choice;
     short         *mood_of;
     int            which;
@@ -114,7 +114,7 @@ void BtlTalkSceneAct(void)
     g_btl_menu_aside = 0;
     choice = BtlMenuChoice();
     mood_of = g_btl_offer[g_btl_offer_slot].mood;
-    rec = (BtlTalkChoice *)(BTL_SCRATCH + g_btl_choice_row * CHOICE_ROW
+    rec = (BtlTalkActChoice *)(BTL_SCRATCH + g_btl_choice_row * CHOICE_ROW
                             + g_btl_choice_acts + choice * 10);
     BtlFaceClose();
     BtlRunFrames(ACT_SETTLE);

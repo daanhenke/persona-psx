@@ -205,12 +205,13 @@ g_btl_text_cluts              = 0x800648AC;
 //-------------------------------------------------------------
 //--- PA: 0x001990   VA: 0x80065D30   subsegment: asm, btlp_pre
 //-------------------------------------------------------------
-func_80065D30                 = 0x80065D30; // type:func size:0x34
-func_80065D64                 = 0x80065D64; // type:func size:0x110
+BtlFrontSlotSet               = 0x80065D30; // type:func size:0x34
+BtlFrontPost                  = 0x80065D64; // type:func size:0x108
 
 //------------------------------------------------------------
 //--- PA: 0x001AD4   VA: 0x80065E74   subsegment: c, drawfront
 //------------------------------------------------------------
+func_80065E6C                 = 0x80065E6C; // type:func size:0x8
 BtlDrawFront                  = 0x80065E74; // type:func size:0x140
 BtlFrontStepReady             = 0x80065FB4; // type:func size:0x8
 BtlFrontStepDraw              = 0x80065FBC; // type:func size:0x8
@@ -218,11 +219,17 @@ BtlFrontStepDraw              = 0x80065FBC; // type:func size:0x8
 //--------------------------------------------------------------
 //--- PA: 0x001C24   VA: 0x80065FC4   subsegment: asm, btlp_pre1
 //--------------------------------------------------------------
-D_80065FC4                    = 0x80065FC4; // type:func size:0x330
+BtlFrontSlotGrow              = 0x80065FC4; // type:func size:0xC0
 
 //---------------------------------------------------------
 //--- PA: 0x001F54   VA: 0x800662F4   subsegment: c, number
 //---------------------------------------------------------
+BtlFrontSlotShrink            = 0x80066084; // type:func size:0xC4
+BtlFrontSlotStep              = 0x80066148; // type:func size:0x8
+BtlFrontSlotDraw              = 0x80066150; // type:func size:0x8
+BtlFrontSlotsTick             = 0x80066158; // type:func size:0xF4
+func_8006624C                 = 0x8006624C; // type:func size:0x8
+BtlFrontQuadUv                = 0x80066254; // type:func size:0xA0
 BtlFormatDecimal              = 0x800662F4; // type:func size:0xA0
 
 //----------------------------------------------------------
@@ -2819,11 +2826,16 @@ BtlActorSlotByKey             = 0x800C5F60; // type:func size:0x3C
 //---------------------------------------------------------------
 //--- PA: 0x061BFC   VA: 0x800C5F9C   subsegment: data, btlp_data
 //---------------------------------------------------------------
+g_btl_front_clut              = 0x800C5F9C; // size:0x100
 g_btl_front_side              = 0x800C609C;
 g_btl_front_step              = 0x800C60A0;
 g_btl_front_timer             = 0x800C60A2;
+g_btl_front_queue             = 0x800C60A8; // size:0x40
+g_btl_front_slot_phase        = 0x800C60E8; // size:0x4
+g_btl_front_modes             = 0x800C60EC; // size:0xC
 g_btl_vram_load_count         = 0x800C60F8;
 g_btl_vram_clear_count        = 0x800C60FC;
+g_btl_talk_win_scripts        = 0x800C6BA0;
 g_btl_bgm_table               = 0x800C6C3C;
 g_btl_demand_menus            = 0x800C6DAC;
 g_btl_talk_give_menu          = 0x800C6DB4;
@@ -2841,12 +2853,16 @@ g_btl_talk_labels             = 0x800C8E00;
 g_btl_talk_script_ids         = 0x800C8E94;
 g_btl_talk_scripts            = 0x800C9F9C;
 g_btl_talk_lines              = 0x800CA2D4;
+g_btl_reactions               = 0x800CA39C;
 g_btl_summon_lines            = 0x800CAB34;
-D_800CAE94                    = 0x800CAE94; // type:u32 size:0x2C
+g_btl_talk_persona_scenes     = 0x800CAE94; // type:u32 size:0x2C
 g_btl_talk_depth              = 0x800CAEC0; // type:u32 size:0xE4
 g_btl_talk_asked              = 0x800CAEC1;
 g_btl_talking                 = 0x800CAEC2;
+g_btl_mood_before             = 0x800CAEC4; // size:0x8
 g_btl_talk_item_gift_script   = 0x800CAECC;
+g_btl_talk_unpickable_script  = 0x800CAEE4; // size:0x4
+g_btl_talk_mute_script        = 0x800CAEE8; // size:0x4
 g_btl_talk_left_script        = 0x800CAEEC;
 g_btl_talk_pick_gift_script   = 0x800CAEF0;
 g_btl_talk_gift_shown_script  = 0x800CAEF8;
@@ -2867,6 +2883,7 @@ g_btl_talk_bind_script        = 0x800CAF34;
 g_btl_talk_cowering_script    = 0x800CAF38;
 g_btl_talk_happy_script       = 0x800CAF3C;
 g_btl_talk_smirk_script       = 0x800CAF40;
+g_btl_talk_turned_down_script = 0x800CAF44; // size:0x4
 g_btl_talk_gift_script        = 0x800CAF48;
 g_btl_talk_money_script       = 0x800CAF4C;
 g_btl_talk_exp_script         = 0x800CAF50;
@@ -2887,6 +2904,7 @@ g_btl_talk_result             = 0x800CAFAA;
 g_btl_recent                  = 0x800CAFAC; // size:0x14
 g_btl_files                   = 0x800CAFC0;
 g_btl_scratch_loaded          = 0x800CB278;
+g_btl_talk_line_script        = 0x800CB27C; // size:0x4
 g_btl_talk_said_script        = 0x800CB280;
 g_btl_talk_said_line          = 0x800CB284;
 g_btl_choice_shown            = 0x800CB288;
@@ -2897,11 +2915,14 @@ g_btl_talk_open_counts        = 0x800CB398;
 g_btl_talk_open_moods         = 0x800CB3A8;
 g_btl_talk_open_lines         = 0x800CB3B4;
 g_btl_talk_sounds_loaded      = 0x800CB3C0;
+g_btl_force_reaction          = 0x800CB3CC; // size:0x10
 g_btl_menu_aside              = 0x800CB3DC;
+g_btl_reaction_shifts         = 0x800CB410; // size:0x28
 g_btl_voice_kind              = 0x800CB438; // type:u32 size:0x4
 g_btl_voice_line              = 0x800CB43A;
 g_btl_voice_who               = 0x800CB43C; // type:u32 size:0x80
 g_btl_voice_step              = 0x800CB43E;
+g_btl_talk_member_pack        = 0x800CB440;
 g_btl_panel_offer             = 0x800CB454;
 g_btl_talk_special_script     = 0x800CB460;
 g_btl_talk_special            = 0x800CB490;
@@ -2909,6 +2930,7 @@ g_btl_talk_special            = 0x800CB490;
 //-----------------------------------------------------------------
 //--- PA: 0x0670FC   VA: 0x800CB49C   subsegment: .data, talkanswer
 //-----------------------------------------------------------------
+g_btl_talk_open_slot          = 0x800CB498; // size:0x4
 g_btl_moon_new_partners       = 0x800CB49C; // type:u32 size:0x10
 g_btl_moon_full_partners      = 0x800CB4AC; // type:u32 size:0x10
 g_btl_talk_answers            = 0x800CB4BC; // size:0x50
@@ -2940,8 +2962,12 @@ g_btl_effect_held             = 0x800CC574;
 g_btl_talk_board_done         = 0x800CC578; // type:s32 size:0x4
 g_btl_talk_board_step         = 0x800CC57C; // type:s32 size:0x4
 g_btl_effect                  = 0x800CC598;
+g_btl_effect_page             = 0x800CC5A8; // size:0x4
 g_btl_effect_cur              = 0x800CC5AC;
 g_btl_effect_prev             = 0x800CC5B0;
+g_btl_effect_motions          = 0x800CC5B4; // size:0x20
+g_btl_effect_drawers          = 0x800CC5D4; // size:0xC
+g_btl_effect_frames           = 0x800CC5E0; // size:0x4
 g_btl_effect_cursor_fn        = 0x800CC5E4;
 g_btl_text_page               = 0x800CC5F4;
 g_btl_prim_peak               = 0x800CC5F8;
@@ -3350,6 +3376,7 @@ g_btl_spell_fx                = 0x800D0484; // size:0xF70
 //-----------------------------------------------------------------
 //--- PA: 0x06D054   VA: 0x800D13F4   subsegment: data, btlp_data2b
 //-----------------------------------------------------------------
+g_btl_strike_spread           = 0x800D13F4; // size:0x8
 g_btl_fx_nine_order           = 0x800D1408; // type:u8 size:0x9
 g_btl_fx_ring_cells           = 0x800D1414; // type:u8 size:0x10
 g_btl_fx_lift                 = 0x800D1424; // type:s32 size:0xC
@@ -3479,6 +3506,7 @@ g_btl_demand_item             = 0x800E8AE4;
 g_btl_demand_money            = 0x800E8AE8;
 g_btl_demand_kind             = 0x800E8AEC;
 g_btl_demand_answer           = 0x800E8AF0;
+g_btl_talk_reaction           = 0x800E8AF8; // size:0x4
 g_btl_talk_gift               = 0x800E8AFC;
 g_btl_panel_gauges            = 0x800E8B00;
 g_btl_mood_state              = 0x800E8B04;
@@ -3495,7 +3523,7 @@ g_btl_member                  = 0x800E8B30; // size:0x8
 g_btl_offer                   = 0x800E8BF0; // type:u32 size:0xD8
 g_btl_level_gap               = 0x800E8CC8;
 g_btl_talk_pair               = 0x800E8CCC;
-g_btl_choice_row              = 0x800E8CD0; // type:u32 size:0x23C
+g_btl_choice_row              = 0x800E8CD0; // type:u32 size:0x4
 g_btl_talk_scene              = 0x800E8CD4;
 g_btl_talk_stage              = 0x800E8CDC;
 g_btl_talk_last_scene         = 0x800E8CE4;
@@ -3541,6 +3569,7 @@ g_btl_seq_answer              = 0x800E91CC; // type:s32 size:0x4
 g_btl_seq_cut                 = 0x800E91D0; // type:s32 size:0x4
 g_btl_talk_cursor_was         = 0x800E91DC; // type:u8 size:0x1
 g_btl_effect_step             = 0x800E91E0;
+g_btl_effect_ots              = 0x800E91F0; // size:0x40
 g_btl_effect_ot               = 0x800E9230;
 g_btl_effect_ox               = 0x800E9234;
 g_btl_effect_oy               = 0x800E9238;
@@ -3879,6 +3908,7 @@ g_load_stage_21               = 0x80140054; // size:0x4
 g_btl_pack_vb                 = 0x80152400;
 g_btl_pack_vh                 = 0x80152404;
 g_btl_pack_seq                = 0x80152408;
+g_btl_front_slots_raw         = 0x80178000; // ignore:True size:0x3B0
 g_btl_voice_vb                = 0x801A1200;
 g_btl_voice_vh                = 0x801A1204;
 g_btl_voice_seq               = 0x801A1208;

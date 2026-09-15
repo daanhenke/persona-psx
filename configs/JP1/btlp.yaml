@@ -12,6 +12,9 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/btlp.ld
   symbol_addrs_path: configs/JP1/sym.btlp.txt
+  # References splat cannot name the way the C writes them: a table reached
+  # from before its start has a negative addend on it.
+  reloc_addrs_path: configs/JP1/reloc.btlp.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.btlp.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.btlp.txt
   compiler: GCC
@@ -60,6 +63,8 @@ segments:
       - [0x4, rodata, btlp_rodata]
       # BtlTalkSceneStep's switch table, which the C emits itself.
       - [0x44, .rodata, talkstep]
+      # Ends with BtlTalkSceneMenu's twenty-entry switch table, which stays in
+      # asm while that routine is guarded.
       - [0x8C, rodata, btlp_rodata0]
       - [0xE4, .rodata, talkpair]
       - [0xF4, rodata, btlp_rodata0a]
@@ -139,6 +144,9 @@ segments:
       - [0x1238, .rodata, enemymotion2]
       - [0x130C, pad, btlp_pad_130c]
       - [0x1310, rodata, btlp_rodata6b1_a]
+      # BtlSpawnMoveStrike's forty-eight-entry switch table, which movestrike.c
+      # emits itself.
+      - [0x135C, .rodata, movestrike]
       # BtlFxStepA0's switch table, which fxspella0.c emits itself, and the
       # word of padding behind it that belongs to nobody.
       - [0x141C, .rodata, fxspella0]
@@ -164,9 +172,10 @@ segments:
       - [0x18C4, .rodata, fxfinish37]
       - [0x18F4, rodata, btlp_rodata6b1_fxa2]
       # 0x1990 is where the leading rodata block ends and text begins.
-      - [0x1990, asm, btlp_pre]
+      # Posting to the front layer, and the front slots' open and close.
+      - [0x1990, c, frontpost]
       - [0x1AD4, c, drawfront]
-      - [0x1C24, asm, btlp_pre1]
+      - [0x1C24, c, frontslots]
       - [0x1F54, c, number]
       - [0x1FF4, c, tilestr]
       - [0x209C, c, drawmesh]
@@ -217,7 +226,8 @@ segments:
       - [0x5FD4, c, talkscenedemand]
       - [0x6CFC, c, talkstep]
       - [0x7308, c, drawfront2]
-      - [0x7310, asm, btlp_9_x1]
+      # Opening the talk, and how a demon takes an act.
+      - [0x7310, c, talkloop]
       - [0x79A0, c, talkreact]
       - [0x7B3C, c, tint2]
       - [0x7C24, c, voice]
@@ -227,7 +237,8 @@ segments:
       - [0x8314, c, showoffer]
       - [0x8378, c, moodretire]
       - [0x84E4, c, talkscript]
-      - [0x85C4, asm, btlp_11]
+      # The talk's own menus: which offer, which member, which act.
+      - [0x85C4, c, talkscenemenu]
       - [0x9EEC, c, offer2]
       - [0x9F70, c, chooseoffer]
       - [0xA104, c, talkpair]
@@ -284,7 +295,8 @@ segments:
       - [0x1438C, asm, btlp_26]
       - [0x14D88, c, effecttext]
       - [0x14DD8, c, effectdraw]
-      - [0x14E80, asm, btlp_27]
+      # Drawing the effect slots.
+      - [0x14E80, c, effects]
       # The answer an effect gives, and two of its cursor handlers.
       - [0x15234, c, effectprompt]
       - [0x15798, c, effectcursor]
@@ -559,7 +571,8 @@ segments:
       - [0x51EB0, c, objvanish]
       - [0x51F7C, c, pickrandom]
       - [0x52188, c, movefx]
-      - [0x5235C, asm, btlp_69_b]
+      # The objects a move's strike is played out with.
+      - [0x5235C, c, movestrike]
       - [0x52810, c, fxtick]
       - [0x528DC, c, fxstart]
       - [0x5292C, c, fxsheet3]

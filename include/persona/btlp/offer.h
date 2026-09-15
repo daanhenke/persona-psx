@@ -110,4 +110,17 @@ extern void BtlMarkMembersMatched(void);
 extern int  BtlTalkBlocked(void);
 extern void BtlOfferMarkEnemies(u_char status, u_char level);
 
+/* Set in BtlOffer.kinds once a contact has been made with the offer, and once
+   a member has been picked to talk to it. */
+#define OFFER_CONTACTED 0x10000000
+#define OFFER_TALKING   0x8000000
+
+extern const u_char *g_btl_demon_talk_profiles[];
+
+extern int  BtlStockHolds(const BtlOffer *offer);
+extern int  BtlOfferRank(int slot);
+extern int  BtlPickOffer(short *slot);
+extern void BtlOfferMenu(int slot);
+extern void BtlTalkMenuEndEffect(void);
+
 #endif

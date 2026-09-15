@@ -77,6 +77,7 @@ extern void BtlReadSectorsAsync(u_long *dest, int sector, int sectors);
 
 extern void BtlLoadPackEntry(int entry);
 extern void BtlLoadPackBank(int entry);
+extern void BtlSeekPackEntry(int entry);
 extern void BtlReadPackBank(int wait, int entry);
 extern void BtlOpenPackBank(void);
 

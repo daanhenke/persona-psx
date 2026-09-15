@@ -145,6 +145,34 @@ extern const u_char g_btl_hex_glyphs[16];
 
 extern BtlEffect *g_btl_effect[];
 
+/* Each slot's two-entry ordering table for either display buffer, the one the
+   drawers are filling now, and which buffer that is. */
+#define BTL_EFFECT_OT_LEN 2
+extern u_long  g_btl_effect_ots[2][BTL_EFFECT_SLOTS][BTL_EFFECT_OT_LEN];
+extern u_long *g_btl_effect_ot;
+extern int     g_btl_effect_page;
+
+/* What the effect is shifted by as it is drawn, in pixels. */
+extern short g_btl_effect_ox;
+extern short g_btl_effect_oy;
+
+/* The motion handlers by the kind byte's low nibble, the row drawers by a
+   row's (counted from one), and the frame drawers by bits 9 and 10 of the
+   flags. */
+extern int  (*g_btl_effect_motions[])(BtlEffect *e);
+extern void (*g_btl_effect_drawers[])(const BtlEffectRow *row);
+extern void (*g_btl_effect_frames[])(BtlEffect *e);
+
+/* Bits of BtlEffect.flags besides the running bit and the shift. */
+#define BTL_EFFECT_DRAWN  0x8000
+#define BTL_EFFECT_ROWS   0x4000
+#define BTL_EFFECT_FRAMED 0x2000
+
+extern void BtlDrawEffects(u_long *ot);
+extern void BtlDrawEffectText(u_char *effect);
+extern void BtlEffectOffset(const BtlEffect *e);
+extern void BtlEffectMoveCursor(int slot);
+
 /* The row each slot's cursor is on. */
 extern BtlEffectRow *g_btl_effect_step[];
 

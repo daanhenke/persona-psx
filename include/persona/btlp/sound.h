@@ -102,5 +102,15 @@ extern int g_btl_bgm_seq;
 extern u_char g_btl_bgm_table[][4];
 extern void BtlBgmOpen(void);
 extern void BtlBgmChange(int track, int column, int base);
+extern void BtlBgmRestore(void);
+
+/* seq.c takes nothing, but the talk menu hands it the line BtlPickLine chose,
+   so it is declared without a prototype. */
+extern void BtlWaitBgmEnd();
+
+extern void BtlQueueVoice(u_short line, int alt);
+
+/* The volume the battle music is playing at. */
+extern short BtlSeqVolumeMean(void);
 
 #endif

@@ -184,7 +184,7 @@ extern void BtlTickObjects(void);
 extern void BtlStepObjScripts(void);
 extern void BtlWaveMesh(void);
 extern void BtlDrawBehind(u_long *ot);
-extern void BtlDrawFront(u_long *ot);
+extern int  BtlDrawFront(u_long *ot);
 extern void BtlFlushVramQueues(void);
 extern void BtlPadRead(void);
 
@@ -299,6 +299,8 @@ extern void BtlSeqPlay(const u_char *script);
 extern void BtlSeqSetState(int state, int frames);
 extern void BtlSeqRun(void);
 extern void BtlSeqWaitDone(void);
+extern void BtlSeqReset(void);
+extern void BtlSeqStart(void);
 extern void BtlFaceClose(void);
 extern void BtlPanelClose(void);
 extern void BtlEnemiesReset(void);

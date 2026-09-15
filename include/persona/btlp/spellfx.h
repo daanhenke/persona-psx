@@ -48,6 +48,10 @@ extern u_char *g_btl_unused_gfx;
    each allocation from the staged artwork's own script table. */
 extern BtlObjDef g_btl_fx_def;
 
+/* The x and y, in whole units, each of the four objects of a spread strike is
+   thrown along. */
+extern signed char g_btl_strike_spread[];
+
 /* A second one of the same, in the overlay's own workspace rather than beside
    the tables. Only BtlFxStep6E fills it in, the way the overlay carries a
    second BtlOpenFxObj and a second copy of the ring's cells. */

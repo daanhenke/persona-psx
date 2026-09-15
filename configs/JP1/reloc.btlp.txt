@@ -1,0 +1,18 @@
+// Relocations splat cannot infer. A table the C indexes from one or two
+// slots before its start compiles to a negative addend on that table, but
+// spimdisasm only names an address after the symbol that covers it, so the
+// expected side would call the same address by its neighbour's name.
+
+// BtlDrawEffects - g_btl_effect_drawers[kind - 1]
+rom:0x14EB8 reloc:MIPS_HI16 symbol:g_btl_effect_drawers addend:-0x4
+rom:0x14EBC reloc:MIPS_LO16 symbol:g_btl_effect_drawers addend:-0x4
+
+// BtlSpawnMoveStrike - g_btl_strike_spread[n - 2] and [n - 1], twice
+rom:0x52558 reloc:MIPS_HI16 symbol:g_btl_strike_spread addend:-0x2
+rom:0x52560 reloc:MIPS_LO16 symbol:g_btl_strike_spread addend:-0x2
+rom:0x52570 reloc:MIPS_HI16 symbol:g_btl_strike_spread addend:-0x1
+rom:0x52578 reloc:MIPS_LO16 symbol:g_btl_strike_spread addend:-0x1
+rom:0x52644 reloc:MIPS_HI16 symbol:g_btl_strike_spread addend:-0x2
+rom:0x5264C reloc:MIPS_LO16 symbol:g_btl_strike_spread addend:-0x2
+rom:0x5265C reloc:MIPS_HI16 symbol:g_btl_strike_spread addend:-0x1
+rom:0x52664 reloc:MIPS_LO16 symbol:g_btl_strike_spread addend:-0x1

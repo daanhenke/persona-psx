@@ -66,4 +66,11 @@ extern void BtlDrawPanelBox(int panel);
 extern void BtlDrawPanel(int buf, u_long *ot);
 extern void BtlPanelSetImage(u_char group, u_char image);
 
+/* The offer the panel is showing, -1 for none. */
+extern int  g_btl_panel_offer;
+extern void BtlPanelLoad(void);
+/* showoffer.c takes nothing, but the talk menu hands it the offer slot, so it has no prototype. */
+extern void BtlPanelShowOffer();
+extern void BtlSetMoodGauges(short a, short b, short c, short d);
+
 #endif

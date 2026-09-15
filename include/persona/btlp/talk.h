@@ -74,7 +74,9 @@ extern void BtlTalkStart(void);
 /* Answers what the scene ended as; BtlRunTalkScene hands that
    answer straight back to whoever opened the negotiation. */
 extern int  BtlTalkSceneStep(void);
-extern void BtlTalkLoop(void);
+/* Answers nought when an offer that was taken ends the talk at once; every
+   other way out leaves the answer unset. */
+extern int  BtlTalkLoop(void);
 extern int  BtlBeginTalking(void);
 extern void BtlClearMemberLines(void);
 extern void BtlClearLineHistory(void);
@@ -99,5 +101,95 @@ extern const u_char *g_btl_arcana_names[];
 extern int BtlRecentOther(int value);
 extern int BtlTalkPairIndex(u_int acts);
 extern void BtlTalkAnswer(int slot, u_int act);
+
+/* The talk's own menus, and the contact box a member picks an act from. */
+extern void BtlTalkSceneMenu(void);
+extern void BtlTalkOpen(int key, int level, const char *name);
+extern int  BtlTalkChoice(void);
+extern void BtlTalkLive(int cell);
+extern void BtlTalkIdle(void);
+extern void BtlTalkHide(void);
+
+/* How an act lands: whether the line is taken, the demon's reaction, the
+   bonuses a Persona and liked equipment add, and the line said back. */
+extern int   BtlTalkLineLands(void);
+extern int   BtlPickReaction(int picked);
+
+/* One entry of a reaction row: the condition it is taken under, and the odds
+   out of a hundred of each gauge moving. A condition of nought always holds;
+   below nine it is a bit of BtlOffer.flags that must be set, counted from one,
+   and from nine a bit that must be clear, counted from nine. */
+typedef struct {
+    /* 0x0 */ u_char cond;
+    /* 0x1 */ u_char odds[4];
+} BtlReaction;                  /* 5 bytes */
+
+/* By member (key less one), act, and whether the offer is wary. */
+extern const BtlReaction g_btl_reactions[][4][2][5];
+
+/* What a shifted offer adds to each gauge's odds, five rows of four. */
+extern const short g_btl_reaction_shifts[][4];
+
+extern void  BtlTalkPersonaBonus(int which);
+extern int   BtlTalkLikedEquip(void);
+extern int   BtlPickLine(int kind);
+extern void  BtlTalkPickScript(int who, int verb, int variant);
+extern void  BtlSayDemonLine(u_char act, u_char line);
+extern void  BtlPushRecent(int value);
+extern void  BtlMoodRetire(void);
+extern short BtlPickTalkTarget(short mask);
+extern void  BtlTintTalkers(void);
+extern void  BtlTintParty(void);
+
+/* Reading the talk's scratch pack in: the file, then the entry. The address
+   just past the pack's header is left in g_btl_scratch_end. */
+extern void    BtlSeekFile(int index);
+extern void    BtlLoadScratch(int index, int from_table);
+extern u_long *g_btl_scratch_end;
+
+/* The act picked, the most recent acts, and the demon's reaction to the one
+   just made: the gauge it moves in the low byte and the weight it adds to the
+   push in the next. g_btl_force_reaction is a debug override - a gauge whose
+   word is 1 is taken whatever the reaction was. */
+extern short g_btl_talk_picked;
+extern int   g_btl_recent[];
+extern int   g_btl_talk_reaction;
+extern int   g_btl_force_reaction[];
+
+/* The gauges as they stood before an act landed, as one block - the four of
+   BTL_MOODS, spelt out so this header stands without offer.h. */
+typedef struct {
+    /* 0x0 */ short mood[4];
+} BtlMoods;
+extern BtlMoods g_btl_mood_before;
+
+/* Which scratch entry a Persona's own scene is, for the demons that play one
+   when they are picked rather than waiting for the party. */
+typedef struct {
+    /* 0x0 */ u_short persona;
+    /* 0x2 */ u_short entry;
+} BtlTalkPersonaScene;
+extern BtlTalkPersonaScene g_btl_talk_persona_scenes[];
+
+/* The slot whose contact box is up, and the pack a member's scene is read
+   from. */
+extern int g_btl_talk_open_slot;
+extern int g_btl_talk_member_pack;
+
+/* What the menus say: an offer that cannot be talked to, a member with
+   nothing to say, the demons walking off, the line a reaction plays, and the
+   scene a won act plays by member and act. */
+extern const u_char *g_btl_talk_unpickable_script;
+extern const u_char *g_btl_talk_mute_script;
+extern const u_char *g_btl_talk_turned_down_script;
+extern const u_char *g_btl_talk_left_script;
+extern const u_char *g_btl_talk_line_script;
+extern const u_char *g_btl_talk_win_scripts[][4];
+
+/* The talk scripts, and which one each member says for each act and line. */
+#define TALK_VERBS    4
+#define TALK_VARIANTS 3
+extern const u_char *g_btl_talk_scripts[];
+extern const u_char  g_btl_talk_script_ids[][TALK_VERBS][TALK_VARIANTS];
 
 #endif
