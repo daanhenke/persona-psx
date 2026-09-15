@@ -43,7 +43,6 @@ extern u_char g_map_unk4;
 extern u_char g_map_room;
 extern u_char D_8004E267;
 extern int    D_800EE618;
-extern u_char D_800CCA2D;
 extern int    g_state_prev;
 
 /* The two scratch buffers past the overlay's own image, which the sound banks
@@ -313,10 +312,10 @@ void ovl_btlp_entry(void)
 
     if (g_btl_encounter < 5 || g_btl_encounter == 6 || g_btl_encounter == 7
         || g_btl_encounter == 0x11 || g_btl_encounter == 0x12) {
-        D_800CCA2D = 1;
+        g_btl_scripted = 1;
     }
 
-    if (g_btl_encounter < 0x23 && D_800CCA2D == 0) {
+    if (g_btl_encounter < 0x23 && g_btl_scripted == 0) {
         g_btl_no_escape = 1;
     }
 

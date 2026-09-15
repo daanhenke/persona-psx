@@ -64,6 +64,15 @@ extern BtlObj *BtlOpenEditBoard(void);
 extern void    BtlShutEditBoard(void);
 extern void    BtlFillEditBoard(BtlActor *a);
 
+/* That board's thirteen numbers as text rows - the eight derived values from
+   melee_atk on, then the five stats - which the level-ups redraw in another
+   palette as each one changes. */
+extern BtlGfxText g_btl_edit_numbers[];
+
+/* The results board a won fight is held on for a key. board1d.c. */
+extern void    BtlOpenBoard1F(void);
+extern void    BtlCloseBoard1F(void);
+
 /* The names of the seven things the fighter is wearing, ten bytes each, as
    the editor's board shows them. equipnames.c. */
 extern void    BtlEditEquipNames(BtlActor *a);

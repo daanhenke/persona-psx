@@ -2757,3 +2757,55 @@ the advanced pointer, both keep the extra register:
     }
 
 - [talkloop.c](/src/btlp/talkloop.c) - `BtlPickReaction`, 99.92% to exact.
+
+## A loop over the enemy slots reaches the objects through the actors
+
+`for (i = BTL_PARTY; i < BTL_ACTORS; i++)` that tests `g_btl_actors[i]` and
+writes through `g_btl_enemies[i - BTL_PARTY].obj` has loop.c keep one index
+counting from nought (`addu s2, zero, zero`) and reach the actors at +0x49C. The
+image counts the actors' index from the first enemy's offset
+(`ori s2, zero, 0x49C`) beside a pointer walk over the objects, which is the
+same table read at the same index:
+
+    g_btl_actors[i].obj->rgb_to[0] = CAST_DIM;
+
+The pointer's start is the enemies' address, so splat names it after them; give
+the `lui`/`addiu` pair a reloc.btlp.txt entry for `g_btl_actors + 0x4FC`.
+
+- [enemymove.c](/src/btlp/enemymove.c) - `BtlEnemyPersonaMove`, 99.77% to exact
+  but for the name.
+
+## Arms that all end in a sound and a reset share one tail when written so
+
+Four hurt arms - an ailment that downs, one that reels, and the hp paid either
+way - each set their resume fields, play a sound and put the phase back to
+nought. The image jumps all four into one `o->motion = ...; BtlSePlay(); o->phase = 0`
+tail, and in every arm reads the motion and phase ahead of its constant stores.
+With `o->phase = 0; break;` inside the ailment arms, only the two hp arms share
+it and the stores come out reordered. Nest the arms in if/else so the reset is
+written once, after all of them, and write the two resume fields first in each
+arm:
+
+    if (a->unkCC != 0) {
+        if (a->unkCC != ENEMY_SELF_NO_AIL && BtlInflictStatus(a, a->unkCC) != 0) {
+            if (down) {
+                a->resume_motion = o->motion;
+                a->resume_phase = o->phase + 1;
+                a->hit_amount = 0;
+                a->c.hp = 0;
+                ...
+            } else { ... }
+        } else {
+            o->attr &= ~ENEMY_SELF_HIT;
+            o->phase++;
+            break;
+        }
+    } else { ... }
+    o->phase = 0;
+    break;
+
+Reordering one arm at a time only gets part of the way (98.19% for the reel arm
+alone).
+
+- [enemymove.c](/src/btlp/enemymove.c) - `BtlEnemyPlayMove`, 96.37% to exact
+  but for the names.

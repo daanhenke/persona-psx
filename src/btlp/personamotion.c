@@ -37,6 +37,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/cast.h>
 #include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
@@ -86,9 +87,6 @@
 /* The one the summon is played on. */
 #define PERSONA_SEQ 1
 
-/* Raised once the summon's sound bank is in and cleared as it is done with.
-   The attack will not start without it. */
-extern u_char g_btl_persona_ready;
 
 /* The two halves of an attack, both still in asm beside this unit. */
 extern void func_800B12D0(BtlObj *o);

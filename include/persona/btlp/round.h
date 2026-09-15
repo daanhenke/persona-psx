@@ -389,7 +389,10 @@ extern void BtlSetReturnMap(void);
    after the outcome run in that order on the way out. */
 extern int  BtlBattleOutcome(void);
 extern void BtlBattleResults(void);
-extern void func_80097A50(void);
+/* Raised by BtlBattleResults when anyone's experience covers a level, which
+   is what BtlLevelUpParty then hands out on the edit board. levelup.c. */
+extern u_char g_btl_level_up;
+extern void BtlLevelUpParty(void);
 extern void BtlRestoreField(void);
 
 /* Adds one of an item to the party's bag. */

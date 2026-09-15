@@ -19,6 +19,7 @@
 #include <persona/main/cd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/cast.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/pack.h>
 #include <persona/btlp/stats.h>
@@ -41,7 +42,6 @@
 #define SUMMON_SCALE_XY 0x100
 #define SUMMON_SCALE_Z  0x1000
 
-extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 
 /* Where every Persona's artwork starts, in sectors from the head of the pack.
    One entry per graphics id and one past the end, so a file runs from its own
@@ -99,9 +99,6 @@ u_short g_btl_persona_sectors[] = {
 };
 
 
-extern short   g_btl_scene_rgb[];
-extern short   g_btl_arena_fade;
-extern BtlObj *g_btl_persona_obj;
 
 BtlObj *BtlSummonActorPersona(BtlActor *a)
 {

@@ -180,3 +180,13 @@ rom:0xD9F4 reloc:MIPS_HI16 symbol:g_btl_talk_stare_odds addend:0xC
 rom:0xD9F8 reloc:MIPS_LO16 symbol:g_btl_talk_stare_odds addend:0xC
 rom:0xDA40 reloc:MIPS_HI16 symbol:g_btl_talk_stare_odds addend:0x20
 rom:0xDA48 reloc:MIPS_LO16 symbol:g_btl_talk_stare_odds addend:0x20
+
+// BtlEnemyPlayMove, BtlEnemyPersonaMove - g_btl_actors[i].obj over the enemy
+// slots; the loop starts at the first enemy, so the address the image loads is
+// the actors' table from its fifth entry, which splat names after the enemies
+rom:0x508A4 reloc:MIPS_HI16 symbol:g_btl_actors addend:0x4FC
+rom:0x508A8 reloc:MIPS_LO16 symbol:g_btl_actors addend:0x4FC
+rom:0x50DDC reloc:MIPS_HI16 symbol:g_btl_actors addend:0x4FC
+rom:0x50DE0 reloc:MIPS_LO16 symbol:g_btl_actors addend:0x4FC
+rom:0x51050 reloc:MIPS_HI16 symbol:g_btl_actors addend:0x4FC
+rom:0x51054 reloc:MIPS_LO16 symbol:g_btl_actors addend:0x4FC

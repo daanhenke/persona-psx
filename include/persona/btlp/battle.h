@@ -284,6 +284,11 @@ extern u_char g_btl_shake_on;
 /* How fast a line is put up: 0 slow, 2 off altogether. */
 extern u_char g_btl_msg_speed;
 
+/* Raised by ovl_btlp_entry for the scripted fights. The ordinary fights among
+   the first 0x23 cannot be run from, and a scripted one goes to its level-ups
+   without the results board. */
+extern u_char g_btl_scripted;
+
 /* Suppresses the hit sound while a member's own turn plays. */
 extern u_char g_btl_se_off;
 

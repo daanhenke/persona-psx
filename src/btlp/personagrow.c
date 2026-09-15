@@ -44,9 +44,6 @@
 extern int     g_btl_enemy_level;
 extern u_short g_btl_persona_rank_exp[GROW_RANKS];
 extern u_char  g_btl_persona_growth[][GROW_COLUMNS * GROW_COLUMNS];
-extern int     g_level_exp_1[];
-
-#define GROW_CLAMP(v, max) ((v) != 0 ? ((v) < (max) + 1 ? (v) : (max)) : 1)
 
 void BtlPersonaGrow(BtlStats *p)
 {
@@ -78,13 +75,13 @@ void BtlPersonaGrow(BtlStats *p)
         p->stat[4] += row[4 * GROW_COLUMNS + p->slots - GROW_FIRST];
         p->unk10 += row[5 * GROW_COLUMNS + p->slots - GROW_FIRST];
         p->unk12 += row[6 * GROW_COLUMNS + p->slots - GROW_FIRST];
-        p->stat[0] = GROW_CLAMP(p->stat[0], GROW_STAT_MAX);
-        p->stat[1] = GROW_CLAMP(p->stat[1], GROW_STAT_MAX);
-        p->stat[2] = GROW_CLAMP(p->stat[2], GROW_STAT_MAX);
-        p->stat[3] = GROW_CLAMP(p->stat[3], GROW_STAT_MAX);
-        p->stat[4] = GROW_CLAMP(p->stat[4], GROW_STAT_MAX);
-        p->unk10 = GROW_CLAMP(p->unk10, GROW_NUM_MAX);
-        p->unk12 = GROW_CLAMP(p->unk12, GROW_NUM_MAX);
+        p->stat[0] = CHAR_GROW_CLAMP(p->stat[0], GROW_STAT_MAX);
+        p->stat[1] = CHAR_GROW_CLAMP(p->stat[1], GROW_STAT_MAX);
+        p->stat[2] = CHAR_GROW_CLAMP(p->stat[2], GROW_STAT_MAX);
+        p->stat[3] = CHAR_GROW_CLAMP(p->stat[3], GROW_STAT_MAX);
+        p->stat[4] = CHAR_GROW_CLAMP(p->stat[4], GROW_STAT_MAX);
+        p->unk10 = CHAR_GROW_CLAMP(p->unk10, GROW_NUM_MAX);
+        p->unk12 = CHAR_GROW_CLAMP(p->unk12, GROW_NUM_MAX);
     }
 }
 

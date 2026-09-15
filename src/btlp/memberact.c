@@ -17,6 +17,7 @@
 #include <persona/main/cd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/cast.h>
 #include <persona/btlp/choice.h>
 #include <persona/btlp/fieldmarks.h>
 #include <persona/btlp/model.h>
@@ -138,10 +139,8 @@ void BtlChoiceSpawn(int set)
 extern u_char   *g_btl_fx_gfx;
 extern u_char   *g_btl_unused_gfx;
 
-/* What the arena drops to while the Persona comes out, and what it is put
-   back to afterwards. */
-#define SUMMON_SCENE_DIM  0x40
-#define SUMMON_SCENE_LIT  0x80
+/* The step the arena fades by while the Persona comes out; what it drops to
+   and is put back to afterwards are the cast's own (cast.h). */
 #define SUMMON_ARENA_FADE 2
 
 /* The trail: eight copies of the member's own record, each a further
@@ -556,34 +555,18 @@ INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberStrike);
 #define CAST_AIL_08      8
 #define CAST_AIL_DEEPEST 2
 
-/* Where the cast's own files sit at the tail of the Persona pack's sector
-   table, where the moves' artwork starts in the same table, and the base
-   sector BtlSummonActorPersona reads a Persona's artwork with. */
-#define CAST_FILE       0x171
-
-/* The page the cast's tim goes to, and the one step the arena fades by. */
-#define CAST_TIM_PAGE   0x1C
-#define CAST_TIM_SLOT   0x11
-#define CAST_ARENA_FADE 1
-
 /* Set on a fighter whose turn a script is driving; the cast then neither
    poses the member nor sounds the swing. */
 #define CAST_SCRIPTED 0x10000000
 
-/* Raised on a fighter that is already dimmed, and what the rest of the field
-   is taken down to while the Persona is out. */
+/* Raised on a fighter that is already dimmed. */
 #define CAST_DIMMED 0x4000
-#define CAST_DIM    0x20
 
 /* How far a record is lifted off the field for the cast. */
 #define CAST_LIFT (-0x300000)
 
-/* The Persona: how it is put up, and how many records it is made of. */
-#define CAST_PERSONA_ATTR   0x20000000
-#define CAST_HUD_ATTR       0x40000000
-#define CAST_SCALE_XY       0x100
-#define CAST_SCALE_Z        0x1000
-#define CAST_PERSONA_PIECES 6
+/* What the fourth kind of act puts on the circle the cast stands in. */
+#define CAST_HUD_ATTR 0x40000000
 
 /* Which enemy the fourth encounter's detour is for: the one whose
    voice bank is swapped in behind the cast. */
@@ -597,8 +580,6 @@ extern u_char   D_800CFA10[];
 extern u_char   D_8004E264;
 extern u_char   D_800E49BF;
 
-extern BtlObj *g_btl_persona_obj;
-extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 extern int     BtlActorSlotByKey(int key);
 
 /* The cast: what a member's turn runs through when the move is a spell and
@@ -678,7 +659,7 @@ void BtlMemberMotion06(BtlObj *o)
             }
         }
         i = 0;
-        o->actor->padCB[0] = g_btl_personas[BtlActorPersona(o->mark_num)].key;
+        o->actor->summon = g_btl_personas[BtlActorPersona(o->mark_num)].key;
         do {
             if (g_btl_personas[BtlActorPersona(o->mark_num)].raw[i]
                 == a->move) {
@@ -734,11 +715,11 @@ void BtlMemberMotion06(BtlObj *o)
         }
         BtlUploadTim((u_long *)g_load_stage, CAST_TIM_PAGE, CAST_TIM_SLOT, 1,
                      0, 1);
-        CdIntToPos(g_btl_persona_sectors[o->actor->padCB[0]] + g_btl_persona_gfx_base,
+        CdIntToPos(g_btl_persona_sectors[o->actor->summon] + g_btl_persona_gfx_base,
                    &loc);
         CdReadFileToAddrAsync((CdlFILE *)&loc,
-                              g_btl_persona_sectors[o->actor->padCB[0] + 1]
-                                  - g_btl_persona_sectors[o->actor->padCB[0]],
+                              g_btl_persona_sectors[o->actor->summon + 1]
+                                  - g_btl_persona_sectors[o->actor->summon],
                               BTL_LOAD_STAGE);
         o->phase++;
         break;
@@ -802,7 +783,7 @@ void BtlMemberMotion06(BtlObj *o)
             a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].sp_cost;
         }
         g_btl_persona_ready = 0;
-        g_btl_persona_obj = BtlSpawnPersona(a->padCB[0], o->col2, o->row,
+        g_btl_persona_obj = BtlSpawnPersona(a->summon, o->col2, o->row,
                                             o->spell_slot);
         g_btl_persona_obj->actor = o->actor;
         BtlObjSetAttr(g_btl_persona_obj, CAST_PERSONA_ATTR);

@@ -152,7 +152,9 @@ typedef struct BtlActor {
                                       0xFF once the turn is spent          */
     /* 0xCA */ u_char  clut_len;   /* entries in this actor's palette, which is
                                       what BtlStepCluts walks               */
-    /* 0xCB */ u_char  padCB[1];
+    /* 0xCB */ u_char  summon;     /* the key of the Persona a cast calls up:
+                                      the member's own, or the one an enemy's
+                                      key picks for its Persona move       */
     /* 0xCC */ u_char  unkCC;      /* the five below are cleared as a record  */
     /* 0xCD */ u_char  level_up;   /* is filled. BtlBattleResults raises it as
                                       the fight's experience takes the level

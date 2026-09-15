@@ -75,7 +75,9 @@ typedef struct {
     /* 0x04 */ u_char spawn;
     /* 0x05 */ u_char talk;
     /* 0x06 */ u_char stand;
-    /* 0x07 */ u_char pad07[0xF];
+    /* 0x07 */ u_char pad07[7];
+    /* 0x0E */ u_char extra;
+    /* 0x0F */ u_char pad0F[7];
     /* 0x16 */ u_char attack[6];
     /* 0x1C */ u_char strike[6];
     /* 0x22 */ u_char after[6];

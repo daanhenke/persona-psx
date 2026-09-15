@@ -117,4 +117,14 @@ typedef struct {
 extern u_char g_char_hp_growth[];
 extern u_char g_char_stat_growth[];
 
+/* The experience each level ends at, a word a level. BtlLevelUpParty reads it
+   from level 0 and BtlDrainLevel from level 1, which is the same table a word
+   in. */
+extern int g_level_exp[];
+extern int g_level_exp_1[];
+
+/* A stat or number that has grown, held between 1 and `max`: one that has
+   wrapped round to nought goes back to 1. */
+#define CHAR_GROW_CLAMP(v, max) ((v) != 0 ? ((v) < (max) + 1 ? (v) : (max)) : 1)
+
 #endif

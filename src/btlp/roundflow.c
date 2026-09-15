@@ -274,7 +274,7 @@ void BtlStageClose(void)
                             n++;
                         } while (m < BTL_PARTY);
                         BtlBattleResults();
-                        func_80097A50();
+                        BtlLevelUpParty();
                         BtlRestoreField();
                     }
 

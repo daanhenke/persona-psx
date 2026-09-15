@@ -150,7 +150,9 @@ segments:
       # the word of padding behind it that belongs to nobody.
       - [0x1238, .rodata, enemymotion2]
       - [0x130C, pad, btlp_pad_130c]
-      - [0x1310, rodata, btlp_rodata6b1_a]
+      # BtlEnemyPlayMove's and BtlEnemyPersonaMove's switch tables, which
+      # enemymove.c emits itself.
+      - [0x1310, .rodata, enemymove]
       # BtlSpawnMoveStrike's forty-eight-entry switch table, which movestrike.c
       # emits itself.
       - [0x135C, .rodata, movestrike]
@@ -462,7 +464,8 @@ segments:
       - [0x3341C, c, defeatdrop]
       - [0x33560, c, insertturn]
       - [0x335D4, c, debuggrid]
-      - [0x336B0, asm, btlp_58_x1]
+      # The levels a won fight's experience buys, counted up on the edit board.
+      - [0x336B0, c, levelup]
       - [0x34494, c, restorefield]
       - [0x348A4, c, turnorder]
       - [0x34998, c, opendialogue]
@@ -571,7 +574,8 @@ segments:
       - [0x4D968, c, personaspell15]
       - [0x4E28C, c, enemymotion2]
       - [0x506E8, c, enemymotion6]
-      - [0x507DC, asm, btlp_69_a_c]
+      # The moves an enemy plays out through an effect, and through a Persona.
+      - [0x507DC, c, enemymove]
       - [0x515B0, c, morph]
       - [0x51820, c, actordef]
       - [0x51A78, c, aimmove]
