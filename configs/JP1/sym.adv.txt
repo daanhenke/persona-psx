@@ -1556,3 +1556,4 @@ D_800BC574               = 0x800BC574; // type:u32 size:0x8
 D_800BC57C               = 0x800BC57C; // type:u32 size:0x98
 g_adv_char_seq           = 0x800BC5B4;
 g_ot                     = 0x800BC5CC;
+g_persona_stock          = 0x801F297C; // ignore:True size:0xF

@@ -10,11 +10,7 @@
  * in src/adv/game/stockslots.c.
  */
 #include <decomp/types.h>
-
-#define g_persona_stock ((u_char *)0x801F297C)
-
-#define STOCK_ROWS 12
-#define STOCK_FREE 0
+#include <persona/common/persona.h>
 
 /* Slides the used slots down over the holes, then reports the last one still
    occupied. -1 says the stock is empty. Only the twelve rows the screen shows

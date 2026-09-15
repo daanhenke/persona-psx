@@ -1024,3 +1024,4 @@ g_bg_shown               = 0x800A0438;
 D_800A04C4               = 0x800A04C4; // type:u32 size:0x36C
 D_800A0830               = 0x800A0830; // type:u32 size:0x60
 g_ot                     = 0x800A0850;
+g_persona_stock          = 0x801F297C; // ignore:True size:0xF

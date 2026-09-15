@@ -186,7 +186,6 @@ g_btl_talk_panic_odds         = 0x8006467C;
 //--- PA: 0x000314   VA: 0x800646B4   subsegment: .rodata, talkscenecharm
 //-----------------------------------------------------------------------
 g_btl_talk_stare_odds         = 0x800646B4;
-g_btl_talk_charm_odds         = 0x800646C0;
 
 //----------------------------------------------------------------------
 //--- PA: 0x00034C   VA: 0x800646EC   subsegment: .rodata, talkscenebind
@@ -3921,6 +3920,7 @@ g_btl_choice_table            = 0x801C000C; // type:u32
 g_btl_choice_acts             = 0x801C0010; // type:u32
 g_formation_preset            = 0x801F2584; // size:0xD0
 g_money                       = 0x801F2674; // ignore:True size:0x4
+g_persona_stock               = 0x801F297C; // ignore:True size:0xF
 g_playtime_min                = 0x801F29BD;
 g_playtime_sec                = 0x801F29BE;
 g_playtime_frame              = 0x801F29BF;

@@ -173,3 +173,10 @@ rom:0xF4D0 reloc:MIPS_LO16 symbol:g_btl_talk_stage addend:-0x1
 // BtlTalkSceneStep - g_btl_talk_scene[g_btl_talk_depth - 1]
 rom:0x6D2C reloc:MIPS_HI16 symbol:g_btl_talk_scene addend:-0x1
 rom:0x6D34 reloc:MIPS_LO16 symbol:g_btl_talk_scene addend:-0x1
+
+// BtlTalkSceneCharm - its own odds and switch table, emitted after the stare
+// scene's thresholds in the same block
+rom:0xD9F4 reloc:MIPS_HI16 symbol:g_btl_talk_stare_odds addend:0xC
+rom:0xD9F8 reloc:MIPS_LO16 symbol:g_btl_talk_stare_odds addend:0xC
+rom:0xDA40 reloc:MIPS_HI16 symbol:g_btl_talk_stare_odds addend:0x20
+rom:0xDA48 reloc:MIPS_LO16 symbol:g_btl_talk_stare_odds addend:0x20
