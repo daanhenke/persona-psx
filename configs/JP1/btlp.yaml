@@ -63,9 +63,9 @@ segments:
       - [0x4, rodata, btlp_rodata]
       # BtlTalkSceneStep's switch table, which the C emits itself.
       - [0x44, .rodata, talkstep]
-      # Ends with BtlTalkSceneMenu's twenty-entry switch table, which stays in
-      # asm while that routine is guarded.
       - [0x8C, rodata, btlp_rodata0]
+      # BtlTalkSceneMenu's twenty-entry switch table, emitted by the C.
+      - [0x94, .rodata, talkscenemenu]
       - [0xE4, .rodata, talkpair]
       - [0xF4, rodata, btlp_rodata0a]
       # BtlTalkSceneSummon's ten-entry switch table, emitted by the C.

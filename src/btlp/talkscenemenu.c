@@ -27,7 +27,6 @@
  * its picture.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libsnd.h>
 #include <rand.h>
 #include <persona/btlp/actor.h>
@@ -108,16 +107,10 @@
     BtlEnemiesReset();                                           \
     BtlPartyReset()
 
-/* Not matched yet: everything but stage 11's push. The image adds the reaction
-   to the gauge through a pointer, so the store invalidates g_btl_talk_reaction
-   and BtlTalkPersonaBonus's argument is read again; the indexed store below
-   lets cse hand it the push's own `& 0xFF`. Written through a pointer, gcc
-   reads the argument again but schedules the index before the said and
-   last-line stores rather than after them. */
-#ifdef NON_MATCHING
 void BtlTalkSceneMenu(void)
 {
     BtlOffer *o;
+    short    *mood;
     BtlActor *a;
     int       choice;
     int       rank;
@@ -189,7 +182,9 @@ void BtlTalkSceneMenu(void)
                 while (g_cd_busy != -1) {
                     BtlDrawFrame();
                 }
-                while (BtlHudState() != 0) {
+                /* The panel's phase is a byte, and the answer is taken as
+                   one. */
+                while ((u_char)BtlHudState() != 0) {
                     BtlDrawFrame();
                 }
                 for (i = 0; g_btl_talk_persona_scenes[i].persona != o->persona; i++) {
@@ -297,7 +292,7 @@ void BtlTalkSceneMenu(void)
         for (i = 0; i < BTL_PARTY; i++) {
             g_btl_actors[i].pickable = 1;
         }
-        while (BtlHudState() != 0) {
+        while ((u_char)BtlHudState() != 0) {
             BtlDrawFrame();
         }
         BtlDrawFrame();
@@ -451,13 +446,18 @@ void BtlTalkSceneMenu(void)
         }
         g_btl_talk_said = (g_btl_talk_reaction & 0xFF);
         g_btl_talk_last_line = g_btl_talk_line;
-        g_btl_offer[g_btl_offer_slot].mood[g_btl_talk_reaction & 0xFF]
-            += REACTION_PUSH + ((g_btl_talk_reaction & 0xFF00) >> 8);
+        /* Write through a gauge pointer so the reaction is reloaded after the
+           store. Reuse this pointer for the clamp walk below to keep gcc's
+           original register allocation and scheduling. */
+        mood = g_btl_offer[g_btl_offer_slot].mood;
+        mood += g_btl_talk_reaction & 0xFF;
+        *mood += REACTION_PUSH + ((g_btl_talk_reaction & 0xFF00) >> 8);
         BtlTalkPersonaBonus((g_btl_talk_reaction & 0xFF));
         BtlTalkLikedEquip();
-        for (i = 0; i < BTL_MOODS; i++) {
-            if (g_btl_offer[g_btl_offer_slot].mood[i] > BTL_MOOD_CAP) {
-                g_btl_offer[g_btl_offer_slot].mood[i] = BTL_MOOD_CAP;
+        mood = g_btl_offer[g_btl_offer_slot].mood;
+        for (i = 0; i < BTL_MOODS; i++, mood++) {
+            if (*mood > BTL_MOOD_CAP) {
+                *mood = BTL_MOOD_CAP;
             }
         }
         for (i = 0; i < BTL_MOODS; i++) {
@@ -538,6 +538,3 @@ void BtlTalkSceneMenu(void)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkscenemenu", BtlTalkSceneMenu);
-#endif
