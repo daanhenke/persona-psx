@@ -90,7 +90,11 @@ segments:
       # BtlFaceDraw's three local initialisers - the quad's rotation, where it
       # stands, and its four corners - which the C emits itself.
       - [0x450, .rodata, facedraw]
-      - [0x488, rodata, btlp_rodata3a]
+      # BtlTalkBoardStep's two switch tables - the board's steps and the
+      # entries the board itself is answered with - which talkboard.c emits,
+      # with the word of padding between them inside the unit.
+      - [0x488, .rodata, talkboard]
+      - [0x4CC, rodata, btlp_rodata3a]
       - [0x58C, .rodata, insert]
       # BtlBoxTick's thirty-three-entry step table sits in here; it becomes
       # `[0x5AC, .rodata, boxtick]` behind a four-byte pad the moment the
@@ -315,7 +319,8 @@ segments:
       - [0x1271C, c, face2]
       # The negotiation board's loops, and the stock list on it.
       - [0x1275C, c, stocklist]
-      - [0x12AB0, asm, btlp_24_x2_a]
+      # One frame of the negotiation board.
+      - [0x12AB0, c, talkboard]
       - [0x13110, c, effect]
       - [0x13194, c, effectopen]
       - [0x13358, c, effect2]

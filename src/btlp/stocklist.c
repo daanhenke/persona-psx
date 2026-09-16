@@ -29,6 +29,7 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/effect.h>
 #include <persona/btlp/input.h>
+#include <persona/btlp/talkboard.h>
 #include <persona/common/persona.h>
 
 #define STOCK_SLOTS 12
@@ -66,21 +67,11 @@ typedef struct {
     /* 0x8 */ const u_char *text;
 } BtlStockNameRow;                     /* 0xC bytes */
 
-extern BtlEffect         g_btl_talk_board;
-extern int               g_btl_talk_board_slot;
-extern int               g_btl_talk_board_done;
-extern int               g_btl_talk_board_step;
-extern u_char            g_btl_talk_cursor_was;
-extern int               g_btl_seq_answer;
-extern int               g_btl_seq_cut;
-extern BtlEffect         g_btl_stock_list;
-extern u_char            g_btl_stock_blank[];
 extern BtlStockNumberRow g_btl_stock_numbers[STOCK_SLOTS];
 extern BtlStockNameRow   g_btl_stock_list_names[STOCK_SLOTS];
 
 extern int  BtlEffectOpen(BtlEffect *e);
 extern void BtlEffectSetKind(int slot, u_char kind);
-extern void BtlTalkBoardStep(void);
 extern void BtlUpdateVoices(void);
 extern int  BtlSeqState(void);
 extern int  BtlSeqAnswer(void);

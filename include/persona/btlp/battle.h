@@ -318,6 +318,12 @@ extern void BtlDrawFrame(void);
 extern void BtlRunFrames(int frames);
 extern void BtlQueueVramLoad(const void *src, int x, int y, int w,
                              int h);
+/* What the sequencer settled on, and whether the line it was playing was cut
+   short; seqstate2.c's step writes both and the negotiation board reads them
+   back. */
+extern int g_btl_seq_answer;
+extern int g_btl_seq_cut;
+
 extern void BtlSeqPlay(const u_char *script);
 extern void BtlSeqSetState(int state, int frames);
 extern void BtlSeqRun(void);
