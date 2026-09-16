@@ -289,6 +289,11 @@ extern u_char g_btl_msg_speed;
    without the results board. */
 extern u_char g_btl_scripted;
 
+/* Raised while a turn is running ahead of the script that drives it: the
+   sequencer's step then plays its frames out as fast as it can until the two
+   are level again. */
+extern u_char g_btl_seq_catchup;
+
 /* Suppresses the hit sound while a member's own turn plays. */
 extern u_char g_btl_se_off;
 

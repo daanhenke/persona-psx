@@ -37,6 +37,16 @@
 extern BtlObj *g_btl_persona_obj;
 extern u_char  g_btl_persona_ready;
 
+/* The two ways the Persona plays a move out once it is standing, which
+   BtlPersonaMotion02 picks between by the move: the plain one, and the spell
+   that walks the caster's target mask, hit by hit. personaact.c. */
+extern void BtlPersonaPlayMove(BtlObj *o);
+extern void BtlPersonaSpellMove(BtlObj *o);
+
+/* The one arm of that spell's walk long enough to stand on its own.
+   personaspell15.c. */
+extern void BtlPersonaSpell15(BtlObj *o);
+
 /* Stands a Persona's records up at a cell of the grid. personaspawn.c. */
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 

@@ -46,7 +46,6 @@
 
 extern BtlObjDef  g_btl_obj_child_def;
 extern u_char     g_btl_half_rate;
-extern u_char     g_btl_seq_catchup;
 
 void BtlStepObjScripts(void)
 {

@@ -88,10 +88,6 @@
 #define PERSONA_SEQ 1
 
 
-/* The two halves of an attack, both still in asm beside this unit. */
-extern void func_800B12D0(BtlObj *o);
-extern void func_800B16BC(BtlObj *o);
-
 extern short g_btl_seq_handle[];
 
 /* 99.35%: the settle's own copy of the height. Loaded before the test, the
@@ -233,9 +229,9 @@ void BtlPersonaMotion02(BtlObj *o)
         if ((attr & BTL_OBJ_TRAIL) == 0) {
             move = o->actor->move;
             if (move >= PERSONA_MOVE_SPLIT && move != PERSONA_MOVE_PLAIN) {
-                func_800B16BC(o);
+                BtlPersonaSpellMove(o);
             } else {
-                func_800B12D0(o);
+                BtlPersonaPlayMove(o);
             }
         }
     }

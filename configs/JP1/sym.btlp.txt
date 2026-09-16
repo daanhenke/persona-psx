@@ -2104,8 +2104,8 @@ BtlPersonaMotion02            = 0x800B1254; // type:func size:0x7C
 //----------------------------------------------------------------
 //--- PA: 0x04CF30   VA: 0x800B12D0   subsegment: asm, btlp_69_a_a
 //----------------------------------------------------------------
-func_800B12D0                 = 0x800B12D0; // type:func size:0x3EC
-func_800B16BC                 = 0x800B16BC; // type:func size:0x64C
+BtlPersonaPlayMove            = 0x800B12D0; // type:func size:0x3EC
+BtlPersonaSpellMove           = 0x800B16BC; // type:func size:0x64C
 
 //-----------------------------------------------------------------
 //--- PA: 0x04D968   VA: 0x800B1D08   subsegment: c, personaspell15

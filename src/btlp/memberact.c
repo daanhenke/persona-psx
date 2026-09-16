@@ -834,7 +834,6 @@ void BtlMemberStrike(BtlObj *o)
    voice bank is swapped in behind the cast. */
 #define CAST_BOSS 3
 
-extern u_char   g_btl_seq_catchup;
 extern u_char   g_btl_act_speed;
 extern u_char   g_btl_act_move;
 extern u_char   D_800CF7EC[];
