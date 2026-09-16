@@ -21,10 +21,16 @@
 
 /* 99.29%, one instruction: the inner loop's bound is the image's copy of the
    value its entry test computed (addu t3, v0), where gcc here works it out
-   again from the outer loop's counter (addiu t3, t1, -1). The bound spelled
-   n - i - 1 is what gives the counter as n - i at all - n - 1 - i folds the
-   one into it - and a while loop, the test turned round, or a local for the
-   bound all leave the recomputation in place. */
+   again from the outer loop's counter (addiu t3, t1, -1). The dumps put it in
+   the second cse: loop optimisation leaves the bound reading the counter
+   through a copy, cse follows the copy but then declines to reuse the entry
+   test's own result for it - the two cost the same, an add against a move, and
+   it keeps the add. The outer loop's bound, which reaches its second use
+   without a copy in the way, is turned into the move the image has. The bound
+   spelled n - i - 1 is what gives the counter as n - i at all - n - 1 - i
+   folds the one into it - and a while loop, the loop written out as a guarded
+   do/while, a local for n, a local for the bound and every declaration order
+   all leave the recomputation in place. */
 #ifdef NON_MATCHING
 int BtlOrderTurns(u_char *order, int n)
 {

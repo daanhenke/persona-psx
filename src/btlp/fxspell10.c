@@ -89,9 +89,14 @@ void BtlFxStepUnused2(BtlObj *o)
 }
 
 /* 98.21%: one instruction, and it is which of the two the delay slot in front
-   of the loop takes - the image fills it with the row counter's zero and leaves
-   the row bound behind it, and gcc here does the opposite whichever order the
-   two are written in. */
+   of the loop takes - the image fills it with the row counter's zero and puts
+   the top row behind the guard, and gcc here fills it with the top row and puts
+   the counter in front. The dumps say why: delay-slot filling takes whichever
+   of the two stands nearest the branch, and the top row stands nearest here
+   because it is set before the loop, where the image's is settled after the
+   guard. Writing it inside the loop instead does move it behind the guard, but
+   then it is no longer worth a saved register at all - gcc builds the 3 afresh
+   each row, and the routine comes out a register and a frame slot short. */
 #ifdef NON_MATCHING
 BtlObj *BtlFxStart10(void)
 {
