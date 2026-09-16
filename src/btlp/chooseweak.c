@@ -1,30 +1,31 @@
-/* Persona 1 (JP) - which offer the party is allowed to make.  BTLP only.
- *   0x8006E310 BtlChooseOffer
+/* Persona 1 (JP) - which offer the party may make at the lower rank. BTLP only.
+ *   0x8006E924 BtlChooseWeakOffer
  *
- * The three offers are scored first, then gathered into a mask: an offer
- * counts if some enemy is party to it and it ranks at all - the rank is the
- * lowest set bit of `kinds`, so an offer with none of the low four set has no
- * rank and is passed over.
+ * The twin of BtlChooseOffer, and the same routine line for line: the offers
+ * are refreshed, gathered into a mask, put through the three refusals and
+ * handed to BtlBestOffer. What differs is the level it reads them at. Where
+ * BtlChooseOffer refreshes the strong gauges and looks for a rank in bits 0..3
+ * of `kinds`, this one refreshes the weak gauges and looks in bits 4..7, and
+ * the level test it asks is the second rather than the first.
  *
- * What is gathered is then put through three refusals, each of which throws
- * the whole choice away rather than dropping the one offer that failed:
- * anything the party already holds the stock of, an offer the round has not
- * scored, and anything the level test turns down. Only a mask that survives
- * all three is handed on to be chosen between.
- *
- * An empty mask and a refused one answer the same -1, so the caller cannot
- * tell "nothing to offer" from "nothing allowed" - and does not need to.
+ * Nothing in the overlay calls it; BtlChooseOffer is what the negotiation
+ * reaches for.
  */
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/offer.h>
 
-/* How far up `kinds` a rank can sit. */
-#define OFFER_KINDS 4
+/* How far up `kinds` a rank can sit, and where the weak ranks start. */
+#define OFFER_KINDS      4
+#define OFFER_WEAK_FIRST 0x10
+
+/* The level test asks about the second rank here, where BtlChooseOffer asks
+   about the first. */
+#define OFFER_TEST_WEAK 2
 
 /* The for-loop keeps the first rank test inside the loop. Giving the counter
    initialization its own block preserves the original register allocation. */
-int BtlChooseOffer(void)
+int BtlChooseWeakOffer(void)
 {
     u_int mask;
     u_long bit;
@@ -32,7 +33,7 @@ int BtlChooseOffer(void)
     int   i;
     int   kind;
 
-    BtlOfferMarkStrong();
+    BtlOfferMarkWeak();
     mask = 0;
     i    = 0;
     do {
@@ -40,7 +41,7 @@ int BtlChooseOffer(void)
             do {
                 kind = 0;
             } while (0);
-            bit = 1;
+            bit = OFFER_WEAK_FIRST;
             kinds = g_btl_offer[i].kinds;
             for (; kind < OFFER_KINDS; kind++, bit <<= 1) {
                 if ((bit & kinds) != 0) {
@@ -74,7 +75,8 @@ int BtlChooseOffer(void)
 
         i = 0;
         do {
-            if ((mask & (1 << i)) != 0 && BtlOfferLevelTest(1, i) != 0) {
+            if ((mask & (1 << i)) != 0
+                && BtlOfferLevelTest(OFFER_TEST_WEAK, i) != 0) {
                 return -1;
             }
             i++;

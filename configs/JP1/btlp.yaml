@@ -67,7 +67,10 @@ segments:
       # BtlTalkSceneMenu's twenty-entry switch table, emitted by the C.
       - [0x94, .rodata, talkscenemenu]
       - [0xE4, .rodata, talkpair]
-      - [0xF4, rodata, btlp_rodata0a]
+      # BtlOfferMoodLine's four cell starts, which the C emits itself, behind
+      # the word of padding the next unit's eight-aligned table wants.
+      - [0xF4, .rodata, moodline]
+      - [0xF8, pad, btlp_pad_f8]
       # BtlTalkSceneSummon's ten-entry switch table, emitted by the C.
       - [0xFC, .rodata, talkscenesummon]
       - [0x124, .rodata, talkscenetrade]
@@ -266,7 +269,11 @@ segments:
       - [0x9F70, c, chooseoffer]
       - [0xA104, c, talkpair]
       - [0xA1CC, c, talkanswer]
-      - [0xA584, asm, btlp_12]
+      # Which offer the party may make at the lower rank, the line an offer
+      # says about how it feels, and the pick between several.
+      - [0xA584, c, chooseweak]
+      - [0xA718, c, moodline]
+      - [0xA9D0, c, bestoffer]
       - [0xABF0, c, offeranswer]
       - [0xACF8, c, beginaction]
       - [0xAD74, c, enemy]
@@ -724,7 +731,9 @@ segments:
       # behind it the run of zeroes the loader never has to write.
       - [0x61BFC, data, btlp_data]
       - [0x670FC, .data, talkanswer]
-      - [0x67180, data, btlp_talkanswer_tail]
+      # BtlBestOffer's order of the twelve kinds, which the C emits itself.
+      - [0x67180, .data, bestoffer]
+      - [0x6718C, data, btlp_talkanswer_tail]
       - [0x68268, .data, cursorplace]
       - [0x68270, data, btlp_data1]
       # The marks' templates, the miss word and the impact spark, which

@@ -581,9 +581,9 @@ BtlTalkAnswer                 = 0x8006E56C; // type:func size:0x3B8
 //------------------------------------------------------------
 //--- PA: 0x00A584   VA: 0x8006E924   subsegment: asm, btlp_12
 //------------------------------------------------------------
-func_8006E924                 = 0x8006E924; // type:func size:0x194
-func_8006EAB8                 = 0x8006EAB8; // type:func size:0x2B8
-func_8006ED70                 = 0x8006ED70; // type:func size:0x220
+BtlChooseWeakOffer            = 0x8006E924; // type:func size:0x194
+BtlOfferMoodLine              = 0x8006EAB8; // type:func size:0x2B8
+BtlBestOffer                  = 0x8006ED70; // type:func size:0x220
 
 //--------------------------------------------------------------
 //--- PA: 0x00ABF0   VA: 0x8006EF90   subsegment: c, offeranswer

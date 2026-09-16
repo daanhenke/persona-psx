@@ -119,6 +119,20 @@ extern const u_char *g_btl_demon_talk_profiles[];
 
 extern int  BtlStockHolds(const BtlOffer *offer);
 extern int  BtlOfferRank(int slot);
+
+/* The three offers weighed and one of them chosen: at the strong rank, at the
+   weak one, and the pick between whatever either of them allowed. */
+extern int  BtlChooseOffer(void);
+extern int  BtlChooseWeakOffer(void);
+extern int  BtlBestOffer(u_int offers);
+
+/* The twelve kinds a demon's talk profile opens with, in the order
+   BtlBestOffer weighs them by. */
+extern u_char g_btl_talk_kind_order[];
+
+/* The line an offer says about the two gauges that have reached the weak
+   level, which nothing in the overlay asks for. */
+extern void BtlOfferMoodLine(int slot);
 extern int  BtlPickOffer(short *slot);
 extern void BtlOfferMenu(int slot);
 extern void BtlTalkMenuEndEffect(void);
