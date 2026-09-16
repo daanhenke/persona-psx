@@ -136,7 +136,6 @@ extern int     g_btl_enemy_gfx_base;
 extern int     g_btl_gfx_sector;
 extern int     g_btl_slot_sound_base;
 extern int     g_btl_sound_base;
-extern short   D_800F4C86;
 extern long    D_800F4BF0[];
 
 /* The moon's two tables, and the pair of pointers the battle keeps out of
@@ -195,6 +194,8 @@ extern void BtlPickSpawn(void);
 /* The one-shade CLUT the battle lays over the stage buffer before uploading
    it: entry nought transparent, every other entry the same grey. */
 #define BTL_CLUT_ENTRIES 0x100
+/* The entry the shade the battle picks out of that line is kept in. */
+#define BTL_CLUT_PICKED  0x1F
 #define BTL_CLUT_FILL    0x8C63
 
 /* A g_map_id at or past this is not a battle field, so the default stands in
@@ -452,7 +453,7 @@ void ovl_btlp_entry(void)
     } while (i < BTL_CLUT_ENTRIES);
     LoadImage(&g_btl_clut_line, (u_long *)clut);
     i          = 0;
-    D_800F4C86 = GetClut(g_btl_clut_line.x, g_btl_clut_line.y);
+    g_btl_clut[BTL_CLUT_PICKED] = GetClut(g_btl_clut_line.x, g_btl_clut_line.y);
 
     cell = (u_char *)g_btl_reach;
     do {
