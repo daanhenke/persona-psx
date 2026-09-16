@@ -25,6 +25,7 @@
 #include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <libgte.h>
+#include <libgpu.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/effect.h>
 #include <persona/btlp/input.h>
@@ -157,7 +158,96 @@ int BtlEffectMotionCollapse(BtlEffect *e)
     return 1;
 }
 
-INCLUDE_ASM("btlp/nonmatchings/effectmotion", BtlDrawGlyphs);
+/* The glyph quad is built in the scratchpad and copied into the frame's
+   buffer, so only one of each is ever needed: the four corners first, then
+   the quad whose screen coordinates RotTransPers4 writes into it. */
+typedef struct {
+    /* 0x00 */ SVECTOR  corner[4];
+    /* 0x20 */ POLY_FT4 quad;
+} BtlGlyphPad;                         /* 0x48 bytes */
+
+/* The transform's two out-parameters are never read, so the corner counter
+   shares their storage - and its low half is what the odd-corner test reads. */
+typedef struct {
+    /* 0x0 */ u_short vx;
+    /* 0x2 */ u_short vy;
+    /* 0x4 */ u_short vz;
+    /* 0x6 */ u_short pad;
+} BtlGlyphVec;                         /* 8 bytes */
+
+#define GLYPH_PAD ((BtlGlyphPad *)0x1F800000)
+
+/* The font is thirty-one cells across, each eight pixels wide and twelve
+   tall, and a line ends at 0xFF. */
+#define GLYPH_COLS 31
+#define GLYPH_W    8
+/* The column shifted rather than multiplied: written as a multiply the
+   remainder is widened to a word first and the image does not widen it. */
+#define GLYPH_W_SHIFT 3
+#define GLYPH_H    12
+#define GLYPH_END  0xFF
+#define GLYPH_CORNERS 4
+
+/* A raw-texture POLY_FT4, and where the glyphs sit in VRAM. */
+#define GLYPH_LEN  9
+#define GLYPH_CODE 0x2D
+#define GLYPH_TP   0
+#define GLYPH_ABR  0
+#define GLYPH_VX   0x3C0
+#define GLYPH_VY   0x100
+
+extern char   *g_btl_prim_next;
+extern u_long *g_btl_effect_ot;
+
+/* One line of text, a glyph at a time. Each cell goes out as a quad through
+   RotTransPers4 rather than a sprite, so a line can sit in perspective with
+   whatever it is drawn on; g_btl_glyph_x walks along the line and
+   g_btl_glyph_y stays where the caller put it. The answer is always one. */
+int BtlDrawGlyphs(const u_char *text, short clut)
+{
+    BtlGlyphPad *pad;
+    BtlGlyphVec  scratch;
+    int          cell;
+    short        x;
+    short        y;
+
+    pad  = GLYPH_PAD;
+    cell = 0;
+    setlen(&pad->quad, GLYPH_LEN);
+    setcode(&pad->quad, GLYPH_CODE);
+    pad->quad.tpage = getTPage(GLYPH_TP, GLYPH_ABR, GLYPH_VX, GLYPH_VY);
+    pad->quad.clut  = clut;
+    while (*text != GLYPH_END) {
+        y = g_btl_glyph_y;
+        x = g_btl_glyph_x + cell * GLYPH_W;
+        for (*(long *)&scratch = 0; *(long *)&scratch < GLYPH_CORNERS;
+             (*(long *)&scratch)++) {
+            pad->corner[*(long *)&scratch].vx = x + (scratch.vx & 1) * GLYPH_W;
+            pad->corner[*(long *)&scratch].vy =
+                y + (*(long *)&scratch >> 1) * GLYPH_H;
+            pad->corner[*(long *)&scratch].vz = 0;
+        }
+        RotTransPers4(&pad->corner[0], &pad->corner[1], &pad->corner[2],
+                      &pad->corner[3], (long *)&pad->quad.x0,
+                      (long *)&pad->quad.x1, (long *)&pad->quad.x2,
+                      (long *)&pad->quad.x3, (long *)&scratch,
+                      (long *)&scratch);
+        pad->quad.u0 = *text % GLYPH_COLS << GLYPH_W_SHIFT;
+        pad->quad.v0 = *text / GLYPH_COLS * GLYPH_H;
+        pad->quad.u1 = (*text % GLYPH_COLS << GLYPH_W_SHIFT) + GLYPH_W;
+        pad->quad.v1 = *text / GLYPH_COLS * GLYPH_H;
+        pad->quad.u2 = *text % GLYPH_COLS << GLYPH_W_SHIFT;
+        pad->quad.v2 = *text / GLYPH_COLS * GLYPH_H + GLYPH_H;
+        pad->quad.u3 = (*text % GLYPH_COLS << GLYPH_W_SHIFT) + GLYPH_W;
+        pad->quad.v3 = *text / GLYPH_COLS * GLYPH_H + GLYPH_H;
+        memcpy(g_btl_prim_next, &pad->quad, sizeof(POLY_FT4));
+        addPrim(g_btl_effect_ot, g_btl_prim_next);
+        text++;
+        g_btl_prim_next += sizeof(POLY_FT4);
+        cell++;
+    }
+    return 1;
+}
 
 /* One row of an effect, in whichever of the eight colours its kind picks. */
 void BtlEffectDrawRow(const BtlEffectRow *row)

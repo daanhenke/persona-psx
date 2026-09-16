@@ -1,3 +1,4 @@
+btl_scratchpad                = 0x1F800000; // ignore:True size:0x400
 gte_ldv0                      = 0x20000000;
 gte_ldv3                      = 0x2000000C;
 gte_stsxy                     = 0x200000D0;
