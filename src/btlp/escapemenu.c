@@ -98,6 +98,15 @@ extern u_char D_800CFCD0[];
 /* Enemies the walk looks at. */
 #define ESCAPE_ENEMIES 9
 
+/* 70.15%. Reading a record's ailment as a signed byte of the record rather
+   than through a pointer to it stops gcc lifting the table's own address out
+   of the two walks, which is what the image does and what took this from
+   67.17%. What is left is the shape of the arms themselves: the image shares
+   one "how the question ends" tail between every way of reaching it and
+   reaches it through short stubs, where the build lays a copy of it at each
+   branch, and it keeps the frames a question stands for and the bit a member
+   on its way out carries in saved registers the whole loop long, which neither
+   naming them as locals nor writing them out as constants reproduces. */
 #ifdef NON_MATCHING
 int BtlEscapeMenu(void)
 {
@@ -134,7 +143,7 @@ int BtlEscapeMenu(void)
                 i = 0;
                 do {
                     if (g_btl_actors[i].c.key != 0
-                        && *(signed char *)&g_btl_actors[i].c.status
+                        && (signed char)g_btl_actors[i].c.status
                                != BTL_STATUS_DOWN
                         && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0
                         && BtlStatusStops(&g_btl_actors[i]) != 0) {
@@ -243,7 +252,7 @@ int BtlEscapeMenu(void)
             i = 0;
             do {
                 if (g_btl_actors[i].c.key != 0
-                    && *(signed char *)&g_btl_actors[i].c.status
+                    && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
                     && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0) {
                     g_btl_actors[i].flags |= ESCAPE_CAUGHT_BIT;
@@ -261,7 +270,7 @@ int BtlEscapeMenu(void)
             timer = ESCAPE_DELAY;
             do {
                 if (g_btl_actors[i].c.key != 0
-                    && *(signed char *)&g_btl_actors[i].c.status
+                    && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
                     && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0) {
                     BtlObjSetScript(

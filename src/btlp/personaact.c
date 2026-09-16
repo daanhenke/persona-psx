@@ -192,10 +192,16 @@ void BtlPersonaPlayMove(BtlObj *o)
 INCLUDE_ASM("btlp/nonmatchings/personaact", BtlPersonaPlayMove);
 #endif
 
-/* 99.26%. The walk, its shared tail and the second pass over the mask are the
-   image's; what is left is which way the walk's last test is branched and
-   where the second pass steps its counter. The table's name comes right when
-   the rodata is carved, which waits on the match. */
+/* 99.80%. The walk, its shared tail and the second pass over the mask are the
+   image's - the second pass steps its one counter past the test rather than
+   before it, which is what the image does and what lets gcc reduce the same
+   counter to the record's own stride. What is left is one branch: the arm that
+   aims at a single slot tests the same three things the image tests, and gcc
+   threads the jump to the shared "nothing to hit" tail into the branch where
+   the image leaves it standing - written as three ors with the goto, as an
+   and with the else, and with the flag set ahead of the test, all three come
+   out the same. The table's name comes right when the rodata is carved, which
+   waits on the match. */
 #ifdef NON_MATCHING
 void BtlPersonaSpellMove(BtlObj *o)
 {
@@ -280,21 +286,19 @@ void BtlPersonaSpellMove(BtlObj *o)
                     a->targets |= 1 << a->order;
                     i = 0;
                     held = g_btl_hits_left;
-                    slot = 0;
                     g_btl_hits_left = 0;
                     do {
-                        i++;
                         if (((a->targets >> i) & 1) != 0
-                            && g_btl_actors[slot].c.key != 0
-                            && (signed char)g_btl_actors[slot].c.status
+                            && g_btl_actors[i].c.key != 0
+                            && (signed char)g_btl_actors[i].c.status
                                    != BTL_STATUS_DOWN
-                            && (g_btl_actors[slot].flags & BTL_ACTOR_OUT) == 0) {
+                            && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
                             picked = 0;
                             g_btl_hits_left = held;
                             g_btl_hit_walk = 0;
                             g_btl_hit_mask = 1;
                         }
-                        slot++;
+                        i++;
                     } while (i < BTL_ACTORS);
                 } else {
                 none:
