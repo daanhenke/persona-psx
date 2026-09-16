@@ -94,6 +94,10 @@ extern u_char g_btl_debug_act_kind2;
    time rather than on the odds its owner's hp earns. Zero on disc. */
 extern u_char g_btl_debug_guard;
 
+/* And one that shows an enemy's numbers on the status board whether the party
+   has analysed the demon or not. Zero on disc. */
+extern u_char g_btl_debug_show_stats;
+
 /* And one that keeps the ailment moves off the party: their finish steps
    over a member while it is set, and it is zero on disc. */
 extern u_char g_btl_debug_party_immune;

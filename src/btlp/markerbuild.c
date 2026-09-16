@@ -80,7 +80,6 @@
 
 extern BtlGfxText   g_btl_marker_rows[][MARKER_ROWS];
 extern const u_char g_btl_marker_gauge_marks[];
-extern const u_char g_btl_status_labels[][LABEL_CELLS];
 extern u_char       g_btl_marker_status[][LABEL_CELLS];
 extern u_char       g_btl_marker_persona_names[][PERSONA_CELLS];
 extern u_char       g_btl_marker_level_cells[][LEVEL_DIGITS];

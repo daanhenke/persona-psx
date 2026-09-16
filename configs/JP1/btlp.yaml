@@ -148,7 +148,9 @@ segments:
       # pickmove.c emits itself - the word of padding behind the first inside
       # the unit.
       - [0x1004, .rodata, pickmove]
-      - [0x1100, rodata, btlp_rodata6b_b]
+      # BtlShowEnemyStatus's five-entry switch table, which enemystatus.c
+      # emits itself.
+      - [0x1100, .rodata, enemystatus]
       # BtlMemberMotion02's, BtlMemberMotion06's and BtlMemberMotion05's
       # switch tables, which memberact.c emits itself.
       - [0x1114, .rodata, memberact]
@@ -568,7 +570,7 @@ segments:
       - [0x471EC, c, usableitems]
       - [0x474BC, c, spelllines]
       - [0x475BC, c, menuboards]
-      - [0x47860, asm, btlp_66_x2]
+      - [0x47860, c, enemystatus]
       - [0x480A0, c, markershow]
       - [0x48428, c, drawnumber]
       - [0x48588, c, numberright]

@@ -126,4 +126,4 @@ D_8007A934           = 0x8007A934; // type:u32 size:0xC
 D_8007A940           = 0x8007A940; // type:u32 size:0x24
 D_8007A964           = 0x8007A964; // type:u32 size:0x3C
 D_8007A9A0           = 0x8007A9A0; // type:u32 size:0x300
-g_persona_stock          = 0x801F297C; // ignore:True size:0xF
+g_persona_stock      = 0x801F297C; // ignore:True size:0xF

@@ -92,6 +92,47 @@ typedef struct {
    bytes a row, of which a board takes the first six. */
 extern u_char g_btl_arcana_labels[][8];
 
+/* A short row of the enemy status board: the two or three cells a figure is
+   drawn into and the byte that ends it. The placeholder run every row takes
+   when the demon has not been analysed has the same shape, which is what lets
+   a row be filled from it whole. enemystatus.c. */
+typedef struct {
+    u_char c0;
+    u_char c1;
+    u_char c2;
+    u_char c3;
+} BtlStatusRow;
+
+extern BtlStatusRow g_btl_status_unknown_cells;
+extern BtlStatusRow g_btl_status_level_cells;
+extern BtlStatusRow g_btl_status_resist_cells;
+extern BtlStatusRow g_btl_status_hp_cells;
+extern BtlStatusRow g_btl_status_hp_max_cells;
+extern BtlStatusRow g_btl_status_sp_cells;
+extern BtlStatusRow g_btl_status_sp_max_cells;
+extern BtlStatusRow g_btl_status_strength_cells;
+extern BtlStatusRow g_btl_status_vitality_cells;
+extern BtlStatusRow g_btl_status_dexterity_cells;
+extern BtlStatusRow g_btl_status_agility_cells;
+extern BtlStatusRow g_btl_status_luck_cells;
+extern BtlStatusRow g_btl_status_unk3A_cells;
+extern BtlStatusRow g_btl_status_unk3C_cells;
+extern BtlStatusRow g_btl_status_rank_cells;
+extern BtlStatusRow g_btl_status_kind_cells;
+
+/* The longer rows: the arcana label and the demon's name in one, the ailment
+   label, and the six spell names eleven cells apart. */
+extern u_char g_btl_status_name_cells[];
+extern u_char g_btl_status_ail_cells[];
+extern u_char g_btl_status_spell_cells[];
+
+/* The rank and kind labels a demon's own record picks out, ten and eleven
+   cells a row, and the ailment labels every board shares. */
+extern u_char g_btl_status_rank_labels[];
+extern u_char g_btl_status_kind_labels[];
+#define BTL_STATUS_LABEL_CELLS 6
+extern const u_char g_btl_status_labels[][BTL_STATUS_LABEL_CELLS];
+
 /* The board of the kinds of enemy in the fight, which R1 on the command picker
    holds up until a key comes: filled in and put up, and taken down.
    board23.c. */

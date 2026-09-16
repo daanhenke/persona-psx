@@ -66,6 +66,10 @@ typedef struct {
    type of the pointer they copy it into, not by the cast here. */
 #define g_persona_stock ((u_char *)0x801F297C)
 
+/* Which demons the party has analysed, a bit per Persona key. In the same
+   save-game work area and reached by hardcoded address like the rest of it. */
+#define g_analysed_demons ((u_long *)0x801F2A48)
+
 #define STOCK_ROWS 12
 #define STOCK_FREE 0
 

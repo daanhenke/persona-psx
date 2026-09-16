@@ -6,7 +6,7 @@ once as it stands, then once per variant, and restored afterwards unless a
 variant is kept.
 
   usage: sweep.py <unit> <Symbol[,Symbol...]> <variants-file>
-                  [--keep NAME] [--args] [-nN] [--version VER]
+                  [--keep NAME] [--args] [--all] [-nN] [--version VER]
          sweep.py btlp/placefallen BtlPlaceFallenStep variants.txt
          sweep.py btlp/debugailment BtlDebugMemberAilment,BtlDebugEnemyAilment v.txt --keep win
 
@@ -31,7 +31,9 @@ matched whatever the file's line endings are.
 Output: the unmodified source is scored first as `base`. Every variant then
 prints one summary line per symbol; a symbol that scores better than its base
 also prints its differing rows - with the operand rows once it is at 90% or
-better, or always with --args. -nN caps the rows as in odiff.py. With --keep
+better, or always with --args. --all prints those rows for every variant, not
+just the ones that scored better - one that scores worse can still be the one
+whose residual is easier to close. -nN caps the rows as in odiff.py. With --keep
 NAME that variant is left in the file at the end; otherwise the file is put
 back exactly as it was, even on an error or ^C.
 
@@ -52,7 +54,7 @@ VARIANT = re.compile(r"(?m)^##### ")
 
 
 def parse_args(argv):
-    opts = {"keep": None, "args": False, "cap": 80,
+    opts = {"keep": None, "args": False, "all": False, "cap": 80,
             "version": os.environ.get("GAME_VERSION", "JP1")}
     rest = []
     i = 0
@@ -66,6 +68,8 @@ def parse_args(argv):
             i += 1
         elif a == "--args":
             opts["args"] = True
+        elif a == "--all":
+            opts["all"] = True
         elif re.fullmatch(r"-n\d+", a):
             opts["cap"] = int(a[2:])
         elif a in ("-h", "--help"):
@@ -181,14 +185,14 @@ def main():
                 head = odiff(unit, sym, opts["cap"], False).splitlines()
                 line = head[0] if head else "no output"
                 score = percent(line)
-                if score > base[sym]:
-                    print("== %s: BETTER %s" % (name, line))
+                better = score > base[sym]
+                print("== %s: %s%s"
+                      % (name, "BETTER " if better else "", line))
+                if better or opts["all"]:
                     rows = odiff(unit, sym, opts["cap"],
                                  opts["args"] or score >= 90).splitlines()[1:]
                     if rows:
                         print("\n".join(rows))
-                else:
-                    print("== %s: %s" % (name, line))
     finally:
         open(src, "w", newline="", encoding="latin-1").write(final)
         if final is not orig:
