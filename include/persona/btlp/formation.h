@@ -112,7 +112,10 @@ extern int  BtlFormationPresetFits(int slot);
 struct BtlObj;
 struct BtlActor;
 
+/* The placement grid's two records: the anchor the cursor is drawn at, and
+   the plate behind it that is hidden while a member is in hand. */
 extern struct BtlObj *g_btl_grid_anchor;
+extern struct BtlObj *g_btl_grid_back;
 extern short          g_btl_place_member;
 extern short          g_btl_place_cell;
 extern short          g_btl_place_col;
@@ -132,6 +135,13 @@ extern int  BtlPlaceFallenStep(void);
    and BTL_PICK_WAIT otherwise. placemenu.c, and the cursor in asm. */
 extern int BtlPlaceMenu(void);
 extern int BtlPlaceGridUpdate(int carrying);
+
+/* What the cursor answers: a member lifted or put down, the player done
+   moving, and the third key. A cancel is BTL_PICK_CANCEL and everything else
+   BTL_PICK_WAIT. */
+#define PLACE_GRID_DONE   0
+#define PLACE_GRID_FINISH (-2)
+#define PLACE_GRID_UNWIND (-3)
 
 /* Raised by the third key anywhere in the placement menu: every step it
    passes through on the way back takes it as its own abort. */

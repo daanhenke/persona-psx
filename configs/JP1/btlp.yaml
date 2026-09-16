@@ -523,7 +523,7 @@ segments:
       - [0x3F5F8, c, choiceupdate]
       # The Persona board's two pages: the spell list and the swap.
       - [0x3F798, c, personamenu]
-      - [0x3FC80, asm, btlp_62_0]
+      - [0x3FC80, c, placegrid]
       - [0x403C0, c, place]
       # Whether a member may stand on a cell.
       - [0x4046C, c, cellfree]

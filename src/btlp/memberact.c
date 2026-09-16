@@ -231,20 +231,23 @@ extern u_char D_800CFA00;
 extern u_char g_btl_member_voice[];
 
 
-/* 97.81%. The two ways nought can give up, the three arms of the walk and the
-   way a turn that found nothing to hit is closed out are the image's, and each
-   of them reads as the arm the image lays down first rather than the early
-   return the draft had: the swing's own failure is the else of the move-area
-   test, the sound is the else of "any hits left", the sweep for anyone still
-   standing is the then of the spell test, and the walk's own step is the then
-   of the four tests rather than their else. What is left is where two shared
-   tails sit - the image jumps from the swing's test to the one
-   `g_btl_hits_left = 0` at the end and lays the hit it found out of line ahead
-   of the loop, where the build puts each where it is reached - and the order
-   the mask and the walk counter are stored in on the way back round. Holding
-   the record and the target mask in locals of their own changes nothing, the
-   walk counted in an int comes out further away, and so does the step written
-   as one chained assignment. */
+/* 99.98%: one instruction. Everything the swing does is laid out the way the
+   image lays it out - each arm is the one gcc emits first rather than the early
+   return the draft had, the hit the walk finds and the one `g_btl_hits_left = 0`
+   the whole round shares are both reached by name from where they are used
+   rather than written out again, and the mask the next round starts from is
+   stored by each arm of its own test rather than through a local the two share.
+   What is left is the 1 the sweep's own bit is built from. The dumps say where
+   it goes: the first cse drops the insn that loads 1 into a pseudo of its own
+   and shifts the round's flag instead, which the line above has just set to 1,
+   so by the time loop optimisation looks for constants to lift out there is no
+   constant left at that site to lift - the image lifts one and shifts it.
+   Nothing that keeps the flag's write where the image writes it keeps the two
+   apart, because a flag set to 1 in front of the shift is the same value to
+   cse; stepping the flag rather than setting it does keep them apart and puts
+   the lifted constant back, at the price of the same one instruction on the
+   flag's own write. The table's name comes right when the rodata is carved for
+   the unit, which waits on the match. */
 #ifdef NON_MATCHING
 /* The swing: entry 2 of g_btl_member_motion, and entry 0x0C as well.
  *
@@ -423,7 +426,7 @@ void BtlMemberMotion02(BtlObj *o)
                 done = 1;
                 if ((g_btl_swing_item->swing & 2) != 0) {
                     i = 0;
-                    slot = (short)a->order;
+                    slot = a->order;
                     kept = g_btl_hits_left;
                     g_btl_hits_left = 0;
                     a->targets |= 1 << slot;

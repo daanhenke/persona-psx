@@ -48,9 +48,6 @@
 /* What the grid's cursor answers besides a cancel: a member picked up or put
    down, the player done moving, and the cancel an abort from further in is
    passed down as. */
-#define PLACE_GRID_DONE   0
-#define PLACE_GRID_FINISH (-2)
-#define PLACE_GRID_UNWIND (-3)
 
 /* How long the grid is given to come up, and the question to settle. */
 #define PLACE_OPEN_FRAMES 30

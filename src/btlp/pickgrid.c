@@ -27,6 +27,7 @@
 #include <decomp/types.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/actor.h>
+#include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
 
 /* Party members, and the grid's shape. */
@@ -81,8 +82,6 @@ extern BtlObjDef       g_btl_obj_defs[];
 /* Eighteen script tables, one per cell, two pointers each. */
 extern const u_long *g_btl_grid_scripts[][2];
 
-extern BtlObj *g_btl_grid_anchor;
-extern BtlObj *g_btl_grid_back;
 extern BtlObj *g_btl_pick_cursors[];
 
 void BtlRefreshPickCursors(void);
