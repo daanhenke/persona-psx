@@ -27,7 +27,11 @@ typedef struct BtlActor {
     /* 0x68 */ int     damage_dealt; /* what this fighter's spells have taken
                                       off everyone they hit, a kill counting
                                       only as far as nought               */
-    /* 0x6C */ u_char  pad6C[8];
+    /* 0x6C */ int     won_share;  /* what the results weigh this member's part
+                                      of the fight at: what its spells took,
+                                      and its share of the hp the party lost  */
+    /* 0x70 */ int     casts;      /* how many times it called a Persona out;
+                                      g_btl_won_casts is the party's total   */
     /* 0x74 */ int     unk74;      /* what the negotiation's parting gift adds
                                       its experience to, once Char.unk14 is
                                       under the cap                          */

@@ -456,7 +456,8 @@ segments:
       - [0x31DE8, c, orderturns]
       - [0x31F38, c, pickother]
       - [0x32170, c, roundtick]
-      - [0x323C0, asm, btlp_57_x1_e]
+      # What a won fight is worth, shared out among the party.
+      - [0x323C0, c, battleresults]
       # A Persona growing, and a fighter losing a level.
       - [0x32DB8, c, personagrow]
       - [0x332F8, c, clutfirst]

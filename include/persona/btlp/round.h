@@ -347,7 +347,9 @@ extern void BtlInsertTurn(int actor);
 /* The line each move announces itself with as it is made, by move id. */
 extern u_char *g_btl_move_lines[];
 
-extern int   D_800F5A60;
+/* How many times the party called a Persona out this fight, which the results
+   weigh the second half of the winnings by. */
+extern int   g_btl_won_casts;
 
 /* The item the fight leaves behind, as an id into g_item_defs. Cleared as the
    battle opens, written by BtlRollDefeatDrop as a demon goes down and read

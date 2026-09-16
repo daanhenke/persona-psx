@@ -117,7 +117,7 @@ void BtlStageOpen(void)
             g_btl_round = 0;
             g_btl_won_exp = 0;
             g_btl_won_unk10 = 0;
-            D_800F5A60 = 0;
+            g_btl_won_casts = 0;
             g_btl_won_money = 0;
             g_btl_drop_item = 0;
 

@@ -1034,12 +1034,12 @@ void BtlMemberMotion06(BtlObj *o)
         }
         BtlCloseMessage(0);
         {
-            BtlActor *actor = o->actor;
-            int count = *(int *)&actor->pad6C[4];
+            int *casts = &o->actor->casts;
+            int  count = *casts;
             g_btl_seq_catchup = 1;
-            *(int *)&actor->pad6C[4] = count + 1;
+            *casts = count + 1;
         }
-        D_800F5A60++;
+        g_btl_won_casts++;
         if (D_8004E264 == 0 && g_btl_act_kind == 0) {
             a->c.sp -= g_btl_personas[BtlActorPersona(o->mark_num)].sp_cost;
         }
