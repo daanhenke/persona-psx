@@ -94,26 +94,23 @@ extern BtlMenuSpot g_btl_config_spots[];
    Confirm on that last row opens the tactics board and turns frames over
    until it answers: its own cancel comes back here, its confirm takes the
    whole page down, and anything else puts the settings board back. */
-/* 98.83%: every instruction is the image's, and the one difference is where
-   the copy of the settings table into the cell walk's own pointer sits - the
-   image puts it after the two values the loop optimiser lifts out of the cell
-   loop, gcc here before them. Indexing the table rather than walking it, and
-   every order of the loop's three initialisations, move it the wrong way. */
-#ifdef NON_MATCHING
 int BtlConfigMenu(void)
 {
     BtlGfxCell    *cursor;
     BtlConfigCell *cell;
     u_char       **rows;
-    u_char       **row;
     int            keys;
     int            at;
     int            answer;
     int            i;
 
-    at   = 0;
-    rows = g_btl_config_rows;
+    at = 0;
     do {
+        /* Read again every frame: lifted out of the whole page the table's
+           address is one held register more, and the cell walk's own
+           pointer comes out in front of the two values the loop optimiser
+           lifts rather than behind them. */
+        rows = g_btl_config_rows;
         keys = BtlMenuKey();
         if ((keys & (PAD_UP | PAD_DOWN)) != 0) {
             BtlSePlay(BTL_SE_SLOT, SE_MENU_MOVE);
@@ -138,12 +135,11 @@ int BtlConfigMenu(void)
             cursor->x = g_btl_config_spots[at].x - BTL_CURSOR_NUDGE;
             cursor->y = g_btl_config_spots[at].y;
         }
-        for (i = 0, cell = g_btl_config_cells, row = rows;
-             i < CONFIG_ROWS; row++, i++, cell++) {
+        for (i = 0, cell = g_btl_config_cells; i < CONFIG_ROWS; i++, cell++) {
             cell[CONFIG_ROWS].mark     = CONFIG_BLANK;
             cell[CONFIG_ROWS * 2].mark = CONFIG_BLANK;
             cell[CONFIG_ROWS * 3].mark = CONFIG_BLANK;
-            cell[CONFIG_ROWS + CONFIG_ROWS * **row].mark = CONFIG_MARK;
+            cell[CONFIG_ROWS + CONFIG_ROWS * *rows[i]].mark = CONFIG_MARK;
         }
         if ((g_btl_pad1_edge & g_btl_key_confirm) != 0 && at == CONFIG_TACTICS) {
             BtlSePlay(BTL_SE_SLOT, SE_MENU_OPEN);
@@ -171,9 +167,6 @@ int BtlConfigMenu(void)
     } while ((g_btl_pad1_edge & (g_btl_key_cancel | g_btl_key_abort)) == 0);
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlConfigMenu);
-#endif
 
 /* BtlCommandEntry's steps. It opens on the next member without a command and
    the picker over them; the rest are the ways out of it. */
