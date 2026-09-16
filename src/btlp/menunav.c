@@ -85,7 +85,6 @@
 
 extern short      g_btl_debug_row;
 extern short      g_btl_orders_row;
-extern short      g_btl_tactics_row;
 extern u_char     g_btl_orders_line0[];
 extern u_char     g_btl_orders_line1[];
 extern u_char     g_btl_orders_line2[];

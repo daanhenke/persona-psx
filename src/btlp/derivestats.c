@@ -48,7 +48,7 @@
 
 extern void BtlApplyPersona(BtlActor *a);
 
-/* 99.57%: every instruction is the image's and in its order; what is left is
+/* 99.58%: every instruction is the image's and in its order; what is left is
    which register holds what in the bad-luck and wolf arms, and the pair of
    equipment ids in the prologue - the image puts the weapon's in $t1 and the
    gun's in $t0 and forms the gun's pointer first, where gcc here does the
@@ -132,9 +132,9 @@ void BtlDeriveBattleStats(BtlActor *a)
         /* The gun before the evasion, though the image stores them the other
            way round: written in store order the scheduler keeps the pair of
            stores together and the loads in front of them come out reversed. */
-        a->gun_hit = gun->rate
-                     + (a->stat[STAT_LUCK] / 4
-                        + (a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2));
+        a->gun_hit = (a->stat[STAT_LUCK] / 4
+                      + (a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2))
+                     + gun->rate;
         a->evade = a->stat[STAT_LUCK] / 4
                    + (a->stat[STAT_AGILITY] + a->stat[STAT_DEXTERITY] / 2)
                    + armour_hit;

@@ -43,7 +43,137 @@
 #include <persona/btlp/talk.h>
 #include <persona/btlp/text.h>
 
+/* The settings page: four rows, three values a row, and the last row is the
+   way through to the tactics board rather than a setting. */
+#define CONFIG_ROWS    4
+#define CONFIG_VALUES  3
+#define CONFIG_TACTICS 3
+#define BTL_CONFIG_VALUES CONFIG_VALUES
+
+/* The glyph a value cell carries: the mark on the one chosen, a blank on the
+   other two. */
+#define CONFIG_BLANK 0x20
+#define CONFIG_MARK  0x21
+
+/* Which slot the menu's sounds come out of, and the four it plays. */
+#define BTL_SE_SLOT   1
+#define SE_MENU_MOVE  0
+#define SE_MENU_STEP  3
+#define SE_MENU_OPEN  1
+#define SE_MENU_BACK  2
+
+/* What BtlTacticsMenuUpdate answers with while it is still running, and when
+   its own cancel takes the whole page down. */
+#define BTL_MENU_RUNNING (-0x100)
+#define BTL_MENU_DONE    (-2)
+
+/* One cell of the settings board: where it sits, the glyphs it draws, and the
+   byte at 9 that carries the mark. The four rows come first and the three
+   columns of values follow them, four cells to a column, so a row's value
+   cells are four, eight and twelve cells past its own. */
+typedef struct {
+    /* 0x0 */ short         x;
+    /* 0x2 */ short         y;
+    /* 0x4 */ const u_char *text;
+    /* 0x8 */ u_char        pad8[1];
+    /* 0x9 */ u_char        mark;
+    /* 0xA */ u_char        padA[2];
+} BtlConfigCell;                       /* 0xC bytes */
+
+extern BtlConfigCell  g_btl_config_cells[];
+extern u_char        *g_btl_config_rows[];
+extern u_char   g_btl_config_nav[][2];
+extern u_char   g_btl_config_step[][BTL_CONFIG_VALUES][2];
+extern BtlMenuSpot g_btl_config_spots[];
+
+/* The settings page. Four rows, each a pointer to the setting itself, and
+   left and right step the row's own value through a table rather than
+   counting - so a row can hold whatever values it likes and the last row,
+   which is the way through to the tactics board, holds none.
+
+   Confirm on that last row opens the tactics board and turns frames over
+   until it answers: its own cancel comes back here, its confirm takes the
+   whole page down, and anything else puts the settings board back. */
+/* 98.83%: every instruction is the image's, and the one difference is where
+   the copy of the settings table into the cell walk's own pointer sits - the
+   image puts it after the two values the loop optimiser lifts out of the cell
+   loop, gcc here before them. Indexing the table rather than walking it, and
+   every order of the loop's three initialisations, move it the wrong way. */
+#ifdef NON_MATCHING
+int BtlConfigMenu(void)
+{
+    BtlGfxCell    *cursor;
+    BtlConfigCell *cell;
+    u_char       **rows;
+    u_char       **row;
+    int            keys;
+    int            at;
+    int            answer;
+    int            i;
+
+    at   = 0;
+    rows = g_btl_config_rows;
+    do {
+        keys = BtlMenuKey();
+        if ((keys & (PAD_UP | PAD_DOWN)) != 0) {
+            BtlSePlay(BTL_SE_SLOT, SE_MENU_MOVE);
+        }
+        if ((keys & (PAD_LEFT | PAD_RIGHT)) != 0 && at != CONFIG_TACTICS) {
+            BtlSePlay(BTL_SE_SLOT, SE_MENU_STEP);
+        }
+        if ((keys & PAD_UP) != 0) {
+            at = g_btl_config_nav[at][0];
+        }
+        if ((keys & PAD_DOWN) != 0) {
+            at = g_btl_config_nav[at][1];
+        }
+        if ((keys & PAD_LEFT) != 0) {
+            *rows[at] = g_btl_config_step[at][*rows[at]][0];
+        }
+        if ((keys & PAD_RIGHT) != 0) {
+            *rows[at] = g_btl_config_step[at][*rows[at]][1];
+        }
+        for (i = 0, cursor = g_btl_menu_cursor; i < BTL_CURSOR_CELLS;
+             i++, cursor++) {
+            cursor->x = g_btl_config_spots[at].x - BTL_CURSOR_NUDGE;
+            cursor->y = g_btl_config_spots[at].y;
+        }
+        for (i = 0, cell = g_btl_config_cells, row = rows;
+             i < CONFIG_ROWS; row++, i++, cell++) {
+            cell[CONFIG_ROWS].mark     = CONFIG_BLANK;
+            cell[CONFIG_ROWS * 2].mark = CONFIG_BLANK;
+            cell[CONFIG_ROWS * 3].mark = CONFIG_BLANK;
+            cell[CONFIG_ROWS + CONFIG_ROWS * **row].mark = CONFIG_MARK;
+        }
+        if ((g_btl_pad1_edge & g_btl_key_confirm) != 0 && at == CONFIG_TACTICS) {
+            BtlSePlay(BTL_SE_SLOT, SE_MENU_OPEN);
+            BtlCloseConfigBoard();
+            BtlOpenTacticsBoard();
+            g_btl_tactics_row = 0;
+            BtlDrawFrame();
+            for (;;) {
+                answer = BtlTacticsMenuUpdate();
+                if (answer == BTL_MENU_DONE) {
+                    BtlSePlay(BTL_SE_SLOT, SE_MENU_BACK);
+                    BtlCloseTacticsBoard();
+                    return BTL_MENU_DONE;
+                }
+                if (answer != BTL_MENU_RUNNING) {
+                    break;
+                }
+                BtlDrawFrame();
+            }
+            BtlSePlay(BTL_SE_SLOT, SE_MENU_BACK);
+            BtlCloseTacticsBoard();
+            BtlOpenConfigBoard();
+        }
+        BtlDrawFrame();
+    } while ((g_btl_pad1_edge & (g_btl_key_cancel | g_btl_key_abort)) == 0);
+    return 0;
+}
+#else
 INCLUDE_ASM("btlp/nonmatchings/commandmenu", BtlConfigMenu);
+#endif
 
 /* BtlCommandEntry's steps. It opens on the next member without a command and
    the picker over them; the rest are the ways out of it. */

@@ -110,6 +110,12 @@ extern const u_char g_btl_msg_undo_formation[];
    orders. The first answers -2 on the abort key; the walk answers 1 once
    every member has a command and 0 when the player backs out of it.
    commandmenu.c. */
+/* Which row of the tactics board the cursor is on, which the settings page
+   puts back to nought as it opens it. */
+extern short g_btl_tactics_row;
+
+/* Answers nought when the page is left the ordinary way and -2 when the
+   tactics board's own cancel takes the whole thing down. */
 extern int BtlConfigMenu(void);
 extern int BtlCommandEntry(void);
 extern int BtlRunTalkScene(void);
