@@ -59,7 +59,6 @@
 /* The attribute a stored layout's preview leaves on the party. */
 #define PLACE_PREVIEW_ATTR 1
 
-#ifdef NON_MATCHING
 int BtlPlaceMenu(void)
 {
     int choice;
@@ -424,6 +423,3 @@ int BtlPlaceMenu(void)
     }
 
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placemenu", BtlPlaceMenu);
-#endif
