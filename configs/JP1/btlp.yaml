@@ -123,7 +123,12 @@ segments:
       - [0xD94, pad, btlp_pad_d94]
       # BtlHoldForMarkers's switch table, which the C emits itself.
       - [0xD98, .rodata, holdmarkers]
-      - [0xDB0, rodata, btlp_rodata6b]
+      # BtlPersonaGuard's three switch tables - the Persona's own kind and the
+      # two reads of the move's, one per arm that makes one - which
+      # personaguard.c emits itself, each of the first two with the word of
+      # padding behind it inside the unit.
+      - [0xDB0, .rodata, personaguard]
+      - [0xEC4, rodata, btlp_rodata6b]
       # BtlCommandEntry's switch table, which commandmenu.c emits itself, and
       # the word of padding behind it that belongs to nobody.
       - [0xF5C, .rodata, commandmenu]
@@ -479,7 +484,7 @@ segments:
       - [0x35160, c, openscenes]
       - [0x35568, c, roundover]
       - [0x35C94, c, holdmarkers]
-      - [0x35E08, asm, btlp_58_x3]
+      - [0x35E08, c, personaguard]
       - [0x3626C, c, commandstage]
       - [0x36930, c, pickenemy]
       - [0x36E30, c, pickmember]

@@ -217,7 +217,6 @@ extern u_char g_btl_line_enc11d[];
 
 /* Where a turn comes in the round, and setting one going. */
 extern int  BtlSlowestOrder(void);
-extern void BtlAimEnemyMove(BtlActor *a);
 extern void BtlHoldForMarkers(void);
 extern void BtlReadyTurnNow(void);
 extern void BtlAimMove(BtlActor *a);

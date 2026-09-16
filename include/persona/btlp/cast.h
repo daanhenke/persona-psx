@@ -11,6 +11,7 @@
  * all of the Persona's records back off.
  */
 #include <decomp/types.h>
+#include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 
 /* The summon circle's artwork in the Persona pack's sector table, and the page
@@ -32,6 +33,11 @@
 #define CAST_SCALE_Z        0x1000
 #define CAST_PERSONA_PIECES 6
 
+/* The line that goes up whenever a Persona acts of its own accord rather
+   than being cast: in its owner's place, which is what BtlMemberMotion06
+   puts up when g_btl_act_kind is set, and in front of it. */
+extern u_char g_btl_msg_persona_acts[];
+
 /* The Persona standing on the field, and whether it has finished coming out;
    the Persona motions wait on the flag. memberact.c keeps the flag. */
 extern BtlObj *g_btl_persona_obj;
@@ -49,5 +55,14 @@ extern void BtlPersonaSpell15(BtlObj *o);
 
 /* Stands a Persona's records up at a cell of the grid. personaspawn.c. */
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
+
+/* Reads the fighter's own Persona off the disc and stands it on the field,
+   answering the record it put up. summonpersona.c. */
+extern BtlObj *BtlSummonActorPersona(BtlActor *a);
+
+/* Gives every member an aimed enemy action reaches a chance to have its
+   Persona come out and stand in front of it, which makes the action miss.
+   Answers whether one did. personaguard.c. */
+extern int BtlPersonaGuard(BtlActor *a);
 
 #endif

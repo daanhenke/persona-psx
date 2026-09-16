@@ -143,6 +143,7 @@ g_btl_debug_skip              = 0x8004E26D;
 g_btl_debug_free_sp           = 0x8004E26E; // type:u8 size:0x1
 g_btl_debug_act_kind1         = 0x8004E270; // type:u8 size:0x1
 g_btl_debug_act_kind2         = 0x8004E271; // type:u8 size:0x1
+g_btl_debug_guard             = 0x8004E272; // type:u8 size:0x1
 g_btl_debug_act_for           = 0x8004E273; // type:u8 size:0x1
 g_btl_debug_hud               = 0x80055BEC;
 g_btl_chain_battle            = 0x80055BED;
@@ -1676,7 +1677,7 @@ BtlHoldForMarkers             = 0x8009A034; // type:func size:0x174
 //---------------------------------------------------------------
 //--- PA: 0x035E08   VA: 0x8009A1A8   subsegment: asm, btlp_58_x3
 //---------------------------------------------------------------
-BtlAimEnemyMove               = 0x8009A1A8; // type:func size:0x464
+BtlPersonaGuard               = 0x8009A1A8; // type:func size:0x464
 
 //---------------------------------------------------------------
 //--- PA: 0x03626C   VA: 0x8009A60C   subsegment: c, commandstage
@@ -3239,6 +3240,7 @@ g_btl_flag_name12             = 0x800CF7C0; // type:u8 size:0x8
 g_btl_flag_name13             = 0x800CF7C8; // type:u8 size:0x10
 g_btl_flag_name14             = 0x800CF7D8; // type:u8 size:0x8
 g_btl_flag_name_unused        = 0x800CF7E0; // type:u8 size:0xC
+g_btl_msg_persona_acts        = 0x800CF7EC; // type:u8 size:0x10
 g_btl_msg_ailment             = 0x800CF7FC;
 g_btl_msg_nobody_to_move      = 0x800CF80C; // size:0x18
 g_btl_msg_place_blocked       = 0x800CF824; // size:0x18

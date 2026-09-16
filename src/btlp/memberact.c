@@ -836,7 +836,6 @@ void BtlMemberStrike(BtlObj *o)
 
 extern u_char   g_btl_act_speed;
 extern u_char   g_btl_act_move;
-extern u_char   D_800CF7EC[];
 extern u_char   D_800CFA10[];
 extern u_char   D_8004E264;
 extern u_char   D_800E49BF;
@@ -910,7 +909,8 @@ void BtlMemberMotion06(BtlObj *o)
                 }
                 g_btl_msg_timer = speed;
             } else if (g_btl_act_kind != 0) {
-                BtlOpenMessage(1, 1, D_800CF7EC, 0x10, CAST_AIL_0C);
+                BtlOpenMessage(1, 1, g_btl_msg_persona_acts, 0x10,
+                              CAST_AIL_0C);
                 if (g_btl_msg_speed == 0) {
                     speed = 0xB4;
                 } else {

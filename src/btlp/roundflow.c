@@ -34,6 +34,7 @@
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/box.h>
+#include <persona/btlp/cast.h>
 #include <persona/btlp/pick.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/pack.h>
@@ -809,7 +810,7 @@ void BtlStageRound(void)
                             case 2:
                                 actor->move = 0;
                                 actor->turn_move = 0;
-                                BtlAimEnemyMove(actor);
+                                BtlPersonaGuard(actor);
                                 BtlOpenPackBank();
                                 break;
                             case 6:
@@ -818,7 +819,7 @@ void BtlStageRound(void)
                                 if (g_btl_place_party == 0) {
                                     BtlAimMove(actor);
                                 }
-                                BtlAimEnemyMove(actor);
+                                BtlPersonaGuard(actor);
                                 BtlOpenPackBank();
                                 if (g_btl_place_party != 0) {
                                     actor->action = 0xFF;

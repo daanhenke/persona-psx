@@ -89,6 +89,11 @@ extern u_char g_btl_debug_act_for;
 extern u_char g_btl_debug_act_kind1;
 extern u_char g_btl_debug_act_kind2;
 
+/* And one for the third thing a Persona does unasked - coming out to stand in
+   front of an owner an enemy has aimed at - which makes it come out every
+   time rather than on the odds its owner's hp earns. Zero on disc. */
+extern u_char g_btl_debug_guard;
+
 /* And one that keeps the ailment moves off the party: their finish steps
    over a member while it is set, and it is zero on disc. */
 extern u_char g_btl_debug_party_immune;

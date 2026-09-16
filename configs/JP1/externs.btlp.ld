@@ -171,6 +171,7 @@ g_btl_debug_free_sp = 0x8004E26E;
 g_item_help = 0x8004AE1C;
 g_btl_debug_act_kind1 = 0x8004E270;
 g_btl_debug_act_kind2 = 0x8004E271;
+g_btl_debug_guard = 0x8004E272;
 g_btl_debug_act_for = 0x8004E273;
 g_btl_chain_battle = 0x80055BED;
 g_state_prev = 0x80055C30;
