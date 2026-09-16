@@ -2879,3 +2879,75 @@ this tree.
 
 - [moodline.c](/src/btlp/moodline.c) - `BtlOfferMoodLine`, 99.31% to exact.
 - [talkboard.c](/src/btlp/talkboard.c) - `BtlTalkBoardStep`.
+
+## The adjust constant of a soft-float conversion names the narrow width
+
+gcc has no unsigned-to-double helper for a narrow mode, so `expand_float`
+converts the value as signed and adds 2^bitsize back when the result came out
+negative. The constant it adds is the width, written out: `0x40700000` is
+256.0 and says QImode, `0x40F00000` is 65536.0 and says HImode. So a
+`lui $a3, 0x4070` in front of `__floatsidf` is telling you the source cast the
+value through `u_char`, and `0x40f0` that it went through `u_short`. Read the
+constant before guessing the cast.
+
+- [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`, the
+  spell's own power as `(u_char)(signed char)spell->power`.
+
+## A frame that is too short is a local nothing reads
+
+When every instruction lines up but the `addiu $sp, $sp, -N` differs, count
+what sits between the outgoing-argument area and the saved registers. Locals
+start at `current_function_outgoing_args_size` and are laid out in declaration
+order, so an addressed local at `0x28($sp)` with six words of argument area
+below it has sixteen bytes of something in front of it. A plain `int` never
+takes a slot unless its address is taken - only an aggregate does - so what is
+missing is an array or a struct declared before it and never read.
+
+- [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`, four
+  words in front of `damage`.
+- [voiceopen.c](/src/btlp/voiceopen.c) - `BtlReadVoiceBank`, the same shape.
+
+## A sum is added onto the record and read back, not kept in a local
+
+`n = rec->hp + amount; rec->hp = n;` and `rec->hp += amount; n = rec->hp;`
+produce the same three instructions but schedule differently: in the first the
+sum is live before the store and the scheduler has an extra value to place, in
+the second gcc keeps the stored register and the read-back is free. When a
+clamp follows and the image shows the store, then the clamp, then the store
+again - with no reload between them - it is the second shape. The read-back
+also has to come before any other store to the same record, or gcc stops
+trusting the register and loads the field again.
+
+- [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`, the
+  repelled arm, 99.51% to 99.83%.
+
+## Three expressions that share a part want the shared part written first
+
+gcc's list scheduler runs backwards and pulls the operand whose defining insn
+comes later into a chain immediately in front of its consumer; the other one is
+left in the ready list, where ties go to the lowest insn number and so come out
+at the front of the block. Holding a shared sub-expression in a local of its
+own therefore does the opposite of what it looks like: the local's own two
+loads become one chain the scheduler keeps together, and the whole chain lands
+behind the standalone loads of the expressions after it.
+
+Where the image interleaves the loads - one from each expression, then the next
+from each - the source has no such local, and each expression is written the
+same way round with its shared part leading:
+`(dex + agility / 2) + luck / 4 + weapon->rate`. Writing the leading term as
+the left operand is what makes its loads issue first.
+
+- [derivestats.c](/src/btlp/derivestats.c) - `BtlDeriveBattleStats`, the
+  bad-luck arm, 99.86% to exact.
+
+## The scheduler writes down what it did
+
+`cc1 -dS` leaves a `.sched` dump beside the assembly whose header is the
+scheduler's own trace: `insn[N]: priority = P` for every insn in a block, then
+one `ready list at T-k` line per cycle with the list it sorted and the insn it
+took. T-1 is the last insn of the block and the highest T the first, so reading
+the picks from the bottom up gives the emitted order. `launching X before Y`
+marks the chain pulls described above. When the only difference left is which
+of two independent loads comes first, this says why.
+
+- [derivestats.c](/src/btlp/derivestats.c) - `BtlDeriveBattleStats`.

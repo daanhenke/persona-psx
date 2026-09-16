@@ -19,7 +19,6 @@
  * helpers turn up in an overlay that has no other use for them.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/common/char.h>
 #include <persona/common/item.h>
 #include <persona/btlp/actor.h>
@@ -46,31 +45,27 @@
 /* What the two spell marks add to the number they lift. */
 #define MARK_SHARE 4.0
 
-extern void BtlApplyPersona(BtlActor *a);
-
-/* 99.58%: every instruction is the image's and in its order; what is left is
-   which register holds what in the bad-luck and wolf arms, and the pair of
-   equipment ids in the prologue - the image puts the weapon's in $t1 and the
-   gun's in $t0 and forms the gun's pointer first, where gcc here does the
-   weapon's first and gets them the other way round, which carries through to
-   the armour totals. Twenty-odd statement and operand orders have been tried;
-   each buys two or three rows and none reaches the end. */
-#ifdef NON_MATCHING
 void BtlDeriveBattleStats(BtlActor *a)
 {
     const ItemDef *defs;
+    int            w;
+    int            g;
     const ItemDef *weapon;
     const ItemDef *gun;
     int            luck;
-    int            aim;
     int            armour_atk;
     int            armour_hit;
     double         d;
 
     BtlApplyPersona(a);
     defs       = g_item_defs;
-    weapon     = &defs[a->c.equip[EQUIP_WEAPON]];
-    gun        = &defs[a->c.equip[EQUIP_GUN]];
+    /* The two ids read out first and the gun's record worked out before the
+       weapon's: indexed straight off the record the pair of pointers comes
+       out in the other two registers, and the armour totals follow them. */
+    w          = a->c.equip[EQUIP_WEAPON];
+    g          = a->c.equip[EQUIP_GUN];
+    gun        = &defs[g];
+    weapon     = &defs[w];
     armour_atk = defs[a->c.equip[EQUIP_ARMOUR]].power
                  + defs[a->c.equip[EQUIP_ARMOUR + 1]].power
                  + defs[a->c.equip[EQUIP_ARMOUR + 2]].power
@@ -127,17 +122,16 @@ void BtlDeriveBattleStats(BtlActor *a)
         /* The part the two hit numbers share through a local of its own -
            spelled inline in both the loads in front of them come out in the
            other order. */
-        aim          = a->stat[STAT_AGILITY] / 2 + a->stat[STAT_DEXTERITY];
-        a->melee_hit = weapon->rate + (a->stat[STAT_LUCK] / 4 + aim);
-        /* The gun before the evasion, though the image stores them the other
-           way round: written in store order the scheduler keeps the pair of
-           stores together and the loads in front of them come out reversed. */
-        a->gun_hit = (a->stat[STAT_LUCK] / 4
-                      + (a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2))
-                     + gun->rate;
-        a->evade = a->stat[STAT_LUCK] / 4
-                   + (a->stat[STAT_AGILITY] + a->stat[STAT_DEXTERITY] / 2)
-                   + armour_hit;
+        /* All three written the same way round - the pair that is halved and
+           quartered first, the luck next, the equipment last. Held back in a
+           local of its own the shared part is one chain the scheduler keeps
+           together, and its two loads come out behind the others. */
+        a->melee_hit = (a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2)
+                       + a->stat[STAT_LUCK] / 4 + weapon->rate;
+        a->gun_hit = (a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2)
+                     + a->stat[STAT_LUCK] / 4 + gun->rate;
+        a->evade = (a->stat[STAT_AGILITY] + a->stat[STAT_DEXTERITY] / 2)
+                   + a->stat[STAT_LUCK] / 4 + armour_hit;
         break;
 
     case BTL_STATUS_POISON:
@@ -185,13 +179,17 @@ void BtlDeriveBattleStats(BtlActor *a)
                        + ((a->stat[STAT_DEXTERITY] + a->stat[STAT_AGILITY] / 2)
                           + a->stat[STAT_LUCK] / 4);
         if (a->c.equip[EQUIP_GUN] != 0 && a->c.equip[EQUIP_AMMO] != 0) {
-            const ItemDef *barrel = &g_item_defs[a->c.equip[EQUIP_GUN]];
-            const ItemDef *round  = &g_item_defs[a->c.equip[EQUIP_AMMO]];
+            const ItemDef *round;
 
-            a->gun_atk = a->stat[STAT_AGILITY] / 4
-                         + (a->stat[STAT_DEXTERITY] / 2
-                            + (barrel->power + round->power));
-            a->gun_hit = barrel->rate
+            /* The gun's own record back through the local the prologue took
+               it in, which is the register the image keeps it in. */
+            gun   = &g_item_defs[a->c.equip[EQUIP_GUN]];
+            round = &g_item_defs[a->c.equip[EQUIP_AMMO]];
+
+            a->gun_atk = (a->stat[STAT_DEXTERITY] / 2
+                          + (gun->power + round->power))
+                         + a->stat[STAT_AGILITY] / 4;
+            a->gun_hit = gun->rate
                          + ((a->stat[STAT_DEXTERITY]
                              + a->stat[STAT_AGILITY] / 2)
                             + a->stat[STAT_LUCK] / 4);
@@ -211,6 +209,3 @@ void BtlDeriveBattleStats(BtlActor *a)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/derivestats", BtlDeriveBattleStats);
-#endif

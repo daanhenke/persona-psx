@@ -404,4 +404,10 @@ extern int BtlUnreadyMemberPrev(int slot);
 extern void BtlApplyPersona(BtlActor *a);
 extern void BtlRecalcStats(BtlActor *a);
 
+/* The fight's own copy of a fighter's numbers worked out from the record
+   and whatever it is carrying: what it hits for, what it hits with, what
+   it shrugs off, and what its ailment does to all of that. derivestats.c.
+   */
+extern void BtlDeriveBattleStats(BtlActor *a);
+
 #endif

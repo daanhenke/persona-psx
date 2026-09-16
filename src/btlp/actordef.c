@@ -34,8 +34,6 @@
 /* How much of the level counts towards a fighting number. */
 #define ACTOR_LEVEL_DIV 5
 
-extern void BtlDeriveBattleStats(BtlActor *a);
-
 void BtlActorFromDef(BtlActor *a, int key)
 {
     const PersonaData *d;

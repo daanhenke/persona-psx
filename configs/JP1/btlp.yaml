@@ -122,11 +122,13 @@ segments:
       # BtlChooseEnemyMove's. The C emits exactly the 0x3FC bytes of the
       # 0x8D8..0xCD4 span.
       - [0x8D8, .rodata, roundflow]
-      # BtlDeriveBattleStats's seventeen-entry ailment table sits in here,
-      # behind a pad word and in front of another; it becomes
-      # `[0xCD8, .rodata, derivestats]` between two `pad` lines the moment the
-      # routine comes out of its guard.
+      # BtlDeriveBattleStats's seventeen-entry ailment table, which
+      # derivestats.c emits itself. The word in front of it belongs to nobody
+      # and is not zero - it holds 0xC0F0 - so it keeps an asm segment of its
+      # own; the one behind it is zero and is a pad.
       - [0xCD4, rodata, btlp_rodata6a]
+      - [0xCD8, .rodata, derivestats]
+      - [0xD1C, pad, btlp_pad_d1c]
       # BtlAilmentTakeTurn's switch table, which ailtaketurn.c emits itself, and
       # the word of padding behind it that belongs to nobody.
       - [0xD20, .rodata, ailtaketurn]

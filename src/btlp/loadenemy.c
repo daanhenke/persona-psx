@@ -38,8 +38,6 @@ u_char g_btl_arcana_rank[24] = {
     0x03, 0x03, 0x02, 0x02, 0x03, 0x00, 0x00, 0x00,
 };
 
-extern void BtlDeriveBattleStats(BtlActor *a);
-
 void BtlLoadEnemyStats(int slot, int key)
 {
     BtlActor          *a;
