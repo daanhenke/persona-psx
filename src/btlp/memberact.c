@@ -363,7 +363,6 @@ void BtlMemberMotion02(BtlObj *o)
         break;
     case 3:
         do {
-            kept = g_btl_hits_left;
             done = 0;
             if ((g_btl_swing_item->swing & 1) != 0
                 || g_btl_swing_item->swing == 8) {
@@ -380,31 +379,30 @@ void BtlMemberMotion02(BtlObj *o)
                 walk = g_btl_hit_walk;
                 if ((short)g_btl_hit_walk < SWING_SLOTS) {
                     do {
-                        if ((a->targets & g_btl_hit_mask) != 0
-                            && g_btl_actors[(short)walk].c.key != 0
-                            && *(signed char *)&g_btl_actors[(short)walk]
+                        if ((a->targets & g_btl_hit_mask) == 0
+                            || g_btl_actors[(short)walk].c.key == 0
+                            || *(signed char *)&g_btl_actors[(short)walk]
                                     .c.status
-                                   != BTL_STATUS_DOWN
-                            && (g_btl_actors[(short)walk].flags & SWING_SPARED)
-                                   == 0) {
+                                   == BTL_STATUS_DOWN
+                            || (g_btl_actors[(short)walk].flags & SWING_SPARED)
+                                   != 0) {
+                            walk = g_btl_hit_walk + 1;
+                            g_btl_hit_mask <<= 1;
+                            g_btl_hit_walk = walk;
+                        } else {
                             g_btl_hit_slot = walk;
                             done = 1;
                             break;
                         }
-                        walk = g_btl_hit_walk + 1;
-                        g_btl_hit_mask <<= 1;
-                        g_btl_hit_walk = walk;
                     } while ((short)walk < SWING_SLOTS);
                     if ((short)g_btl_hit_walk < SWING_SLOTS) {
                         continue;
                     }
                 }
                 done = 1;
-                if ((g_btl_swing_item->swing & 2) == 0) {
-                    g_btl_hits_left = 0;
-                    done = 1;
-                } else {
+                if ((g_btl_swing_item->swing & 2) != 0) {
                     i = 0;
+                    kept = g_btl_hits_left;
                     g_btl_hits_left = 0;
                     a->targets |= 1 << a->order;
                     do {
@@ -420,24 +418,16 @@ void BtlMemberMotion02(BtlObj *o)
                         }
                         i++;
                     } while (i < SWING_SLOTS);
+                } else {
+                    g_btl_hits_left = 0;
+                    done = 1;
                 }
             }
         } while (done == 0);
         o->phase++;
         /* fallthrough */
     case 4:
-        if (g_btl_hits_left > 0) {
-            if (g_btl_hit_slot < SWING_FIRST_ENEMY) {
-                BtlSoundOpen(g_btl_banks, 6,
-                             g_btl_actors[g_btl_hit_slot].c.key);
-            } else {
-                BtlSoundOpen(g_btl_slot_banks, 6,
-                             (g_btl_actors[g_btl_hit_slot].obj->tpage >> 1)
-                                 - SWING_FIRST_ENEMY);
-            }
-            o->phase++;
-            break;
-        }
+        if (g_btl_hits_left <= 0) {
         if (g_btl_place_party != 0) {
             a->action = 0xFF;
         }
@@ -464,6 +454,17 @@ void BtlMemberMotion02(BtlObj *o)
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
             scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
         o->phase = 7;
+        } else {
+            if (g_btl_hit_slot < SWING_FIRST_ENEMY) {
+                BtlSoundOpen(g_btl_banks, 6,
+                             g_btl_actors[g_btl_hit_slot].c.key);
+            } else {
+                BtlSoundOpen(g_btl_slot_banks, 6,
+                             (g_btl_actors[g_btl_hit_slot].obj->tpage >> 1)
+                                 - SWING_FIRST_ENEMY);
+            }
+            o->phase++;
+        }
         break;
     case 5:
         BtlMemberStrike(o);

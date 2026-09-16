@@ -150,7 +150,12 @@ segments:
       # memberact.c emits itself. The table in front of them belongs to the
       # same unit and joins this segment when its routine comes out of asm.
       - [0x1144, .rodata, memberact]
-      - [0x11B0, rodata, btlp_rodata6b1]
+      - [0x11B0, pad, btlp_pad_11b0]  # the next unit's .rodata is 8-aligned
+      # BtlMemberMotion03's phase table, which membermotion03.c emits itself,
+      # with the word of padding behind it inside the unit.
+      - [0x11B4, .rodata, membermotion03]
+      - [0x11D0, pad, btlp_pad_11d0]  # the table is seven words, the gcc one eight
+      - [0x11D4, rodata, btlp_rodata6b1]
       # BtlEnemyMotion02's switch table, which enemymotion2.c emits itself, and
       # the word of padding behind it that belongs to nobody.
       - [0x1238, .rodata, enemymotion2]
@@ -577,7 +582,7 @@ segments:
       - [0x4960C, c, markers]
       - [0x49734, c, memberact]
       - [0x4C454, c, membermotion12]
-      - [0x4C5E4, asm, btlp_69_a]
+      - [0x4C5E4, c, membermotion03]
       - [0x4CB24, c, personamotion]
       # The two ways a summoned Persona plays a move out: the plain one, and
       # the spell that walks the caster's target mask.
