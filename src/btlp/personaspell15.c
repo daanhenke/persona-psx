@@ -25,7 +25,6 @@
  * the soft-float calls are most of its length.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <rand.h>
 #include <libsnd.h>
 #include <persona/common/spell.h>
@@ -112,14 +111,6 @@
 #define MARK_NO_SLOT 0xFF
 #define MARK_KIND    0xD
 
-/* 99.89%: one register short of the image. The caster's own numbers are
-   held in $a0 there and in $v1 here; everything else - the shape, the
-   order, the frame and the soft-float work - lines up. gcc gives that
-   pseudo its $v1 preference from the copy in the repelled arm, and a local
-   of its own there takes the preference away but drops the priority far
-   enough that the numbers land in a held register instead. Around forty
-   scopes, orders and shapes have been tried. */
-#ifdef NON_MATCHING
 void BtlPersonaSpell15(BtlObj *o)
 {
     const SpellData *spell;
@@ -244,20 +235,26 @@ void BtlPersonaSpell15(BtlObj *o)
         damage = damage < 0 ? 0 : damage > DAMAGE_CAP ? DAMAGE_CAP : damage;
 
         switch (react) {
-        case BTL_REACT_REPEL:
+        case BTL_REACT_REPEL: {
+            int heal;
+
             BtlSePlay(SE_SLOT, SE_REPEL);
             o->child = BtlSpawnMoveStrike(a->move, 0, &t->obj->x);
             /* Added on the record and then read back off it for the clamp:
-               the store to the hit amount makes gcc load it again. */
+               the store to the hit amount makes gcc load it again. A total
+               of its own, not the one the numbers above were worked out in:
+               that one is held where the image holds it only because it is
+               still the caster's. */
             t->c.hp += damage;
-            n = t->c.hp;
+            heal = t->c.hp;
             t->hit_amount = damage;
-            if (t->c.hp_max < n) {
-                n = t->c.hp_max;
+            if (t->c.hp_max < heal) {
+                heal = t->c.hp_max;
             }
-            t->c.hp = n;
+            t->c.hp = heal;
             t->obj->motion = MOTION_HEAL;
             break;
+        }
 
         case BTL_REACT_NULL:
             obj->attr |= OBJ_NULLED;
@@ -273,7 +270,8 @@ void BtlPersonaSpell15(BtlObj *o)
             } while (i < FX_CLUT_COLORS);
             o->child = BtlSpawnMoveStrike(a->move, 1, &obj->x);
             a->hit_amount = damage;
-            a->c.hp -= damage;
+            n = a->c.hp - damage;
+            a->c.hp = n;
             if (g_btl_debug_flags[1] != 0 && a->c.hp <= 0) {
                 a->c.hp = 1;
             }
@@ -350,6 +348,3 @@ void BtlPersonaSpell15(BtlObj *o)
     }
     o->phase++;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personaspell15", BtlPersonaSpell15);
-#endif

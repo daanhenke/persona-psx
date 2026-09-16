@@ -2951,3 +2951,38 @@ marks the chain pulls described above. When the only difference left is which
 of two independent loads comes first, this says why.
 
 - [derivestats.c](/src/btlp/derivestats.c) - `BtlDeriveBattleStats`.
+
+## A value in the wrong register is named by the copy that feeds it
+
+gcc's global allocator hands a pseudo a hard-register preference whenever it
+is copied to or from a register local-alloc has already placed -
+`set_preference` reads `reg_renumber`, so a pseudo-to-pseudo copy counts as
+soon as one end is local. `cc1 -dg` prints it: `;; 81 preferences: 3` means
+that pseudo asked for `$v1` and got it.
+
+So when every instruction lines up and one value is simply in the wrong
+register, the arm to change is not the one the difference shows up in - it is
+whichever arm assigns the variable from a short-lived total. Give that arm a
+local of its own and the preference goes away. That alone is usually not
+enough: the variable loses those references too, its priority
+(`floor_log2(refs) * refs / live_length`) falls, and it ends up in a callee-
+saved register instead of the argument register the image uses. Both halves
+have to be right - the shared variable wants the references the image's has,
+which means using it in every arm the image keeps it in.
+
+- [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`,
+  99.89% to exact: the repelled arm's total into a `heal` of its own, and the
+  nulled arm's difference into the same local the stage bending uses.
+
+## A loop that moves something and then shares the tail breaks, not gotos
+
+When the block a loop jumps to on a hit ends in `j` back to the assignment
+the fall-through path also runs, the source is `break` and one shared
+statement after the loop - not `goto` past it. Worth checking even when the
+instruction counts already agree: only the jump's target gives it away, and
+the scores read it as an operand difference. It matters beyond the two words,
+because the value the shared statement uses is then live across the call
+inside the loop, which is what puts it in a callee-saved register.
+
+- [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`, the
+  missed arm placing its mark.
