@@ -231,24 +231,22 @@ extern u_char D_800CFA00;
 extern u_char g_btl_member_voice[];
 
 
-/* 99.98%: one instruction. Everything the swing does is laid out the way the
-   image lays it out - each arm is the one gcc emits first rather than the early
-   return the draft had, the hit the walk finds and the one `g_btl_hits_left = 0`
-   the whole round shares are both reached by name from where they are used
-   rather than written out again, and the mask the next round starts from is
-   stored by each arm of its own test rather than through a local the two share.
-   What is left is the 1 the sweep's own bit is built from. The dumps say where
-   it goes: the first cse drops the insn that loads 1 into a pseudo of its own
-   and shifts the round's flag instead, which the line above has just set to 1,
-   so by the time loop optimisation looks for constants to lift out there is no
-   constant left at that site to lift - the image lifts one and shifts it.
-   Nothing that keeps the flag's write where the image writes it keeps the two
-   apart, because a flag set to 1 in front of the shift is the same value to
-   cse; stepping the flag rather than setting it does keep them apart and puts
-   the lifted constant back, at the price of the same one instruction on the
-   flag's own write. The table's name comes right when the rodata is carved for
-   the unit, which waits on the match. */
-#ifdef NON_MATCHING
+/* Two things about the round below are the routine's, not the compiler's, and
+   both took a while to read off the image.
+ *
+ * The hit the walk finds, and the one `g_btl_hits_left = 0` every way of
+ * finishing empty-handed shares, are reached by name from the arm that wants
+ * them rather than written out again at each use. That is what puts them where
+ * the image puts them - the hit at the end of the arm that never runs it, the
+ * shared clear at the end of the round - and the RTL dumps say no pass moves
+ * either block, so where they sit is the source's to choose.
+ *
+ * The round's flag is set on each of the two paths that reach the sweep rather
+ * than once below them. Set once below, it is still 1 when the sweep builds its
+ * own bit a few lines later, and the first cse drops the constant that bit is
+ * shifted from and shifts the flag instead - which leaves loop optimisation
+ * nothing to lift, where the image lifts a 1 of its own and shifts that.
+ */
 /* The swing: entry 2 of g_btl_member_motion, and entry 0x0C as well.
  *
  * Nought settles what is being swung - which hand, which weapon record, which
@@ -400,7 +398,9 @@ void BtlMemberMotion02(BtlObj *o)
                 goto walked;
             } else {
                 walk = g_btl_hit_walk;
-                if ((short)g_btl_hit_walk < SWING_SLOTS) {
+                if ((short)g_btl_hit_walk >= SWING_SLOTS) {
+                    done = 1;
+                } else {
                     for (;;) {
                         if ((a->targets & g_btl_hit_mask) == 0
                             || g_btl_actors[(short)walk].c.key == 0
@@ -422,8 +422,8 @@ void BtlMemberMotion02(BtlObj *o)
                     if ((short)g_btl_hit_walk < SWING_SLOTS) {
                         continue;
                     }
+                    done = 1;
                 }
-                done = 1;
                 if ((g_btl_swing_item->swing & 2) != 0) {
                     i = 0;
                     slot = a->order;
@@ -570,9 +570,6 @@ void BtlMemberMotion02(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/memberact", BtlMemberMotion02);
-#endif
 
 /* The motion a member fires a gun on, which swings the other hand's numbers. */
 #define STRIKE_GUN_MOTION 0xC

@@ -149,10 +149,9 @@ segments:
       # the unit.
       - [0x1004, .rodata, pickmove]
       - [0x1100, rodata, btlp_rodata6b_b]
-      # BtlMemberMotion06's and BtlMemberMotion05's switch tables, which
-      # memberact.c emits itself. The table in front of them belongs to the
-      # same unit and joins this segment when its routine comes out of asm.
-      - [0x1144, .rodata, memberact]
+      # BtlMemberMotion02's, BtlMemberMotion06's and BtlMemberMotion05's
+      # switch tables, which memberact.c emits itself.
+      - [0x1114, .rodata, memberact]
       - [0x11B0, pad, btlp_pad_11b0]  # the next unit's .rodata is 8-aligned
       # BtlMemberMotion03's phase table, which membermotion03.c emits itself,
       # with the word of padding behind it inside the unit.
