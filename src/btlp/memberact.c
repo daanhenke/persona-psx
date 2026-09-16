@@ -231,6 +231,20 @@ extern u_char D_800CFA00;
 extern u_char g_btl_member_voice[];
 
 
+/* 97.81%. The two ways nought can give up, the three arms of the walk and the
+   way a turn that found nothing to hit is closed out are the image's, and each
+   of them reads as the arm the image lays down first rather than the early
+   return the draft had: the swing's own failure is the else of the move-area
+   test, the sound is the else of "any hits left", the sweep for anyone still
+   standing is the then of the spell test, and the walk's own step is the then
+   of the four tests rather than their else. What is left is where two shared
+   tails sit - the image jumps from the swing's test to the one
+   `g_btl_hits_left = 0` at the end and lays the hit it found out of line ahead
+   of the loop, where the build puts each where it is reached - and the order
+   the mask and the walk counter are stored in on the way back round. Holding
+   the record and the target mask in locals of their own changes nothing, the
+   walk counted in an int comes out further away, and so does the step written
+   as one chained assignment. */
 #ifdef NON_MATCHING
 /* The swing: entry 2 of g_btl_member_motion, and entry 0x0C as well.
  *
@@ -277,18 +291,19 @@ void BtlMemberMotion02(BtlObj *o)
         if (g_btl_actors[g_btl_hit_slot].c.key == 0) {
             if (BtlMarkMoveArea(a, g_btl_swing_item->area,
                                 g_btl_swing_item->swing)
-                < 0) {
+                >= 0) {
+                slot = BtlSlowestOrder();
+                g_btl_hit_slot = slot;
+                if ((short)slot < 0) {
+                    o->phase = 0xA;
+                    break;
+                }
+                g_btl_hit_slot = slot + SWING_FIRST_ENEMY;
+                a->order = g_btl_hit_slot;
+            } else {
                 o->phase = 0xA;
                 break;
             }
-            slot = BtlSlowestOrder();
-            g_btl_hit_slot = slot;
-            if ((short)slot < 0) {
-                o->phase = 0xA;
-                break;
-            }
-            g_btl_hit_slot = slot + SWING_FIRST_ENEMY;
-            a->order = g_btl_hit_slot;
         }
         g_btl_hits_left = BtlRollHits(g_btl_swing_item->hits);
         scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
@@ -367,7 +382,7 @@ void BtlMemberMotion02(BtlObj *o)
             if ((g_btl_swing_item->swing & 1) != 0
                 || g_btl_swing_item->swing == 8) {
                 if (g_btl_actors[g_btl_hit_slot].c.key == 0
-                    || *(signed char *)&g_btl_actors[g_btl_hit_slot].c.status
+                    || (signed char)g_btl_actors[g_btl_hit_slot].c.status
                            == BTL_STATUS_DOWN
                     || (done = 1,
                         (g_btl_actors[g_btl_hit_slot].flags & SWING_SPARED)
@@ -378,23 +393,25 @@ void BtlMemberMotion02(BtlObj *o)
             } else {
                 walk = g_btl_hit_walk;
                 if ((short)g_btl_hit_walk < SWING_SLOTS) {
-                    do {
+                    for (;;) {
                         if ((a->targets & g_btl_hit_mask) == 0
                             || g_btl_actors[(short)walk].c.key == 0
-                            || *(signed char *)&g_btl_actors[(short)walk]
-                                    .c.status
+                            || (signed char)g_btl_actors[(short)walk].c.status
                                    == BTL_STATUS_DOWN
                             || (g_btl_actors[(short)walk].flags & SWING_SPARED)
                                    != 0) {
                             walk = g_btl_hit_walk + 1;
-                            g_btl_hit_mask <<= 1;
                             g_btl_hit_walk = walk;
+                            g_btl_hit_mask <<= 1;
+                            if ((short)walk >= SWING_SLOTS) {
+                                break;
+                            }
                         } else {
                             g_btl_hit_slot = walk;
                             done = 1;
                             break;
                         }
-                    } while ((short)walk < SWING_SLOTS);
+                    }
                     if ((short)g_btl_hit_walk < SWING_SLOTS) {
                         continue;
                     }
@@ -406,9 +423,9 @@ void BtlMemberMotion02(BtlObj *o)
                     g_btl_hits_left = 0;
                     a->targets |= 1 << a->order;
                     do {
-                        if (((a->targets >> (i & 0x1F)) & 1) != 0
+                        if (((a->targets >> i) & 1) != 0
                             && g_btl_actors[i].c.key != 0
-                            && *(signed char *)&g_btl_actors[i].c.status
+                            && (signed char)g_btl_actors[i].c.status
                                    != BTL_STATUS_DOWN
                             && (g_btl_actors[i].flags & SWING_SPARED) == 0) {
                             done = 0;
@@ -428,32 +445,32 @@ void BtlMemberMotion02(BtlObj *o)
         /* fallthrough */
     case 4:
         if (g_btl_hits_left <= 0) {
-        if (g_btl_place_party != 0) {
-            a->action = 0xFF;
-        }
-        if (a->counter != 0) {
-            a->unkD8 = 1;
-            a->counter = 0;
-            a->order = g_btl_counter_order;
-            a->targets = g_btl_counter_targets;
-            if (a->counter_turn != 0) {
-                a->action = 0;
-            } else {
+            if (g_btl_place_party != 0) {
                 a->action = 0xFF;
             }
-        }
-        BtlReadyNextTurn();
-        BtlSoundClose(6);
-        if ((o->attr & BTL_OBJ_CARRIED) != 0) {
-            scripts = &g_btl_member_scripts[SCRIPT_RUN_IN
-                                            + o->kind * MEMBER_SCRIPT_MODEL];
-        } else {
-            scripts = &g_btl_member_scripts[SCRIPT_AFTER
-                                            + o->kind * MEMBER_SCRIPT_MODEL];
-        }
-        BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
-            scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
-        o->phase = 7;
+            if (a->counter != 0) {
+                a->unkD8 = 1;
+                a->counter = 0;
+                a->order = g_btl_counter_order;
+                a->targets = g_btl_counter_targets;
+                if (a->counter_turn != 0) {
+                    a->action = 0;
+                } else {
+                    a->action = 0xFF;
+                }
+            }
+            BtlReadyNextTurn();
+            BtlSoundClose(6);
+            if ((o->attr & BTL_OBJ_CARRIED) != 0) {
+                scripts = &g_btl_member_scripts[
+                    SCRIPT_RUN_IN + o->kind * MEMBER_SCRIPT_MODEL];
+            } else {
+                scripts = &g_btl_member_scripts[
+                    SCRIPT_AFTER + o->kind * MEMBER_SCRIPT_MODEL];
+            }
+            BtlObjSetScript(o, (BtlSeqStep *)o->scripts[
+                scripts[o->actor->script_pick * MEMBER_SCRIPT_PICK]]);
+            o->phase = 7;
         } else {
             if (g_btl_hit_slot < SWING_FIRST_ENEMY) {
                 BtlSoundOpen(g_btl_banks, 6,
