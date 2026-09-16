@@ -12,6 +12,8 @@
 #define PERSONA_BTLP_EFFECT_H
 
 #include <decomp/types.h>
+#include <libgte.h>
+#include <libgpu.h>
 
 /* A piece of an effect: the chain hanging off BtlEffect.next, and what the
    draw pass walks to put an effect's text on screen. The low nibble of `kind`
@@ -83,7 +85,13 @@ typedef struct BtlEffect {
                                    0x1000 is unity, as everywhere else here */
     /* 0x3C */ long    scale_y;
     /* 0x40 */ long    scale;   /* settled at unity when a motion is done   */
-    /* 0x44 */ u_char  pad44[0x4C];
+    /* 0x44 */ u_char  pad44[4];
+    /* 0x48 */ union {          /* the box itself, one primitive per ordering
+                                   table: the frame's own quad is flat, and the
+                                   cursor's is shaded corner by corner       */
+        POLY_F4 flat;
+        POLY_G4 shaded;
+    } prim[2];
     /* 0x90 */ u_long  mode[3]; /* a DR_MODE naming the effect's texture    */
     /* 0x9C */ u_long  mode_kept[3];
                                 /* a copy of it, taken when the record is
@@ -110,6 +118,14 @@ extern int  BtlDrawGlyphs(const u_char *text, short clut);
 extern void BtlEffectDrawRow(const BtlEffectRow *row);
 extern void BtlEffectDrawNumber(const BtlEffectRow *row);
 extern int  BtlEffectDrawLines(const BtlEffectRow *row);
+
+/* The box an effect is drawn in: the frame walks its eight pieces and hands
+   each one to the piece drawer, and the cursor handler at entry nought of
+   g_btl_effect_cursor_fn lays one shaded quad over the whole of it.
+   effectframe.c, framepiece.c. */
+extern int  BtlDrawEffectFrame(BtlEffect *e);
+extern int  BtlEffectCursorBox(BtlEffect *e);
+extern int  BtlDrawFramePiece(int piece, short x, short y, short run, short flat);
 
 /* Where the next glyph goes. BtlDrawGlyphs walks x along the line and the
    row drawers step y down. */

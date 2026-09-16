@@ -858,7 +858,7 @@ BtlDrawFramePiece             = 0x8007822C; // type:func size:0x500
 //--- PA: 0x01438C   VA: 0x8007872C   subsegment: asm, btlp_26
 //------------------------------------------------------------
 BtlDrawEffectFrame            = 0x8007872C; // type:func size:0x524
-func_80078C50                 = 0x80078C50; // type:func size:0x4D8
+BtlEffectCursorBox            = 0x80078C50; // type:func size:0x4D8
 
 //-------------------------------------------------------------
 //--- PA: 0x014D88   VA: 0x80079128   subsegment: c, effecttext

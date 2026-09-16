@@ -301,7 +301,8 @@ segments:
       - [0x13444, c, effect3]
       - [0x1349C, c, effectmotion]
       - [0x13E8C, c, framepiece]
-      - [0x1438C, asm, btlp_26]
+      # The box an effect is drawn in, and the cursor that lies over it.
+      - [0x1438C, c, effectframe]
       - [0x14D88, c, effecttext]
       - [0x14DD8, c, effectdraw]
       # Drawing the effect slots.
