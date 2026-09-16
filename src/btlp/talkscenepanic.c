@@ -123,7 +123,6 @@ extern void  BtlTalkEndStep(void);
 extern void  BtlStockAdd(int persona);
 extern void  BtlBoxOpen(short cols, short x, short y, int style);
 extern void  BtlIndicatorBar(void);
-extern void  BtlLoadActorGfx(int slot);
 extern void  BtlSoundClose(int slot);
 extern void  BtlShowAilmentMarks(int show);
 

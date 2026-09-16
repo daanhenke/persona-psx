@@ -21,7 +21,6 @@
 extern int  BtlSeqState(void);
 extern void BtlSeqSetState(int state, int frames);
 extern void BtlIndicatorBar(void);
-extern void BtlLoadActorGfx(int slot);
 
 void BtlBeginAction(void)
 {

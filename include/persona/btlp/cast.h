@@ -54,6 +54,11 @@ extern void BtlPersonaSpellMove(BtlObj *o);
 extern void BtlPersonaSpell15(BtlObj *o);
 
 /* Stands a Persona's records up at a cell of the grid. personaspawn.c. */
+/* The two summons: the one that reads the Persona in a step at a time while
+   the field keeps moving, and the one that reads it in one breath. Both dim
+   the arena, put the fighter to full white and hand the record back. */
+extern BtlObj *BtlSummonPersona(int actor, int which);
+
 extern BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion);
 
 /* Reads the fighter's own Persona off the disc and stands it on the field,

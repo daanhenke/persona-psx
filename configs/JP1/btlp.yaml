@@ -110,7 +110,9 @@ segments:
       # body is not compiled, so nothing would emit them.
       - [0x684, rodata, btlp_rodata5]
       - [0x7B4, .rodata, bindgfx]
-      - [0x7C8, rodata, btlp_rodata6]
+      - [0x7C8, pad, btlp_pad_7c8]  # the next unit's .rodata is 8-aligned
+      # BtlLoadActorGfx's six-entry step table, which actorgfx.c emits.
+      - [0x7CC, .rodata, actorgfx]
       # BtlActorMotion08's two switch tables: the phases, and the enemies that
       # fall their own way.
       - [0x7E4, .rodata, deathmotion]
@@ -397,7 +399,10 @@ segments:
       - [0x20274, c, personaspawn]
       - [0x20530, c, fieldmarks]
       - [0x20AF0, c, actorobj]
-      - [0x20BA4, asm, btlp_42]
+      # The flash a fighter's action opens with, and the summon taken a step
+      # at a time while the disc is read.
+      - [0x20BA4, c, actorgfx]
+      - [0x21028, c, summonload]
       - [0x21324, c, talkleave]
       - [0x21380, c, summonpersona]
       - [0x214F8, c, partyspawn]

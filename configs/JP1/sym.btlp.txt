@@ -3358,6 +3358,7 @@ g_btl_impact_def              = 0x800CCC30; // size:0x8
 //--- PA: 0x068898   VA: 0x800CCC38   subsegment: data, btlp_data1_a
 //------------------------------------------------------------------
 g_btl_actor_def               = 0x800CCC38; // size:0x8
+g_btl_load_def                = 0x800CCC40; // size:0x8
 g_btl_persona_ranks           = 0x800CCC48; // size:0x8
 g_btl_test_party_keys         = 0x800CCD00;
 g_btl_test_party_personas     = 0x800CCD28;

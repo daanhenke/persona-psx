@@ -379,7 +379,8 @@ extern int BtlPickableNext(int slot);
 extern int BtlPickablePrev(int slot);
 
 /* Reads one fighter's artwork in over whatever was there. */
-extern void BtlLoadActorGfx(int slot);
+/* Answers nought always, and no caller reads it. */
+extern int  BtlLoadActorGfx(int actor);
 
 /* Fills the status board in with one enemy's derived numbers. */
 extern void BtlShowEnemyStatus(int slot);
