@@ -47,9 +47,6 @@ extern const u_char *g_btl_offer_labels[];
 extern int           g_btl_talk_menu_effect;
 
 extern int  BtlStockHolds(const BtlOffer *offer);
-extern int  BtlEffectOpen(BtlEffect *e);
-extern void BtlEffectSetKind(int slot, u_char kind);
-
 #ifdef NON_MATCHING
 void BtlOfferMenu(int slot)
 {

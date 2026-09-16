@@ -51,8 +51,6 @@
 #define TALK_SCENE_AFTER 0xC
 #define TALK_STAGE_OPEN  1
 
-extern int BtlSeqState(void);
-
 void BtlOfferMoodLine(int slot)
 {
     BtlOffer *o;

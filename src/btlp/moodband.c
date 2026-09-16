@@ -11,6 +11,7 @@
  * effect and one for the command menu's, which the menu builder fills in.
  */
 #include <decomp/types.h>
+#include <persona/btlp/effect.h>
 
 #define MOOD_BAND_LOW  0x58
 #define MOOD_BAND_HIGH 0x5D
@@ -21,7 +22,6 @@
 extern int g_btl_talk_effect;
 extern int g_btl_talk_menu_effect;
 
-extern void BtlEffectSetKind(int slot, u_char kind);
 
 int BtlMoodBand(int value)
 {

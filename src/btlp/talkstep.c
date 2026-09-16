@@ -102,7 +102,6 @@ extern void  BtlTalkSceneAct(void);
 extern void  BtlTalkSceneDemand(void);
 
 extern void  BtlUpdateVoices(void);
-extern int   BtlSeqState(void);
 extern int   BtlSeqAnswer(void);
 extern void  BtlOpenChoice(void);
 extern void  BtlFaceLoad(int who, int always);

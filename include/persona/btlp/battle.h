@@ -346,4 +346,7 @@ extern void BtlWaitAnyKey(void);
 extern void BtlTalkersLeave(void);
 extern int BtlStockHasRoom(void);
 
+/* Where the message sequence player has got to. seq.c. */
+extern int BtlSeqState(void);
+
 #endif

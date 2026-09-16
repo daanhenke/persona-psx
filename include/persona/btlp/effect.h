@@ -198,6 +198,14 @@ extern int g_btl_effect_cur;
 extern int g_btl_effect_prev;
 extern int g_btl_effect_held;
 
+/* A slot taken for one prompt - the template is copied in and the slot
+   number answered - the key the pad left in the slot the frame it closed,
+   and the kind the window is drawn as. effectopen.c, effectprompt.c and
+   effect.c. */
+extern int  BtlEffectOpen(BtlEffect *e);
+extern int  BtlEffectAnswer(void);
+extern void BtlEffectSetKind(int slot, u_char kind);
+
 extern void BtlEffectRelease(int slot);
 extern void BtlEffectSelect(int slot);
 extern void BtlEffectRestore(void);

@@ -41,9 +41,6 @@ extern u_char       g_btl_stock_names[][STOCK_NAME];
 extern BtlEffectRow *g_btl_stock_effect;
 extern int          g_btl_talk_effect;
 
-extern int  BtlEffectOpen(BtlEffect *e);
-extern void BtlEffectSetKind(int slot, u_char kind);
-
 #ifdef NON_MATCHING
 void BtlTalkStockMenu(void)
 {

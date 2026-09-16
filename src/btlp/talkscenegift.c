@@ -108,7 +108,6 @@ extern int   BtlRollUncommon(void);
 extern int   BtlRollCommon(void);
 extern int   BtlRoundMoney(int amount);
 extern void  BtlSetInsert(int slot, u_long value);
-extern int   BtlSeqState(void);
 extern void  BtlLoadPackEntry(int entry);
 extern void  BtlBgmOpen(void);
 extern void  SsVabTransCompleted(long immediate);

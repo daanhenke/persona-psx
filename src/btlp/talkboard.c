@@ -66,10 +66,6 @@
 /* Frames the scene page waits out once its pack is let go of. */
 #define BOARD_CLOSE_FRAMES 3
 
-extern int  BtlEffectOpen(BtlEffect *e);
-extern int  BtlEffectAnswer(void);
-extern void BtlEffectSetKind(int slot, u_char kind);
-
 void BtlTalkBoardStep(void)
 {
     int   *slot;

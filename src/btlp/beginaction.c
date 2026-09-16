@@ -18,7 +18,6 @@
 #define BTL_SEQ_ACTION 8
 #define BTL_ACTION_FRAMES 4
 
-extern int  BtlSeqState(void);
 extern void BtlSeqSetState(int state, int frames);
 extern void BtlIndicatorBar(void);
 

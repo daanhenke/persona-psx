@@ -112,10 +112,13 @@
 #define MARK_NO_SLOT 0xFF
 #define MARK_KIND    0xD
 
-/* Not an exact match yet: everything but two registers is in place - the
-   caster's own numbers are held in $a0 in the image and in $v1 here, and
-   the mark a miss leaves behind lands in $s3 rather than $s0. The shape,
-   the order and the frame are the image's. */
+/* 99.89%: one register short of the image. The caster's own numbers are
+   held in $a0 there and in $v1 here; everything else - the shape, the
+   order, the frame and the soft-float work - lines up. gcc gives that
+   pseudo its $v1 preference from the copy in the repelled arm, and a local
+   of its own there takes the preference away but drops the priority far
+   enough that the numbers land in a held register instead. Around forty
+   scopes, orders and shapes have been tried. */
 #ifdef NON_MATCHING
 void BtlPersonaSpell15(BtlObj *o)
 {
@@ -124,6 +127,7 @@ void BtlPersonaSpell15(BtlObj *o)
     BtlActor        *a;
     BtlActor        *t;
     BtlObj          *obj;
+    BtlObj          *miss;
     BtlObj          *e;
     /* Sixteen bytes of frame nothing here uses; the routine is the wrong
        length without them. */
@@ -329,22 +333,20 @@ void BtlPersonaSpell15(BtlObj *o)
         o->child = BtlSpawnMoveStrike(a->move, 0, &t->obj->x);
         t->obj->motion = MOTION_MISS;
         o->timer = HOLD_MISS;
-        /* The mark back through the local the caster's own record came in:
-           nothing here reads that again, and the two of them in registers of
-           their own is one held register too many. */
-        obj = BtlSpawnMiss(&t->obj->x);
-        obj->mark_num = MARK_NO_SLOT;
-        obj->z -= MISS_LIFT;
+        miss = BtlSpawnMiss(&t->obj->x);
+        miss->mark_num = MARK_NO_SLOT;
+        miss->z -= MISS_LIFT;
         e = g_btl_obj_pool;
         while (e != 0) {
             if (e->kind == MARK_KIND && e->mark_num == t->obj->mark_num) {
-                BtlObjMoveBefore(obj, e);
-                goto placed;
+                BtlObjMoveBefore(miss, e);
+                break;
             }
             e = e->next;
         }
-        obj->mark_num = t->obj->mark_num;
-    placed:;
+        /* Whether it went in front of a mark or not, the miss carries the
+           target's own number: it is the mark the record is read through. */
+        miss->mark_num = t->obj->mark_num;
     }
     o->phase++;
 }

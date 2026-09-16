@@ -115,7 +115,6 @@ extern const u_char *g_btl_talk_joined_script;
 extern int   BtlOfferLevelTest(int level, u_short slot);
 extern int   BtlTalkGiveItem(void);
 extern void  BtlOfferFinish(void);
-extern int   BtlSeqState(void);
 extern void  BtlSeqSetState(int state, int frames);
 extern const u_char *BtlMessage(int line, int kind);
 extern void  BtlTalkEndStatus(u_char status, int pack);

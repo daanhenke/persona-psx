@@ -70,10 +70,7 @@ typedef struct {
 extern BtlStockNumberRow g_btl_stock_numbers[STOCK_SLOTS];
 extern BtlStockNameRow   g_btl_stock_list_names[STOCK_SLOTS];
 
-extern int  BtlEffectOpen(BtlEffect *e);
-extern void BtlEffectSetKind(int slot, u_char kind);
 extern void BtlUpdateVoices(void);
-extern int  BtlSeqState(void);
 extern int  BtlSeqAnswer(void);
 extern void BtlIndicatorBar(void);
 

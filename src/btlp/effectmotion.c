@@ -27,6 +27,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/draw.h>
 #include <persona/btlp/effect.h>
 #include <persona/btlp/input.h>
 #include <persona/btlp/number.h>
@@ -195,9 +196,6 @@ typedef struct {
 #define GLYPH_ABR  0
 #define GLYPH_VX   0x3C0
 #define GLYPH_VY   0x100
-
-extern char   *g_btl_prim_next;
-extern u_long *g_btl_effect_ot;
 
 /* One line of text, a glyph at a time. Each cell goes out as a quad through
    RotTransPers4 rather than a sprite, so a line can sit in perspective with

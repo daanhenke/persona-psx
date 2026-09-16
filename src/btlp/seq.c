@@ -12,7 +12,6 @@ extern int   g_btl_bgm_state;
 extern int   g_btl_bgm_seq;
 extern short g_btl_seq_handle;
 
-extern int  BtlSeqState(void);
 extern void BtlSeqSetState(int a, int b);
 extern void BtlUpdateVoices(void);
 
