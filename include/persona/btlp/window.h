@@ -93,4 +93,7 @@ extern BtlWindow g_btl_seq_window;
    timer. The second argument holds the typing where it is. */
 extern short BtlWindowStep(BtlWindow *w, int pause);
 
+/* The sequencer's window on screen, a sprite a glyph. seqwindowdraw.c. */
+extern void BtlSeqWindowDraw(void);
+
 #endif

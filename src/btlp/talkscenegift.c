@@ -95,8 +95,8 @@
 extern volatile int  g_cd_busy;
 extern u_char        g_btl_banks[];
 extern const short   g_btl_gift_odds[][GIFT_KINDS];
-extern const u_char *g_btl_talk_gift_script;
-extern const u_char *g_btl_talk_item_gift_script;
+extern const u_char g_btl_talk_gift_script[];
+extern const u_char g_btl_talk_item_gift_script[];
 extern const u_char *g_btl_talk_money_script;
 extern const u_char *g_btl_talk_exp_script;
 extern const u_char *g_btl_talk_heal_script;

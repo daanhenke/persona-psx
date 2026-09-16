@@ -345,7 +345,7 @@ segments:
       - [0x1819C, c, seqstate3]
       - [0x182C4, c, seqwindowdraw]
       - [0x1869C, c, text]
-      - [0x188C0, asm, btlp_32_x3]
+      - [0x188C0, c, textwindowdraw]
       - [0x1900C, c, text3]
       - [0x1904C, c, menu]
       - [0x190C0, c, menuopen]

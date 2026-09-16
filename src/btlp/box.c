@@ -27,42 +27,6 @@
 #include <persona/btlp/text.h>
 #include <persona/btlp/gfx.h>
 
-/* Scratch the graphics are unpacked into: the palette first, the frame's tiles
-   0x200 bytes in. Reached by hardcoded address rather than through a symbol. */
-#define BTL_BOX_CLUT  ((u_char *)0x8014AA00)
-#define BTL_BOX_TILES ((u_long *)0x8014AC00)
-
-/* Where each lands in VRAM. The tiles share the message windows' page column,
-   so they move with it. */
-#define BTL_BOX_PAGE0    11
-#define BTL_BOX_PAGE_W   3
-#define BTL_BOX_COL      0x40
-#define BTL_BOX_TILES_Y  0x188
-#define BTL_BOX_TILES_W  0x2C
-#define BTL_BOX_TILES_H  0x20
-#define BTL_BOX_CLUT_Y   0x1FB
-#define BTL_BOX_CLUT_W   0x100
-
-/* Where the box starts from, and how far away it sits. */
-#define BTL_BOX_START_X 0x10
-#define BTL_BOX_START_Y 0x40
-#define BTL_BOX_DIST    100
-
-/* Full size on an axis, how far a ramp step moves, and the sliver the
-   collapse stops the height at. */
-#define BTL_BOX_FULL 0x1000
-#define BTL_BOX_RAMP 0x180
-#define BTL_BOX_THIN 0x40
-
-extern u_char *g_btl_box_pack;
-extern VECTOR  g_btl_box_pos;
-extern SVECTOR g_btl_box_rot;
-extern VECTOR  g_btl_box_scale;
-
-extern u_char  g_btl_box_step;
-extern u_char  g_btl_box_hold;
-extern u_short g_btl_box_flags;
-
 /* Reading the graphics in is the one thing that does not happen every time the
    box opens; bit 0x20 of the flags is what remembers it has been done. */
 void BtlBoxLoad(void)

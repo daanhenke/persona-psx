@@ -43,6 +43,11 @@ extern const u_short  g_btl_text_cluts[];
 #define BTL_TEXT_CLUT_W  0x10
 #define BTL_TEXT_CLUT_H  4
 
+/* The second window on screen: sprites while the box behind it is at full
+   size, quads through the box's own matrix while it is still opening.
+   textwindowdraw.c. */
+extern void BtlTextWindowDraw(void);
+
 extern int  BtlTextState(void);
 extern void BtlTextReset(void);
 extern void BtlTextClose(void);

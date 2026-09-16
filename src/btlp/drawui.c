@@ -16,6 +16,7 @@
 #include <libgpu.h>
 #include <persona/btlp/input.h>
 #include <persona/btlp/text.h>
+#include <persona/btlp/window.h>
 
 /* The primitive buffer, and how much of it one frame gets. */
 #define BTL_PRIM_POOL 0x801AC200
@@ -35,8 +36,6 @@ extern void BtlSeqAdvance(void);
 extern void BtlHudTick(void);
 extern void BtlBoxTick(void);
 extern void BtlMenuDraw(void);
-extern void BtlSeqWindowDraw(void);
-extern void BtlTextWindowDraw(void);
 extern void BtlTalkDrawPanel(void);
 extern void BtlHudDraw(void);
 extern void BtlBoxDraw(void);
