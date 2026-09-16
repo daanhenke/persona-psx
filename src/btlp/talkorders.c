@@ -312,19 +312,25 @@ void BtlReadyItemAction(BtlActor *a, const ItemDef *item)
    one fighter or at everything the pickable mask covers; the kind's own arm
    puts the whole enemy side on and either takes the slowest fighter's place,
    picks another enemy, or marks the enemies around the one it settled on. */
-/* 88.00%: the body is the image's, and what is left is where its two shared
-   tails sit. The image writes the refusal out inline in the kind arm and lets
-   the marker call at the very end be what every other way out falls into;
-   written the other way round - a refusal label at the bottom and the marker
-   call in each arm - the two tails swap places and the arms end up calling it
-   themselves. The three re-reads of the move byte in the range tests are the
-   other residue. */
+/* 92.94%: the refusal is written out inline in the kind arm now, where the
+   image has it, and the marker call at the very end is what the rest fall
+   into - that and sharing one read of the move byte between the last two
+   range tests took it up from 88%.
+
+   What is left is three things. The single-target arm builds its order and
+   its marker kind in the other order, so the two constants and the sum come
+   out swapped. The kind arm's second test of the move byte is one read in
+   the image and shared with the first here, and forcing it through the
+   volatile macro costs more elsewhere than it buys. And the down and left-
+   the-field tests are laid out the other way round: the image branches away
+   to the marker tail and falls into the refusal, where gcc here does the
+   reverse. */
 #ifdef NON_MATCHING
 void BtlReadySpellAction(BtlActor *a)
 {
     const SpellData *spell;
     const BtlStats  *p;
-    u_char           status;
+    int              status;
     short            move;
     int              i;
     int              kind;
@@ -373,8 +379,8 @@ void BtlReadySpellAction(BtlActor *a)
     }
 
     if ((u_int)(BTL_MOVE(a) - SPELL_FREE_FIRST) < SPELL_FREE_COUNT
-        || ((u_int)BTL_MOVE(a) >= MOVE_SPELL_FIRST
-            && BTL_MOVE(a) != MOVE_SWUNG_SPELL)) {
+        || ((u_int)a->move >= MOVE_SPELL_FIRST
+            && a->move != MOVE_SWUNG_SPELL)) {
         kind = spell->aim & AIM_MASK;
         switch (kind) {
         case AIM_ONE:
@@ -420,6 +426,10 @@ void BtlReadySpellAction(BtlActor *a)
             }
             if ((signed char)g_btl_actors[a->order].c.status
                 == BTL_STATUS_DOWN) {
+            /* The refusal written out here, where the image has it: every
+               other way out reaches it from above and the marker call at the
+               very end is what the rest fall into. */
+            refuse:
                 a->mark_kind = MARK_REFUSED;
                 BtlShowMarker(g_btl_actor_turn, 1, MARK_REFUSED);
                 a->obj->motion = BTL_MOTION_SHAKE;
@@ -469,12 +479,6 @@ void BtlReadySpellAction(BtlActor *a)
     }
     a->mark_kind = MARK_SPELL;
     BtlShowMarker(g_btl_actor_turn, 1, MARK_SPELL);
-    return;
-
-refuse:
-    a->mark_kind = MARK_REFUSED;
-    BtlShowMarker(g_btl_actor_turn, 1, MARK_REFUSED);
-    a->obj->motion = BTL_MOTION_SHAKE;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlReadySpellAction);

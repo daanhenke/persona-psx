@@ -2986,3 +2986,42 @@ inside the loop, which is what puts it in a callee-saved register.
 
 - [personaspell15.c](/src/btlp/personaspell15.c) - `BtlPersonaSpell15`, the
   missed arm placing its mark.
+
+## A pointer initialised behind the hoists is the loop optimiser's, not yours
+
+Loop invariants are inserted at the loop's pre-header, so anything the `for`
+initialises comes out in front of them. When the image puts one of the
+initialisations *after* the hoisted values instead, that pointer is not in the
+source at all: it is a general induction variable, and strength reduction
+emits its initial value after `move_movables` has finished. Write the body to
+index the array - `rows[i]` - and let gcc make the walk.
+
+The same routine's other half: a table address read once in front of the outer
+loop is loop-invariant across the whole routine and takes a callee-saved
+register for its trouble. Read inside the outer loop it costs nothing and the
+frame comes out the image's size.
+
+- [commandmenu.c](/src/btlp/commandmenu.c) - `BtlConfigMenu`, 98.83% to exact.
+
+## Which of two tails is written out inline is visible in the branch targets
+
+A routine with two ways out - one taken from everywhere, one fallen into -
+compiles them wherever the source puts them, and the branch operands say which
+is which: if every `goto` in the diff aims a few hundred bytes earlier than
+yours, the label they aim at is written out in the middle of the image's
+source and yours is at the bottom. Move the label's body up to the arm that
+would otherwise `goto` it, and let the other tail be the one at the end that
+everything falls into.
+
+- [talkorders.c](/src/btlp/talkorders.c) - `BtlReadySpellAction`, the refusal
+  inline in the kind arm, 88.00% to 91.56%.
+
+## A volatile read is a blunt instrument; share the one the image shares
+
+`*(volatile u_char *)&a->move` forces a load per use, which is the right tool
+when the image reads a byte again and again. It is the wrong one where the
+image reads it once for two tests in a row: use the plain field there and cse
+merges exactly those two, leaving the volatile reads around them alone.
+
+- [talkorders.c](/src/btlp/talkorders.c) - `BtlReadySpellAction`, the last two
+  range tests, 91.56% to 92.94%.
