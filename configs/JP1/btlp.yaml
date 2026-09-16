@@ -89,6 +89,9 @@ segments:
       - [0x450, .rodata, facedraw]
       - [0x488, rodata, btlp_rodata3a]
       - [0x58C, .rodata, insert]
+      # BtlBoxTick's thirty-three-entry step table sits in here; it becomes
+      # `[0x5AC, .rodata, boxtick]` behind a four-byte pad the moment the
+      # routine comes out of its guard.
       - [0x5A8, rodata, btlp_rodata4]
       - [0x634, .rodata, windowstep]
       - [0x668, pad, btlp_pad_668]  # the assembler pads .rodata to 8
@@ -331,7 +334,7 @@ segments:
       - [0x16388, c, cursordraw2]
       - [0x164DC, c, box]
       # BtlBoxTick, the next unit along, is still asm
-      - [0x16704, asm, btlp_30_x3]
+      - [0x16704, c, boxtick]
       - [0x170C8, c, seqvalue2]
       - [0x1710C, c, uploadtext]
       - [0x17230, c, talk]

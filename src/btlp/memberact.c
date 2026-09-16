@@ -268,6 +268,7 @@ void BtlMemberMotion02(BtlObj *o)
     u_short       kept;
     int           done;
     int           slot;
+    int           timer;
     int           i;
 
     a = o->actor;
@@ -361,11 +362,11 @@ void BtlMemberMotion02(BtlObj *o)
             if (g_btl_msg_speed != 2) {
                 BtlOpenMessage(1, 1, &D_800CFA00, 8, 0xC);
                 if (g_btl_msg_speed == 0) {
-                    i = 0x3C;
+                    timer = 0x3C;
                 } else {
-                    i = 0x1E;
+                    timer = 0x1E;
                 }
-                g_btl_msg_timer = i;
+                g_btl_msg_timer = timer;
             }
             o->timer = 0x3C;
             o->phase = 9;
@@ -381,15 +382,19 @@ void BtlMemberMotion02(BtlObj *o)
             done = 0;
             if ((g_btl_swing_item->swing & 1) != 0
                 || g_btl_swing_item->swing == 8) {
-                if (g_btl_actors[g_btl_hit_slot].c.key == 0
-                    || (signed char)g_btl_actors[g_btl_hit_slot].c.status
-                           == BTL_STATUS_DOWN
-                    || (done = 1,
+                if (g_btl_actors[g_btl_hit_slot].c.key != 0
+                    && (signed char)g_btl_actors[g_btl_hit_slot].c.status
+                           != BTL_STATUS_DOWN
+                    && (done = 1,
                         (g_btl_actors[g_btl_hit_slot].flags & SWING_SPARED)
-                            != 0)) {
-                    g_btl_hits_left = 0;
-                    done = 1;
+                            == 0)) {
+                    continue;
                 }
+                goto nohit;
+            hit:
+                g_btl_hit_slot = walk;
+                done = 1;
+                goto walked;
             } else {
                 walk = g_btl_hit_walk;
                 if ((short)g_btl_hit_walk < SWING_SLOTS) {
@@ -407,11 +412,10 @@ void BtlMemberMotion02(BtlObj *o)
                                 break;
                             }
                         } else {
-                            g_btl_hit_slot = walk;
-                            done = 1;
-                            break;
+                            goto hit;
                         }
                     }
+                walked:
                     if ((short)g_btl_hit_walk < SWING_SLOTS) {
                         continue;
                     }
@@ -419,9 +423,10 @@ void BtlMemberMotion02(BtlObj *o)
                 done = 1;
                 if ((g_btl_swing_item->swing & 2) != 0) {
                     i = 0;
+                    slot = (short)a->order;
                     kept = g_btl_hits_left;
                     g_btl_hits_left = 0;
-                    a->targets |= 1 << a->order;
+                    a->targets |= 1 << slot;
                     do {
                         if (((a->targets >> i) & 1) != 0
                             && g_btl_actors[i].c.key != 0
@@ -436,6 +441,7 @@ void BtlMemberMotion02(BtlObj *o)
                         i++;
                     } while (i < SWING_SLOTS);
                 } else {
+                nohit:
                     g_btl_hits_left = 0;
                     done = 1;
                 }
@@ -498,11 +504,10 @@ void BtlMemberMotion02(BtlObj *o)
             g_btl_hits_left--;
         }
         if ((short)g_btl_hit_walk < 0) {
-            i = 1;
+            g_btl_hit_mask = 1;
         } else {
-            i = g_btl_hit_mask << 1;
+            g_btl_hit_mask <<= 1;
         }
-        g_btl_hit_mask = i;
         g_btl_hit_walk++;
         o->phase = 3;
         break;

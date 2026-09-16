@@ -58,6 +58,13 @@
 #define BTL_BOX_RAMP 0x180
 #define BTL_BOX_THIN 0x40
 
+/* Where each column of the frame sits, which tile it takes and how wide that
+   tile is. Seventeen entries each: the left edge, fifteen middles, and the
+   closing entry every box's last column takes whatever its width. */
+extern u_short g_btl_box_col_x[];
+extern u_char  g_btl_box_col_u[];
+extern u_char  g_btl_box_col_w[];
+
 /* The packed graphics, and the three values the box's matrix is built from.
    They sit back to back in this order, which is how the text window's drawer
    reaches all three off the scale's own address. */
@@ -65,6 +72,21 @@ extern u_char *g_btl_box_pack;
 extern VECTOR  g_btl_box_pos;
 extern SVECTOR g_btl_box_rot;
 extern VECTOR  g_btl_box_scale;
+
+/* The same run again from the offset pair in front of it, which is the view
+   the box's own drawer takes: it reaches every one of them off that address
+   rather than by name. */
+typedef struct {
+    /* 0x00 */ short   ox;
+    /* 0x02 */ short   oy;
+    /* 0x04 */ VECTOR  pos;
+    /* 0x14 */ SVECTOR rot;
+    /* 0x1C */ VECTOR  scale;
+} BtlBoxXform;
+
+/* The box a frame at a time, and on screen. boxtick.c. */
+extern void BtlBoxTick(void);
+extern void BtlBoxDraw(void);
 
 extern u_short g_btl_box_flags;
 extern u_char  g_btl_box_step;
