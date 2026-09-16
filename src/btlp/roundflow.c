@@ -89,7 +89,6 @@ extern char BtlHudState(void);
 
 /* The three ailments the close leaves on. POISON and SICK are carried out of
    the fight and onto the field; DEAD is already in persona/btlp/actor.h. */
-#define BTL_STATUS_POISON 0x0D
 #define BTL_STATUS_SICK   0x10
 
 /* The wait at the top is the whole routine's loop rather than a loop of its

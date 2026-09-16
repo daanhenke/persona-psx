@@ -2809,3 +2809,73 @@ alone).
 
 - [enemymove.c](/src/btlp/enemymove.c) - `BtlEnemyPlayMove`, 96.37% to exact
   but for the names.
+
+## The same block scope twice is two pseudos; one at function scope is one
+
+Two loops that each walk a table with a counter and a pointer. Declaring the
+counter and the pointer inside each loop's own block gives gcc a separate
+pseudo per block, and each one is short-lived enough to outrank the pointer it
+walks beside - the whole pre-header comes out in the other register order. The
+allocator sorts by `floor_log2(refs) * refs / live_length` and the live length
+is decided by where the variable is born, so a counter born in the block is
+always the short one. One counter declared at function scope and shared by both
+loops has the refs of both and outranks both pointers, which is what the image
+has.
+
+The same lever cuts the other way when it is the *value* that must survive: a
+mask bit a loop both tests and puts back has to be a variable, or the write to
+the winner's index lets cse rewrite the second `1 << i` as `1 << best` and
+invalidate the cached shift - and *that* variable has to be block-scoped, since
+one at function scope is a single pseudo across both loops.
+
+- [talkboard.c](/src/btlp/talkboard.c) - `BtlTalkBoardStep`, 99.02% to exact
+  on the shared counter.
+- [bestoffer.c](/src/btlp/bestoffer.c) - `BtlBestOffer`, 97.35% to 99.63% on
+  the block-scoped bit.
+
+## A step counter is raised after the call whose work it stands for
+
+A state machine whose arms each do one job and bump the counter. Written
+`step++;` first, the scheduler leaves it above that call's own argument setup;
+written after the call it lands where the image has it, between the arguments
+and the stores. The two spellings are the same code, so this is only about
+where the scheduler is allowed to put the one instruction.
+
+- [summonload.c](/src/btlp/summonload.c) - `BtlSummonPersona`, 99.34% to exact.
+- [actorgfx.c](/src/btlp/actorgfx.c) - `BtlLoadActorGfx`, 93.79% to exact with
+  two other levers.
+
+## A template's pointer field written before its flag word anchors the address
+
+`BtlObjAlloc` is handed a two-field template whose `scripts` field is rewritten
+before each call. Writing `.attr` first makes gcc materialise `&def` and reach
+`scripts` at `+4`; writing `.scripts` first makes it materialise `&def.scripts`
+and reach the attribute word at `-4`, which is what the image does - the same
+`lui %hi(sym+4) / addiu / addiu reg,-4` shape `BtlSpawnActorObj` already has.
+Writing `.attr` first also lets the loop optimiser hoist `&def` out of the
+frame loop entirely, which shifts every register after it.
+
+- [actorgfx.c](/src/btlp/actorgfx.c) - `BtlLoadActorGfx`, 86.21% to 99.47%.
+
+## Indexing off a pointer, not walking it, keeps one induction variable
+
+A loop testing two far-apart fields of the same record - `o->c.key` at 0x3E and
+`o->pickable` at 0xB7 - walked with `o++` makes gcc strength-reduce
+`&o->pickable` into a second induction variable of its own, so the loop carries
+two `addiu ...,0xEC`. Written `o[i].c.key` / `o[i].pickable` with a plain
+counter it keeps one pointer and two displacements, which is what the image
+has.
+
+- [talkorders.c](/src/btlp/talkorders.c) - `BtlReadyItemAction`, 93.87% to
+  98.32%.
+
+## The tail of BtlMessage wants the script pointer in a local
+
+The directory lookup inlined - `*(u_long *)(SCRATCH + dir + slot * 4) +
+SCRATCH + dir` - is reassociated by gcc into `(dir + SCRATCH) + script` unless
+the sum up to the scratch base is assigned to a `u_char *` of its own first.
+The local also has to be block-scoped, since `at` is taken at file scope in
+this tree.
+
+- [moodline.c](/src/btlp/moodline.c) - `BtlOfferMoodLine`, 99.31% to exact.
+- [talkboard.c](/src/btlp/talkboard.c) - `BtlTalkBoardStep`.

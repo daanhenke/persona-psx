@@ -122,6 +122,10 @@ segments:
       # BtlChooseEnemyMove's. The C emits exactly the 0x3FC bytes of the
       # 0x8D8..0xCD4 span.
       - [0x8D8, .rodata, roundflow]
+      # BtlDeriveBattleStats's seventeen-entry ailment table sits in here,
+      # behind a pad word and in front of another; it becomes
+      # `[0xCD8, .rodata, derivestats]` between two `pad` lines the moment the
+      # routine comes out of its guard.
       - [0xCD4, rodata, btlp_rodata6a]
       # BtlAilmentTakeTurn's switch table, which ailtaketurn.c emits itself, and
       # the word of padding behind it that belongs to nobody.
@@ -468,7 +472,8 @@ segments:
       - [0x2F514, c, inflict]
       - [0x2F6B8, c, statusstops]
       - [0x2F6E4, c, readymarkers]
-      - [0x2F800, asm, btlp_57]
+      # The fight's own copy of a fighter's numbers, bent for its ailment.
+      - [0x2F800, c, derivestats]
       # The reach grid: which fighters a move can land on.
       - [0x301B0, c, reach]
       - [0x30934, c, enemy2]

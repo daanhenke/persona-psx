@@ -280,6 +280,14 @@ typedef struct BtlActor {
 
 /* Three more that stop a member's command: GUILT a swing outright and a cast
    once it has any level, CLOSE and BLIND a cast at their last. */
+/* The eight BtlDeriveBattleStats bends a fighter's numbers for. */
+#define BTL_STATUS_SLEEP  7
+#define BTL_STATUS_UNLUCK 0xA
+#define BTL_STATUS_POISON 0xD
+#define BTL_STATUS_BARSAK 0x15
+#define BTL_STATUS_MAD    0x16
+#define BTL_STATUS_WOLF   0x17
+
 #define BTL_STATUS_CLOSE 8
 #define BTL_STATUS_BLIND 9
 #define BTL_STATUS_GUILT 0xC

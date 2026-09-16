@@ -30,6 +30,32 @@
 #include <persona/btlp/round.h>
 #include <persona/common/item.h>
 
+/* The marker a refused action puts up, and what the fighter's object is put
+   through under it. */
+#define MARK_REFUSED     5
+#define MARK_ITEM        3
+#define BTL_MOTION_SHAKE 4
+
+/* The bit of the item's group field the marker's kind is taken from. */
+#define ITEM_GROUP_MARK 0x10
+
+/* How far behind the slowest fighter a readied action comes in. */
+#define TURN_GAP 5
+
+/* The aim nibble of ItemDef.swing, which is SpellData.aim's nibble again:
+   one fighter, a whole side either way round, or the weakest. */
+#define AIM_MASK  0xF
+#define AIM_ONE   1
+#define AIM_SIDE  2
+#define AIM_SIDE2 4
+#define AIM_ONE2  8
+
+/* The nine slots the enemy side reaches over, where they start in a target
+   mask, and a number no fighter's hp reaches. */
+#define BTL_COMBATANTS  9
+#define BTL_ENEMY_SLOT0 5
+#define HP_HIGHEST      0x3E7
+
 /* The walk is the same in all three: g_btl_actor_turn is the counter as well
    as the slot, so the tests read the record through it while the pointer next
    to it carries the writes and the call. */
@@ -161,6 +187,67 @@ void BtlTalkersLeaveField(void)
 INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlTalkersLeaveField);
 #endif
 
-INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlReadyItemAction);
+/* A weapon or a used item made ready. BtlMarkMoveArea says which cells it
+   reaches and answers negative when it reaches none; a fighter carrying guilt
+   is refused whatever the answer was. Both refusals are the shake.
+
+   Past that the action takes its place five behind the slowest fighter and the
+   aim nibble of the item's own swing byte says what it is pointed at: one
+   fighter, which is the slot the order itself names; a whole side, which is
+   every slot that is filled and pickable; or the weakest, which is the lowest
+   hp among those - and that one moves the order onto the fighter it found. */
+void BtlReadyItemAction(BtlActor *a, const ItemDef *item)
+{
+    BtlActor *o;
+    int       order;
+    int       i;
+    int       low;
+
+    if (BtlMarkMoveArea(a, item->area, item->swing) >= 0
+        && (signed char)a->c.status != BTL_STATUS_GUILT) {
+    /* The marker's kind goes through the same local the order does, which is
+       what keeps the pair in one register. */
+    order        = (item->unk06 & ITEM_GROUP_MARK) != 0 ? MARK_ITEM : 0;
+    a->mark_kind = order;
+    BtlShowMarker(g_btl_actor_turn, 1, order);
+    order = BtlSlowestOrder() + TURN_GAP;
+    switch (item->swing & AIM_MASK) {
+    case AIM_ONE:
+        a->order   = order;
+        a->targets = 1 << order;
+        break;
+    case AIM_SIDE:
+    case AIM_SIDE2:
+        a->order   = order;
+        a->targets = 0;
+        o          = g_btl_combatants;
+        for (i = 0; i < BTL_COMBATANTS; i++) {
+            if (o[i].c.key != 0 && o[i].pickable != 0) {
+                a->targets |= 1 << (i + BTL_ENEMY_SLOT0);
+            }
+        }
+        break;
+    case AIM_ONE2:
+        /* The order the slowest fighter gave it is thrown away here: the
+           weakest fighter's own slot takes its place. */
+        i   = 0;
+        low = HP_HIGHEST;
+        o   = g_btl_combatants;
+        for (; i < BTL_COMBATANTS; i++) {
+            if (o[i].c.key != 0 && o[i].pickable != 0 && o[i].c.hp < low) {
+                low   = o[i].c.hp;
+                order = i;
+            }
+        }
+        a->order   = order + BTL_ENEMY_SLOT0;
+        a->targets = 1 << (order + BTL_ENEMY_SLOT0);
+        break;
+    }
+    } else {
+        a->mark_kind = MARK_REFUSED;
+        BtlShowMarker(g_btl_actor_turn, 1, MARK_REFUSED);
+        a->obj->motion = BTL_MOTION_SHAKE;
+    }
+}
 
 INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlReadySpellAction);
