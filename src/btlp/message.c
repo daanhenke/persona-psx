@@ -13,7 +13,6 @@
  * BtlSeqPlay.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 
 /* The (group, index) table, past the end of whatever was loaded. */
 #define BTL_MSG_TABLE 0x3B4
@@ -25,27 +24,23 @@
    relocated symbol needs the `addiu` as well. The directory offset is added
    twice over rather than being kept as a pointer.
 
-   What is below is the right nineteen instructions in the right order - the
-   load-delay nop included, which is what the split return is for - but gcc
-   puts the buffer in v1 and the directory offset in a0 where the original has
-   them the other way round. Reordering the two loads, the two statements and
-   the declarations all leave that alone. */
+   The table's byte offset is worked out into a variable of its own before it
+   meets the pointer. Indexed in place, gcc adds the index to the pointer
+   rather than the pointer to the index, and the buffer and the directory
+   offset swap registers. */
 #define g_btl_scratch ((u_char *)0x801C0000)
 extern u_char *g_btl_scratch_end;
 
-#ifdef NON_MATCHING
 u_char *BtlMessage(int index, int group)
 {
     u_char *at;
     u_long  dir;
     u_short slot;
+    int     i;
 
-    slot = ((u_short *)(g_btl_scratch_end + BTL_MSG_TABLE))
-           [group * BTL_MSG_GROUP + index];
+    i = (group * BTL_MSG_GROUP + index) * 2;
+    slot = *(u_short *)(g_btl_scratch_end + i + BTL_MSG_TABLE);
     dir = *(u_long *)g_btl_scratch;
     at = *(u_long *)(g_btl_scratch + dir + slot * 4) + g_btl_scratch;
     return at + dir;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/message", BtlMessage);
-#endif

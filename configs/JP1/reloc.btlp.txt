@@ -221,3 +221,11 @@ rom:0x1A4B0 reloc:MIPS_HI16 symbol:g_btl_hud addend:0x97
 rom:0x1A4B8 reloc:MIPS_LO16 symbol:g_btl_hud addend:0x97
 rom:0x1A4BC reloc:MIPS_HI16 symbol:g_btl_hud addend:0x94
 rom:0x1A4C4 reloc:MIPS_LO16 symbol:g_btl_hud addend:0x94
+
+// BtlTalkUpdate - g_btl_talk_cells[g_btl_talk_index].x and .y. The table's
+// size is outside global_vram and so ignored; spimdisasm names its fifth byte
+// D_800CC754 instead.
+rom:0x176F8 reloc:MIPS_HI16 symbol:g_btl_talk_cells addend:0x4
+rom:0x17700 reloc:MIPS_LO16 symbol:g_btl_talk_cells addend:0x4
+rom:0x17704 reloc:MIPS_HI16 symbol:g_btl_talk_cells addend:0x6
+rom:0x1770C reloc:MIPS_LO16 symbol:g_btl_talk_cells addend:0x6

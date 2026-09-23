@@ -15,7 +15,6 @@
  * is here because the assembler laid it down between two that are used.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
@@ -88,16 +87,15 @@ void BtlFxStepUnused2(BtlObj *o)
     }
 }
 
-/* 98.21%: one instruction, and it is which of the two the delay slot in front
-   of the loop takes - the image fills it with the row counter's zero and puts
-   the top row behind the guard, and gcc here fills it with the top row and puts
-   the counter in front. The dumps say why: delay-slot filling takes whichever
-   of the two stands nearest the branch, and the top row stands nearest here
-   because it is set before the loop, where the image's is settled after the
-   guard. Writing it inside the loop instead does move it behind the guard, but
-   then it is no longer worth a saved register at all - gcc builds the 3 afresh
-   each row, and the routine comes out a register and a frame slot short. */
-#ifdef NON_MATCHING
+/* The top row is set at the head of each row, and the enemy side's height is
+   worked out before the party side's that subtracts from it. Both matter to
+   loop.c: a constant set inside the loop is only hoisted in front of it when
+   its savings times its lifetime clears the loop's size, and the 3 needs the
+   enemy line between it and its use to live long enough. Hoisted, it lands
+   behind the loop guard in a saved register, which is where the image has it
+   and what leaves the guard's delay slot to the row counter's zero. Set once
+   before the loop, it sits in front of the guard and takes that slot; set
+   right before its use, it is rebuilt every row and a saved register short. */
 BtlObj *BtlFxStart10(void)
 {
     BtlObj *o;
@@ -120,12 +118,12 @@ BtlObj *BtlFxStart10(void)
     }
     cell = rows * FX_GRID_W - 1;
     prev = 0;
-    top  = FX_10_ROWS;
     for (row = 0; row < rows; row++) {
+        top     = FX_10_ROWS;
         col     = 0;
+        y_enemy = (PLACE_ROW_H + row * FX_10_ROW_H) * PLACE_FIXED;
         y_party = ((top - row) * FX_10_ROW_H - FX_10_HIGH) * PLACE_FIXED;
         x       = FX_GRID_X0;
-        y_enemy = (PLACE_ROW_H + row * FX_10_ROW_H) * PLACE_FIXED;
         for (; col < FX_GRID_W; col++) {
             if (g_btl_actor_turn < BTL_PARTY) {
                 pos[0] = x;
@@ -150,6 +148,3 @@ BtlObj *BtlFxStart10(void)
     }
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell10", BtlFxStart10);
-#endif

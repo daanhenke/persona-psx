@@ -3025,3 +3025,43 @@ merges exactly those two, leaving the volatile reads around them alone.
 
 - [talkorders.c](/src/btlp/talkorders.c) - `BtlReadySpellAction`, the last two
   range tests, 91.56% to 92.94%.
+
+## An index worked out on its own is added to the pointer, not the reverse
+
+`((u_short *)(base + OFF))[group * 14 + index]` has gcc add the scaled index
+*to* the pointer (`addu v0, v0, v1` with the index already in v0), and every
+register after it comes out swapped. Working the byte offset out into an
+`int` first - `i = (group * 14 + index) * 2;` then `*(u_short *)(base + i +
+OFF)` - makes the pointer the left operand, which is the image's `addu v1, v1,
+v0`, and the rest of the routine falls into place behind it.
+
+- [message.c](/src/btlp/message.c) - `BtlMessage`, 76.84% to exact.
+
+## A constant set inside a loop is hoisted only if it lives long enough
+
+loop.c moves a constant load out of a loop when its savings times its
+lifetime - the insns between the set and its last use inside the loop -
+clears the loop's size (the loop dump prints `regno R (life L), savings S
+... not desirable` when it does not). A value the image keeps in a saved
+register and sets *behind* the loop guard is one of these hoists: write it at
+the head of the loop body, and if the dump still says "not desirable", put
+another statement of the body between it and its use. Set before the loop
+instead, it lands in front of the guard and takes the guard's delay slot;
+set right before its use, it is rebuilt every trip.
+
+- [fxspell10.c](/src/btlp/fxspell10.c) - `BtlFxStart10`, the top row's 3 with
+  the enemy height worked out between it and the party height, 98.21% to exact.
+
+## A `char` local can cost eight frame bytes that nothing reads
+
+Not every unread frame slot is a dead aggregate. A `char` (unsigned here,
+under `-funsigned-char`) that is assigned a signed byte and then used as an
+`int` reserves eight bytes of locals (`# vars= 8` in the `.frame` comment)
+while living entirely in a register. The pickers that step over the down and
+the lifted all have exactly that frame and a copy of the ailment in the
+branch's delay slot, and declaring the ailment `char` reproduces both - but
+also an `andi 0xff` the image does not have, so it is the shape of the answer
+and not yet the answer. `long unused[2]` stands in for it meanwhile.
+
+- [pickother.c](/src/btlp/pickother.c) - `BtlPickOtherMember`, frame and copy
+  right, one `andi` over.

@@ -200,7 +200,8 @@ INCLUDE_ASM("btlp/nonmatchings/personaact", BtlPersonaPlayMove);
    threads the jump to the shared "nothing to hit" tail into the branch where
    the image leaves it standing - written as three ors with the goto, as an
    and with the else, and with the flag set ahead of the test, all three come
-   out the same. The table's name comes right when the rodata is carved, which
+   out the same, and so does `continue` with the goto after it. The table's
+   name comes right when the rodata is carved, which
    waits on the match. */
 #ifdef NON_MATCHING
 void BtlPersonaSpellMove(BtlObj *o)

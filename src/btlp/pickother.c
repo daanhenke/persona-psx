@@ -31,7 +31,17 @@ extern u_char g_btl_other_enemies[BTL_ENEMIES];
    slot with the move into the register it keeps it in for the range test,
    where gcc here loads straight into that register. Assigning the local after
    the first compare - on a line of its own, in a comma, as a short - comes out
-   the same. */
+   the same.
+
+   The RTL dumps say what the image did. The comma form already gives the
+   right RTL - the scratch compared, then copied into the local after the
+   branch - but cse deletes the local unless it outlives the block, and once
+   kept (an initialiser before the loop does it) sched1 still hoists the flags
+   load over the copy, so the scratch overlaps it and shares its register.
+   Declaring the ailment `char` gets the copy, and with it the eight-byte frame
+   the `unused` array stands in for (see Matching Nudges, "A char local can
+   cost eight frame bytes"), but zero-extends it once more before the range
+   test. */
 #ifdef NON_MATCHING
 int BtlPickOtherMember(int slot)
 {

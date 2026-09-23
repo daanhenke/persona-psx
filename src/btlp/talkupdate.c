@@ -13,7 +13,6 @@
  * box puts it.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/menu.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/input.h>
@@ -45,8 +44,6 @@ extern int         g_btl_talk_state;
 extern int         g_btl_talk_index;
 extern int         g_btl_talk_choice;
 
-
-#ifdef NON_MATCHING
 void BtlTalkUpdate(void)
 {
     /* Down and right share an address temporary initialized in its own
@@ -125,6 +122,3 @@ void BtlTalkUpdate(void)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkupdate", BtlTalkUpdate);
-#endif

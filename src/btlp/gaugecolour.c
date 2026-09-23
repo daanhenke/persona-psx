@@ -19,6 +19,13 @@
  * closest; sharing one is worse, block-scoping them changes nothing, and writing
  * the test into the colour itself - the reuse direction of one-variable-or-two -
  * is worse again. It is a register question, so the permuter is the next move.
+ *
+ * Every if/else shape with the low colour in an arm of its own (low first, low
+ * in the else, the ternary, the nested else-if) gets the registers exactly
+ * right - the colour in the compare's register - but leaves the compare's
+ * branch slot empty, where the image has stolen the low colour out of the
+ * else arm into it and dropped the jump around. So the source is one of those;
+ * what is not found is why reorg will steal from the arm there and not here.
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>

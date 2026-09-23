@@ -198,7 +198,11 @@ void BtlOpenDialogue(void)
             skip:
                 /* These two read the speaker through the record rather than
                    through the walker; the two pointers come out in each
-                   other's saved registers otherwise. */
+                   other's saved registers otherwise. With no walker at all,
+                   every read written `line->who`, gcc's loop pass builds the
+                   same walker itself and the result is that same swap: the
+                   walker's 17 references outrank the record's 13, so it takes
+                   s1. Index forms and every loop spelling leave it there. */
                 if (line->who != 0) {
                     BtlFaceClose();
                 }

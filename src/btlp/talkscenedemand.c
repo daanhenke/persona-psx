@@ -371,7 +371,12 @@ void BtlTalkSceneDemand(void)
                             e++;
                         } while (i < 9);
                         /* The address and HP total share this scratch local;
-                           a direct pointer assignment loses the image's copy. */
+                           a direct pointer assignment loses the image's copy.
+                           The image reads HP and its cap through the address
+                           and stores through the copy, which is cse keeping
+                           the address's register canonical - only a local
+                           that outlives e does that (weight, gauge), and then
+                           cse drops the copy for the store as well. */
                         used = (int)&g_btl_enemies[worst];
                         e = (BtlActor *)used;
                         used = take + e->c.hp;
