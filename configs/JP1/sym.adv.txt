@@ -1385,7 +1385,7 @@ D_800AF77C               = 0x800AF77C; // type:func size:0x84
 //------------------------------------------------------------------
 PersonaStockFind         = 0x800AF800; // type:func size:0x48
 PersonaStockAdd          = 0x800AF848; // type:func size:0x38
-func_800AF880            = 0x800AF880; // type:func size:0x94
+PersonaStockReturn       = 0x800AF880; // type:func size:0x94
 PersonaStockFindFree     = 0x800AF914; // type:func size:0x44
 
 //---------------------------------------------------------------------------

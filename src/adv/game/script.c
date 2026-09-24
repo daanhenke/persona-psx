@@ -37,7 +37,7 @@
  *  32   key                             a character leaves, unequipped
  *  33   id                              put a Persona in the stock
  *  34   id ->                           jump if the stock holds it
- *  35   id                              func_800AF880
+ *  35   id                              put a Persona in the stock, closing gaps
  *  36   ->                              jump if no Persona record is free
  *  37   key n ->                        jump if the member's unk56 < n
  *  38   key exp32 ->                    jump if the member's unk1C < exp
@@ -84,7 +84,7 @@
  *  67   bust place                      show a bust picture
  *  68   -                               take it down
  *  69   actor se                        a sound, and its mark over an actor
- *  6C   n                               AdvScreenEffect
+ *  6C   n                               a fade, flash or view shake
  *  6D   -                               stop the view shaking
  *  6E   a b c d e                       ActorStartMove
  *  71   chan image                      start one of the scene's animations
@@ -257,7 +257,7 @@ extern void   AdvTynCutscene(void);
 extern void   AdvRoomRebuild(void);
 extern void   func_800AFAD0(u_char chr, u_char key, u_char level);
 extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
-extern void   func_800AF880(u_char id);
+extern void   PersonaStockReturn(u_char id);
 extern void   func_800715EC(void);
 extern void   func_80091608(int a);
 extern void   func_800AEE9C(int a);
@@ -442,7 +442,7 @@ loop:
         }
         break;
     case 0x35:
-        func_800AF880(s[2]);
+        PersonaStockReturn(s[2]);
         break;
     case 0x36:
         p = PersonaFindFree();
