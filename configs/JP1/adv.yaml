@@ -311,5 +311,11 @@ segments:
       # The overlay's own workspace: what the disc carries a value for,
       # and behind it the run of zeroes the loader never has to write.
       - [0x4C960, data, adv_data]
+      # The arcana labels, emitted by stocklist.c.
+      - [0x4D538, .data, ui/stocklist]
+      - [0x4D5D4, data, adv_data1]
+      # The controller page's action names and layouts, emitted by padlayout.c.
+      - [0x5488C, .data, ../common/ui/padlayout]
+      - [0x54A04, data, adv_data2]
       - [0x5746C, bss, adv_bss]
   - [0x58274]

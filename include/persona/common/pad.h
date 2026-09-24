@@ -29,7 +29,7 @@ extern PadBinding g_pad_bindings[];
 #define PAD_LAYOUT_ENTRIES 20
 
 extern u_char        g_pad_layout_actions[];
-extern const u_char *g_pad_action_names[];
+extern u_char *g_pad_action_names[];
 
 void PadDrawLayout(u_char layout);
 

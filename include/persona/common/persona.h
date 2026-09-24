@@ -149,8 +149,9 @@ extern const PersonaDef g_persona_defs[];
 
 /* The six-cell label each arcana is shown by, by the 1-based
    PersonaData.arcana, flat. Each overlay that draws one carries its copy. */
+#define ARCANA_LABELS  26
 #define ARCANA_LABEL_W 6
-extern u_char g_arcana_labels[];
+extern u_char g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W];
 
 /* A Persona's name into a menu row, from glyph bank `base`; the row is
    cleared first, so id 0 leaves it blank. */
