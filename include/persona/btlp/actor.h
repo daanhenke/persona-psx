@@ -65,14 +65,17 @@ typedef struct BtlActor {
     /* 0x8C */ u_short gun_hit;
     /* 0x8E */ u_short defence;
     /* 0x90 */ u_short evade;
-    /* 0x92 */ u_short unk3A;      /* Char.unk3A, which the negotiation weighs
-                                      the acting member's against the demon's
-                                      to decide whether a contact lands    */
-    /* 0x94 */ u_short unk3C;
+    /* 0x92 */ u_short mag_atk;    /* Char.mag_atk, which the negotiation
+                                      weighs the acting member's against the
+                                      demon's to decide whether a contact
+                                      lands; madness raises it by a share  */
+    /* 0x94 */ u_short mag_def;    /* Char.mag_def; stone cuts it with the
+                                      defence, and a spell's damage is split
+                                      by it                                */
     /* 0x96 */ u_short persona_num[4];
                                    /* the equipped Persona's +0x10..+0x16, put
                                       here by BtlApplyPersona. The first two go
-                                      on into Char.unk3A and Char.unk3C, which
+                                      on into Char.mag_atk and Char.mag_def, which
                                       is where the negotiation reads the one it
                                       weighs a contact with. */
     /* 0x9E */ u_short persona_sum; /* half its fourth stat plus its fourth plus

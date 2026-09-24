@@ -80,8 +80,8 @@ void StatusDrawMember(short member)
     NUMBER(g_chars[member].gun_hit, 3, 11, 37);
     NUMBER(g_chars[member].defence, 3, 12, 37);
     NUMBER(g_chars[member].evade, 3, 13, 37);
-    NUMBER(g_chars[member].unk3A, 3, 14, 37);
-    NUMBER(g_chars[member].unk3C, 3, 15, 37);
+    NUMBER(g_chars[member].mag_atk, 3, 14, 37);
+    NUMBER(g_chars[member].mag_def, 3, 15, 37);
 }
 
 void StatusDrawName(short member)
@@ -112,6 +112,6 @@ void StatusDrawPersona(short persona)
     NUMBER(g_personas[persona].stat[4], 2, 16, 5);
 
     TileMapFillRect(AT(8, 35), 0, 3, 2, MAP_W);
-    NUMBER(g_personas[persona].unk10, 3, 8, 37);
-    NUMBER(g_personas[persona].unk12, 3, 9, 37);
+    NUMBER(g_personas[persona].mag_atk, 3, 8, 37);
+    NUMBER(g_personas[persona].mag_def, 3, 9, 37);
 }

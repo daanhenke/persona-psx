@@ -111,8 +111,8 @@ void BtlTalkSceneHappy(void)
 
     case TALK_STAGE_TOUCH:
         g_btl_talk_stage[g_btl_talk_depth - 1] = TALK_STAGE_BACK;
-        if (g_btl_actors[g_btl_actor_slot].unk3A
-            >= g_btl_enemies[g_btl_talk_target].unk3A) {
+        if (g_btl_actors[g_btl_actor_slot].mag_atk
+            >= g_btl_enemies[g_btl_talk_target].mag_atk) {
             BtlEndTalking();
             BtlTalkEndStatus(BTL_STATUS_HAPPY, TALK_PACK_HAPPY);
             BtlTextOpen(g_btl_talk_happy_script, TALK_TEXT_X, TALK_TEXT_Y);

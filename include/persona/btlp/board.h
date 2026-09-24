@@ -115,8 +115,8 @@ extern BtlStatusRow g_btl_status_vitality_cells;
 extern BtlStatusRow g_btl_status_dexterity_cells;
 extern BtlStatusRow g_btl_status_agility_cells;
 extern BtlStatusRow g_btl_status_luck_cells;
-extern BtlStatusRow g_btl_status_unk3A_cells;
-extern BtlStatusRow g_btl_status_unk3C_cells;
+extern BtlStatusRow g_btl_status_mag_atk_cells;
+extern BtlStatusRow g_btl_status_mag_def_cells;
 extern BtlStatusRow g_btl_status_rank_cells;
 extern BtlStatusRow g_btl_status_kind_cells;
 

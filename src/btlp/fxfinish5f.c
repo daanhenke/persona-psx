@@ -6,7 +6,7 @@
  * each it applies the move instead of resolving a blow. A fighter held by
  * PUPPET is stepped over.
  *
- * - 0x5F and 0x62 heal the healer's unk3A and up to fifteen more, 0x60 and 0x63
+ * - 0x5F and 0x62 heal the healer's mag_atk and up to fifteen more, 0x60 and 0x63
  *   twice that, and a healer shut in by CLOSE gives only half. The fighter's
  *   object is put on its healing motion and the heal is put up over it.
  * - 0x61 and 0x64 heal whatever hp the fighter is missing - unless a Persona
@@ -167,7 +167,7 @@ void BtlFxFinish5F(BtlObj *o)
             case 0x5F:
             case 0x62:
                 amount = (a->flags & BTL_ACTOR_TIMED_A) == 0
-                             ? g_btl_actors[g_btl_actor_turn].unk3A
+                             ? g_btl_actors[g_btl_actor_turn].mag_atk
                                    + (rand() & 0xF)
                              : 0;
                 if (FX_5F_HEALER_CLOSED(self)) {
@@ -186,7 +186,7 @@ void BtlFxFinish5F(BtlObj *o)
             case 0x60:
             case 0x63:
                 amount = (a->flags & BTL_ACTOR_TIMED_A) == 0
-                             ? (g_btl_actors[g_btl_actor_turn].unk3A
+                             ? (g_btl_actors[g_btl_actor_turn].mag_atk
                                 + (rand() & 0xF)) * 2
                              : 0;
                 if (FX_5F_HEALER_CLOSED(self)) {

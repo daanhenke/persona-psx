@@ -207,8 +207,8 @@ void BtlLevelUpParty(void)
                 hp_gain += LEVEL_HERO_HP
                          + (a->c.stat[STAT_VITALITY] + a->c.stat[STAT_LUCK]) / LEVEL_HERO_HP_DIV;
             }
-            sp_first = a->unk3A;
-            sp_second = a->unk3C;
+            sp_first = a->mag_atk;
+            sp_second = a->mag_def;
             sp_gain += (sp_first / LEVEL_SP_WEIGHT + sp_second) / LEVEL_SP_DIV + LEVEL_SP_BASE;
             a->c.unk14 -= *exp;
             a->c.level++;

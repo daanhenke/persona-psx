@@ -28,12 +28,12 @@ void BtlLoadPersonas(void)
     d = g_btl_personas;
     i = 0;
     do {
-        d->exp = s->unk00;
-        d->rank_exp = s->unk04;
-        d->rank_left = s->unk08;
+        d->exp = s->exp;
+        d->rank_exp = s->rank_exp;
+        d->rank_left = s->rank_left;
         d->bond = s->bond;
-        d->unk10 = s->unk10;
-        d->unk12 = s->unk12;
+        d->mag_atk = s->mag_atk;
+        d->mag_def = s->mag_def;
         d->key   = s->key;
         memcpy(d->name, s->name, 10);
         d->sp_cost = s->sp_cost;

@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - a new Persona record.  ADV only.
- *   0x800B053C PersonaCreate
+ *   0x800B053C PersonaFill
  *
  * Script command 4F gives a character a new Persona: a free g_personas slot
  * is filled out of the Persona's definition, with only the first of its
@@ -10,7 +10,7 @@
 
 #define NO_OWNER 0xFF
 
-void PersonaCreate(u_char slot, u_char id)
+void PersonaFill(u_char slot, u_char id)
 {
     Persona          *p;
     const PersonaDef *d;
@@ -18,11 +18,11 @@ void PersonaCreate(u_char slot, u_char id)
 
     p = &g_personas[slot];
     d = &g_persona_defs[id];
-    p->unk00 = d->unk00;
-    p->unk04 = 0;
-    p->unk08 = 0;
-    p->unk10 = d->unk04;
-    p->unk12 = d->unk06;
+    p->exp = d->exp;
+    p->rank_exp = 0;
+    p->rank_left = 0;
+    p->mag_atk = d->mag_atk;
+    p->mag_def = d->mag_def;
     p->unk14 = 0;
     p->unk16 = 0;
     p->key = id;

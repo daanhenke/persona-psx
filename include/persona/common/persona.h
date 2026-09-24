@@ -22,15 +22,17 @@
 #define PERSONA_BOND_FULL    3
 
 typedef struct {
-    /* 0x00 */ u_long  unk00;     /* PersonaDef.unk00, copied in             */
-    /* 0x04 */ u_long  unk04;
-    /* 0x08 */ u_long  unk08;
+    /* 0x00 */ u_long  exp;       /* all the experience it has gained; a new
+                                     record starts from PersonaDef.exp       */
+    /* 0x04 */ u_long  rank_exp;  /* how much of it counts toward the next
+                                     rank, and how much the next rank still
+                                     wants (BtlStats has the same three)     */
+    /* 0x08 */ u_long  rank_left;
     /* 0x0C */ u_long  bond;      /* PersonaDef.bond, copied in as the record
                                      is built                                */
-    /* 0x10 */ u_short unk10;     /* CharRecalcStats copies this pair into the
-                                     carrier's Char+0x3A and +0x3C, or writes
-                                     1 into both when no Persona is equipped */
-    /* 0x12 */ u_short unk12;
+    /* 0x10 */ u_short mag_atk;   /* magic attack and defence; CharRecalcStats
+                                     copies the pair onto the carrier       */
+    /* 0x12 */ u_short mag_def;
     /* 0x14 */ u_short unk14;     /* both zeroed as the record is built     */
     /* 0x16 */ u_short unk16;
     /* 0x18 */ u_char  key;       /* identifies the record; 0 while unused */
@@ -94,9 +96,9 @@ typedef struct {
     /* 0x08 */ int    exp;        /* what a demon of this Persona is worth:
                                      BtlTalkSceneGift scales the experience it
                                      leaves behind by this                   */
-    /* 0x0C */ u_short unk0C;     /* the pair a contact is weighed with, which
-                                     lands on Char.unk3A and Char.unk3C      */
-    /* 0x0E */ u_short unk0E;
+    /* 0x0C */ u_short mag_atk;   /* a demon's magic attack and defence,
+                                     landing on Char.mag_atk and mag_def    */
+    /* 0x0E */ u_short mag_def;
     /* 0x10 */ int    unk10;      /* lands on Char +0x1C                     */
     /* 0x14 */ u_short drop;      /* what a demon of this Persona leaves
                                      behind: the item's id in the low nine
@@ -129,9 +131,10 @@ extern PersonaData g_persona_data[];
    main fills a g_personas slot out of one of these; the battle keeps the byte
    at +0x28 beside every record it copies. */
 typedef struct {
-    /* 0x00 */ u_long  unk00;
-    /* 0x04 */ u_short unk04;     /* the pair a contact is weighed with      */
-    /* 0x06 */ u_short unk06;
+    /* 0x00 */ u_long  exp;       /* what a new record starts with          */
+    /* 0x04 */ u_short mag_atk;   /* magic attack and defence, copied onto
+                                     the record (Persona.mag_atk)           */
+    /* 0x06 */ u_short mag_def;
     /* 0x08 */ u_char  name[10];  /* tile bytes; kept whole, on the battle's record at
                                      +0x1F and the save game's at +0x19     */
     /* 0x12 */ u_char  sp_cost;   /* SP a cast through this Persona takes    */

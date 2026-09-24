@@ -33,11 +33,11 @@ void CharRecalcStats(u_char n)
     k = c->entry;
     if (k != CHAR_NO_ENTRY && !c->blocked &&
         g_personas[v = c->list[k]].key != 0) {
-        c->unk3A = g_personas[v].unk10;
-        c->unk3C = g_personas[v].unk12;
+        c->mag_atk = g_personas[v].mag_atk;
+        c->mag_def = g_personas[v].mag_def;
     } else {
-        c->unk3A = 1;
-        c->unk3C = 1;
+        c->mag_atk = 1;
+        c->mag_def = 1;
     }
     k = c->equip[EQUIP_GUN];
     v = c->equip[EQUIP_AMMO];

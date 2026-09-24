@@ -41,8 +41,8 @@ void BtlActorFromDef(BtlActor *a, int key)
     d = &g_persona_data[key];
 
     a->c.unk10 = d->exp;
-    a->c.unk3A = d->unk0C;
-    a->c.unk3C = d->unk0E;
+    a->c.mag_atk = d->mag_atk;
+    a->c.mag_def = d->mag_def;
     a->c.unk1C = d->unk10;
     a->drop = d->drop;
     a->price = (u_short)d->price;

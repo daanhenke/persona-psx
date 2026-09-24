@@ -570,9 +570,9 @@ void StatusPageDraw(member)
     n = FormatDecimal(g_chars[i].stat[4], g_hud_digits, 2);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 15, 24), GLYPH_DIGIT0, n);
     TileMapWriteRow(c->name, AT(g_tilemap1, 10, 12), 0, 8);
-    n = FormatDecimal(g_chars[i].unk3A, g_hud_digits, 3);
+    n = FormatDecimal(g_chars[i].mag_atk, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
-    n = FormatDecimal(g_chars[i].unk3C, g_hud_digits, 3);
+    n = FormatDecimal(g_chars[i].mag_def, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
 
     for (row = 0; row < 3; row++) {
@@ -618,9 +618,9 @@ void StatusSlotDraw(member, slot)
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, n);
         n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 2, 34), GLYPH_DIGIT0, n);
-        n = FormatDecimal(g_personas[i].unk10, g_hud_digits, 3);
+        n = FormatDecimal(g_personas[i].mag_atk, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
-        n = FormatDecimal(g_personas[i].unk12, g_hud_digits, 3);
+        n = FormatDecimal(g_personas[i].mag_def, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
     } else {
         n = 0;
@@ -660,9 +660,9 @@ void StatusPreviewDraw(Char *c)
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, 1);
         n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 2, 33), GLYPH_DIGIT0, n);
-        n = FormatDecimal(g_personas[i].unk10, g_hud_digits, 3);
+        n = FormatDecimal(g_personas[i].mag_atk, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
-        n = FormatDecimal(g_personas[i].unk12, g_hud_digits, 3);
+        n = FormatDecimal(g_personas[i].mag_def, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
         n = FormatDecimal(c->stat[0], g_hud_digits, 2);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 11, 24), GLYPH_DIGIT0, n);

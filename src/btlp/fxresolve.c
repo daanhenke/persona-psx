@@ -146,7 +146,7 @@ void BtlFxResolveHit(BtlObj *o)
         return;
     }
 
-    power = self->unk3A;
+    power = self->mag_atk;
     if ((signed char)self->stage[6] != 0) {
         power += power * ((signed char)self->stage[6] + 1) / 8;
     }
@@ -198,7 +198,7 @@ void BtlFxResolveHit(BtlObj *o)
                 instant = 0;
                 damage = power * power;
                 damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
-                amount = damage / (a->unk3C * 6);
+                amount = damage / (a->mag_def * 6);
                 react = 0;
             } else {
                 instant = 1;
@@ -230,7 +230,7 @@ void BtlFxResolveHit(BtlObj *o)
                 instant = 0;
                 damage = power * power;
                 damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
-                amount = damage / (a->unk3C * 6);
+                amount = damage / (a->mag_def * 6);
                 react = 0;
             } else {
                 instant = 1;
@@ -282,7 +282,7 @@ void BtlFxResolveHit(BtlObj *o)
             } else {
                 damage = power * power;
                 damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
-                amount = damage / (a->unk3C * 6);
+                amount = damage / (a->mag_def * 6);
                 react = 0;
             }
             break;

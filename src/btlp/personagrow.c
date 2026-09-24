@@ -73,15 +73,15 @@ void BtlPersonaGrow(BtlStats *p)
         p->stat[2] += row[2 * GROW_COLUMNS + p->slots - GROW_FIRST];
         p->stat[3] += row[3 * GROW_COLUMNS + p->slots - GROW_FIRST];
         p->stat[4] += row[4 * GROW_COLUMNS + p->slots - GROW_FIRST];
-        p->unk10 += row[5 * GROW_COLUMNS + p->slots - GROW_FIRST];
-        p->unk12 += row[6 * GROW_COLUMNS + p->slots - GROW_FIRST];
+        p->mag_atk += row[5 * GROW_COLUMNS + p->slots - GROW_FIRST];
+        p->mag_def += row[6 * GROW_COLUMNS + p->slots - GROW_FIRST];
         p->stat[0] = CHAR_GROW_CLAMP(p->stat[0], GROW_STAT_MAX);
         p->stat[1] = CHAR_GROW_CLAMP(p->stat[1], GROW_STAT_MAX);
         p->stat[2] = CHAR_GROW_CLAMP(p->stat[2], GROW_STAT_MAX);
         p->stat[3] = CHAR_GROW_CLAMP(p->stat[3], GROW_STAT_MAX);
         p->stat[4] = CHAR_GROW_CLAMP(p->stat[4], GROW_STAT_MAX);
-        p->unk10 = CHAR_GROW_CLAMP(p->unk10, GROW_NUM_MAX);
-        p->unk12 = CHAR_GROW_CLAMP(p->unk12, GROW_NUM_MAX);
+        p->mag_atk = CHAR_GROW_CLAMP(p->mag_atk, GROW_NUM_MAX);
+        p->mag_def = CHAR_GROW_CLAMP(p->mag_def, GROW_NUM_MAX);
     }
 }
 

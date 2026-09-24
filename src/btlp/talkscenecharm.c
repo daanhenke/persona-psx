@@ -152,8 +152,8 @@ void BtlTalkSceneCharm(void)
         break;
 
     case TALK_STAGE_TOUCH:
-        if (g_btl_actors[g_btl_actor_slot].unk3A
-            >= g_btl_enemies[g_btl_talk_target].unk3A) {
+        if (g_btl_actors[g_btl_actor_slot].mag_atk
+            >= g_btl_enemies[g_btl_talk_target].mag_atk) {
             BtlEndTalking();
             BtlTalkEndStatus(BTL_STATUS_CHARM, TALK_PACK_CHARM);
             BtlTextOpen(g_btl_talk_charm_script, TALK_TEXT_X, TALK_TEXT_Y);

@@ -552,9 +552,9 @@ void PersonaDataDraw(id)
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 8, 23), GLYPH_DIGIT0, n);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 8, 27), GLYPH_DIGIT0, n);
 
-    n = FormatDecimal(g_persona_data[id].unk0C, g_hud_digits, 3);
+    n = FormatDecimal(g_persona_data[id].mag_atk, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 30, 9), GLYPH_DIGIT0, n);
-    n = FormatDecimal(g_persona_data[id].unk0E, g_hud_digits, 3);
+    n = FormatDecimal(g_persona_data[id].mag_def, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 31, 9), GLYPH_DIGIT0, n);
 
     n = FormatDecimal(g_persona_data[id].stat[0], g_hud_digits, 2);

@@ -33,10 +33,11 @@ typedef struct {
                                     BtlPersonaGrow carries what is over
                                     into the rank after                    */
     /* 0x0C */ u_long  bond;     /* PersonaDef.bond: see PERSONA_BOND_BITS  */
-    /* 0x10 */ u_short unk10;
-    /* 0x12 */ u_short unk12;
+    /* 0x10 */ u_short mag_atk;  /* Persona.mag_atk and mag_def; a rank up
+                                    grows them out of the growth table     */
+    /* 0x12 */ u_short mag_def;
     /* 0x14 */ u_short unk14;    /* BtlApplyPersona copies these two onto the
-                                    actor beside unk10 and unk12, and nothing
+                                    actor beside mag_atk and mag_def, and nothing
                                     has read them back yet */
     /* 0x16 */ u_short unk16;
     /* 0x18 */ u_short attack;   /* the three BtlEnemyDeriveStats works out */

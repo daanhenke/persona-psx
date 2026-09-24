@@ -241,9 +241,9 @@ void StatusPersonaDraw(persona)
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 28, 17), GLYPH_DIGIT0, n);
 
     TileMapFillRect(AT(g_tilemap1, 30, 7), 0, 3, 2, MAP_W);
-    n = FormatDecimal(p->unk10, g_hud_digits, 3);
+    n = FormatDecimal(p->mag_atk, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 30, 9), GLYPH_DIGIT0, n);
-    n = FormatDecimal(p->unk12, g_hud_digits, 3);
+    n = FormatDecimal(p->mag_def, g_hud_digits, 3);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 31, 9), GLYPH_DIGIT0, n);
 
     i = D_800B198B[p->kind];

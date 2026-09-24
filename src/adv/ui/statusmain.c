@@ -78,8 +78,8 @@ void StatusDrawMain(u_char slot)
     FIELD(g_chars[member].gun_hit, 3, 20, 24, 26);
     FIELD(g_chars[member].defence, 3, 21, 24, 26);
     FIELD(g_chars[member].evade, 3, 22, 24, 26);
-    FIELD(g_chars[member].unk3A, 3, 23, 24, 26);
-    FIELD(g_chars[member].unk3C, 3, 24, 24, 26);
+    FIELD(g_chars[member].mag_atk, 3, 23, 24, 26);
+    FIELD(g_chars[member].mag_def, 3, 24, 24, 26);
 
     TileMapFillRect(AT(17, 4), 0, 10, CHAR_EQUIP, MAP_W);
     DrawItemName(g_chars[member].equip[0], AT(17, 4), 0, 1);

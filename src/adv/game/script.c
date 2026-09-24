@@ -267,7 +267,7 @@ extern void   AdvScreenEffect(u_char n);
 extern void   ActorStartMove(u_char a, u_char b, u_char c, u_char d, u_char e);
 extern u_char ActorsMoveStep(u_char actor);
 extern short  PersonaSlotsLast(void);
-extern void   PersonaCreate(u_char p, u_char n);
+extern void   PersonaFill(u_char p, u_char n);
 
 void AdvScriptSpecial(u_char n);
 
@@ -651,7 +651,7 @@ loop:
     case 0x4F:
 
         c = PersonaFindFree();
-        PersonaCreate(c, s[3]);
+        PersonaFill(c, s[3]);
         a = CharFind2(s[2]);
         b = CharEntryFindFree(a);
         g_chars[a].list[b] = c;

@@ -307,12 +307,12 @@ Persona *PersonaCreate(Char *c, int id)
     d = &g_persona_defs[id];
     for (i = 0; i < PERSONA_COUNT; i++, p++) {
         if (p->key == 0) {
-            p->unk00 = 0;
-            p->unk04 = 0;
-            p->unk08 = 0;
+            p->exp = 0;
+            p->rank_exp = 0;
+            p->rank_left = 0;
             p->bond = d->bond;
-            p->unk10 = d->unk04;
-            p->unk12 = d->unk06;
+            p->mag_atk = d->mag_atk;
+            p->mag_def = d->mag_def;
             p->key = id;
             memcpy(p->name, d->name, 10);
             p->sp_cost = d->sp_cost;

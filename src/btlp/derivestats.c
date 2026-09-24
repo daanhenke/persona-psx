@@ -80,8 +80,8 @@ void BtlDeriveBattleStats(BtlActor *a)
     a->gun_hit   = a->c.gun_hit;
     a->defence   = a->c.defence;
     a->evade     = a->c.evade;
-    a->unk3A     = a->c.unk3A;
-    a->unk3C     = a->c.unk3C;
+    a->mag_atk     = a->c.mag_atk;
+    a->mag_def     = a->c.mag_def;
     a->stat[STAT_STRENGTH]  = a->c.stat[STAT_STRENGTH];
     a->stat[STAT_VITALITY]  = a->c.stat[STAT_VITALITY];
     a->stat[STAT_DEXTERITY] = a->c.stat[STAT_DEXTERITY];
@@ -142,8 +142,8 @@ void BtlDeriveBattleStats(BtlActor *a)
     case BTL_STATUS_STONE:
         d          = (double)a->c.defence;
         a->defence = d / SLEEP_OUT_OF * STONE_LEFT;
-        d          = (double)a->c.unk3C;
-        a->unk3C   = d / SLEEP_OUT_OF * STONE_LEFT;
+        d          = (double)a->c.mag_def;
+        a->mag_def   = d / SLEEP_OUT_OF * STONE_LEFT;
         break;
 
     case BTL_STATUS_BARSAK:
@@ -155,8 +155,8 @@ void BtlDeriveBattleStats(BtlActor *a)
         break;
 
     case BTL_STATUS_MAD:
-        d        = (double)a->c.unk3A;
-        a->unk3A = d + d / MARK_SHARE;
+        d        = (double)a->c.mag_atk;
+        a->mag_atk = d + d / MARK_SHARE;
         break;
 
     case BTL_STATUS_WOLF:

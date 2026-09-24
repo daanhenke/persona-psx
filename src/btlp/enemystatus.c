@@ -123,9 +123,9 @@ void BtlShowEnemyStatus(int slot)
                       a->stat[STAT_AGILITY], STATUS_DIGITS_2);
         BtlDrawNumber((u_char *)&g_btl_status_luck_cells, a->stat[STAT_LUCK],
                       STATUS_DIGITS_2);
-        BtlDrawNumber((u_char *)&g_btl_status_unk3A_cells, a->unk3A,
+        BtlDrawNumber((u_char *)&g_btl_status_mag_atk_cells, a->mag_atk,
                       STATUS_DIGITS_3);
-        BtlDrawNumber((u_char *)&g_btl_status_unk3C_cells, a->unk3C,
+        BtlDrawNumber((u_char *)&g_btl_status_mag_def_cells, a->mag_def,
                       STATUS_DIGITS_3);
         memcpy(&g_btl_status_rank_cells,
                &g_btl_status_rank_labels[a->persona_rank * STATUS_RANK_ROW],
@@ -169,8 +169,8 @@ void BtlShowEnemyStatus(int slot)
     BtlStatusBlank(2, g_btl_status_dexterity_cells);
     BtlStatusBlank(2, g_btl_status_agility_cells);
     BtlStatusBlank(2, g_btl_status_luck_cells);
-    BtlStatusBlank(3, g_btl_status_unk3A_cells);
-    BtlStatusBlank(3, g_btl_status_unk3C_cells);
+    BtlStatusBlank(3, g_btl_status_mag_atk_cells);
+    BtlStatusBlank(3, g_btl_status_mag_def_cells);
     BtlStatusBlank(3, g_btl_status_rank_cells);
     BtlStatusBlank(3, g_btl_status_kind_cells);
 
@@ -187,8 +187,8 @@ void BtlShowEnemyStatus(int slot)
     g_btl_status_dexterity_cells.c2 = STATUS_END;
     g_btl_status_agility_cells.c2 = STATUS_END;
     g_btl_status_luck_cells.c2 = STATUS_END;
-    g_btl_status_unk3A_cells.c3 = STATUS_END;
-    g_btl_status_unk3C_cells.c3 = STATUS_END;
+    g_btl_status_mag_atk_cells.c3 = STATUS_END;
+    g_btl_status_mag_def_cells.c3 = STATUS_END;
     g_btl_status_rank_cells.c3 = STATUS_END;
     g_btl_status_kind_cells.c3 = STATUS_END;
     do {

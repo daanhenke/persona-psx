@@ -72,8 +72,8 @@ void BtlApplyPersona(BtlActor *a)
         which = BtlActorPersona(a->obj->mark_num);
         if (which >= 0 && a->c.blocked == 0) {
             p = &g_btl_personas[which];
-            a->persona_num[0] = p->unk10;
-            a->persona_num[1] = p->unk12;
+            a->persona_num[0] = p->mag_atk;
+            a->persona_num[1] = p->mag_def;
             a->persona_num[2] = p->unk14;
             a->persona_num[3] = p->unk16;
             a->persona_sum = p->stat[2] * 2 + p->stat[3] + p->stat[4] / 2;
@@ -158,8 +158,8 @@ void BtlApplyPersona(BtlActor *a)
         a->c.stat[4] = CHAR_GROW_CLAMP(a->c.stat[4], STAT_MAX);
 
         if (g_btl_debug_keep_numbers == 0) {
-            a->c.unk3A = a->persona_num[0];
-            a->c.unk3C = a->persona_num[1];
+            a->c.mag_atk = a->persona_num[0];
+            a->c.mag_def = a->persona_num[1];
         }
     }
 }

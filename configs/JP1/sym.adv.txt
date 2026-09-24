@@ -1426,7 +1426,7 @@ CharEntryFindFree        = 0x800B04E0; // type:func size:0x5C
 //-----------------------------------------------------------
 //--- PA: 0x04C19C   VA: 0x800B053C   subsegment: asm, adv_57
 //-----------------------------------------------------------
-PersonaCreate            = 0x800B053C; // type:func size:0x1CC
+PersonaFill              = 0x800B053C; // type:func size:0x1CC
 
 //-------------------------------------------------------------
 //--- PA: 0x04C368   VA: 0x800B0708   subsegment: c, game/stats

@@ -43,13 +43,16 @@ typedef struct {
     /* 0x34 */ u_short gun_hit;
     /* 0x36 */ u_short defence;
     /* 0x38 */ u_short evade;
-    /* 0x3A */ u_short unk3A;     /* copied out of the equipped Persona's
-                                     +0x10 and +0x12, or 1 when no Persona
-                                     is equipped. ItemUse adds unk3A to
-                                     rand() % 16 for a heal and 0x800AFEE4
-                                     takes a fifth of it, which is not
-                                     enough to name the pair.             */
-    /* 0x3C */ u_short unk3C;
+    /* 0x3A */ u_short mag_atk;   /* magic attack and defence: the equipped
+                                     Persona's pair, or 1 when none is
+                                     equipped (an enemy's come from its
+                                     PersonaData). The status screens print
+                                     them after the six above; ItemUse adds
+                                     mag_atk to rand() % 16 for a heal, and
+                                     the battle bends them with madness and
+                                     stone as it bends the physical numbers
+                                     with berserk and stone.              */
+    /* 0x3C */ u_short mag_def;
     /* 0x3E */ u_char  key;       /* identifies the record; 0 while unused  */
     /* 0x3F */ u_char  name[10];  /* packed glyph bytes; the status HUD draws
                                      eight of them, 0xFF ending the row   */

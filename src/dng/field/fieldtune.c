@@ -79,8 +79,8 @@ void CharInit(int rec, int tmpl)
     c->gun_hit = 13;
     c->defence = 14;
     c->evade = 15;
-    c->unk3A = 16;
-    c->unk3C = 17;
+    c->mag_atk = 16;
+    c->mag_def = 17;
     c->key = tmpl + 1;
     c->level = 5;
     c->unk56 = 5;

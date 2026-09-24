@@ -26,12 +26,12 @@ void BtlStorePersonas(void)
     s = g_btl_personas;
     i = 0;
     do {
-        d->unk00 = s->exp;
-        d->unk04 = s->rank_exp;
-        d->unk08 = s->rank_left;
+        d->exp = s->exp;
+        d->rank_exp = s->rank_exp;
+        d->rank_left = s->rank_left;
         d->bond = s->bond;
-        d->unk10 = s->unk10;
-        d->unk12 = s->unk12;
+        d->mag_atk = s->mag_atk;
+        d->mag_def = s->mag_def;
         d->key   = s->key;
         memcpy(d->name, s->name, 10);
         d->sp_cost = s->sp_cost;
@@ -74,8 +74,8 @@ void BtlGivePersona(Char *c, int key)
             d->rank_exp = 0;
             d->rank_left = 0;
             d->bond = def->bond;
-            d->unk10 = def->unk04;
-            d->unk12 = def->unk06;
+            d->mag_atk = def->mag_atk;
+            d->mag_def = def->mag_def;
             d->key = key;
             memcpy(d->name, def->name, 10);
             d->sp_cost = def->sp_cost;

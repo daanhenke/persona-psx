@@ -17,8 +17,8 @@
  * the character's row of g_char_hp_growth, and each base stat from its column
  * of g_char_stat_growth, clamped to 999 and 99. The hero has no row in either
  * table and is left as set. The directions walk a cursor over the five base
- * stats and nudge the one under it, and the shoulder buttons nudge unk3A and
- * unk3C. Every frame the Persona is applied again and the stats recalculated,
+ * stats and nudge the one under it, and the shoulder buttons nudge mag_atk
+ * and mag_def. Every frame the Persona is applied again and the stats recalculated,
  * so the board shows the member as they would fight.
  *
  * On the equipment page up and down pick a slot and left and right step what
@@ -261,19 +261,19 @@ int BtlDebugEditMember(void)
                 g_btl_step--;
             }
             if (keys & PAD_L1) {
-                a->c.unk3A--;
+                a->c.mag_atk--;
             }
             if (keys & PAD_R1) {
-                a->c.unk3A++;
+                a->c.mag_atk++;
             }
             if (keys & PAD_L2) {
-                a->c.unk3C--;
+                a->c.mag_def--;
             }
             if (keys & PAD_R2) {
-                a->c.unk3C++;
+                a->c.mag_def++;
             }
-            a->c.unk3A = EDIT_CLAMP(a->c.unk3A, EDIT_NUM_MAX);
-            a->c.unk3C = EDIT_CLAMP(a->c.unk3C, EDIT_NUM_MAX);
+            a->c.mag_atk = EDIT_CLAMP(a->c.mag_atk, EDIT_NUM_MAX);
+            a->c.mag_def = EDIT_CLAMP(a->c.mag_def, EDIT_NUM_MAX);
             break;
 
         case EDIT_EQUIP:
