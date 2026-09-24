@@ -71,7 +71,7 @@ void FieldSetFloor(void)
     g_floor_spots = (u_char *)(PACK_BASE + g_pack_spot_tab[DNG_FLOOR]);
     D_8009FDEC = 0;
     g_floor_events = (u_char *)(PACK_BASE + g_pack_event_tab[DNG_FLOOR]);
-    g_scene->flag6EA04 = 0;
+    g_scene->win.kind = 0;
     D_800993B8 = 0;
     g_bgm_off = 0;
     D_8009FE3C = 0;

@@ -17,6 +17,18 @@
 /* How many objects the scene has room for. */
 #define SCENE_OBJS 968
 
+/* The selection window's layout; kind 0 means none, cleared for each new
+   floor. */
+typedef struct {
+    u_short first;   /* 0x0 */
+    u_short y;       /* 0x2 */
+    u_short count;   /* 0x4 */
+    u_short rows;    /* 0x6 */
+    u_char  kind;    /* 0x8 */
+    u_char  pad9[3];
+    u_long *src;     /* 0xC */
+} DngWindow;
+
 /* The flat sprites drawn over the field: exactly as many as fit before the
    objects. */
 #define FIELD_SPRITES 150
@@ -30,7 +42,11 @@ typedef struct {
     GsOT          ot[2];              /* 0x1AE80 one per display buffer */
     u_char        pad1AEA8[0x36364 - 0x1AEA8];
     GsSPRITE      backdrop;           /* 0x36364 */
-    u_char        pad36388[0x3649C - 0x36388];
+    u_char        pad36388[0x3640A - 0x36388];
+    short         msg_scroll_a;       /* 0x3640A the message box's scroll */
+    u_char        pad3640C[6];
+    short         msg_scroll_b;       /* 0x36412 */
+    u_char        pad36414[0x3649C - 0x36414];
     GsSPRITE      sky;                /* 0x3649C scrolls sideways as the party turns */
     u_char        pad364C0[0x364D4 - 0x364C0];
     PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
@@ -41,9 +57,8 @@ typedef struct {
     long          sin, cos;           /* 0x6E914 of the party's angle */
     u_char        pad6E91C[0x6E97C - 0x6E91C];
     u_long        glyph[16][2];       /* 0x6E97C a glyph decoded for upload */
-    u_char        pad6E9FC[8];
-    u_char        flag6EA04;          /* 0x6EA04 cleared for a new floor */
-    u_char        pad6EA05[0x6EACC - 0x6EA05];
+    DngWindow     win;                /* 0x6E9FC the selection window */
+    u_char        pad6EA0C[0x6EACC - 0x6EA0C];
     signed char   lift_x, lift_y;     /* 0x6EACC which lift on the floor */
     u_char        lift;               /* 0x6EACE its row of g_lift_stops */
     u_char        pad6EACF;
@@ -328,6 +343,24 @@ void FieldEnterFrom(void);
 
 u_long *FieldMapTmd(u_long *tmd);
 void FieldSetPrimClut(u_short *list, u_short clut);
+
+/* The message box's cursor, text colour and upload rectangle, the palette
+   of each text colour, and the window table. */
+extern int     g_msg_col;
+extern int     g_msg_line;
+extern u_char  g_msg_color;
+extern RECT    g_msg_rect;
+extern u_short g_msg_cluts[];
+extern u_long *g_pack_msg_tab;
+extern u_long  g_win_default[];
+extern u_long  g_win_kinds[];
+
+void FieldMsgPutGlyph(u_short n);
+void FieldMsgClear(void);
+void FieldMsgNewLine(void);
+void FieldMsgClearLine(int line);
+void FieldMsgSetWindow(int n);
+void FieldMsgTint(u_char *cells, u_char color, int col, int line, int count);
 void FieldDecodeGlyph(u_short n);
 void FieldSetMoonIcon(void);
 /* Defined old-style, so declared without a prototype: callers pass ints. */

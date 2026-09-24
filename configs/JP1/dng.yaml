@@ -98,6 +98,8 @@ segments:
       - [0xF26C, c, field/fieldlift]
       - [0xF5EC, c, field/fieldshake]
       - [0xF6C4, asm, dng_s1_x3f]
+      - [0x10718, c, field/fieldmsg]
+      - [0x10B88, asm, dng_s1_x3g]
       - [0x113B0, c, common/gfx/slot]
       - [0x116F8, c, common/gfx/fade]
       - [0x117A0, asm, dng_s2]
