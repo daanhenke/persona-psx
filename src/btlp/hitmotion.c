@@ -26,7 +26,6 @@
  * of if the whole side is acting or it is its own turn, and goes idle if not.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libsnd.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -105,53 +104,41 @@ void BtlMemberMotion0F(BtlObj *o)
     }
 }
 
-/* 99.05%, registers only: the table's address and the actor's pick come out
-   in each other's registers, and the last add with its operands the other way
-   round. The index through a local, and its terms turned round, change
-   nothing or move further away. */
-#ifdef NON_MATCHING
+/* The script row is taken as a pointer and indexed by the pick, the way every
+   other reader of g_btl_member_scripts does it; summed as one flat index gcc
+   associates it the other way. */
 void BtlActorMotion04(BtlObj *o)
 {
-    int script;
+    u_char *row;
+    int     script;
 
     if (o->attr & BTL_OBJ_OTHER_SIDE) {
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[g_btl_models[o->kind].hit]);
         o->motion = 0;
     } else {
-        script = g_btl_member_scripts[SCRIPT_HIT
-                                      + o->kind * MEMBER_SCRIPT_MODEL
-                                      + o->actor->script_pick
-                                            * MEMBER_SCRIPT_PICK];
+        row = &g_btl_member_scripts[SCRIPT_HIT
+                                    + o->kind * MEMBER_SCRIPT_MODEL];
+        script = row[o->actor->script_pick * MEMBER_SCRIPT_PICK];
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[script]);
         o->actor->flags |= BTL_ACTOR_FLINCHED;
         o->motion = 0;
     }
     o->phase = 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/hitmotion", BtlActorMotion04);
-#endif
 
-/* 93.85%: the stand script is slot 0 of the member's row, and with no constant
-   in the index gcc sums the model's block and the pick first and loads
-   symbol-relative, where the image adds the table to the model's block before
-   the pick - as it does for the flinch, whose slot is not 0. An explicit
-   address, pointer arithmetic and the terms turned round all fold the same
-   way. */
-#ifdef NON_MATCHING
 void BtlMemberMotion11(BtlObj *o)
 {
-    int script;
+    u_char *row;
+    int     script;
 
     switch (o->phase) {
     case 0:
         if (o->attr & BTL_OBJ_OTHER_SIDE) {
             script = g_btl_models[o->kind].hit;
         } else {
-            script = g_btl_member_scripts[SCRIPT_HIT
-                                          + o->kind * MEMBER_SCRIPT_MODEL
-                                          + o->actor->script_pick
-                                                * MEMBER_SCRIPT_PICK];
+            row = &g_btl_member_scripts[SCRIPT_HIT
+                                        + o->kind * MEMBER_SCRIPT_MODEL];
+            script = row[o->actor->script_pick * MEMBER_SCRIPT_PICK];
         }
         BtlObjSetScript(o, (BtlSeqStep *)o->scripts[script]);
         o->timer = HIT_HOLD;
@@ -165,10 +152,9 @@ void BtlMemberMotion11(BtlObj *o)
             if (o->attr & BTL_OBJ_OTHER_SIDE) {
                 script = g_btl_models[o->kind].spawn;
             } else {
-                script = g_btl_member_scripts[SCRIPT_STAND
-                                              + o->kind * MEMBER_SCRIPT_MODEL
-                                              + o->actor->script_pick
-                                                    * MEMBER_SCRIPT_PICK];
+                row = &g_btl_member_scripts[SCRIPT_STAND
+                                            + o->kind * MEMBER_SCRIPT_MODEL];
+                script = row[o->actor->script_pick * MEMBER_SCRIPT_PICK];
             }
             BtlObjSetScript(o, (BtlSeqStep *)o->scripts[script]);
         }
@@ -177,6 +163,3 @@ void BtlMemberMotion11(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/hitmotion", BtlMemberMotion11);
-#endif

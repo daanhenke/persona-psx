@@ -24,7 +24,6 @@
  * already up - answering whether anybody moved at all.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
@@ -89,21 +88,17 @@ void BtlStandPreset(int preset)
     BtlBuildMarkers();
 }
 
-/* 98.52%, registers only: every instruction is where the image has it, but
-   the column counter and the running cell trade registers (a2 and a3, t0 and
-   t1). The layout reached as (g_btl_formation_preset + preset)->cell[k] - the
-   spelling that matched BtlStandPreset - is what put the table's address
-   ahead of the layout's start, as the image has it. */
-#ifdef NON_MATCHING
+/* One counter for both walks: i hides the five cursors and then runs over
+   the preset's cells, which is what shares its register with the column
+   count the way the image has it. The layout is reached as
+   (g_btl_formation_preset + preset)->cell[i], BtlStandPreset's spelling. */
 void BtlPlacePreset(int preset)
 {
-    u_char *p;
     int  cell;
     long x;
     long y;
     int  row;
     int  col;
-    int  k;
     int  i;
 
     i = 0;
@@ -112,27 +107,24 @@ void BtlPlacePreset(int preset)
     } while (i < PARTY_MAX);
 
     row = 0;
-    k = 0;
+    i = 0;
     do {
         y = (row * PRESET_YPITCH + PRESET_Y) << 16;
         col = 0;
         do {
             x = (col * PRESET_XPITCH + PRESET_X) << 16;
-            cell = (g_btl_formation_preset + preset)->cell[k];
+            cell = (g_btl_formation_preset + preset)->cell[i];
             if (cell != CELL_EMPTY) {
                 g_btl_pick_cursors[cell]->x = x;
                 g_btl_pick_cursors[cell]->y = y;
                 g_btl_pick_cursors[cell]->attr &= ~BTL_OBJ_HIDDEN;
             }
             col++;
-            k++;
+            i++;
         } while (col < GRID_W);
         row++;
     } while (row < GRID_H);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placecursor", BtlPlacePreset);
-#endif
 
 int BtlMarkMovedMembers(void)
 {

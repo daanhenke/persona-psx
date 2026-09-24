@@ -3164,3 +3164,23 @@ write the routine the plain way once and score it.
   plain `for` over the buffer, 95.06% to exact.
 - [clock.c](/src/btlp/clock.c) - `BtlClockTick`, the plain increments and
   test, 82.05% to exact.
+
+## A table read the way its matched readers read it
+
+When a guarded routine reads a table that matched routines also read, copy
+their spelling before anything else. g_btl_member_scripts is read by every
+matched mover as `row = &table[SLOT + kind * MODEL]; script = row[pick *
+PICK];` - summed as one flat index, gcc associates the sum the other way and
+no spelling of the flat index recovers it.
+
+- [hitmotion.c](/src/btlp/hitmotion.c) - `BtlActorMotion04` 99.05% and
+  `BtlMemberMotion11` 93.85%, both to exact.
+
+## Two loops, one counter
+
+A register the image shares between two loops' counters is often one
+variable reused: the original declared `i`, walked one table with it, then set
+it back to zero and walked the next. Separate `i` and `k` locals get their own
+allocations and swap registers with their neighbours.
+
+- [placecursor.c](/src/btlp/placecursor.c) - `BtlPlacePreset`, 98.52% to exact.
