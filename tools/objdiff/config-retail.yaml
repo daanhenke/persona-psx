@@ -1,9 +1,10 @@
 # Progress categories reported to objdiff / decomp.dev.
 #
 # Paths are relative to the version's expected/ directory, so they are the
-# target name followed by the source tree under it. `common` is its own
-# category: those sources are compiled into several overlays, and a unit only
-# ever appears once under the name splat gave it.
+# target name followed by the source tree under it. The sources in src/common
+# are compiled into several targets, each through a wrapper of its own
+# (src/<target>/common/...), so each copy counts toward the target it is
+# linked into.
 
 categories:
   - id: exe
@@ -52,7 +53,7 @@ categories:
       - nld
 
   - id: ovl.adv
-    name: Adventure / Town
+    name: Adventure
     paths:
       - adv
 
@@ -85,11 +86,6 @@ categories:
     name: Name Entry (US)
     paths:
       - nld
-
-  - id: common
-    name: Shared
-    paths:
-      - common
 
 expected_paths:
   ALL: expected/
