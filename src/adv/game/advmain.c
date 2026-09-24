@@ -120,7 +120,7 @@ extern void CharSetLevelExp(u_char level, u_char slot);
 extern void VramClearRect(int x, int y, int w, int h);
 extern void LoadFileToAddr(const char *name, void *dest);
 extern void LoadFileToAddrAsync(const char *name, void *dest);
-extern void func_80085AE0(void);
+extern void AdvRoomRebuild(void);
 extern void AdvResetBanks(void);
 extern void AdvCloseBanks(void);
 extern void AdvSilenceBgm(void);
@@ -250,7 +250,7 @@ void ovl_adv_entry(void)
             LoadFileToAddr(str_adv_ev03_bgd, ROOM_DATA_AT);
             break;
         }
-        func_80085AE0();
+        AdvRoomRebuild();
         AdvResetBanks();
         goto loaded;
     case ENTER_FIELD:

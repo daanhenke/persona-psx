@@ -833,10 +833,10 @@ SoundFadeOutSeq          = 0x800858DC; // type:func size:0x7C
 //---------------------------------------------------------------
 //--- PA: 0x0215B8   VA: 0x80085958   subsegment: asm, adv_32a_x1
 //---------------------------------------------------------------
-func_80085958            = 0x80085958; // type:func size:0x108
-func_80085A60            = 0x80085A60; // type:func size:0x80
-func_80085AE0            = 0x80085AE0; // type:func size:0x1C8
-func_80085CA8            = 0x80085CA8; // type:func size:0x118
+AdvSceneFadeOut          = 0x80085958; // type:func size:0x108
+AdvQueueCmdBar           = 0x80085A60; // type:func size:0x80
+AdvRoomRebuild           = 0x80085AE0; // type:func size:0x1C8
+AdvQueueShadows          = 0x80085CA8; // type:func size:0x118
 
 //--------------------------------------------------------------
 //--- PA: 0x021A20   VA: 0x80085DC0   subsegment: c, gfx/advfade

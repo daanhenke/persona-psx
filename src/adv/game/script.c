@@ -250,11 +250,11 @@ extern void   TimQueueAt(u_long *tim, short x, short y, short cx, short cy);
 extern void   ViewShakeStop(void);
 
 /* Not worked out yet. */
-extern void   func_80085958(void);
+extern void   AdvSceneFadeOut(void);
 extern int    func_80098B8C(u_char id);
-extern void   func_80085A60(void);
+extern void   AdvQueueCmdBar(void);
 extern void   AdvTynCutscene(void);
-extern void   func_80085AE0(void);
+extern void   AdvRoomRebuild(void);
 extern void   func_800AFAD0(u_char chr, u_char key, u_char level);
 extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
 extern void   func_800AF880(u_char id);
@@ -337,14 +337,14 @@ loop:
 
         g_cutscene_on = 1;
         a = s[2];
-        func_80085958();
+        AdvSceneFadeOut();
         func_80098B8C(a);
-        func_80085A60();
+        AdvQueueCmdBar();
         if (g_cutscene_alt) {
             AdvTynCutscene();
             break;
         }
-        func_80085AE0();
+        AdvRoomRebuild();
         AdvFadeUpBlocking(4, 0x80);
         break;
     case 0x2B:
@@ -614,10 +614,10 @@ loop:
         CharStatAdd(g_party[a], s[3], s[5], s[4]);
         break;
     case 0x4B:
-        func_80085958();
+        AdvSceneFadeOut();
         a = func_80098B8C(0x24);
-        func_80085A60();
-        func_80085AE0();
+        AdvQueueCmdBar();
+        AdvRoomRebuild();
         AdvFadeUpBlocking(4, 0x80);
         if (a) {
             leave = LEAVE_SCREEN;
@@ -625,11 +625,11 @@ loop:
         break;
     case 0x4C:
 
-        func_80085958();
-        func_80085A60();
+        AdvSceneFadeOut();
+        AdvQueueCmdBar();
         func_800715EC();
         func_80091608(1);
-        func_80085AE0();
+        AdvRoomRebuild();
         TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[1]),
                    0x380, 0x1C8, 0x100, 0x1F8);
         TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[0]),
@@ -1024,7 +1024,7 @@ void AdvScriptSpecial(u_char n)
         LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", (void *)ADVCMD_AT);
         AdvPickEffect();
         AdvEffectSetupSlots();
-        func_80085AE0();
+        AdvRoomRebuild();
         SlotSetPos(BAR_SLOT, 0x35, 0xE0, -0x20);
         SlotSetPos(BAR_SLOT2, 0x34, 0xE3, -0x20);
         FadeStepDown(0, 0);

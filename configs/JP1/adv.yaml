@@ -214,7 +214,7 @@ segments:
       - [0x202F4, asm, adv_32a]
       - [0x20D18, c, game/eventfiles]
       - [0x2153C, c, audio/soundfade]
-      - [0x215B8, asm, adv_32a_x1]
+      - [0x215B8, c, game/roomload]
       - [0x21A20, c, gfx/advfade]
       - [0x21BE0, c, gfx/boxfade]
       - [0x21EB0, c, game/runframe]
