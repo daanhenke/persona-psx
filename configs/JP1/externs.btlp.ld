@@ -24,6 +24,7 @@ ReadTIM = 0x8002F498;
 RotAverageNclip4 = 0x8002A414;
 RotTrans = 0x8002A234;
 RotTransPers = 0x8002A1A4;
+RotTransPers3 = 0x8002A1D4;
 RotTransPers4 = 0x8002A264;
 SetDrawArea = 0x8002D8E0;
 SetDrawMode = 0x8002D9D0;

@@ -15,7 +15,6 @@
  * record is made.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
@@ -45,7 +44,14 @@
 #define FX_MARK_SWEEP 0x10
 #define FX_SWEEP_STEP 8
 
-#ifdef NON_MATCHING
+/* What loop.c is allowed to lift decides this one. The two loops are real
+   loops - their depth is what ranks the column counter above the row in the
+   saved registers - but nothing may leave them: the row's delay goes through
+   `when`, assigned in both arms and more than once, so it is never invariant,
+   and the two y steps sit side by side so the step constant lives too briefly
+   to be worth a register. Delay slots then put the second step where the image
+   has it. The tint call comes first; the counters set after it still land in
+   the prologue. */
 BtlObj *BtlFxStartSweep(void)
 {
     BtlObj *o;
@@ -54,65 +60,55 @@ BtlObj *BtlFxStartSweep(void)
     long    x;
     long    y_party;
     long    y_enemy;
-    int     when;
     int     row;
     int     col;
     int     cell;
+    int     when;
+
+    BtlTintTargets(g_btl_actor_turn, FX_SWEEP_R, FX_SWEEP_G, FX_SWEEP_B);
 
     row   = FX_SWEEP_H - 1;
     cell  = FX_SWEEP_W * FX_SWEEP_H - 1;
     after = 0;
 
-    BtlTintTargets(g_btl_actor_turn, FX_SWEEP_R, FX_SWEEP_G, FX_SWEEP_B);
-
     g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
     y_party = FX_SWEEP_Y_PARTY;
     y_enemy = FX_SWEEP_Y_ENEMY;
 
-    for (; row >= 0; row--)
-    {
+    do {
         col = 0;
         x   = FX_SWEEP_X0;
-        for (; col < FX_SWEEP_W; col++)
-        {
-            if (g_btl_actor_turn < BTL_PARTY)
-            {
+        do {
+            if (g_btl_actor_turn < BTL_PARTY) {
                 pos[0] = x;
                 pos[1] = y_enemy;
-            }
-            else
-            {
+                pos[2] = 0;
+            } else {
                 pos[0] = x;
                 pos[1] = y_party;
+                pos[2] = 0;
             }
-            pos[2] = 0;
-
             o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
                             pos, FX_OBJ_CD, FX_OBJ_CE);
             o->mark_num = cell + FX_MARK_SWEEP;
             o->attr     = FX_OBJ_ATTR;
             o->attached = after;
-            /* The row's own delay, taken into a local of its own: written
-               straight into the record the compiler lifts it out of the
-               column loop, where the image works it out afresh each time. */
-            if (g_btl_actor_turn < BTL_PARTY)
-            {
-                when = (FX_SWEEP_H - 1 - row) * FX_SWEEP_STEP;
-            }
-            else
-            {
+            if (g_btl_actor_turn < BTL_PARTY) {
+                when = FX_SWEEP_H - 1;
+                when -= row;
+                when *= FX_SWEEP_STEP;
+            } else {
                 when = row * FX_SWEEP_STEP;
             }
             o->timer = when;
             after = o;
             x    += FX_SWEEP_DX;
+            col++;
             cell--;
-        }
+        } while (col < FX_SWEEP_W);
         y_party -= FX_SWEEP_DY;
         y_enemy -= FX_SWEEP_DY;
-    }
+        row--;
+    } while (row >= 0);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxsweep", BtlFxStartSweep);
-#endif

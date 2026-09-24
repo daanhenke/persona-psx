@@ -32,6 +32,15 @@ typedef struct {
 
 extern BtlMember g_btl_member[];
 
+/* 88.62%, and the shape is the image's: the counter reset at the head of each
+   pass (reorg copies that into the back branch's slot, which makes it look
+   like the tail), the fresh number written through the record rather than a
+   `next` local, and nothing lifted out of the walks - the 3 and the scratch
+   array's address are rebuilt each pass, which goto loops give and for loops
+   do not. What is left says the outer walk was a real loop after all: the
+   image works out m + kind * 6 once ahead of it and adds the 0xE inside,
+   where real loops here lift the whole address, 0xE included, the other way
+   round. */
 #ifdef NON_MATCHING
 short BtlPickLine(int kind)
 {
@@ -41,32 +50,36 @@ short BtlPickLine(int kind)
     int        i;
     int        n;
     int        v;
-    int        next;
     short      fresh[BTL_LINES];
 
     m = &g_btl_member[g_btl_actor_slot];
     if (m->cursor[kind] == -1) {
         n = 0;
         v = 0;
-        do {
-            i = 0;
-            used = m->used[kind];
-            do {
-                if (*used == v) {
-                    break;
-                }
-                i++;
-                used++;
-            } while (i < BTL_LINES);
-            if (i == BTL_LINES) {
-                fresh[n] = v;
-                n++;
-            }
-            v++;
-        } while (v < BTL_KINDS);
+    next_value:
         i = 0;
         used = m->used[kind];
+    next_place:
+        if (*used == v) {
+            goto found;
+        }
+        i++;
+        used++;
+        if (i < BTL_LINES) {
+            goto next_place;
+        }
+    found:
+        if (i == BTL_LINES) {
+            fresh[n] = v;
+            n++;
+        }
+        v++;
+        if (v < BTL_KINDS) {
+            goto next_value;
+        }
         pick = fresh[rand() % n];
+        i = 0;
+        used = m->used[kind];
         do {
             if (*used == -1) {
                 *used = pick;
@@ -78,12 +91,10 @@ short BtlPickLine(int kind)
             i++;
             used++;
         } while (i < BTL_LINES);
-    } else {
-        next = (m->cursor[kind] + 1) % BTL_LINES;
-        m->cursor[kind] = next;
-        pick = m->used[kind][next];
+        return pick;
     }
-    return pick;
+    m->cursor[kind] = (m->cursor[kind] + 1) % BTL_LINES;
+    return m->used[kind][m->cursor[kind]];
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/line", BtlPickLine);

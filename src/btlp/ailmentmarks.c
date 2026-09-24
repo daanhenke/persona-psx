@@ -18,12 +18,16 @@
  * before it puts a demon's face up.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/status.h>
 
-#ifdef NON_MATCHING
+/* The ailment is read as a plain `(signed char)` of the field each time. Read
+   through a cast pointer, `*(signed char *)&...`, every read becomes a
+   pointer the loop steps on its own - three more saved registers and eight
+   bytes of frame - where the image keeps only the record offset and the
+   object pointer and reaches the bytes off the offset. The mark-only test is
+   written with the hiding arm first, as the image branches. */
 void BtlShowAilmentMarks(int show)
 {
     BtlObj *mark;
@@ -34,7 +38,7 @@ void BtlShowAilmentMarks(int show)
         mark = g_btl_actors[i].obj->mark;
         if (mark != 0
             && g_btl_actors[i].c.key != 0
-            && (status = *(signed char *)&g_btl_actors[i].c.status) != BTL_STATUS_DOWN
+            && (status = (signed char)g_btl_actors[i].c.status) != BTL_STATUS_DOWN
             && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
             if (show == 0
                 || (g_btl_actors[i].obj->attr & BTL_OBJ_HIDDEN) != 0
@@ -46,12 +50,12 @@ void BtlShowAilmentMarks(int show)
                                 *(const u_long **)(g_btl_actor_gfx + status * 4
                                                    + BTL_GFX_SCRIPTS));
                 BtlObjSetScript(mark->attached,
-                                g_btl_ail_level_marks[*(signed char *)&g_btl_actors[i].c.ail_level]);
+                                g_btl_ail_level_marks[(signed char)g_btl_actors[i].c.ail_level]);
                 mark->unkCE = g_btl_actors[i].c.status + BTL_MARK_BIAS;
-                if (*(signed char *)&g_btl_actors[i].c.status < BTL_AIL_MARK_ONLY) {
-                    g_btl_actors[i].obj->mark->attached->attr &= ~BTL_OBJ_HIDDEN;
-                } else {
+                if ((signed char)g_btl_actors[i].c.status >= BTL_AIL_MARK_ONLY) {
                     g_btl_actors[i].obj->mark->attached->attr |= BTL_OBJ_HIDDEN;
+                } else {
+                    g_btl_actors[i].obj->mark->attached->attr &= ~BTL_OBJ_HIDDEN;
                 }
                 g_btl_actors[i].obj->mark->attr &= ~BTL_OBJ_HIDDEN;
                 g_btl_actors[i].obj->mark->motion = 0;
@@ -60,7 +64,4 @@ void BtlShowAilmentMarks(int show)
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/ailmentmarks", BtlShowAilmentMarks);
-#endif
 

@@ -75,6 +75,13 @@ extern void    BtlPlaceMember(int member, int col, int row);
 extern void    BtlSpawnFixedEnemies(void);
 extern int     BtlResetTalk(int open);
 
+/* 91.42%. Taken from the image so far: one counter for the clearing walk,
+   the counter zeroed ahead of the CD wait (reorg puts it in both of the
+   wait's branch slots), no reset of g_cd_busy after it, and the fixed-enemy
+   test on the encounter as unsigned. What is left is register pressure: the
+   image spills the set argument and reloads it each trip, where this keeps
+   one value more alive across the calls and spills the species instead, a
+   word of frame over. */
 #ifdef NON_MATCHING
 void BtlSpawnEnemies(int set)
 {
@@ -96,15 +103,13 @@ void BtlSpawnEnemies(int set)
     int       which;
     int       fill;
 
-    rec = 0;
     i = 0;
     g_btl_gfx_next = g_btl_enemy_gfx_start;
     do {
         g_btl_combatants[i].c.key = 0;
-        rec++;
         g_btl_combatants[i].obj = 0;
         i++;
-    } while (rec < BTL_ENEMY_SLOTS);
+    } while (i < BTL_ENEMY_SLOTS);
 
     fill = BTL_GRID_EMPTY;
     i = BTL_GRID_SQUARES;
@@ -120,14 +125,13 @@ void BtlSpawnEnemies(int set)
                           g_btl_enemy_gfx_offsets[set + 1]
                               - g_btl_enemy_gfx_offsets[set],
                           (u_long *)BTL_STAGE);
+    i = 0;
     while (g_cd_busy != CD_IDLE) {
         BtlDrawFrame();
     }
 
-    i = 0;
     live = 0;
     rec = 0;
-    g_cd_busy = CD_IDLE;
     do {
         which = (set * BTL_ENEMY_SLOTS + i) * BTL_ENEMY_ROW;
         raw = g_btl_encounters[which + 1];
@@ -182,7 +186,7 @@ void BtlSpawnEnemies(int set)
     } while (i < BTL_ENEMY_SLOTS);
 
     DrawSync(0);
-    if (g_btl_encounter - BTL_FIXED_FIRST < BTL_FIXED_COUNT) {
+    if ((u_short)g_btl_encounter - BTL_FIXED_FIRST < (u_int)BTL_FIXED_COUNT) {
         BtlSpawnFixedEnemies();
     }
     BtlResetTalk(0);

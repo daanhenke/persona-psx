@@ -3120,3 +3120,22 @@ relocation against the grid with a negative addend, which needs its
 - [cellfree.c](/src/btlp/cellfree.c) - `BtlFormationCellFree` 90.97% and
   `BtlFormationCellFreeOfFallen` 85.54%, both to exact; the latter's eight
   unread frame bytes came with the macro.
+
+## Nothing lifted, yet the counters ranked by loop depth: real loops with nothing worth lifting
+
+When the image rebuilds every constant inside a loop (steps, attribute words,
+a `2 - row`), gcc's for loops over-hoist them into extra saved registers and
+the frame grows. Goto loops stop the hoisting but flatten the reference
+weighting, so an inner counter no longer outranks an outer one in the saved
+registers. The image is usually real loops in which nothing *qualified*:
+loop.c lifts a set only if savings x lifetime clears the loop's size, and
+never lifts a register assigned more than once. So route a per-trip value
+through a local assigned in each arm (`when = H - 1; when -= row;` in one,
+`when = row * STEP;` in the other), and keep two uses of one step constant
+adjacent (`y_party -= DY; y_enemy -= DY; row--;` rather than the decrement
+between them) so its lifetime is too short; reorg still moves the second use
+into the branch slot where the image has it.
+
+- [fxsweep.c](/src/btlp/fxsweep.c) - `BtlFxStartSweep`, 78.96% to exact.
+- [fxgrid.c](/src/btlp/fxgrid.c) - `BtlOpenFxGrid`, 77.79% to 99.15% with an
+  explicit second counter; its move test's constant still gets lifted.

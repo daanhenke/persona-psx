@@ -68,6 +68,7 @@ ReadGeomOffset                = 0x80029F44;
 SetGeomOffset                 = 0x80029F64;
 SetGeomScreen                 = 0x80029F84;
 RotTransPers                  = 0x8002A1A4;
+RotTransPers3                 = 0x8002A1D4;
 RotTrans                      = 0x8002A234;
 RotTransPers4                 = 0x8002A264;
 RotAverage4                   = 0x8002A2E4;

@@ -38,6 +38,17 @@
    apart. */
 #define FX_MARK_OWN 0x20
 
+/* 99.15%: every instruction is the image's; what is left is which saved
+   register the column counter and the two y positions get. Two things in the
+   image are not what gcc makes of a plain pair of for loops: the delay table
+   is read through a counter of its own, k, reset from the cell at each row and
+   stepped beside it, and nothing at all is lifted out of either loop - the 9
+   the move is tested against, the lift and the steps are all rebuilt every
+   trip. As goto loops that is what comes out. BtlFxStartSweep says the loops
+   are real, though: its allocation needs the loop depth that only real loops
+   give, and it matched once nothing in them was worth lifting. Here the 9 is
+   still lifted out of any real loop - the two tests against it match, which
+   doubles its savings - and that is the part not yet found. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxGrid(int table)
 {
@@ -45,11 +56,13 @@ BtlObj *BtlOpenFxGrid(int table)
     BtlObj *after;
     long    pos[3];
     long    x;
+    long    z;
     long    y_party;
     long    y_enemy;
     int     row;
     int     col;
     int     cell;
+    int     k;
 
     row     = FX_GRID_H - 1;
     cell    = FX_GRID_W * FX_GRID_H - 1;
@@ -60,56 +73,52 @@ BtlObj *BtlOpenFxGrid(int table)
 
     y_party = FX_GRID_Y_PARTY;
 
-    for (; row >= 0; row--)
-    {
-        x = FX_GRID_X0;
-        for (col = 0; col < FX_GRID_W; col++)
-        {
-            if (g_btl_fx_move == FX_MOVE_OWN_SIDE)
-            {
-                if (g_btl_actor_turn < BTL_PARTY)
-                {
-                    pos[0] = x;
-                    pos[1] = y_party;
-                    pos[2] = FX_GRID_Z_LIFT;
-                }
-                else
-                {
-                    pos[0] = x;
-                    pos[1] = y_enemy;
-                    pos[2] = FX_GRID_Z_LIFT;
-                }
-            }
-            else
-            {
-                if (g_btl_actor_turn < BTL_PARTY)
-                {
-                    pos[0] = x;
-                    pos[1] = y_enemy;
-                }
-                else
-                {
-                    pos[0] = x;
-                    pos[1] = y_party;
-                }
-                pos[2] = 0;
-            }
-
-            o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
-                            pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->attr |= FX_OBJ_ATTR;
-            o->attached = after;
-            after = o;
-            x += FX_GRID_DX;
-
-            o->mark_num = g_btl_fx_move == FX_MOVE_OWN_SIDE
-                              ? cell + FX_MARK_OWN
-                              : cell + FX_MARK_FAR;
-            o->timer = g_btl_fx_grid_order[cell + FX_MARK_FAR] >> 1;
-            cell--;
+next_row:
+    col = 0;
+    k   = cell + FX_MARK_FAR;
+    x   = FX_GRID_X0;
+next_col:
+    if (g_btl_fx_move == FX_MOVE_OWN_SIDE) {
+        z = FX_GRID_Z_LIFT;
+        if (g_btl_actor_turn < BTL_PARTY) {
+            pos[0] = x;
+            pos[1] = y_party;
+            pos[2] = z;
+        } else {
+            pos[0] = x;
+            pos[1] = y_enemy;
+            pos[2] = z;
         }
-        y_enemy -= FX_GRID_DY;
-        y_party -= FX_GRID_DY;
+    } else {
+        if (g_btl_actor_turn < BTL_PARTY) {
+            pos[0] = x;
+            pos[1] = y_enemy;
+        } else {
+            pos[0] = x;
+            pos[1] = y_party;
+        }
+        pos[2] = 0;
+    }
+
+    o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
+                    pos, FX_OBJ_CD, FX_OBJ_CE);
+    o->attr |= FX_OBJ_ATTR;
+    o->attached = after;
+    o->mark_num = g_btl_fx_move == FX_MOVE_OWN_SIDE ? cell + FX_MARK_OWN : k;
+    after = o;
+    x += FX_GRID_DX;
+    col++;
+    o->timer = g_btl_fx_grid_order[k] >> 1;
+    k--;
+    cell--;
+    if (col < FX_GRID_W) {
+        goto next_col;
+    }
+    y_enemy -= FX_GRID_DY;
+    row--;
+    y_party -= FX_GRID_DY;
+    if (row >= 0) {
+        goto next_row;
     }
     return o;
 }

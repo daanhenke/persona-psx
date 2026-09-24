@@ -12,7 +12,6 @@
  * panel is showing its second image every wedge collapses onto that midline.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 
@@ -63,7 +62,13 @@ extern long          g_btl_panel_wedge_xy[][3];
 extern SPRT          g_btl_panel_sprite;
 extern short         g_btl_mood_gauge[];
 
-#ifdef NON_MATCHING
+/* The wedge walk is indexed by i and nothing else. The walking pointers and
+   the pointer-compare end test are what loop.c makes of it - written into the
+   source they come out in a different order and cost a register - and every
+   coordinate is read straight from the table, where holding one in a local
+   whose address is taken costs eight bytes of frame. The tip's height is
+   dropped first and the rest after the three zeroes, which is the order the
+   image keeps its two temporaries in. */
 void BtlPlacePanel(void)
 {
     /* How far a full gauge pushes its wedge, one per gauge. */
@@ -76,12 +81,8 @@ void BtlPlacePanel(void)
     int     ofy;
     long    p;
     long    flag;
-    short  *px;
-    short  *py;
     int     i;
     short   v;
-    short   y1;
-    short  *py1;
 
     ReadGeomOffset(&ofx, &ofy);
     SetGeomOffset(PANEL_OFX, PANEL_OFY);
@@ -112,56 +113,44 @@ void BtlPlacePanel(void)
         g_btl_panel_sprite.clut = GetClut(PANEL_CLUTX, PANEL_CLUTY);
     }
 
-    py = &g_btl_panel_wedges[0].y0;
-    px = &g_btl_panel_wedges[0].x0;
     i = 0;
     do {
-        /* Through `v` rather than straight into the vector: the original
-           stores each coordinate once, with both arms feeding the one store. */
         if (g_btl_panel_wedges[i].axis != 0) {
             tip.vx = PANEL_MID;
             if (g_btl_panel_image != PANEL_FLAT) {
-                v = *py + (short)(push[i] * g_btl_mood_gauge[i] >> 12);
+                v = g_btl_panel_wedges[i].y0
+                    + (short)(push[i] * g_btl_mood_gauge[i] >> 12);
             } else {
                 v = PANEL_MID;
             }
             tip.vy = v;
         } else {
             if (g_btl_panel_image != PANEL_FLAT) {
-                v = *px + (short)(push[i] * g_btl_mood_gauge[i] >> 12);
+                v = g_btl_panel_wedges[i].x0
+                    + (short)(push[i] * g_btl_mood_gauge[i] >> 12);
             } else {
                 v = PANEL_MID;
             }
             tip.vx = v;
             tip.vy = PANEL_MID;
         }
-        base.vx = *px;
-        px += 6;
-        base.vy = *py;
-        py += 6;
+        base.vx = g_btl_panel_wedges[i].x0;
+        base.vy = g_btl_panel_wedges[i].y0;
         foot.vx = g_btl_panel_wedges[i].x1;
-        /* Read up here rather than at the point of use: the original
-           holds it across the four zeroes below. */
-        y1 = g_btl_panel_wedges[i].y1;
+        foot.vy = g_btl_panel_wedges[i].y1;
+        tip.vy -= PANEL_MID;
         base.vy -= PANEL_MID;
         tip.vz = 0;
         base.vz = 0;
         foot.vz = 0;
-        tip.vy -= PANEL_MID;
-        /* Read back through a pointer: that is what leaves it in the
-           register the original uses across the four zeroes above. */
-        py1 = &y1;
-        foot.vy = *py1 - PANEL_MID;
+        foot.vy -= PANEL_MID;
         RotTransPers3(&tip, &base, &foot,
                       &g_btl_panel_wedge_xy[i][0],
                       &g_btl_panel_wedge_xy[i][1],
                       &g_btl_panel_wedge_xy[i][2], &p, &flag);
         i++;
-    } while ((int)py < (int)&g_btl_panel_wedges[BTL_MOODS].y0);
+    } while (i < BTL_MOODS);
 
     SetGeomOffset(ofx, ofy);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/panelplace", BtlPlacePanel);
-#endif
 

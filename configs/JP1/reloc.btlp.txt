@@ -240,3 +240,18 @@ rom:0x40494 reloc:MIPS_HI16 symbol:g_btl_formation addend:-0x1
 rom:0x4049C reloc:MIPS_LO16 symbol:g_btl_formation addend:-0x1
 rom:0x404FC reloc:MIPS_HI16 symbol:g_btl_formation addend:-0x5
 rom:0x40500 reloc:MIPS_LO16 symbol:g_btl_formation addend:-0x5
+
+// BtlShowAilmentMarks - the walk's end, &g_btl_actors[BTL_ACTORS].obj, which lies
+// inside g_btl_enemies' range and is named after it by the split.
+rom:0x2F4DC reloc:MIPS_HI16 symbol:g_btl_actors addend:0xD48
+rom:0x2F4E0 reloc:MIPS_LO16 symbol:g_btl_actors addend:0xD48
+
+// BtlPlacePanel - g_btl_panel_wedges[i].x1 and .y1, and the walk's end
+// &g_btl_panel_wedges[BTL_MOODS].y0, which the split names after
+// g_btl_highlight_rgb beyond it.
+rom:0x10F70 reloc:MIPS_HI16 symbol:g_btl_panel_wedges addend:0x4
+rom:0x10F78 reloc:MIPS_LO16 symbol:g_btl_panel_wedges addend:0x4
+rom:0x10F84 reloc:MIPS_HI16 symbol:g_btl_panel_wedges addend:0x6
+rom:0x10F8C reloc:MIPS_LO16 symbol:g_btl_panel_wedges addend:0x6
+rom:0x10FD8 reloc:MIPS_HI16 symbol:g_btl_panel_wedges addend:0x32
+rom:0x10FDC reloc:MIPS_LO16 symbol:g_btl_panel_wedges addend:0x32

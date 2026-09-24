@@ -84,7 +84,9 @@ segments:
       - [0x38C, .rodata, drop]
       - [0x3D0, rodata, btlp_rodata2]
       - [0x41C, .rodata, leveltest]
-      - [0x434, rodata, btlp_rodata3]
+      # BtlPlacePanel's push table, which the C emits itself.
+      - [0x434, .rodata, panelplace]
+      - [0x43C, rodata, btlp_rodata3]
       # BtlHighlightBegin's row order, which the C emits itself.
       - [0x44C, .rodata, highlight]
       # BtlFaceDraw's three local initialisers - the quad's rotation, where it
