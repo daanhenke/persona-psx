@@ -7,47 +7,27 @@
  * the target and will not come out above 0xFF. The two clamps are what say the
  * values are byte-sized even though they are kept as shorts.
  *
- * *cur is written twice on either path - once with the raw step and again with
- * the clamped result - and *target is read again inside the branch rather than
- * kept from the test at the top. The rising path keeps the untruncated sum as
- * its answer while the falling one keeps the truncated short; each path has its
- * own result variable, and they are not one variable spelt twice.
+ * It reads like two macro expansions: no locals at all, *cur written once with
+ * the step and once with the clamp, every value read back through the
+ * pointer. That is load-bearing. With *cur in an int local the load outlives
+ * the compares and takes the wrong register; with the sum in a local the
+ * rising path loses its copy. The ternaries stored through the short pointer
+ * are also what reserve the twenty-four bytes of frame nothing reads.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 
 #define APPROACH_MAX 0xFF
 
-#ifdef NON_MATCHING
 void BtlApproach(short *cur, const short *target, int step)
 {
-    int unused[2];
-    int now;
-    int up;
-    int sum;
-
-    now = *cur;
-    up = now;
-    if (now != *target) {
-        if (now < *target) {
-            sum = step + up;
-            *cur = sum;
-            up = sum;
-            if (*cur >= 0) {
-                if (*target < *cur) {
-                    up = *target;
-                }
-            } else {
-                up = 0;
-            }
-            *cur = up;
+    if (*cur != *target) {
+        if (*cur < *target) {
+            *cur = step + *cur;
+            *cur = *cur < 0 ? 0 : (*cur > *target ? *target : *cur);
         } else {
-            *cur = up - step;
+            *cur -= step;
             *cur = *cur < *target ? *target
                 : (*cur > APPROACH_MAX ? APPROACH_MAX : *cur);
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/approach", BtlApproach);
-#endif

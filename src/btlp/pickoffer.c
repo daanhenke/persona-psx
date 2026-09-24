@@ -16,7 +16,6 @@
  * player has not decided yet.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/offer.h>
@@ -42,53 +41,41 @@
 
 extern int  BtlMenuKey(void);
 
-#ifdef NON_MATCHING
+/* One step round the three offers, wrapping at both ends. The argument is
+   evaluated at every use, as the image does it. */
+#define PICK_WRAP(n) \
+    ((n) < 0 ? BTL_OFFERS - 1 : ((n) > BTL_OFFERS - 1 ? 0 : (n)))
+
+/* Whether anyone is on an offer. A statement expression, and that matters:
+   the block inside it stops gcc copying the walk's exit test in front of the
+   loop, so the test stays at the loop head, reloads the slot, and the two
+   wraps share their tails as the image has them. A plain condition has the
+   test copied behind the first wrap, where cse reuses the stored value. */
+#define PICK_USED(n) ({ g_btl_offer[n].used; })
+
+/* The key word is an int holding the pad bits as a u_short, which is what
+   keeps the image's mask; the frame the old `unused[8]` stood in for is the
+   wrap ternaries stored through the short pointer. */
 int BtlPickOffer(short *slot)
 {
     BtlActor *a;
     u_short   edge;
-    u_short   keys;
+    int       keys;
     int       i;
-    int       n;
-    long      unused[8];
 
-    keys = BtlMenuKey();
+    keys = (u_short)BtlMenuKey();
     if ((keys & PAD_LEFT) != 0) {
         BtlSePlay(PICK_SE_BANK, PICK_SE_MOVE);
-        n = *slot - 1;
-        goto wrap_prev;
-        while (g_btl_offer[*slot].used == 0) {
-            n = *slot - 1;
-        wrap_prev:
-            /* Spelt with the in-range test first: gcc does not invert this
-               one back, and the other way round lays the blocks out wrong. */
-            if (n >= 0) {
-                if (n > BTL_OFFERS - 1) {
-                    n = 0;
-                }
-            } else {
-                n = BTL_OFFERS - 1;
-            }
-            *slot = n;
+        *slot = PICK_WRAP(*slot - 1);
+        while (PICK_USED(*slot) == 0) {
+            *slot = PICK_WRAP(*slot - 1);
         }
     }
     if ((keys & PAD_RIGHT) != 0) {
         BtlSePlay(PICK_SE_BANK, PICK_SE_MOVE);
-        n = *slot + 1;
-        goto wrap_next;
-        while (g_btl_offer[*slot].used == 0) {
-            n = *slot + 1;
-        wrap_next:
-            /* Spelt with the in-range test first: gcc does not invert this
-               one back, and the other way round lays the blocks out wrong. */
-            if (n >= 0) {
-                if (n > BTL_OFFERS - 1) {
-                    n = 0;
-                }
-            } else {
-                n = BTL_OFFERS - 1;
-            }
-            *slot = n;
+        *slot = PICK_WRAP(*slot + 1);
+        while (PICK_USED(*slot) == 0) {
+            *slot = PICK_WRAP(*slot + 1);
         }
     }
 
@@ -143,7 +130,4 @@ int BtlPickOffer(short *slot)
 
     return BTL_PICK_WAIT;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/pickoffer", BtlPickOffer);
-#endif
 

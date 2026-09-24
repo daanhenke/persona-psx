@@ -11,50 +11,39 @@
  * or on its cell. This time the cell itself has to be empty as well.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 
-/* 90.97%: every test is the image's but the one above the cell, whose return
-   the image lays out in line - a beq on to the test below, then the jump to
-   the return - where gcc here shares it with the two before. The last test
-   written return-1-first is what puts the 1 in the delay slot of its branch;
-   an ok local, the up test guarding the rest, an else chain, a ternary and an
-   explicit else all leave the up test's return shared. The two names at a
-   negative offset from g_btl_formation are D_ labels in the image and cannot
-   be spelt as a symbol here. */
-#ifdef NON_MATCHING
+/* A cell of either grid by column and row. Both routines read like these
+   were macros: the index is worked out afresh for every test, col and row
+   narrowed again at every use, and the neighbours left and right reached off
+   the address of the cell itself. Written through a `cell` local instead, the
+   index is kept, the addresses are built differently, and the fallen grid's
+   copy loses the eight bytes of frame the image reserves. The tests below the
+   cell are each an early return with the 1 at the end, as the others are. */
+#define CELL(c, r)   (g_btl_formation[(r) * GRID_W + (c)])
+#define FALLEN(c, r) (g_btl_formation_fallen.cell[(r) * GRID_W + (c)])
+
 int BtlFormationCellFree(short col, short row)
 {
-    if (col > 0 && g_btl_formation[row * GRID_W + col - 1] != CELL_EMPTY) {
+    if (col > 0 && (&CELL(col, row))[-1] != CELL_EMPTY) {
         return 0;
     }
-    if (col < GRID_W - 1
-        && g_btl_formation[row * GRID_W + col + 1] != CELL_EMPTY) {
+    if (col < GRID_W - 1 && (&CELL(col, row))[1] != CELL_EMPTY) {
         return 0;
     }
-    if (row > 0 && g_btl_formation[(row - 1) * GRID_W + col] != CELL_EMPTY) {
+    if (row > 0 && CELL(col, row - 1) != CELL_EMPTY) {
         return 0;
     }
-    if (row >= GRID_H - 1) {
-        return 1;
+    if (row < GRID_H - 1 && CELL(col, row + 1) != CELL_EMPTY) {
+        return 0;
     }
-    return g_btl_formation[(row + 1) * GRID_W + col] == CELL_EMPTY;
+    return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/cellfree", BtlFormationCellFree);
-#endif
 
-/* 85.54%: the same up test, and more. The image keeps an eight-byte frame in
-   this leaf - a byte local nothing here has been found for (neither the
-   counter as u_char nor as short) - takes col and row into t0 and a3 the
-   other way round, and builds the fallen grid's address into a register ahead
-   of the cell index, reaching the left neighbour off that sum. */
-#ifdef NON_MATCHING
 int BtlFormationCellFreeOfFallen(short col, short row)
 {
     BtlActor *a;
-    int       cell;
     int       i;
 
     g_btl_formation_fallen = *(BtlFormation *)g_btl_formation;
@@ -62,30 +51,23 @@ int BtlFormationCellFreeOfFallen(short col, short row)
     for (i = 0; i < BTL_PARTY; i++, a++) {
         if (a->c.key != 0 && (signed char)a->c.status == BTL_STATUS_DOWN
             && a->revive_mark == BTL_REVIVE_STOOD) {
-            g_btl_formation_fallen.cell[a->place_row * GRID_W + a->place_col] =
-                i;
+            FALLEN(a->place_col, a->place_row) = i;
         }
     }
-    cell = row * GRID_W + col;
-    if (g_btl_formation_fallen.cell[cell] != CELL_EMPTY) {
+    if (FALLEN(col, row) != CELL_EMPTY) {
         return 0;
     }
-    if (col > 0 && (g_btl_formation_fallen.cell + cell)[-1] != CELL_EMPTY) {
+    if (col > 0 && (&FALLEN(col, row))[-1] != CELL_EMPTY) {
         return 0;
     }
-    if (col < GRID_W - 1
-        && g_btl_formation_fallen.cell[cell + 1] != CELL_EMPTY) {
+    if (col < GRID_W - 1 && (&FALLEN(col, row))[1] != CELL_EMPTY) {
         return 0;
     }
-    if (row > 0
-        && g_btl_formation_fallen.cell[(row - 1) * GRID_W + col] != CELL_EMPTY) {
+    if (row > 0 && FALLEN(col, row - 1) != CELL_EMPTY) {
         return 0;
     }
-    if (row >= GRID_H - 1) {
-        return 1;
+    if (row < GRID_H - 1 && FALLEN(col, row + 1) != CELL_EMPTY) {
+        return 0;
     }
-    return g_btl_formation_fallen.cell[(row + 1) * GRID_W + col] == CELL_EMPTY;
+    return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/cellfree", BtlFormationCellFreeOfFallen);
-#endif

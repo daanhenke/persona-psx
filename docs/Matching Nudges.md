@@ -3073,3 +3073,50 @@ straight through cc1 and reading the `vars=` count is the quick check.
   `BtlPickOtherEnemy`, 98.66% to exact (with their table read twice at the end).
 - [pickable.c](/src/btlp/pickable.c) - `BtlAnyMemberTargetable`, 98.06% to exact.
 - [reach.c](/src/btlp/reach.c) - `BtlPickAiTarget`, 99.38% to exact.
+
+## A ternary stored through a short pointer reserves frame nothing reads
+
+`*p = *p < *q ? *q : *p;` with `short *p` costs sixteen bytes of locals
+(`# vars= 16`) though the code never touches the stack; a narrow local
+compared twice costs eight more. A leaf routine with an unexplained frame and
+clamp-shaped code is usually the macro form written out: no locals, the value
+stored through the pointer, then read back through it for the clamp. The
+same form fixes the registers, because every later read of `*p` becomes the
+halfword copy the store left behind, so the first load dies at the compares -
+with an `int` local holding it, the load lives on and takes the wrong register.
+Write `x = step + *p` rather than `*p + step` if the image's `addu` has the
+step first.
+
+- [approach.c](/src/btlp/approach.c) - `BtlApproach`, 95.72% to exact, and the
+  `int unused[2]` gone.
+
+## A statement expression in a loop test keeps the test where it is written
+
+jump.c copies a `while` loop's exit test in front of the loop, so the first
+trip's test lands in the same block as whatever came before it - and cse then
+reuses a value just stored rather than reloading it. The copy is refused when
+the test holds a block, and a statement expression, `({ ... })`, is one, even
+with nothing declared in it. So an image whose loop test reloads a variable
+the code before the loop has just stored, and whose loop body shares its
+tail with that code, is a `while` over a statement-expression macro: write
+the macro. Two copies of a step, one before the loop and one as its body,
+with the test between them, is the other half of the shape.
+
+- [pickoffer.c](/src/btlp/pickoffer.c) - `BtlPickOffer`, `PICK_USED`, with
+  the wrap written as a ternary macro evaluated at every use; 87.41% to exact,
+  a goto into the loop and a `long unused[8]` gone.
+
+## Grid lookups want the macro, not a kept index
+
+When the image recomputes `row * W + col` for every neighbour test, narrows
+the short arguments again at each use, and reaches the left and right
+neighbours as `-1`/`+1` off the cell's own address, the source was a macro -
+`#define CELL(c, r) (grid[(r) * W + (c)])` - used as `(&CELL(col, row))[-1]`
+for the sides and `CELL(col, row - 1)` above and below. A `cell` local keeps
+the index and builds different addresses. A negative neighbour comes out as a
+relocation against the grid with a negative addend, which needs its
+`reloc.btlp.txt` override.
+
+- [cellfree.c](/src/btlp/cellfree.c) - `BtlFormationCellFree` 90.97% and
+  `BtlFormationCellFreeOfFallen` 85.54%, both to exact; the latter's eight
+  unread frame bytes came with the macro.
