@@ -306,7 +306,10 @@ FlushImageUploads        = 0x80068414; // type:func size:0x88
 //----------------------------------------------------------
 //--- PA: 0x0040FC   VA: 0x8006849C   subsegment: asm, adv_5
 //----------------------------------------------------------
-D_8006849C               = 0x8006849C; // type:func size:0x168
+func_8006849C            = 0x8006849C; // type:func size:0x8
+func_800684A4            = 0x800684A4; // type:func size:0x8
+func_800684AC            = 0x800684AC; // type:func size:0x8
+TimQueue                 = 0x800684B4; // type:func size:0x150
 TimQueueAt               = 0x80068604; // type:func size:0x170
 func_80068774            = 0x80068774; // type:func size:0x264
 func_800689D8            = 0x800689D8; // type:func size:0xDDC
