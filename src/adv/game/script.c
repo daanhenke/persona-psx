@@ -140,6 +140,11 @@ extern u_char g_cmd_len[];
 
 #define MONEY_MAX 999999999
 
+/* The original has an empty loop inside the money clamp - most likely a debug
+   report that the release build compiles away. It is not nothing to gcc: the
+   loop keeps the second test from reusing the value the first one loaded. */
+#define SCRIPT_DEBUG(msg) do { } while (0)
+
 #define U16(p) (*(u_short *)(p))
 #define U32(p) (*(u_long *)(p))
 #define TARGET(s)  (*(u_char **)((s) + 4))
@@ -509,6 +514,7 @@ loop:
             g_money += U32(s + 4);
         }
         if (g_money > MONEY_MAX) {
+            SCRIPT_DEBUG("money over limit");
             g_money = MONEY_MAX;
         }
         if (g_money < 0) {
