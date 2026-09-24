@@ -3432,6 +3432,22 @@ jumps to a shared store of another, write the unshared store first.
   reel's ailment turns set after its hit amount, took it from 98.70% to
   exact.
 
+## A value picked in branches is stored in each arm
+
+When the image sets a constant in a compare's delay slot and every path then
+reaches one store, the source stored in each arm (`p[9] = LOW;` ...), not
+into a local stored once. gcc cross-jumps the identical stores into one, and
+each arm is left setting only the value, which reorg can then pull into the
+branch's slot. The same goes for a field written straight into a record and
+tested there, rather than built in a local first.
+
+- [gaugecolour.c](/src/btlp/gaugecolour.c) - `BtlSetGaugeColour`, the low
+  test first and a store in each arm: 91.62% to exact after every
+  local-colour shape had stalled.
+- [menuopen.c](/src/btlp/menuopen.c) - `BtlMenuOpenChoices` writes each
+  window's script straight into `w->script`, tests it there, and reads the
+  directory offset from its global at each use.
+
 ## Rows reached by fresh address loads are separate objects
 
 When one symbol's offsets each get their own `lui`/`addiu` in the image,
