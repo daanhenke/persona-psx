@@ -27,9 +27,16 @@ typedef struct {
 /* The game state block as the field sees it. Only the fields the overlay
    reaches are laid out; the rest belongs to the save. */
 typedef struct {
-    u_char  pad0[0x15A0];
-    u_short map;         /* 0x15A0 */
-    u_char  pad15A2[0x15C8 - 0x15A2];
+    u_char   pad0[0x1580];
+    GsRVIEW2 view;       /* 0x1580 the camera as last saved */
+    u_short  map;        /* 0x15A0 */
+    u_char   pad15A2[2];
+    u_char   x;          /* 0x15A4 */
+    u_char   pad15A5;
+    u_char   y;          /* 0x15A6 */
+    u_char   pad15A7;
+    u_char   dir;        /* 0x15A8 facing, 0-3 */
+    u_char   pad15A9[0x15C8 - 0x15A9];
     /* The door being opened: for each of its two halves, which axis of the
        translation moves and which scene object it is. */
     short   door_axis[2]; /* 0x15C8 */
@@ -38,6 +45,70 @@ typedef struct {
 
 extern DngScene *g_scene;
 extern DngState *g_dng;
+
+/* The floor is a grid of tile numbers FLOOR_W wide; each tile number picks a
+   definition whose flags say what stepping on it does. */
+#define FLOOR_W 24
+
+typedef struct {
+    u_char  pad0[0xA];
+    u_short flags;
+} TileDef;
+
+#define TILE_KIND     0x1F   /* what the tile is, when TILE_SPECIAL is set */
+#define TILE_MUSIC    0x200  /* stepping on it starts the floor's music */
+#define TILE_SPECIAL  0x800
+#define TILE_CLOCK    0x1000
+
+#define TILE_KIND_DOOR 4
+
+extern u_char (*g_floor_grid)[FLOOR_W];
+extern TileDef *g_tile_defs;
+
+/* The flags of the tile last stepped on, and its kind when special. */
+extern int g_tile_flags;
+extern int g_tile_kind;
+
+/* Where the music was last started from; 0xF0 and up is nowhere. */
+extern u_char g_music_x;
+extern u_char g_music_y;
+
+/* Per map, which of the two floor tunes it plays, and the two tunes. */
+extern u_char g_map_music[][2];
+extern short  g_floor_tune_a;
+extern short  g_floor_tune_b;
+
+extern u_char g_quest_bits;
+
+/* The view the field is drawn from while walking, as two separate vectors
+   rather than a GsRVIEW2 - the code never derives one's address from the
+   other's. A step moves the eye and the target together, 30 units a frame along the facing's axis, and ends
+   300 units on from where it began. */
+extern long g_view_eye[3];
+extern long g_view_at[3];
+extern long g_step_from_eye;
+extern long g_step_from_at;
+
+/* Per facing, which axis of the view a step moves along (0 x, 2 z) and
+   which way. */
+extern u_char g_dir_axis[];
+extern long   g_dir_step[];
+
+#define STEP_SPEED 30
+#define STEP_LEN   300
+
+/* The floor's pack, loaded at PACK_BASE, and its index at PACK_INDEX: a
+   word saying where in the index the floor's counts start, then the count
+   of entries in each of the pack's offset tables. Both are reached by
+   address - the byte reads index a literal, which is why the image adds the
+   index before the base. */
+#define PACK_BASE   0x80130000
+#define PACK_INDEX  ((u_char *)0x801DD000)
+#define g_pack_sel  (*(int *)0x801DD000)
+extern u_long *g_pack_images;
+extern u_long *g_pack_tims;
+
+extern u_char g_field_hold;
 
 /* The countdown clock some floors run against, in hours, minutes, seconds
    and frames. It only runs while g_clock_on is set. */
@@ -79,11 +150,24 @@ extern int      g_bob_count[];
 extern int      g_bob_step[];
 
 void CoordSetRot(SVECTOR *rot, GsCOORDINATE2 *coord);
+void UploadImageRows(void *desc, u_short x, u_short y, short rows);
+void TimLoad(u_long *tim, int nopal);
+
+void func_80069A14(void);
+void func_8006A3CC(void);
+void func_8006D33C(int arg);
 
 void FieldBobVerts(int ch, int v, int period);
 void FieldFadePrims(u_char *prim);
 void FieldClockTick(int frames);
 void FieldDoorSlide(void);
 void FieldClockHands(u_short flags, int obj);
+
+void FieldReload(void);
+void FieldEnterTile(void);
+void FieldStepView(void);
+void FieldStepEnd(void);
+void FieldSaveView(void);
+void FieldStepBegin(void);
 
 #endif
