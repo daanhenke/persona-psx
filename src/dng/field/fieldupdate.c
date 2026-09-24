@@ -30,9 +30,6 @@ extern FieldBinds g_field_binds[];
 #define PAD_DOWN  0x4000
 #define PAD_LEFT  0x8000
 
-/* What the frame's step did: FieldWalk's result, or 3 and 4 for a turn. */
-extern u_char g_step_kind;
-
 /* Per destination room, the facing the party arrives with. */
 extern u_char g_dest_facings[][2];
 

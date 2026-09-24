@@ -20,7 +20,7 @@ extern void LoadFileToAddrAsync(char *name, void *dest);
 extern void LoadFileToAddr(char *name, void *dest);
 extern void bcopy(void *src, void *dst, int n);
 extern void func_80015384(short map, int kind, short *vab);
-extern int  func_8006BBC0(void);
+
 
 /* The state block's map and floor, and the party's tile, as words: map 9
    floor 0, and a tile with its x and y bytes masked out of the word. With
@@ -42,7 +42,6 @@ extern u_long D_801CD080;
 extern u_long D_801CD084;
 extern u_long D_801CD088;
 
-extern u_char g_step_kind;
 extern u_char D_8001555C[];
 
 /* Bit 1: on map 9, the ambient sequence plays. */
@@ -185,7 +184,7 @@ void ovl_dng_entry(void)
             }
         }
         MarkSeen(g_dng->pos[POS_X], g_dng->pos[POS_Y]);
-        if (func_8006BBC0() != 0) {
+        if (FieldTileEffect() != 0) {
             continue;
         }
         if (g_step_kind == 0 || (u_char)(g_step_kind - 3) < 2) {

@@ -88,7 +88,7 @@ typedef struct {
     DR_AREA       areas[8];           /* 0x6E91C drawing areas, two per buffer pair */
     u_long        glyph[16][2];       /* 0x6E97C a glyph decoded for upload */
     DngWindow     win;                /* 0x6E9FC the selection window */
-    u_char        pad6EA0C[0x6EACC - 0x6EA0C];
+    GsLINE        boxes[3][4];        /* 0x6EA0C the lift's arrival boxes, a row of four lines each */
     signed char   lift_x, lift_y;     /* 0x6EACC which lift on the floor */
     u_char        lift;               /* 0x6EACE its row of g_lift_stops */
     u_char        pad6EACF;
@@ -648,6 +648,10 @@ extern u_char D_800993C6;
 
 void FieldDamageFloor(int div);
 void FieldPoisonFloor(void);
+int  FieldTileEffect(void);
+
+/* What the frame's step did: FieldWalk's result, or 3 and 4 for a turn. */
+extern u_char g_step_kind;
 
 int  FieldFindEntry(void);
 void FieldLoadGfx(void);
