@@ -56,7 +56,7 @@ int FieldWalk(int ret)
         }
         g_dng->pos[g_dir_axis[g_dng->walk_dir]] = g_walk_undo;
     }
-    func_8006A4D0();
+    FieldPauseBgm();
     FieldBumpWall();
     return 0;
 }
@@ -67,7 +67,7 @@ void FieldTurn(int turn)
     int  i;
     long start;
 
-    func_8006A4D0();
+    FieldPauseBgm();
     start = g_dng->angle;
     for (i = 0; i < 9; i++) {
         g_dng->angle += turn * TURN_SPEED;
@@ -90,5 +90,5 @@ void FieldSetHeading(int turn)
     g_dng->view.vpz = -g_dng->pos[POS_Y] * STEP_LEN - ((g_scene->sin * 150) >> 12);
     g_dng->view.vrx = g_dng->view.vpx + ((g_scene->cos * 5000) >> 12);
     g_dng->view.vrz = g_dng->view.vpz + ((g_scene->sin * 5000) >> 12);
-    g_scene->sky_angle -= turn << 5;
+    g_scene->sky.cx -= turn << 5;
 }

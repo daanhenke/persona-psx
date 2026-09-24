@@ -17,14 +17,20 @@
 /* How many objects the scene has room for. */
 #define SCENE_OBJS 968
 
+/* The flat sprites drawn over the field. */
+#define FIELD_SPRITES 105
+
 typedef struct {
-    u_char        pad0[0x1518];
+    GsSPRITE      sprites[FIELD_SPRITES]; /* 0x00000 */
+    u_char        padEC4[0x1518 - 0xEC4];
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
-    u_char        pad19E58[0x364AC - 0x19E58];
-    u_short       sky_angle;          /* 0x364AC the backdrop turns with the party */
-    u_char        pad364AE[0x6E910 - 0x364AE];
+    u_char        pad19E58[0x36364 - 0x19E58];
+    GsSPRITE      backdrop;           /* 0x36364 */
+    u_char        pad36388[0x3649C - 0x36388];
+    GsSPRITE      sky;                /* 0x3649C scrolls sideways as the party turns */
+    u_char        pad364C0[0x6E910 - 0x364C0];
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
@@ -152,6 +158,12 @@ extern short g_bump_seq;
 #define STEP_CLOCK   (*(u_char *)0x801F2B30)
 extern u_char g_effect_over;
 
+/* Set while the field is faded in. */
+extern u_char g_field_lit;
+
+/* Played in place of the floor's tune while the party stands still. */
+extern short g_idle_seq;
+
 /* A turn is nine frames of TURN_SPEED, then snaps to a quarter turn. */
 #define TURN_SPEED   96
 #define QUARTER_TURN 0x400
@@ -220,11 +232,9 @@ void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8006E988(int x, int y);
 void func_8006FFF4(void);
-void func_8006A4D0(void);
 int  func_8006C9C8(void);
 void func_8006CF40(void);
 void func_80070DAC(int arg);
-void func_8006A3CC(void);
 void func_8006D33C(int arg);
 
 void FieldBobVerts(int ch, int v, int period);
@@ -251,5 +261,9 @@ int  FieldTileOneWay(void);
 int  FieldTileSolid(void);
 void FieldBumpWall(void);
 void FieldLoadAhead(void);
+
+void FieldFadeOut(void);
+void FieldFadeIn(void);
+int  FieldPauseBgm(void);
 
 #endif

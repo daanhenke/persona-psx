@@ -36,7 +36,7 @@ void FieldReload(void)
     func_8006D33C(1);
     g_field_hold = 0;
     FieldEnterTile();
-    func_8006A3CC();
+    FieldFadeIn();
 }
 
 /* Reads the tile the party stands on. A door is shown already open, and a

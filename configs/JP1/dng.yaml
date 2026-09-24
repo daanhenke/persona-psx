@@ -66,6 +66,8 @@ segments:
       - [0x4888, c, field/fieldwalk]
       - [0x4DA8, c, field/fieldstairs]
       - [0x56DC, asm, dng_0_s2]
+      - [0x5F30, c, field/fieldfade]
+      - [0x619C, asm, dng_0_s3]
       - [0xB638, c, common/gfx/coord]
       - [0xB738, asm, dng_s1]
       - [0xB768, c, common/gfx/tim]
