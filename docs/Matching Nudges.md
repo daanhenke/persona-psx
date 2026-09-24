@@ -3401,6 +3401,9 @@ of one and index it.
 
 - [highlight.c](/src/btlp/highlight.c) - `g_btl_highlight_colour[]`, which took
   `BtlHighlightDraw` from 93.97% to 99.74%.
+- [talkscenestare.c](/src/btlp/talkscenestare.c) - `g_btl_talk_lost_script[]`.
+  Read as a scalar, its load rose above the mark's attribute store and the
+  lost arm could no longer jump into the surprised tail. 96.46% to 99.54%.
 
 ## Two pseudos on the same priority go in declaration order
 
@@ -3422,6 +3425,12 @@ jumps to a shared store of another, write the unshared store first.
 - [talkorders.c](/src/btlp/talkorders.c) - in `BtlReadySpellAction`, the
   picked-enemy arm writes `order` before `targets`, so `targets` is the tail
   it shares.
+- [personaact.c](/src/btlp/personaact.c) - `BtlPersonaPlayMove`. The fall's
+  first arm steps the phase itself and breaks, where the other arms fall
+  through to one shared `o->phase++`. The image shows it as a load of the
+  phase inside the arm and a jump to the shared add and store. That, and the
+  reel's ailment turns set after its hit amount, took it from 98.70% to
+  exact.
 
 ## Rows reached by fresh address loads are separate objects
 

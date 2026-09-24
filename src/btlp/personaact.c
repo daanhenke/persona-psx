@@ -65,11 +65,10 @@
 /* How long the fall is held before the turn goes on. */
 #define PERSONA_FALL_HOLD 0x1E
 
-/* 98.70%. Every arm and every store is the image's; what is left is the tail
-   of the fall, where the image writes the body's phase back before it reads
-   the record's own and keeps the hold in the other register. Writing the hold
-   before the sound, and the phase before it, both come out further away. */
-#ifdef NON_MATCHING
+/* The fall's first arm steps the phase itself and breaks, so only the
+   increment is shared with the arms below it and the arm reads the phase
+   before it jumps, as in the image. The reel's ailment turns are set after
+   its hit amount. */
 void BtlPersonaPlayMove(BtlObj *o)
 {
     BtlActor *a;
@@ -125,6 +124,8 @@ void BtlPersonaPlayMove(BtlObj *o)
             BtlSePlay(STRIKE_VOICE, 1);
             obj->phase = 0;
             o->timer = PERSONA_FALL_HOLD;
+            o->phase++;
+            break;
         } else if ((a->obj->attr & BTL_OBJ_CARRIED) != 0
                    && (signed char)a->c.status != BTL_STATUS_NOINPUT) {
             if (a->unkCC != 0) {
@@ -142,8 +143,8 @@ void BtlPersonaPlayMove(BtlObj *o)
                         a->unkDF = 1;
                         a->resume_motion = obj->motion;
                         a->resume_phase = obj->phase;
-                        a->ail_turns = 2;
                         a->hit_amount = 0;
+                        a->ail_turns = 2;
                         obj->motion = STRIKE_MOTION_REEL;
                         BtlSePlay(STRIKE_SE_SLOT, 5);
                         o->timer = PERSONA_FALL_HOLD;
@@ -188,9 +189,6 @@ void BtlPersonaPlayMove(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personaact", BtlPersonaPlayMove);
-#endif
 
 /* 99.80%. The walk, its shared tail and the second pass over the mask are the
    image's - the second pass steps its one counter past the test rather than

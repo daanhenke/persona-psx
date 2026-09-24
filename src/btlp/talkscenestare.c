@@ -99,7 +99,9 @@ extern void BtlTextSetState(short state, int timer, int pause);
 
 extern u_char       *g_btl_actor_gfx;
 extern const u_char *g_btl_talk_menace_script;
-extern const u_char *g_btl_talk_lost_script;
+/* An array of one: read as a scalar, gcc lifts the load above the mark's
+   attribute store in the lost arm, and the image does not. */
+extern const u_char *g_btl_talk_lost_script[];
 extern const u_char *g_btl_talk_glared_script;
 extern const u_char *g_btl_talk_offer_over_script;
 extern const u_char *g_btl_talk_surprised_script;
@@ -112,16 +114,19 @@ extern void BtlBoxOpen(short cols, short x, short y, int style);
 extern void BtlShowAilmentMarks(int show);
 extern void BtlSoundClose(int slot);
 
-/* 96.46%, from 73.86%. What changed:
+/* 99.54%, from 73.86%. What changed:
    - each arm writes out its own text, box and close-down; gcc cross-jumps
      the shared tails the way the image shows;
    - the held test is `== 1`, with its arm first;
    - one counter serves the odds walk and the held flag;
-   - the motion row is taken as in the other member motions.
+   - the motion row is taken as in the other member motions;
+   - the lost line's script pointer is an array of one, so its load stays
+     behind the mark's attribute store and the lost arm jumps into the
+     surprised tail with only the text's position left to set.
    What is left:
-   - in the lost arm the image stores the mark's attribute before it sets up
-     the text call, and gcc here sets the call up first, so the two tails
-     part a few instructions early;
+   - in the glared arm the image sets the text's x before loading the
+     script, and gcc here loads first; an array for that script does not
+     move it;
    - the odds initialiser's .rodata is named in the image, which needs the
      unit's rodata split once the routine matches. */
 #ifdef NON_MATCHING
@@ -190,7 +195,7 @@ void BtlTalkSceneStare(void)
                             *(const u_long **)(g_btl_actor_gfx + 0x8C));
             a->obj->mark->unkCE = STARE_SHADOW_CE;
             a->obj->mark->attr &= ~BTL_OBJ_HIDDEN;
-            BtlTextOpen(g_btl_talk_lost_script, TALK_TEXT_X, TALK_TEXT_Y);
+            BtlTextOpen(g_btl_talk_lost_script[0], TALK_TEXT_X, TALK_TEXT_Y);
             BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
             BtlWaitAnyKey();
             g_btl_talk_depth--;
