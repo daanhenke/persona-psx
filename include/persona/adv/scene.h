@@ -89,6 +89,71 @@ typedef struct {
 
 extern AdvScene *g_adv_scene;
 
+/* The pack's actor definitions, reached by address. A room's eight actors
+   each come in two forms, and an event flag says which one the room shows:
+   the second once the flag is set. The eight extras have the same two forms
+   in a shorter record; the last two tables only place things. */
+typedef struct {
+    /* 0x00 */ int     script;
+    /* 0x04 */ union {
+                   u_int flags;         /* ACTOR_* above the low nibble    */
+                   struct {
+                       u_char  dir;     /* facing, the low two bits        */
+                       u_char  pad;
+                       u_short shadow;
+                   } b;
+               } u;
+    /* 0x08 */ u_char  unk22;
+    /* 0x09 */ u_char  x, y;
+    /* 0x0B */ u_char  bright;
+    /* 0x0C */ u_char  lift;
+    /* 0x0D */ u_char  pad0D[3];
+} AdvActorForm;                          /* 0x10 bytes */
+
+typedef struct {
+    /* 0x00 */ u_short flag;             /* 0xFFFF: always the first form  */
+    /* 0x02 */ u_short pad02;
+    /* 0x04 */ AdvActorForm form[2];
+} AdvActorDef;                           /* 0x24 bytes */
+
+typedef struct {
+    /* 0x00 */ int     script;
+    /* 0x04 */ u_char  unk22;
+    /* 0x05 */ u_char  unk23;            /* its high nibble is the flags   */
+    /* 0x06 */ u_char  x, y;
+    /* 0x08 */ u_char  bright;
+    /* 0x09 */ u_char  lift;
+    /* 0x0A */ u_char  pad0A[2];
+} AdvPropForm;                           /* 0x0C bytes */
+
+typedef struct {
+    /* 0x00 */ u_short flag;
+    /* 0x02 */ u_short pad02;
+    /* 0x04 */ AdvPropForm form[2];
+} AdvPropDef;                            /* 0x1C bytes */
+
+typedef struct {
+    /* 0x00 */ u_char  x, y;
+    /* 0x02 */ u_char  pad02[6];
+    /* 0x08 */ u_char  lift;
+    /* 0x09 */ u_char  pad09;
+} AdvMarkDef;                            /* 10 bytes */
+
+typedef struct {
+    /* 0x00 */ u_char  x, y;
+    /* 0x02 */ u_char  dir;
+    /* 0x03 */ u_char  lift;
+} AdvSpotDef;                            /* 4 bytes */
+
+#define ROOM_ACTORS 8
+#define g_room_actor_defs ((AdvActorDef (*)[ROOM_ACTORS])0x801001F0)
+#define g_prop_defs       ((AdvPropDef *)0x80100AF0)
+#define g_mark_defs       ((AdvMarkDef *)0x80100BD0)
+#define g_spot_defs       ((AdvSpotDef *)0x80100C20)
+
+/* Which room of the scene is loaded. */
+#define g_adv_room (*(u_char *)0x801F5355)
+
 /* Every one of the tile lookups answers 0xFF for "no record here". */
 #define TRIGGER_NONE 0xFF
 

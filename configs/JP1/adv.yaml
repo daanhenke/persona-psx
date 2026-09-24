@@ -198,7 +198,7 @@ segments:
       - [0x1F1C8, c, gfx/imagecells]
       - [0x1F448, asm, adv_31]
       - [0x1FA20, c, game/camera]
-      - [0x1FBCC, asm, adv_32]
+      - [0x1FBCC, c, game/actorsbuild]
       - [0x201F8, c, game/sceneimages]
       - [0x202F4, asm, adv_32a]
       - [0x2153C, c, audio/soundfade]

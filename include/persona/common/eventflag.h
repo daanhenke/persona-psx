@@ -21,4 +21,7 @@ extern int EventFlagTest(u_short *id);
 #define EVENT_FLAGS_BANK2 ((u_long *)0x801F2A48)
 #define EVENT_FLAG_BANK_WORDS 8
 
+/* The flags themselves, a bit each, reached by literal address. */
+#define g_event_flags ((u_char *)0x801F29C8)
+
 #endif

@@ -10,9 +10,10 @@
 #include <decomp/types.h>
 
 typedef struct {
-    /* 0x00 */ u_char  pad00[4];
+    /* 0x00 */ int     script;          /* what the actor's sprite plays;
+                                           -1 for nothing                   */
     /* 0x04 */ u_int   flags;           /* ACTOR_FLIP_OK, ACTOR_SEMITRANS    */
-    /* 0x08 */ u_char  pad08[4];
+    /* 0x08 */ int     unk08;           /* -1 once the actor is built     */
     /* 0x0C */ u_short id;              /* 0xFFFF while the slot is unused  */
     /* 0x0E */ u_short world_x;         /* the renderer subtracts the camera
                                            from these to get a screen position */
@@ -32,7 +33,11 @@ typedef struct {
                                            much again                       */
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
-    /* 0x20 */ u_char  pad20[6];
+    /* 0x20 */ u_char  home_x, home_y;  /* where a room actor was placed  */
+    /* 0x22 */ u_char  unk22;
+    /* 0x23 */ u_char  unk23;
+    /* 0x24 */ u_char  unk24;
+    /* 0x25 */ u_char  unk25;
     /* 0x26 */ u_char  unk26;          /* gates the second leg of a diagonal
                                           step the way the tile under the
                                           actor gates the first            */
