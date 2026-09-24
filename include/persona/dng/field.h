@@ -43,6 +43,11 @@ typedef struct {
     u_long        glyph[16][2];       /* 0x6E97C a glyph decoded for upload */
     u_char        pad6E9FC[8];
     u_char        flag6EA04;          /* 0x6EA04 cleared for a new floor */
+    u_char        pad6EA05[0x6EACC - 0x6EA05];
+    signed char   lift_x, lift_y;     /* 0x6EACC which lift on the floor */
+    u_char        lift;               /* 0x6EACE its row of g_lift_stops */
+    u_char        pad6EACF;
+    u_char        lift_at;            /* 0x6EAD0 the floor its indicator shows */
 } DngScene;
 
 /* The game state block as the field sees it. Only the fields the overlay
@@ -378,10 +383,28 @@ void FieldIrisFxStep(void);
 void FieldIrisFxSetup(void);
 
 void FieldShake(int dir);
+
+/* A cell of the lift indicator's texture, and the patterns built of them. */
+typedef struct {
+    int w, h, u, v;
+} LiftCell;
+extern LiftCell g_lift_cells[];
+extern int      g_lift_patterns[][7];
+extern int      g_lift_pattern_of[];
+
+/* Per lift, the floor each button stops at, and - the second half of the
+   same rows - the floor each position in the lift leaves from. */
+extern u_char g_lift_stops[][12];
+extern u_char g_lift_from[][12];
+
+void FieldSetLiftDigits(int n);
+void FieldRideLift(int button);
+void func_8006F510(int a);
+void func_80070090(int a);
 void FieldNudge(int frames, int dy);
 
 void FieldStartBattle(void);
-void FieldPlayJingle(u_char n, short loops);
+void FieldPlayJingle(); /* old-style: callers pass two or three ints */
 void FieldPlaySeq(); /* old-style: callers pass ints */
 
 /* The fog libgs is given, the scale its depth is built from, and the

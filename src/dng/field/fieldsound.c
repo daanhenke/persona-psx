@@ -55,8 +55,10 @@ void FieldStartBattle(void)
 }
 
 /* Plays sequence `n` as a jingle, replacing whatever jingle is playing, for
-   `loops` repeats. */
-void FieldPlayJingle(u_char n, short loops)
+   `loops` repeats. Old-style: some callers pass a third argument. */
+void FieldPlayJingle(n, loops)
+    u_char n;
+    short  loops;
 {
     if (SEQ_OFFSETS[n] != 0) {
         SsSetNck(g_seq_handles[SEQ_JINGLE]);

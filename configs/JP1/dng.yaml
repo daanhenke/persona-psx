@@ -95,6 +95,7 @@ segments:
       - [0xDB58, c, field/fieldfxwave]
       - [0xDF08, c, field/fieldfxiris]
       - [0xE36C, asm, dng_s1_x3e]
+      - [0xF26C, c, field/fieldlift]
       - [0xF5EC, c, field/fieldshake]
       - [0xF6C4, asm, dng_s1_x3f]
       - [0x113B0, c, common/gfx/slot]
