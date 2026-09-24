@@ -112,6 +112,18 @@ extern void BtlBoxOpen(short cols, short x, short y, int style);
 extern void BtlShowAilmentMarks(int show);
 extern void BtlSoundClose(int slot);
 
+/* 96.46%, from 73.86%. What changed:
+   - each arm writes out its own text, box and close-down; gcc cross-jumps
+     the shared tails the way the image shows;
+   - the held test is `== 1`, with its arm first;
+   - one counter serves the odds walk and the held flag;
+   - the motion row is taken as in the other member motions.
+   What is left:
+   - in the lost arm the image stores the mark's attribute before it sets up
+     the text call, and gcc here sets the call up first, so the two tails
+     part a few instructions early;
+   - the odds initialiser's .rodata is named in the image, which needs the
+     unit's rodata split once the routine matches. */
 #ifdef NON_MATCHING
 void BtlTalkSceneStare(void)
 {
@@ -119,11 +131,11 @@ void BtlTalkSceneStare(void)
        two of them. */
     int  odds[3] = { 0x80, TALK_ODDS_ALL, 0 };
     BtlActor *a;
-    int  held;
-    int  roll;
     int  i;
+    int  roll;
     int *p;
     const u_char *line;
+    const u_char *row;
 
     switch (g_btl_talk_stage[g_btl_talk_depth - 1]) {
     case TALK_STAGE_RUN:
@@ -147,62 +159,40 @@ void BtlTalkSceneStare(void)
 
     case TALK_STAGE_STARE:
         BtlTextOpen(g_btl_talk_menace_script, TALK_TEXT_X, TALK_TEXT_Y);
-        held = 0;
+        i = 0;
         BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
         BtlWaitAnyKey();
         BtlEndTalking();
         if (BtlOfferLevelTest(TALK_OFFER_LEVEL, g_btl_offer_slot) == 1) {
-            held = rand() % STARE_GOOD == 0;
+            if (rand() % STARE_GOOD == 0) {
+                i = 1;
+            }
         } else {
             if (rand() % STARE_BAD != 0) {
-                held = 1;
+                i = 1;
             }
         }
         g_btl_talk_flags |= TALK_FLAG_ENDED;
         g_btl_offer[g_btl_offer_slot].kinds |= OFFER_CONTACTED;
-        /* The two text calls are shared and the glared arm tested first; the
-           original branches the other way round, which gcc will not invert
-           back - so this is the best of the shapes tried so far, not exact. */
-        BtlTextSetState(TALK_TEXT_STATE, 0, 1);
-        BtlTextWaitDone();
-        if (held == 0) {
-            BtlTextOpen(g_btl_talk_glared_script, TALK_TEXT_X, TALK_TEXT_Y);
+        if (i == 1) {
+            BtlTextSetState(TALK_TEXT_STATE, 0, 1);
+            BtlTextWaitDone();
+            a = &g_btl_actors[g_btl_actor_slot];
+            a->c.status = STARE_STATUS;
+            a->c.ail_level = STARE_LEVEL;
+            a->ail_turns = STARE_UNK_EA;
+            row = &g_btl_talk_motion[g_btl_actors[STARE_MOTION_OF].c.key
+                                     * TALK_MOTION_KEY];
+            BtlObjSetScript(a->obj,
+                a->obj->scripts[row[g_btl_actors[STARE_MOTION_OF].script_pick
+                                    * TALK_MOTION_PICK]]);
+            BtlObjSetScript(a->obj->mark,
+                            *(const u_long **)(g_btl_actor_gfx + 0x8C));
+            a->obj->mark->unkCE = STARE_SHADOW_CE;
+            a->obj->mark->attr &= ~BTL_OBJ_HIDDEN;
+            BtlTextOpen(g_btl_talk_lost_script, TALK_TEXT_X, TALK_TEXT_Y);
             BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
             BtlWaitAnyKey();
-            goto command;
-        }
-        a = &g_btl_actors[g_btl_actor_slot];
-        a->c.status = STARE_STATUS;
-        a->c.ail_level = STARE_LEVEL;
-        a->ail_turns = STARE_UNK_EA;
-        BtlObjSetScript(a->obj,
-            a->obj->scripts[g_btl_talk_motion[
-                g_btl_actors[STARE_MOTION_OF].c.key * TALK_MOTION_KEY
-                + g_btl_actors[STARE_MOTION_OF].script_pick * TALK_MOTION_PICK]]);
-        BtlObjSetScript(a->obj->mark,
-                        *(const u_long **)(g_btl_actor_gfx + 0x8C));
-        a->obj->mark->unkCE = STARE_SHADOW_CE;
-        a->obj->mark->attr &= ~BTL_OBJ_HIDDEN;
-        line = g_btl_talk_lost_script;
-        break;
-
-    case TALK_STAGE_CLOSE:
-        held = 0;
-        BtlOfferFinish();
-        BtlTextOpen(g_btl_talk_offer_over_script, TALK_TEXT_X, TALK_TEXT_Y);
-        BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
-        BtlWaitAnyKey();
-        if (BtlOfferLevelTest(TALK_OFFER_LEVEL, g_btl_offer_slot) == 1) {
-            held = rand() % STARE_GOOD == 0;
-        } else {
-            if (rand() % STARE_BAD != 0) {
-                held = 1;
-            }
-        }
-        g_btl_talk_flags |= TALK_FLAG_ENDED;
-        g_btl_offer[g_btl_offer_slot].kinds |= OFFER_CONTACTED;
-        if (held == 0) {
-        command:
             g_btl_talk_depth--;
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
@@ -214,13 +204,70 @@ void BtlTalkSceneStare(void)
             BtlHudHide();
             BtlEnemiesReset();
             BtlPartyReset();
-            g_btl_phase = BTL_PHASE_COMMAND;
+            BtlSoundClose(TALK_SLOT_VOICE);
+            g_btl_phase = BTL_PHASE_SURPRISED;
+            return;
+        } else {
+            BtlTextSetState(TALK_TEXT_STATE, 0, 1);
+            BtlTextWaitDone();
+            BtlTextOpen(g_btl_talk_glared_script, TALK_TEXT_X, TALK_TEXT_Y);
+            BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
+            BtlWaitAnyKey();
+            goto command;
+        }
+
+    case TALK_STAGE_CLOSE:
+        i = 0;
+        BtlOfferFinish();
+        BtlTextOpen(g_btl_talk_offer_over_script, TALK_TEXT_X, TALK_TEXT_Y);
+        BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
+        BtlWaitAnyKey();
+        if (BtlOfferLevelTest(TALK_OFFER_LEVEL, g_btl_offer_slot) == 1) {
+            if (rand() % STARE_GOOD == 0) {
+                i = 1;
+            }
+        } else {
+            if (rand() % STARE_BAD != 0) {
+                i = 1;
+            }
+        }
+        g_btl_talk_flags |= TALK_FLAG_ENDED;
+        g_btl_offer[g_btl_offer_slot].kinds |= OFFER_CONTACTED;
+        if (i == 1) {
+            BtlTextSetState(TALK_TEXT_STATE, 0, 1);
+            BtlTextWaitDone();
+            BtlTextOpen(g_btl_talk_surprised_script, TALK_TEXT_X, TALK_TEXT_Y);
+            BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
+            BtlWaitAnyKey();
+            g_btl_talk_depth--;
+            g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
+            g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
+            BtlShowAilmentMarks(1);
+            BtlFaceClose();
+            BtlPanelClose();
+            BtlBoxClose();
+            BtlSeqClear();
+            BtlHudHide();
+            BtlEnemiesReset();
+            BtlPartyReset();
+            BtlSoundClose(TALK_SLOT_VOICE);
+            g_btl_phase = BTL_PHASE_SURPRISED;
             return;
         }
-        BtlTextSetState(TALK_TEXT_STATE, 0, 1);
-        BtlTextWaitDone();
-        line = g_btl_talk_surprised_script;
-        break;
+    command:
+        g_btl_talk_depth--;
+        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
+        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
+        BtlShowAilmentMarks(1);
+        BtlFaceClose();
+        BtlPanelClose();
+        BtlBoxClose();
+        BtlSeqClear();
+        BtlHudHide();
+        BtlEnemiesReset();
+        BtlPartyReset();
+        g_btl_phase = BTL_PHASE_COMMAND;
+        return;
 
     case TALK_STAGE_TAKE:
         BtlSeqRun();
@@ -246,22 +293,7 @@ void BtlTalkSceneStare(void)
         return;
     }
 
-    BtlTextOpen(line, TALK_TEXT_X, TALK_TEXT_Y);
-    BtlBoxOpen(TALK_BOX_W, TALK_BOX_X, TALK_TEXT_Y, 0);
-    BtlWaitAnyKey();
-    g_btl_talk_depth--;
-    g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
-    g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
-    BtlShowAilmentMarks(1);
-    BtlFaceClose();
-    BtlPanelClose();
-    BtlBoxClose();
-    BtlSeqClear();
-    BtlHudHide();
-    BtlEnemiesReset();
-    BtlPartyReset();
-    BtlSoundClose(TALK_SLOT_VOICE);
-    g_btl_phase = BTL_PHASE_SURPRISED;
+    return;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/talkscenestare", BtlTalkSceneStare);

@@ -93,6 +93,7 @@ SetSemiTrans                  = 0x8002C16C;
 SetShadeTex                   = 0x8002C194;
 SetPolyF4                     = 0x8002C20C;
 SetPolyFT4                    = 0x8002C220;
+SetPolyG3                     = 0x8002C1E4;
 SetPolyG4                     = 0x8002C234;
 SetSprt16                     = 0x8002C270;
 SetSprt                       = 0x8002C284;

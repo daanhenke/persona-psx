@@ -60,6 +60,17 @@ extern const char    g_btl_mesh_cells[];
 extern u_char        g_btl_arena_show;
 extern u_char        g_btl_mesh_show;
 
+/* 98.76%. Taken from the image:
+   - the page is read before the palette, each straight from its table;
+   - each row keeps a copy of its lower edge (yb) for the two lower corners;
+   - the first texture pointer is worked out from the table, not from the
+     second;
+   - the strip loop counts in the row counter.
+   What is left:
+   - the image derives the first texture pointer's base from the second's
+     (base + 1, less one);
+   - the quad goes through v1 where this uses a0;
+   - the vertex pointer and the buffer counter take each other's stack slot. */
 #ifdef NON_MATCHING
 void BtlBuildMesh(void)
 {
@@ -73,10 +84,10 @@ void BtlBuildMesh(void)
     int            cell;
     int            col;
     int            row;
-    int            i;
     short          x1;
     short          y0;
     short          y1;
+    short          yb;
 
     v = g_btl_mesh;
     buf = 0;
@@ -89,9 +100,10 @@ void BtlBuildMesh(void)
         do {
             col = 0;
             y0 = row * MESH_CELL;
+            yb = y1;
             x1 = MESH_CELL;
             w = &g_btl_mesh_cells[cell * 2 + 1];
-            u = w - 1;
+            u = &g_btl_mesh_cells[cell * 2];
             do {
                 cell++;
                 SetPolyFT4(g_btl_polyft4_next);
@@ -103,9 +115,9 @@ void BtlBuildMesh(void)
                 p->x1 = x1;
                 p->y1 = y0;
                 p->x2 = col * MESH_CELL;
-                p->y2 = y1;
+                p->y2 = yb;
                 p->x3 = x1;
-                p->y3 = y1;
+                p->y3 = yb;
                 p->u0 = *u * MESH_CELL;
                 g_btl_polyft4_next->v0 = *w * MESH_CELL;
                 g_btl_polyft4_next->u1 = *u * MESH_CELL + MESH_CELL;
@@ -115,15 +127,9 @@ void BtlBuildMesh(void)
                 g_btl_polyft4_next->u3 = *u * MESH_CELL + MESH_CELL;
                 g_btl_polyft4_next->v3 = *w * MESH_CELL + MESH_CELL;
                 p = g_btl_polyft4_next;
-                /* Both the palette and the page go through the same variable
-                   the strip loop counts with, and the palette is read out
-                   first; taking either straight from its table where it is
-                   used costs the match. */
-                i = g_btl_clut[MESH_SLOT];
-                p->clut = i;
+                p->tpage = g_btl_tpage[MESH_SLOT];
                 col++;
-                i = g_btl_tpage[MESH_SLOT];
-                g_btl_polyft4_next->tpage = i;
+                g_btl_polyft4_next->clut = g_btl_clut[MESH_SLOT];
                 p->r0 = MESH_GREY;
                 g_btl_polyft4_next->g0 = MESH_GREY;
                 x1 += MESH_CELL;
@@ -136,15 +142,15 @@ void BtlBuildMesh(void)
             y1 += MESH_CELL;
         } while (row < MESH_ROWS);
 
-        i = 0;
+        row = 0;
         g_btl_polyft4_next = (POLY_FT4 *)(g_btl_prim_pool + off + MESH_STRIPS);
         do {
-            i++;
+            row++;
             SetPolyFT4(g_btl_polyft4_next);
             SetShadeTex(g_btl_polyft4_next, 0);
             SetSemiTrans(g_btl_polyft4_next, 0);
             g_btl_polyft4_next++;
-        } while (i < MESH_STRIP_PRIMS);
+        } while (row < MESH_STRIP_PRIMS);
 
         off += MESH_FRAME;
         buf++;

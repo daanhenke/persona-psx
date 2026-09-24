@@ -57,14 +57,13 @@ extern short   g_btl_place_from_col;
 extern short   g_btl_place_from_row;
 extern int     g_btl_place_walk;
 
-/* 95.45%. Every branch, call and store is the image's. What is left is the
-   two wraps: where a direction takes a row or a column past the last, the
-   image works the new value out with a mask off the comparison and stores it
-   once, and gcc branches round a second store. The same wrap written as
-   cursor.c writes its own - `n = n + 1; n = n < 5 ? n : 0;` - does produce the
-   mask, but only with `n` an int, and here the comparison is on a short: the
-   image loads the field unsigned, adds one and sign-extends the sum, which no
-   typing of the temporary has reproduced. */
+/* 98.60%. The two upward wraps are written as a short sum compared and
+   masked: `row = (short)(row + 1) < 5 ? row + 1 : 0`. The cursors are indexed
+   by the counter, not walked by hand. What is left: in the two downward wraps
+   the image copies the decremented value before shifting it for the sign
+   test and stores the copy, where gcc here stores first and shifts in place.
+   At the confirm, the column and row are read into v0/v1 rather than v1/a0.
+   An int temporary, a pre-decrement and a ternary were all tried. */
 #ifdef NON_MATCHING
 int BtlPlaceGridUpdate(int carrying)
 {
@@ -89,10 +88,7 @@ int BtlPlaceGridUpdate(int carrying)
     }
     if ((key & PAD_DOWN) != 0) {
         g_btl_place_walk = BtlUnreadyMemberNext(g_btl_place_walk);
-        g_btl_place_row++;
-        if (g_btl_place_row >= PLACE_GRID_SIDE) {
-            g_btl_place_row = 0;
-        }
+        g_btl_place_row = (short)(g_btl_place_row + 1) < PLACE_GRID_SIDE ? g_btl_place_row + 1 : 0;
     }
     if ((key & PAD_LEFT) != 0) {
         g_btl_place_walk = BtlUnreadyMemberPrev(g_btl_place_walk);
@@ -103,10 +99,7 @@ int BtlPlaceGridUpdate(int carrying)
     }
     if ((key & PAD_RIGHT) != 0) {
         g_btl_place_walk = BtlUnreadyMemberNext(g_btl_place_walk);
-        g_btl_place_col++;
-        if (g_btl_place_col >= PLACE_GRID_SIDE) {
-            g_btl_place_col = 0;
-        }
+        g_btl_place_col = (short)(g_btl_place_col + 1) < PLACE_GRID_SIDE ? g_btl_place_col + 1 : 0;
     }
 
     at = g_btl_place_row * PLACE_GRID_SIDE + g_btl_place_col;
@@ -131,22 +124,21 @@ int BtlPlaceGridUpdate(int carrying)
         }
     }
 
-    cursor = g_btl_pick_cursors;
-    for (i = 0; i < BTL_PARTY; i++, cursor++) {
+    for (i = 0; i < BTL_PARTY; i++) {
         if (g_btl_place_member == i) {
-            (*cursor)->motion = PLACE_CURSOR_ON;
+            g_btl_pick_cursors[i]->motion = PLACE_CURSOR_ON;
         } else {
-            (*cursor)->motion = PLACE_CURSOR_OFF;
+            g_btl_pick_cursors[i]->motion = PLACE_CURSOR_OFF;
             if (g_btl_actors[i].marker < PLACE_MARKER_UP) {
-                (*cursor)->rgb_to[0] = PLACE_CURSOR_LIT;
-                (*cursor)->rgb_to[1] = PLACE_CURSOR_LIT;
-                (*cursor)->rgb_to[2] = PLACE_CURSOR_LIT;
+                g_btl_pick_cursors[i]->rgb_to[0] = PLACE_CURSOR_LIT;
+                g_btl_pick_cursors[i]->rgb_to[1] = PLACE_CURSOR_LIT;
+                g_btl_pick_cursors[i]->rgb_to[2] = PLACE_CURSOR_LIT;
             } else {
-                (*cursor)->rgb_to[0] = PLACE_CURSOR_DIM;
-                (*cursor)->rgb_to[1] = PLACE_CURSOR_DIM;
-                (*cursor)->rgb_to[2] = PLACE_CURSOR_DIM;
+                g_btl_pick_cursors[i]->rgb_to[0] = PLACE_CURSOR_DIM;
+                g_btl_pick_cursors[i]->rgb_to[1] = PLACE_CURSOR_DIM;
+                g_btl_pick_cursors[i]->rgb_to[2] = PLACE_CURSOR_DIM;
             }
-            (*cursor)->fade = PLACE_CURSOR_FADE;
+            g_btl_pick_cursors[i]->fade = PLACE_CURSOR_FADE;
         }
     }
 

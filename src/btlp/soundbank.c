@@ -15,54 +15,41 @@
  * its own.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libsnd.h>
 #include <persona/btlp/sound.h>
 
-#ifdef NON_MATCHING
 /* A slot of -1 means "any free one"; the answer is the slot actually used.
-   A bank with no VAB header opens nothing and returns the null header value.
-   Keeping that value as the initial result avoids a separate zero load. */
+   A bank with no VAB header opens nothing and falls off the end, which hands
+   back the null header still in v0. */
 int BtlSoundOpen(const BtlSoundBank *banks, int slot, int index)
 {
-    short              *p;
-    int                 i;
-    int                 used;
-    int                 result;
+    int i;
 
-    result = (int)banks[index].vh;
-    used = slot;
-    if (result != 0) {
+    if (banks[index].vh != NULL) {
         if (slot < 0) {
-            p = g_btl_vab;
             for (i = 0; i < BTL_SOUND_SLOTS; i++) {
-                if (*p < 0) {
-                    used = i;
+                if (g_btl_vab[i] < 0) {
+                    slot = i;
                     break;
                 }
-                p++;
             }
         }
 
         SsVabTransCompleted(1);
 
-        g_btl_vab[used] = SsVabOpenHead(banks[index].vh, -1);
+        g_btl_vab[slot] = SsVabOpenHead(banks[index].vh, -1);
         /* The body goes up in whatever pieces the SPU will take, so the call
            is repeated until it stops answering with a negative. */
-        while (SsVabTransBody(banks[index].vb, g_btl_vab[used]) < 0) {
+        while (SsVabTransBody(banks[index].vb, g_btl_vab[slot]) < 0) {
             ;
         }
 
-        g_btl_seq[used] = SsSepOpen(banks[index].seq, g_btl_vab[used],
+        g_btl_seq[slot] = SsSepOpen(banks[index].seq, g_btl_vab[slot],
                                     banks[index].nsep);
-        g_btl_seq_count[used] = banks[index].nsep;
-        result = used;
+        g_btl_seq_count[slot] = banks[index].nsep;
+        return slot;
     }
-    return result;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/soundbank", BtlSoundOpen);
-#endif
 
 
 void BtlSoundClose(int slot)

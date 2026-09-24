@@ -90,6 +90,13 @@ extern void BtlPanelSetImage(int group, u_char image);
 extern void BtlPushRecent(int value);
 extern void BtlTalkAnswer(int slot, u_int act);
 
+/* 90.36%, from 71.48%. The rank test asks for the best rank, so its long arm
+   comes first and the other lands at the end, as the image lays them out.
+   The gauges are tested as a signed short. What is left is how the choice
+   record is reached: the image keeps the record's offset plus the pack's high
+   half in s0 and reads each field with its own low half (the image names
+   them g_btl_choice_text and D_801C0006). The acts word is read through its
+   symbol rather than as a word of the pack. */
 #ifdef NON_MATCHING
 void BtlTalkSceneAct(void)
 {
@@ -145,17 +152,8 @@ void BtlTalkSceneAct(void)
     BtlTalkScoreLine(rec->mood[which],
                      rec->amount[which]);
 
-    if (BtlOfferRank(g_btl_offer_slot) != OFFER_RANK_BEST) {
-        g_btl_talk_depth--;
-        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
-        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
-        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
-        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
-        dir = *(u_long *)BTL_SCRATCH;
-        script = BTL_SCRATCH + dir
-                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
-    } else {
-        if ((g_btl_panel_gauges >> mood & 1) != 0) {
+    if (BtlOfferRank(g_btl_offer_slot) == OFFER_RANK_BEST) {
+        if (((short)g_btl_panel_gauges >> mood & 1) != 0) {
             if ((1 << mood & g_btl_offer[g_btl_offer_slot].kinds) != 0
                 && rec->amount[which] >= ACT_NOTICED) {
                 dir = *(u_long *)BTL_SCRATCH;
@@ -171,7 +169,7 @@ void BtlTalkSceneAct(void)
                 return;
             }
         }
-        if ((g_btl_panel_gauges >> mood & 1) == 0) {
+        if (((short)g_btl_panel_gauges >> mood & 1) == 0) {
             bit = 1 << mood;
             if ((bit & g_btl_offer[g_btl_offer_slot].kinds) != 0
                 && rec->amount[which] >= ACT_NOTICED) {
@@ -180,6 +178,15 @@ void BtlTalkSceneAct(void)
                 BtlPushRecent(mood);
             }
         }
+        g_btl_talk_depth--;
+        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
+        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
+        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
+        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
+        dir = *(u_long *)BTL_SCRATCH;
+        script = BTL_SCRATCH + dir
+                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
+    } else {
         g_btl_talk_depth--;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;

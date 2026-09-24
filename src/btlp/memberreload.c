@@ -23,6 +23,7 @@
 #include <persona/btlp/sound.h>
 #include <persona/btlp/gfx.h>
 #include <persona/btlp/clut.h>
+#include <persona/btlp/load.h>
 
 /* Slots 5 to 9 are the party's. */
 #define BTL_MEMBER_SLOT0 5
@@ -43,6 +44,13 @@ extern int     g_btl_gfx_sector;
 
 extern void    BtlReadSectors(u_long *dest, int sector, int sectors);
 
+/* 99.65%, from 99.20%. The owner's variable is used again for the file's first
+   sector, which is what gives it the copy of the member the image makes, and
+   the TIM is read through g_load_stage the way BtlLoadMemberGfx reads it.
+   What is left is one register choice: global alloc takes the slot table's
+   walking pointer before the owner (priority 2 to 1.6), so the owner lands
+   in a3 and the pointer in v1, where the image has the owner in v1 and the
+   pointer in a0. The loop and wrap shapes tried leave that as it is. */
 #ifdef NON_MATCHING
 short BtlReloadMemberGfx(int member, int actor)
 {
@@ -66,14 +74,14 @@ short BtlReloadMemberGfx(int member, int actor)
         }
     }
 
-    BtlReadSectors((u_long *)BTL_STAGE,
-                   g_btl_member_file[member] + g_btl_gfx_sector,
-                   g_btl_member_file[member + 1] - g_btl_member_file[member]);
+    owner = g_btl_member_file[member];
+    BtlReadSectors((u_long *)BTL_STAGE, owner + g_btl_gfx_sector,
+                   g_btl_member_file[member + 1] - owner);
 
     /* The byte at +2 of the file is the palette's length, one short of what
        BtlStepCluts wants. Zeroing the halfword it sits in leaves the TIM
        header the upload below reads. */
-    tim = BTL_STAGE[0];
+    tim = (u_long *)g_load_stage;
     g_btl_actors[actor].clut_len = *((u_char *)tim + 2) + 1;
     ((u_short *)tim)[1] = 0;
     clut = BtlUploadTim(tim, i, actor, 0, 0, 1);

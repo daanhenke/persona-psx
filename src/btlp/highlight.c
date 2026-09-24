@@ -41,7 +41,9 @@ extern DR_MODE g_btl_highlight_mode[];
 extern int     g_btl_highlight_state;
 extern int     g_btl_highlight_level;
 extern int     g_btl_highlight_row;
-extern int     g_btl_highlight_colour;
+/* An array of one: its reads stay behind stores through the quad, as the
+   image's do, which a plain int's do not. */
+extern int     g_btl_highlight_colour[];
 extern u_char  g_btl_highlight_x[];
 extern u_char  g_btl_highlight_rgb[];
 
@@ -73,7 +75,7 @@ void BtlHighlightBegin(int which)
     g_btl_highlight_state = HIGHLIGHT_RISING;
     g_btl_highlight_level = 2;
     g_btl_highlight_row = rows[which];
-    g_btl_highlight_colour = which;
+    g_btl_highlight_colour[0] = which;
 }
 
 /* Ends the bar early, by dropping it straight into the phase it would have
@@ -88,6 +90,10 @@ void BtlHighlightEnd(void)
    brightness is 0x1000 and sixteen frames carry it either way. Corners 0 and
    3 are left grey and 1 and 2 take the row's colour, which is what makes the
    bar read as a diagonal sheen rather than a flat block. */
+/* 99.74%. The colour index is an array of one (see its declaration): as a
+   scalar gcc lifts its load above the corner stores, and the image does not.
+   The quad's address starts from the table's base. What is left is only which
+   of v0 and a1 hold the base and the scaled index while they are added. */
 #ifdef NON_MATCHING
 void BtlHighlightDraw(int buf, u_long *ot)
 {
@@ -124,7 +130,8 @@ void BtlHighlightDraw(int buf, u_long *ot)
         break;
     }
 
-    p = &g_btl_highlight_poly[buf];
+    p = g_btl_highlight_poly;
+    p += buf;
     top = g_btl_highlight_row * HIGHLIGHT_PITCH + HIGHLIGHT_TOP;
     bottom = g_btl_highlight_row * HIGHLIGHT_PITCH + HIGHLIGHT_BOTTOM;
     p->x0 = g_btl_highlight_x[0] + HIGHLIGHT_LEFT;
@@ -136,7 +143,7 @@ void BtlHighlightDraw(int buf, u_long *ot)
     p->x3 = g_btl_highlight_x[3] + HIGHLIGHT_LEFT;
     p->y3 = bottom;
 
-    rgb = &g_btl_highlight_rgb[g_btl_highlight_colour * 4];
+    rgb = &g_btl_highlight_rgb[g_btl_highlight_colour[0] * 4];
     p->r0 = (u_int)g_btl_highlight_level >> 6;
     p->g0 = (u_int)g_btl_highlight_level >> 6;
     p->b0 = (u_int)g_btl_highlight_level >> 6;

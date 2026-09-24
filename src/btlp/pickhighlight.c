@@ -15,28 +15,36 @@
  * one's item at 0xFF.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/pick.h>
 
-/* How bright a slot's item is drawn, live or not. */
-
-/* And its highlight, chosen or not. */
+/* How bright a slot's item is drawn, chosen or not. */
 #define PICK_CHOSEN 0xFF
 #define PICK_REST   0x60
 
-#ifdef NON_MATCHING
+/* The colour is set up as in BtlPickRefresh: the levels and the object into
+   locals, in the order the image loads them. */
 void BtlPickHighlight(int chosen)
 {
     int i;
+    short red, blue;
+    int green;
+    BtlObj *obj;
 
     i = 0;
     do {
         if (g_btl_pick_live[g_btl_pick_page][i] == 0) {
-            BtlObjSetRgb(g_btl_pick_objs[i], PICK_DARK, PICK_DARK, PICK_DARK);
+            red = PICK_DARK;
+            green = PICK_DARK;
+            obj = g_btl_pick_objs[i];
+            blue = PICK_DARK;
         } else {
-            BtlObjSetRgb(g_btl_pick_objs[i], PICK_LIVE, PICK_LIVE, PICK_LIVE);
+            red = PICK_LIVE;
+            green = PICK_LIVE;
+            obj = g_btl_pick_objs[i];
+            blue = PICK_LIVE;
         }
+        BtlObjSetRgb(obj, red, green, blue);
         BtlObjSetFade(g_btl_pick_objs[i], PICK_FADE);
 
         if (chosen == i) {
@@ -53,6 +61,3 @@ void BtlPickHighlight(int chosen)
         i++;
     } while (i < 6);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/pickhighlight", BtlPickHighlight);
-#endif

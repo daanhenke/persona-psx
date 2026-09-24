@@ -76,7 +76,10 @@ extern void BtlFxResolveHit(BtlObj *o);
    it, the first scheduling pass carries the read down to the byte store into
    g_btl_shake_on, and `slot` trades a1 for a0 with the group byte. No order of
    the four statements, no type for `slot` and no place for the shake store
-   puts the read between the two. */
+   puts the read between the two. Read through an array view of the byte
+   (`extern u_char t[] __asm__("g_btl_fx_target")`) after the phase store, the
+   read stays behind that store (99.10%), but then comes out ahead of the
+   attribute and move loads rather than after them. */
 #ifdef NON_MATCHING
 void BtlFxStep01(BtlObj *o)
 {

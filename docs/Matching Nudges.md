@@ -3365,3 +3365,15 @@ the C's literal.
 under GAS they come out as `dsra32`/`dsrl32` garbage. Include
 `<decomp/gte.h>`, which holds the real `lwc2`/`swc2`/RTPT words. BtlDrawArenaBack
 went from 88.16% to 93.21% on the include alone.
+
+## A global the image reads behind stores is an array
+
+gcc 2.6 treats a scalar global at a fixed address as unable to alias a store
+into a structure through a pointer, so it lifts the global's load above such
+stores. An array element, even `x[0]`, counts as "in a structure" and stays
+behind them. When the image re-reads a global after a run of `p->field`
+stores, or reads it later than any source order gives, declare it as an array
+of one and index it.
+
+- [highlight.c](/src/btlp/highlight.c) - `g_btl_highlight_colour[]`, which took
+  `BtlHighlightDraw` from 93.97% to 99.74%.

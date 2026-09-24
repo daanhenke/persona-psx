@@ -13,7 +13,6 @@
  * - the one past the six - behind them.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/offer.h>
 #include <persona/btlp/stats.h>
@@ -35,7 +34,6 @@
 
 extern const u_char *g_btl_demon_talk_profiles[];
 
-#ifdef NON_MATCHING
 int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
 {
     const u_char     *record;
@@ -46,11 +44,10 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
     offer_slot = g_btl_actors[slot].c.list[g_btl_actors[slot].c.entry];
     record = g_btl_demon_talk_profiles[i];
     p = &g_btl_personas[offer_slot];
-    i = 0;
     if (p->key == 0) {
         return 0;
     }
-    do {
+    for (i = 0; i < OFFER_WANTS; i++) {
         if ((record + i)[OFFER_WANT_AT] != OFFER_WANT_END
             && ((record + i)[OFFER_WANT_AT] & OFFER_WANT_KIND) == p->key) {
             if (((record + i)[OFFER_WANT_AT] & OFFER_WANT_GOOD) != 0) {
@@ -60,11 +57,7 @@ int BtlOfferAnswer(u_short slot, short offer_slot, u_int *out)
             *out = (record + i)[OFFER_ANSWER];
             return OFFER_ANSWERED;
         }
-        i++;
-    } while (i < OFFER_WANTS);
+    }
     *out = (record + i)[OFFER_ANSWER];
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/offeranswer", BtlOfferAnswer);
-#endif

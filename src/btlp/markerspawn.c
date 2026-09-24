@@ -74,6 +74,11 @@ BtlMarkerDef g_btl_marker_defs[BTL_MARKER_PARTS] = {
 };
 extern BtlObj            *g_btl_marker_obj[];
 
+/* 96.95%. The marker loop takes each marker's position by index and walks
+   only the definitions. The lone position is three words, and the extra
+   record takes the old record before it is marked. What is left: the image
+   sets up BtlObjSetAttr's two arguments right after the allocation returns,
+   and gcc here sets them after the stores. */
 #ifdef NON_MATCHING
 void BtlSpawnMarkers(void)
 {
@@ -81,7 +86,7 @@ void BtlSpawnMarkers(void)
     const long         *pos;
     BtlObj             *obj;
     BtlObj             *prev;
-    long                lone[6];
+    long                lone[3];
     int                 marker;
     int                 j;
 
@@ -102,26 +107,22 @@ void BtlSpawnMarkers(void)
     BtlObjSetScale(obj, MARKER_SCALE_XY, MARKER_SCALE_XY, MARKER_SCALE_Z);
     g_btl_marker_obj[BTL_MARKERS] = obj;
 
-    marker = 0;
-    pos = g_btl_marker_pos[0];
-    do {
+    for (marker = 0; marker < BTL_MARKERS; marker++) {
         j = 0;
         def = g_btl_marker_defs;
         prev = 0;
-        do {
-            j++;
+        for (; j < BTL_MARKER_PARTS; j++) {
             obj = BtlObjAlloc(def->defs, MARKER_GROUP, prev, def->kind,
-                              def->index + marker, pos, def->p7, def->p8);
+                              def->index + marker, g_btl_marker_pos[marker],
+                              def->p7, def->p8);
             def++;
             obj->attached = prev;
             obj->mark_num = marker;
             obj->attr |= MARKER_PIECE_BIT;
             prev = obj;
-        } while (j < BTL_MARKER_PARTS);
+        }
         g_btl_marker_obj[marker] = obj;
-        marker++;
-        pos += 4;
-    } while (marker < BTL_MARKERS);
+    }
 
     marker = 0;
     prev = 0;
@@ -129,8 +130,8 @@ void BtlSpawnMarkers(void)
         obj = BtlObjAlloc(g_btl_obj_defs, MARKER_GROUP, prev, 1, 1,
                           g_btl_marker_pos[marker], 0x19, 0x1E);
         prev = obj;
-        obj->mark_num = marker;
         obj->attached = g_btl_marker_obj[marker];
+        obj->mark_num = marker;
         g_btl_marker_obj[marker] = obj;
         g_btl_marker_shown[marker] = 0;
         marker++;

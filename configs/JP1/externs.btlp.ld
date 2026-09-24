@@ -31,6 +31,7 @@ SetDrawMode = 0x8002D9D0;
 SetLineG2 = 0x8002C2FC;
 SetPolyF4 = 0x8002C20C;
 SetPolyFT4 = 0x8002C220;
+SetPolyG3 = 0x8002C1E4;
 SetPolyG4 = 0x8002C234;
 SetSemiTrans = 0x8002C16C;
 SetShadeTex = 0x8002C194;

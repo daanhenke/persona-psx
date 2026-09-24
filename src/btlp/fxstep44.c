@@ -33,10 +33,11 @@
 /* What the last phase leaves behind. */
 #define FX_44_DONE 0x80
 
-/* 93.30%: the loop's tail. The image works the stagger, the counter's step and
-   the record's kind out as soon as the allocation returns and stores them at
-   the end; gcc here computes each at its own store, whether they are written
-   inline, stepped by hand or held in temps. */
+/* 97.58%: the tail's stores in the order the image's loads allow (a sweep
+   of every order of the six statements tops out here). What is left is where
+   the allocation's result is copied into `prev`: the image does it after it
+   has built the attribute constant, and gcc here does it straight after the
+   call. */
 #ifdef NON_MATCHING
 void BtlFxStep44(BtlObj *o)
 {
@@ -76,12 +77,12 @@ void BtlFxStep44(BtlObj *o)
                 pos[2] = 0;
                 prev = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, prev,
                                    FX_OBJ_DRAW, 0, pos, FX_OBJ_CD, FX_OBJ_CE);
-                prev->attr = FX_OBJ_ATTR;
                 prev->motion = FX_44_MOTION;
+                prev->attr = FX_OBJ_ATTR;
+                prev->kind = o->kind;
                 prev->mark_num = FX_COPY_MARK;
                 prev->timer = i * FX_44_STAGGER;
                 i++;
-                prev->kind = o->kind;
             }
         }
         o->phase++;
