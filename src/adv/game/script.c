@@ -84,7 +84,7 @@
  *  67   bust place                      show a bust picture
  *  68   -                               take it down
  *  69   actor se                        a sound, and its mark over an actor
- *  6C   n                               func_800AE040
+ *  6C   n                               AdvScreenEffect
  *  6D   -                               stop the view shaking
  *  6E   a b c d e                       ActorStartMove
  *  71   chan image                      start one of the scene's animations
@@ -262,8 +262,8 @@ extern void   func_800715EC(void);
 extern void   func_80091608(int a);
 extern void   func_800AEE9C(int a);
 extern void   func_800AF1D8(int a);
-extern void   func_800ADCFC(u_char actor);
-extern void   func_800AE040(u_char n);
+extern void   ActorPlace(u_char actor);
+extern void   AdvScreenEffect(u_char n);
 extern void   ActorStartMove(u_char a, u_char b, u_char c, u_char d, u_char e);
 extern u_char ActorsMoveStep(u_char actor);
 extern short  func_800B0A90(void);
@@ -742,7 +742,7 @@ loop:
         g_adv_actors[a].bright = s[0xA];
         g_adv_actors[a].move = MOVE_NONE;
         g_adv_actors[a].script = -1;
-        func_800ADCFC(a);
+        ActorPlace(a);
         break;
     case 0x65:
         a = s[2];
@@ -799,7 +799,7 @@ loop:
                  g_adv_actors[a].world_x, g_adv_actors[a].world_y);
         break;
     case 0x6C:
-        func_800AE040(s[2]);
+        AdvScreenEffect(s[2]);
         break;
     case 0x6D:
         ViewShakeStop();
@@ -883,7 +883,7 @@ loop:
         g_adv_actors[a].phase = 0;
         g_adv_actors[a].slope = 0;
         g_adv_actors[a].unk26 = s[6];
-        func_800ADCFC(a);
+        ActorPlace(a);
         break;
     case 0x80:
         AdvLoadBgm(s[2]);

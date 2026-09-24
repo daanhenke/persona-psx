@@ -740,7 +740,7 @@ EventFlagClear           = 0x800820E4; // type:func size:0x44
 //-----------------------------------------------------------
 D_80082128               = 0x80082128; // type:func size:0x1A4
 ActorSetStandSprite      = 0x800822CC; // type:func size:0x1C0
-func_8008248C            = 0x8008248C; // type:func size:0x1E8
+ActorSetShadowSprite     = 0x8008248C; // type:func size:0x1E8
 
 //-----------------------------------------------------------------
 //--- PA: 0x01E2D4   VA: 0x80082674   subsegment: c, gfx/slotxscale
@@ -1346,8 +1346,8 @@ PartyFindSlot            = 0x800ADCB8; // type:func size:0x44
 //------------------------------------------------------------
 //--- PA: 0x04995C   VA: 0x800ADCFC   subsegment: asm, adv_54b
 //------------------------------------------------------------
-func_800ADCFC            = 0x800ADCFC; // type:func size:0x344
-func_800AE040            = 0x800AE040; // type:func size:0x134
+ActorPlace               = 0x800ADCFC; // type:func size:0x344
+AdvScreenEffect          = 0x800AE040; // type:func size:0x134
 ViewShakeStop            = 0x800AE174; // type:func size:0x30
 ViewShakeStep            = 0x800AE1A4; // type:func size:0x15C
 ActorStartMove           = 0x800AE300; // type:func size:0xC8
@@ -1614,6 +1614,7 @@ D_800BAB84               = 0x800BAB84; // type:u32 size:0xC
 D_800BAB90               = 0x800BAB90; // type:u32 size:0xC
 D_800BAB9C               = 0x800BAB9C; // type:u32 size:0xC70
 g_grow_slot_x            = 0x800BAD20;
+g_actor_defs             = 0x800BAD3C;
 g_adv_field_state        = 0x800BB7EC;
 g_effect_tick            = 0x800BB7FC;
 g_page_fwd_repeat        = 0x800BB800; // size:0x10
