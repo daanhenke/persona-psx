@@ -215,7 +215,7 @@ BgMapClearRow            = 0x80066778; // type:func size:0x40
 //-------------------------------------------------------------
 //--- PA: 0x002418   VA: 0x800667B8   subsegment: asm, adv_3_x1
 //-------------------------------------------------------------
-func_800667B8            = 0x800667B8; // type:func size:0x1B8
+BgReset                  = 0x800667B8; // type:func size:0x1B8
 func_80066970            = 0x80066970; // type:func size:0xF2C
 switchD                  = 0x80066E38;
 default                  = 0x8006785C;
@@ -1252,7 +1252,7 @@ MapDrawName              = 0x80095B88; // type:func size:0xFC
 //-----------------------------------------------------------
 //--- PA: 0x0318E4   VA: 0x80095C84   subsegment: asm, adv_51
 //-----------------------------------------------------------
-func_80095C84            = 0x80095C84; // type:func size:0x220
+MapDrawMarkers           = 0x80095C84; // type:func size:0x220
 func_80095EA4            = 0x80095EA4; // type:func size:0x450
 func_800962F4            = 0x800962F4; // type:func size:0x68
 func_8009635C            = 0x8009635C; // type:func size:0x5A0
@@ -1448,6 +1448,7 @@ AdvUnpack                = 0x800B0ACC; // type:func size:0x234
 //--------------------------------------------------------------
 g_flicker_ramp           = 0x800B0D00; // type:u32 size:0x7620
 g_pow10                  = 0x800B0D20;
+g_bg_clut                = 0x800B0D48; // size:0x80
 g_config_marker_def      = 0x800B1148;
 g_menu_sel               = 0x800B1788;
 g_menu_subsel            = 0x800B178A;
@@ -1614,17 +1615,17 @@ D_800BBBF0               = 0x800BBBF0; // type:u32 size:0x4
 D_800BBBF4               = 0x800BBBF4; // type:u32 size:0x4
 D_800BBBF8               = 0x800BBBF8; // type:u32 size:0x38
 g_cam_x                  = 0x800BBBFC;
+g_map_scroll_x           = 0x800BBC00;
 g_cam_y                  = 0x800BBC08;
+g_map_scroll_y           = 0x800BBC0C;
 g_image_queue_count      = 0x800BBC18;
 g_map_name_cells         = 0x800BBC1C;
 D_800BBC30               = 0x800BBC30; // type:u32 size:0x18
 g_page_back_repeat       = 0x800BBC3C;
 D_800BBC48               = 0x800BBC48; // type:u32 size:0x8
-g_image_queue            = 0x800BBC4C;
-D_800BBC50               = 0x800BBC50; // type:u32 size:0x4
-D_800BBC54               = 0x800BBC54; // type:u32 size:0x410
+g_image_queue            = 0x800BBC4C; // size:0x300
 g_ot_index               = 0x800BBF54;
-g_bg_index               = 0x800BBF58;
+g_bg_index               = 0x800BBF58; // size:0x78
 g_panel_cells            = 0x800BBFD8; // size:0x60
 g_persona_list_count     = 0x800BC038;
 g_adv_chest_count        = 0x800BC03C;
@@ -1640,7 +1641,9 @@ D_800BC574               = 0x800BC574; // type:u32 size:0x8
 D_800BC57C               = 0x800BC57C; // type:u32 size:0x98
 g_adv_char_seq           = 0x800BC5B4;
 g_ot                     = 0x800BC5CC;
+g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 g_bg_state               = 0x800E1E4C; // ignore:True size:0x10
+g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
 D_801F2564               = 0x801F2564; // ignore:True
 g_money                  = 0x801F2674; // ignore:True size:0x4
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF

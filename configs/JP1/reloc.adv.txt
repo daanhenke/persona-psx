@@ -14,3 +14,35 @@ rom:0x3F4C reloc:MIPS_HI16 symbol:g_image_anim addend:0xE
 rom:0x3F54 reloc:MIPS_LO16 symbol:g_image_anim addend:0xE
 rom:0x3FC8 reloc:MIPS_HI16 symbol:g_image_anim addend:0x148
 rom:0x3FCC reloc:MIPS_LO16 symbol:g_image_anim addend:0x148
+
+// The upload queue splits at +0x4 the same way; every reference into it.
+rom:0x24E8 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x24F0 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x24F8 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x2500 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x37A8 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x37B0 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x37B4 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x37BC reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x4024 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x402C reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x4034 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x403C reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x408C reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x4090 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x4170 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x4178 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x4180 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x4188 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x420C reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x4214 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x421C reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x4224 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x42D8 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x42E0 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x42E8 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x42F0 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x436C reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x4374 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x437C reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x4384 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
