@@ -11,6 +11,7 @@
  * the way out rather than being left wherever the step landed.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -31,6 +32,10 @@ extern int   g_ot_index;
 extern void AdvRunFrame(void);
 extern void AdvRenderCharFrame(short extra);
 
+/* 90.96% and 88.23%: identical code, but two saved registers trade places in
+   the first, and the second's prologue narrows its parameters in another
+   order. */
+#ifdef NON_MATCHING
 /* Darkens from `from` down past `to`. */
 void AdvBoxFadeDown(short step, short from, short to, short x, u_short y,
                     short char_frame)
@@ -106,3 +111,7 @@ void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
         AdvRenderCharFrame(0);
     }
 }
+#else
+INCLUDE_ASM("adv/nonmatchings/gfx/boxfade", AdvBoxFadeDown);
+INCLUDE_ASM("adv/nonmatchings/gfx/boxfade", AdvBoxFadeUp);
+#endif

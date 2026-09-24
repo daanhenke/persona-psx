@@ -74,4 +74,10 @@ typedef struct {
 #define SHADOW_COPY     3
 #define SHADOW_COPY_LIT 4
 
+/* The actor the view follows; the others sort against it. */
+extern u_char g_cam_actor;
+
+void ActorsSetDepth(u_short actor);
+void ActorsPlaceSprites(void);
+
 #endif

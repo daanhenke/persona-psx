@@ -1342,8 +1342,8 @@ PartyFindSlot            = 0x800ADCB8; // type:func size:0x44
 //------------------------------------------------------------
 func_800ADCFC            = 0x800ADCFC; // type:func size:0x344
 func_800AE040            = 0x800AE040; // type:func size:0x134
-func_800AE174            = 0x800AE174; // type:func size:0x30
-func_800AE1A4            = 0x800AE1A4; // type:func size:0x15C
+ViewShakeStop            = 0x800AE174; // type:func size:0x30
+ViewShakeStep            = 0x800AE1A4; // type:func size:0x15C
 func_800AE300            = 0x800AE300; // type:func size:0xC8
 func_800AE3C8            = 0x800AE3C8; // type:func size:0xA28
 
@@ -1699,3 +1699,7 @@ g_clock_min              = 0x801F29C1; // ignore:True
 g_clock_sec              = 0x801F29C2; // ignore:True
 g_clock_frame            = 0x801F29C3; // ignore:True
 g_clock_on               = 0x801F29C4; // ignore:True
+g_adv_loading            = 0x800BC208; // size:0x1
+g_view_shake             = 0x800B632C; // size:0x2
+g_view2_dx               = 0x800BB93C; // size:0x2
+g_view2_dy               = 0x800BB948; // size:0x2
