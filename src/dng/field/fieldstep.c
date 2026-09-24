@@ -50,11 +50,11 @@ void FieldEnterTile(void)
     int       tune;
 
     d = g_dng;
-    flags = g_tile_defs[g_floor_grid[d->y][d->x]].flags;
+    flags = g_tile_defs[g_floor_grid[d->pos[POS_Y]][d->pos[POS_X]]].flags;
     g_tile_flags = flags;
     if ((flags & TILE_SPECIAL) && (g_tile_kind = flags & TILE_KIND) == TILE_KIND_DOOR) {
-        cy = d->y % WINDOW;
-        cx = d->x % WINDOW;
+        cy = d->pos[POS_Y] % WINDOW;
+        cx = d->pos[POS_X] % WINDOW;
         d->door_obj[0] = (cy * WINDOW + cx) * 8 + 2;
         d->door_obj[1] = (cy * WINDOW + cx) * 8 + 3;
         g_scene->objs[d->door_obj[0]].coord2->coord.t[d->door_axis[0]] += DOOR_OPEN;
@@ -75,24 +75,24 @@ void FieldEnterTile(void)
             tune = g_floor_tune_b;
         }
         SsPlayBack(tune, 0, 0);
-        g_music_x = g_dng->x;
-        g_music_y = g_dng->y;
+        g_music_x = g_dng->pos[POS_X];
+        g_music_y = g_dng->pos[POS_Y];
     }
 }
 
 /* One frame of a step. */
 void FieldStepView(void)
 {
-    g_view_eye[g_dir_axis[g_dng->dir]] += g_dir_step[g_dng->dir] * STEP_SPEED;
-    g_view_at[g_dir_axis[g_dng->dir]] += g_dir_step[g_dng->dir] * STEP_SPEED;
+    g_view_eye[g_dir_axis[g_dng->walk_dir]] += g_dir_step[g_dng->walk_dir] * STEP_SPEED;
+    g_view_at[g_dir_axis[g_dng->walk_dir]] += g_dir_step[g_dng->walk_dir] * STEP_SPEED;
     FieldSaveView();
 }
 
 /* The last frame of a step: exactly a tile on from where it began. */
 void FieldStepEnd(void)
 {
-    g_view_eye[g_dir_axis[g_dng->dir]] = g_dir_step[g_dng->dir] * STEP_LEN + g_step_from_eye;
-    g_view_at[g_dir_axis[g_dng->dir]] = g_dir_step[g_dng->dir] * STEP_LEN + g_step_from_at;
+    g_view_eye[g_dir_axis[g_dng->walk_dir]] = g_dir_step[g_dng->walk_dir] * STEP_LEN + g_step_from_eye;
+    g_view_at[g_dir_axis[g_dng->walk_dir]] = g_dir_step[g_dng->walk_dir] * STEP_LEN + g_step_from_at;
     FieldSaveView();
 }
 
@@ -107,7 +107,7 @@ void FieldSaveView(void)
 
 void FieldStepBegin(void)
 {
-    g_step_from_eye = g_view_eye[g_dir_axis[g_dng->dir]];
-    g_step_from_at = g_view_at[g_dir_axis[g_dng->dir]];
+    g_step_from_eye = g_view_eye[g_dir_axis[g_dng->walk_dir]];
+    g_step_from_at = g_view_at[g_dir_axis[g_dng->walk_dir]];
     func_80069A14();
 }

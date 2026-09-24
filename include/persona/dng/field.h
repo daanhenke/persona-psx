@@ -22,6 +22,12 @@ typedef struct {
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
+    u_char        pad19E58[0x364AC - 0x19E58];
+    u_short       sky_angle;          /* 0x364AC the backdrop turns with the party */
+    u_char        pad364AE[0x6E910 - 0x364AE];
+    u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
+    u_char        pad6E912[2];
+    long          sin, cos;           /* 0x6E914 of the party's angle */
 } DngScene;
 
 /* The game state block as the field sees it. Only the fields the overlay
@@ -31,17 +37,21 @@ typedef struct {
     GsRVIEW2 view;       /* 0x1580 the camera as last saved */
     u_short  map;        /* 0x15A0 */
     u_char   pad15A2[2];
-    u_char   x;          /* 0x15A4 */
-    u_char   pad15A5;
-    u_char   y;          /* 0x15A6 */
-    u_char   pad15A7;
-    u_char   dir;        /* 0x15A8 facing, 0-3 */
-    u_char   pad15A9[0x15C8 - 0x15A9];
+    u_char   pos[3];     /* 0x15A4 the party's tile, [POS_X] and [POS_Y];
+                            a step indexes it with g_dir_axis */
+    u_char   facing;     /* 0x15A7 0-3, counting anticlockwise */
+    u_char   walk_dir;   /* 0x15A8 the facing a step goes towards */
+    u_char   pad15A9[3];
+    long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
+    u_char   pad15B0[0x15C8 - 0x15B0];
     /* The door being opened: for each of its two halves, which axis of the
        translation moves and which scene object it is. */
     short   door_axis[2]; /* 0x15C8 */
     u_short door_obj[2];  /* 0x15CC */
 } DngState;
+
+#define POS_X 0
+#define POS_Y 2
 
 extern DngScene *g_scene;
 extern DngState *g_dng;
@@ -90,9 +100,30 @@ extern long g_step_from_eye;
 extern long g_step_from_at;
 
 /* Per facing, which axis of the view a step moves along (0 x, 2 z) and
-   which way. */
+   which way, and which way the party's tile moves along it. */
 extern u_char g_dir_axis[];
 extern long   g_dir_step[];
+extern int    g_dir_tile_step[];
+
+/* A step remembers the tile it leaves and, for a step undone, the one
+   coordinate it changed. */
+extern u_char g_walk_from_x;
+extern u_char g_walk_from_y;
+extern u_char g_walk_undo;
+
+/* Any mode bits set, a step is refused without walking. */
+extern int g_field_mode;
+
+/* The floor's tune pauses while the party stands; the first step resumes
+   it, slowed down, unless the tune is off. */
+#define BGM_RESUMED 0x80
+extern u_char g_bgm_flags;
+extern u_char g_bgm_off;
+extern short  g_bgm_seq;
+
+/* A turn is nine frames of TURN_SPEED, then snaps to a quarter turn. */
+#define TURN_SPEED   96
+#define QUARTER_TURN 0x400
 
 #define STEP_SPEED 30
 #define STEP_LEN   300
@@ -153,7 +184,16 @@ void CoordSetRot(SVECTOR *rot, GsCOORDINATE2 *coord);
 void UploadImageRows(void *desc, u_short x, u_short y, short rows);
 void TimLoad(u_long *tim, int nopal);
 
+void func_80065978(void);
+int  func_8006966C(void);
+void func_800695D8(void);
+int  func_80069708(void);
+void func_800697B0(void);
 void func_80069A14(void);
+void func_8006A4D0(void);
+int  func_8006C9C8(void);
+void func_8006CF40(void);
+void func_80070DAC(int arg);
 void func_8006A3CC(void);
 void func_8006D33C(int arg);
 
@@ -169,5 +209,9 @@ void FieldStepView(void);
 void FieldStepEnd(void);
 void FieldSaveView(void);
 void FieldStepBegin(void);
+
+int  FieldWalk(int ret);
+void FieldTurn(int turn);
+void FieldSetHeading(int turn);
 
 #endif
