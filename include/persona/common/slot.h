@@ -85,7 +85,10 @@ extern void SlotInit(void *def, u_char slot, int attr, short x, short y);
    That is what makes it different from a unit declaring a prototype its
    neighbours declare differently, which is nearly always an accident of how
    the decompilation was written rather than something the object needs. */
-#ifdef SLOT_TAGGED_INT
+#if defined(SLOT_TAGGED_INTXY)
+/* dng's persona data view hands x and y over unnarrowed too. */
+extern void SlotInitTagged(void *def, u_char slot, int attr, int x, int y);
+#elif defined(SLOT_TAGGED_INT)
 extern void SlotInitTagged(void *def, int slot, int attr, short x, short y);
 #else
 extern void SlotInitTagged(void *def, u_char slot, int attr, short x, short y);

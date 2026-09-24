@@ -1,5 +1,5 @@
-/* Persona 1 (JP) - marking an automap tile revealed.  ADV only.
- *   ADV 0x80096AB0
+/* Persona 1 (JP) - marking an automap tile revealed.
+ *   ADV 0x80096AB0  DNG 0x80097308
  *
  * Handed the first room of the map already resolved, because the scene keeps
  * that index alongside the room number - which is the difference from
