@@ -35,6 +35,8 @@ extern const u_char str_cell_run[];
 
 extern void  TileMapWriteRow(const u_char *src, short *dst, int base,
                              u_short count);
+extern void  TileMapWriteCol(const u_char *src, short *dst, int base,
+                             u_short count, u_short stride);
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
                                 u_short count);
 extern void  TileMapFillRect(short *dst, short value, u_short w, u_short h,

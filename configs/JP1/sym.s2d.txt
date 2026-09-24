@@ -79,7 +79,7 @@ PlayTimeTick             = 0x80065EB8; // type:func size:0xC8
 //-----------------------------------------------------------
 //--- PA: 0x001BE0   VA: 0x80065F80   subsegment: asm, s2d_s2
 //-----------------------------------------------------------
-D_80065F80               = 0x80065F80; // type:func size:0xDC
+ClockTick                = 0x80065F80; // type:func size:0xDC
 
 //--------------------------------------------------------------------
 //--- PA: 0x001CBC   VA: 0x8006605C   subsegment: c, common/ui/decimal
@@ -112,7 +112,7 @@ BgMapSetCell             = 0x8006708C; // type:func size:0x88
 //--------------------------------------------------------------
 //--- PA: 0x002D74   VA: 0x80067114   subsegment: asm, s2d_s3_x2
 //--------------------------------------------------------------
-func_80067114            = 0x80067114; // type:func size:0x258
+FontUploadGlyph          = 0x80067114; // type:func size:0x258
 
 //---------------------------------------------------------------------
 //--- PA: 0x002FCC   VA: 0x8006736C   subsegment: c, common/gfx/tilemap
@@ -122,7 +122,7 @@ TileMapWriteRow          = 0x8006736C; // type:func size:0x4C
 //--------------------------------------------------------------
 //--- PA: 0x003018   VA: 0x800673B8   subsegment: asm, s2d_s3_x3
 //--------------------------------------------------------------
-D_800673B8               = 0x800673B8; // type:func size:0x54
+TileMapWriteCol          = 0x800673B8; // type:func size:0x54
 
 //-------------------------------------------------------------------------
 //--- PA: 0x00306C   VA: 0x8006740C   subsegment: c, common/gfx/tilemapblit
@@ -1243,3 +1243,9 @@ D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C;
 g_msg                    = 0x80101E4C; // ignore:True size:0x40
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
+g_font_bits              = 0x801E0000; // ignore:True
+g_clock_hours            = 0x801F29C0; // ignore:True
+g_clock_min              = 0x801F29C1; // ignore:True
+g_clock_sec              = 0x801F29C2; // ignore:True
+g_clock_frame            = 0x801F29C3; // ignore:True
+g_clock_on               = 0x801F29C4; // ignore:True

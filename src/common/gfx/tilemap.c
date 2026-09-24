@@ -10,8 +10,8 @@
  * 0x1400 bytes apart, which is exactly 40*64*2, so they are contiguous.
  *
  * The reverse writer and the two rectangle routines are a unit of their own in
- * tilemapblit.c: a routine none of the three overlays has worked out sits
- * between this and them.
+ * tilemapblit.c. The column writer after the row writer has no caller in any
+ * of the three.
  */
 #include <decomp/types.h>
 
@@ -32,5 +32,22 @@ void TileMapWriteRow(const u_char *src, short *dst, int base, u_short count)
         src++;
         count--;
         dst++;
+    }
+}
+
+/* TileMapWriteRow turned on its side: each byte goes `stride` cells below the
+   last, so a label reads downwards. Nothing in any of the three overlays calls
+   it. */
+void TileMapWriteCol(const u_char *src, short *dst, int base, u_short count,
+                     u_short stride)
+{
+    while (count != 0) {
+        if (*src == 0xFF) {
+            return;
+        }
+        *dst = *src + base;
+        src++;
+        dst += stride;
+        count--;
     }
 }

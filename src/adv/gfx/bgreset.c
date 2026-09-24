@@ -9,6 +9,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <persona/common/bg.h>
+#include <persona/common/font.h>
 #include <persona/common/item.h>
 #include <persona/common/menulist.h>
 #include <persona/common/pad.h>
@@ -154,7 +155,7 @@ extern u_char      InputCheckAcceptA(u_char repeat);
 
 #define g_money2 (*(u_int *)0x801F2678)
 
-void FontUploadGlyph(short x, short y, u_short glyph);
+
 
 /* FormatDecimal's body, which this file carries as an inline of its own:
    the digits least significant first, and how many of them count. */

@@ -367,7 +367,7 @@ BgMapSetCell             = 0x80077064; // type:func size:0x88
 //--------------------------------------------------------------
 //--- PA: 0x012D4C   VA: 0x800770EC   subsegment: asm, dng_s4_x2
 //--------------------------------------------------------------
-func_800770EC            = 0x800770EC; // type:func size:0x258
+FontUploadGlyph          = 0x800770EC; // type:func size:0x258
 
 //---------------------------------------------------------------------
 //--- PA: 0x012FA4   VA: 0x80077344   subsegment: c, common/gfx/tilemap
@@ -377,7 +377,7 @@ TileMapWriteRow          = 0x80077344; // type:func size:0x4C
 //--------------------------------------------------------------
 //--- PA: 0x012FF0   VA: 0x80077390   subsegment: asm, dng_s4_x3
 //--------------------------------------------------------------
-D_80077390               = 0x80077390; // type:func size:0x54
+TileMapWriteCol          = 0x80077390; // type:func size:0x54
 
 //-------------------------------------------------------------------------
 //--- PA: 0x013044   VA: 0x800773E4   subsegment: c, common/gfx/tilemapblit
@@ -1218,3 +1218,4 @@ g_map_seen               = 0x801F2B38; // ignore:True
 g_bump_seq               = 0x801F5394;
 g_floor_tune_a           = 0x801F5396;
 g_floor_tune_b           = 0x801F5398;
+g_font_bits              = 0x801E0000; // ignore:True

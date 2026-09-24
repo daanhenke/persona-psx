@@ -199,7 +199,7 @@ PlayTimeTick             = 0x80066420; // type:func size:0xC8
 //----------------------------------------------------------
 //--- PA: 0x002148   VA: 0x800664E8   subsegment: asm, adv_2
 //----------------------------------------------------------
-D_800664E8               = 0x800664E8; // type:func size:0xDC
+ClockTick                = 0x800664E8; // type:func size:0xDC
 
 //-----------------------------------------------------------------------
 //--- PA: 0x002224   VA: 0x800665C4   subsegment: c, ../common/ui/decimal
@@ -242,7 +242,7 @@ TileMapWriteRow          = 0x80067B7C; // type:func size:0x4C
 //-------------------------------------------------------------
 //--- PA: 0x003828   VA: 0x80067BC8   subsegment: asm, adv_3_x3
 //-------------------------------------------------------------
-D_80067BC8               = 0x80067BC8; // type:func size:0x54
+TileMapWriteCol          = 0x80067BC8; // type:func size:0x54
 
 //----------------------------------------------------------------------------
 //--- PA: 0x00387C   VA: 0x80067C1C   subsegment: c, ../common/gfx/tilemapblit
@@ -1690,3 +1690,12 @@ g_playtime_min           = 0x801F29BD;
 g_playtime_sec           = 0x801F29BE;
 g_playtime_frame         = 0x801F29BF;
 g_adv_room               = 0x801F5355; // ignore:True size:0x1
+g_font_bits              = 0x801E0000; // ignore:True
+g_vab_id                 = 0x801F535C; // ignore:True size:0x10
+g_seq_handle             = 0x801F537C; // ignore:True size:0x40
+g_seq_offset             = 0x80118020; // ignore:True size:0x100
+g_clock_hours            = 0x801F29C0; // ignore:True
+g_clock_min              = 0x801F29C1; // ignore:True
+g_clock_sec              = 0x801F29C2; // ignore:True
+g_clock_frame            = 0x801F29C3; // ignore:True
+g_clock_on               = 0x801F29C4; // ignore:True
