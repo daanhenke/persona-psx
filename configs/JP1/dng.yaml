@@ -77,7 +77,7 @@ segments:
       - [0xA0E4, c, field/fieldcell]
       - [0xA70C, asm, dng_0_s5]
       - [0xADB0, c, field/fieldsetup]
-      - [0xB170, asm, dng_0_s6]
+      - [0xB170, c, field/fieldscene]
       - [0xB638, c, common/gfx/coord]
       - [0xB738, c, field/fieldtmd]
       - [0xB768, c, common/gfx/tim]

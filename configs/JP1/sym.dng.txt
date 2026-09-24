@@ -197,8 +197,8 @@ FieldFadeSeqs            = 0x8006F150; // type:func size:0x6C
 FieldCloseSound          = 0x8006F1BC; // type:func size:0xA0
 FieldSetView             = 0x8006F25C; // type:func size:0x16C
 FieldInitLight           = 0x8006F3C8; // type:func size:0x148
-func_8006F510            = 0x8006F510; // type:func size:0x2B8
-func_8006F7C8            = 0x8006F7C8; // type:func size:0x210
+FieldBuildScene          = 0x8006F510; // type:func size:0x2B8
+FieldPlaceObject         = 0x8006F7C8; // type:func size:0x210
 
 //-------------------------------------------------------------------
 //--- PA: 0x00B638   VA: 0x8006F9D8   subsegment: c, common/gfx/coord
@@ -1122,6 +1122,9 @@ g_compass_cels           = 0x8009C8B0;
 g_map_marker_defs        = 0x8009C930;
 g_tile_walls             = 0x8009C9CC;
 g_flag_groups            = 0x8009CD04;
+D_8009CD50               = 0x8009CD50;
+D_8009DC70               = 0x8009DC70;
+D_8009EB90               = 0x8009EB90;
 g_field_lit              = 0x8009FAB0;
 g_page_fwd_repeat        = 0x8009FAB8;
 
@@ -1213,6 +1216,7 @@ g_effect_over            = 0x800A04FC;
 g_pack_obj_tab           = 0x800A0530;
 g_pack_images            = 0x800A0534;
 g_index_info_tab         = 0x800A053C;
+g_pack_tmd_tab           = 0x800A0540;
 g_msg_color              = 0x800A0548;
 D_800A059C               = 0x800A059C;
 g_pack_event_tab         = 0x800A05A0;

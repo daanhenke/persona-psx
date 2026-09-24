@@ -63,7 +63,7 @@ void FieldInitGraph(void)
 #ifdef NON_MATCHING
 void FieldSetFloor(void)
 {
-    g_model_defs = (u_char *)(PACK_BASE + *g_pack_model_tab);
+    g_model_defs = (ModelDef *)(PACK_BASE + *g_pack_model_tab);
     g_tile_defs = (TileDef *)(INDEX_BASE + *g_index_tile_tab);
     g_floor_info = (u_char *)(INDEX_BASE + g_index_info_tab[DNG_FLOOR]);
     g_floor_grid = (void *)(INDEX_BASE + g_index_grid_tab[DNG_FLOOR]);

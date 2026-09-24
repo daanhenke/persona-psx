@@ -29,6 +29,13 @@ typedef struct {
     u_long *src;     /* 0xC */
 } DngWindow;
 
+/* A mapped TMD's object list. A struct of one member, not a bare pointer:
+   indexed, gcc then adds the index after the scene's address, as the image
+   does. */
+typedef struct {
+    u_long *tmd;
+} SceneModel;
+
 /* The flat sprites drawn over the field: exactly as many as fit before the
    objects. */
 #define FIELD_SPRITES 150
@@ -51,7 +58,8 @@ typedef struct {
     u_char        pad364C0[0x364D4 - 0x364C0];
     PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
     GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
-    u_char        pad6E4E4[0x6E910 - 0x6E4E4];
+    u_char        pad6E4E4[0x6E50C - 0x6E4E4];
+    SceneModel    models[257];        /* 0x6E50C the floor's TMDs, from 1 */
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
@@ -110,7 +118,7 @@ extern DngState *g_dng;
 #define FLOOR_W 24
 
 typedef struct {
-    u_char  pad0[8];
+    u_char  models[8]; /* 0x0 the models its eight objects show */
     u_char  icon;    /* 0x8 its minimap cell */
     u_char  pad9;
     u_short flags;   /* 0xA */
@@ -236,7 +244,24 @@ extern u_long *g_index_grid_tab;
 
 /* The current floor's entries. g_floor_spots is a list the field matches
    against the party's tile; g_floor_events carries what a spot starts. */
-extern u_char *g_model_defs;
+/* A model a tile can show: its TMD, the object attribute, its offset from
+   the tile's corner and its rotation in degrees. */
+typedef struct {
+    u_char  tmd;
+    u_char  pad1[3];
+    u_long  attr;     /* 0x4 */
+    u_char  pad8[4];
+    short   x, y, z;  /* 0xC */
+    short   rx, ry, rz; /* 0x12 */
+} ModelDef;
+
+extern ModelDef *g_model_defs;
+extern u_long   *g_pack_tmd_tab;
+
+/* Per scene object; nothing here says more. */
+extern int D_8009CD50[];
+extern int D_8009DC70[];
+extern int D_8009EB90[];
 extern u_char *g_floor_info;
 extern u_char *g_floor_objs;
 extern u_char *g_floor_spots;
@@ -441,8 +466,9 @@ extern u_char g_lift_stops[][12];
 extern u_char g_lift_from[][12];
 
 void FieldSetLiftDigits(int n);
+void FieldBuildScene(int reload);
+void FieldPlaceObject(int obj, int model, int x, int y);
 void FieldRideLift(int button);
-void func_8006F510(int a);
 void func_80070090(int a);
 void FieldNudge(int frames, int dy);
 

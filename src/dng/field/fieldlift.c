@@ -78,7 +78,7 @@ void FieldRideLift(int button)
     g_floor_spots = (u_char *)(PACK_BASE + g_pack_spot_tab[DNG_FLOOR]);
     g_floor_events = (u_char *)(PACK_BASE + g_pack_event_tab[DNG_FLOOR]);
     FieldRebuildMap();
-    func_8006F510(1);
+    FieldBuildScene(1);
     func_80070090(0);
     FieldLoadWallCluts();
 }
