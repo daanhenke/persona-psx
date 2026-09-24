@@ -17,9 +17,10 @@ typedef struct {
     /* 0x030 */ MenuList unk030;
     /* 0x040 */ MenuList unk040;
     /* 0x050 */ MenuList unk050;
-    /* 0x060 */ MenuList unk060;
-    /* 0x070 */ MenuList unk070;
-    /* 0x080 */ u_char   pad080[0x20];
+    /* 0x060 */ MenuList status_cmd;    /* skills, member pages, stock      */
+    /* 0x070 */ MenuList skill_member;  /* the skills screen's member       */
+    /* 0x080 */ MenuList skill_persona; /* one of the member's Personas     */
+    /* 0x090 */ MenuList skill_spell;   /* and one of its spells            */
     /* 0x0A0 */ MenuList status_member; /* the status menu's party member   */
     /* 0x0B0 */ MenuList persona_cmd;   /* 0 equips the Persona, else views */
     /* 0x0C0 */ MenuList persona_slot;  /* which of the member's Personas   */

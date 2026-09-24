@@ -1,0 +1,378 @@
+/* Persona 1 (JP) - the status menu.  ADV only.
+ *   0x8006CA88 StatusMenuStep   0x8006CB7C StatusMenuOpen
+ *   0x8006CFAC StatusStockScreen
+ */
+#include <decomp/types.h>
+#include <decomp/include_asm.h>
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include <persona/common/menuctx.h>
+#include <persona/common/char.h>
+#include <persona/common/persona.h>
+#include <persona/common/formation.h>
+#include <persona/common/bg.h>
+#include <persona/adv/personapage.h>
+
+/* The stock screen's first step. */
+#define STOCK_PICK 10
+
+/* The status menu's commands. */
+#define STATUS_SKILLS   0
+#define STATUS_PERSONAS 1
+#define STATUS_STOCK    2
+
+extern short   g_menu_subsel;
+extern short   g_menu_sel;
+extern u_char  g_menu_blink;
+extern u_short g_key_menu_close;
+extern int     g_pad_pressed[];
+extern short   g_stock_last;
+extern u_char  g_fm_mark_def[];
+extern short   g_fm_mark_pos[][2];
+extern u_short g_menu_bg_rle[];
+extern u_char  D_800B17E0[];
+extern u_char  D_800B1D08[];
+extern u_char  D_800B2330[];
+
+extern void  DrawStatusHud(void);
+extern void  BgBoxShow(void);
+extern void  func_800782A4(int a, int b);
+extern void  func_8008C23C(short member);
+extern short PersonaStockCompact(void);
+extern void  PersonaStockDraw(void);
+extern void  func_80076CE0(void);
+extern u_char MenuStepMember(int *sel, u_char last);
+extern u_char CharTopEntry(short slot);
+extern u_char PersonaTopSpell(short id);
+extern void   BgPanelSet(short id, short x, short y);
+extern void   func_8007AF78(void);
+extern void   func_8007B288(short member);
+extern void   func_8007B554(short member, short persona);
+extern void   func_800768F0(void);
+extern u_char D_800B12B8[];
+extern u_char D_800B1EB8[];
+/* The spell whose description the skills screen's panel shows. */
+extern short  g_skill_help_spell;
+
+extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
+extern void func_80077F8C(int a, int b);
+extern void func_8007A62C(int a, int b);
+extern void StatusPersonaPick(void);
+extern void StatusPersonaView(void);
+extern void StatusStockPick(void);
+extern void StatusStockReleasePick(void);
+extern void StatusStockReleaseConfirm(void);
+extern void StatusStockView(void);
+
+void StatusMenuOpen(void);
+void StatusTopStep(void);
+short StatusStockOpen();
+void SkillMemberPick(void);
+void SkillPersonaPick(void);
+void func_8006DA28(void);
+void func_8006DDD8(void);
+void func_8006E10C(void);
+void func_8006F020(void);
+
+void StatusMenuStep(void)
+{
+    switch (g_menu_subsel) {
+    case 0:
+        StatusMenuOpen();
+        g_menu_subsel++;
+        break;
+    case 1:
+        StatusTopStep();
+        break;
+    case 2:
+        SkillMemberPick();
+        break;
+    case 3:
+        SkillPersonaPick();
+        break;
+    case 4:
+        func_8006DA28();
+        break;
+    case 5:
+        func_8006DDD8();
+        break;
+    case 6:
+        func_8006E10C();
+        break;
+    case 7:
+        func_8006F020();
+        break;
+    case 8:
+        StatusPersonaPick();
+        break;
+    case 9:
+        StatusPersonaView();
+        break;
+    }
+}
+
+void StatusMenuOpen(void)
+{
+    func_800768F0();
+    SlotSetAnim(0x2D, 0, 0, 0, 0, 0xC, 0, 0);
+    func_80077F8C(1, 2);
+    func_8007A62C(1, 6);
+}
+
+/* The status menu's command list, a frame: skills, the member pages, and
+   the Persona stock. */
+void StatusTopStep(void)
+{
+    int i;
+
+    DrawStatusHud();
+    if (MenuStepCursor(&g_menu->status_cmd)) {
+        func_800782A4(1, 6);
+    }
+    if (InputCheckAcceptA(2)) {
+        switch (g_menu->status_cmd.cur) {
+        case STATUS_SKILLS:
+            SlotClearAll();
+            SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+            SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+            SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0xC, 0, 0);
+            SlotInitTagged(g_fm_mark_def, 1, 0x42,
+                           (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
+                           (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
+            SlotSetFlicker(1, 1);
+            g_menu_subsel++;
+            break;
+        case STATUS_PERSONAS:
+            func_8008EDBC(7);
+            SlotClearAll();
+            TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+            TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);
+            TileMapDrawBox(AT(g_tilemap0, 1, 8), 0x18, 5, MAP_W);
+            TileMapBlitRle(g_menu_bg_rle, AT(g_tilemap0, 8, 0), MAP_W);
+            TileMapWriteRow(str_cell_run, AT(g_tilemap2, 0, 3), 0x457, 6);
+            for (i = 0; i < 3; i++) {
+                TileMapWriteBar(AT(g_tilemap0, 2 + i, 10), 10);
+                TileMapWriteBar(AT(g_tilemap0, 2 + i, 21), 10);
+                *AT(g_tilemap2, 1 + i, 0) = 0x418 + i;
+            }
+            func_8008C23C(g_menu->status_member.cur);
+            BgBoxShow();
+            DrawStatusHud();
+            SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+            SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+            SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
+            SlotInitTagged(g_fm_mark_def, 1, 0x42,
+                           (g_fm_mark_pos + 1)[g_menu->status_member.cur][0],
+                           (g_fm_mark_pos + 1)[g_menu->status_member.cur][1]);
+            SlotSetFlicker(1, 1);
+            g_menu_subsel += 5;
+            break;
+        case STATUS_STOCK:
+            StatusStockScreen();
+            break;
+        }
+    } else if (InputCheckAcceptB(2) || g_menu_allow_hold) {
+        g_menu_blink = 0xFF;
+        g_menu_sel = 0;
+        g_menu_subsel = 0;
+    }
+}
+
+/* The Persona stock screen: its own loop until a step leaves it. */
+void StatusStockScreen(void)
+{
+    if (StatusStockOpen(1)) {
+        return;
+    }
+    g_menu_subsel = STOCK_PICK;
+loop:
+    RunFrame();
+    if (!g_menu_allow_hold && (g_key_menu_close & g_pad_pressed[0])) {
+        g_menu_allow_hold = 1;
+        SoundPlaySeq(0x18, 0, 1);
+    }
+    switch (g_menu_subsel) {
+    case 0:
+        return;
+    case STOCK_PICK:
+        StatusStockPick();
+        break;
+    case STOCK_PICK + 1:
+        StatusStockReleasePick();
+        break;
+    case STOCK_PICK + 2:
+        StatusStockReleaseConfirm();
+        break;
+    case STOCK_PICK + 3:
+        StatusStockView();
+        break;
+    }
+    goto loop;
+}
+
+/* The Persona stock list. With nothing in stock there is nothing to show:
+   on the way in (`first`) the menu is left altogether. */
+short StatusStockOpen(first)
+    short first;
+{
+    int i;
+
+    func_8008EDBC(0xA);
+    SlotClearAll();
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+    TileMapDrawWindow(g_tilemap0, 0x1E, 0x12, MAP_W);
+    TileMapDrawBox(AT(g_tilemap0, 1, 1), 0x1C, 0x10, MAP_W);
+    TileMapWriteRow(D_800B17E0, AT(g_tilemap1, 13, 2), 0x285, 6);
+    for (i = 0; i < STOCK_ROWS; i++) {
+        TileMapWriteBar(AT(g_tilemap0, 2 + i, 2), 0xB);
+        TileMapWriteBar(AT(g_tilemap0, 2 + i, 13), 5);
+        TileMapWriteBar(AT(g_tilemap0, 2 + i, 18), 10);
+    }
+    g_stock_last = PersonaStockCompact();
+    PersonaStockDraw();
+    TileMapWriteBar(AT(g_tilemap0, 15, 2), 10);
+    SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+    SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+    SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0xC, 0, 0);
+    if (g_stock_last == -1) {
+        if (first) {
+            func_80076CE0();
+            g_menu_subsel = 0;
+            return 1;
+        }
+        return 0;
+    }
+    SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0, 0);
+    if (g_menu->stock.cur != g_stock_last + 1) {
+        SlotSetPos(1, 0x42, 0x48, g_menu->stock.cur * 12 + 0x24);
+    } else {
+        SlotSetPos(1, 0x42, 0x48, 0xC0);
+    }
+    SlotSetFlicker(1, 1);
+    return 0;
+}
+
+/* The skills screen's member marker, a frame. Accepting a member lays out
+   their Personas and the first one's spells. */
+void SkillMemberPick(void)
+{
+    DrawStatusHud();
+    if (MenuStepMember(&g_menu->skill_member.cur, g_party_last)) {
+        MenuListInit(&g_menu->skill_persona, 0, 0,
+                     CharTopEntry(g_menu->skill_member.cur), 0x16);
+        g_menu->skill_spell.cur = 0;
+        SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
+                   (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
+    }
+    if (InputCheckAcceptA(1)) {
+        func_8008EDBC(6);
+        func_8007AF78();
+        func_8007B288(g_menu->skill_member.cur);
+        MenuListInit(&g_menu->skill_persona, 0, 0,
+                     CharTopEntry(g_menu->skill_member.cur), 0x16);
+        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SlotInitTagged(D_800B12B8, 2, 0x42, 0x58,
+                       g_menu->skill_persona.cur * 12 + 0x54);
+        SlotSetFlicker(2, 1);
+        g_slot_cur = &g_slots[2];
+        if (g_menu->skill_persona.hi == 0xFF) {
+            g_slot_cur->attr |= SLOT_ATTR_HIDE;
+        } else {
+            g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+        }
+        g_menu_subsel++;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        g_menu_subsel = 0;
+    }
+}
+
+/* The member's Personas, a frame; the marker still moves between members.
+   Accepting a Persona opens its spells, with the first one's description. */
+void SkillPersonaPick(void)
+{
+    u_long   chars = (u_long)g_chars;
+    Persona *personas = g_personas;
+    Char    *c;
+    int      i = g_menu->skill_member.cur;   /* the member before the step,
+                                                 then a member, then a Persona */
+
+    if (MenuStepCursor(&g_menu->skill_member)) {
+        if (i != g_menu->skill_member.cur) {
+            g_menu->skill_spell.cur = 0;
+            MenuListInit(&g_menu->skill_persona, 0, 0,
+                         CharTopEntry(g_menu->skill_member.cur), 0x16);
+            func_8007B288(g_menu->skill_member.cur);
+            func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+            SlotSetPos(1, 0x42,
+                       (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
+                       (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
+            g_slot_cur = &g_slots[2];
+            if (g_menu->skill_persona.hi == 0xFF) {
+                g_slot_cur->attr |= SLOT_ATTR_HIDE;
+            } else {
+                g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+            }
+        }
+    } else if (g_menu->skill_persona.hi != 0xFF &&
+               MenuStepCursor(&g_menu->skill_persona)) {
+        g_menu->skill_spell.cur = 0;
+        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+    }
+    SlotSetPos(2, 0x42, 0x58, g_menu->skill_persona.cur * 12 + 0x54);
+    DrawStatusHud();
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->skill_persona.hi != 0xFF) {
+            i = g_party_at[g_menu->skill_member.cur];
+            c = (Char *)(i * sizeof(Char) + chars);
+            i = c->list[g_menu->skill_persona.cur];
+            MenuListInit(&g_menu->skill_spell, 0, 0, PersonaTopSpell(i), 0x16);
+            if (i != 0xFF && !c->blocked) {
+                g_skill_help_spell = personas[i].spell[g_menu->skill_spell.cur];
+            } else {
+                g_skill_help_spell = 0;
+            }
+            BgPanelSet(g_skill_help_spell, 0x3C, 0xE);
+            SlotInitTagged(g_pdata_cursor_def, 3, 0x42, 0xC8,
+                           g_menu->skill_spell.cur * 12 + 0x24);
+            SlotInitTagged(D_800B1EB8, 0x2E, 0x24, 0x3A, 0xC);
+            if (g_menu->skill_spell.hi == 0xFF) {
+                g_slot_cur = &g_slots[3];
+                g_slot_cur->attr |= SLOT_ATTR_HIDE;
+            }
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(2, 0);
+            SlotSetFlicker(3, 1);
+            g_menu_subsel++;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        func_800768F0();
+        SlotClear(2);
+        SlotClear(0x2F);
+        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0xC, 0, 0);
+        SlotInitTagged(g_fm_mark_def, 1, 0x42,
+                       (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
+                       (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
+        SlotSetFlicker(1, 1);
+        g_menu_subsel--;
+    }
+}
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DA28);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DDD8);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E10C);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E29C);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", D_8006E650);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E94C);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006ED78);
+
+INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006F020);

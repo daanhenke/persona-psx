@@ -254,8 +254,8 @@ void FormationMenu(void)
     MenuListInit(&g_menu->unk030, 0, 0, 2, 0x2E);
     MenuListInit(&g_menu->unk040, 1, 0, 1, 0x1E);
     MenuListInit(&g_menu->unk050, 0, 0, g_party_last, 0x1A);
-    MenuListInit(&g_menu->unk060, 0, 0, 2, 0x2E);
-    MenuListInit(&g_menu->unk070, 0, 0, g_party_last, 0x1A);
+    MenuListInit(&g_menu->status_cmd, 0, 0, 2, 0x2E);
+    MenuListInit(&g_menu->skill_member, 0, 0, g_party_last, 0x1A);
     MenuListInit(&g_menu->unk100, 0, 0, 2, 0x2E);
     MenuListInit(&g_menu->unk220, 0, 0, 8, 0x16);
     MenuListInit(&g_menu->unk230, 0, 0, 3, 0x14);

@@ -109,6 +109,8 @@ D_800643A4               = 0x800643A4; // type:u32 size:0x138C
 //-------------------------------------------------------------------
 //--- PA: 0x000170   VA: 0x80064510   subsegment: rodata, adv_rodata1
 //-------------------------------------------------------------------
+jtbl_80064430            = 0x80064430; // size:0x28
+jtbl_80064458            = 0x80064458; // size:0x38
 jtbl_80064490            = 0x80064490; // size:0x24
 jtbl_800644B8            = 0x800644B8; // size:0x24
 jtbl_800644E0            = 0x800644E0; // size:0x24
@@ -351,13 +353,13 @@ func_8006AF40            = 0x8006AF40; // type:func size:0x260
 func_8006B1A0            = 0x8006B1A0; // type:func size:0x598
 func_8006B738            = 0x8006B738; // type:func size:0x878
 func_8006BFB0            = 0x8006BFB0; // type:func size:0xAD8
-func_8006CA88            = 0x8006CA88; // type:func size:0xF4
-func_8006CB7C            = 0x8006CB7C; // type:func size:0x60
-func_8006CBDC            = 0x8006CBDC; // type:func size:0x3D0
-func_8006CFAC            = 0x8006CFAC; // type:func size:0xF8
-func_8006D0A4            = 0x8006D0A4; // type:func size:0x278
-func_8006D31C            = 0x8006D31C; // type:func size:0x23C
-func_8006D558            = 0x8006D558; // type:func size:0x4D0
+StatusMenuStep           = 0x8006CA88; // type:func size:0xF4
+StatusMenuOpen           = 0x8006CB7C; // type:func size:0x60
+StatusTopStep            = 0x8006CBDC; // type:func size:0x3D0
+StatusStockScreen        = 0x8006CFAC; // type:func size:0xF8
+StatusStockOpen          = 0x8006D0A4; // type:func size:0x278
+SkillMemberPick          = 0x8006D31C; // type:func size:0x23C
+SkillPersonaPick         = 0x8006D558; // type:func size:0x4D0
 func_8006DA28            = 0x8006DA28; // type:func size:0x3B0
 func_8006DDD8            = 0x8006DDD8; // type:func size:0x334
 func_8006E10C            = 0x8006E10C; // type:func size:0x190
@@ -1680,6 +1682,7 @@ g_arcana_top             = 0x800BC198;
 g_bg_shown               = 0x800BC19C;
 g_equip_last             = 0x800BC20C;
 g_hud_digits             = 0x800BC218;
+g_skill_help_spell       = 0x800BC228;
 D_800BC22C               = 0x800BC22C; // type:u32 size:0x338
 D_800BC56C               = 0x800BC56C; // type:u32 size:0x8
 D_800BC574               = 0x800BC574; // type:u32 size:0x8

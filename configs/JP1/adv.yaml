@@ -55,6 +55,7 @@ segments:
     subsegments:
       - [0x0, rodata, adv_id]
       - [0x4, rodata, adv_rodata]
+      - [0x90, .rodata, ui/statusmenu]
       - [0xF0, .rodata, game/formationmenu]
       - [0x13C, rodata, adv_rodata0b]
       - [0x140, .rodata, ui/configmenu]
@@ -124,6 +125,7 @@ segments:
       - [0x68B0, c, common/ui/itemrowuse]
       - [0x69FC, c, ui/pagescroll]
       - [0x6BA0, asm, adv_8]
+      - [0x86E8, c, ui/statusmenu]
       - [0xB01C, c, ui/statuspersona]
       - [0xCE54, c, game/formationmenu]
       - [0xDB30, c, common/ui/menustatus]
