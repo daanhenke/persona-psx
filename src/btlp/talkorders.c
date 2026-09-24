@@ -180,11 +180,14 @@ void BtlTalkersJoin(void)
     g_btl_talk_outcome = 3;
 }
 
-/* Not matched: the same shape and the same instructions bar one. gcc lifts
-   the 1 that puts the marker up into a saved register, because the switch and
-   the BtlShowMarker call want it too, and the image writes it out afresh at
-   each of the four places instead - so this carries one register more and the
-   frame is four bytes wider. Everything else lines up.
+/* 92.36%, from 85.84%. The cases are written in the image's order: 0, then
+   3 (which goes to the refusal when either slot is empty), then 1, then the
+   refusal. That lets 0 and 3 share the item call. Left: gcc lifts the 1 that
+   puts the marker up into a saved register and the image writes it out
+   afresh. The loop dump shows why: the marker's 1 is materialised in SImode
+   and matches the case-1 compare the switch emits at its end, so the pair
+   has savings 2 at life 2. Moving the marker store, a local for the kind, or
+   a byte-wide switch value leaves the match in place.
 
    The same again: the kept copies go back over the live ones and the action
    is aimed afresh, because the negotiation moved everybody about and a target
@@ -214,15 +217,17 @@ void BtlTalkersLeaveField(void)
             case 0:
                 BtlReadyItemAction(a, &g_item_defs[a->c.equip[0]]);
                 break;
-            case 1:
-                BtlReadySpellAction(a);
-                break;
             case 3:
                 if (a->c.equip[1] != 0 && a->c.equip[2] != 0) {
                     BtlReadyItemAction(a, &g_item_defs[a->c.equip[1]]);
                     break;
                 }
+                goto refuse;
+            case 1:
+                BtlReadySpellAction(a);
+                break;
             default:
+            refuse:
                 a->mark_kind = 5;
                 BtlShowMarker(g_btl_actor_turn, 1, 5);
                 a->obj->motion = 4;

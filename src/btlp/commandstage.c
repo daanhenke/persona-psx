@@ -85,12 +85,20 @@ extern void BtlOpenConfigBoard(void);
 extern void BtlCloseConfigBoard(void);
 
 
+/* 99.33%, from 98.89%. The join outcome is a value of its own, set after the
+   entry test the way the talk slot is. The first test still compares
+   against a fresh 3, and the 3 goes into the branch's delay slot. The refusal
+   walk steps its flag pointer in the for. Left: step 5 re-enters at `run:`,
+   and the image sets the step before it scales the choice, where gcc here
+   scales first. The jump table's name follows once the unit owns its
+   .rodata. */
 #ifdef NON_MATCHING
 void BtlStageCommand(void)
 {
     BtlActor  *a;
     int      (**entry)(void);
     int        two;
+    int        join;
     int       choice;
     int       slot;
 
@@ -99,13 +107,14 @@ void BtlStageCommand(void)
        them across the whole loop - so they are one value here. Written as two
        constants, gcc materialises each of the three tests on its own and the
        routine comes out a saved register and four instructions short. */
-    two = PICK_TALK;
     g_btl_formation_moved = 0;
     BtlShowAilmentMarks(1);
     if (g_btl_talk_outcome == BTL_TALK_JOIN) {
         choice = 0;
         g_btl_step = PICK_TALK;
     }
+    join = BTL_TALK_JOIN;
+    two = PICK_TALK;
 
     for (;;) {
         switch (g_btl_step) {
@@ -124,7 +133,7 @@ void BtlStageCommand(void)
                 while (g_btl_member_boards[MEMBER_BOARDS_LAST]->motion != 0) {
                     BtlDrawFrame();
                 }
-                g_btl_step = BTL_TALK_JOIN;
+                g_btl_step = join;
                 break;
             }
             if (g_btl_pad1_edge & g_btl_key_r1) {
@@ -168,7 +177,7 @@ void BtlStageCommand(void)
                 return;
             }
             choice = BtlPickUpdate(&g_btl_pick_help_row);
-            if (g_btl_talk_outcome == BTL_TALK_JOIN) {
+            if (g_btl_talk_outcome == join) {
                 choice = PICK_TALK;
             }
             if (choice < 0) {
@@ -184,7 +193,7 @@ void BtlStageCommand(void)
             entry = &g_btl_pick_command[choice];
             if (*entry != NULL && (*entry)() != 0) {
                 if (choice == two
-                    && g_btl_talk_outcome == BTL_TALK_JOIN) {
+                    && g_btl_talk_outcome == join) {
                     g_btl_step = choice;
                     break;
                 }
@@ -210,7 +219,7 @@ void BtlStageCommand(void)
                in a pointer of its own, which is the one saved register the
                image keeps for the walk. */
             a = g_btl_actors;
-            for (slot = 0; slot < BTL_PARTY; slot++) {
+            for (slot = 0; slot < BTL_PARTY; slot++, a++) {
                 if (g_btl_actors[slot].c.key != 0
                     && (signed char)g_btl_actors[slot].c.status
                            != BTL_STATUS_DOWN
@@ -220,7 +229,6 @@ void BtlStageCommand(void)
                     g_btl_actors[slot].obj->motion = MOTION_REFUSED;
                     BtlShowMarker(slot, 1, MARKER_REFUSED);
                 }
-                a++;
             }
             g_btl_step++;
             break;
@@ -239,7 +247,7 @@ void BtlStageCommand(void)
                 g_btl_stage++;
                 return;
             }
-            if (choice != two || g_btl_talk_outcome != BTL_TALK_JOIN) {
+            if (choice != two || g_btl_talk_outcome != join) {
                 goto back_to_picker;
             }
             BtlPickHighlight(g_btl_pick_help_row);

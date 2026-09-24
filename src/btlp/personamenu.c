@@ -17,7 +17,6 @@
  * answers the list slot on a confirm, with the other answers as above.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/common/spell.h>
 #include <persona/btlp/actor.h>
@@ -120,23 +119,20 @@ int BtlPersonaSpellUpdate(short *row)
     return BTL_PICK_WAIT;
 }
 
-/* 95.89%, registers only: the name fill's packed line pointer takes t1 and
-   the row index t0, the other way round from the image, and the pointer is
-   loaded before the Persona id rather than after it. Reordering the setup,
-   taking the id into a local and walking the marks by pointer all leave it
-   there or lose ground. */
-#ifdef NON_MATCHING
+/* The spell names are packed by a counter of their own, k, beside the row
+   index. loop.c turns k's line address into the walking pointer, and that is
+   what sets the pointer up after the Persona is looked up. */
 int BtlPersonaSwapUpdate(short *row)
 {
     BtlStats   *p;
     BtlGfxCell *cell;
-    u_char     *line;
     int         equipped;
     int         pick;
     int         keys;
     int         id;
     int         n;
     int         i;
+    int         k;
 
     equipped = BtlActorPersona(g_btl_actor_turn);
     g_btl_swap_personas[0] = SWAP_NONE;
@@ -165,13 +161,13 @@ int BtlPersonaSwapUpdate(short *row)
         *row = pick;
     }
 
-    line = (u_char *)g_btl_persona_spell_lines;
     p = &g_btl_personas[g_btl_swap_personas[*row]];
-    for (i = 0; i < BTL_STATS_SPELLS; i++) {
+    for (i = 0, k = 0; i < BTL_STATS_SPELLS; i++) {
         g_btl_persona_spell_lines[i][0] = LINE_EMPTY;
         if (p->spell[i] != 0) {
-            memcpy(line, g_spell_data[p->spell[i]].name, SPELL_NAME_CELLS);
-            line += SPELL_LINE;
+            memcpy(g_btl_persona_spell_lines[k],
+                   g_spell_data[p->spell[i]].name, SPELL_NAME_CELLS);
+            k++;
         }
     }
 
@@ -190,6 +186,3 @@ int BtlPersonaSwapUpdate(short *row)
     }
     return BTL_PICK_WAIT;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personamenu", BtlPersonaSwapUpdate);
-#endif

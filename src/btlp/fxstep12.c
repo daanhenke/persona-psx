@@ -16,7 +16,6 @@
  * when the record has drifted a hundred and sixty units from the middle.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -44,7 +43,7 @@
 /* How far it is carried each frame, how often it leaves a pair behind, how far
    behind the pair stands, and which of the script tables they come from. */
 #define FX_2F_FALL  0xA0000
-#define FX_2F_EVERY 5
+#define FX_2F_EVERY 20
 #define FX_2F_BACK  0x140000
 #define FX_2F_FIRST 2
 #define FX_2F_LAST  4
@@ -90,11 +89,9 @@ void BtlFxStep12(BtlObj *o)
     }
 }
 
-/* 95.55%: structurally the image, one register out. The slot the far side is
-   walked by is a saved register there and a temp here - there is no call in
-   the loop for it to survive, so nothing in the source asks for one - and
-   every other temp shifts along behind it. */
-#ifdef NON_MATCHING
+/* The slot the far side is walked by is the counter of the copying loop
+   too, which is what puts it in a saved register. The copy's kind and scripts
+   go down before its mark. */
 void BtlFxStep2F(BtlObj *o)
 {
     BtlObj *copy;
@@ -103,7 +100,6 @@ void BtlFxStep2F(BtlObj *o)
     int     start;
     int     slot;
     int     last;
-    int     i;
 
     if (o->mark_num == FX_COPY_MARK) {
         return;
@@ -147,20 +143,20 @@ void BtlFxStep2F(BtlObj *o)
         }
         y = o->y + ((g_btl_actor_turn < BTL_PARTY) ? -FX_2F_FALL : FX_2F_FALL);
         o->y = y;
-        if ((y >> 16) / FX_2F_EVERY * FX_2F_EVERY != (y >> 16)) {
+        if ((y >> 16) != (y >> 16) / FX_2F_EVERY * FX_2F_EVERY) {
             return;
         }
         g_btl_fx_def.attr = FX_2F_ATTR;
-        for (i = FX_2F_FIRST; i < FX_2F_LAST; i++) {
-            g_btl_fx_def.scripts = (const u_long **)o->scripts[i];
+        for (slot = FX_2F_FIRST; slot < FX_2F_LAST; slot++) {
+            g_btl_fx_def.scripts = (const u_long **)o->scripts[slot];
             pos[0] = o->x;
             pos[1] = o->y - FX_2F_BACK;
             pos[2] = o->z;
             copy = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, 0, FX_OBJ_DRAW, 0,
                                &o->x, FX_OBJ_CD, FX_OBJ_CE);
             copy->kind = o->kind;
-            copy->mark_num = FX_COPY_MARK;
             copy->scripts = o->scripts;
+            copy->mark_num = FX_COPY_MARK;
         }
         return;
     case 1:
@@ -178,6 +174,3 @@ void BtlFxStep2F(BtlObj *o)
         return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxstep12", BtlFxStep2F);
-#endif

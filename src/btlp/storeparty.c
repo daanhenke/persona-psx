@@ -16,7 +16,6 @@
  */
 #include <decomp/types.h>
 #include <decomp/libc.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/common/char.h>
@@ -45,25 +44,25 @@
 #define g_save_confirm    (*(u_char *)0x801F2AC9)
 #define g_save_msg_speed  (*(u_char *)0x801F2ACA)
 
-/* 99.76%. The party is walked by a pointer of its own. Indexed by i, loop.c
-   makes the flag's address a constant offset from the party's, and the flag
-   stops being indexed by i itself. One pair is left: the image loads g_chars
-   before the party pointer, and here the pointer's init comes first. A
-   source init sits ahead of anything loop.c hoists, so the image's pointer
-   looks like a reduced giv. */
-#ifdef NON_MATCHING
+/* The party is walked by a pointer of its own. Indexed by i, loop.c makes
+   the flag's address a constant offset from the party's, and the flag stops
+   being indexed by i itself. The records' base is a plain address set up
+   ahead of the walker, and it is added after the index, which is the order
+   the image loads and adds them in. */
 void BtlStoreParty(void)
 {
     Char *c;
     u_char *party;
     int i;
+    u_long chars;
 
     i = 0;
+    chars = (u_long)g_chars;
     party = g_party;
     for (; i < BTL_PARTY; party++, i++) {
         /* The destination is worked out before the flag is stored; the
            other way round gcc schedules the store first. */
-        c = &g_chars[*party];
+        c = (Char *)(*party * sizeof(Char) + chars);
         g_save_actor_flag[i] = g_btl_actors[i].tactic;
         memcpy(c, &g_btl_actors[i].c, sizeof(Char));
     }
@@ -75,6 +74,3 @@ void BtlStoreParty(void)
     g_save_confirm = g_btl_confirm;
     g_save_msg_speed = g_btl_msg_speed;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/storeparty", BtlStoreParty);
-#endif

@@ -18,27 +18,31 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/status.h>
 
-/* 90.05%, and structurally closer than the 91.89% it replaces, which stood a
-   `u_long pad[2]` in for eight bytes of frame. The level is a signed char,
-   which is what the frame bytes are and what gives the image's copy of it in
-   the branch slot. Left: the table row is built with its base loaded first,
-   and the record and the status trade saved registers. */
+/* 98.57%, from 90.05%. The level is a signed char, which is what the frame
+   bytes are and what gives the image's copy of it in the branch slot. The
+   turn count is stored in each arm, which is what ranks the record above the
+   status in global alloc, and the row test reads the row first. The row is
+   the table's base stepped on in a second statement, which is what loads the
+   base before the multiply. Left: the row lands in a0 where the image has v0,
+   so the constant 1 for the shift is set early instead of after the row's
+   last use. A byte-offset spelling gets the registers right but loads the
+   base late again. */
 #ifdef NON_MATCHING
 int BtlInflictStatus(BtlActor *a, int status)
 {
     const u_long *row;
     BtlObj       *mark;
     signed char   level;
-    int           turns;
 
     if (a->c.key >= BTL_KEY_DEMON
         && (g_btl_demon_statuses[a->c.key] & (1 << status)) == 0) {
         return 0;
     }
 
-    row = &g_btl_status_over[status * BTL_AIL_LEVELS];
+    row = g_btl_status_over;
+    row += status * BTL_AIL_LEVELS;
     level = a->c.ail_level;
-    if ((1 << (signed char)a->c.status) & row[level]) {
+    if (row[level] & (1 << (signed char)a->c.status)) {
         if ((signed char)a->c.status == status) {
             if (level == BTL_AIL_DEEPEST) {
                 return 0;
@@ -50,14 +54,13 @@ int BtlInflictStatus(BtlActor *a, int status)
         }
 
         if (status == 0x12) {
-            turns = BTL_AIL_TURNS_CLOAK;
+            a->ail_turns = BTL_AIL_TURNS_CLOAK;
         } else if (status == 0xE || status == 0xF
                    || status == 0x15 || status == 0x16) {
-            turns = BTL_AIL_TURNS_LONG;
+            a->ail_turns = BTL_AIL_TURNS_LONG;
         } else {
-            turns = BTL_AIL_TURNS_SHORT;
+            a->ail_turns = BTL_AIL_TURNS_SHORT;
         }
-        a->ail_turns = turns;
 
         mark = a->obj->mark;
         if (status != BTL_STATUS_DOWN) {

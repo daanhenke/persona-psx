@@ -36,18 +36,19 @@
 
 extern int BtlMoodBand(short value);
 
-/* 89.23%. What the image shows and this does not have yet: the plain step 3
-   is held in a local across the BtlMoodBand call (a saved register, stored as
-   the line said and again as the default step), the two band tests are
-   switches whose case trees hold three values (a case 0 beside 1 and 2), and
-   the constant-step arms share one store-and-return tail with the value
-   loaded on the way in. Each alone scores lower than this; together they
-   have not yet been put right at once. */
+/* 90.22%, from 89.23%. Both band tests are switches, each with a case 0
+   beside 1 and 2, which gives the image's three-way compare trees. The
+   constant steps go to one store-and-return tail, and the plain step is held
+   in a local across the BtlMoodBand call. Left: on the non-mood path the
+   image fills the weight test's delay slot with the return value, and gcc
+   here fills it with the strong step, because weight and step land in
+   different registers. */
 #ifdef NON_MATCHING
 int BtlTalkTakeLine(short slot, short verb, short said, short weight,
                     short mood)
 {
-    int band;
+    short plain;
+    short step;
 
     if (verb != TALK_VERB_MOOD) {
         g_btl_talk_result |= TALK_NEW;
@@ -61,34 +62,45 @@ int BtlTalkTakeLine(short slot, short verb, short said, short weight,
             return 0;
         }
         if (weight < TALK_STRONG) {
-            g_btl_talk_step = TALK_STEP_PLAIN;
+            step = TALK_STEP_PLAIN;
         } else {
-            g_btl_talk_step = TALK_STEP_STRONG;
+            step = TALK_STEP_STRONG;
         }
+        g_btl_talk_step = step;
         g_btl_talk_said = said;
         return 1;
     }
 
     g_btl_talk_result |= TALK_NEW;
+    plain = TALK_STEP_PLAIN;
     if (slot == 0) {
-        g_btl_talk_said = TALK_STEP_PLAIN;
-        band = BtlMoodBand(mood);
-        if (band == 1) {
-            g_btl_talk_step = TALK_STEP_STRONG;
-        } else if (band == 2) {
-            g_btl_talk_step = TALK_STEP_BEST;
-        } else {
-            g_btl_talk_step = TALK_STEP_PLAIN;
+        g_btl_talk_said = plain;
+        switch (BtlMoodBand(mood)) {
+        case 1:
+            step = TALK_STEP_STRONG;
+            goto set;
+        case 2:
+            step = TALK_STEP_BEST;
+            goto set;
+        case 0:
+        default:
+            g_btl_talk_step = plain;
+            return 1;
         }
-        return 1;
     }
     g_btl_talk_said = said;
-    band = BtlMoodBand(mood);
-    if (band > 0 && band < 3) {
-        g_btl_talk_step = TALK_STEP_PLAIN;
+    switch (BtlMoodBand(mood)) {
+    case 1:
+    case 2:
+        step = TALK_STEP_PLAIN;
+        goto set;
+    case 0:
+    default:
+        g_btl_talk_result |= TALK_TOO_WEAK;
         return 1;
     }
-    g_btl_talk_result |= TALK_TOO_WEAK;
+set:
+    g_btl_talk_step = step;
     return 1;
 }
 #else
