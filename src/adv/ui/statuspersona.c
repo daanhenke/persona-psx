@@ -1,4 +1,15 @@
 /* Persona 1 (JP) - the status menu's Persona pages.  ADV only.
+ *   0x8006F3BC StatusPersonaPick     0x8006F6D0 StatusPersonaLayout
+ *   0x8006FAA0 StatusPersonaPreview  0x8006FB30 StatusPersonaDraw
+ *   0x8006FF00 StatusPersonaNames    0x8006FFC0 StatusPersonaView
+ *   0x800704B0 StatusStockPick       0x8007081C StatusStockReleasePick
+ *   0x80070ACC StatusStockReleaseConfirm  0x80070CBC StatusStockView
+ *
+ * A member's Personas: moving the cursor previews the member's stats with
+ * each one active, and the view command reads the Persona's portrait off the
+ * disc (AdvResolveSceneLoc kind 5) and opens its page. The Persona stock
+ * opens the persona data screen's page instead (kind 4), and lets a Persona
+ * go behind a yes/no prompt.
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
@@ -56,6 +67,9 @@ extern u_char g_fm_hint2_def[];
 extern short  PersonaStockCompact(void);
 extern void   PersonaStockDraw(void);
 extern void   func_80076CE0(void);
+extern u_char D_800B17E0[];
+extern u_char D_800B1D08[];
+extern u_char D_800B2330[];
 
 #define PROMPT_CUR_SLOT 3
 /* A description message's third byte, which is the Persona it describes. */
@@ -455,10 +469,81 @@ void StatusStockReleaseConfirm(void)
     g_menu_subsel--;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/statuspersona", func_80070CBC);
+/* A stock Persona's data page, a frame. While the page rests at either stop
+   the cursor moves between stock entries, reading each one's portrait; backing
+   out redraws the stock list. */
+void StatusStockView(void)
+{
+    int id;   /* the Persona, then the page's scroll stop, then the row */
 
-INCLUDE_ASM("adv/nonmatchings/ui/statuspersona", func_800711F4);
+    if (!MenuStepCursor(&g_menu->page) && (g_cam_y == 0 || g_cam_y == PAGE_LOW) &&
+        MenuStepCursor(&g_menu->list[0])) {
+        id = g_persona_stock[g_menu->list[0].cur];
+        AdvResolveSceneLoc(STOCK_PORTRAIT_KIND, id, 0);
+        CdReadFileToAddrAsync(&g_adv_scene_file, STOCK_PORTRAIT_SECTORS,
+                              PORTRAIT_READ);
+        while (g_cd_busy != -1) {
+            RunFrame();
+        }
+        TimQueueAt(PORTRAIT_TIM, 0x140, 0x168, 0, 0x1E6);
+        PersonaDataDraw(id);
+        DrawPersonaDataStatBars(id);
+    }
 
-INCLUDE_ASM("adv/nonmatchings/ui/statuspersona", func_80071324);
+    switch (g_menu->page.cur) {
+    case 0:
+        id = 0;
+        break;
+    case 1:
+        id = PAGE_LOW;
+        break;
+    }
+    if (id < g_cam_y) {
+        g_cam_y -= PAGE_STEP;
+    }
+    if (g_cam_y < id) {
+        g_cam_y += PAGE_STEP;
+    }
+    if (id < g_map_scroll_y) {
+        g_map_scroll_y -= PAGE_STEP;
+    }
+    if (g_map_scroll_y < id) {
+        g_map_scroll_y += PAGE_STEP;
+    }
+    SlotSetPos(PAGE_TOP_SLOT, 0x50, 0x44, 0x40 - g_cam_y);
+    SlotSetPos(PAGE_BOTTOM_SLOT, 0x50, 0x48, 0x120 - g_cam_y);
+    PAGE_MARKS();
 
-INCLUDE_ASM("adv/nonmatchings/ui/statuspersona", func_800715EC);
+    if ((g_cam_y == 0 || g_cam_y == PAGE_LOW) &&
+        (InputCheckAcceptB(1) || g_menu_allow_hold)) {
+        func_8008EDBC(0xA);
+        SlotClearAll();
+        TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+        TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+        TileMapDrawWindow(g_tilemap0, 0x1E, 0x12, MAP_W);
+        TileMapDrawBox(AT(g_tilemap0, 1, 1), 0x1C, 0x10, MAP_W);
+        TileMapWriteRow(D_800B17E0, AT(g_tilemap1, 13, 2), 0x285, 6);
+        for (id = 0; id < STOCK_ROWS; id++) {
+            TileMapWriteBar(AT(g_tilemap0, 2 + id, 2), 0xB);
+            TileMapWriteBar(AT(g_tilemap0, 2 + id, 13), 5);
+            TileMapWriteBar(AT(g_tilemap0, 2 + id, 18), 10);
+        }
+        g_stock_last = PersonaStockCompact();
+        PersonaStockDraw();
+        TileMapWriteBar(AT(g_tilemap0, 15, 2), 10);
+        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0xC, 0, 0);
+        SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0, 0);
+        g_menu->stock.cur = g_menu->list[0].cur;
+        if (g_menu->stock.cur != g_stock_last + 1) {
+            SlotSetPos(1, 0x42, 0x48, g_menu->stock.cur * 12 + 0x24);
+        } else {
+            SlotSetPos(1, 0x42, 0x48, 0xC0);
+        }
+        SlotSetFlicker(1, 1);
+        g_cam_y = 0;
+        g_map_scroll_y = 0;
+        g_menu_subsel -= 3;
+    }
+}
