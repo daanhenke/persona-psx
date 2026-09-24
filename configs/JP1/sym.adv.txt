@@ -109,6 +109,8 @@ D_800643A4               = 0x800643A4; // type:u32 size:0x138C
 //-------------------------------------------------------------------
 //--- PA: 0x000170   VA: 0x80064510   subsegment: rodata, adv_rodata1
 //-------------------------------------------------------------------
+jtbl_80064490            = 0x80064490; // size:0x24
+jtbl_800644B8            = 0x800644B8; // size:0x24
 str_adv_advcmd           = 0x80064528;
 
 //-------------------------------------------------------------------
@@ -373,9 +375,9 @@ StatusStockPick          = 0x800704B0; // type:func size:0x36C
 StatusStockReleasePick   = 0x8007081C; // type:func size:0x2B0
 StatusStockReleaseConfirm = 0x80070ACC; // type:func size:0x1F0
 StatusStockView          = 0x80070CBC; // type:func size:0x538
-func_800711F4            = 0x800711F4; // type:func size:0x130
-func_80071324            = 0x80071324; // type:func size:0x2C8
-func_800715EC            = 0x800715EC; // type:func size:0x8E4
+FormationMenuStep        = 0x800711F4; // type:func size:0x130
+FormationMenuOpen        = 0x80071324; // type:func size:0x2C8
+FormationMenu            = 0x800715EC; // type:func size:0x8E4
 
 //--------------------------------------------------------------------------
 //--- PA: 0x00DB30   VA: 0x80071ED0   subsegment: c, ../common/ui/menustatus
@@ -1681,6 +1683,8 @@ D_800BC22C               = 0x800BC22C; // type:u32 size:0x338
 D_800BC56C               = 0x800BC56C; // type:u32 size:0x8
 D_800BC574               = 0x800BC574; // type:u32 size:0x8
 D_800BC57C               = 0x800BC57C; // type:u32 size:0x98
+D_800BC594               = 0x800BC594;
+D_800BC5A4               = 0x800BC5A4;
 g_adv_char_seq           = 0x800BC5B4;
 g_ot                     = 0x800BC5CC; // size:0x28
 g_stock_last             = 0x800BC5F4;
@@ -1711,6 +1715,7 @@ g_playtime_min           = 0x801F29BD;
 g_playtime_sec           = 0x801F29BE;
 g_playtime_frame         = 0x801F29BF;
 g_key_menu_close         = 0x801F2A94;
+g_pad_config             = 0x801F2AC7;
 g_adv_room               = 0x801F5355; // ignore:True size:0x1
 g_font_bits              = 0x801E0000; // ignore:True
 g_vab_id                 = 0x801F535C; // ignore:True size:0x10
@@ -1753,7 +1758,7 @@ g_map_pos_x              = 0x801F5352; // size:0x1
 g_map_pos_y              = 0x801F5353; // size:0x1
 g_map_unk4               = 0x801F5354; // size:0x1
 g_scene_images           = 0x80100C40; // ignore:True size:0x70
-g_adv_unpacked           = 0x80118000; // ignore:True size:0x10
+g_adv_unpacked           = 0x80118000; // ignore:True size:0x20
 g_moon                   = 0x801F2B30; // size:0x1
 g_kage_sprite            = 0x800BAC58; // size:0x38
 g_fade_sprites           = 0x800DC010; // size:0x1

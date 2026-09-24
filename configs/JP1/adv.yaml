@@ -55,6 +55,8 @@ segments:
     subsegments:
       - [0x0, rodata, adv_id]
       - [0x4, rodata, adv_rodata]
+      - [0xF0, .rodata, game/formationmenu]
+      - [0x13C, rodata, adv_rodata0b]
       # partyhud's ten bytes end at 0x16E; the linker pads to the next word,
       # so the asm rodata after it begins at 0x170, not in the padding.
       - [0x164, .rodata, common/ui/partyhud]
@@ -122,7 +124,7 @@ segments:
       - [0x69FC, c, ui/pagescroll]
       - [0x6BA0, asm, adv_8]
       - [0xB01C, c, ui/statuspersona]
-      - [0xCE54, asm, adv_8b]
+      - [0xCE54, c, game/formationmenu]
       - [0xDB30, c, common/ui/menustatus]
       - [0xDBC8, c, ui/statusscreen]
       - [0xE9DC, asm, adv_9]
