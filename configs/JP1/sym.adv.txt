@@ -739,7 +739,7 @@ EventFlagClear           = 0x800820E4; // type:func size:0x44
 //--- PA: 0x01DD88   VA: 0x80082128   subsegment: asm, adv_30
 //-----------------------------------------------------------
 D_80082128               = 0x80082128; // type:func size:0x1A4
-func_800822CC            = 0x800822CC; // type:func size:0x1C0
+ActorSetStandSprite      = 0x800822CC; // type:func size:0x1C0
 func_8008248C            = 0x8008248C; // type:func size:0x1E8
 
 //-----------------------------------------------------------------
@@ -789,7 +789,7 @@ WalkAdvance              = 0x80083460; // type:func size:0x100
 //------------------------------------------------------------
 //--- PA: 0x01F1C0   VA: 0x80083560   subsegment: asm, adv_30c
 //------------------------------------------------------------
-func_80083560            = 0x80083560; // type:func size:0x8
+WalkSlopeAdvance         = 0x80083560; // type:func size:0x8
 
 //-----------------------------------------------------------------
 //--- PA: 0x01F1C8   VA: 0x80083568   subsegment: c, gfx/imagecells
@@ -1350,8 +1350,8 @@ func_800ADCFC            = 0x800ADCFC; // type:func size:0x344
 func_800AE040            = 0x800AE040; // type:func size:0x134
 ViewShakeStop            = 0x800AE174; // type:func size:0x30
 ViewShakeStep            = 0x800AE1A4; // type:func size:0x15C
-func_800AE300            = 0x800AE300; // type:func size:0xC8
-func_800AE3C8            = 0x800AE3C8; // type:func size:0xA28
+ActorStartMove           = 0x800AE300; // type:func size:0xC8
+ActorsMoveStep           = 0x800AE3C8; // type:func size:0xA28
 
 //-----------------------------------------------------------------
 //--- PA: 0x04AA50   VA: 0x800AEDF0   subsegment: c, game/scrollcam
@@ -1521,10 +1521,14 @@ g_mes_offsets            = 0x800B5F30;
 str_adv_ev01_bgd         = 0x800B6134;
 str_adv_ev02_bgd         = 0x800B6148;
 str_adv_ev03_bgd         = 0x800B615C;
-g_leave_defs             = 0x800B6314; // size:0x18
+g_walk_defs              = 0x800B61E4; // size:0x20
+g_stand_defs             = 0x800B6204; // size:0x110
+g_leave_defs             = 0x800B6314; // size:0x10
+g_dir_dz                 = 0x800B6324; // size:0x8
 g_room_origins           = 0x800B6330; // size:0x14
 g_room_backdrops         = 0x800B6344; // size:0x8
 str_chest_empty          = 0x800B634C;
+g_slope_lift             = 0x800B6354; // size:0x4
 g_dir_flip               = 0x800B6358; // size:0x4
 g_room_map_sizes         = 0x800B636C; // size:0xA
 g_dir_x                  = 0x800B6378;

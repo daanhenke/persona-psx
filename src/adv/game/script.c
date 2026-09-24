@@ -86,7 +86,7 @@
  *  69   actor se                        a sound, and its mark over an actor
  *  6C   n                               func_800AE040
  *  6D   -                               stop the view shaking
- *  6E   a b c d e                       func_800AE300
+ *  6E   a b c d e                       ActorStartMove
  *  71   chan image                      start one of the scene's animations
  *  72   chan                            stop it
  *  73   actor                           draw an actor semi-transparent
@@ -264,8 +264,8 @@ extern void   func_800AEE9C(int a);
 extern void   func_800AF1D8(int a);
 extern void   func_800ADCFC(u_char actor);
 extern void   func_800AE040(u_char n);
-extern void   func_800AE300(u_char a, u_char b, u_char c, u_char d, u_char e);
-extern u_char func_800AE3C8(u_char actor);
+extern void   ActorStartMove(u_char a, u_char b, u_char c, u_char d, u_char e);
+extern u_char ActorsMoveStep(u_char actor);
 extern short  func_800B0A90(void);
 extern void   func_800B053C(u_char p, u_char n);
 
@@ -737,10 +737,10 @@ loop:
         g_adv_actors[a].dir = g_adv_actors[a].next_dir = s[6];
         g_adv_actors[a].flags = ((s[7] & 0xF) << 8) + ((s[8] & 0xF) << 7) + (s[9] << 9);
         g_adv_actors[a].phase = 0;
-        g_adv_actors[a].unk25 = 0;
+        g_adv_actors[a].slope = 0;
         g_adv_actors[a].unk26 = s[0xB];
         g_adv_actors[a].bright = s[0xA];
-        g_adv_actors[a].unk08 = -1;
+        g_adv_actors[a].move = MOVE_NONE;
         g_adv_actors[a].script = -1;
         func_800ADCFC(a);
         break;
@@ -756,8 +756,8 @@ loop:
         g_adv_actors[a].next_dir = 0;
         g_adv_actors[a].dir = 0;
         g_adv_actors[a].phase = 0;
-        g_adv_actors[a].unk25 = 0;
-        g_adv_actors[a].unk08 = -1;
+        g_adv_actors[a].slope = 0;
+        g_adv_actors[a].move = MOVE_NONE;
         ActorSetTile(g_adv_actors[a].x, g_adv_actors[a].y, &g_adv_actors[a]);
         b = g_adv_actors[a].unk22;
         if ((u_int)b >= 0x80) {
@@ -805,7 +805,7 @@ loop:
         ViewShakeStop();
         break;
     case 0x6E:
-        func_800AE300(s[2], s[3], s[4], s[5], s[6]);
+        ActorStartMove(s[2], s[3], s[4], s[5], s[6]);
         break;
     case 0x71:
         u = s[3];
@@ -870,7 +870,7 @@ loop:
         SlotClear(s[2] + 0x20);
         break;
     case 0x7B:
-        while (func_800AE3C8(g_cam_actor)) {
+        while (ActorsMoveStep(g_cam_actor)) {
             AdvRunFrame();
         }
         SsSeqStop(g_seq_handle[10]);
@@ -881,7 +881,7 @@ loop:
         g_adv_actors[a].y = s[4];
         g_adv_actors[a].dir = g_adv_actors[a].next_dir = s[5];
         g_adv_actors[a].phase = 0;
-        g_adv_actors[a].unk25 = 0;
+        g_adv_actors[a].slope = 0;
         g_adv_actors[a].unk26 = s[6];
         func_800ADCFC(a);
         break;

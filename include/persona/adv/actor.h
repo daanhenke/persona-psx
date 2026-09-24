@@ -13,7 +13,9 @@ typedef struct {
     /* 0x00 */ int     script;          /* what the actor's sprite plays;
                                            -1 for nothing                   */
     /* 0x04 */ u_int   flags;           /* ACTOR_FLIP_OK, ACTOR_SEMITRANS    */
-    /* 0x08 */ int     unk08;           /* -1 once the actor is built     */
+    /* 0x08 */ u_char *move;            /* the pack move script it is
+                                           walking: (dir, tiles) pairs up to
+                                           0xFF; MOVE_NONE for none          */
     /* 0x0C */ u_short id;              /* 0xFFFF while the slot is unused  */
     /* 0x0E */ u_short world_x;         /* the renderer subtracts the camera
                                            from these to get a screen position */
@@ -21,7 +23,9 @@ typedef struct {
     /* 0x12 */ short   z;               /* base sort depth                  */
     /* 0x14 */ short   depth;           /* added to z: 0, or 0x20 for an
                                            actor standing behind another    */
-    /* 0x16 */ u_char  pad16;
+    /* 0x16 */ u_char  face;            /* the facing its sprite shows;
+                                           follows `dir` unless a move says
+                                           otherwise                         */
     /* 0x17 */ u_char  dir;             /* facing: 0 up, 1 down, 2 left,
                                            3 right, indexing g_dir_x/g_dir_y */
     /* 0x18 */ u_char  next_dir;        /* AdvBuildActors sets both from the
@@ -36,12 +40,15 @@ typedef struct {
     /* 0x20 */ u_char  home_x, home_y;  /* where a room actor was placed  */
     /* 0x22 */ u_char  unk22;
     /* 0x23 */ u_char  unk23;
-    /* 0x24 */ u_char  unk24;
-    /* 0x25 */ u_char  unk25;
+    /* 0x24 */ u_char  face_moves;      /* a move script turns `face` as
+                                           well as `dir`                     */
+    /* 0x25 */ u_char  slope;           /* the facing it took onto the slope
+                                           it is on, or 0                    */
     /* 0x26 */ u_char  unk26;          /* gates the second leg of a diagonal
                                           step the way the tile under the
                                           actor gates the first            */
-    /* 0x27 */ u_char  pad27[2];
+    /* 0x27 */ u_char  tiles_left;      /* of the move under way          */
+    /* 0x28 */ u_char  wait;            /* frames before the next move    */
     /* 0x29 */ u_char  shadow;          /* how the second sprite below the
                                            actor is drawn: SHADOW_*          */
     /* 0x2A */ u_char  pad2A[2];
@@ -52,6 +59,9 @@ typedef struct {
    actor definitions expand to - the array runs on past them. */
 #define g_adv_actors ((AdvActor *)0x801F15D8)
 #define ACTOR_COUNT  25
+
+/* No move script. */
+#define MOVE_NONE    ((u_char *)-1)
 
 /* An empty slot reads 0xFFFF in its id; ActorAtTile answers 0xFF for "nobody
    is standing there". An actor standing behind another draws behind it, which

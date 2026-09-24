@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - stepping a walk in progress.  ADV only.
- *   0x800834B4 WalkAdvance
+ *   0x800834B4 WalkAdvance   0x80083560 WalkSlopeAdvance
  *
  * The tail of the actor unit, past a table that is not worked out yet. This
  * adds up `steps` frames from `phase` and applies the total to a screen
@@ -43,4 +43,11 @@ void WalkAdvance(u_short *wy, u_short *wx, u_char dir, int phase, u_char steps)
         *wx = sx + *wx;
         break;
     }
+}
+
+/* Called alongside WalkAdvance with the actor's slope, and empty: whatever
+   was to bend the walk up a slope was taken out before release. */
+void WalkSlopeAdvance(u_short *wy, u_short *wx, u_char dir, u_char phase,
+                      u_char steps, u_char slope)
+{
 }

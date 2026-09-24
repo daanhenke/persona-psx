@@ -46,11 +46,11 @@ void AdvBuildActors(void)
             g_adv_actors[i].next_dir = d->form[1].u.b.dir & 3;
             g_adv_actors[i].phase = 0;
             g_adv_actors[i].shadow = d->form[1].u.b.shadow;
-            g_adv_actors[i].unk25 = 0;
+            g_adv_actors[i].slope = 0;
             g_adv_actors[i].unk22 = d->form[1].unk22;
             g_adv_actors[i].unk26 = d->form[1].lift;
             g_adv_actors[i].bright = d->form[1].bright;
-            g_adv_actors[i].unk08 = -1;
+            g_adv_actors[i].move = MOVE_NONE;
             g_adv_actors[i].flags = d->form[1].u.flags & 0xFFF0;
         } else {
             g_adv_actors[i].script = d->form[0].script;
@@ -60,11 +60,11 @@ void AdvBuildActors(void)
             g_adv_actors[i].next_dir = d->form[0].u.b.dir & 3;
             g_adv_actors[i].phase = 0;
             g_adv_actors[i].shadow = d->form[0].u.b.shadow;
-            g_adv_actors[i].unk25 = 0;
+            g_adv_actors[i].slope = 0;
             g_adv_actors[i].unk22 = d->form[0].unk22;
             g_adv_actors[i].unk26 = d->form[0].lift;
             g_adv_actors[i].bright = d->form[0].bright;
-            g_adv_actors[i].unk08 = -1;
+            g_adv_actors[i].move = MOVE_NONE;
             g_adv_actors[i].flags = d->form[0].u.flags & 0xFFF0;
         }
     }
@@ -77,9 +77,9 @@ void AdvBuildActors(void)
             g_adv_actors[PROP_ACTOR + i].y = g_prop_defs[i].form[1].y;
             g_adv_actors[PROP_ACTOR + i].unk23 = g_prop_defs[i].form[1].unk23;
             g_adv_actors[PROP_ACTOR + i].unk22 = g_prop_defs[i].form[1].unk22;
-            g_adv_actors[PROP_ACTOR + i].unk24 = 0;
+            g_adv_actors[PROP_ACTOR + i].face_moves = 0;
             g_adv_actors[PROP_ACTOR + i].unk26 = g_prop_defs[i].form[1].lift;
-            g_adv_actors[PROP_ACTOR + i].unk08 = -1;
+            g_adv_actors[PROP_ACTOR + i].move = MOVE_NONE;
             g_adv_actors[PROP_ACTOR + i].bright = g_prop_defs[i].form[1].bright;
             g_adv_actors[PROP_ACTOR + i].flags =
                 g_prop_defs[i].form[1].unk23 & 0xFFF0;
@@ -89,9 +89,9 @@ void AdvBuildActors(void)
             g_adv_actors[PROP_ACTOR + i].y = p->form[0].y;
             g_adv_actors[PROP_ACTOR + i].unk23 = p->form[0].unk23;
             g_adv_actors[PROP_ACTOR + i].unk22 = p->form[0].unk22;
-            g_adv_actors[PROP_ACTOR + i].unk24 = 0;
+            g_adv_actors[PROP_ACTOR + i].face_moves = 0;
             g_adv_actors[PROP_ACTOR + i].unk26 = p->form[0].lift;
-            g_adv_actors[PROP_ACTOR + i].unk08 = -1;
+            g_adv_actors[PROP_ACTOR + i].move = MOVE_NONE;
             g_adv_actors[PROP_ACTOR + i].bright = p->form[0].bright;
             g_adv_actors[PROP_ACTOR + i].flags = p->form[0].unk23 & 0xFFF0;
         }
@@ -109,9 +109,9 @@ void AdvBuildActors(void)
     g_adv_actors[LEADER].y = 0;
     g_adv_actors[LEADER].unk23 = 0;
     g_adv_actors[LEADER].unk22 = 0;
-    g_adv_actors[LEADER].unk24 = 0;
+    g_adv_actors[LEADER].face_moves = 0;
     g_adv_actors[LEADER].bright = FULL_BRIGHT;
-    g_adv_actors[LEADER].unk08 = -1;
+    g_adv_actors[LEADER].move = MOVE_NONE;
     for (i = 0; i < ROOM_ACTORS; i++) {
         g_adv_actors[SPOT_ACTOR + i].x = g_spot_defs[i].x;
         g_adv_actors[SPOT_ACTOR + i].y = g_spot_defs[i].y;
