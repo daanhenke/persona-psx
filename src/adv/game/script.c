@@ -266,8 +266,8 @@ extern void   ActorPlace(u_char actor);
 extern void   AdvScreenEffect(u_char n);
 extern void   ActorStartMove(u_char a, u_char b, u_char c, u_char d, u_char e);
 extern u_char ActorsMoveStep(u_char actor);
-extern short  func_800B0A90(void);
-extern void   func_800B053C(u_char p, u_char n);
+extern short  PersonaSlotsLast(void);
+extern void   PersonaCreate(u_char p, u_char n);
 
 void AdvScriptSpecial(u_char n);
 
@@ -651,7 +651,7 @@ loop:
     case 0x4F:
 
         c = PersonaFindFree();
-        func_800B053C(c, s[3]);
+        PersonaCreate(c, s[3]);
         a = CharFind2(s[2]);
         b = CharEntryFindFree(a);
         g_chars[a].list[b] = c;
@@ -701,7 +701,7 @@ loop:
         g_adv_actors[s[2]].script = U32(s + 4);
         break;
     case 0x59:
-        q = func_800B0A90();
+        q = PersonaSlotsLast();
     count:
         a = q + 1;
         if (s[2] == a) {

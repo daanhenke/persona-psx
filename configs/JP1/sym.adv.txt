@@ -1423,7 +1423,7 @@ CharEntryFindFree        = 0x800B04E0; // type:func size:0x5C
 //-----------------------------------------------------------
 //--- PA: 0x04C19C   VA: 0x800B053C   subsegment: asm, adv_57
 //-----------------------------------------------------------
-func_800B053C            = 0x800B053C; // type:func size:0x1CC
+PersonaCreate            = 0x800B053C; // type:func size:0x1CC
 
 //-------------------------------------------------------------
 //--- PA: 0x04C368   VA: 0x800B0708   subsegment: c, game/stats
@@ -1445,7 +1445,7 @@ FlagBank3Set             = 0x800B0A60; // type:func size:0x30
 //--------------------------------------------------------------
 //--- PA: 0x04C6F0   VA: 0x800B0A90   subsegment: asm, adv_58_x1
 //--------------------------------------------------------------
-func_800B0A90            = 0x800B0A90; // type:func size:0x3C
+PersonaSlotsLast         = 0x800B0A90; // type:func size:0x3C
 AdvUnpack                = 0x800B0ACC; // type:func size:0x234
 
 

@@ -22,7 +22,7 @@
 #define PERSONA_BOND_FULL    3
 
 typedef struct {
-    /* 0x00 */ u_long  unk00;
+    /* 0x00 */ u_long  unk00;     /* PersonaDef.unk00, copied in             */
     /* 0x04 */ u_long  unk04;
     /* 0x08 */ u_long  unk08;
     /* 0x0C */ u_long  bond;      /* PersonaDef.bond, copied in as the record
@@ -31,7 +31,8 @@ typedef struct {
                                      carrier's Char+0x3A and +0x3C, or writes
                                      1 into both when no Persona is equipped */
     /* 0x12 */ u_short unk12;
-    /* 0x14 */ u_char  pad14[4];
+    /* 0x14 */ u_short unk14;     /* both zeroed as the record is built     */
+    /* 0x16 */ u_short unk16;
     /* 0x18 */ u_char  key;       /* identifies the record; 0 while unused */
     /* 0x19 */ u_char  name[10];  /* straight out of the definition's name */
     /* 0x23 */ u_char  sp_cost;   /* PersonaDef.sp_cost, copied the same way */
@@ -51,7 +52,9 @@ typedef struct {
                                   /* the same list as it came off the disc,
                                      which is what the battle packs          */
     /* 0x3B */ u_char  unk3B;
-    /* 0x3C */ u_char  pad3C[3];
+    /* 0x3C */ u_char  unk3C;     /* both zeroed as the record is built     */
+    /* 0x3D */ u_char  unk3D;
+    /* 0x3E */ u_char  pad3E;
     /* 0x3F */ u_char  owner;     /* the key of the character carrying it; the
                                      scripts give and take Personas by it     */
 } Persona;                        /* 0x40 bytes */
@@ -126,7 +129,7 @@ extern PersonaData g_persona_data[];
    main fills a g_personas slot out of one of these; the battle keeps the byte
    at +0x28 beside every record it copies. */
 typedef struct {
-    /* 0x00 */ u_char  pad00[4];
+    /* 0x00 */ u_long  unk00;
     /* 0x04 */ u_short unk04;     /* the pair a contact is weighed with      */
     /* 0x06 */ u_short unk06;
     /* 0x08 */ u_char  name[10];  /* tile bytes; kept whole, on the battle's record at
