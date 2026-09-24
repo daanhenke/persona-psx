@@ -75,12 +75,12 @@ void FieldInitStrip(void)
 /* Works out which automap room the party's floor draws on, marks the
    party's tile seen, and redraws every cell of the minimap window around
    it - blank off the floor, and blank where the tile is unseen when the map
-   shows seen tiles only. */
-/* 92.1%: the mark and the case tree are the image's; in the window loop,
-   loop.c hoists all of (y % 11 + 11) % 11 out of the column loop, where the
-   image keeps the final division in it and hoists only y % 11 + 11 and its
-   sign. */
-#ifdef NON_MATCHING
+   shows seen tiles only.
+ *
+ * The icon store is written out in both arms of the seen-only test. Jump's
+ * cross-jumping merges the two copies, but only after loop.c has counted
+ * them, and the bigger count is what stops it hoisting the column index's
+ * second division out of the loop, as in the image. */
 void FieldRebuildMap(void)
 {
     u_int    row, col;
@@ -118,21 +118,24 @@ void FieldRebuildMap(void)
         for (col = 0; col < WINDOW; col++, x++) {
             cell = &((u_short (*)[WINDOW])(PACK_BASE + 8 + *g_pack_cell_tab))
                 [(y % WINDOW + WINDOW) % WINDOW][(x % WINDOW + WINDOW) % WINDOW];
-            if (y >= 0 && x >= 0 && y < FLOOR_W && x < FLOOR_W &&
-                (!g_dng->map_seen_only ||
-                 (g_map_seen[(g_map_base[g_dng->area] + g_dng->room) * MAP_BYTES +
-                             y * MAP_ROW_BYTES + x / 8] &
-                  (0x80 >> (x % 8))))) {
-                *cell = g_tile_defs[g_floor_grid[y][x]].icon;
+            if (y >= 0 && x >= 0 && y < FLOOR_W && x < FLOOR_W) {
+                if (g_dng->map_seen_only) {
+                    if (g_map_seen[y * MAP_ROW_BYTES +
+                                   (g_map_base[g_dng->area] + g_dng->room) * MAP_BYTES + x / 8] &
+                        (0x80 >> (x % 8))) {
+                        *cell = g_tile_defs[g_floor_grid[y][x]].icon;
+                    } else {
+                        *cell = 0;
+                    }
+                } else {
+                    *cell = g_tile_defs[g_floor_grid[y][x]].icon;
+                }
             } else {
                 *cell = 0;
             }
         }
     }
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldcell", FieldRebuildMap);
-#endif
 
 /* Copies tile (x, y)'s minimap icon into its window cell. */
 void FieldSetCell(int x, int y)
