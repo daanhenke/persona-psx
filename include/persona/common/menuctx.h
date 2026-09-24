@@ -45,7 +45,9 @@ typedef struct {
     /* 0x230 */ MenuList unk230;
     /* 0x240 */ MenuList unk240;
     /* 0x250 */ MenuList unk250;
-    /* 0x260 */ u_char   pad260[0xC0];
+    /* 0x260 */ MenuList item_row;      /* the item bag's cursor            */
+    /* 0x270 */ MenuList item_col;
+    /* 0x280 */ u_char   pad280[0xA0];
     /* 0x320 */ MenuList formation_cmd; /* 0 arranges the party, 1 presets  */
     /* 0x330 */ u_char   pad330[0x70];
     /* 0x3A0 */ MenuList grid[2];  /* the formation grid's row, then column  */
