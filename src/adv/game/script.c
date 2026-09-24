@@ -108,6 +108,10 @@
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
+
+/* This unit calls ImageAnimStart without a prototype. */
+#define IMAGE_ANIM_START_KR
+
 #include <libcd.h>
 #include <persona/main/cd.h>
 #include <persona/adv/actor.h>
@@ -153,7 +157,7 @@ extern u_char g_cmd_len[];
 #define g_formation_preset ((u_char *)0x801F2584)
 
 /* The actors' sprite definitions in the scene pack, and the sound marks'. */
-extern void  *g_pack_sprites[];
+#define g_pack_sprites ((void **)0x80100070)
 extern void  *g_se_marks[];
 extern u_char g_msg_speeds[];
 extern int    g_actor_dim;
@@ -206,13 +210,13 @@ extern void   CharUnequip(u_char chr, u_char slot);
 extern void   CharRecalcStats(u_char chr);
 extern void   ItemsCommitPending(void);
 extern void   ItemsCompact(void);
-extern void   ItemsAdd(u_short id, short count);
-extern void   ItemsRemove(u_short id, short count);
+extern void   ItemsAdd(short id, short count);
+extern void   ItemsRemove(short id, short count);
 extern short  ItemsFind(u_short id);
 extern void   PersonaStockAdd(u_char id);
 extern u_char PersonaStockFind(u_char id);
 extern u_char PersonaStockFindFree(void);
-extern short  PersonaStockCompact(void);
+extern int    PersonaStockCompact(void);
 extern short  PersonaFindFree(void);
 extern short  PersonaFind(u_char key);
 extern u_char CharEntryFind(u_char chr, u_char v);
@@ -257,664 +261,686 @@ extern void   func_800AF1D8(int a);
 extern void   func_800ADCFC(u_char actor);
 extern void   func_800AE040(u_char n);
 extern void   func_800AE300(u_char a, u_char b, u_char c, u_char d, u_char e);
-extern int    func_800AE3C8(u_char actor);
+extern u_char func_800AE3C8(u_char actor);
 extern short  func_800B0A90(void);
 extern void   func_800B053C(u_char p, u_char n);
 
 #ifdef NON_MATCHING
 int AdvRunScript(u_char *s)
 {
-    RECT     clut = { 0x20, 0x1E2, 11, 1 };
-    u_char  *save = (u_char *)0x801F2AC4;
     MsgState *msg = g_msg;
-    int      leave;
+    RECT     clut = { 0x20, 0x1E2, 11, 1 };
+    int      leave = 0;
+    u_char  *save = (u_char *)0x801F2AC4;
     u_int    keep;
-    short    slot;
-    u_char   chr;
-    int      i;
-    int      n;
-    int      found;
+    int      a;
+    int      b;
+    int      c;
+    int      d;
     short    p;
+    u_int    u;
+    int      r;
+    short    q;
+    int      f;
     u_char   e;
-    AdvActor *a;
-    short    x, y, tx, ty;
 
-    leave = 0;
     if (s == (u_char *)-1) {
         goto end;
     }
     SlotClear(0x34);
     g_script_97C = 0x10;
 
-    for (;;) {
-        keep = g_money2;
-        switch (s[1]) {
-        case 0x23:
-            if ((rand() & 0xFF) <= s[2]) {
-                goto jump;
+loop:
+    keep = g_money2;
+    switch (s[1]) {
+    case 0x23:
+        if ((rand() & 0xFF) <= s[2]) {
+            goto jump;
+        }
+        break;
+    case 0x24:
+        EventFlagSet(U16(s + 2));
+        break;
+    case 0x25:
+        EventFlagClear(U16(s + 2));
+        break;
+    case 0x26:
+        if (EventFlagGet(U16(s + 2))) {
+            goto jump;
+        }
+        break;
+    case 0x27:
+        func_800AD348(s[2]);
+        if (s[2] >= 0xD0) {
+            g_1B88 = 1;
+            leave = LEAVE_ADVCMD;
+        }
+        break;
+    case 0x28:
+        g_script_534C = s[2];
+        leave = LEAVE_MAP;
+        break;
+    case 0x29:
+        g_map_id = U16(s + 2);
+        g_map_pos_x = s[4];
+        g_map_pos_y = s[5];
+        g_adv_room = s[6];
+        leave = LEAVE_POS;
+        break;
+    case 0x2A:
+
+        g_cutscene_on = 1;
+        a = s[2];
+        func_80085958();
+        func_80098B8C(a);
+        func_80085A60();
+        if (g_cutscene_alt) {
+            func_80088C70();
+            break;
+        }
+        func_80085AE0();
+        AdvFadeUpBlocking(4, 0x80);
+        break;
+    case 0x2B:
+        g_script_534C = U16(s + 2);
+        g_adv_room = s[4];
+        leave = LEAVE_ROOM;
+        break;
+    case 0x2C:
+        g_map_id = s[2];
+        g_map_unk4 = s[3];
+        g_map_pos_x = s[4];
+        g_map_pos_y = s[5];
+        g_adv_room = s[6];
+        leave = LEAVE_POS4;
+        break;
+    case 0x2D:
+        g_script_15C2 = s[2];
+        leave = LEAVE_6;
+        break;
+    case 0x2E:
+        if (g_script_2B34 == s[2]) {
+            goto jump;
+        }
+        break;
+    case 0x2F:
+        a = PartyFindByKey(s[2]);
+        b = g_party[a];
+        r = s[3];
+        u = g_chars[b].level;
+    below:
+        if (u < r) {
+            goto jump;
+        }
+        break;
+    case 0x30:
+        p = PartyFindByKey(s[2]);
+    none:
+        if (p == -1) {
+            goto jump;
+        }
+        break;
+    case 0x31:
+        /* A character joins, and takes up the Personas that are theirs. */
+        b = 0;
+        a = CharFindFree();
+        PartyAdd(a);
+        func_800AFAD0(a, s[2], g_chars[0].level);
+        c = 0;
+        d = 0;
+        PartyCompact();
+        for (; b < 31; b++) {
+            if (g_personas[b].key != 0 && g_personas[b].owner == s[2]) {
+                g_chars[a].list[d] = b;
+                d++;
+                c = 1;
             }
+        }
+        if (c) {
+            g_chars[a].entry = 0;
+            func_800B0014(1, g_chars[0].level, a, s[2]);
+        }
+        g_chars[a].entry = 0;
+        g_chars[a].unk1C = ExpToLevel(g_chars[a].unk56 - 1, 0, 0);
+        CharApplyStats(a);
+        CharRecalcStats(a);
+        g_money2 = keep;
+        break;
+    case 0x32:
+
+        /* A character leaves: their equipment goes back to the bag. */
+        a = PartyFindSlot(CharFind2(s[2]));
+        b = g_party[a];
+        CopyShorts((u_short *)0x801F267C, (u_short *)0x800EAE4C, 0x17F);
+        CharUnequip(b, 0);
+        CharUnequip(b, 1);
+        CharUnequip(b, 2);
+        CharUnequip(b, 3);
+        CharUnequip(b, 4);
+        CharUnequip(b, 5);
+        CharUnequip(b, 6);
+        ItemsCommitPending();
+        ItemsCompact();
+        g_party[a] = 0xFF;
+        g_chars[b].key = 0;
+        g_chars[b].pad5F[0] = g_chars[b].unk56;
+        PartyCompact();
+        g_money2 = keep;
+        break;
+    case 0x33:
+        PersonaStockAdd(s[2]);
+        break;
+    case 0x34:
+        if (PersonaStockFind(s[2]) != 0xFF) {
+            goto jump;
+        }
+        break;
+    case 0x35:
+        func_800AF880(s[2]);
+        break;
+    case 0x36:
+        p = PersonaFindFree();
+        goto none;
+    case 0x37:
+        a = PartyFindByKey(s[2]);
+        b = g_party[a];
+        r = s[3];
+        u = g_chars[b].unk56;
+        goto below;
+    case 0x38:
+
+        a = PartyFindByKey(s[2]);
+        b = g_party[a];
+        if (g_chars[b].unk1C < U32(s + 4)) {
+            s = TARGET8(s);
+            goto loop;
+        }
+        break;
+    case 0x39:
+        /* Nobody carries this Persona any more. */
+        a = PersonaFind(s[2]);
+        if (a == -1) {
             break;
-        case 0x24:
-            EventFlagSet(U16(s + 2));
-            break;
-        case 0x25:
-            EventFlagClear(U16(s + 2));
-            break;
-        case 0x26:
-            if (EventFlagGet(U16(s + 2))) {
-                goto jump;
-            }
-            break;
-        case 0x27:
-            func_800AD348(s[2]);
-            if (s[2] >= 0xD0) {
-                g_1B88 = 1;
-                leave = LEAVE_ADVCMD;
-            }
-            break;
-        case 0x28:
-            g_script_534C = s[2];
-            leave = LEAVE_MAP;
-            break;
-        case 0x29:
-            g_map_id = U16(s + 2);
-            g_map_pos_x = s[4];
-            g_map_pos_y = s[5];
-            g_adv_room = s[6];
-            leave = LEAVE_POS;
-            break;
-        case 0x2A:
-            g_cutscene_on = 1;
-            n = s[2];
-            func_80085958();
-            func_80098B8C(n);
-            func_80085A60();
-            if (g_cutscene_alt) {
-                func_80088C70();
-                break;
-            }
-            func_80085AE0();
-            AdvFadeUpBlocking(4, 0x80);
-            break;
-        case 0x2B:
-            g_script_534C = U16(s + 2);
-            g_adv_room = s[4];
-            leave = LEAVE_ROOM;
-            break;
-        case 0x2C:
-            g_map_id = s[2];
-            g_map_unk4 = s[3];
-            g_map_pos_x = s[4];
-            g_map_pos_y = s[5];
-            g_adv_room = s[6];
-            leave = LEAVE_POS4;
-            break;
-        case 0x2D:
-            g_script_15C2 = s[2];
-            leave = LEAVE_6;
-            break;
-        case 0x2E:
-            if (g_script_2B34 == s[2]) {
-                goto jump;
-            }
-            break;
-        case 0x2F:
-            slot = PartyFindByKey(s[2]);
-            if (g_chars[g_party[slot]].level < s[3]) {
-                goto jump;
-            }
-            break;
-        case 0x30:
-            if (PartyFindByKey(s[2]) == -1) {
-                goto jump;
-            }
-            break;
-        case 0x31:
-            /* A character joins, and takes up the Personas that are theirs. */
-            chr = CharFindFree();
-            PartyAdd(chr);
-            found = 0;
-            func_800AFAD0(chr, s[2], g_chars[0].level);
-            n = 0;
-            PartyCompact();
-            for (i = 0; i < 31; i++) {
-                if (g_personas[i].key != 0 && g_personas[i].owner == s[2]) {
-                    g_chars[chr].list[n] = i;
-                    n++;
-                    found = 1;
+        }
+        for (b = 0; b < 5; b++) {
+            c = CharEntryFind(b, a);
+            if (c != 0xFF) {
+                g_chars[b].list[c] = 0xFF;
+                if (g_chars[b].entry == c) {
+                    g_chars[b].entry = 0xFF;
                 }
+                CharRecalcStats(PartyFindSlot(b));
             }
-            if (found) {
-                g_chars[chr].entry = 0;
-                func_800B0014(1, g_chars[0].level, chr, s[2]);
+        }
+        for (b = 0; b < 16; b++) {
+            if (g_persona_slots[b] == a) {
+                g_persona_slots[b] = 0xFF;
             }
-            g_chars[chr].entry = 0;
-            g_chars[chr].unk1C = ExpToLevel(g_chars[chr].unk56 - 1, 0, 0);
-            CharApplyStats(chr);
-            CharRecalcStats(chr);
-            g_money2 = keep;
+        }
+        g_personas[a].key = 0;
+        break;
+    case 0x3A:
+        p = ItemsFind(s[2]);
+        goto none;
+    case 0x3B:
+        if (ItemsFind(s[2]) == 99) {
+            goto jump;
+        }
+        break;
+    case 0x3C:
+        ItemsAdd(*(short *)(s + 2), s[4]);
+        g_money2 = keep;
+        break;
+    case 0x3D:
+        ItemsRemove(*(short *)(s + 2), s[4]);
+        g_money2 = keep;
+        break;
+    case 0x3E:
+        if (U32(s + 4) > (u_int)g_money) {
+            s = TARGET8(s);
+            goto loop;
+        }
+        break;
+    case 0x3F:
+        if (s[2]) {
+            g_money -= U32(s + 4);
+        } else {
+            g_money += U32(s + 4);
+        }
+        if (g_money > MONEY_MAX) {
+            g_money = MONEY_MAX;
+        }
+        if (g_money < 0) {
+            g_money = 0;
+        }
+        break;
+    case 0x40:
+        if (s[2] == g_moon) {
+            goto jump;
+        }
+        break;
+    case 0x41:
+        g_script_2B32 = s[3];
+        break;
+    case 0x42:
+        /* A share of the hp, s[2] / 255 of it. The share is taken off the
+           record the script's own byte at the a names - a slip for
+           g_party that the image carries. */
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x32:
-            /* A character leaves: their equipment goes back to the bag. */
-            slot = PartyFindSlot(CharFind2(s[2]));
-            chr = g_party[slot];
-            CopyShorts((u_short *)0x801F267C, (u_short *)0x800EAE4C, 0x17F);
-            CharUnequip(chr, 0);
-            CharUnequip(chr, 1);
-            CharUnequip(chr, 2);
-            CharUnequip(chr, 3);
-            CharUnequip(chr, 4);
-            CharUnequip(chr, 5);
-            CharUnequip(chr, 6);
-            ItemsCommitPending();
-            ItemsCompact();
-            g_party[slot] = 0xFF;
-            g_chars[chr].key = 0;
-            g_chars[chr].pad5F[0] = g_chars[chr].unk56;
-            PartyCompact();
-            g_money2 = keep;
+        }
+        b = g_party[a];
+        c = s[2] * g_chars[b].hp / 255;
+        g_chars[s[a]].hp -= c;
+        break;
+    case 0x43:
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x33:
-            PersonaStockAdd(s[2]);
+        }
+        b = g_party[a];
+        c = s[2] * g_chars[b].sp / 255;
+        g_chars[s[a]].sp -= c;
+        break;
+    case 0x44:
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x34:
-            if (PersonaStockFind(s[2]) != 0xFF) {
-                goto jump;
-            }
+        }
+        b = g_party[a];
+        if (g_chars[b].hp == g_chars[b].hp_max) {
+            goto jump;
+        }
+        g_chars[b].hp = g_chars[b].hp_max;
+        break;
+    case 0x45:
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x35:
-            func_800AF880(s[2]);
+        }
+        b = g_party[a];
+        if (g_chars[b].sp == g_chars[b].sp_max) {
+            goto jump;
+        }
+        g_chars[b].sp = g_chars[b].sp_max;
+        break;
+    case 0x46:
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x36:
-            if (PersonaFindFree() == -1) {
-                goto jump;
-            }
+        }
+        b = g_party[a];
+        if (g_chars[b].status != s[2]) {
+            goto jump;
+        }
+        break;
+    case 0x47:
+        a = PartyFindByKey(s[2]);
+        b = g_party[a];
+        if (g_chars[b].status == s[3]) {
+            goto jump;
+        }
+        g_chars[b].status = s[3];
+        break;
+    case 0x48:
+        a = PartyFindByKey(s[2]);
+        if (a == -1) {
             break;
-        case 0x37:
-            slot = PartyFindByKey(s[2]);
-            if (g_chars[g_party[slot]].unk56 < s[3]) {
-                goto jump;
-            }
-            break;
-        case 0x38:
-            slot = PartyFindByKey(s[2]);
-            if (g_chars[g_party[slot]].unk1C < U32(s + 4)) {
-                goto jump8;
-            }
-            break;
-        case 0x39:
-            /* Nobody carries this Persona any more. */
-            p = PersonaFind(s[2]);
-            if (p == -1) {
-                break;
-            }
-            for (i = 0; i < 5; i++) {
-                e = CharEntryFind(i, p);
-                if (e != 0xFF) {
-                    g_chars[i].list[e] = 0xFF;
-                    if (g_chars[i].entry == e) {
-                        g_chars[i].entry = 0xFF;
-                    }
-                    CharRecalcStats(PartyFindSlot(i));
-                }
-            }
-            for (i = 0; i < 16; i++) {
-                if (g_persona_slots[i] == p) {
-                    g_persona_slots[i] = 0xFF;
-                }
-            }
-            g_personas[p].key = 0;
-            break;
-        case 0x3A:
-            if (ItemsFind(s[2]) == -1) {
-                goto jump;
-            }
-            break;
-        case 0x3B:
-            if (ItemsFind(s[2]) == 99) {
-                goto jump;
-            }
-            break;
-        case 0x3C:
-            ItemsAdd(*(short *)(s + 2), s[4]);
-            g_money2 = keep;
-            break;
-        case 0x3D:
-            ItemsRemove(*(short *)(s + 2), s[4]);
-            g_money2 = keep;
-            break;
-        case 0x3E:
-            if ((u_int)g_money < U32(s + 4)) {
-                goto jump8;
-            }
-            break;
-        case 0x3F:
-            if (s[2]) {
-                g_money -= U32(s + 4);
-            } else {
-                g_money += U32(s + 4);
-            }
-            if (g_money > MONEY_MAX) {
-                g_money = MONEY_MAX;
-            }
-            if (g_money < 0) {
-                g_money = 0;
-            }
-            break;
-        case 0x40:
-            if (s[2] == g_moon) {
-                goto jump;
-            }
-            break;
-        case 0x41:
-            g_script_2B32 = s[3];
-            break;
-        case 0x42:
-            /* A share of the hp, s[2] / 255 of it. The share is taken off the
-               record the script's own byte at the slot names - a slip for
-               g_party that the image carries. */
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            n = s[2] * g_chars[g_party[slot]].hp / 255;
-            g_chars[s[slot]].hp -= n;
-            break;
-        case 0x43:
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            n = s[2] * g_chars[g_party[slot]].sp / 255;
-            g_chars[s[slot]].sp -= n;
-            break;
-        case 0x44:
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            if (g_chars[g_party[slot]].hp == g_chars[g_party[slot]].hp_max) {
-                goto jump;
-            }
-            g_chars[g_party[slot]].hp = g_chars[g_party[slot]].hp_max;
-            break;
-        case 0x45:
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            if (g_chars[g_party[slot]].sp == g_chars[g_party[slot]].sp_max) {
-                goto jump;
-            }
-            g_chars[g_party[slot]].sp = g_chars[g_party[slot]].sp_max;
-            break;
-        case 0x46:
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            if (g_chars[g_party[slot]].status != s[2]) {
-                goto jump;
-            }
-            break;
-        case 0x47:
-            slot = PartyFindByKey(s[2]);
-            if (g_chars[g_party[slot]].status == s[3]) {
-                goto jump;
-            }
-            g_chars[g_party[slot]].status = s[3];
-            break;
-        case 0x48:
-            slot = PartyFindByKey(s[2]);
-            if (slot == -1) {
-                break;
-            }
-            if (g_chars[g_party[slot]].status != s[3]) {
-                goto jump;
-            }
-            g_chars[g_party[slot]].status = 0;
-            break;
-        case 0x49:
-            slot = PartyFindByKey(s[2]);
-            if (CharStat(g_party[slot], s[4]) < s[4]) {
-                goto jump8;
-            }
-            break;
-        case 0x4A:
-            slot = PartyFindByKey(s[2]);
-            CharStatAdd(g_party[slot], s[3], s[5], s[4]);
-            break;
-        case 0x4B:
-            func_80085958();
-            n = func_80098B8C(0x24);
-            func_80085A60();
-            func_80085AE0();
-            AdvFadeUpBlocking(4, 0x80);
-            if (n) {
-                leave = LEAVE_SCREEN;
-            }
-            break;
-        case 0x4C:
-            func_80085958();
-            func_80085A60();
-            func_800715EC();
-            func_80091608(1);
-            func_80085AE0();
-            TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[1]),
-                       0x380, 0x1C8, 0x100, 0x1F8);
-            TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[0]),
-                       0x380, 0x100, 0x3C0, 0x1A0);
-            AdvFadeUpBlocking(8, 0x80);
-            break;
-        case 0x4D:
-            for (i = 0; i < U16(s + 2); i++) {
-                AdvRunFrame();
-            }
-            break;
-        case 0x4E:
-            if (PersonaStockFindFree() == 0xFF) {
-                goto jump;
-            }
-            break;
-        case 0x4F:
-            p = PersonaFindFree();
-            func_800B053C(p, s[3]);
-            chr = CharFind2(s[2]);
-            e = CharEntryFindFree(chr);
-            g_chars[chr].list[e] = p;
-            g_chars[chr].entry = e;
-            g_personas[p].owner = g_chars[chr].key;
-            CharRecalcStats(chr);
-            g_money2 = keep;
-            break;
-        case 0x50:
-            if (PersonaFind(s[2]) == -1) {
-                goto jump;
-            }
-            break;
-        case 0x51:
-            slot = PartyFindByKey(s[2]);
-            if (CharEntryFindFree(g_party[slot]) == 0xFF) {
-                goto jump;
-            }
-            break;
-        case 0x52:
-            slot = PartyFindByKey(s[2]);
-            g_party[slot] = 0xFF;
-            PartyCompact();
-            g_money2 = keep;
-            break;
-        case 0x53:
-            PartyAdd(CharFind(s[2]));
-            PartyCompact();
-            g_money2 = keep;
-            break;
-        case 0x54:
-            if (s[2] == g_msg_answer) {
-                goto jump;
-            }
-            break;
-        case 0x55:
-            BgMapInit(TARGET(s), g_msg_speeds[save[8]]);
-            s += g_cmd_len[s[1]];
-            SoundOpenSeq(0x18, 0, 0);
-            SoundOpenSeq(0x19, 0, 0);
-            SoundOpenSeq(0x1A, 0, 0);
-            SoundOpenSeq(0x1B, 0, 0);
-            while (!(msg->flags & MSG_DONE)) {
-                MsgStep();
-                AdvRunFrame();
-            }
-            for (i = 0; i < 24; i++) {
-                AdvRunFrame();
-            }
-            SsSetNck(g_seq_handle[0x18]);
-            SsSetNck(g_seq_handle[0x19]);
-            SsSetNck(g_seq_handle[0x1A]);
-            SsSetNck(g_seq_handle[0x1B]);
-            continue;
-        case 0x56:
-            FlagBank3Set(s[2]);
-            break;
-        case 0x57:
-            slot = PartyFindByKey(s[2]);
-            chr = g_party[slot];
-            g_chars[chr].blocked = s[3];
-            CharApplyStats(chr);
-            CharRecalcStats(chr);
-            break;
-        case 0x58:
-            g_adv_actors[s[2]].script = U32(s + 4);
-            break;
-        case 0x59:
-            if (s[2] == func_800B0A90() + 1) {
-                goto jump;
-            }
-            break;
-        case 0x5A:
-            if (s[2] == PersonaStockCompact() + 1) {
-                goto jump;
-            }
-            break;
-        case 0x60:
-            BgMapClearRow(0);
-            BgMapClearRow(1);
-            BgMapClearRow(2);
-            BgMapClearRow(3);
-            g_bg_layers[4].h = 0;
-            msg->cursor = 0;
-            QueueImageUpload((u_short *)&clut, g_msg_clut);
-            func_800AEE9C(0);
-            break;
-        case 0x61:
-            func_800AF1D8(0);
-            break;
-        case 0x63:
-            g_adv_effect = s[2];
-            AdvEffectSetupSlots();
-            break;
-        case 0x64:
-            a = &g_adv_actors[s[2]];
-            a->unk22 = s[3];
-            a->shadow = s[8] >> 4;
-            a->home_x = a->x = s[4];
-            a->home_y = a->y = s[5];
-            a->next_dir = a->dir = s[6];
-            a->phase = 0;
-            a->unk25 = 0;
-            a->flags = ((s[7] & 0xF) << 8) + ((s[8] & 0xF) << 7) + (s[9] << 9);
-            a->unk26 = s[0xB];
-            a->unk08 = -1;
-            a->script = -1;
-            a->bright = s[0xA];
-            func_800ADCFC(s[2]);
-            break;
-        case 0x65:
-            a = &g_adv_actors[s[2]];
-            a->unk22 = s[3];
-            a->x = s[4];
-            a->y = s[5];
-            a->flags = (s[6] << 7) + (s[7] << 9);
-            a->unk23 = s[6];
-            a->bright = s[8];
-            a->next_dir = 0;
-            a->dir = 0;
-            a->phase = 0;
-            a->unk25 = 0;
-            a->unk08 = -1;
-            a->unk26 = s[9];
-            ActorSetTile(a->x, a->y, a);
-            n = a->unk22;
-            if (n >= 0x80) {
-                n -= 0x80;
-            }
-            if (a->flags & 0x80) {
-                SlotInit(g_pack_sprites[n], s[2], a->z, a->world_x, a->world_y);
-            } else {
-                SlotInitTagged(g_pack_sprites[n], s[2], a->z, a->world_x,
-                               a->world_y);
-            }
-            SlotSetBrightness(s[2],
-                              a->bright - (a->bright >> 4) * 8 * g_actor_dim);
-            a->id = 0;
-            break;
-        case 0x66:
-            g_adv_actors[s[2]].id = 0xFFFF;
-            g_adv_actors[s[2]].unk22 = 0xFF;
-            break;
-        case 0x67:
+        }
+        b = g_party[a];
+        if (g_chars[b].status != s[3]) {
+            goto jump;
+        }
+        g_chars[b].status = 0;
+        break;
+    case 0x49:
+
+        a = PartyFindByKey(s[2]);
+        if (CharStat(g_party[a], s[4]) < s[4]) {
+            s = TARGET8(s);
+            goto loop;
+        }
+        break;
+    case 0x4A:
+        a = PartyFindByKey(s[2]);
+        CharStatAdd(g_party[a], s[3], s[5], s[4]);
+        break;
+    case 0x4B:
+        func_80085958();
+        a = func_80098B8C(0x24);
+        func_80085A60();
+        func_80085AE0();
+        AdvFadeUpBlocking(4, 0x80);
+        if (a) {
+            leave = LEAVE_SCREEN;
+        }
+        break;
+    case 0x4C:
+
+        func_80085958();
+        func_80085A60();
+        func_800715EC();
+        func_80091608(1);
+        func_80085AE0();
+        TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[1]),
+                   0x380, 0x1C8, 0x100, 0x1F8);
+        TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[0]),
+                   0x380, 0x100, 0x3C0, 0x1A0);
+        AdvFadeUpBlocking(8, 0x80);
+        break;
+    case 0x4D:
+        for (a = 0; a < U16(s + 2); a++) {
             AdvRunFrame();
-            AdvSelectFile(3, s[2]);
-            CdReadFileToAddrAsync(&g_adv_scene_file, 5, (u_long *)0x800F4000);
+        }
+        break;
+    case 0x4E:
+        f = PersonaStockFindFree();
+    full:
+        if (f == 0xFF) {
+            goto jump;
+        }
+        break;
+    case 0x4F:
+
+        c = PersonaFindFree();
+        func_800B053C(c, s[3]);
+        a = CharFind2(s[2]);
+        b = CharEntryFindFree(a);
+        g_chars[a].list[b] = c;
+        g_chars[a].entry = b;
+        g_personas[c].owner = g_chars[a].key;
+        CharRecalcStats(a);
+        g_money2 = keep;
+        break;
+    case 0x50:
+        p = PersonaFind(s[2]);
+        goto none;
+    case 0x51:
+        a = PartyFindByKey(s[2]);
+        f = CharEntryFindFree(g_party[a]);
+        goto full;
+    case 0x52:
+        a = PartyFindByKey(s[2]);
+        g_party[a] = 0xFF;
+        PartyCompact();
+        g_money2 = keep;
+        break;
+    case 0x53:
+        PartyAdd(CharFind(s[2]));
+        PartyCompact();
+        g_money2 = keep;
+        break;
+    case 0x54:
+        if (s[2] == g_msg_answer) {
+            goto jump;
+        }
+        break;
+    case 0x55:
+        BgMapInit(TARGET(s), g_msg_speeds[save[8]]);
+        s += g_cmd_len[s[1]];
+        goto msgwait;
+    case 0x56:
+        FlagBank3Set(s[2]);
+        break;
+    case 0x57:
+        a = PartyFindByKey(s[2]);
+        b = g_party[a];
+        g_chars[b].blocked = s[3];
+        CharApplyStats(b);
+        CharRecalcStats(b);
+        break;
+    case 0x58:
+        g_adv_actors[s[2]].script = U32(s + 4);
+        break;
+    case 0x59:
+        q = func_800B0A90();
+    count:
+        a = q + 1;
+        if (s[2] == a) {
+            goto jump;
+        }
+        break;
+    case 0x5A:
+        q = PersonaStockCompact();
+        goto count;
+    case 0x60:
+        BgMapClearRow(0);
+        BgMapClearRow(1);
+        BgMapClearRow(2);
+        BgMapClearRow(3);
+        g_bg_layers[4].scrolly = 0;
+        msg->cursor = 0;
+        QueueImageUpload((u_short *)&clut, g_msg_clut);
+        func_800AEE9C(0);
+        break;
+    case 0x61:
+        func_800AF1D8(0);
+        break;
+    case 0x63:
+        g_adv_effect = s[2];
+        AdvEffectSetupSlots();
+        break;
+    case 0x64:
+        a = s[2];
+        g_adv_actors[a].unk22 = s[3];
+        g_adv_actors[a].shadow = s[8] >> 4;
+        g_adv_actors[a].x = g_adv_actors[a].home_x = s[4];
+        g_adv_actors[a].y = g_adv_actors[a].home_y = s[5];
+        g_adv_actors[a].dir = g_adv_actors[a].next_dir = s[6];
+        g_adv_actors[a].flags = ((s[7] & 0xF) << 8) + ((s[8] & 0xF) << 7) + (s[9] << 9);
+        g_adv_actors[a].phase = 0;
+        g_adv_actors[a].unk25 = 0;
+        g_adv_actors[a].unk26 = s[0xB];
+        g_adv_actors[a].bright = s[0xA];
+        g_adv_actors[a].unk08 = -1;
+        g_adv_actors[a].script = -1;
+        func_800ADCFC(a);
+        break;
+    case 0x65:
+        a = s[2];
+        g_adv_actors[a].unk22 = s[3];
+        g_adv_actors[a].x = s[4];
+        g_adv_actors[a].y = s[5];
+        g_adv_actors[a].flags = (s[6] << 7) + (s[7] << 9);
+        g_adv_actors[a].unk23 = s[6];
+        g_adv_actors[a].bright = s[8];
+        g_adv_actors[a].unk26 = s[9];
+        g_adv_actors[a].next_dir = 0;
+        g_adv_actors[a].dir = 0;
+        g_adv_actors[a].phase = 0;
+        g_adv_actors[a].unk25 = 0;
+        g_adv_actors[a].unk08 = -1;
+        ActorSetTile(g_adv_actors[a].x, g_adv_actors[a].y, &g_adv_actors[a]);
+        b = g_adv_actors[a].unk22;
+        if ((u_int)b >= 0x80) {
+            b -= 0x80;
+        }
+        if (g_adv_actors[a].flags & 0x80) {
+            SlotInit(g_pack_sprites[b], a, g_adv_actors[a].z,
+                     g_adv_actors[a].world_x, g_adv_actors[a].world_y);
+        } else {
+            SlotInitTagged(g_pack_sprites[b], a, g_adv_actors[a].z,
+                           g_adv_actors[a].world_x, g_adv_actors[a].world_y);
+        }
+        SlotSetBrightness(a, g_adv_actors[a].bright -
+                                 ((g_adv_actors[a].bright >> 4) << 3) * g_actor_dim);
+        g_adv_actors[a].id = 0;
+        break;
+    case 0x66:
+        g_adv_actors[s[2]].id = 0xFFFF;
+        g_adv_actors[s[2]].unk22 = 0xFF;
+        break;
+    case 0x67:
+        AdvRunFrame();
+        AdvSelectFile(3, s[2]);
+        CdReadFileToAddrAsync(&g_adv_scene_file, 5, (u_long *)0x800F4000);
+        while (g_cd_busy != -1) {
+            AdvRunFrame();
+        }
+        TimQueueAt((u_long *)0x800F4008, 0x140, 0x168, 0, 0x1E6);
+        AdvRunFrame();
+        AdvGrowSlot(s[3]);
+        break;
+    case 0x68:
+        AdvShrinkSlot();
+        break;
+    case 0x69:
+        AdvSoundCommand(s[3] + 1);
+        a = s[2];
+        SlotInit(g_se_marks[s[3]], a + 0x20, g_adv_actors[a].z - 1,
+                 g_adv_actors[a].world_x, g_adv_actors[a].world_y);
+        break;
+    case 0x6C:
+        func_800AE040(s[2]);
+        break;
+    case 0x6D:
+        ViewShakeStop();
+        break;
+    case 0x6E:
+        func_800AE300(s[2], s[3], s[4], s[5], s[6]);
+        break;
+    case 0x71:
+        u = s[3];
+        ImageAnimStart(s[2], g_scene_images[u].script,
+                       g_scene_images[u].x, g_scene_images[u].y,
+                       g_scene_images[u].w, g_scene_images[u].h);
+        break;
+    case 0x72:
+        ImageAnimStop(s[2]);
+        break;
+    case 0x73:
+        g_adv_actors[s[2]].flags |= ACTOR_SEMITRANS;
+        break;
+    case 0x74:
+        g_adv_actors[s[2]].flags &= ~ACTOR_SEMITRANS;
+        break;
+    case 0x75:
+    case 0x76:
+        SlotFadeIn(s[2], s[3]);
+        g_adv_actors[s[2]].bright = 0x80;
+        break;
+    case 0x77:
+        SlotFadeOut(s[2], s[3]);
+        g_adv_actors[s[2]].bright = 0;
+        break;
+    case 0x78:
+        /* The view pans a pixel a frame onto the new actor. */
+        a = g_cam_y;
+        g_cam_actor = s[2];
+        b = g_cam_x;
+        CamCenterOnActor(g_cam_actor);
+        c = g_cam_y;
+        d = g_cam_x;
+        g_cam_y = a;
+        g_cam_x = b;
+        while (c != g_cam_y || d != g_cam_x) {
+            if (c < g_cam_y) {
+                g_cam_y--;
+            }
+            if (g_cam_y < c) {
+                g_cam_y++;
+            }
+            if (d < g_cam_x) {
+                g_cam_x--;
+            }
+            if (g_cam_x < d) {
+                g_cam_x++;
+            }
+            AdvRunFrame();
+        }
+        break;
+    case 0x79:
+        if (s[7]) {
+            AdvScrollCamera(s[4] + 2, s[5], s[6]);
+            AdvScrollCamera(s[2], s[3], s[6]);
+        } else {
+            AdvScrollCamera(s[2], s[3], s[6]);
+            AdvScrollCamera(s[4] + 2, s[5], s[6]);
+        }
+        break;
+    case 0x7A:
+        SlotClear(s[2] + 0x20);
+        break;
+    case 0x7B:
+        while (func_800AE3C8(g_cam_actor)) {
+            AdvRunFrame();
+        }
+        SsSeqStop(g_seq_handle[10]);
+        break;
+    case 0x7C:
+        a = s[2];
+        g_adv_actors[a].x = s[3];
+        g_adv_actors[a].y = s[4];
+        g_adv_actors[a].dir = g_adv_actors[a].next_dir = s[5];
+        g_adv_actors[a].phase = 0;
+        g_adv_actors[a].unk25 = 0;
+        g_adv_actors[a].unk26 = s[6];
+        func_800ADCFC(a);
+        break;
+    case 0x80:
+        AdvLoadBgm(s[2]);
+        if (s[2] < 0x40) {
+            LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", (void *)0x80118000);
             while (g_cd_busy != -1) {
                 AdvRunFrame();
             }
-            TimQueueAt((u_long *)0x800F4008, 0x140, 0x168, 0, 0x1E6);
-            AdvRunFrame();
-            AdvGrowSlot(s[3]);
-            break;
-        case 0x68:
-            AdvShrinkSlot();
-            break;
-        case 0x69:
-            AdvSoundCommand(s[3] + 1);
-            n = s[2];
-            SlotInit(g_se_marks[s[3]], n + 0x20, g_adv_actors[n].z - 1,
-                     g_adv_actors[n].world_x, g_adv_actors[n].world_y);
-            break;
-        case 0x6C:
-            func_800AE040(s[2]);
-            break;
-        case 0x6D:
-            ViewShakeStop();
-            break;
-        case 0x6E:
-            func_800AE300(s[2], s[3], s[4], s[5], s[6]);
-            break;
-        case 0x71:
-            ImageAnimStart(s[2], g_scene_images[s[3]].script,
-                           g_scene_images[s[3]].x, g_scene_images[s[3]].y,
-                           g_scene_images[s[3]].w, g_scene_images[s[3]].h);
-            break;
-        case 0x72:
-            ImageAnimStop(s[2]);
-            break;
-        case 0x73:
-            g_adv_actors[s[2]].flags |= ACTOR_SEMITRANS;
-            break;
-        case 0x74:
-            g_adv_actors[s[2]].flags &= ~ACTOR_SEMITRANS;
-            break;
-        case 0x75:
-        case 0x76:
-            SlotFadeIn(s[2], s[3]);
-            g_adv_actors[s[2]].bright = 0x80;
-            break;
-        case 0x77:
-            SlotFadeOut(s[2], s[3]);
-            g_adv_actors[s[2]].bright = 0;
-            break;
-        case 0x78:
-            /* The view pans a pixel a frame onto the new actor. */
-            y = g_cam_y;
-            g_cam_actor = s[2];
-            x = g_cam_x;
-            CamCenterOnActor(g_cam_actor);
-            ty = g_cam_y;
-            tx = g_cam_x;
-            g_cam_y = y;
-            g_cam_x = x;
-            while (ty != g_cam_y || tx != g_cam_x) {
-                if (ty < g_cam_y) {
-                    g_cam_y--;
-                }
-                if (g_cam_y < ty) {
-                    g_cam_y++;
-                }
-                if (tx < g_cam_x) {
-                    g_cam_x--;
-                }
-                if (g_cam_x < tx) {
-                    g_cam_x++;
-                }
-                AdvRunFrame();
-            }
-            break;
-        case 0x79:
-            if (s[7]) {
-                AdvScrollCamera(s[4] + 2, s[5], s[6]);
-                AdvScrollCamera(s[2], s[3], s[6]);
-            } else {
-                AdvScrollCamera(s[2], s[3], s[6]);
-                AdvScrollCamera(s[4] + 2, s[5], s[6]);
-            }
-            break;
-        case 0x7A:
-            SlotClear(s[2] + 0x20);
-            break;
-        case 0x7B:
-            while (func_800AE3C8(g_cam_actor)) {
-                AdvRunFrame();
-            }
-            SsSeqStop(g_seq_handle[10]);
-            break;
-        case 0x7C:
-            a = &g_adv_actors[s[2]];
-            a->x = s[3];
-            a->y = s[4];
-            a->phase = 0;
-            a->unk25 = 0;
-            a->next_dir = a->dir = s[5];
-            a->unk26 = s[6];
-            func_800ADCFC(s[2]);
-            break;
-        case 0x80:
-            AdvLoadBgm(s[2]);
-            if (s[2] < 0x40) {
-                LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", (void *)0x80118000);
-                while (g_cd_busy != -1) {
-                    AdvRunFrame();
-                }
-            }
-            break;
-        case 0x81:
-            AdvSoundCommand(s[2]);
-            break;
-        case 0x87:
-            if (s[2] < g_clock[0]) {
-                goto jump;
-            }
-            if (s[2] != g_clock[0] || s[3] >= g_clock[1]) {
-                break;
-            }
-        case OP_JUMP:
-        jump:
-            s = TARGET(s);
-            continue;
-        case 0x88:
-            g_clock[4] = 0;
-            break;
-        case 0x89:
-            g_clock[4] = 1;
-            break;
-        case 0x8A:
-            g_clock[3] = 0;
-            g_clock[2] = 0;
-            g_clock[1] = 0;
-            g_clock[0] = 0;
-            break;
-        case OP_END:
-            goto end;
         }
-        s += g_cmd_len[s[1]];
-        if (leave) {
-            g_script_resume = s;
+        break;
+    case 0x81:
+        AdvSoundCommand(s[2]);
+        break;
+    case 0x87:
+        if (s[2] < g_clock[0]) {
+            goto jump;
+        }
+        if (s[2] != g_clock[0] || s[3] >= g_clock[1]) {
             break;
         }
-        continue;
-    jump8:
-        s = TARGET8(s);
+    case OP_JUMP:
+    jump:
+        s = TARGET(s);
+        goto loop;
+    case 0x88:
+        g_clock[4] = 0;
+        break;
+    case 0x89:
+        g_clock[4] = 1;
+        break;
+    case 0x8A:
+        g_clock[3] = 0;
+        g_clock[2] = 0;
+        g_clock[1] = 0;
+        g_clock[0] = 0;
+        break;
+    case OP_END:
+        goto end;
     }
+    s += g_cmd_len[s[1]];
+    if (leave == 0) {
+        goto loop;
+    }
+    g_script_resume = s;
+    goto end;
+
+msgwait:
+    SoundOpenSeq(0x18, 0, 0);
+    SoundOpenSeq(0x19, 0, 0);
+    SoundOpenSeq(0x1A, 0, 0);
+    SoundOpenSeq(0x1B, 0, 0);
+    while (!(msg->flags & MSG_DONE)) {
+        MsgStep();
+        AdvRunFrame();
+    }
+    for (a = 0; a < 24; a++) {
+        AdvRunFrame();
+    }
+    SsSetNck(g_seq_handle[0x18]);
+    SsSetNck(g_seq_handle[0x19]);
+    SsSetNck(g_seq_handle[0x1A]);
+    SsSetNck(g_seq_handle[0x1B]);
+    goto loop;
+
 end:
     g_cam_actor = 0;
     return leave;

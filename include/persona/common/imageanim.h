@@ -37,8 +37,14 @@ extern ImageAnim g_image_anim[IMAGE_ANIM_COUNT];
 
 void ImageAnimStop(int chan);
 void ImageAnimStopAll(void);
+/* A unit that called it without a prototype - its short arguments go over
+   as ints - defines IMAGE_ANIM_START_KR before including this. */
+#ifdef IMAGE_ANIM_START_KR
+void ImageAnimStart();
+#else
 void ImageAnimStart(int chan, u_long **script, u_short x, u_short y,
                     u_short w, u_short h);
+#endif
 void ImageAnimStep(void);
 
 /* The deferred VRAM uploads (imagequeue.c): the frame's LoadImages are
