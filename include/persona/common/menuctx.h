@@ -12,7 +12,9 @@
 
 typedef struct {
     /* 0x000 */ int      member;   /* which party member the screen is on */
-    /* 0x004 */ u_char   pad004[0x1BC];
+    /* 0x004 */ u_char   pad004[0xCC];
+    /* 0x0D0 */ MenuList page;     /* the persona data view's page         */
+    /* 0x0E0 */ u_char   pad0E0[0xE0];
     /* 0x1C0 */ int      slot_base;
     /* 0x1C4 */ u_char   pad1C4[0xC];
     /* 0x1D0 */ int      row;

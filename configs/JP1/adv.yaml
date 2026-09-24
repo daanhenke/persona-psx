@@ -303,7 +303,7 @@ segments:
       - [0x3255C, c, common/game/tilewalls]
       - [0x32698, c, common/game/automap]
       - [0x32710, c, common/game/automapmark]
-      - [0x32790, asm, adv_52]
+      - [0x32790, c, ui/personadata]
       - [0x34598, c, common/game/flags2]
       - [0x346A0, c, common/ui/personalist]
       - [0x3476C, asm, adv_53]

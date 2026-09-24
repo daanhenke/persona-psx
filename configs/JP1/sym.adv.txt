@@ -1282,11 +1282,11 @@ MapMarkTile              = 0x80096AB0; // type:func size:0x80
 //--- PA: 0x032790   VA: 0x80096B30   subsegment: asm, adv_52
 //-----------------------------------------------------------
 func_80096B30            = 0x80096B30; // type:func size:0x62C
-func_8009715C            = 0x8009715C; // type:func size:0x150
+PersonaDataScreen        = 0x8009715C; // type:func size:0x150
 func_800972AC            = 0x800972AC; // type:func size:0x480
 func_8009772C            = 0x8009772C; // type:func size:0x3B8
-func_80097AE4            = 0x80097AE4; // type:func size:0x23C
-func_80097D20            = 0x80097D20; // type:func size:0x354
+PersonaDataPick          = 0x80097AE4; // type:func size:0x23C
+PersonaDataView          = 0x80097D20; // type:func size:0x354
 func_80098074            = 0x80098074; // type:func size:0x40C
 func_80098480            = 0x80098480; // type:func size:0x4B8
 
@@ -1664,6 +1664,7 @@ g_pad_held               = 0x800DC000; // size:0x4
 g_pad_pressed            = 0x800DC004; // size:0x4
 g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
+g_persona_list           = 0x800EAE4C; // ignore:True
 g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
 g_tilemap0               = 0x800EE180; // ignore:True size:0x1400
 g_tilemap1               = 0x800EF580; // ignore:True size:0x1400
