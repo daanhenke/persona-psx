@@ -280,18 +280,12 @@ void BtlDrawObjects(void)
                     g_btl_polyg4_next->r3 = lit;
                     g_btl_polyg4_next->g3 = lit;
                     g_btl_polyg4_next->b3 = 0;
-                    {
-                        /* Keep the primitive across tag writes, which can
-                           otherwise make gcc reload the global pointer. */
-                        POLY_G4* quad = g_btl_polyg4_next;
-                        ot = (u_long *)(g_btl_prim_pool
-                                        + g_btl_frame * BTL_FRAME_BYTES
-                                        + BTL_ARENA_OT);
-                        setaddr(quad, getaddr(ot));
-                        addr = (u_int)quad;
-                        g_btl_polyg4_next = quad + 1;
-                        setaddr(ot, addr);
-                    }
+                    /* libgpu's addPrim, with the table's address written
+                       into it and so worked out for each of its two uses. */
+                    addPrim(g_btl_prim_pool + g_btl_frame * BTL_FRAME_BYTES
+                                + BTL_ARENA_OT,
+                            g_btl_polyg4_next);
+                    g_btl_polyg4_next++;
                 }
                 cells += BTL_GRID_ROWS;
                 x1 += BTL_GRID_W;

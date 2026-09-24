@@ -15,7 +15,6 @@
  * asked for before the first has been taken.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 
 /* Fields to the second, and the same count for seconds and minutes. */
 #define CLOCK_WRAP 60
@@ -37,20 +36,16 @@ extern volatile u_char g_btl_vsync_count;
 extern int    g_btl_frame_queued;
 extern int    g_btl_frame_ticks;
 
-#ifdef NON_MATCHING
+/* Written plainly: the two counters, then the frame. The scheduler lays the
+   three increments over each other the way the image has them. */
 void BtlClockTick(void)
 {
     u_char *hours;
-    union {
-        u_int frames;
-        int waiting;
-    } tick;
 
     hours = &g_playtime;
-    tick.waiting = ++g_playtime_frame < CLOCK_WRAP;
-    ++g_btl_vsync_count;
+    g_btl_vsync_count++;
     g_btl_frame_ticks++;
-    if (!tick.waiting) {
+    if (++g_playtime_frame >= CLOCK_WRAP) {
         g_playtime_frame = 0;
         if (++g_playtime_sec >= CLOCK_WRAP) {
             g_playtime_sec = 0;
@@ -70,6 +65,3 @@ void BtlClockTick(void)
         g_btl_frame_queued = 1;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/clock", BtlClockTick);
-#endif

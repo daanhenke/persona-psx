@@ -25,7 +25,6 @@
  * holds - an empty slot is drawn grey and with the blank name.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/effect.h>
 #include <persona/btlp/input.h>
@@ -138,12 +137,12 @@ void BtlRefreshStockList(void)
     } while (i < STOCK_SLOTS);
 }
 
-/* 95.66%: every store is where the image has it, but the image leaves the
-   first constant the loop writes, STOCK_NUMBER_UNK, in the loop and lifts the
-   next two, where gcc here lifts the first two and leaves the third. The head
-   written through a local, the fields written through the row pointers, and a
-   separate local for the next row number all move further away. */
-#ifdef NON_MATCHING
+/* loop.c lifts the loop's constants in the order it meets them, and its
+   budget shrinks with each one: the image lifts the kind, the column and the
+   0xFF and leaves 0x8E, so 0x8E is written after the other two. The list head
+   is read before the name row is taken, which is the order the lifted
+   addresses stand in ahead of the loop. The scheduler puts the stores back in
+   the image's order. */
 void BtlBuildStockList(void)
 {
     BtlStockNumberRow *num;
@@ -153,15 +152,15 @@ void BtlBuildStockList(void)
     g_btl_stock_list.next = (BtlEffectRow *)-1;
     for (i = 0; i < STOCK_SLOTS; i++) {
         num = &g_btl_stock_numbers[i];
-        name = &g_btl_stock_list_names[i];
         num->row.next = g_btl_stock_list.next;
         g_btl_stock_list.next = &num->row;
+        name = &g_btl_stock_list_names[i];
         name->next = g_btl_stock_list.next;
         g_btl_stock_list.next = (BtlEffectRow *)name;
         g_btl_stock_numbers[i].row.row = i;
-        g_btl_stock_numbers[i].unk14 = STOCK_NUMBER_UNK;
         g_btl_stock_numbers[i].row.kind = STOCK_NUMBER;
         g_btl_stock_numbers[i].row.x = STOCK_NUMBER_X;
+        g_btl_stock_numbers[i].unk14 = STOCK_NUMBER_UNK;
         g_btl_stock_numbers[i].row.y = i + 1;
         g_btl_stock_numbers[i].row.text = &g_persona_stock[i];
         g_btl_stock_numbers[i].row.u.mask = STOCK_BYTE;
@@ -173,6 +172,3 @@ void BtlBuildStockList(void)
     }
     BtlRefreshStockList();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/stocklist", BtlBuildStockList);
-#endif

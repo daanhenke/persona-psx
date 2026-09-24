@@ -3139,3 +3139,28 @@ into the branch slot where the image has it.
 - [fxsweep.c](/src/btlp/fxsweep.c) - `BtlFxStartSweep`, 78.96% to exact.
 - [fxgrid.c](/src/btlp/fxgrid.c) - `BtlOpenFxGrid`, 77.79% to 99.15% with an
   explicit second counter; its move test's constant still gets lifted.
+
+## loop.c lifts constants in order until its budget runs out
+
+Each invariant loop.c lifts out of a loop costs part of a shrinking budget,
+and it considers them in the order they appear in the loop body. So when
+the image lifts some of a loop's constants and rebuilds others every trip,
+the ones it rebuilt were met *last*: move their statements after the others.
+The loop dump says it directly - the same `life 1, savings 1` reads "moved"
+early in the list and "not desirable" later. The same order decides which
+invariant addresses come first in the preheader. The scheduler puts stores
+to different fields back in the image's order afterwards.
+
+- [stocklist.c](/src/btlp/stocklist.c) - `BtlBuildStockList`, 95.66% to exact.
+
+## An old workaround can outlive what it worked around
+
+Guarded routines carry contortions that were once load-bearing - a digit
+buffer re-pointed every trip, a union for a flag, a `do { } while (0)` - and
+other fixes since have often made them unnecessary. Before hunting a residual,
+write the routine the plain way once and score it.
+
+- [effectmotion.c](/src/btlp/effectmotion.c) - `BtlEffectDrawNumber`, the
+  plain `for` over the buffer, 95.06% to exact.
+- [clock.c](/src/btlp/clock.c) - `BtlClockTick`, the plain increments and
+  test, 82.05% to exact.

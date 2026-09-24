@@ -22,7 +22,6 @@
  * end shut do not.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <libgte.h>
 #include <libgpu.h>
@@ -285,26 +284,16 @@ void BtlFormatHexGlyphs(u_int value, u_char *out, int unused)
     *out = 0xFF;
 }
 
-/* Not matched, both of these, and both down to the same last thing. Each is
-   the right length with the right instructions in the right order; what is
-   left is which register the allocator hands to which local - eight words in
-   one and seventeen in the other, all of them a name rather than a value.
-
-   Two things did most of the work getting them here, and are worth keeping
-   in mind for the next one: the record is read through a second pointer of
-   its own, and the digit buffer through a pointer taken again on every turn
-   of the loop, which is what stops gcc walking it. */
 /* A number read through the row's pointer and drawn where the row sits. The
    mask says how wide the value is, and the top bit of the kind byte picks hex
    over decimal - the decimal formatter writes plain digits, so they are
    carried up into the glyph codes afterwards, leaving the blank it pads with
-   alone. */
-#ifdef NON_MATCHING
+   alone. The record is read through a second pointer of its own for the
+   kind test, which is what the image's registers want; the digit loop is the
+   plain one. */
 void BtlEffectDrawNumber(const BtlEffectRow *row)
 {
     const BtlEffectRow *r;
-    u_char *p;
-    u_char *base;
     u_char text[16];
     u_int  value;
     int    i;
@@ -325,28 +314,16 @@ void BtlEffectDrawNumber(const BtlEffectRow *row)
     if ((r->kind & 0x80) != 0) {
         BtlFormatHexGlyphs(value, text, 0);
     } else {
-        do {
-            BtlFormatDecimal(value, text, 0);
-            i = 0;
-        } while (0);
-        base = text;
-        p = base;
-        if (p[0] != 0xFF) {
-            do {
-                if (p[i] != EFFECT_DIGIT_BLANK) {
-                    p[i] += EFFECT_DIGIT_ZERO;
-                }
-                i++;
-                p = base;
-            } while (p[i] != 0xFF);
+        BtlFormatDecimal(value, text, 0);
+        for (i = 0; text[i] != 0xFF; i++) {
+            if (text[i] != EFFECT_DIGIT_BLANK) {
+                text[i] += EFFECT_DIGIT_ZERO;
+            }
         }
         text[i] = 0xFF;
     }
     BtlDrawGlyphs(text, g_btl_clut[EFFECT_CLUT + ((row->kind >> 4) & 7)]);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectmotion", BtlEffectDrawNumber);
-#endif
 
 /* A run of lines out of the list the row points at, one under the next. It
    stops early on a line of -1, and on a drawer that says it could not fit
