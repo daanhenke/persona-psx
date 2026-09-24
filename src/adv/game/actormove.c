@@ -59,7 +59,7 @@ void ActorStartMove(u_char a, u_char move, u_char speed, u_char dir,
     g_adv_actors[a].steps = speed + 1;
     g_adv_actors[a].next_dir = dir;
     g_adv_actors[a].face_moves = face_moves;
-    if (g_adv_actors[a].unk22 == KIND_STEPS) {
+    if (g_adv_actors[a].kind == KIND_STEPS) {
         SsSeqPlay(g_seq_handle, 1, 0);
     }
 }
@@ -95,7 +95,7 @@ u_char ActorsMoveStep(u_char follow)
                 A.move = MOVE_NONE;
                 A.dir = A.next_dir;
                 A.face = A.next_dir;
-                if (A.unk22 == KIND_STEPS) {
+                if (A.kind == KIND_STEPS) {
                     ActorSetStandSprite(i);
                 }
                 continue;
@@ -104,7 +104,7 @@ u_char ActorsMoveStep(u_char follow)
             if (A.face_moves) {
                 A.face = *p;
             }
-            if (A.unk22 == KIND_STEPS) {
+            if (A.kind == KIND_STEPS) {
                 SlotInit(g_walk_defs[A.face], i, A.z, A.world_x, A.world_y);
                 switch (A.shadow) {
                 case SHADOW_FLAT:
@@ -142,7 +142,7 @@ u_char ActorsMoveStep(u_char follow)
             A.move += 3;
             continue;
             } else {
-                if (A.unk22 == KIND_STEPS) {
+                if (A.kind == KIND_STEPS) {
                     ActorSetStandSprite(i);
                 }
                 A.wait--;
@@ -162,32 +162,32 @@ u_char ActorsMoveStep(u_char follow)
                     if (new == TILE_SLOPE_V) A.slope = 0;
                     if (new == TILE_SLOPE_H) {
                         A.slope = 0;
-                        A.unk26 += g_slope_lift[A.dir];
-                        if (old == TILE_SLOPE_H) A.unk26 += g_slope_lift[A.dir];
+                        A.lift += g_slope_lift[A.dir];
+                        if (old == TILE_SLOPE_H) A.lift += g_slope_lift[A.dir];
                     }
                     break;
                 case 1:
                     if (new == TILE_SLOPE_V) A.slope = 0;
                     if (new == TILE_SLOPE_H) {
                         A.slope = 1;
-                        A.unk26 += g_slope_lift[A.dir];
-                        if (old == TILE_SLOPE_H) A.unk26 += g_slope_lift[A.dir];
+                        A.lift += g_slope_lift[A.dir];
+                        if (old == TILE_SLOPE_H) A.lift += g_slope_lift[A.dir];
                     }
                     break;
                 case 2:
                     if (new == TILE_SLOPE_H) A.slope = 0;
                     if (new == TILE_SLOPE_V) {
                         A.slope = 2;
-                        A.unk26 += g_slope_lift[A.dir];
-                        if (old == TILE_SLOPE_V) A.unk26 += g_slope_lift[A.dir];
+                        A.lift += g_slope_lift[A.dir];
+                        if (old == TILE_SLOPE_V) A.lift += g_slope_lift[A.dir];
                     }
                     break;
                 case 3:
                     if (new == TILE_SLOPE_H) A.slope = 0;
                     if (new == TILE_SLOPE_V) {
                         A.slope = 3;
-                        A.unk26 += g_slope_lift[A.dir];
-                        if (old == TILE_SLOPE_V) A.unk26 += g_slope_lift[A.dir];
+                        A.lift += g_slope_lift[A.dir];
+                        if (old == TILE_SLOPE_V) A.lift += g_slope_lift[A.dir];
                     }
                     break;
                 }
@@ -195,16 +195,16 @@ u_char ActorsMoveStep(u_char follow)
                 if (old == TILE_SLOPE_V || old == TILE_SLOPE_H) {
                     switch (A.dir) {
                     case 0:
-                        if (old == TILE_SLOPE_H) A.unk26 += g_slope_lift[0];
+                        if (old == TILE_SLOPE_H) A.lift += g_slope_lift[0];
                         break;
                     case 1:
-                        if (old == TILE_SLOPE_H) A.unk26 += g_slope_lift[1];
+                        if (old == TILE_SLOPE_H) A.lift += g_slope_lift[1];
                         break;
                     case 2:
-                        if (old == TILE_SLOPE_V) A.unk26 += g_slope_lift[2];
+                        if (old == TILE_SLOPE_V) A.lift += g_slope_lift[2];
                         break;
                     case 3:
-                        if (old == TILE_SLOPE_V) A.unk26 += g_slope_lift[3];
+                        if (old == TILE_SLOPE_V) A.lift += g_slope_lift[3];
                         break;
                     }
                 }

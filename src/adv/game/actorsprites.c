@@ -45,7 +45,7 @@ extern u_char g_dir_flip[];
 #define SCREEN_X(n) (g_adv_actors[n].world_x - g_cam_x - g_view_dx)
 #define SCREEN_Y(n)                                                            \
     (g_adv_actors[n].world_y - g_cam_y - g_view_dy                             \
-     - g_adv_actors[n].unk26 * STEP_H)
+     - g_adv_actors[n].lift * STEP_H)
 #define DEPTH(n) (g_adv_actors[n].z + g_adv_actors[n].depth)
 
 /* 87.90%: the original re-masks the counter at every use rather than keeping

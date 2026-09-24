@@ -38,15 +38,23 @@ typedef struct {
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
     /* 0x20 */ u_char  home_x, home_y;  /* where a room actor was placed  */
-    /* 0x22 */ u_char  unk22;
+    /* 0x22 */ u_char  kind;            /* which sprite set: 0xFF none (the
+                                           actor is taken away), 1 a party
+                                           member with walking sprites and
+                                           footsteps, 0x80 up a sprite out of
+                                           the scene pack, anything else four
+                                           of the overlay's own, one a facing.
+                                           AdvApproach.kind is matched to it */
     /* 0x23 */ u_char  unk23;
     /* 0x24 */ u_char  face_moves;      /* a move script turns `face` as
                                            well as `dir`                     */
     /* 0x25 */ u_char  slope;           /* the facing it took onto the slope
                                            it is on, or 0                    */
-    /* 0x26 */ u_char  unk26;          /* gates the second leg of a diagonal
-                                          step the way the tile under the
-                                          actor gates the first            */
+    /* 0x26 */ u_char  lift;            /* steps above the floor: the sprite
+                                           is drawn seven pixels up for each,
+                                           a slope tile raises or lowers it,
+                                           and only a grounded actor takes
+                                           the second leg of a diagonal step */
     /* 0x27 */ u_char  tiles_left;      /* of the move under way          */
     /* 0x28 */ u_char  wait;            /* frames before the next move    */
     /* 0x29 */ u_char  shadow;          /* how the second sprite below the

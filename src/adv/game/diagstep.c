@@ -130,12 +130,12 @@ u_char SceneTryDiagCW(AdvActor *a)
         break;
     case 6:
     case 9:
-        if (a->unk26 == 0) {
+        if (a->lift == 0) {
             return 0xFF;
         }
         goto move;
     case 4:
-        if (a->unk26 == 0) {
+        if (a->lift == 0) {
             return 0xFF;
         }
     case 2:
@@ -217,7 +217,7 @@ u_char SceneTryDiagCCW(AdvActor *a)
         break;
     case 6:
     case 9:
-        if (a->unk26 == 0) {
+        if (a->lift == 0) {
             return 0xFF;
         }
         break;
@@ -242,7 +242,7 @@ u_char SceneTryDiagCCW(AdvActor *a)
         break;
     case 6:
     case 9:
-        if (a->unk26 == 0) {
+        if (a->lift == 0) {
             return 0xFF;
         }
         goto move;

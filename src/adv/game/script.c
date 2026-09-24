@@ -730,7 +730,7 @@ loop:
         break;
     case 0x64:
         a = s[2];
-        g_adv_actors[a].unk22 = s[3];
+        g_adv_actors[a].kind = s[3];
         g_adv_actors[a].shadow = s[8] >> 4;
         g_adv_actors[a].x = g_adv_actors[a].home_x = s[4];
         g_adv_actors[a].y = g_adv_actors[a].home_y = s[5];
@@ -738,7 +738,7 @@ loop:
         g_adv_actors[a].flags = ((s[7] & 0xF) << 8) + ((s[8] & 0xF) << 7) + (s[9] << 9);
         g_adv_actors[a].phase = 0;
         g_adv_actors[a].slope = 0;
-        g_adv_actors[a].unk26 = s[0xB];
+        g_adv_actors[a].lift = s[0xB];
         g_adv_actors[a].bright = s[0xA];
         g_adv_actors[a].move = MOVE_NONE;
         g_adv_actors[a].script = -1;
@@ -746,20 +746,20 @@ loop:
         break;
     case 0x65:
         a = s[2];
-        g_adv_actors[a].unk22 = s[3];
+        g_adv_actors[a].kind = s[3];
         g_adv_actors[a].x = s[4];
         g_adv_actors[a].y = s[5];
         g_adv_actors[a].flags = (s[6] << 7) + (s[7] << 9);
         g_adv_actors[a].unk23 = s[6];
         g_adv_actors[a].bright = s[8];
-        g_adv_actors[a].unk26 = s[9];
+        g_adv_actors[a].lift = s[9];
         g_adv_actors[a].next_dir = 0;
         g_adv_actors[a].dir = 0;
         g_adv_actors[a].phase = 0;
         g_adv_actors[a].slope = 0;
         g_adv_actors[a].move = MOVE_NONE;
         ActorSetTile(g_adv_actors[a].x, g_adv_actors[a].y, &g_adv_actors[a]);
-        b = g_adv_actors[a].unk22;
+        b = g_adv_actors[a].kind;
         if ((u_int)b >= 0x80) {
             b -= 0x80;
         }
@@ -776,7 +776,7 @@ loop:
         break;
     case 0x66:
         g_adv_actors[s[2]].id = 0xFFFF;
-        g_adv_actors[s[2]].unk22 = 0xFF;
+        g_adv_actors[s[2]].kind = 0xFF;
         break;
     case 0x67:
         AdvRunFrame();
@@ -882,7 +882,7 @@ loop:
         g_adv_actors[a].dir = g_adv_actors[a].next_dir = s[5];
         g_adv_actors[a].phase = 0;
         g_adv_actors[a].slope = 0;
-        g_adv_actors[a].unk26 = s[6];
+        g_adv_actors[a].lift = s[6];
         ActorPlace(a);
         break;
     case 0x80:

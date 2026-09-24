@@ -141,7 +141,7 @@ typedef struct {
                        u_short shadow;
                    } b;
                } u;
-    /* 0x08 */ u_char  unk22;
+    /* 0x08 */ u_char  kind;
     /* 0x09 */ u_char  x, y;
     /* 0x0B */ u_char  bright;
     /* 0x0C */ u_char  lift;
@@ -156,7 +156,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ int     script;
-    /* 0x04 */ u_char  unk22;
+    /* 0x04 */ u_char  kind;
     /* 0x05 */ u_char  unk23;            /* its high nibble is the flags   */
     /* 0x06 */ u_char  x, y;
     /* 0x08 */ u_char  bright;

@@ -60,13 +60,13 @@ void ActorPlace(u_char a)
     u_char kind;
     Slot  *t = &g_slots[a + SHADOW_SLOT];
 
-    if (A.unk22 != KIND_NONE) {
+    if (A.kind != KIND_NONE) {
         ActorSetTile(A.x, A.y, &A);
         A.world_x++;
         A.world_y -= 2;
         A.id = 0;
-        if (A.unk22 >= KIND_PACK) {
-            kind = A.unk22 - KIND_PACK;
+        if (A.kind >= KIND_PACK) {
+            kind = A.kind - KIND_PACK;
             if (A.flags & ACTOR_UNTAG) {
                 SlotInit(g_pack_sprites[kind], a, A.z, A.world_x, A.world_y);
             } else {
@@ -74,10 +74,10 @@ void ActorPlace(u_char a)
                                A.world_y);
             }
             ActorSetShadowSprite(a);
-        } else if (A.unk22 == KIND_STAND) {
+        } else if (A.kind == KIND_STAND) {
             ActorSetStandSprite(a);
         } else {
-            kind = A.unk22 * 4 + A.dir;
+            kind = A.kind * 4 + A.dir;
             SlotInit(g_actor_defs[kind], a, A.z, A.world_x, A.world_y);
             ActorSetShadowSprite(a);
             if (g_dir_flip[A.dir]) {
