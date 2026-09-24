@@ -46,3 +46,11 @@ rom:0x436C reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
 rom:0x4374 reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
 rom:0x437C reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
 rom:0x4384 reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+
+// g_pow10[i - 1]: FormatDecimal and the copy MsgStep inlines, twice.
+rom:0x2258 reloc:MIPS_HI16 symbol:g_pow10 addend:-0x4
+rom:0x225C reloc:MIPS_LO16 symbol:g_pow10 addend:-0x4
+rom:0x3054 reloc:MIPS_HI16 symbol:g_pow10 addend:-0x4
+rom:0x3058 reloc:MIPS_LO16 symbol:g_pow10 addend:-0x4
+rom:0x31B0 reloc:MIPS_HI16 symbol:g_pow10 addend:-0x4
+rom:0x31B4 reloc:MIPS_LO16 symbol:g_pow10 addend:-0x4

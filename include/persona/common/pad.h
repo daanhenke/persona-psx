@@ -33,4 +33,8 @@ extern u_char *g_pad_action_names[];
 
 void PadDrawLayout(u_char layout);
 
+/* The live pad: what is held this frame, and what went down this frame. */
+extern int g_pad_held[];
+extern int g_pad_pressed[];
+
 #endif

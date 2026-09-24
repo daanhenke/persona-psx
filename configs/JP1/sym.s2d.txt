@@ -1241,5 +1241,5 @@ D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
 D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C;
-g_bg_state               = 0x80101E4C; // ignore:True size:0x10
+g_msg                    = 0x80101E4C; // ignore:True size:0x40
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF

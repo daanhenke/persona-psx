@@ -73,6 +73,9 @@ extern const u_char *g_item_help[];
  * own work area, so it moves with WORK_BIAS - S2D's sits 0x20000 higher.
  */
 #define g_items         ((u_short *)0x801F267C)
+
+/* Where item `id` sits in g_items, or -1 (items.c). */
+short ItemsFind(u_short id);
 #define g_items_pending ((u_short *)(0x800EAE4C + WORK_BIAS))
 
 /* The party's money, eight bytes before g_items in the same work area. The

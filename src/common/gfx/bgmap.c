@@ -20,7 +20,7 @@
    blanks the map's four rows. */
 void BgMapInit(void *src, short arg)
 {
-    g_bg_state->src = src;
+    g_msg->script = src;
     g_bg_map.cellw = g_bg_map.cellh = BG_MAP_CELL;
     g_bg_map.ncellw = BG_MAP_W;
     g_bg_map.ncellh = BG_MAP_H;
@@ -28,11 +28,11 @@ void BgMapInit(void *src, short arg)
     g_bg_map.index = g_bg_index;
     g_bg_layers[MAP_LAYER].scrollx = 0;
     g_bg_layers[MAP_LAYER].scrolly = 0;
-    g_bg_state->unk0A = 0;
-    g_bg_state->tick = 0;
-    g_bg_state->unk04 = 0;
-    g_bg_state->unk06 = 0;
-    g_bg_state->unk08 = arg;
+    g_msg->cursor = 0;
+    g_msg->flags = 0;
+    g_msg->wait = 0;
+    g_msg->delay = 0;
+    g_msg->speed = arg;
     BgMapClearRow(0);
     BgMapClearRow(1);
     BgMapClearRow(2);

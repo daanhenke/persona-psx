@@ -14,7 +14,7 @@
  * nibble scaled by 16 gives u, the high nibble is already v. The CLUT keeps
  * its top bits and takes a palette from the background tick, which is what
  * animates the water and fire tiles. */
-void BgMapSetCell(u_short idx)
+void BgMapSetCell(u_short idx, u_short glyph)
 {
     u_int state;
     u_int row;
@@ -25,7 +25,7 @@ void BgMapSetCell(u_short idx)
     /* Every one of these four locals is load-bearing: the tick, the old CLUT,
        the half of it that survives, and even the constant column. Folding any
        of them back into the expression that uses it costs the match. */
-    state = g_bg_state->tick;
+    state = g_msg->flags;
     /* `* 16` and `<< 4` are not interchangeable here: the shift form schedules
        differently and costs the match. */
     g_bg_cells[idx + 1].u = ((idx + 1) & 0xF) * 16;

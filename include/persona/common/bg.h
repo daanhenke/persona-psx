@@ -14,6 +14,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <persona/common/menulist.h>
 
 #define BG_LAYERS 6
 
@@ -31,24 +32,51 @@ extern u_int  *g_bg_maps[];
 extern GsMAP   g_bg_map;
 extern u_short g_bg_index[BG_MAP_W * BG_MAP_H];
 
-/* The map's cell definitions and its state, both in the work area and
-   reached by hardcoded address, so S2D's come out 0x20000 higher on the
-   same WORK_BIAS. */
+/* The map's cell definitions and the message window's state, both in the work
+   area and reached by hardcoded address, so S2D's come out 0x20000 higher on
+   the same WORK_BIAS.
+
+   The map is the message window: BgMapInit opens a message by handing it the
+   script, and the interpreter (0x80066970) walks the script a glyph at a time
+   into the map's cells. */
 typedef struct {
-    /* 0x00 */ u_int  tick;   /* its low bits pick the animated tiles'
-                                 palette; BgPanelSet parks it at 0x8000 */
-    /* 0x04 */ short  unk04;
-    /* 0x06 */ short  unk06;
-    /* 0x08 */ short  unk08;  /* BgMapInit's second argument */
-    /* 0x0A */ short  unk0A;
-    /* 0x0C */ void  *src;    /* what BgMapInit was handed to draw from */
-} BgMapState;
+    /* 0x00 */ u_int    flags;    /* MSG_*; bits 4-6 also pick the palette
+                                     BgMapSetCell gives each glyph, and
+                                     BgPanelSet parks a closed window at
+                                     MSG_DONE                             */
+    /* 0x04 */ u_short  wait;     /* frames left in a scripted pause      */
+    /* 0x06 */ u_short  delay;    /* frames left before the next glyph    */
+    /* 0x08 */ u_short  speed;    /* what `delay` is put back to          */
+    /* 0x0A */ u_short  cursor;   /* the next cell, four rows of fifteen  */
+    /* 0x0C */ u_char  *script;   /* where the message is being read      */
+    /* 0x10 */ u_char  *sub;      /* where an inserted string is read,
+                                     while MSG_SUB is set                 */
+    /* 0x14 */ MenuList choice[2];/* a choice's rows, then columns        */
+    /* 0x34 */ u_char   choices;
+    /* 0x35 */ u_char   left;     /* glyphs left of an inserted string    */
+    /* 0x36 */ u_char   digits[8];/* a number being printed               */
+    /* 0x3E */ u_char   pad3E[2];
+} MsgState;
+
+#define MSG_SUB       0x000001  /* reading `sub`, not `script`             */
+#define MSG_SCROLL    0x000002  /* scroll a row before the next glyph      */
+#define MSG_FULL      0x000004  /* the window has filled once              */
+#define MSG_KEY       0x000008  /* waiting for a key                       */
+#define MSG_COUNTED   0x004000  /* the insert is `left` glyphs long        */
+#define MSG_DONE      0x008000  /* the message has ended                   */
+#define MSG_CHOOSING  0x010000  /* a choice follows the insert             */
+#define MSG_CHOICE    0x020000  /* a choice is open                        */
+#define MSG_FIRST     0x040000  /* a first name; the surname follows       */
+#define MSG_SURNAME   0x080000  /* print the surname next                  */
+#define MSG_NEWLINE   0x100000  /* the row was ended by a newline          */
+#define MSG_BACKWARD  0x200000  /* read the insert backwards (digits)      */
 
 #define g_bg_cells ((GsCELL *)(0x800E224C + WORK_BIAS))
-#define g_bg_state ((BgMapState *)(0x800E1E4C + WORK_BIAS))
+#define g_msg ((MsgState *)(0x800E1E4C + WORK_BIAS))
 
-extern void BgMapInit(void *src, short arg);
+extern void BgMapInit(void *script, short speed);
 extern void BgMapClearRow(u_short row);
-extern void BgMapSetCell(u_short idx);
+/* The glyph is handed over too, though only the cell's own index is used. */
+extern void BgMapSetCell(u_short idx, u_short glyph);
 
 #endif

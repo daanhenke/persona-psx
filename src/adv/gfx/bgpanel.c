@@ -26,7 +26,7 @@ void BgPanelSet(short id, short x, short y)
 {
     u_int *state;
 
-    state = &g_bg_state->tick;
+    state = &g_msg->flags;
     if (id != 0) {
         BgMapInit(g_bg_maps[id], 0);
         g_bg_layers[PANEL_LAYER].w = PANEL_W;

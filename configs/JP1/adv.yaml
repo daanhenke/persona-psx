@@ -97,7 +97,6 @@ segments:
       - [0x2224, c, common/ui/decimal]
       - [0x2314, c, common/gfx/bgmap]
       - [0x2418, c, gfx/bgreset]
-      - [0x25D0, asm, adv_3_x1]
       - [0x34FC, c, common/gfx/bgmapcell]
       - [0x3584, asm, adv_3_x2]
       - [0x37DC, c, common/gfx/tilemap]
