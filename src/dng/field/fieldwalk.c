@@ -38,7 +38,7 @@ int FieldWalk(int ret)
             g_scene->from_x = g_walk_from_x;
             g_scene->from_y = g_walk_from_y;
             if (g_tile_flags != g_tile_defs[g_floor_grid[g_dng->pos[POS_Y]][g_dng->pos[POS_X]]].flags) {
-                func_8006CF40();
+                FieldOpenDoor();
             }
             FieldStepBegin();
             for (i = 0; i < 5; i++) {

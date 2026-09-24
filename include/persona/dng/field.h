@@ -34,6 +34,8 @@ typedef struct {
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
+    u_char        pad6E91C[0x6EA04 - 0x6E91C];
+    u_char        flag6EA04;          /* 0x6EA04 cleared for a new floor */
 } DngScene;
 
 /* The game state block as the field sees it. Only the fields the overlay
@@ -42,14 +44,15 @@ typedef struct {
     u_char   pad0[0x1580];
     GsRVIEW2 view;       /* 0x1580 the camera as last saved */
     u_short  map;        /* 0x15A0 */
-    u_char   pad15A2[2];
+    u_short  floor;      /* 0x15A2 which of the map's floors */
     u_char   pos[3];     /* 0x15A4 the party's tile, [POS_X] and [POS_Y];
                             a step indexes it with g_dir_axis */
     u_char   facing;     /* 0x15A7 0-3, counting anticlockwise */
     u_char   walk_dir;   /* 0x15A8 the facing a step goes towards */
     u_char   pad15A9[3];
     long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
-    u_char   pad15B0[0x15BC - 0x15B0];
+    u_char   flag15B0;   /* 0x15B0 cleared coming back from S2D or ADV */
+    u_char   pad15B1[0x15BC - 0x15B1];
     u_char   tick_flags; /* 0x15BC */
     u_char   pad15BD;
     u_short  area;       /* 0x15BE the automap's map id */
@@ -63,6 +66,12 @@ typedef struct {
 
 #define POS_X 0
 #define POS_Y 2
+
+/* FieldSetFloor reads the floor as a plain halfword off the state pointer,
+   not as a member: read as g_dng->floor, gcc 2.6 takes a struct member and a
+   fixed global as unable to alias and hoists every read above the stores in
+   between, where the image rereads it after each one. */
+#define DNG_FLOOR (*(u_short *)((u_char *)g_dng + 0x15A2))
 
 extern DngScene *g_scene;
 extern DngState *g_dng;
@@ -179,6 +188,33 @@ extern short g_idle_seq;
 #define PACK_BASE   0x80130000
 #define PACK_INDEX  ((u_char *)0x801DD000)
 #define g_pack_sel  (*(int *)0x801DD000)
+#define INDEX_BASE  0x801DD000
+
+/* The pack's and the index's offset tables, as the entry point finds them:
+   one entry for the models, one per floor for the rest. */
+extern u_long *g_pack_model_tab;
+extern u_long *g_pack_obj_tab;
+extern u_long *g_pack_spot_tab;
+extern u_long *g_pack_event_tab;
+extern u_long *g_index_tile_tab;
+extern u_long *g_index_info_tab;
+extern u_long *g_index_grid_tab;
+
+/* The current floor's entries. g_floor_spots is a list the field matches
+   against the party's tile; g_floor_events carries what a spot starts. */
+extern u_char *g_model_defs;
+extern u_char *g_floor_info;
+extern u_char *g_floor_objs;
+extern u_char *g_floor_spots;
+extern u_char *g_floor_events;
+
+/* Cleared by FieldSetFloor; nothing here says more about them. */
+extern int    D_8009FDEC;
+extern int    D_800993B8;
+extern u_char D_8009FE3C;
+extern u_char D_8009FAD0;
+extern u_char D_800A059C;
+extern int    D_800A02E0;
 extern u_long *g_pack_images;
 extern u_long *g_pack_tims;
 
@@ -232,8 +268,8 @@ void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8006E988(int x, int y);
 void func_8006FFF4(void);
+void func_80070BF0(int a, int b);
 int  func_8006C9C8(void);
-void func_8006CF40(void);
 void func_80070DAC(int arg);
 void func_8006D33C(int arg);
 
@@ -265,5 +301,10 @@ void FieldLoadAhead(void);
 void FieldFadeOut(void);
 void FieldFadeIn(void);
 int  FieldPauseBgm(void);
+
+int  FieldOpenDoor(void);
+void FieldInitGraph(void);
+void FieldSetFloor(void);
+void FieldEnterFrom(void);
 
 #endif
