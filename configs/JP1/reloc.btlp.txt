@@ -290,3 +290,7 @@ rom:0x5B08 reloc:MIPS_NONE symbol:D_801C0006
 rom:0x5BF0 reloc:MIPS_NONE symbol:g_btl_choice_text
 rom:0x5CC8 reloc:MIPS_NONE symbol:D_801C0006
 rom:0x5D7C reloc:MIPS_NONE symbol:D_801C0006
+
+// BtlFxResolveHit - the fixed lookup of g_spell_data[0x6E].element.
+rom:0x5ECC8 reloc:MIPS_HI16 symbol:g_spell_data addend:0x8A4
+rom:0x5ECCC reloc:MIPS_LO16 symbol:g_spell_data addend:0x8A4

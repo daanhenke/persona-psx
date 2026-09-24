@@ -13,7 +13,6 @@
  * script has played out.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -43,17 +42,13 @@
 
 extern void BtlFxReopenVoices(void);
 
-/* 99.88%: the two induction pointers the walk is reduced to are incremented
-   in the other order - the image steps the enemy's before the actor's. The
-   same residual as BtlFxStep72, and its comment carries the loop dump's
-   account of why two induction variables cannot put the two in step. */
-#ifdef NON_MATCHING
+/* As in BtlFxStep72, walk the enemy object fields by actor stride while
+   retaining the full slot for the actor checks. */
 void BtlFxStepE8(BtlObj *o)
 {
     BtlObj *n;
     int     i;
     int     slot;
-    int     k;
 
     if (o->mark_num == FX_MARK_HEAD) {
         switch (o->phase) {
@@ -78,8 +73,7 @@ void BtlFxStepE8(BtlObj *o)
             }
             i = 0;
             if (g_btl_no_escape == 0) {
-                k = 0;
-                for (slot = BTL_PARTY; slot < BTL_ACTORS; slot++, k++) {
+                for (slot = BTL_PARTY; slot < BTL_ACTORS; slot++) {
                     if (g_btl_actors[slot].c.key == 0) {
                         continue;
                     }
@@ -90,10 +84,13 @@ void BtlFxStepE8(BtlObj *o)
                     if ((g_btl_actors[slot].flags & BTL_ACTOR_OUT) != 0) {
                         continue;
                     }
-                    g_btl_enemies[k].obj->motion = FX_E8_MOTION;
-                    g_btl_enemies[k].obj->timer = i * FX_E8_STAGGER;
+                    (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                                  + (slot - BTL_PARTY) * sizeof(BtlActor)))->motion = FX_E8_MOTION;
+                    (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                                  + (slot - BTL_PARTY) * sizeof(BtlActor)))->timer = i * FX_E8_STAGGER;
                     i++;
-                    g_btl_enemies[k].obj->attr |= FX_E8_GOING;
+                    (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                                  + (slot - BTL_PARTY) * sizeof(BtlActor)))->attr |= FX_E8_GOING;
                 }
             }
             o->timer = i * FX_E8_STAGGER + FX_E8_HOLD;
@@ -134,6 +131,3 @@ void BtlFxStepE8(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxstepe8", BtlFxStepE8);
-#endif

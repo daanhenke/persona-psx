@@ -24,7 +24,6 @@
  * they walk: it opens the sound banks the next phase will speak from.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <rand.h>
 #include <libsnd.h>
 #include <persona/common/spell.h>
@@ -113,19 +112,9 @@
 #define FX_HIT_ROLL     0xFF
 #define FX_HIT_LEVEL    2
 
-/* The damage a spell does: the caster's stat squared, scaled by the spell's
-   weight, over six times the target's own. */
-#define FX_HIT_SCALED(d, a)                                                    \
-    ((d) * ((g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0)          \
-     / ((a)->unk3C * 6))
-
-/* 98.62%: every instruction is in place but the saved registers are dealt
-   out in another order - the target, the caster and the stat trade s1, s5
-   and s2 for s2, s3 and s5 - and the formula's last two argument copies and
-   the clear of `react` sit one slot apart. The switches, the formula split
-   through `damage` and the reversed take arm were each worth a structural
-   cluster; declaration order moves nothing. */
-#ifdef NON_MATCHING
+/* Keep the scaled numerator in damage before dividing by the target's
+   stat. Reusing that double lets the squared stat and scaled value share
+   the same register pair. */
 void BtlFxResolveHit(BtlObj *o)
 {
     BtlActor *self;
@@ -208,7 +197,8 @@ void BtlFxResolveHit(BtlObj *o)
             if ((u_int)(g_btl_fx_move - FX_HIT_A_FIRST) < FX_HIT_SPARED) {
                 instant = 0;
                 damage = power * power;
-                amount = FX_HIT_SCALED(damage, a);
+                damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
+                amount = damage / (a->unk3C * 6);
                 react = 0;
             } else {
                 instant = 1;
@@ -239,7 +229,8 @@ void BtlFxResolveHit(BtlObj *o)
             if ((u_int)(g_btl_fx_move - FX_HIT_B_FIRST) < FX_HIT_SPARED) {
                 instant = 0;
                 damage = power * power;
-                amount = FX_HIT_SCALED(damage, a);
+                damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
+                amount = damage / (a->unk3C * 6);
                 react = 0;
             } else {
                 instant = 1;
@@ -268,30 +259,32 @@ void BtlFxResolveHit(BtlObj *o)
             break;
         default:
             if (g_btl_fx_move == FX_HIT_TAKE) {
-            switch (self->unkD8) {
-            case 0:
-                amount = 0;
-                break;
-            case 1:
-                amount = FX_HIT_PIERCE_FULL;
-                break;
-            default:
-                if (self->c.hp >= a->c.hp) {
-                    amount = a->c.hp - 1;
-                } else {
-                    amount = self->c.hp;
+                i = self->unkD8;
+                switch (i) {
+                case 0:
+                    amount = 0;
+                    break;
+                case 1:
+                    amount = FX_HIT_PIERCE_FULL;
+                    break;
+                default:
+                    if (a->c.hp <= self->c.hp) {
+                        amount = a->c.hp - 1;
+                    } else {
+                        amount = self->c.hp;
+                    }
+                    break;
                 }
-                break;
+                react = 0;
+            } else if (g_btl_fx_move == FX_HIT_SPARE) {
+                amount = a->c.hp - 1;
+                react = 1;
+            } else {
+                damage = power * power;
+                damage *= (g_spell_data[g_btl_fx_move].power / 2.0 + 5.0) / 10.0;
+                amount = damage / (a->unk3C * 6);
+                react = 0;
             }
-            react = 0;
-        } else if (g_btl_fx_move == FX_HIT_SPARE) {
-            amount = a->c.hp - 1;
-            react = 1;
-        } else {
-            damage = power * power;
-            amount = FX_HIT_SCALED(damage, a);
-            react = 0;
-        }
             break;
         }
     } else {
@@ -366,8 +359,8 @@ void BtlFxResolveHit(BtlObj *o)
         if (reflect) {
             amount /= 2;
         }
-        a->c.hp += amount;
         a->hit_amount = amount;
+        a->c.hp += amount;
         a->c.hp = a->c.hp > a->c.hp_max ? a->c.hp_max : a->c.hp;
         a->obj->motion = FX_HIT_HEAL_MOTION;
         a->obj->phase = 0;
@@ -439,13 +432,13 @@ void BtlFxResolveHit(BtlObj *o)
         if (g_btl_no_escape == 0) {
             if ((g_btl_fx_move == FX_HIT_LUCK_A1
                  || g_btl_fx_move == FX_HIT_LUCK_A2)
-                && a->c.level < self->c.level
+                && self->c.level > a->c.level
                 && (rand() & FX_HIT_LUCK_A) == 0) {
                 amount = a->c.hp;
             }
             if ((g_btl_fx_move == FX_HIT_LUCK_B1
                  || g_btl_fx_move == FX_HIT_LUCK_B2)
-                && a->c.level < self->c.level
+                && self->c.level > a->c.level
                 && (rand() & FX_HIT_LUCK_B) == 0) {
                 amount = a->c.hp;
             }
@@ -455,8 +448,8 @@ void BtlFxResolveHit(BtlObj *o)
             a->c.status = 0;
             a->c.ail_level = 0;
         }
-        a->c.hp -= amount;
         a->hit_amount = amount;
+        a->c.hp -= amount;
         self->damage_dealt += amount;
         if (g_btl_hit_slot < BTL_PARTY) {
             voice = g_btl_hit_slot + 7;
@@ -580,9 +573,6 @@ void BtlFxResolveHit(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxresolve", BtlFxResolveHit);
-#endif
 
 /* The effect slots a cast leaves the enemies' voices in, two apart. */
 #define FX_VOICE_SLOT_FIRST 10

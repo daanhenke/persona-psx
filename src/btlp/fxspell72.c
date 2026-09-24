@@ -28,7 +28,6 @@
  * own script has played out.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <rand.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -73,27 +72,12 @@ BtlObj *BtlFxStart72(void)
     return o;
 }
 
-/* 99.88%: the two induction pointers the enemy walk is reduced to are
-   incremented in the other order - the image steps the enemy's before the
-   actor's, and this steps the actor's first.
-
-   The loop dump says why. The walk has two induction variables, `slot` and
-   `k`, and loop optimisation gives each its own class: the actor addresses
-   are reduced against `slot` and the enemy ones against `k`. Each class's
-   update is planted in front of its own variable's increment, so the order
-   of the two updates is the order of `slot++` and `k++` in the source -
-   while the order the two are *set up* in is the class list, which is the
-   reverse of that. The image has both in the same order, which one class
-   would give and two never can: writing the enemy side against `slot` as
-   well does put them in step, but then the actor addresses are combined onto
-   the enemy side's own multiply and lose the 0x49C their register starts at.
-   BtlFxStepE8's walk is the same shape and stops in the same place. */
-#ifdef NON_MATCHING
+/* The actor checks use the full slot; the enemy object fields are walked
+   from their own array, one actor record apart. */
 void BtlFxStep72(BtlObj *o)
 {
     BtlObj *obj;
     int     i;
-    int     k;
     int     slot;
 
     switch (o->phase) {
@@ -121,8 +105,7 @@ void BtlFxStep72(BtlObj *o)
             o->children = 1;
         }
         if (o->children == 0) {
-            for (slot = BTL_PARTY, i = 0, k = 0; slot < BTL_ACTORS;
-                 slot++, k++) {
+            for (slot = BTL_PARTY, i = 0; slot < BTL_ACTORS; slot++) {
                 if (g_btl_actors[slot].c.key == 0) {
                     continue;
                 }
@@ -133,10 +116,13 @@ void BtlFxStep72(BtlObj *o)
                 if ((g_btl_actors[slot].flags & BTL_ACTOR_OUT) != 0) {
                     continue;
                 }
-                g_btl_enemies[k].obj->motion = FX_72_MOTION;
-                g_btl_enemies[k].obj->timer  = i * FX_72_STAGGER;
+                (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                              + (slot - BTL_PARTY) * sizeof(BtlActor)))->motion = FX_72_MOTION;
+                (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                              + (slot - BTL_PARTY) * sizeof(BtlActor)))->timer  = i * FX_72_STAGGER;
                 i++;
-                g_btl_enemies[k].obj->attr |= FX_72_GOING;
+                (*(BtlObj **)((u_char *)&g_btl_enemies[0].obj
+                              + (slot - BTL_PARTY) * sizeof(BtlActor)))->attr |= FX_72_GOING;
             }
         }
         o->timer = FX_72_HOLD;
@@ -168,9 +154,6 @@ void BtlFxStep72(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell72", BtlFxStep72);
-#endif
 
 
 /* How fast the head grows and how big it stops - the two scales are unity at
