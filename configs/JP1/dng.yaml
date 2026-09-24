@@ -68,6 +68,8 @@ segments:
       - [0x56DC, asm, dng_0_s2]
       - [0x5F30, c, field/fieldfade]
       - [0x619C, asm, dng_0_s3]
+      - [0x7F5C, c, field/fieldhazard]
+      - [0x8334, asm, dng_0_s3b]
       - [0x8BA0, c, field/fieldinit]
       - [0x8F9C, asm, dng_0_s4]
       - [0x98DC, c, field/fieldgfx]

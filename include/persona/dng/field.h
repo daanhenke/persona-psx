@@ -279,6 +279,7 @@ void func_8006FFF4(void);
 void func_8006FCB8(int id, int w, int h, int page, int u, int a, int b, int c);
 void func_8006FED0(u_short clut);
 void func_80070BF0(int a, int b);
+void func_800739F8(int a, int b);
 int  func_8006C9C8(void);
 void func_80070DAC(int arg);
 void func_8006D33C(int arg);
@@ -338,6 +339,12 @@ extern int        g_fog_near;
 /* The floor's entry tile, laid out like the state's pos: x at [0], y at
    [2]; 0xFF when the floor has none. */
 extern u_char g_entry_pos[3];
+
+/* Set when poison lands on the field; nothing here says more. */
+extern u_char D_800993C6;
+
+void FieldDamageFloor(int div);
+void FieldPoisonFloor(void);
 
 int  FieldFindEntry(void);
 void FieldLoadGfx(void);
