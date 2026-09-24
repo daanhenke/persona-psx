@@ -70,7 +70,7 @@ GsGetLs                  = 0x800351F0; // type:func
 bcopy                    = 0x80041328; // type:func
 bzero                    = 0x80041338; // type:func
 rand                     = 0x80041368; // type:func
-g_persona_data           = 0x80041760;
+g_persona_data           = 0x80041760; // size:0x38
 g_item_defs              = 0x800443E0;
 g_level_growth           = 0x8004735C;
 g_spell_data             = 0x80047D20;
@@ -465,7 +465,7 @@ PadSetPageButtons        = 0x800768A4; // type:func size:0x4C
 //--- PA: 0x012550   VA: 0x800768F0   subsegment: asm, adv_14
 //-----------------------------------------------------------
 func_800768F0            = 0x800768F0; // type:func size:0xF8
-func_800769E8            = 0x800769E8; // type:func size:0x23C
+PersonaStockDraw         = 0x800769E8; // type:func size:0x23C
 
 //------------------------------------------------------------------------------
 //--- PA: 0x012884   VA: 0x80076C24   subsegment: c, ../common/game/personastock
@@ -942,7 +942,7 @@ ConfigDrawLabels         = 0x8008BC1C; // type:func size:0x104
 //-----------------------------------------------------------
 //--- PA: 0x027980   VA: 0x8008BD20   subsegment: asm, adv_40
 //-----------------------------------------------------------
-func_8008BD20            = 0x8008BD20; // type:func size:0x130
+PadDrawLayout            = 0x8008BD20; // type:func size:0x130
 D_8008BE50               = 0x8008BE50; // type:func size:0x1A8
 
 //---------------------------------------------------------------------------
@@ -1461,6 +1461,7 @@ str_place_3d_adv         = 0x800B18A8;
 str_place_2d             = 0x800B18B4;
 str_place_battle_top     = 0x800B18C0;
 str_place_in_battle      = 0x800B18CC;
+g_arcana_labels          = 0x800B18D8;
 g_menu_bg_rle            = 0x800B1B80;
 g_persona_list_rule      = 0x800B248C;
 g_formation_member_def   = 0x800B2754;
@@ -1523,6 +1524,8 @@ str_cfg_auto_battle      = 0x800B8B38;
 str_cfg_speeds           = 0x800B8B94;
 g_config_labels_left     = 0x800B8BF4;
 g_config_labels_right    = 0x800B8C24;
+g_pad_action_names       = 0x800B8D08;
+g_pad_layout_actions     = 0x800B8D54;
 g_stat_bar_cells         = 0x800B91FC;
 str_config_title         = 0x800B9210;
 str_nothing              = 0x800B921C;
@@ -1620,6 +1623,7 @@ D_800BC574               = 0x800BC574; // type:u32 size:0x8
 D_800BC57C               = 0x800BC57C; // type:u32 size:0x98
 g_adv_char_seq           = 0x800BC5B4;
 g_ot                     = 0x800BC5CC;
+D_801F2564               = 0x801F2564; // ignore:True
 g_money                  = 0x801F2674; // ignore:True size:0x4
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
 g_playtime_min           = 0x801F29BD;

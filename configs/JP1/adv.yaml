@@ -38,6 +38,12 @@ options:
   # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
   # than the Shift-JIS ones the ROM holds.
   data_string_guesser_level: 0
+  # Everything the overlay reaches outside its own image: the resident
+  # executable's code and data, as btlp.yaml has it. Without the range a
+  # reference into the middle of a main symbol - g_persona_data + 0x26 - comes
+  # out as a fresh D_ label rather than the offset the C writes.
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   # overlay id 7
@@ -126,6 +132,7 @@ segments:
       - [0x12330, asm, adv_13]
       - [0x12504, c, ../common/ui/padconfig]
       - [0x12550, asm, adv_14]
+      - [0x12648, c, ui/stocklist]
       - [0x12884, c, ../common/game/personastock]
       - [0x12940, asm, adv_15]
       - [0x12A48, c, ../common/game/charentry]
@@ -207,7 +214,8 @@ segments:
       - [0x2748C, c, ../common/gfx/fadesprites]
       - [0x27574, asm, adv_39]
       - [0x2787C, c, ../common/ui/configlabels]
-      - [0x27980, asm, adv_40]
+      - [0x27980, c, ../common/ui/padlayout]
+      - [0x27AB0, asm, adv_40]
       - [0x27C58, c, ../common/ui/padbindings]
       - [0x27DAC, asm, adv_41]
       - [0x28290, c, ../common/game/formationrepair]

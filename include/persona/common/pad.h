@@ -23,4 +23,14 @@ extern PadBinding g_pad_bindings[];
 #define BIND_ACCEPT_A 0
 #define BIND_ACCEPT_B 1
 
+/* The controller page: each layout gives twenty buttons an action apiece,
+   one row of PAD_LAYOUT_ENTRIES action indices a layout, and an action index
+   picks its name. Action 0 is no action. Each overlay carries its own copy. */
+#define PAD_LAYOUT_ENTRIES 20
+
+extern u_char        g_pad_layout_actions[];
+extern const u_char *g_pad_action_names[];
+
+void PadDrawLayout(u_char layout);
+
 #endif

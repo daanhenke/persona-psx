@@ -10,9 +10,7 @@
  * shown but draws nothing.
  */
 #include <decomp/types.h>
-#include <libgte.h>
-#include <libgpu.h>
-#include <libgs.h>
+#include <persona/common/bg.h>
 
 /* Which of the six layers the panel is, and the strip it fills. */
 #define PANEL_LAYER 4
@@ -26,13 +24,6 @@
 
 /* Reached by hardcoded address rather than through the linker symbol. */
 #define BG_STATE_AT 0x800E1E4C
-
-extern GsBG   g_bg_layers[];
-extern u_long g_bg_shown;
-extern u_int *g_bg_maps[];
-
-extern void BgMapInit(u_int *map, int arg);
-extern void BgMapClearRow(u_short row);
 
 void BgPanelSet(short id, short x, short y)
 {

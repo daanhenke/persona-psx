@@ -9,9 +9,10 @@
  * ascending run draws any stretch of the font.
  */
 #include <decomp/types.h>
-#include <libgte.h>
-#include <libgpu.h>
-#include <libgs.h>
+#include <persona/adv/moneybox.h>
+#include <persona/common/bg.h>
+#include <persona/common/item.h>
+#include <persona/common/tilemap.h>
 
 /* Which layer the box is, and where it sits. */
 #define BOX_LAYER 5
@@ -21,10 +22,6 @@
 #define BOX_W     0x60
 #define BOX_H     0x24
 #define BOX_OTZ   0x3E
-
-/* The cell run behind it: twelve across, four down. */
-#define BOX_CELLS_W 0xC
-#define BOX_CELLS_H 4
 
 /* The two labels, and the cell that closes the amount off. */
 #define LABEL_TOP_AT    0
@@ -39,24 +36,6 @@
 /* Nine digits, drawn backwards from the font's zero. */
 #define MONEY_DIGITS 9
 #define MONEY_AT     22
-#define GLYPH_DIGIT0 0xC0
-
-extern GsBG         g_bg_layers[];
-extern u_short      g_bg_layer_otz[];
-extern u_long       g_bg_shown;
-extern short        g_panel_cells[];
-extern u_char       g_hud_digits[];
-/* Reached by hardcoded address, like the rest of the save-game area. */
-#define g_money (*(u_int *)0x801F2674)
-extern const u_char str_cell_run[];
-
-extern short FormatDecimal(u_int value, u_char *dst, u_short width);
-extern void  TileMapWriteRow(const u_char *src, short *dst, int base,
-                             u_short count);
-extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
-                                u_short count);
-extern void  TileMapFillRect(short *dst, short value, u_short w, u_short h,
-                             u_short stride);
 
 void BgBoxShow(void)
 {
@@ -77,6 +56,6 @@ void BgBoxShow(void)
     TileMapWriteRow(str_cell_run, &cells[LABEL_SIDE_AT], LABEL_SIDE_BASE,
                     LABEL_SIDE_LEN);
     g_panel_cells[UNIT_AT] = UNIT_GLYPH;
-    n = FormatDecimal(g_money, g_hud_digits, MONEY_DIGITS);
+    n = FormatDecimal(G_MONEY, g_hud_digits, MONEY_DIGITS);
     TileMapWriteRowRev(g_hud_digits, &cells[MONEY_AT], GLYPH_DIGIT0, n);
 }
