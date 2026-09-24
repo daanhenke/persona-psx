@@ -169,7 +169,7 @@ ImageAnimStart           = 0x80067930; // type:func size:0x64
 //--------------------------------------------------------------
 //--- PA: 0x0035F4   VA: 0x80067994   subsegment: asm, s2d_1_s1a
 //--------------------------------------------------------------
-func_80067994            = 0x80067994; // type:func size:0x190
+ImageAnimStep            = 0x80067994; // type:func size:0x190
 
 //------------------------------------------------------------------------
 //--- PA: 0x003784   VA: 0x80067B24   subsegment: c, common/gfx/imagequeue
@@ -1098,8 +1098,8 @@ str_place_battle_top     = 0x8009D310;
 str_place_in_battle      = 0x8009D31C;
 g_persona_list_rule      = 0x8009DEDC;
 g_formation_member_def   = 0x8009E200;
-g_bg_map                 = 0x8009E59C;
-g_bg_layers              = 0x8009E5BC;
+g_bg_map                 = 0x8009E59C; // size:0x10
+g_bg_layers              = 0x8009E5BC; // size:0xD8
 g_formation_marker_def   = 0x8009EBB4;
 g_pad_binding_table      = 0x8009EBC8;
 str_cfg_message_speed    = 0x8009ED2C;
@@ -1229,9 +1229,7 @@ D_800B8FF0               = 0x800B8FF0; // type:u32 size:0x4
 D_800B8FF4               = 0x800B8FF4; // type:u32 size:0x4
 D_800B8FF8               = 0x800B8FF8; // type:u32 size:0x4
 D_800B8FFC               = 0x800B8FFC; // type:u32 size:0x18
-g_image_anim             = 0x800B9008;
-D_800B9014               = 0x800B9014; // type:u32 size:0x4
-D_800B9018               = 0x800B9018; // type:u32 size:0x1B4
+g_image_anim             = 0x800B9008; // size:0x140
 g_bg_shown               = 0x800B914C;
 g_equip_last             = 0x800B91CC; // type:u32 size:0x20
 g_hud_digits             = 0x800B91D0;
@@ -1243,4 +1241,5 @@ D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
 D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C;
+g_bg_state               = 0x80101E4C; // ignore:True size:0x10
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF

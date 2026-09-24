@@ -12,21 +12,8 @@
  * other two overlays have something else there.
  */
 #include <decomp/types.h>
+#include <persona/common/imageanim.h>
 
-typedef struct {
-    /* 0x00 */ u_long **script;   /* (u_long **)-1 while the channel is idle */
-    /* 0x04 */ u_long  *data;     /* image the current frame is uploading    */
-    /* 0x08 */ int      delay;    /* frames left before the next entry       */
-    /* 0x0C */ u_short  x;
-    /* 0x0E */ u_short  y;
-    /* 0x10 */ u_short  w;
-    /* 0x12 */ u_short  h;
-} ImageAnim;                      /* 0x14 bytes */
-
-#define IMAGE_ANIM_COUNT 16
-#define IMAGE_ANIM_FREE  ((u_long **)-1)
-
-extern ImageAnim g_image_anim[];
 
 void ImageAnimStop(int chan)
 {

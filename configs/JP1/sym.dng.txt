@@ -309,7 +309,7 @@ ImageAnimStart           = 0x80077908; // type:func size:0x64
 //--------------------------------------------------------------
 //--- PA: 0x0135CC   VA: 0x8007796C   subsegment: asm, dng_1_s1a
 //--------------------------------------------------------------
-func_8007796C            = 0x8007796C; // type:func size:0x190
+ImageAnimStep            = 0x8007796C; // type:func size:0x190
 
 //------------------------------------------------------------------------
 //--- PA: 0x01375C   VA: 0x80077AFC   subsegment: c, common/gfx/imagequeue
@@ -967,8 +967,8 @@ str_place_2d             = 0x8009A5F8;
 str_place_battle_top     = 0x8009A604;
 str_place_in_battle      = 0x8009A610;
 g_persona_list_rule      = 0x8009B1D0;
-g_bg_map                 = 0x8009B890;
-g_bg_layers              = 0x8009B8B0;
+g_bg_map                 = 0x8009B890; // size:0x10
+g_bg_layers              = 0x8009B8B0; // size:0xD8
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
 g_config_labels_left     = 0x8009C124;
@@ -1017,11 +1017,10 @@ D_800A01E0               = 0x800A01E0; // type:u32 size:0xFC
 g_bg_index               = 0x800A01E8;
 g_persona_list_count     = 0x800A02CC;
 D_800A02DC               = 0x800A02DC; // type:u32 size:0x24
-g_image_anim             = 0x800A02F4;
-D_800A0300               = 0x800A0300; // type:u32 size:0x4
-D_800A0304               = 0x800A0304; // type:u32 size:0x1C0
+g_image_anim             = 0x800A02F4; // size:0x140
 g_bg_shown               = 0x800A0438;
 D_800A04C4               = 0x800A04C4; // type:u32 size:0x36C
 D_800A0830               = 0x800A0830; // type:u32 size:0x60
 g_ot                     = 0x800A0850;
+g_bg_state               = 0x800E1E4C; // ignore:True size:0x10
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF

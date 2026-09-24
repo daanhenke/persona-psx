@@ -12,6 +12,7 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/dng.ld
   symbol_addrs_path: configs/JP1/sym.dng.txt
+  reloc_addrs_path: configs/JP1/reloc.dng.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.dng.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.dng.txt
   compiler: GCC
@@ -77,8 +78,7 @@ segments:
       - [0x11B04, c, common/game/playtime]
       - [0x11BCC, asm, dng_s3]
       - [0x11CA8, c, common/ui/decimal]
-      - [0x11D98, asm, dng_s4]
-      - [0x11E5C, c, common/gfx/bgmap]
+      - [0x11D98, c, common/gfx/bgmap]
       - [0x11E9C, asm, dng_s4_x1]
       - [0x12CC4, c, common/gfx/bgmapcell]
       - [0x12D4C, asm, dng_s4_x2]
@@ -92,7 +92,6 @@ segments:
       - [0x1350C, c, common/gfx/imageanim]
       - [0x13530, asm, dng_1_s1b]
       - [0x13568, c, common/gfx/imageanimstart]
-      - [0x135CC, asm, dng_1_s1a]
       - [0x1375C, c, common/gfx/imagequeue]
       - [0x1385C, asm, dng_1_s2]
       - [0x149E8, c, common/ui/menutick]

@@ -6,20 +6,7 @@
  * is a unit of its own well ahead of this, in bgmap.c.
  */
 #include <decomp/types.h>
-#include <libgte.h>
-#include <libgpu.h>
-#include <libgs.h>
-
-extern GsMAP   g_bg_map;
-extern u_short g_bg_index[];
-
-/* The cell definitions the map points at, and the background tick whose low
-   bits pick a palette. Both are work-area addresses. */
-#define g_bg_cells ((GsCELL *)(0x800E224C + WORK_BIAS))
-
-/* [0] is the animation tick, reached by address like the cells beside it, so
-   S2D's copy comes out 0x20000 higher on the same WORK_BIAS. */
-#define g_bg_state ((u_int *)(0x800E1E4C + WORK_BIAS))
+#include <persona/common/bg.h>
 
 /* Points one map cell at its own tile and fills in that tile's GsCELL.
  *
@@ -38,7 +25,7 @@ void BgMapSetCell(u_short idx)
     /* Every one of these four locals is load-bearing: the tick, the old CLUT,
        the half of it that survives, and even the constant column. Folding any
        of them back into the expression that uses it costs the match. */
-    state = g_bg_state[0];
+    state = g_bg_state->tick;
     /* `* 16` and `<< 4` are not interchangeable here: the shift form schedules
        differently and costs the match. */
     g_bg_cells[idx + 1].u = ((idx + 1) & 0xF) * 16;

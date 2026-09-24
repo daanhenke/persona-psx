@@ -22,14 +22,11 @@
 #define PANEL_ROWS  4
 #define BG_IDLE     0x8000
 
-/* Reached by hardcoded address rather than through the linker symbol. */
-#define BG_STATE_AT 0x800E1E4C
-
 void BgPanelSet(short id, short x, short y)
 {
     u_int *state;
 
-    state = (u_int *)BG_STATE_AT;
+    state = &g_bg_state->tick;
     if (id != 0) {
         BgMapInit(g_bg_maps[id], 0);
         g_bg_layers[PANEL_LAYER].w = PANEL_W;

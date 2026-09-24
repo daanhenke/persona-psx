@@ -12,6 +12,7 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/s2d.ld
   symbol_addrs_path: configs/JP1/sym.s2d.txt
+  reloc_addrs_path: configs/JP1/reloc.s2d.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.s2d.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.s2d.txt
   compiler: GCC
@@ -72,8 +73,7 @@ segments:
       - [0x1B18, c, common/game/playtime]
       - [0x1BE0, asm, s2d_s2]
       - [0x1CBC, c, common/ui/decimal]
-      - [0x1DAC, asm, s2d_s3]
-      - [0x1E70, c, common/gfx/bgmap]
+      - [0x1DAC, c, common/gfx/bgmap]
       - [0x1EB0, asm, s2d_s3_x1]
       - [0x2CEC, c, common/gfx/bgmapcell]
       - [0x2D74, asm, s2d_s3_x2]
@@ -87,7 +87,6 @@ segments:
       - [0x3534, c, common/gfx/imageanim]
       - [0x3558, asm, s2d_1_s1b]
       - [0x3590, c, common/gfx/imageanimstart]
-      - [0x35F4, asm, s2d_1_s1a]
       - [0x3784, c, common/gfx/imagequeue]
       - [0x3884, asm, s2d_1_s2]
       - [0x49A0, c, common/ui/menutick]

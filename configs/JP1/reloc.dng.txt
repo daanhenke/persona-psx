@@ -1,0 +1,16 @@
+// Relocations splat cannot infer. The image animation channels are named
+// with a size, but spimdisasm still splits the bss at their +0xC field, and
+// the step loop runs to one entry past the array; both are pinned to
+// g_image_anim here so the expected side names what the C names.
+
+// ImageAnimStart and ImageAnimStep
+rom:0x13588 reloc:MIPS_HI16 symbol:g_image_anim addend:0xC
+rom:0x13590 reloc:MIPS_LO16 symbol:g_image_anim addend:0xC
+rom:0x13594 reloc:MIPS_HI16 symbol:g_image_anim addend:0xE
+rom:0x1359C reloc:MIPS_LO16 symbol:g_image_anim addend:0xE
+rom:0x13680 reloc:MIPS_HI16 symbol:g_image_anim addend:0xC
+rom:0x13688 reloc:MIPS_LO16 symbol:g_image_anim addend:0xC
+rom:0x136AC reloc:MIPS_HI16 symbol:g_image_anim addend:0xE
+rom:0x136B4 reloc:MIPS_LO16 symbol:g_image_anim addend:0xE
+rom:0x13728 reloc:MIPS_HI16 symbol:g_image_anim addend:0x148
+rom:0x1372C reloc:MIPS_LO16 symbol:g_image_anim addend:0x148

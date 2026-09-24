@@ -12,6 +12,7 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/adv.ld
   symbol_addrs_path: configs/JP1/sym.adv.txt
+  reloc_addrs_path: configs/JP1/reloc.adv.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.adv.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.adv.txt
   compiler: GCC
@@ -88,8 +89,7 @@ segments:
       - [0x2080, c, ../common/game/playtime]
       - [0x2148, asm, adv_2]
       - [0x2224, c, ../common/ui/decimal]
-      - [0x2314, asm, adv_3]
-      - [0x23D8, c, ../common/gfx/bgmap]
+      - [0x2314, c, ../common/gfx/bgmap]
       - [0x2418, asm, adv_3_x1]
       - [0x34FC, c, ../common/gfx/bgmapcell]
       - [0x3584, asm, adv_3_x2]
@@ -103,8 +103,6 @@ segments:
       - [0x3DB4, c, ../common/gfx/imageanim]
       - [0x3DD8, c, ../common/gfx/imageanimall]
       - [0x3E08, c, ../common/gfx/imageanimstart]
-      # ImageAnimStep, the rest of imageanim's unit, is not worked out yet.
-      - [0x3E6C, asm, adv_4]
       - [0x3FFC, c, ../common/gfx/imagequeue]
       - [0x40FC, asm, adv_5]
       - [0x5414, c, ../common/ui/menutick]
