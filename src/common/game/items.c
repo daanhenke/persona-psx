@@ -156,7 +156,11 @@ short ItemsFindPending(u_short id)
    calling ItemsFind, which is how the original has it.
 
    This does not come out of the C yet, so the overlays take it from asm; it is
-   kept here for the progress build only. */
+   kept here for the progress build only. At 93.07% on ADV: the original
+   sign-extends j once and uses it both for the index and for k = j, where
+   this copies j as it stands and folds the extension into the index. The
+   search for a free slot is a goto loop - as a do-while its g_items moves
+   to the wrong loop's preheader. */
 #ifdef NON_MATCHING
 void ItemsCommitPending(void)
 {
@@ -164,34 +168,37 @@ void ItemsCommitPending(void)
     u_short *dst;
     short    i;
     short    j;
+    short    k;
 
     i = 0;
     do {
-        src = &g_items_pending[i];
-        if (*src != 0) {
+        if (g_items_pending[i] != 0) {
+            k = g_items_pending[i] & ITEM_ID;
+            dst = g_items;
             j = 0;
             do {
-                if ((g_items[j] & ITEM_ID) == (*src & ITEM_ID)) {
+                if ((dst[j] & ITEM_ID) == k) {
+                    k = j;
                     goto found;
                 }
-                j = j + 1;
+                j++;
             } while (j < ITEM_SLOTS);
-            j = -1;
+            k = -1;
         found:
-            if (j < 0) {
-                do {
-                    j = j + 1;
-                    dst = &g_items[j];
-                    if ((*dst & ITEM_ID) == 0) {
-                        break;
-                    }
-                } while ((*dst >> 9) != 0);
-                *dst = *src;
+            if (k >= 0) {
+                g_items[k] = g_items_pending[i];
             } else {
-                g_items[j] = *src;
+                src = &g_items_pending[i];
+            next:
+                k++;
+                dst = &g_items[k];
+                if ((*dst & ITEM_ID) != 0 && (*dst >> 9) != 0) {
+                    goto next;
+                }
+                *dst = *src;
             }
         }
-        i = i + 1;
+        i++;
     } while (i < ITEM_SLOTS);
 }
 #endif
