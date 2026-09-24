@@ -31,7 +31,7 @@ void FieldStartBattle(void)
     if (kind == 2) {
         func_80071EF8();
     } else {
-        func_800712B8();
+        FieldFxBegin();
     }
     PreloadBtlField();
     for (i = 0; i < FIELD_SEQS; i++) {
@@ -48,7 +48,7 @@ void FieldStartBattle(void)
     if (kind == 2) {
         func_80072018();
     } else {
-        func_80071368(kind);
+        FieldFxRun(kind);
     }
     g_field_lit = 0;
     g_state_next = GAME_STATE_BTL;

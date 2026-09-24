@@ -279,8 +279,8 @@ void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
 void func_80071EF8(void);
-void func_800712B8(void);
-void func_80071368(int kind);
+void func_8007192C(void);
+void func_800713B0(int kind);
 void func_80072018(void);
 void func_800739F8(int a, int b);
 int  func_8006C9C8(void);
@@ -346,6 +346,19 @@ void FieldResetSound(void);
 
 /* Per sequence, the handle it is opened into. */
 extern signed char g_seq_slot[];
+
+/* Which display buffer is being drawn into. */
+extern int g_draw_buf;
+
+/* What a battle transition moves: the scene's objects and the offset it
+   applies to them. */
+extern GsDOBJ2       *g_fx_objs;
+extern GsCOORDINATE2 *g_fx_coords;
+extern SVECTOR       *g_fx_rots;
+extern SVECTOR        g_fx_shift;
+
+void FieldFxBegin(void);
+void FieldFxRun(int kind);
 
 void FieldStartBattle(void);
 void FieldPlayJingle(u_char n, short loops);

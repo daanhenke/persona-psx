@@ -89,6 +89,8 @@ segments:
       - [0xBCF0, asm, dng_s1_x3]
       - [0xC6F4, c, field/fieldsound]
       - [0xCA0C, asm, dng_s1_x3b]
+      - [0xCF18, c, field/fieldfx]
+      - [0xD010, asm, dng_s1_x3c]
       - [0x113B0, c, common/gfx/slot]
       - [0x116F8, c, common/gfx/fade]
       - [0x117A0, asm, dng_s2]
