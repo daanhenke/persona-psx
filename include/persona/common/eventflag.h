@@ -24,4 +24,9 @@ extern int EventFlagTest(u_short *id);
 /* The flags themselves, a bit each, reached by literal address. */
 #define g_event_flags ((u_char *)0x801F29C8)
 
+/* Whether story flag `id` is set, tested in place the way the ADV loaders do
+   it: the id is a signed short, so the byte index is a signed divide. */
+#define EVENT_FLAG(id) \
+    ((u_char)(g_event_flags[(short)(id) / 8] & (1 << ((id) & 7))))
+
 #endif

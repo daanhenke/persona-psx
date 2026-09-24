@@ -89,6 +89,33 @@ typedef struct {
 
 extern AdvScene *g_adv_scene;
 
+/* The head of the pack read to 0x80100000, ahead of the scene block
+   g_adv_scene points at. It names the other files the scene needs, most of
+   them in two versions: `flag` is a story flag, and once it is set the
+   scene takes `alt` instead of `id`. 0xFFFF is "none" for any of them.
+   AdvPickSceneByFlags reads the MES half, AdvLoadEventBg the rest. */
+typedef struct {
+    /* 0x00 */ u_short flag;
+    /* 0x02 */ u_short id;
+    /* 0x04 */ u_short alt;
+} AdvVariant;
+
+typedef struct {
+    /* 0x00 */ u_short    pad00[3];
+    /* 0x06 */ u_short    mes_flag[2]; /* pick one of four MES entries:   */
+    /* 0x0A */ u_short    mes[4];      /* neither, first, second or both  */
+    /* 0x12 */ AdvVariant bg;          /* the EBG entry                   */
+    /* 0x18 */ AdvVariant tim_180;     /* images out of that entry, each  */
+    /* 0x1E */ AdvVariant tim_280;     /* going to its own VRAM column    */
+    /* 0x24 */ AdvVariant tim_300;
+    /* 0x2A */ u_short    tim_160;     /* these two are not conditional:  */
+    /* 0x2C */ u_short    tim_380;     /* only "none" skips them          */
+    /* 0x2E */ u_short    pad2E[3];
+} AdvPackHead;                         /* 0x34 bytes, then the scene      */
+
+/* Reached by hardcoded address. */
+#define g_adv_pack ((AdvPackHead *)0x80100000)
+
 /* The pack's actor definitions, reached by address. A room's eight actors
    each come in two forms, and an event flag says which one the room shows:
    the second once the flag is set. The eight extras have the same two forms

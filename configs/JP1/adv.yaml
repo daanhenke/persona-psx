@@ -204,6 +204,7 @@ segments:
       - [0x1FBCC, c, game/actorsbuild]
       - [0x201F8, c, game/sceneimages]
       - [0x202F4, asm, adv_32a]
+      - [0x20D18, c, game/eventfiles]
       - [0x2153C, c, audio/soundfade]
       - [0x215B8, asm, adv_32a_x1]
       - [0x21A20, c, gfx/advfade]
@@ -218,7 +219,8 @@ segments:
       - [0x22E3C, c, gfx/effectsky]
       - [0x23F5C, c, audio/soundcmd]
       - [0x241B4, c, audio/bank]
-      - [0x2444C, asm, adv_37]
+      - [0x2444C, c, audio/loadbgm]
+      - [0x247EC, asm, adv_37]
       - [0x26C08, c, common/gfx/coord]
       - [0x26D08, asm, adv_38]
       # VramClearRect comes out with sw ra scheduled one slot late.
@@ -327,6 +329,7 @@ segments:
       - [0x4C554, c, common/game/itemsedit]
       - [0x4C6C0, c, common/game/flagbank3]
       - [0x4C6F0, asm, adv_58_x1]
+      - [0x4C72C, c, game/unpack]
       # The overlay's own workspace: what the disc carries a value for,
       # and behind it the run of zeroes the loader never has to write.
       - [0x4C960, data, adv_data]

@@ -34,6 +34,8 @@ extern volatile CdRequest g_cd_queue[];
 extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
 extern void     CdReadToAddr(int size, u_long *dest);
 extern int      CdReadPolled(int size, u_long *dest, int mode);
+/* Blocking read of `sectors` sectors of a resolved file. cdfileread.c. */
+extern void     CdReadFileToAddr(CdlFILE *file, int sectors, u_long *dest);
 extern void     LoadFileToAddrAsync(const char *name, void *dest);
 /* Reads `sectors` sectors from where `file` points into `dest` without
    waiting; g_cd_busy says when it is done. cdfileload.c. */

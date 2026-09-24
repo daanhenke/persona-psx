@@ -301,7 +301,7 @@ FlushImageUploads        = 0x80068414; // type:func size:0x88
 //--- PA: 0x0040FC   VA: 0x8006849C   subsegment: asm, adv_5
 //----------------------------------------------------------
 D_8006849C               = 0x8006849C; // type:func size:0x168
-func_80068604            = 0x80068604; // type:func size:0x170
+TimQueueAt               = 0x80068604; // type:func size:0x170
 func_80068774            = 0x80068774; // type:func size:0x264
 func_800689D8            = 0x800689D8; // type:func size:0xDDC
 
@@ -815,7 +815,7 @@ AdvSceneStartImages      = 0x80084598; // type:func size:0xFC
 //--- PA: 0x0202F4   VA: 0x80084694   subsegment: asm, adv_32a
 //------------------------------------------------------------
 func_80084694            = 0x80084694; // type:func size:0xA24
-D_800850B8               = 0x800850B8; // type:func size:0x94
+AdvLoadImageFile         = 0x800850B8; // type:func size:0x94
 AdvPickSceneByFlags      = 0x8008514C; // type:func size:0x2F4
 AdvLoadEventBg           = 0x80085440; // type:func size:0x49C
 
@@ -1708,3 +1708,7 @@ g_item_descs             = 0x8004AE1C;
 g_adv_scene_file         = 0x8005E654; // size:0x18
 g_party_tactic           = 0x801F2AE6; // ignore:True size:0x8
 g_save_2AE4              = 0x801F2AE4; // ignore:True size:0x2
+g_options                = 0x801F2AC8; // size:0x1C
+g_bgm_ready              = 0x801F5358; // size:0x2
+g_bgm_pack               = 0x801CD000; // ignore:True size:0x20
+g_adv_pack               = 0x80100000; // ignore:True size:0x34
