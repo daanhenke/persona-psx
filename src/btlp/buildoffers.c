@@ -21,7 +21,6 @@
  * `used` cleared, and the rest are marked in use.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
@@ -49,7 +48,9 @@ extern void BtlOfferPickTalkers(void);
 extern int  BtlOfferFind(int species);
 extern int  BtlOfferFree(void);
 
-#ifdef NON_MATCHING
+/* One variable is both the slot an offer is found in and the party's count,
+   and the offer pointer is walked again for the last pass. Each of those
+   decides a register the image uses. */
 void BtlBuildOffers(void)
 {
     const u_char *profile;
@@ -58,8 +59,7 @@ void BtlBuildOffers(void)
     BtlMember    *m;
     BtlOffer     *offer;
     BtlOffer     *rec;
-    int           counted;
-    int           slot;
+    int           n;         /* the party counted, then an offer's slot */
     int           held;
     int           was;
     int           i;
@@ -70,7 +70,7 @@ void BtlBuildOffers(void)
     a = g_btl_actors;
     e = a + BTL_PARTY;
     m = g_btl_member;
-    counted = 0;
+    n = 0;
     i = 0;
     g_btl_talk_level = 0;
     do {
@@ -79,13 +79,13 @@ void BtlBuildOffers(void)
             g_btl_talk_level += a->c.level;
             m->pair[0] = a->c.status;
             m->pair[1] = a->c.ail_level;
-            counted++;
+            n++;
         }
         a++;
-        i++;
         m++;
+        i++;
     } while (i < BTL_PARTY);
-    g_btl_talk_level = g_btl_talk_level / counted;
+    g_btl_talk_level = g_btl_talk_level / n;
 
     i = 0;
     rec = g_btl_offer;
@@ -100,8 +100,8 @@ void BtlBuildOffers(void)
     i = 0;
     do {
         if (e->c.key != 0) {
-            slot = BtlOfferFind(e->c.key);
-            if (slot == BTL_NO_OFFER) {
+            n = BtlOfferFind(e->c.key);
+            if (n == BTL_NO_OFFER) {
                 offer = &g_btl_offer[BtlOfferFree()];
                 offer->used = 1 << i;
                 offer->persona = e->c.key;
@@ -122,7 +122,7 @@ void BtlBuildOffers(void)
                 offer->demons++;
                 offer->mood[3] = held;
             } else {
-                offer = &g_btl_offer[slot];
+                offer = &g_btl_offer[n];
                 if (offer->demons == 0) {
                     was = offer->hp_now;
                     offer->hp = 0;
@@ -143,18 +143,18 @@ void BtlBuildOffers(void)
     } while (i < BTL_ENEMIES);
 
     g_btl_offer_count = 0;
-    rec = g_btl_offer;
+    offer = g_btl_offer;
     i = 0;
     do {
-        if (rec->demons != 0) {
-            if ((rec->kinds & OFFER_IN_USE) == 0) {
-                rec->kinds |= OFFER_IN_USE;
+        if (offer->demons != 0) {
+            if ((offer->kinds & OFFER_IN_USE) == 0) {
+                offer->kinds |= OFFER_IN_USE;
             }
             g_btl_offer_count++;
         } else {
-            rec->used = 0;
+            offer->used = 0;
         }
-        rec++;
+        offer++;
         i++;
     } while (i < BTL_OFFERS);
 
@@ -163,6 +163,3 @@ void BtlBuildOffers(void)
     BtlMarkMembersMatched();
     BtlMarkOffersLive();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/buildoffers", BtlBuildOffers);
-#endif

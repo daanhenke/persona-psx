@@ -15,8 +15,12 @@
  * The row's first cell is set to the end marker before the name is copied over
  * it, so it is written and then lost every time round. The image does it.
  *
- * BtlOpenPersonaBoard is 94.64% and behind INCLUDE_ASM. Nothing structural is
- * left in it; two things about the loop are:
+ * BtlOpenPersonaBoard is 97.09% and behind INCLUDE_ASM. The first cell store
+ * is written as (cells + 8)[i], so it becomes a walker of its own and the
+ * counter for the seven survives, as in the image. The rest of the old note
+ * still applies to the two line accesses and the first store's addressing;
+ * a sweep of 143 spellings of the four accesses found nothing better.
+ * Two things about the loop are:
  *
  *   the image carries four induction variables where this carries two - one per
  *   occurrence of each array rather than one per array - and a counter of its
@@ -107,7 +111,7 @@ void BtlOpenPersonaBoard(void)
                      g_btl_actors[g_btl_actor_turn].c.sp_max, PERSONA_SP_W);
     i = 0;
     do {
-        g_btl_persona_cells[PERSONA_SPELL_CELL + i].clut = PERSONA_CLUT_LIVE;
+        (g_btl_persona_cells + PERSONA_SPELL_CELL)[i].clut = PERSONA_CLUT_LIVE;
         g_btl_persona_spell_lines[i][0] = BTL_TEXT_END;
         spell = p->spell[i];
         if (spell != 0 && (g_spell_data[spell].kind & SPELL_KIND_LISTED) == 0) {

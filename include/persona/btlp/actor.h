@@ -224,14 +224,14 @@ typedef struct BtlActor {
                                       member one of the last four. An offer
                                       that is done with sets the first on
                                       every enemy it involved             */
-    /* 0xE7 */ u_char  ward_turns; /* rounds the ward at BTL_ACTOR_WARDS has
+    /* 0xE7 */ signed char ward_turns; /* rounds the ward at BTL_ACTOR_WARDS has
                                       left to run. BtlFxFinish8C sets it as
                                       the ward lands and the round counts it
                                       down, clearing all four bits together
                                       when it reaches nought. Cleared with
                                       the run above as a record is filled   */
-    /* 0xE8 */ u_char  timed_a;    /* rounds BTL_ACTOR_TIMED_A has left, and */
-    /* 0xE9 */ u_char  timed_b;    /* BTL_ACTOR_TIMED_B; the round's end counts
+    /* 0xE8 */ signed char timed_a; /* rounds BTL_ACTOR_TIMED_A has left, and */
+    /* 0xE9 */ signed char timed_b; /* BTL_ACTOR_TIMED_B; the round's end counts
                                       both down and drops the flag at nought */
     /* 0xEA */ u_char  ail_turns;  /* how long the ailment at Char.status is
                                       meant to last. BtlInflictStatus sets it

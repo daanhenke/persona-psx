@@ -317,20 +317,12 @@ void BtlReadyItemAction(BtlActor *a, const ItemDef *item)
    one fighter or at everything the pickable mask covers; the kind's own arm
    puts the whole enemy side on and either takes the slowest fighter's place,
    picks another enemy, or marks the enemies around the one it settled on. */
-/* 92.94%: the refusal is written out inline in the kind arm now, where the
-   image has it, and the marker call at the very end is what the rest fall
-   into - that and sharing one read of the move byte between the last two
-   range tests took it up from 88%.
-
-   What is left is three things. The single-target arm builds its order and
-   its marker kind in the other order, so the two constants and the sum come
-   out swapped. The kind arm's second test of the move byte is one read in
-   the image and shared with the first here, and forcing it through the
-   volatile macro costs more elsewhere than it buys. And the down and left-
-   the-field tests are laid out the other way round: the image branches away
-   to the marker tail and falls into the refusal, where gcc here does the
-   reverse. */
-#ifdef NON_MATCHING
+/* The refusal is written out once, at the end of the kind arm, and every
+   way out of the tests above jumps to it. The marker call at the very end is
+   what the rest fall into. The kind arm's first read of the move byte is the
+   volatile one, so the second test reads it again, as the image does. The
+   single-target arm works its order out in i, which puts it in the image's
+   register. */
 void BtlReadySpellAction(BtlActor *a)
 {
     const SpellData *spell;
@@ -339,7 +331,6 @@ void BtlReadySpellAction(BtlActor *a)
     short            move;
     int              i;
     int              kind;
-    int              order;
 
     spell = &g_spell_data[a->move];
     p     = &g_btl_personas[BtlActorPersona(g_btl_actor_turn)];
@@ -393,10 +384,10 @@ void BtlReadySpellAction(BtlActor *a)
             if (BtlMarkMoveArea(a, spell->target, kind) < 0) {
                 goto refuse;
             }
-            order        = BtlSlowestOrder() + TURN_GAP;
+            i            = BtlSlowestOrder() + TURN_GAP;
             a->mark_kind = MARK_SPELL;
-            a->order     = order;
-            a->targets   = 1 << order;
+            a->order     = i;
+            a->targets   = 1 << i;
             BtlShowMarker(g_btl_actor_turn, 1, MARK_SPELL);
             return;
         case AIM_SIDE:
@@ -419,7 +410,7 @@ void BtlReadySpellAction(BtlActor *a)
     case KIND_1C:
     case KIND_1E:
     case KIND_32:
-        if ((u_int)(a->move - MOVE_PLAIN_FIRST) >= MOVE_PLAIN_COUNT
+        if ((u_int)(BTL_MOVE(a) - MOVE_PLAIN_FIRST) >= MOVE_PLAIN_COUNT
             && a->move != MOVE_PLAIN_KIND) {
             if (spell->target != 0) {
                 a->mark_kind = MARK_SPELL;
@@ -431,21 +422,18 @@ void BtlReadySpellAction(BtlActor *a)
             }
             if ((signed char)g_btl_actors[a->order].c.status
                 == BTL_STATUS_DOWN) {
-            /* The refusal written out here, where the image has it: every
-               other way out reaches it from above and the marker call at the
-               very end is what the rest fall into. */
-            refuse:
-                a->mark_kind = MARK_REFUSED;
-                BtlShowMarker(g_btl_actor_turn, 1, MARK_REFUSED);
-                a->obj->motion = BTL_MOTION_SHAKE;
-                return;
+                goto refuse;
             }
             if ((g_btl_actors[a->order].flags & BTL_ACTOR_OUT) == 0) {
                 a->mark_kind = MARK_SPELL;
                 BtlShowMarker(g_btl_actor_turn, 1, MARK_SPELL);
                 return;
             }
-            goto refuse;
+        refuse:
+            a->mark_kind = MARK_REFUSED;
+            BtlShowMarker(g_btl_actor_turn, 1, MARK_REFUSED);
+            a->obj->motion = BTL_MOTION_SHAKE;
+            return;
         }
         break;
     }
@@ -464,8 +452,8 @@ void BtlReadySpellAction(BtlActor *a)
                 a->order   = BtlSlowestOrder() + TURN_GAP;
                 a->targets = 1 << a->order;
             } else {
-                a->targets = 1 << i;
                 a->order   = i;
+                a->targets = 1 << i;
             }
         } else {
             BtlSetPickable();
@@ -485,6 +473,3 @@ void BtlReadySpellAction(BtlActor *a)
     a->mark_kind = MARK_SPELL;
     BtlShowMarker(g_btl_actor_turn, 1, MARK_SPELL);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlReadySpellAction);
-#endif

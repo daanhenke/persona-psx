@@ -39,18 +39,21 @@ extern short         g_btl_effect_oy;
 extern void (*g_btl_effect_cursor_fn[])(void);
 
 
-/* 92.49%. The cursor is placed through an int-typed call: this unit was
+/* 93.21%. The cursor is placed through an int-typed call: this unit was
    built against a BtlCursorPlace that took ints, so the image passes the two
    sums without narrowing them (input.h keeps the short one, which is the
-   definition's). What is left is registers: the image keeps the moved
-   selection apart from the temporary it is worked out in, and reads the step
-   into a0 before copying it to s0. */
+   definition's). The step and the walked row are one variable, as the
+   image's s0 is (93.21%, from 92.49%). What is left is registers: the image
+   keeps the moved selection apart from the temporary it is worked out in.
+   Here the two are merged: CSE takes the selection as the canonical copy
+   because it lives longer, so the temporary dies at the copy and is tied to
+   it. Block-scoped temporaries and a temporary reused for the walk leave
+   that as it is. */
 #ifdef NON_MATCHING
 void BtlEffectMoveCursor(int slot)
 {
     BtlEffect    *e;
     BtlEffectRow *row;
-    BtlEffectRow *step;
     u_short       grid;
     int           cols;
     int           rows;
@@ -60,7 +63,7 @@ void BtlEffectMoveCursor(int slot)
 
     e = g_btl_effect[slot];
     if (slot == g_btl_effect_cur
-        && (step = g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
+        && (row = g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
         if ((e->kind & BTL_EFFECT_NOPAD) == 0) {
             grid = e->grid;
             keep = e->sel;
@@ -101,25 +104,22 @@ void BtlEffectMoveCursor(int slot)
             }
 
             row = e->next;
-            for (;;) {
+            do {
                 if (row->row == (u_char)sel) {
                     keep = sel;
                     g_btl_effect_step[g_btl_effect_cur] = row;
                     break;
                 }
                 row = row->next;
-                if (row == (BtlEffectRow *)-1) {
-                    break;
-                }
-            }
+            } while (row != (BtlEffectRow *)-1);
             e->sel = keep;
-            step = g_btl_effect_step[g_btl_effect_cur];
+            row = g_btl_effect_step[g_btl_effect_cur];
         }
-        g_btl_effect_cursor_fn[step->kind & 0xF]();
+        g_btl_effect_cursor_fn[row->kind & 0xF]();
         ((void (*)(int, int))BtlCursorPlace)(
-            e->curx + g_btl_effect_ox + step->x * BTL_EFFECT_CELL
+            e->curx + g_btl_effect_ox + row->x * BTL_EFFECT_CELL
                 + BTL_EFFECT_DX,
-            e->cury + g_btl_effect_oy + step->y * BTL_EFFECT_CELL
+            e->cury + g_btl_effect_oy + row->y * BTL_EFFECT_CELL
                 + BTL_EFFECT_DY);
     }
 }

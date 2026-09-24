@@ -65,7 +65,8 @@
    answers to it, so the turn is left exactly as the handler aimed it. */
 #define MAD_ACT 6
 
-/* 97.74%: the two arms that end up aiming share their tail, and the image
+/* 97.98%: the spell count and the slot the aim lands on are one variable,
+   n. The two arms that end up aiming share their tail, and the image
    shares it one statement earlier than this does - the slot plus five is
    worked out in each arm and lands in the shared block already in the return
    register, where this works it out at the label and has to carry the slot
@@ -79,9 +80,8 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
     SpellData *s;
     int        spell;
     u_char     list[BTL_STATS_SPELLS];
-    int        n;
     int        i;
-    int        slot;
+    int        n;
     int        refused;
     int        damage;
 
@@ -115,20 +115,20 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
     case MAD_AIM_ONE:
         BtlSetPickable();
         for (;;) {
-            slot = BtlSlowestOrder();
-            if (slot < 0) {
+            n = BtlSlowestOrder();
+            if (n < 0) {
                 *act = AIL_ACT_NONE;
                 return;
             }
             damage = 0;
             if (BtlApplyAffinity(&damage, s->element,
-                                 g_btl_combatants[slot].c.resist) >= 0
-                && (g_btl_combatants[slot].flags & MAD_WARDED) == 0) {
-                a->order   = slot + BTL_PARTY;
-                a->targets = 1 << (slot + BTL_PARTY);
+                                 g_btl_combatants[n].c.resist) >= 0
+                && (g_btl_combatants[n].flags & MAD_WARDED) == 0) {
+                a->order   = n + BTL_PARTY;
+                a->targets = 1 << (n + BTL_PARTY);
                 break;
             }
-            g_btl_combatants[slot].pickable = 0;
+            g_btl_combatants[n].pickable = 0;
         }
         break;
 
@@ -148,9 +148,9 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
             *act = AIL_ACT_NONE;
             return;
         }
-        slot = BtlSlowestOrder();
+        n = BtlSlowestOrder();
     aim:
-        a->order   = slot + BTL_PARTY;
+        a->order   = n + BTL_PARTY;
         a->targets = BtlPickableMask();
         break;
 
@@ -160,16 +160,16 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
             for (i = 0; i < BTL_ENEMIES; i++) {
                 g_btl_combatants[i].pick_saved = g_btl_combatants[i].pickable;
             }
-            slot = BtlSlowestOrder();
-            if (slot < 0) {
+            n = BtlSlowestOrder();
+            if (n < 0) {
                 *act = AIL_ACT_NONE;
                 return;
             }
             damage = 0;
             if (BtlApplyAffinity(&damage, s->element,
-                                 g_btl_combatants[slot].c.resist) >= 0
+                                 g_btl_combatants[n].c.resist) >= 0
                 && (g_btl_combatants[i].flags & MAD_WARDED) == 0) {
-                BtlMarkEnemiesAround(&g_btl_combatants[slot], s->target);
+                BtlMarkEnemiesAround(&g_btl_combatants[n], s->target);
                 refused = 0;
                 for (i = 0; i < BTL_ENEMIES; i++) {
                     if (g_btl_combatants[i].pickable != 0
@@ -186,7 +186,7 @@ void BtlAilmentTurnMad(BtlActor *a, u_char *act)
                     g_btl_combatants[i].pickable = g_btl_combatants[i].pick_saved;
                 }
             }
-            g_btl_combatants[slot].pickable = 0;
+            g_btl_combatants[n].pickable = 0;
         }
         break;
     }

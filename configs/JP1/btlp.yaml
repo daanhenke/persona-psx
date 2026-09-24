@@ -151,6 +151,10 @@ segments:
       # padding behind it inside the unit.
       - [0xDB0, .rodata, personaguard]
       - [0xEC4, rodata, btlp_rodata6b]
+      # BtlReadySpellAction's switch table, which talkorders.c emits itself,
+      # and the word of padding behind it that belongs to nobody.
+      - [0xEDC, .rodata, talkorders]
+      - [0xF58, pad, btlp_pad_f58]
       # BtlCommandEntry's switch table, which commandmenu.c emits itself, and
       # the word of padding behind it that belongs to nobody.
       - [0xF5C, .rodata, commandmenu]

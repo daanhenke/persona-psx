@@ -3188,6 +3188,30 @@ allocations and swap registers with their neighbours.
   Three walks shared one counter, and two searches shared one flag even
   though the flag means "clear" in the first and "found" in the second. The
   image held each in the same register across the whole routine.
+- [fxstep12.c](/src/btlp/fxstep12.c) - `BtlFxStep2F`. The far-side walk's
+  slot is also the copying loop's counter. The copying loop calls, so the
+  shared variable goes to a saved register, which the walk alone never asks
+  for.
+- [buildoffers.c](/src/btlp/buildoffers.c) - `BtlBuildOffers`. The party
+  count is also the slot an offer is found in, and the offer pointer is
+  walked again for the last pass rather than a second pointer.
+- [talkorders.c](/src/btlp/talkorders.c) - `BtlReadySpellAction`. The
+  single-target arm works its order out in the search counter `i`.
+
+When registers alone are wrong, `build/scratch/merge.py` writes a sweep of
+every same-typed pair of locals merged into one.
+
+## A division's magic number checks its constant
+
+gcc turns a division by a constant into a multiply by a magic number and a
+shift. When the image's multiplier matches but its shift does not, or the
+product that follows is a different multiple, the constant in the source is
+wrong. 0x66666667 with a shift of 1 is a division by 5, and with a shift of 3
+it is a division by 20.
+
+- [fxstep12.c](/src/btlp/fxstep12.c) - `BtlFxStep2F` drops a pair every 20
+  units, not every 5. That constant and the reused counter took it from
+  95.55% to exact.
 
 ## A product divided by a constant folds; a shift does not
 
@@ -3387,6 +3411,17 @@ it is declared. So when two registers are swapped and a greg dump
 
 - [likedequip.c](/src/btlp/likedequip.c) - the entry counter and the enemy's
   record tied at a third; declaring `n` first finished `BtlTalkLikedEquip`.
+
+## A cross-jumped tail wants its shared store last
+
+When several arms end with the same store, gcc merges them and each arm
+jumps to the single copy. An arm only reaches that tail if the store is its
+last statement. When the image stores one field in the jump's delay slot and
+jumps to a shared store of another, write the unshared store first.
+
+- [talkorders.c](/src/btlp/talkorders.c) - in `BtlReadySpellAction`, the
+  picked-enemy arm writes `order` before `targets`, so `targets` is the tail
+  it shares.
 
 ## Rows reached by fresh address loads are separate objects
 
