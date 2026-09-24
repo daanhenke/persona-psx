@@ -186,6 +186,8 @@ extern const u_char *g_btl_talk_mute_script;
 extern const u_char *g_btl_talk_turned_down_script;
 extern const u_char *g_btl_talk_left_script;
 extern const u_char *g_btl_talk_line_script;
+/* The line a demon hands over an item with. */
+extern const u_char *g_btl_talk_gift_script;
 extern const u_char *g_btl_talk_win_scripts[][4];
 
 /* The talk scripts, and which one each member says for each act and line. */

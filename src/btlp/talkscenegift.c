@@ -95,7 +95,6 @@
 extern volatile int  g_cd_busy;
 extern u_char        g_btl_banks[];
 extern const short   g_btl_gift_odds[][GIFT_KINDS];
-extern const u_char g_btl_talk_gift_script[];
 extern const u_char g_btl_talk_item_gift_script[];
 extern const u_char *g_btl_talk_money_script;
 extern const u_char *g_btl_talk_exp_script;
@@ -118,6 +117,17 @@ extern void  BtlSePlay(int slot, int seq);
 extern void  BtlSoundOpen(u_char *banks, int slot, u_char key);
 extern void  BtlSoundClose(int slot);
 
+/* 89.31%, from 79.77%:
+   - money is the literal address G_MONEY, as the image reaches it;
+   - the charm and the experience cases test for the fallback first, which is
+     what the image falls into;
+   - both rewards multiply the Persona's own figure by the roll, which puts
+     the offer's lookup between the roll's multiply and its remainder;
+   - the gift line's script is a pointer (talk.h).
+   What is left: the image's frame has 32 bytes more of locals than this
+   one, and nothing reads them, so some locals were declared narrower than
+   here; and the item arms test the roll in each arm, which gcc threads only
+   when the join is a bare `item != 0`. */
 #ifdef NON_MATCHING
 void BtlTalkSceneGift(void)
 {
@@ -179,31 +189,31 @@ void BtlTalkSceneGift(void)
         goto try_money;
 
     case GIFT_CHARM:
-        if ((short)BtlItemSlot(GIFT_CHARM_ITEM) != 0) {
-            BtlItemAdd(GIFT_CHARM_ITEM);
-            g_btl_talk_depth--;
-            g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
-            g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
-            BtlSeqPlay(g_btl_talk_item_gift_script);
-            while (BtlSeqState() != 0) {
-                BtlDrawFrame();
-            }
-            return;
+        if ((u_short)BtlItemSlot(GIFT_CHARM_ITEM) == 0) {
+        try_money:
+            g_btl_talk_stage[g_btl_talk_depth - 1] = GIFT_MONEY;
+            break;
         }
-    try_money:
-        g_btl_talk_stage[g_btl_talk_depth - 1] = GIFT_MONEY;
-        break;
+        BtlItemAdd(GIFT_CHARM_ITEM);
+        g_btl_talk_depth--;
+        g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
+        g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
+        BtlSeqPlay(g_btl_talk_item_gift_script);
+        while (BtlSeqState() != 0) {
+            BtlDrawFrame();
+        }
+        return;
 
     case GIFT_MONEY:
-        if (g_money < MONEY_CAP) {
+        if (G_MONEY < MONEY_CAP) {
             amount = BtlRoundMoney(
-                (rand() % REWARD_SPAN * MONEY_STEP + MONEY_BASE)
-                * g_persona_data[g_btl_offer[g_btl_offer_slot].persona].price
+                g_persona_data[g_btl_offer[g_btl_offer_slot].persona].price
+                * (rand() % REWARD_SPAN * MONEY_STEP + MONEY_BASE)
                 / REWARD_UNIT
                 * g_btl_offer[g_btl_offer_slot].demons + 1);
-            g_money += amount;
-            if (g_money > MONEY_CAP) {
-                g_money = MONEY_CAP;
+            G_MONEY += amount;
+            if (G_MONEY > MONEY_CAP) {
+                G_MONEY = MONEY_CAP;
             }
             BtlSetInsert(INSERT_AMOUNT, amount);
             g_btl_talk_depth--;
@@ -219,21 +229,21 @@ void BtlTalkSceneGift(void)
         break;
 
     case GIFT_EXP:
-        if (g_btl_actors[g_btl_actor_slot].c.unk14 < EXP_CAP) {
+        if (g_btl_actors[g_btl_actor_slot].c.unk14 >= EXP_CAP) {
+            g_btl_talk_stage[g_btl_talk_depth - 1] = GIFT_HEAL;
+        } else {
             g_btl_talk_depth--;
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
             g_btl_actors[g_btl_actor_slot].unk74 +=
-                (rand() % REWARD_SPAN * EXP_STEP + EXP_BASE)
-                * g_persona_data[g_btl_offer[g_btl_offer_slot].persona].exp
+                g_persona_data[g_btl_offer[g_btl_offer_slot].persona].exp
+                * (rand() % REWARD_SPAN * EXP_STEP + EXP_BASE)
                 / REWARD_UNIT + 1;
             BtlSetInsert(INSERT_AMOUNT, 0);
             BtlSeqPlay(g_btl_talk_exp_script);
             while (BtlSeqState() != 0) {
                 BtlDrawFrame();
             }
-        } else {
-            g_btl_talk_stage[g_btl_talk_depth - 1] = GIFT_HEAL;
         }
         break;
 

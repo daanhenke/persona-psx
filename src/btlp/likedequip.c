@@ -39,7 +39,6 @@ typedef struct {
 
 extern const BtlLikedEquip g_btl_liked_equip[];
 
-extern const u_char *g_btl_talk_gift_script;
 
 /* Below this the demon keeps its things whatever it thinks of the speaker. */
 #define GIFT_LEVEL 0x1E
