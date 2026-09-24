@@ -15,7 +15,7 @@
 #define g_slots ((Slot *)0x800DC10C)
 extern Slot *g_slot_cur;
 
-/* Set while AdvLoadBst's file is on its way in. */
+/* Set while func_800AD348 reads an ADVCMD.BIN entry in. */
 extern u_char g_adv_loading;
 
 extern void AdvDrawEffect(void);

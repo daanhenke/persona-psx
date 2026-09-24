@@ -1317,7 +1317,7 @@ MoneyAdd                 = 0x800AAFD4; // type:func size:0x34
 //--- PA: 0x046C68   VA: 0x800AB008   subsegment: asm, adv_54
 //-----------------------------------------------------------
 D_800AB008               = 0x800AB008; // type:func size:0x7E0
-AdvLoadBst               = 0x800AB7E8; // type:func size:0x1B60
+AdvRunScript             = 0x800AB7E8; // type:func size:0x1B60
 func_800AD348            = 0x800AD348; // type:func size:0x338
 func_800AD680            = 0x800AD680; // type:func size:0x540
 
@@ -1712,3 +1712,15 @@ g_options                = 0x801F2AC8; // size:0x1C
 g_bgm_ready              = 0x801F5358; // size:0x2
 g_bgm_pack               = 0x801CD000; // ignore:True size:0x20
 g_adv_pack               = 0x80100000; // ignore:True size:0x34
+g_script_534C            = 0x801F534C; // size:0x2
+g_script_15C2            = 0x801F15C2; // size:0x2
+g_script_2B34            = 0x801F2B34; // size:0x1
+g_script_2B32            = 0x801F2B32; // size:0x1
+g_cutscene_on            = 0x801F1BC8; // size:0x2
+g_cutscene_alt           = 0x801F1BCA; // size:0x2
+g_script_97C             = 0x800BB97C; // size:0x2
+g_msg_speeds             = 0x800B0FC8;
+g_se_marks               = 0x800BAD28;
+g_actor_dim              = 0x800BB988; // size:0x4
+g_cmd_len                = 0x800BAC90; // size:0x8B
+g_pack_sprites           = 0x80100070;

@@ -51,7 +51,9 @@ typedef struct {
                                   /* the same list as it came off the disc,
                                      which is what the battle packs          */
     /* 0x3B */ u_char  unk3B;
-    /* 0x3C */ u_char  pad3C[4];
+    /* 0x3C */ u_char  pad3C[3];
+    /* 0x3F */ u_char  owner;     /* the key of the character carrying it; the
+                                     scripts give and take Personas by it     */
 } Persona;                        /* 0x40 bytes */
 
 #define g_personas ((Persona *)0x801F1DAC)
