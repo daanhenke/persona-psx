@@ -92,7 +92,6 @@ segments:
       - [0xCF18, c, field/fieldfx]
       - [0xD010, asm, dng_s1_x3c]
       - [0xD7F4, c, field/fieldfxfade]
-      - [0xD8B0, asm, dng_s1_x3d]
       - [0xDB58, c, field/fieldfxwave]
       - [0xDCC4, asm, dng_s1_x3e]
       - [0x113B0, c, common/gfx/slot]

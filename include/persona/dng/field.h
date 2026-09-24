@@ -26,11 +26,14 @@ typedef struct {
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
-    u_char        pad19E58[0x36364 - 0x19E58];
+    u_char        pad19E58[0x1AE80 - 0x19E58];
+    GsOT          ot[2];              /* 0x1AE80 one per display buffer */
+    u_char        pad1AEA8[0x36364 - 0x1AEA8];
     GsSPRITE      backdrop;           /* 0x36364 */
     u_char        pad36388[0x3649C - 0x36388];
     GsSPRITE      sky;                /* 0x3649C scrolls sideways as the party turns */
-    u_char        pad364C0[0x6E4D4 - 0x364C0];
+    u_char        pad364C0[0x364D4 - 0x364C0];
+    PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
     GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
     u_char        pad6E4E4[0x6E910 - 0x6E4E4];
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
@@ -278,8 +281,6 @@ void TimLoadAt(u_long *tim, int x, int y);
 void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_80071C50(void);
-void func_80071E04(void);
 void func_80072064(void);
 void func_8007192C(void);
 void func_800713B0(int kind);
@@ -367,6 +368,8 @@ extern int g_wave_tint[];
 
 void FieldFadeFxBegin(void);
 void FieldFadeFxRun(void);
+void FieldFadeFxStep(void);
+void FieldFadeFxSetup(void);
 void FieldWaveFxBegin(void);
 void FieldWaveFxRun(void);
 
