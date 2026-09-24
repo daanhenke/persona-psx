@@ -3334,3 +3334,34 @@ INCLUDE_ASM nothing would emit it.
   rest of that one came from plain loops, a `*p` read and a separate `p++` in
   the digit copy, and the label table taken into a local at the head of
   each pass (found by the permuter).
+
+## Only the counter is a variable; loop.c makes the rest
+
+When the prologue sets the saved registers in the order counter, then
+constants, then stepped values, only the counter was a variable in the
+source. Loop invariants are placed ahead of the loop, and loop.c's stepped
+values come after them. Hand-kept stepping variables (`y0 -= 0x28`) are
+initialised in source order, ahead of the invariants. Write each coordinate
+and texture offset as an expression of the counter. For a run counted down,
+write `i * -STEP + base`: `base - i * STEP` makes gcc step i * STEP and
+subtract every time round.
+
+- [arena.c](/src/btlp/arena.c) - `BtlDrawArenaRight`, `Left`, `Top` and
+  `Bottom`: all four went exact the same way.
+
+## A literal address splat keeps naming can be un-named per instruction
+
+When the source reaches an address as a number and splat names it after a
+symbol that other code does reach by name (so `ignore:True` is out), add
+`rom:0x... reloc:MIPS_NONE symbol:<any>` to reloc.btlp.txt for each lui and
+each load. Splat then prints the raw immediates, and objdiff pairs them with
+the C's literal.
+
+- [arena.c](/src/btlp/arena.c) - the arena colour in three edge drawers.
+
+## GTE macros come from decomp/gte.h
+
+`inline.h` from the SDK emits placeholder words for Sony's assembler, and
+under GAS they come out as `dsra32`/`dsrl32` garbage. Include
+`<decomp/gte.h>`, which holds the real `lwc2`/`swc2`/RTPT words. BtlDrawArenaBack
+went from 88.16% to 93.21% on the include alone.

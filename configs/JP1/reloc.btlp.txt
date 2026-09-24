@@ -255,3 +255,24 @@ rom:0x10F84 reloc:MIPS_HI16 symbol:g_btl_panel_wedges addend:0x6
 rom:0x10F8C reloc:MIPS_LO16 symbol:g_btl_panel_wedges addend:0x6
 rom:0x10FD8 reloc:MIPS_HI16 symbol:g_btl_panel_wedges addend:0x32
 rom:0x10FDC reloc:MIPS_LO16 symbol:g_btl_panel_wedges addend:0x32
+
+// BtlDrawArenaRight/Left/Top reach the arena's colour by address, not by
+// name: the image adds no relocation there, so none is invented for it.
+rom:0x1E6AC reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E6B0 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E6C4 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E6C8 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E6DC reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E6E0 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E94C reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E950 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E964 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E968 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E97C reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1E980 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EE84 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EE88 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EE9C reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EEA0 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EEB4 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+rom:0x1EEB8 reloc:MIPS_NONE symbol:g_btl_arena_rgb

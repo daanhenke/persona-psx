@@ -13,7 +13,6 @@
  * given back at the end.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/actor.h>
@@ -46,12 +45,16 @@ extern u_char    g_btl_member_scripts[];
 extern u_char   *g_btl_enemy_gfx_start;
 
 extern u_short  BtlLoadMemberGfx(int member, int actor);
-extern BtlObj  *BtlSpawnMemberObj(int key, int col, int row, int gfx,
+extern BtlObj  *BtlSpawnMemberObj(int key, int col, int row, short gfx,
                                   int member);
 extern BtlObj  *BtlSpawnActorObj(int model, const long *pos);
 extern void     BtlPartyResetGfx(void);
 
-#ifdef NON_MATCHING
+/* One counter walks every member loop and the grid, and the column counter
+   also searches for a free cell - the image keeps each in one saved register.
+   The flags are cleared through a pointer of their own. The script row is
+   taken the way the other member motions take it, and the hand test is
+   written as the && the branches show. */
 void BtlSpawnParty(void)
 {
     BtlActor *a;
@@ -59,33 +62,30 @@ void BtlSpawnParty(void)
     int       key;
     int       member;
     int       i;
-    int       n;
     int       col;
+    BtlActor *p;
+    const u_char *set;
     int       row;
 
     i = BTL_MEMBERS - 1;
-    a = &g_btl_actors[BTL_MEMBERS - 1];
+    p = &g_btl_actors[BTL_MEMBERS - 1];
     do {
-        a->flags = 0;
+        p->flags = 0;
         i--;
-        a--;
+        p--;
     } while (i >= 0);
 
-    member = 0;
-    i = 0;
-    do {
-        if (g_btl_actors[member].c.key != 0
-            && g_btl_actors[member].c.status == BTL_STATUS_DEAD) {
-            for (n = 0; n < GRID_CELLS; n++) {
-                if (g_btl_formation[n] == CELL_EMPTY) {
-                    g_btl_formation[n] = member;
+    for (i = 0; i < BTL_MEMBERS; i++) {
+        if (g_btl_actors[i].c.key != 0
+            && (signed char)g_btl_actors[i].c.status == BTL_STATUS_DEAD) {
+            for (col = 0; col < GRID_CELLS; col++) {
+                if (g_btl_formation[col] == CELL_EMPTY) {
+                    g_btl_formation[col] = i;
                     break;
                 }
             }
         }
-        member++;
-        i += sizeof(BtlActor);
-    } while (member < BTL_MEMBERS);
+    }
 
     i = 0;
     for (row = 0; row < GRID_W; row++) {
@@ -94,18 +94,18 @@ void BtlSpawnParty(void)
             if (member != 0xFF) {
                 a = &g_btl_actors[member];
                 key = a->c.key;
-                if (a->c.equip[0] == BTL_HAND_EMPTY
-                    || a->c.equip[0] == BTL_HAND_A
-                    || a->c.equip[0] == BTL_HAND_B) {
-                    a->script_pick = 0;
-                } else {
+                if (a->c.equip[0] != BTL_HAND_EMPTY
+                    && a->c.equip[0] != BTL_HAND_A
+                    && a->c.equip[0] != BTL_HAND_B) {
                     a->script_pick = 1;
+                } else {
+                    a->script_pick = 0;
                 }
                 obj = BtlSpawnMemberObj(key, col << 1, row,
                                         BtlLoadMemberGfx(key, member), member);
                 a->obj = obj;
                 obj->mark_num = member;
-                a->obj->actor = a;
+                a->obj->actor = &g_btl_actors[member];
                 a->obj->mark = BtlSpawnActorObj(
                     *(signed char *)&a->c.status, &a->obj->x);
                 a->obj->mark->shift_x = BTL_SHADOW_X;
@@ -113,20 +113,18 @@ void BtlSpawnParty(void)
                 a->obj->mark->attached->shift_x = BTL_SHADOW_X2;
                 a->obj->mark->attached->shift = BTL_SHADOW_Y;
 
-                if (a->c.status == BTL_STATUS_DEAD) {
+                if ((signed char)a->c.status == BTL_STATUS_DEAD) {
+                    set = &g_btl_member_scripts[key * BTL_SCRIPT_ROW];
                     BtlObjSetScript(a->obj,
-                        a->obj->scripts[g_btl_member_scripts[
-                            a->script_pick * BTL_SCRIPT_SET
-                            + key * BTL_SCRIPT_ROW]]);
+                        a->obj->scripts[set[a->script_pick * BTL_SCRIPT_SET]]);
                     a->obj->attr |= BTL_OBJ_HIDDEN;
                     a->obj->shadow->attr |= BTL_OBJ_HIDDEN;
                     a->obj->mark->attr |= BTL_OBJ_HIDDEN;
                     a->obj->mark->attached->attr |= BTL_OBJ_HIDDEN;
                 } else {
+                    set = &g_btl_member_scripts[key * BTL_SCRIPT_ROW];
                     BtlObjSetScript(a->obj,
-                        a->obj->scripts[g_btl_member_scripts[
-                            a->script_pick * BTL_SCRIPT_SET
-                            + key * BTL_SCRIPT_ROW]]);
+                        a->obj->scripts[set[a->script_pick * BTL_SCRIPT_SET]]);
                 }
                 BtlApplyPersona(a);
                 BtlRecalcStats(a);
@@ -167,23 +165,16 @@ void BtlSpawnParty(void)
         }
     }
 
-    member = 0;
-    i = 0;
-    do {
-        member++;
+    for (i = 0; i < BTL_MEMBERS; i++) {
         if (g_btl_actors[i].c.key != 0
-            && g_btl_actors[i].c.status == BTL_STATUS_DEAD) {
+            && (signed char)g_btl_actors[i].c.status == BTL_STATUS_DEAD) {
             g_btl_formation[g_btl_actors[i].obj->row * GRID_W
                             + (g_btl_actors[i].obj->col2 >> 1)] = 0xFF;
         }
-        i++;
-    } while (member < BTL_MEMBERS);
+    }
 
     g_btl_enemy_gfx_start = g_btl_gfx_next;
     DrawSync(0);
     BtlPartyResetGfx();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/partyspawn", BtlSpawnParty);
-#endif
 

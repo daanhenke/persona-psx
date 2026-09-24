@@ -17,7 +17,7 @@
 #include <persona/btlp/object.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
-#include <inline.h>
+#include <decomp/gte.h>
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
 
@@ -54,15 +54,26 @@
 extern SVECTOR   g_btl_arena_face[];
 extern SVECTOR   g_btl_arena_quad[];
 
-/* The four edges reach the arena's colour by address, one component at a time.
-   Through the array symbol gcc hoists the base into a saved register for the
-   loop and then has to spill a live value to make room; the original
-   re-materialises the address at each of the three uses. */
+/* Three of the edges reach the arena's colour by address, one component at a
+   time. Through the array symbol gcc hoists the base into a saved register
+   for the loop, and the original re-materialises the address at each of the
+   three uses. reloc.btlp.txt keeps splat from naming those loads, since the
+   image has no relocation there. The bottom edge does reach it through the
+   symbol.
+
+   Every edge is written as expressions of its counter alone. loop.c then
+   steps each coordinate and texture offset itself, which is where the image
+   gets its registers from. A run counted down is written `i * -STEP + base`:
+   as `base - i * STEP`, gcc steps i * STEP and subtracts every time round. */
 #define g_btl_arena_r (*(short *)0x800CCA12)
 #define g_btl_arena_g (*(short *)0x800CCA14)
 #define g_btl_arena_b (*(short *)0x800CCA16)
 
-/* The face, in the plane z = 0. It is the only one of the five put through
+/* 93.21%. Written as the edges are, every coordinate worked out from the row
+   and the column. The image also steps a copy of the row's top (s6) for the
+   second corner, which none of `ymid` before the columns, the corners read
+   through it, or the old stepped variables reproduces.
+   The face, in the plane z = 0. It is the only one of the five put through
    the GTE by hand rather than through RotAverageNclip4, and it is the one that
    walks the arena's colour toward the scene's. */
 #ifdef NON_MATCHING
@@ -72,41 +83,20 @@ void BtlDrawArenaBack(void)
     short  *rgb;
     int     row;
     int     col;
-    int     x0;
-    int     x1;
-    int     y0;
-    int     y1;
-    int     ymid;
-    int     u0;
-    int     u1;
-    int     v0;
-    int     v1;
 
-    row = 0;
-    rgb = g_btl_arena_rgb;
-    v1 = ARENA_CELL_FLAT;
-    v0 = 0;
-    y1 = -(ARENA_Y - ARENA_STEP);
-    y0 = -ARENA_Y;
-    do {
-        col = 0;
-        ymid = y0;
-        u1 = ARENA_CELL_FLAT;
-        u0 = 0;
-        x1 = -(ARENA_X - ARENA_STEP);
-        x0 = -ARENA_X;
-        do {
-            g_btl_arena_face[0].vx = x0;
-            g_btl_arena_face[0].vy = y0;
+    for (row = 0; row < ARENA_BACK_ROWS; row++) {
+        for (col = 0; col < ARENA_BACK_COLS; col++) {
+            g_btl_arena_face[0].vx = col * ARENA_STEP - ARENA_X;
+            g_btl_arena_face[0].vy = row * ARENA_STEP - ARENA_Y;
             g_btl_arena_face[0].vz = 0;
-            g_btl_arena_face[1].vx = x1;
-            g_btl_arena_face[1].vy = ymid;
+            g_btl_arena_face[1].vx = col * ARENA_STEP - (ARENA_X - ARENA_STEP);
+            g_btl_arena_face[1].vy = row * ARENA_STEP - ARENA_Y;
             g_btl_arena_face[1].vz = 0;
-            g_btl_arena_face[2].vx = x0;
-            g_btl_arena_face[2].vy = y1;
+            g_btl_arena_face[2].vx = col * ARENA_STEP - ARENA_X;
+            g_btl_arena_face[2].vy = row * ARENA_STEP - (ARENA_Y - ARENA_STEP);
             g_btl_arena_face[2].vz = 0;
-            g_btl_arena_face[3].vx = x1;
-            g_btl_arena_face[3].vy = y1;
+            g_btl_arena_face[3].vx = col * ARENA_STEP - (ARENA_X - ARENA_STEP);
+            g_btl_arena_face[3].vy = row * ARENA_STEP - (ARENA_Y - ARENA_STEP);
             g_btl_arena_face[3].vz = 0;
             gte_ldv3(&g_btl_arena_face[0], &g_btl_arena_face[1],
                      &g_btl_arena_face[2]);
@@ -117,77 +107,54 @@ void BtlDrawArenaBack(void)
             gte_ldv0(&g_btl_arena_face[3]);
             gte_rtps();
             gte_stsxy((long *)&g_btl_polyft4_next->x3);
-            g_btl_polyft4_next->u0 = u0;
-            g_btl_polyft4_next->v0 = v0;
-            g_btl_polyft4_next->u1 = u1;
-            g_btl_polyft4_next->v1 = v0;
-            g_btl_polyft4_next->u2 = u0;
-            g_btl_polyft4_next->v2 = v1;
-            g_btl_polyft4_next->u3 = u1;
-            x1 += ARENA_STEP;
-            g_btl_polyft4_next->v3 = v1;
-            x0 += ARENA_STEP;
-            g_btl_polyft4_next->r0 = rgb[0];
-            col++;
-            g_btl_polyft4_next->g0 = rgb[1];
-            g_btl_polyft4_next->b0 = rgb[2];
-            u0 += ARENA_CELL_FLAT;
+            g_btl_polyft4_next->u0 = col * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v0 = row * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->u1 = col * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v1 = row * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->u2 = col * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v2 = row * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->u3 = col * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v3 = row * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->r0 = g_btl_arena_rgb[0];
+            g_btl_polyft4_next->g0 = g_btl_arena_rgb[1];
+            g_btl_polyft4_next->b0 = g_btl_arena_rgb[2];
             g_btl_polyft4_next->clut = g_btl_clut[ARENA_SLOT];
             g_btl_polyft4_next->tpage = g_btl_tpage[ARENA_SLOT];
             ot = (u_long *)(g_btl_prim_pool + g_btl_frame * ARENA_FRAME
                             + ARENA_OT);
             addPrim(ot, g_btl_polyft4_next);
             g_btl_polyft4_next++;
-            u1 += ARENA_CELL_FLAT;
-        } while (col < ARENA_BACK_COLS);
-        v1 += ARENA_CELL_FLAT;
-        v0 += ARENA_CELL_FLAT;
-        y1 += ARENA_STEP;
-        row++;
-        y0 += ARENA_STEP;
-    } while (row < ARENA_BACK_ROWS);
+        }
+    }
 
-    BtlApproach(&g_btl_arena_rgb[0], &g_btl_scene_rgb[0], g_btl_arena_fade);
-    BtlApproach(&g_btl_arena_rgb[1], &g_btl_scene_rgb[1], g_btl_arena_fade);
-    BtlApproach(&g_btl_arena_rgb[2], &g_btl_scene_rgb[2], g_btl_arena_fade);
+    rgb = g_btl_arena_rgb;
+    BtlApproach(&rgb[0], &rgb[3], rgb[-1]);
+    BtlApproach(&rgb[1], &rgb[4], rgb[-1]);
+    BtlApproach(&rgb[2], &rgb[5], rgb[-1]);
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaBack);
 #endif
 
 /* The right edge, standing in the plane x = 0x78 and running upwards. */
-#ifdef NON_MATCHING
 void BtlDrawArenaRight(void)
 {
     u_long *ot;
     long    out[4];
     int     i;
     long    n;
-    short   y0;
-    short   y1;
-    char    u0;
-    char    u1;
-    char    vtop;
 
-    i = 0;
-    vtop = ARENA_V_UP0;
-    u1 = ARENA_CELL_UP;
-    u0 = 0;
-    y1 = (ARENA_Y - ARENA_STEP);
-    y0 = ARENA_Y;
-    do {
+    for (i = 0; i < ARENA_UPRIGHT; i++) {
         g_btl_arena_quad[0].vx = ARENA_X;
-        g_btl_arena_quad[0].vy = y0;
+        g_btl_arena_quad[0].vy = i * -ARENA_STEP + ARENA_Y;
         g_btl_arena_quad[0].vz = 0;
         g_btl_arena_quad[1].vx = ARENA_X;
-        g_btl_arena_quad[1].vy = y1;
+        g_btl_arena_quad[1].vy = i * -ARENA_STEP + (ARENA_Y - ARENA_STEP);
         g_btl_arena_quad[1].vz = 0;
         g_btl_arena_quad[2].vx = ARENA_X;
-        g_btl_arena_quad[2].vy = y0;
+        g_btl_arena_quad[2].vy = i * -ARENA_STEP + ARENA_Y;
         g_btl_arena_quad[3].vx = ARENA_X;
-        g_btl_arena_quad[3].vy = y1;
-        /* The depth of the two far corners never changes, and writing it
-           after the rest of the quad is what puts it where it goes. */
+        g_btl_arena_quad[3].vy = i * -ARENA_STEP + (ARENA_Y - ARENA_STEP);
         g_btl_arena_quad[2].vz = ARENA_DEPTH;
         g_btl_arena_quad[3].vz = ARENA_DEPTH;
         n = RotAverageNclip4(&g_btl_arena_quad[0], &g_btl_arena_quad[1],
@@ -198,13 +165,13 @@ void BtlDrawArenaRight(void)
                              (long *)&g_btl_polyft4_next->x3,
                              &out[0], &out[1], &out[2]);
         if (n > 0) {
-            g_btl_polyft4_next->u0 = u0;
-            g_btl_polyft4_next->v0 = vtop;
-            g_btl_polyft4_next->u1 = u1;
-            g_btl_polyft4_next->v1 = vtop;
-            g_btl_polyft4_next->u2 = u0;
+            g_btl_polyft4_next->u0 = i * ARENA_CELL_UP;
+            g_btl_polyft4_next->v0 = ARENA_V_UP0;
+            g_btl_polyft4_next->u1 = i * ARENA_CELL_UP + ARENA_CELL_UP;
+            g_btl_polyft4_next->v1 = ARENA_V_UP0;
+            g_btl_polyft4_next->u2 = i * ARENA_CELL_UP;
             g_btl_polyft4_next->v2 = ARENA_V_UP1;
-            g_btl_polyft4_next->u3 = u1;
+            g_btl_polyft4_next->u3 = i * ARENA_CELL_UP + ARENA_CELL_UP;
             g_btl_polyft4_next->v3 = ARENA_V_UP1;
             g_btl_polyft4_next->r0 = g_btl_arena_r;
             g_btl_polyft4_next->g0 = g_btl_arena_g;
@@ -216,50 +183,28 @@ void BtlDrawArenaRight(void)
             addPrim(ot, g_btl_polyft4_next);
             g_btl_polyft4_next++;
         }
-        u1 += ARENA_CELL_UP;
-        u0 += ARENA_CELL_UP;
-        y1 -= ARENA_STEP;
-        i++;
-        y0 -= ARENA_STEP;
-    } while (i < ARENA_UPRIGHT);
+    }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaRight);
-#endif
 
 /* The left edge, in the plane x = -0x78, running downwards. */
-#ifdef NON_MATCHING
 void BtlDrawArenaLeft(void)
 {
     u_long *ot;
     long    out[4];
     int     i;
     long    n;
-    short   y0;
-    short   y1;
-    char    u0;
-    char    u1;
-    char    vtop;
 
-    i = 0;
-    vtop = ARENA_V_UP0;
-    u1 = ARENA_CELL_UP;
-    u0 = 0;
-    y1 = (-ARENA_Y + ARENA_STEP);
-    y0 = -ARENA_Y;
-    do {
+    for (i = 0; i < ARENA_UPRIGHT; i++) {
         g_btl_arena_quad[0].vx = -ARENA_X;
-        g_btl_arena_quad[0].vy = y0;
+        g_btl_arena_quad[0].vy = i * ARENA_STEP + -ARENA_Y;
         g_btl_arena_quad[0].vz = 0;
         g_btl_arena_quad[1].vx = -ARENA_X;
-        g_btl_arena_quad[1].vy = y1;
+        g_btl_arena_quad[1].vy = i * ARENA_STEP + (-ARENA_Y + ARENA_STEP);
         g_btl_arena_quad[1].vz = 0;
         g_btl_arena_quad[2].vx = -ARENA_X;
-        g_btl_arena_quad[2].vy = y0;
+        g_btl_arena_quad[2].vy = i * ARENA_STEP + -ARENA_Y;
         g_btl_arena_quad[3].vx = -ARENA_X;
-        g_btl_arena_quad[3].vy = y1;
-        /* The depth of the two far corners never changes, and writing it
-           after the rest of the quad is what puts it where it goes. */
+        g_btl_arena_quad[3].vy = i * ARENA_STEP + (-ARENA_Y + ARENA_STEP);
         g_btl_arena_quad[2].vz = ARENA_DEPTH;
         g_btl_arena_quad[3].vz = ARENA_DEPTH;
         n = RotAverageNclip4(&g_btl_arena_quad[0], &g_btl_arena_quad[1],
@@ -270,13 +215,13 @@ void BtlDrawArenaLeft(void)
                              (long *)&g_btl_polyft4_next->x3,
                              &out[0], &out[1], &out[2]);
         if (n > 0) {
-            g_btl_polyft4_next->u0 = u0;
-            g_btl_polyft4_next->v0 = vtop;
-            g_btl_polyft4_next->u1 = u1;
-            g_btl_polyft4_next->v1 = vtop;
-            g_btl_polyft4_next->u2 = u0;
+            g_btl_polyft4_next->u0 = i * ARENA_CELL_UP;
+            g_btl_polyft4_next->v0 = ARENA_V_UP0;
+            g_btl_polyft4_next->u1 = i * ARENA_CELL_UP + ARENA_CELL_UP;
+            g_btl_polyft4_next->v1 = ARENA_V_UP0;
+            g_btl_polyft4_next->u2 = i * ARENA_CELL_UP;
             g_btl_polyft4_next->v2 = ARENA_V_UP1;
-            g_btl_polyft4_next->u3 = u1;
+            g_btl_polyft4_next->u3 = i * ARENA_CELL_UP + ARENA_CELL_UP;
             g_btl_polyft4_next->v3 = ARENA_V_UP1;
             g_btl_polyft4_next->r0 = g_btl_arena_r;
             g_btl_polyft4_next->g0 = g_btl_arena_g;
@@ -288,16 +233,8 @@ void BtlDrawArenaLeft(void)
             addPrim(ot, g_btl_polyft4_next);
             g_btl_polyft4_next++;
         }
-        u1 += ARENA_CELL_UP;
-        u0 += ARENA_CELL_UP;
-        y1 += ARENA_STEP;
-        i++;
-        y0 += ARENA_STEP;
-    } while (i < ARENA_UPRIGHT);
+    }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaLeft);
-#endif
 
 /* The bottom edge, in the plane y = 0xC8, running to the right.
  *
@@ -306,38 +243,24 @@ INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaLeft);
  * colour's address and built addPrim's 0x00FFFFFF mask inside the loop, where
  * the other three do the reverse. Both forms of the colour access, and a local
  * pointer for it, were tried here; each leaves gcc holding the mask. */
-#ifdef NON_MATCHING
 void BtlDrawArenaBottom(void)
 {
     u_long *ot;
     long    out[4];
     int     i;
     long    n;
-    short   x0;
-    short   x1;
-    char    u0;
-    char    u1;
-    char    vtop;
 
-    i = 0;
-    vtop = ARENA_V_FLAT0;
-    u1 = ARENA_CELL_FLAT;
-    u0 = 0;
-    x1 = (-ARENA_X + ARENA_STEP);
-    x0 = -ARENA_X;
-    do {
-        g_btl_arena_quad[0].vx = x0;
+    for (i = 0; i < ARENA_FLAT; i++) {
+        g_btl_arena_quad[0].vx = i * ARENA_STEP + -ARENA_X;
         g_btl_arena_quad[0].vy = ARENA_Y;
         g_btl_arena_quad[0].vz = 0;
-        g_btl_arena_quad[1].vx = x1;
+        g_btl_arena_quad[1].vx = i * ARENA_STEP + (-ARENA_X + ARENA_STEP);
         g_btl_arena_quad[1].vy = ARENA_Y;
         g_btl_arena_quad[1].vz = 0;
-        g_btl_arena_quad[2].vx = x0;
+        g_btl_arena_quad[2].vx = i * ARENA_STEP + -ARENA_X;
         g_btl_arena_quad[2].vy = ARENA_Y;
-        g_btl_arena_quad[3].vx = x1;
+        g_btl_arena_quad[3].vx = i * ARENA_STEP + (-ARENA_X + ARENA_STEP);
         g_btl_arena_quad[3].vy = ARENA_Y;
-        /* The depth of the two far corners never changes, and writing it
-           after the rest of the quad is what puts it where it goes. */
         g_btl_arena_quad[2].vz = ARENA_DEPTH;
         g_btl_arena_quad[3].vz = ARENA_DEPTH;
         n = RotAverageNclip4(&g_btl_arena_quad[0], &g_btl_arena_quad[1],
@@ -348,17 +271,17 @@ void BtlDrawArenaBottom(void)
                              (long *)&g_btl_polyft4_next->x3,
                              &out[0], &out[1], &out[2]);
         if (n > 0) {
-            g_btl_polyft4_next->u0 = u0;
-            g_btl_polyft4_next->v0 = vtop;
-            g_btl_polyft4_next->u1 = u1;
-            g_btl_polyft4_next->v1 = vtop;
-            g_btl_polyft4_next->u2 = u0;
+            g_btl_polyft4_next->u0 = i * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v0 = ARENA_V_FLAT0;
+            g_btl_polyft4_next->u1 = i * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v1 = ARENA_V_FLAT0;
+            g_btl_polyft4_next->u2 = i * ARENA_CELL_FLAT;
             g_btl_polyft4_next->v2 = ARENA_V_FLAT1;
-            g_btl_polyft4_next->u3 = u1;
+            g_btl_polyft4_next->u3 = i * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
             g_btl_polyft4_next->v3 = ARENA_V_FLAT1;
-            g_btl_polyft4_next->r0 = g_btl_arena_r;
-            g_btl_polyft4_next->g0 = g_btl_arena_g;
-            g_btl_polyft4_next->b0 = g_btl_arena_b;
+            g_btl_polyft4_next->r0 = g_btl_arena_rgb[0];
+            g_btl_polyft4_next->g0 = g_btl_arena_rgb[1];
+            g_btl_polyft4_next->b0 = g_btl_arena_rgb[2];
             g_btl_polyft4_next->clut = g_btl_clut[ARENA_SLOT];
             g_btl_polyft4_next->tpage = g_btl_tpage[ARENA_SLOT];
             ot = (u_long *)(g_btl_prim_pool + g_btl_frame * ARENA_FRAME
@@ -366,50 +289,28 @@ void BtlDrawArenaBottom(void)
             addPrim(ot, g_btl_polyft4_next);
             g_btl_polyft4_next++;
         }
-        u1 += ARENA_CELL_FLAT;
-        u0 += ARENA_CELL_FLAT;
-        x1 += ARENA_STEP;
-        i++;
-        x0 += ARENA_STEP;
-    } while (i < ARENA_FLAT);
+    }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaBottom);
-#endif
 
 /* The top edge, in the plane y = -0xC8, running to the left. */
-#ifdef NON_MATCHING
 void BtlDrawArenaTop(void)
 {
     u_long *ot;
     long    out[4];
     int     i;
     long    n;
-    short   x0;
-    short   x1;
-    char    u0;
-    char    u1;
-    char    vtop;
 
-    i = 0;
-    vtop = ARENA_V_FLAT0;
-    u1 = ARENA_CELL_FLAT;
-    u0 = 0;
-    x1 = (ARENA_X - ARENA_STEP);
-    x0 = ARENA_X;
-    do {
-        g_btl_arena_quad[0].vx = x0;
+    for (i = 0; i < ARENA_FLAT; i++) {
+        g_btl_arena_quad[0].vx = i * -ARENA_STEP + ARENA_X;
         g_btl_arena_quad[0].vy = -ARENA_Y;
         g_btl_arena_quad[0].vz = 0;
-        g_btl_arena_quad[1].vx = x1;
+        g_btl_arena_quad[1].vx = i * -ARENA_STEP + (ARENA_X - ARENA_STEP);
         g_btl_arena_quad[1].vy = -ARENA_Y;
         g_btl_arena_quad[1].vz = 0;
-        g_btl_arena_quad[2].vx = x0;
+        g_btl_arena_quad[2].vx = i * -ARENA_STEP + ARENA_X;
         g_btl_arena_quad[2].vy = -ARENA_Y;
-        g_btl_arena_quad[3].vx = x1;
+        g_btl_arena_quad[3].vx = i * -ARENA_STEP + (ARENA_X - ARENA_STEP);
         g_btl_arena_quad[3].vy = -ARENA_Y;
-        /* The depth of the two far corners never changes, and writing it
-           after the rest of the quad is what puts it where it goes. */
         g_btl_arena_quad[2].vz = ARENA_DEPTH;
         g_btl_arena_quad[3].vz = ARENA_DEPTH;
         n = RotAverageNclip4(&g_btl_arena_quad[0], &g_btl_arena_quad[1],
@@ -420,13 +321,13 @@ void BtlDrawArenaTop(void)
                              (long *)&g_btl_polyft4_next->x3,
                              &out[0], &out[1], &out[2]);
         if (n > 0) {
-            g_btl_polyft4_next->u0 = u0;
-            g_btl_polyft4_next->v0 = vtop;
-            g_btl_polyft4_next->u1 = u1;
-            g_btl_polyft4_next->v1 = vtop;
-            g_btl_polyft4_next->u2 = u0;
+            g_btl_polyft4_next->u0 = i * ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v0 = ARENA_V_FLAT0;
+            g_btl_polyft4_next->u1 = i * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
+            g_btl_polyft4_next->v1 = ARENA_V_FLAT0;
+            g_btl_polyft4_next->u2 = i * ARENA_CELL_FLAT;
             g_btl_polyft4_next->v2 = ARENA_V_FLAT1;
-            g_btl_polyft4_next->u3 = u1;
+            g_btl_polyft4_next->u3 = i * ARENA_CELL_FLAT + ARENA_CELL_FLAT;
             g_btl_polyft4_next->v3 = ARENA_V_FLAT1;
             g_btl_polyft4_next->r0 = g_btl_arena_r;
             g_btl_polyft4_next->g0 = g_btl_arena_g;
@@ -438,14 +339,6 @@ void BtlDrawArenaTop(void)
             addPrim(ot, g_btl_polyft4_next);
             g_btl_polyft4_next++;
         }
-        u1 += ARENA_CELL_FLAT;
-        u0 += ARENA_CELL_FLAT;
-        x1 -= ARENA_STEP;
-        i++;
-        x0 -= ARENA_STEP;
-    } while (i < ARENA_FLAT);
+    }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/arena", BtlDrawArenaTop);
-#endif
 

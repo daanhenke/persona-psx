@@ -75,13 +75,21 @@ extern void    BtlPlaceMember(int member, int col, int row);
 extern void    BtlSpawnFixedEnemies(void);
 extern int     BtlResetTalk(int open);
 
-/* 91.42%. Taken from the image so far: one counter for the clearing walk,
-   the counter zeroed ahead of the CD wait (reorg puts it in both of the
-   wait's branch slots), no reset of g_cd_busy after it, and the fixed-enemy
-   test on the encounter as unsigned. What is left is register pressure: the
-   image spills the set argument and reloads it each trip, where this keeps
-   one value more alive across the calls and spills the species instead, a
-   word of frame over. */
+/* 94.49%. Taken from the image so far:
+   - one counter for the clearing walk;
+   - the counter zeroed ahead of the CD wait (reorg puts it in both of the
+     wait's branch slots);
+   - no reset of g_cd_busy after the wait;
+   - the fixed-enemy test on the encounter as unsigned;
+   - the record re-reached through g_btl_combatants after each call rather
+     than held in `a`;
+   - the species stored into the grid rather than head >> 8 worked out again.
+   What is left:
+   - i and the set's doubled offset trade saved registers;
+   - the image reaches the stage table's entry at raw * 2 through a
+     %hi/%lo pair of its own (in v0, not $at);
+   - the two words before that entry count as misses against the image's
+     D_ names. */
 #ifdef NON_MATCHING
 void BtlSpawnEnemies(int set)
 {
@@ -152,7 +160,7 @@ void BtlSpawnEnemies(int set)
             a->obj->actor = a;
             a->clut_len = head + 1;
             BtlLoadEnemyStats(live, species);
-            obj = BtlSpawnActorObj(*(signed char *)&a->c.status,
+            obj = BtlSpawnActorObj(*(signed char *)&g_btl_combatants[rec].c.status,
                                    &g_btl_combatants[rec].obj->x);
             g_btl_combatants[rec].obj->mark = obj;
             g_btl_combatants[rec].obj->mark->shift_x =
@@ -176,7 +184,7 @@ void BtlSpawnEnemies(int set)
                 g_btl_combatants[rec].obj->mark->attached->attr
                     |= BTL_OBJ_HIDDEN;
             } else {
-                g_btl_grid[row * BTL_GRID_WIDTH + col] = head >> 8;
+                g_btl_grid[row * BTL_GRID_WIDTH + col] = species;
             }
             *(u_short *)((char *)tim + 2) = head;
             rec++;
