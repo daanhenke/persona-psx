@@ -109,5 +109,5 @@ void FieldStepBegin(void)
 {
     g_step_from_eye = g_view_eye[g_dir_axis[g_dng->walk_dir]];
     g_step_from_at = g_view_at[g_dir_axis[g_dng->walk_dir]];
-    func_80069A14();
+    FieldLoadAhead();
 }

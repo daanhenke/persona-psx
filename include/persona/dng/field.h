@@ -43,7 +43,12 @@ typedef struct {
     u_char   walk_dir;   /* 0x15A8 the facing a step goes towards */
     u_char   pad15A9[3];
     long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
-    u_char   pad15B0[0x15C8 - 0x15B0];
+    u_char   pad15B0[0x15BC - 0x15B0];
+    u_char   tick_flags; /* 0x15BC */
+    u_char   pad15BD;
+    u_short  area;       /* 0x15BE the automap's map id */
+    u_short  room;       /* 0x15C0 and its room within the map */
+    u_char   pad15C2[0x15C8 - 0x15C2];
     /* The door being opened: for each of its two halves, which axis of the
        translation moves and which scene object it is. */
     short   door_axis[2]; /* 0x15C8 */
@@ -111,7 +116,9 @@ extern u_char g_walk_from_x;
 extern u_char g_walk_from_y;
 extern u_char g_walk_undo;
 
-/* Any mode bits set, a step is refused without walking. */
+/* Any mode bits set, a step is refused without walking. FIELD_MODE_DOWN
+   marks the stairs as leading down a floor. */
+#define FIELD_MODE_DOWN 0x80
 extern int g_field_mode;
 
 /* The floor's tune pauses while the party stands; the first step resumes
@@ -120,6 +127,30 @@ extern int g_field_mode;
 extern u_char g_bgm_flags;
 extern u_char g_bgm_off;
 extern short  g_bgm_seq;
+
+/* Whether the stairs just taken changed floor, and which way: 1 up, 2 down,
+   0 not at all. */
+extern int g_stair_floor;
+
+/* Debugging: walls and one-way tiles stop nothing. */
+extern u_char g_noclip;
+
+/* The thud of walking into a wall. */
+extern short g_bump_seq;
+
+/* A tile that stops a step: off the grid, tile 0 or TILE_SOLID. A
+   TILE_KIND_ONEWAY tile refuses the facings whose bit is set from bit 5. */
+#define TILE_SOLID       0x8000
+#define TILE_KIND_ONEWAY 2
+
+/* How far a bump pushes the view in, per frame. */
+#define BUMP_SPEED 18
+
+/* Counted down a step at a time while the tick flags are all set; reaching
+   zero raises g_effect_over. */
+#define EFFECT_STEPS (*(u_char *)0x801F29A9)
+#define STEP_CLOCK   (*(u_char *)0x801F2B30)
+extern u_char g_effect_over;
 
 /* A turn is nine frames of TURN_SPEED, then snaps to a quarter turn. */
 #define TURN_SPEED   96
@@ -185,11 +216,10 @@ void UploadImageRows(void *desc, u_short x, u_short y, short rows);
 void TimLoad(u_long *tim, int nopal);
 
 void func_80065978(void);
-int  func_8006966C(void);
-void func_800695D8(void);
-int  func_80069708(void);
-void func_800697B0(void);
-void func_80069A14(void);
+void func_80069A7C(void);
+void func_80069EB4(void);
+void func_8006E988(int x, int y);
+void func_8006FFF4(void);
 void func_8006A4D0(void);
 int  func_8006C9C8(void);
 void func_8006CF40(void);
@@ -213,5 +243,13 @@ void FieldStepBegin(void);
 int  FieldWalk(int ret);
 void FieldTurn(int turn);
 void FieldSetHeading(int turn);
+
+void FieldStairs(int dir);
+void FieldHop(int dir);
+int  FieldStepTick(void);
+int  FieldTileOneWay(void);
+int  FieldTileSolid(void);
+void FieldBumpWall(void);
+void FieldLoadAhead(void);
 
 #endif

@@ -20,10 +20,10 @@ int FieldWalk(int ret)
 
     g_walk_from_x = g_dng->pos[POS_X];
     g_walk_from_y = g_dng->pos[POS_Y];
-    if (func_8006966C() == 0) {
+    if (FieldTileOneWay() == 0) {
         g_walk_undo = g_dng->pos[g_dir_axis[g_dng->walk_dir]];
         g_dng->pos[g_dir_axis[g_dng->walk_dir]] += g_dir_tile_step[g_dng->walk_dir];
-        if (func_80069708() == 0 && func_8006C9C8() == 0) {
+        if (FieldTileSolid() == 0 && func_8006C9C8() == 0) {
             if (g_field_mode != 0) {
                 g_dng->pos[g_dir_axis[g_dng->walk_dir]] = g_walk_undo;
                 return ret;
@@ -51,13 +51,13 @@ int FieldWalk(int ret)
                 func_80065978();
             }
             FieldStepEnd();
-            func_800695D8();
+            FieldStepTick();
             return ret;
         }
         g_dng->pos[g_dir_axis[g_dng->walk_dir]] = g_walk_undo;
     }
     func_8006A4D0();
-    func_800697B0();
+    FieldBumpWall();
     return 0;
 }
 
