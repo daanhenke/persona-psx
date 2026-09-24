@@ -361,6 +361,16 @@ void FieldMsgNewLine(void);
 void FieldMsgClearLine(int line);
 void FieldMsgSetWindow(int n);
 void FieldMsgTint(u_char *cells, u_char color, int col, int line, int count);
+void FieldMsgPrintBytes(u_char *s, u_char n);
+void FieldMsgPrint();      /* old-style */
+int  FieldFindMember(u_char key);
+void FieldMsgPrintCodes(); /* old-style */
+void FieldMsgSetStyle(u_int style);
+
+/* Set together by FieldMsgSetStyle; nothing here says more. */
+extern u_char D_8009FAE0;
+extern int    D_8009FAE4;
+extern int    g_msg_styles[];
 void FieldDecodeGlyph(u_short n);
 void FieldSetMoonIcon(void);
 /* Defined old-style, so declared without a prototype: callers pass ints. */

@@ -5,15 +5,23 @@
  *   0x80074D64 FieldMsgClearLine
  *   0x80074DD8 FieldMsgSetWindow
  *   0x80074EB4 FieldMsgTint
+ *   0x80074F28 FieldMsgPrintBytes
+ *   0x80074FA4 FieldMsgPrint
+ *   0x80075054 FieldFindMember
+ *   0x800750B8 FieldMsgPrintCodes
+ *   0x8007518C FieldMsgSetStyle
  *
  * Text is drawn into a strip of VRAM beside the screen, three lines of
  * fifteen glyphs, and shown through a primitive list in the pack whose cells
  * carry the text colour's palette. A fourth line scrolls the window up.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <persona/common/char.h>
+#include <persona/common/status.h>
 #include <persona/dng/field.h>
 
 #define MSG_LINES   3
@@ -112,4 +120,124 @@ void FieldMsgTint(u_char *cells, u_char color, int col, int line, int count)
         *(u_short *)cells = g_msg_cluts[color];
         cells += 8;
     }
+}
+
+/* Text ends at MSG_END; a glyph code with its top bit set takes the next
+   byte as its low half. */
+#define MSG_END      0xFF
+#define MSG_CODE_END 1
+#define MSG_CODE_NL  3
+
+/* Prints up to `n` single-byte glyphs, a frame each. */
+void FieldMsgPrintBytes(u_char *s, u_char n)
+{
+    int    i;
+    u_char c;
+
+    for (i = 0; i < n; i++) {
+        c = *s;
+        if (c == MSG_END) {
+            break;
+        }
+        s++;
+        FieldMsgPutGlyph(c);
+        func_80065978();
+    }
+}
+
+/* Prints up to `n` glyph codes, a frame each. Old-style, like the rest of
+   the printers: n is narrowed at every test. */
+/* 74.2%: the image reads the byte twice - once against MSG_END, kept for a
+   one-byte glyph, and again for the two-byte test - where every spelling
+   here shares one load and masks it. */
+#ifdef NON_MATCHING
+void FieldMsgPrint(s, n)
+    u_char *s;
+    u_char  n;
+{
+    int    i;
+    u_char c;
+
+    for (i = 0; i < n; i++) {
+        c = *s;
+        if (c == MSG_END) {
+            break;
+        }
+        if (!(*s & 0x80)) {
+            s++;
+            FieldMsgPutGlyph(c);
+        } else {
+            FieldMsgPutGlyph(((*s & 0x7F) << 8) | s[1]);
+            s += 2;
+        }
+        func_80065978();
+    }
+}
+#else
+INCLUDE_ASM("dng/nonmatchings/field/fieldmsg", FieldMsgPrint);
+#endif
+
+/* The party slot holding the character whose record key is `key` + 1, or
+   -1. */
+int FieldFindMember(u_char key)
+{
+    u_char *p;
+    int     i;
+
+    p = g_party;
+    for (i = 0; i < 5; i++, p++) {
+        if (*p != 0xFF && g_chars[*p].key == key + 1) {
+            return *p;
+        }
+    }
+    return -1;
+}
+
+/* Prints up to `n` glyph codes or control codes, a frame each. */
+/* 85.3%: the image reads the byte twice - once against MSG_END, kept for a
+   one-byte glyph, and again for the two-byte test - where every spelling
+   here shares one load and masks it. */
+#ifdef NON_MATCHING
+void FieldMsgPrintCodes(s, n)
+    u_char *s;
+    u_char  n;
+{
+    int     i;
+    u_char  c;
+    u_short g;
+
+    for (i = 0; i < n; i++) {
+        c = *s;
+        if (c == MSG_END) {
+            c = *++s;
+            if (c == MSG_CODE_END) {
+                break;
+            }
+            s++;
+            if (c == MSG_CODE_NL) {
+                FieldMsgNewLine();
+            }
+        } else {
+            if (!(*s & 0x80)) {
+                s++;
+                g = c;
+            } else {
+                g = ((*s & 0x7F) << 8) | s[1];
+                s += 2;
+            }
+            FieldMsgPutGlyph(g);
+        }
+        func_80065978();
+    }
+}
+#else
+INCLUDE_ASM("dng/nonmatchings/field/fieldmsg", FieldMsgPrintCodes);
+#endif
+
+/* A style byte: the low five bits one setting, the top three an index into
+   a table for the other. */
+void FieldMsgSetStyle(u_int style)
+{
+    D_8009FAE4 = g_msg_styles[(style >> 5) & 7];
+    D_8009FAE0 = style & 0x1F;
 }
