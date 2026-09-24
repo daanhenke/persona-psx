@@ -270,6 +270,7 @@ extern int      g_bob_step[];
 void CoordSetRot(SVECTOR *rot, GsCOORDINATE2 *coord);
 void UploadImageRows(void *desc, u_short x, u_short y, short rows);
 void TimLoad(u_long *tim, int nopal);
+void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
 void func_80069A7C(void);
@@ -333,6 +334,13 @@ void FieldResetSound(void);
 extern GsFOGPARAM g_fog;
 extern double     g_fog_scale;
 extern int        g_fog_near;
+
+/* The floor's entry tile, laid out like the state's pos: x at [0], y at
+   [2]; 0xFF when the floor has none. */
+extern u_char g_entry_pos[3];
+
+int  FieldFindEntry(void);
+void FieldLoadGfx(void);
 
 void FieldFadeSeqs(void);
 void FieldCloseSound(void);

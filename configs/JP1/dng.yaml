@@ -70,6 +70,8 @@ segments:
       - [0x619C, asm, dng_0_s3]
       - [0x8BA0, c, field/fieldinit]
       - [0x8F9C, asm, dng_0_s4]
+      - [0x98DC, c, field/fieldgfx]
+      - [0x9B90, asm, dng_0_s4b]
       - [0xA0E4, c, field/fieldcell]
       - [0xA70C, asm, dng_0_s5]
       - [0xADB0, c, field/fieldsetup]
