@@ -31,7 +31,7 @@
  *   2  WINDOW ANIMATION    DO / DO NOT          g_options[0x23]
  *   3  AUTO BATTLE SETTINGS (opens a page)
  *
- * The list page picks its row from slot_base and the battle page from row,
+ * The list page picks its row from cfg_list and the battle page from cfg_row,
  * which is the only structural difference between the two.
  */
 #include <decomp/types.h>
@@ -100,17 +100,17 @@ void ConfigListPlaceMarkers(void)
 {
     SlotSetFlicker(2, 0);
     SlotSetFlicker(3, 0);
-    SlotSetFlicker(g_menu->slot_base + 2, 1);
+    SlotSetFlicker(g_menu->cfg_list.cur + 2, 1);
     SlotSetPos(2, 0x42, g_options[3] * OPT_STEP + OPT_X0, 0x48);
     SlotSetPos(3, 0x42, g_options[0] * OPT_STEP + OPT_X0, 0x60);
 }
 
-/* The same for the list page, which picks its row from slot_base - the field
+/* The same for the list page, which picks its row from cfg_list - the field
    ConfigListPlaceMarkers uses to decide which marker to arm. Its last three
    rows open pages rather than holding a value. */
 void ConfigListBeginEdit(void)
 {
-    switch (g_menu->slot_base) {
+    switch (g_menu->cfg_list.cur) {
     case 0:
         MenuListInit(&g_menu->list[1], g_options[3], 0, 1, OPT_FLAGS);
         break;
@@ -129,7 +129,7 @@ void ConfigListBeginEdit(void)
    SOUND takes effect at once rather than waiting for the next track. */
 void ConfigListApplyOption(void)
 {
-    switch (g_menu->slot_base) {
+    switch (g_menu->cfg_list.cur) {
     case 0:
         OPT_AT[3] = OPT_VALUE;
         break;

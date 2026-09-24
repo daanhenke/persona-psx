@@ -86,7 +86,7 @@ void ConfigRedrawBattlePage(void)
                     0, 8);
 
     SlotSetPos(CURSOR_SLOT, CURSOR_Z, CURSOR_X,
-               g_menu->row * ROW_PITCH + CURSOR_Y0);
+               g_menu->cfg_row.cur * ROW_PITCH + CURSOR_Y0);
     ConfigBeginEdit();
     ConfigPlaceMarkers();
     SlotClear(5);

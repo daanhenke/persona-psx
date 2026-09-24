@@ -432,7 +432,7 @@ DrawPlaceLabel           = 0x800757B4; // type:func size:0x98
 //------------------------------------------------------------
 //--- PA: 0x0114AC   VA: 0x8007584C   subsegment: asm, adv_11a
 //------------------------------------------------------------
-func_8007584C            = 0x8007584C; // type:func size:0x394
+ConfigStepRows           = 0x8007584C; // type:func size:0x394
 ConfigStepTactics        = 0x80075BE0; // type:func size:0x1D0
 
 //----------------------------------------------------------------------------
@@ -444,7 +444,7 @@ ConfigCloseChoice        = 0x80075E94; // type:func size:0x80
 //-----------------------------------------------------------
 //--- PA: 0x011B74   VA: 0x80075F14   subsegment: asm, adv_12
 //-----------------------------------------------------------
-func_80075F14            = 0x80075F14; // type:func size:0x1AC
+ConfigPageOpen           = 0x80075F14; // type:func size:0x1AC
 
 //--------------------------------------------------------------------------
 //--- PA: 0x011D20   VA: 0x800760C0   subsegment: c, ../common/ui/configlist

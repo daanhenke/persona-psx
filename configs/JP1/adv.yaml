@@ -138,10 +138,10 @@ segments:
       - [0x10320, c, common/game/formationload]
       - [0x104D0, c, ui/configmenu]
       - [0x11414, c, common/ui/placelabel]
-      - [0x114AC, asm, adv_11a]
+      - [0x114AC, c, ui/configrows]
       - [0x11840, c, ui/configtactics]
       - [0x11A10, c, common/ui/configchoice]
-      - [0x11B74, asm, adv_12]
+      - [0x11B74, c, ui/configpage]
       # config.c is one unit: the battle-page redraw and the marker placement
       # sit between its list helpers, so all seven are the same object.
       - [0x11D20, c, common/ui/configlist]

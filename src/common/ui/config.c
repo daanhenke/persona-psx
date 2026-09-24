@@ -31,7 +31,7 @@
  *   2  WINDOW ANIMATION    DO / DO NOT          g_options[0x23]
  *   3  AUTO BATTLE SETTINGS (opens a page)
  *
- * The list page picks its row from slot_base and the battle page from row,
+ * The list page picks its row from cfg_list and the battle page from cfg_row,
  * which is the only structural difference between the two.
  */
 #include <decomp/types.h>
@@ -105,7 +105,7 @@ void ConfigPlaceMarkers(void)
     SlotSetFlicker(2, 0);
     SlotSetFlicker(3, 0);
     SlotSetFlicker(4, 0);
-    SlotSetFlicker(g_menu->row + 2, 1);
+    SlotSetFlicker(g_menu->cfg_row.cur + 2, 1);
     SlotSetPos(2, MARKER_Z, g_options[1] * OPT_STEP + OPT_X0, 0x48);
     SlotSetPos(3, MARKER_Z, g_options[2] * OPT_STEP + OPT_X0, 0x60);
     SlotSetPos(4, MARKER_Z, g_options[0x23] * OPT_STEP + OPT_X0, 0x78);
@@ -116,7 +116,7 @@ void ConfigPlaceMarkers(void)
    edit; the count passed with each is one less than the number of choices. */
 void ConfigBeginEdit(void)
 {
-    switch (g_menu->row) {
+    switch (g_menu->cfg_row.cur) {
     case 0:
         MenuListInit(&g_menu->list[1], g_options[1], 0, 1, OPT_FLAGS);
         break;
@@ -135,7 +135,7 @@ void ConfigBeginEdit(void)
 /* Stores the edited value into whichever option the selected row names. */
 void ConfigApplyOption(void)
 {
-    switch (g_menu->row) {
+    switch (g_menu->cfg_row.cur) {
     case 0:
         g_options[1] = OPT_VALUE;
         break;

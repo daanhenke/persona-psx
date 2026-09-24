@@ -46,8 +46,8 @@ extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern void func_800782A4(int a, int b);
 extern void func_80095208(void);
-extern void func_80075F14(void);
-extern void func_8007584C(void);
+extern void ConfigPageOpen(void);
+extern void ConfigStepRows(void);
 
 void ConfigMenuOpen(void);
 void MenuOtherStep(void);
@@ -75,7 +75,7 @@ void ConfigMenuStep(void)
         ConfigPadStep();
         break;
     case 5:
-        func_8007584C();
+        ConfigStepRows();
         break;
     case 6:
         ConfigStepTactics();
@@ -129,7 +129,7 @@ void MenuOtherStep(void)
             g_menu_subsel = 0;
             break;
         case OTHER_CONFIG:
-            func_80075F14();
+            ConfigPageOpen();
             g_menu_subsel++;
             break;
         }
@@ -151,7 +151,7 @@ void ConfigOptionStep(void)
         func_8008FC78(g_menu->list[1].cur + g_menu->list[0].cur * 2);
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_80075F14();
+        ConfigPageOpen();
         g_menu_subsel--;
     }
 }
@@ -188,7 +188,7 @@ void ConfigPadStep(void)
     }
     if (*(u_char *)g_pad_pressed || g_menu_allow_hold) {
         SoundPlaySeq(0x18, 0, 1);
-        func_80075F14();
+        ConfigPageOpen();
         g_menu_subsel -= 2;
     }
 }

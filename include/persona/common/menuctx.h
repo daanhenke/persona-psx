@@ -35,10 +35,8 @@ typedef struct {
     /* 0x150 */ u_char   pad150[0x20];
     /* 0x170 */ MenuList unk170;
     /* 0x180 */ u_char   pad180[0x40];
-    /* 0x1C0 */ int      slot_base;
-    /* 0x1C4 */ u_char   pad1C4[0xC];
-    /* 0x1D0 */ int      row;
-    /* 0x1D4 */ u_char   pad1D4[0xC];
+    /* 0x1C0 */ MenuList cfg_list;      /* the config list page's row       */
+    /* 0x1D0 */ MenuList cfg_row;       /* the config battle page's row     */
     /* 0x1E0 */ MenuList member_list; /* the config tactics page's member */
     /* 0x1F0 */ u_char   pad1F0[0x30];
     /* 0x220 */ MenuList unk220;
