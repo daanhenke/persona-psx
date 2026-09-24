@@ -60,6 +60,8 @@ segments:
       - [0x8C8, .rodata, common/gfx/statbarsdata]
       - [0x8DC, rodata, dng_rodata2b]
       - [0x98C, asm, dng]
+      - [0x333C, c, field/fieldanim]
+      - [0x3928, asm, dng_0_s1]
       - [0xB638, c, common/gfx/coord]
       - [0xB738, asm, dng_s1]
       - [0xB768, c, common/gfx/tim]
