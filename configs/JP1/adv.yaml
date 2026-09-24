@@ -283,6 +283,7 @@ segments:
       - [0x2AD48, c, common/gfx/cellsrow]
       - [0x2AE08, c, ui/statuspages]
       - [0x2B778, asm, adv_45_x1]
+      - [0x2B9A8, c, game/charrecalc]
       - [0x2BC54, c, common/game/charstats]
       - [0x2C2A4, asm, adv_46]
       - [0x2C974, c, ui/equipcompare]
