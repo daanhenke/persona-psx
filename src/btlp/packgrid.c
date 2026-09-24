@@ -12,7 +12,6 @@
  * per-frame amount and the record is put on the motion that spends it over
  * sixteen frames.
  */
-#include <decomp/include_asm.h>
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
@@ -34,86 +33,63 @@
 #define PACK_MOTION 0xD
 #define PACK_FRAMES 0x10
 
-/* Both searches are written as a label and a goto rather than as loops. As
-   do/whiles with a break gcc rotates each of them, peeling the first cell's
-   load out above the loop and jumping into the test - thirteen instructions
-   the image does not have, and 72.88% against 86.18% this way. What is still
-   out is the grid's own address: the image lifts it into a saved register for
-   the second search and gcc here folds the pointer back to the symbol and
-   builds the address afresh at the one use. */
-#ifdef NON_MATCHING
+/* One flag serves both searches and one counter every walk but the columns,
+   the way BtlAfterTalk is written for the party - the image keeps each in a
+   single register throughout. The step is shifted into fixed point rather
+   than multiplied by PLACE_FIXED: as a product gcc folds the division by
+   sixteen into it, and the image divides at run time. */
 void BtlPackEnemyGrid(void)
 {
     BtlObj *o;
     u_char *p;
-    int     clear;
-    int     found;
-    int     cell;
+    int     flag;
     int     col;
     int     row;
-    int     shift;
     int     fill;
-    int     base;
     int     i;
 
-    fill = GRID_EMPTY;
-    clear = 1;
-    cell = GRID_BACK;
-peek:
-    if (g_btl_grid[cell] != fill) {
-        clear = 0;
-        goto peeked;
+    i = GRID_BACK;
+    flag = 1;
+    for (; i < GRID_BACK + GRID_PEEK; i++) {
+        if (g_btl_grid[i] != GRID_EMPTY) {
+            flag = 0;
+            break;
+        }
     }
-    cell++;
-    if (cell < GRID_BACK + GRID_PEEK) {
-        goto peek;
-    }
-peeked:
-    if (clear == 0) {
+    if (flag == 0) {
         return;
     }
 
-    found = 0;
-    fill = GRID_EMPTY;
+    flag = 0;
     row = GRID_ROWS - 1;
-    cell = GRID_BACK;
-scan:
-    col = 0;
-    base = cell;
-cols:
-    if (g_btl_grid[base + col] != fill) {
-        found = 1;
-        goto scanned;
-    }
-    col++;
-    if (col < GRID_WIDTH) {
-        goto cols;
-    }
-scanned:
-    if (found == 0) {
-        row--;
-        cell -= GRID_WIDTH;
-        if (row >= 0) {
-            goto scan;
+    do {
+        for (col = 0; col < GRID_WIDTH; col++) {
+            if (g_btl_grid[row * GRID_WIDTH + col] != GRID_EMPTY) {
+                flag = 1;
+                break;
+            }
         }
-    }
+        if (flag) {
+            break;
+        }
+        row--;
+    } while (row >= 0);
 
     fill = GRID_EMPTY;
-    cell = GRID_LAST;
+    i = GRID_LAST;
     p = &g_btl_grid[GRID_LAST];
     do {
         *p = fill;
-        cell--;
+        i--;
         p--;
-    } while (cell >= 0);
+    } while (i >= 0);
 
-    shift = (GRID_ROWS - 1) - row;
     i = 0;
     do {
         if (g_btl_combatants[i].c.key != 0) {
-            o = g_btl_combatants[i].obj;
-            o->step_y = shift * PLACE_ROW_H * PLACE_FIXED / PACK_FRAMES;
-            g_btl_combatants[i].obj->row += shift;
+            g_btl_combatants[i].obj->step_y =
+                (((GRID_ROWS - 1) - row) * PLACE_ROW_H << 16) / PACK_FRAMES;
+            g_btl_combatants[i].obj->row -= row - (GRID_ROWS - 1);
             g_btl_combatants[i].obj->motion = PACK_MOTION;
             g_btl_combatants[i].obj->phase = 0;
             g_btl_combatants[i].obj->steps = PACK_FRAMES;
@@ -124,6 +100,3 @@ scanned:
         i++;
     } while (i < BTL_ENEMIES);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/packgrid", BtlPackEnemyGrid);
-#endif

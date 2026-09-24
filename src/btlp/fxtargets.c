@@ -27,6 +27,13 @@
 /* How much later each record starts than the one before it. */
 #define FX_STEP 2
 
+/* 91.66%. The image stores r, g and b to their home slots as words and reads
+   them back with lhu. The following forms were tried and none of them gives
+   that pair:
+   - a K&R definition with u_short parameters stores halfwords (88.28%);
+   - a K&R definition with an int prototype in scope stores halfwords;
+   - a prototyped u_short definition stores halfwords;
+   - an int definition never reloads. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
 {

@@ -49,7 +49,6 @@ extern const u_char *g_btl_talk_gift_script;
 #define INSERT_ITEM 3
 
 extern int          BtlOfferLevelTest(int test, u_short slot);
-extern unsigned int BtlItemSlot(u_short id);
 extern void         BtlSetInsert(int kind, const u_char *text);
 
 /* 91.43%, written as the plain three loops it is: loop.c makes the entry
@@ -100,15 +99,10 @@ INCLUDE_ASM("btlp/nonmatchings/likedequip", BtlTalkLikedEquip);
 /* The enemy is reached as a slot of g_btl_actors rather than through
    g_btl_enemies: the original builds one base and adds the five party records
    to it, which is the same table said the other way. */
-#ifdef NON_MATCHING
 int BtlTalkGiveItem(void)
 {
     const BtlActor *me;
     const BtlActor *him;
-    const char     *like;
-    const char     *end;
-    const char     *who;
-    int             species;
     int             n;
     int             i;
     u_long          item;
@@ -119,43 +113,30 @@ int BtlTalkGiveItem(void)
         return 0;
     }
     if ((rand() & 1) != 0) {
-        n = 0;
-        species = him->species;
-        like = (const char *)g_btl_liked_equip[0].likes;
-        do {
-            i = 0;
-            end = like;
-            do {
-                if (*end == species) {
+        for (n = 0; n < LIKED_ENTRIES; n++) {
+            for (i = 0; i < LIKED_SPECIES; i++) {
+                if (g_btl_liked_equip[n].likes[i] == him->species) {
                     break;
                 }
-                i++;
-                end++;
-            } while (i < LIKED_SPECIES);
+            }
             if (i != LIKED_SPECIES) {
                 break;
             }
-            n++;
-            like += sizeof(BtlLikedEquip);
-        } while (n < LIKED_ENTRIES);
-        i = 0;
+        }
         if (n != LIKED_ENTRIES) {
-            who = (const char *)g_btl_liked_equip[n].givento;
             item = g_btl_liked_equip[n].item;
-            do {
-                if (me->c.key == *who) {
+            for (i = 0; i < LIKED_SPECIES; i++) {
+                if (me->c.key == g_btl_liked_equip[n].givento[i]) {
                     break;
                 }
-                i++;
-                who++;
-            } while (i < LIKED_SPECIES);
+            }
             if (i == LIKED_SPECIES) {
                 return 0;
             }
             if (g_btl_talk_level < GIFT_LEVEL) {
                 return 0;
             }
-            if (BtlItemSlot(item & 0xFFFF) != 0) {
+            if ((u_short)BtlItemSlot(item & 0xFFFF) != 0) {
                 BtlSetInsert(INSERT_ITEM, g_item_defs[item].name);
                 BtlSeqPlay(g_btl_talk_gift_script);
                 BtlSeqWaitDone();
@@ -166,7 +147,4 @@ int BtlTalkGiveItem(void)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/likedequip", BtlTalkGiveItem);
-#endif
 

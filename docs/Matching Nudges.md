@@ -3184,3 +3184,27 @@ it back to zero and walked the next. Separate `i` and `k` locals get their own
 allocations and swap registers with their neighbours.
 
 - [placecursor.c](/src/btlp/placecursor.c) - `BtlPlacePreset`, 98.52% to exact.
+- [packgrid.c](/src/btlp/packgrid.c) - `BtlPackEnemyGrid`, 96.46% to exact.
+  Three walks shared one counter, and two searches shared one flag even
+  though the flag means "clear" in the first and "found" in the second. The
+  image held each in the same register across the whole routine.
+
+## A product divided by a constant folds; a shift does not
+
+`x * (PLACE_ROW_H * PLACE_FIXED) / 16` is folded by fold() into
+`x * (PLACE_ROW_H * PLACE_FIXED / 16)`: one `sll 14`, and no division at run
+time. If the image computes the product and then divides (`bgez`,
+`addiu 15`, `sra 4`), write the fixed-point step as a shift:
+`(x * PLACE_ROW_H << 16) / 16`. A negated product, `-(x * C) / 16`, also
+survives, but it leaves a `negu` in the code.
+
+- [packgrid.c](/src/btlp/packgrid.c) - `BtlPackEnemyGrid`: the shift took the
+  routine from 93.88% to 96.46%.
+
+## A grid search written as the matched sibling writes it
+
+BtlPackEnemyGrid had been written with labels and gotos because do/while
+loops that break peeled the first load. The same search in the matched
+BtlAfterTalk is a `for` over the columns inside a do/while over the rows,
+with a flag and two breaks. Copied, it went from 86.18% to 93.88% on the loop
+shapes alone.

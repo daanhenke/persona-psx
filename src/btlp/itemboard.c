@@ -61,6 +61,14 @@ void BtlCloseItemBoard(void)
     BtlBoardShut(g_btl_list_board);
 }
 
+/* 98.38%. The clear and the line loop's slot reads are plain indexing: a
+   hand-walked slot pointer shared by both put it in a saved register where the
+   image has a loop.c pointer. The line loop's other walkers stay - written as
+   indexing that loop scores 71%. What is left is in the first loop: the image
+   loads the entry before the count's second read, and the count test's branch
+   takes its delay slot from the loop test rather than the fall-through. The
+   entry's type, the order of the three reads, and the shape of the tests
+   (one chain, nested, a continue) all score the same. */
 #ifdef NON_MATCHING
 void BtlBuildItemLines(u_short *from)
 {
@@ -68,7 +76,6 @@ void BtlBuildItemLines(u_short *from)
     BtlGfxText  *rows2;
     u_char      *name;
     u_char      *count_at;
-    u_short     *slot;
     u_short      entry;
     signed char *h;
     signed char *h2;
@@ -98,24 +105,18 @@ void BtlBuildItemLines(u_short *from)
         from++;
     }
 
-    if (n < ITEM_LINES) {
-        slot = &g_btl_item_slots[n];
-        do {
-            *slot = 0;
-            n++;
-            slot++;
-        } while (n < ITEM_LINES);
+    for (; n < ITEM_LINES; n++) {
+        g_btl_item_slots[n] = 0;
     }
 
     n    = 0;
     tall = ITEM_LINE_H;
     h2   = &rows2->h;
     h    = &rows->h;
-    slot = g_btl_item_slots;
     do {
-        memcpy(name, g_item_defs[*slot & ITEM_ID].name,
+        memcpy(name, g_item_defs[g_btl_item_slots[n] & ITEM_ID].name,
                sizeof(g_btl_item_names[0]));
-        count = *slot >> ITEM_SHIFT;
+        count = g_btl_item_slots[n] >> ITEM_SHIFT;
         if (count == 0) {
             *count_at = BTL_TEXT_END;
         } else {
@@ -131,7 +132,6 @@ void BtlBuildItemLines(u_short *from)
         } else {
             *h2 = 0;
         }
-        slot++;
         n++;
         name     += sizeof(g_btl_item_names[0]);
         count_at += sizeof(g_btl_item_counts[0]);

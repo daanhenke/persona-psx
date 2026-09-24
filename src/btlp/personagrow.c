@@ -85,9 +85,13 @@ void BtlPersonaGrow(BtlStats *p)
     }
 }
 
-/* 96.09%, registers only: every instruction is where the image has it, but
-   the fighter's pointer is kept in a3 where the image keeps it in a2, and the
-   locals shift along with it. */
+/* 98.50%, registers only. Indexing the highest-stat search off `base`, with
+   i cleared before best, put the fighter in a2 as in the image. What is left:
+   the level read at the top sits in a0 rather than a3, the two clamps swap
+   a0/a1, and the stat loop's key product and level swap v0/v1. A local for
+   the level changes nothing (CSE already keeps it). Folding the column into
+   one index (`rows[key * ROW + half]`) moves the product out of order
+   (88.6%). */
 #ifdef NON_MATCHING
 void BtlDrainLevel(BtlActor *a)
 {
@@ -109,15 +113,12 @@ void BtlDrainLevel(BtlActor *a)
             i = 0;
             best = 0;
             base = a->c.stat_base;
-            stat = base;
-            do {
-                if (*stat >= best) {
-                    best = *stat;
+            for (; i < CHAR_STATS; i++) {
+                if (base[i] >= best) {
+                    best = base[i];
                     which = i;
                 }
-                i++;
-                stat++;
-            } while (i < CHAR_STATS);
+            }
             base[(u_char)which] -= DRAIN_STAT;
             sp = a->c.sp;
             a->c.hp_max -= DRAIN_MAXIMA;

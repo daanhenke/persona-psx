@@ -30,10 +30,11 @@
 #define FORM_PRESETS 8
 #define FORM_LIVE    8
 
-/* One byte per party slot, taken off the actor. Reached through the linker
-   rather than by address: as a constant gcc folds it into the walk over
-   g_party beside it, and the original keeps the two apart. */
-extern u_char g_save_actor_flag[];
+/* One byte per party slot, taken off the actor: g_options + 0x1E, the slot
+   BtlTakeParty reads back. A number rather than a name - the image adds the
+   index first, as maspsx does for a literal base (takeparty's load does the
+   same). */
+#define g_save_actor_flag ((u_char *)0x801F2AE6)
 
 /* Where they live in the save block, beside the HUD style hudload.c reaches
    the same way. The five bytes before the animation setting take one byte per
@@ -43,16 +44,26 @@ extern u_char g_save_actor_flag[];
 #define g_save_confirm    (*(u_char *)0x801F2AC9)
 #define g_save_msg_speed  (*(u_char *)0x801F2ACA)
 
+/* 99.45%. The party is walked by a pointer of its own: indexed by i, loop.c
+   makes the flag's address a constant offset from the party's and the flag
+   stops being indexed by i itself. What is left is one pair: the image loads
+   g_chars before the party pointer, where here the pointer's init comes first
+   (a source init sits ahead of anything loop.c hoists, so the image's pointer
+   looks like a reduced giv). The flag store also counts as a miss, because a
+   literal leaves no relocation to pair with the image's symbol. */
 #ifdef NON_MATCHING
 void BtlStoreParty(void)
 {
     Char *c;
+    u_char *party;
     int i;
 
-    for (i = 0; i < BTL_PARTY; i++) {
+    i = 0;
+    party = g_party;
+    for (; i < BTL_PARTY; party++, i++) {
         /* The destination is worked out before the flag is stored; the
            other way round gcc schedules the store first. */
-        c = &g_chars[g_party[i]];
+        c = &g_chars[*party];
         g_save_actor_flag[i] = g_btl_actors[i].tactic;
         memcpy(c, &g_btl_actors[i].c, sizeof(Char));
     }

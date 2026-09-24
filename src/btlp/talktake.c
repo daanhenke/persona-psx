@@ -36,6 +36,13 @@
 
 extern int BtlMoodBand(short value);
 
+/* 89.23%. What the image shows and this does not have yet: the plain step 3
+   is held in a local across the BtlMoodBand call (a saved register, stored as
+   the line said and again as the default step), the two band tests are
+   switches whose case trees hold three values (a case 0 beside 1 and 2), and
+   the constant-step arms share one store-and-return tail with the value
+   loaded on the way in. Each alone scores lower than this; together they
+   have not yet been put right at once. */
 #ifdef NON_MATCHING
 int BtlTalkTakeLine(short slot, short verb, short said, short weight,
                     short mood)

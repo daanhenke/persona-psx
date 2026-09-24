@@ -19,6 +19,11 @@
 /* How long every cell waits on top of its own entry in the scatter. */
 #define FX_GRID_LATE 8
 
+/* 89.85%, in the shape BtlFxStartSweep matched in: real do/while loops,
+   the order index as a counter of its own (k, as BtlOpenFxGrid has it), the
+   position's third word set in both arms. Left: loop.c still lifts the row
+   step, 0xFFEC0000 - its outer loop is 51 insns against the budget at life 2,
+   where the image's must have been larger or its budget spent. */
 #ifdef NON_MATCHING
 BtlObj *BtlFxStartSheetLate(void)
 {
@@ -31,53 +36,47 @@ BtlObj *BtlFxStartSheetLate(void)
     int     row;
     int     col;
     int     cell;
+    int     k;
 
-    row     = FX_GRID_H - 1;
-    cell    = FX_GRID_W * FX_GRID_H - 1;
-    after   = 0;
+    row   = FX_GRID_H - 1;
+    cell  = FX_GRID_W * FX_GRID_H - 1;
+    after = 0;
+    BtlTintTargets(g_btl_actor_turn, g_btl_tint_fx_r, g_btl_tint_fx_g,
+                   g_btl_tint_fx_b);
+    g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
     y_party = FX_GRID_Y_PARTY;
     y_enemy = FX_GRID_Y_ENEMY;
 
-    BtlTintTargets(g_btl_actor_turn, g_btl_tint_fx_r, g_btl_tint_fx_g,
-                   g_btl_tint_fx_b);
-
-    g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
-
-    for (; row >= 0; row--)
-    {
+    do {
         col = 0;
+        k   = cell + FX_MARK_FAR;
         x   = FX_GRID_X0;
-        for (; col < FX_GRID_W; col++)
-        {
-            if (g_btl_actor_turn < BTL_PARTY)
-            {
+        do {
+            if (g_btl_actor_turn < BTL_PARTY) {
                 pos[0] = x;
                 pos[1] = y_enemy;
-            }
-            else
-            {
+                pos[2] = 0;
+            } else {
                 pos[0] = x;
                 pos[1] = y_party;
+                pos[2] = 0;
             }
-            pos[2] = 0;
-
             o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
                             pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->attr     = FX_OBJ_ATTR;
             o->attached = after;
             after = o;
-            x    += FX_GRID_DX;
-            o->mark_num = cell + FX_MARK_FAR;
-            o->timer    = (g_btl_fx_grid_order[cell + FX_MARK_FAR] >> 1)
-                        + FX_GRID_LATE;
+            x += FX_GRID_DX;
+            col++;
+            o->attr     = FX_OBJ_ATTR;
+            o->mark_num = k;
+            o->timer    = (g_btl_fx_grid_order[k] >> 1) + FX_GRID_LATE;
+            k--;
             cell--;
-        }
-        /* Both rows step by the same amount, so the compiler shares the one
-           constant between them and then lifts it clear of the loop; the
-           image works it out afresh on every row. */
+        } while (col < FX_GRID_W);
         y_party -= FX_GRID_DY;
         y_enemy -= FX_GRID_DY;
-    }
+        row--;
+    } while (row >= 0);
     return o;
 }
 #else
