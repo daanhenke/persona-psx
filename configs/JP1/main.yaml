@@ -12,6 +12,7 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/main.ld
   symbol_addrs_path: configs/JP1/sym.main.txt
+  reloc_addrs_path: configs/JP1/reloc.main.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.main.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.main.txt
   compiler: GCC
@@ -36,6 +37,11 @@ options:
   rodata_string_guesser_level: 2
   data_string_guesser_level: 2
   gp_value: 0x80055BD0
+  # Main's own bss runs on past the image to 0x800643A0; the range lets a
+  # size on a bss symbol name interior references (g_cd_queue + 0x24) as the
+  # offset the C writes rather than a fresh D_ label, as the overlays have it.
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   - name: header

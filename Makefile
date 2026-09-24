@@ -115,6 +115,10 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 # base + WORK_BIAS, so each overlay has to say how far its own area is above the
 # one the others share.
 #
+# - main's sources keep a tentative definition as a real common (maspsx's
+#   --use-comm-section). That is how the image reaches main's own small data
+#   gp-relative from C, and the common merges into the label splat emits.
+#
 # Keep prose out of the body below - it is expanded into every recipe, so a
 # comment there is handed to the shell and echoed once per file built.
 define FlagsSwitch
@@ -127,6 +131,7 @@ define FlagsSwitch
 	$(eval CC_FLAGS = $(OPT) $(DL_FLAGS) -mips1 -mcpu=3000 -w -funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return -fcommon -fverbose-asm -msoft-float -mgas -fgnu-linker -fdollars-in-identifiers -quiet)
 	$(eval ASPSX_VERSION := 2.34)
 	$(eval MASPSX_FLAGS = --gnu-as-path $(AS) --aspsx-version=$(ASPSX_VERSION) $(COMMON_FLAG) --run-assembler --expand-div $(AS_FLAGS))
+	$(if $(findstring /main/,$(1)),$(eval MASPSX_FLAGS += --use-comm-section))
 	$(if $(findstring /s2d/,$(1)),$(eval OVL_FLAGS := -DWORK_BIAS=0x20000),$(eval OVL_FLAGS := -DWORK_BIAS=0))
 endef
 

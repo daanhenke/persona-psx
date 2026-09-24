@@ -14,6 +14,9 @@
 #include <decomp/include_asm.h>
 #include <libcd.h>
 #include <persona/common/eventflag.h>
+#include <persona/common/char.h>
+#include <persona/common/persona.h>
+#include <persona/btlp/actor.h>
 #include <persona/main/cd.h>
 
 /* Scratch CdlFILE for the ADV scene. Its size slot holds a *sector count*,
@@ -44,14 +47,28 @@ extern u_short g_adv_e1_offsets[];
 extern u_short g_adv_e2_offsets[];
 extern u_short g_adv_e3_offsets[];
 extern const char str_namedt_bin[];
+extern const char str_bf_bin[];
+extern const u_short g_bf_offsets[];
+
+/* Which map each story encounter is fought on, by encounter id. */
+#define ENC_STORY_COUNT 0x23
+extern const u_char g_enc_story_map[ENC_STORY_COUNT];
+
+/* Set once the party's actors have been cleared for the first battle. */
+u_char g_btl_actors_cleared;
+
+/* The encounter's map and the hero's surprise roll, as dng's field.h has them. */
+#define g_enc_map      (*(u_char *)0x801F5354)
+#define g_enc_surprise (*(u_char *)0x801F5355)
 
 extern char *strcpy(char *dst, const char *src);
 
-extern void AdvResolveSceneLoc(short kind, short index, void *unused);
+extern void AdvResolveSceneLoc(short kind, int index, void *unused);
 
 #define ADV_DEST  ((void *)0x80180000)
 #define ADV_SCENE_DEST ((void *)0x801B8000)
 #define NAME_DEST ((void *)0x80140000)
+#define BTL_FIELD_DEST ((u_long *)0x80140000)
 #define S2D_MDL_DEST ((void *)0x80140000)
 #define S2D_MAP_DEST ((void *)0x80190000)
 
@@ -150,81 +167,177 @@ void PreloadAdv(void)
  *
  * The size slot is left holding a *sector count*, not bytes; PreloadAdv is
  * what shifts it left by 11. */
+/* 95.34%. The shape is the image's: case order 0,3,4,5, packs 0-3 in order,
+   the flat files storing the size before CdPosToInt, and the next entry
+   reached through a pointer taken as a value (&tbl[slot + 1]), which is what
+   keeps CSE from folding it into &tbl[slot]. What is left is allocation: the
+   image gives tbl and e the index's register (s1) and &tbl[slot] s3, which
+   pins the andi above the table load; here tbl takes s3 and the andi moves
+   into the jump's delay slot. The flat cases also build off in v0 rather
+   than a0, so base is copied out of v0. */
 #ifdef NON_MATCHING
-void AdvResolveSceneLoc(short kind, short index, void *unused)
+void AdvResolveSceneLoc(short kind, int index, void *unused)
 {
+    CdlFILE *fp;
+    CdlFILE *pk;
     int      base;
+    int      pos;
     int      off;
-    int      pack;
-    int      slot;
+    short    slot;
     u_short *tbl;
+    u_short *e;
 
     switch (kind) {
     case 0:
-        pack = index / 256;
-        switch (pack) {
-        case 1:
-            CdSearchFileLoc(&g_adv_scene_file, str_adv_e1_bin);
-            base = CdPosToInt(&g_adv_scene_file.pos);
-            tbl = g_adv_e1_offsets;
-            break;
+        switch ((short)index / 256) {
         case 0:
-            CdSearchFileLoc(&g_adv_scene_file, str_adv_e0_bin);
-            base = CdPosToInt(&g_adv_scene_file.pos);
+            pk = &g_adv_scene_file;
+            CdSearchFileLoc(pk, str_adv_e0_bin);
+            pos = CdPosToInt(&pk->pos);
+            slot = index & 0xFF;
             tbl = g_adv_e0_offsets;
             break;
+        case 1:
+            pk = &g_adv_scene_file;
+            CdSearchFileLoc(pk, str_adv_e1_bin);
+            pos = CdPosToInt(&pk->pos);
+            slot = index & 0xFF;
+            tbl = g_adv_e1_offsets;
+            break;
         case 2:
-            CdSearchFileLoc(&g_adv_scene_file, str_adv_e2_bin);
-            base = CdPosToInt(&g_adv_scene_file.pos);
+            pk = &g_adv_scene_file;
+            CdSearchFileLoc(pk, str_adv_e2_bin);
+            pos = CdPosToInt(&pk->pos);
+            slot = index & 0xFF;
             tbl = g_adv_e2_offsets;
             break;
         case 3:
-            CdSearchFileLoc(&g_adv_scene_file, str_adv_e3_bin);
-            base = CdPosToInt(&g_adv_scene_file.pos);
+            pk = &g_adv_scene_file;
+            CdSearchFileLoc(pk, str_adv_e3_bin);
+            pos = CdPosToInt(&pk->pos);
+            slot = index & 0xFF;
             tbl = g_adv_e3_offsets;
             break;
         default:
             goto out;
         }
-        slot = index & 0xFF;
-        CdIntToPos(base + tbl[slot], &g_adv_scene_file.pos);
-        g_adv_scene_file.size = tbl[slot + 1] - tbl[slot];
+        CdIntToPos(pos + tbl[slot], &pk->pos);
+        e = &tbl[slot + 1];
+        g_adv_scene_file.size = *e - tbl[slot];
 out:
         g_cd_queue[0].dest = ADV_SCENE_DEST;
         return;
+    case 3:
+        fp = &g_adv_scene_file;
+        CdSearchFileLoc(fp, str_adv_bst_bin);
+        g_adv_scene_file.size = 5;
+        base = CdPosToInt(&fp->pos) + 1;
+        off = (short)index * 5;
+        break;
     case 4:
-        CdSearchFileLoc(&g_adv_scene_file, str_adv_dvl_bin);
+        fp = &g_adv_scene_file;
+        CdSearchFileLoc(fp, str_adv_dvl_bin);
         g_adv_scene_file.size = 9;
-        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
-        off = index * 9;
+        base = CdPosToInt(&fp->pos) + 1;
+        off = (short)index * 9;
         break;
     case 5:
-        CdSearchFileLoc(&g_adv_scene_file, str_adv_per_bin);
+        fp = &g_adv_scene_file;
+        CdSearchFileLoc(fp, str_adv_per_bin);
         g_adv_scene_file.size = 8;
-        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
-        off = index * 8;
-        break;
-    case 3:
-        CdSearchFileLoc(&g_adv_scene_file, str_adv_bst_bin);
-        g_adv_scene_file.size = 5;
-        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
-        off = index * 5;
+        base = CdPosToInt(&fp->pos) + 1;
+        off = (short)index * 8;
         break;
     default:
         return;
     }
-
-    CdIntToPos(base + off, &g_adv_scene_file.pos);
+    CdIntToPos(base + off, &fp->pos);
 }
 #else
 INCLUDE_ASM("main/nonmatchings/preload", AdvResolveSceneLoc);
 #endif
 
-/* Two more this file carries but does not work out: a helper of the resolver
-   and the routine that builds a Persona record from a pack. */
-INCLUDE_ASM("main/nonmatchings/preload", PreloadBtlField);
+/* Before a battle: reads the encounter map's slice of BF.BIN, and clears the
+   five party actors the first time a battle is entered.
+ *
+ * A story encounter (id under 0x23) picks its map from a table; a map id of
+ * 0x80 and up is folded down by 0x44. Either way the surprise roll is reset.
+ * g_bf_offsets holds each map's start sector in BF.BIN, entry i + 1 being
+ * where it ends. */
+void PreloadBtlField(void)
+{
+    CdlFILE file;
+    CdlLOC  loc;
+    u_char  map;
 
-INCLUDE_ASM("main/nonmatchings/preload", PersonaCreate);
+    map = g_enc_map;
+    if ((u_short)g_map_id[0] < ENC_STORY_COUNT) {
+        map = g_enc_story_map[(u_short)g_map_id[0]];
+        g_enc_surprise = 0;
+        g_enc_map = map;
+    }
+    if (map >= 0x80) {
+        map -= 0x44;
+        g_enc_map = map;
+        g_enc_surprise = 0;
+    }
+
+    CdSearchFileLoc(&file, str_bf_bin);
+    CdIntToPos(CdPosToInt(&file.pos) + g_bf_offsets[map], &loc);
+    CdReadFileToAddrAsync((CdlFILE *)&loc, g_bf_offsets[map + 1] - g_bf_offsets[map],
+                          BTL_FIELD_DEST);
+
+    if (!g_btl_actors_cleared) {
+        g_btl_actors_cleared = 1;
+        bzero((u_char *)g_btl_actors, 5 * sizeof(BtlActor));
+    }
+}
+
+/* Gives character `c` Persona `id`: the first free g_personas slot is filled
+   out of the definition and becomes the only entry on the character's list.
+   Returns the record, or the first one if all 31 are taken. */
+
+Persona *PersonaCreate(Char *c, int id)
+{
+    Persona          *p;
+    const PersonaDef *d;
+    int               i;
+
+    p = g_personas;
+    d = &g_persona_defs[id];
+    for (i = 0; i < PERSONA_COUNT; i++, p++) {
+        if (p->key == 0) {
+            p->unk00 = 0;
+            p->unk04 = 0;
+            p->unk08 = 0;
+            p->bond = d->bond;
+            p->unk10 = d->unk04;
+            p->unk12 = d->unk06;
+            p->key = id;
+            memcpy(p->name, d->name, 10);
+            p->sp_cost = d->sp_cost;
+            p->level = d->level;
+            p->kind = d->kind;
+            p->stat[0] = d->stat[0];
+            p->stat[1] = d->stat[1];
+            p->stat[2] = d->stat[2];
+            p->stat[3] = d->stat[3];
+            p->stat[4] = d->stat[4];
+            p->resist = d->resist;
+            p->slots = 8;
+            memcpy(p->spell, d->raw, PERSONA_SPELLS);
+            memcpy((u_long *)p->raw, (u_long *)d->raw, PERSONA_SPELLS);
+            p->unk3B = d->raw[6];
+            p->pad3E = d->unk28;
+            c->entry = 0;
+            c->list[0] = i;
+            c->list[1] = i + 1;
+            c->list[2] = 0xFF;
+            return p;
+        }
+    }
+    return g_personas;
+}
 
 /* State 5 (NAME): one asynchronous read, nothing else. */
 void PreloadName(void)

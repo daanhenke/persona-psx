@@ -17,7 +17,7 @@ categories:
       - end
 
   - id: exe.main
-    name: Boot and Overlay Loader
+    name: Main
     paths:
       - main
 
@@ -50,7 +50,6 @@ categories:
       - s2d
       - casino
       - name
-      - nld
 
   - id: ovl.adv
     name: Adventure
@@ -81,11 +80,6 @@ categories:
     name: Name Entry
     paths:
       - name
-
-  - id: ovl.nld
-    name: Name Entry (US)
-    paths:
-      - nld
 
 expected_paths:
   ALL: expected/
