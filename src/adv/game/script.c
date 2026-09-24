@@ -75,8 +75,8 @@
  *  58   actor script32                  point an actor at a script
  *  59   n ->                            jump if the stock holds n - 1
  *  5A   n ->                            the same after compacting it
- *  60   -                               close the message window
- *  61   -                               CinemaClose
+ *  60   -                               clear the message box, put the cinema frame up
+ *  61   -                               take the cinema frame down
  *  63   n                               start a room effect
  *  64   actor ...                       put an actor in the room
  *  65   actor ...                       put an actor on a tile, with a sprite

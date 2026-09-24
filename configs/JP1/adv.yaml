@@ -330,7 +330,7 @@ segments:
       - [0x49DD4, c, game/viewshake]
       - [0x49F60, c, game/actormove]
       - [0x4AA50, c, game/scrollcam]
-      - [0x4AAFC, asm, adv_55]
+      - [0x4AAFC, c, game/cinema]
       - [0x4B0B8, c, gfx/growslot]
       - [0x4B1C8, c, gfx/shrinkslot]
       - [0x4B29C, c, game/cinemadim]
