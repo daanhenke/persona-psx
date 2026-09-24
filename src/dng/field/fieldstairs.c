@@ -16,18 +16,11 @@
 /* Sets the automap bit of tile (x, y) of room n, counting rooms from `seen`. */
 static inline void MarkSeen(u_char *seen, u_short area, u_short room, u_char x, u_char y)
 {
-    int n, mask, i;
-
-    n = g_map_base[area] + room;
-    mask = 0x80 >> (x & 7);
-    i = n * MAP_BYTES + y * MAP_ROW_BYTES + x / 8;
-    seen[i] |= mask;
+    seen[y * MAP_ROW_BYTES + (g_map_base[area] + room) * MAP_BYTES + (x >> 3)] |= 0x80 >> (x & 7);
 }
 
 /* The automap bit of the party's tile, in the room `seen` starts at. */
-#define MARK_SEEN(seen)                                                        \
-    MarkSeen(seen, g_dng->area, g_dng->room, g_dng->pos[POS_X],               \
-             g_dng->pos[POS_Y])
+#define MARK_SEEN(seen) MarkSeen(seen, g_dng->area, g_dng->room, g_dng->pos[POS_X], g_dng->pos[POS_Y])
 
 /* The rooms above and below this one in the automap. */
 #define SEEN_BELOW (g_map_seen - MAP_BYTES)
@@ -36,9 +29,11 @@ static inline void MarkSeen(u_char *seen, u_short area, u_short room, u_char x, 
 /* Takes a flight of stairs, `dir` 1 going up and -1 going down: two tiles
    along the walk direction with a hop on each, marking both on the automap
    of this floor and, when the stairs lead off it, of the next. */
-/* 94.6%: the third mark's arms set the base before reloading g_dng, so the
-   reload is cross-jumped into the shared tail where the image keeps one in
-   each arm; and the index's x >> 3 is scheduled after x & 7. */
+/* 98.3%: the automap index is summed y first, which puts the multiply for
+   the room where the image has it; the one row left is where sched loads
+   g_dng->room inside the two arms of each conditional mark - after x in the
+   image, before it here. Neither the order of the inline's parameters nor
+   of the reads moves it. */
 #ifdef NON_MATCHING
 void FieldStairs(int dir)
 {

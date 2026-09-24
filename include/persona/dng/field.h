@@ -52,7 +52,9 @@ typedef struct {
     u_char   pad15A9[3];
     long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
     u_char   flag15B0;   /* 0x15B0 cleared coming back from S2D or ADV */
-    u_char   pad15B1[0x15BC - 0x15B1];
+    u_char   pad15B1;
+    u_char   map_seen_only; /* 0x15B2 the minimap hides tiles not yet seen */
+    u_char   pad15B3[0x15BC - 0x15B3];
     u_char   tick_flags; /* 0x15BC */
     u_char   pad15BD;
     u_short  area;       /* 0x15BE the automap's map id */
@@ -309,6 +311,7 @@ void FieldInitGraph(void);
 void FieldSetFloor(void);
 void FieldEnterFrom(void);
 
+void FieldRebuildMap(void);
 void FieldSetCell(int x, int y);
 void FieldResetSound(void);
 
