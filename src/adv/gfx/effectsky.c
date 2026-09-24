@@ -12,7 +12,6 @@
  * own sway and fall rate, and every frame of the six gets the same position.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -33,23 +32,44 @@ typedef struct {
     u_short y;
 } Home;
 
-#define WAVE(group, sway0, fall0)                                                                                                 \
-    for (i = 0; i < 4; i++) {                                                                                                     \
-        g_effect3_frames[0].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[1].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[2].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[3].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[4].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[5].spr[(group) * 4 + i].x = ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2)) % SCREEN_W; \
-        g_effect3_frames[0].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
-        g_effect3_frames[1].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
-        g_effect3_frames[2].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
-        g_effect3_frames[3].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
-        g_effect3_frames[4].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
-        g_effect3_frames[5].spr[(group) * 4 + i].y = ((u_char)(g_effect_tick / (i + (fall0))) + (home[group] + i)->y) & 0xFF;     \
+/* One group of four sparkles: each drifts on a sine of the tick, divided by a
+   sway that widens by two a sparkle, and falls at the tick divided by its own
+   rate, the byte it lands on wrapping round the screen's height. */
+#define WAVE(group, sway0, fall0)                                              \
+    for (i = 0; i < 4; i++) {                                                   \
+        g_effect3_frames[0].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        g_effect3_frames[1].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        g_effect3_frames[2].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        g_effect3_frames[3].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        g_effect3_frames[4].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        g_effect3_frames[5].spr[(group) * 4 + i].x =                            \
+            ((home[group] + i)->x + rsin(g_effect_tick) / ((sway0) + i * 2))    \
+            % SCREEN_W;                                                         \
+        fall = (u_char)(g_effect_tick / (i + (fall0)));                         \
+        g_effect3_frames[0].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
+        g_effect3_frames[1].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
+        g_effect3_frames[2].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
+        g_effect3_frames[3].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
+        g_effect3_frames[4].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
+        g_effect3_frames[5].spr[(group) * 4 + i].y =                            \
+            ((home[group] + i)->y + fall) & 0xFF;                               \
     }
 
-#ifdef NON_MATCHING
 void EffectSkyStep(void)
 {
     GsGLINE *line = g_sky_lines;
@@ -60,7 +80,14 @@ void EffectSkyStep(void)
         { { 0x00, 0x00 }, { 0xE0, 0x30 }, { 0xC0, 0x98 }, { 0x100, 0x80 } },
     };
     int      i;
+    /* Never used, and n is only a copy of an index the other groups write
+       out in full: both are what gets the image's register assignment out
+       of the allocator (found with the permuter), not anything the routine
+       needs. Without either, the entry offset and the sway trade s1 and s2
+       in three of the four groups. */
     int      sway;
+    int      fall;
+    int      n;
     int      shade;
 
     for (i = 0; i < SKY_MID; i++) {
@@ -92,9 +119,27 @@ void EffectSkyStep(void)
 
     WAVE(0, 0x32, 8);
     WAVE(1, 0x14, 12);
-    WAVE(2, 0x1E, 6);
+    for (i = 0; i < 4; i++) {
+        g_effect3_frames[0].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        g_effect3_frames[1].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        g_effect3_frames[2].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        g_effect3_frames[3].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        g_effect3_frames[4].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        g_effect3_frames[5].spr[2 * 4 + i].x =
+            ((home[2] + i)->x + rsin(g_effect_tick) / (0x1E + i * 2)) % SCREEN_W;
+        fall = (u_char)(g_effect_tick / (i + 6));
+        n = 2 * 4 + i;
+        g_effect3_frames[0].spr[n].y = ((home[2] + i)->y + fall) & 0xFF;
+        g_effect3_frames[1].spr[n].y = ((home[2] + i)->y + fall) & 0xFF;
+        g_effect3_frames[2].spr[n].y = ((home[2] + i)->y + fall) & 0xFF;
+        g_effect3_frames[3].spr[n].y = ((home[2] + i)->y + fall) & 0xFF;
+        g_effect3_frames[4].spr[2 * 4 + i].y = ((home[2] + i)->y + fall) & 0xFF;
+        g_effect3_frames[5].spr[n].y = ((home[2] + i)->y + fall) & 0xFF;
+    }
     WAVE(3, 0x28, 4);
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/gfx/effectsky", EffectSkyStep);
-#endif

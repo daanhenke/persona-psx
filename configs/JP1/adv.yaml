@@ -67,6 +67,9 @@ segments:
       - [0x35C, rodata, adv_rodata4]
       - [0x368, .rodata, game/camera]
       - [0x37C, rodata, adv_rodata5]
+      # EffectSkyStep's table of sparkle homes, which the C emits itself.
+      - [0x45C, .rodata, gfx/effectsky]
+      - [0x49C, rodata, adv_rodata5a]
       - [0x6F0, .rodata, common/game/equip]
       - [0x72C, rodata, adv_rodata6]
       # the two stat-bar units emit their own switch tables.
