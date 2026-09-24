@@ -221,6 +221,8 @@ segments:
       - [0x241B4, c, audio/bank]
       - [0x2444C, c, audio/loadbgm]
       - [0x247EC, asm, adv_37]
+      - [0x248D0, c, game/tyncut]
+      - [0x2635C, asm, adv_37_x1]
       - [0x26C08, c, common/gfx/coord]
       - [0x26D08, asm, adv_38]
       # VramClearRect comes out with sw ra scheduled one slot late.

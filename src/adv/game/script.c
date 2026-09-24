@@ -253,7 +253,7 @@ extern void   ViewShakeStop(void);
 extern void   func_80085958(void);
 extern int    func_80098B8C(u_char id);
 extern void   func_80085A60(void);
-extern void   func_80088C70(void);
+extern void   AdvTynCutscene(void);
 extern void   func_80085AE0(void);
 extern void   func_800AFAD0(u_char chr, u_char key, u_char level);
 extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
@@ -341,7 +341,7 @@ loop:
         func_80098B8C(a);
         func_80085A60();
         if (g_cutscene_alt) {
-            func_80088C70();
+            AdvTynCutscene();
             break;
         }
         func_80085AE0();
