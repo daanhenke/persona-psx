@@ -9,4 +9,4 @@
 	url = https://github.com/matt-kempster/m2c.git
 [submodule "tools/maspsx"]
 	path = tools/maspsx
-	url = https://github.com/mkst/maspsx.git
+	url = https://github.com/daanhenke/maspsx.git
