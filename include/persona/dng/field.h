@@ -81,8 +81,10 @@ extern DngState *g_dng;
 #define FLOOR_W 24
 
 typedef struct {
-    u_char  pad0[0xA];
-    u_short flags;
+    u_char  pad0[8];
+    u_char  icon;    /* 0x8 its minimap cell */
+    u_char  pad9;
+    u_short flags;   /* 0xA */
 } TileDef;
 
 #define TILE_KIND     0x1F   /* what the tile is, when TILE_SPECIAL is set */
@@ -193,6 +195,7 @@ extern short g_idle_seq;
 /* The pack's and the index's offset tables, as the entry point finds them:
    one entry for the models, one per floor for the rest. */
 extern u_long *g_pack_model_tab;
+extern u_long *g_pack_cell_tab;
 extern u_long *g_pack_obj_tab;
 extern u_long *g_pack_spot_tab;
 extern u_long *g_pack_event_tab;
@@ -266,7 +269,6 @@ void TimLoad(u_long *tim, int nopal);
 void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_8006E988(int x, int y);
 void func_8006FFF4(void);
 void func_80070BF0(int a, int b);
 int  func_8006C9C8(void);
@@ -306,5 +308,13 @@ int  FieldOpenDoor(void);
 void FieldInitGraph(void);
 void FieldSetFloor(void);
 void FieldEnterFrom(void);
+
+void FieldSetCell(int x, int y);
+void FieldResetSound(void);
+
+/* Every sequence libsnd has open for the field, -1 when free. In the save
+   area and reached by address. */
+#define SEQ_HANDLES     32
+#define g_seq_handles   ((short *)0x801F537C)
 
 #endif

@@ -224,7 +224,7 @@ void FieldBumpWall(void)
    it faces along x, a row when along z. */
 void FieldLoadAhead(void)
 {
-    func_8006E988(g_dng->pos[POS_X], g_dng->pos[POS_Y]);
+    FieldSetCell(g_dng->pos[POS_X], g_dng->pos[POS_Y]);
     if (g_dng->walk_dir & 1) {
         func_80069A7C();
     } else {
