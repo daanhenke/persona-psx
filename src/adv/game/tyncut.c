@@ -137,7 +137,7 @@ void AdvTynCutscene(void)
     GsBOXF box = { 0x40000000, -0x7C, 0x28, 0xF8, 0x38, 0x20, 0x20, 0x20 };
     int    i;
     int    k;
-    short  x;
+    u_short x;
     short  y;
     int    n;
     int    vol;
