@@ -90,13 +90,15 @@ extern void BtlPanelSetImage(int group, u_char image);
 extern void BtlPushRecent(int value);
 extern void BtlTalkAnswer(int slot, u_int act);
 
-/* 90.36%, from 71.48%. The rank test asks for the best rank, so its long arm
+/* 90.50%, from 71.48%. The rank test asks for the best rank, so its long arm
    comes first and the other lands at the end, as the image lays them out.
-   The gauges are tested as a signed short. What is left is how the choice
-   record is reached: the image keeps the record's offset plus the pack's high
-   half in s0 and reads each field with its own low half (the image names
-   them g_btl_choice_text and D_801C0006). The acts word is read through its
-   symbol rather than as a word of the pack. */
+   The gauges are tested as a signed short. The record's fields are plain
+   offsets off its address; the image's %lo names for them (g_btl_choice_text,
+   D_801C0006) are un-named in reloc.btlp.txt. What is left: each arm steps
+   the talk depth and works out its script before the shared BtlSeqPlay, and
+   the lookup's loads stay behind the depth's store. Written that way here,
+   gcc lifts the loads above the byte store. The acts word is read after the
+   choice's offset in the image. */
 #ifdef NON_MATCHING
 void BtlTalkSceneAct(void)
 {

@@ -276,3 +276,17 @@ rom:0x1EE9C reloc:MIPS_NONE symbol:g_btl_arena_rgb
 rom:0x1EEA0 reloc:MIPS_NONE symbol:g_btl_arena_rgb
 rom:0x1EEB4 reloc:MIPS_NONE symbol:g_btl_arena_rgb
 rom:0x1EEB8 reloc:MIPS_NONE symbol:g_btl_arena_rgb
+
+// BtlTalkSceneAct - the chosen act's record is reached from the scratch
+// base by address; these are field offsets off it, not the symbols that
+// happen to sit at those addresses in the scratch area.
+rom:0x59EC reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5A04 reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5A20 reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5A40 reloc:MIPS_NONE symbol:D_801C0006
+rom:0x5A78 reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5AF4 reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5B08 reloc:MIPS_NONE symbol:D_801C0006
+rom:0x5BF0 reloc:MIPS_NONE symbol:g_btl_choice_text
+rom:0x5CC8 reloc:MIPS_NONE symbol:D_801C0006
+rom:0x5D7C reloc:MIPS_NONE symbol:D_801C0006
