@@ -221,8 +221,8 @@ void FieldLoadAhead(void)
 {
     FieldSetCell(g_dng->pos[POS_X], g_dng->pos[POS_Y]);
     if (g_dng->walk_dir & 1) {
-        func_80069A7C();
+        FieldLoadColumn();
     } else {
-        func_80069EB4();
+        FieldLoadRow();
     }
 }

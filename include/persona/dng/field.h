@@ -40,23 +40,42 @@ typedef struct {
    objects. */
 #define FIELD_SPRITES 150
 
+/* A background layer: the GsBG and the map it draws. */
+typedef struct {
+    GsBG  bg;
+    GsMAP map;
+} FieldLayer;
+
+/* The layers: the backdrop behind the view, the message window's frame and
+   text, and the sky that scrolls sideways as the party turns. */
+#define LAYER_BACKDROP 0
+#define LAYER_MSG      3
+#define LAYER_SKY      6
+#define FIELD_LAYERS   7
+
+/* One ordering table per cell of the 11 by 11 view window. */
+#define CELL_OTS 121
+
 typedef struct {
     GsSPRITE      sprites[FIELD_SPRITES]; /* 0x00000 */
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
-    GsOT          world_ot[2];        /* 0x19E58 the 3D field's, one per display buffer */
-    u_char        pad19E80[0x1AE80 - 0x19E80];
-    GsOT          ot[2];              /* 0x1AE80 one per display buffer */
-    u_char        pad1AEA8[0x36364 - 0x1AEA8];
-    GsSPRITE      backdrop;           /* 0x36364 */
-    u_char        pad36388[0x3640A - 0x36388];
-    short         msg_scroll_a;       /* 0x3640A the message box's scroll */
-    u_char        pad3640C[6];
-    short         msg_scroll_b;       /* 0x36412 */
-    u_char        pad36414[0x3649C - 0x36414];
-    GsSPRITE      sky;                /* 0x3649C scrolls sideways as the party turns */
-    u_char        pad364C0[0x364D4 - 0x364C0];
+    /* The ordering tables, each one per display buffer, and their tags. */
+    GsOT          world_ot[2];        /* 0x19E58 the 3D field's */
+    GsOT_TAG      world_tags[2][512]; /* 0x19E80 */
+    GsOT          ot[2];              /* 0x1AE80 */
+    GsOT_TAG      ot_tags[2][4];      /* 0x1AEA8 */
+    GsOT          cell_ot[2][CELL_OTS]; /* 0x1AEC8 */
+    GsOT_TAG      cell_tags[2][CELL_OTS][32]; /* 0x1C1B0 */
+    GsOT          ot_a[2];            /* 0x23AB0 */
+    GsOT_TAG      ot_a_tags[2][2];    /* 0x23AD8 */
+    GsOT          ot_b[2];            /* 0x23AE8 */
+    GsOT_TAG      ot_b_tags[2][2];    /* 0x23B10 */
+    GsOT          ot_c[2];            /* 0x23B20 */
+    GsOT_TAG      ot_c_tags[2][4];    /* 0x23B48 */
+    u_char        pad23B68[0x36368 - 0x23B68];
+    FieldLayer    layers[FIELD_LAYERS]; /* 0x36368 */
     PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
     GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
     u_char        pad6E4E4[0x6E504 - 0x6E4E4];
@@ -66,7 +85,7 @@ typedef struct {
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
-    u_char        pad6E91C[0x6E97C - 0x6E91C];
+    DR_AREA       areas[8];           /* 0x6E91C drawing areas, two per buffer pair */
     u_long        glyph[16][2];       /* 0x6E97C a glyph decoded for upload */
     DngWindow     win;                /* 0x6E9FC the selection window */
     u_char        pad6EA0C[0x6EACC - 0x6EA0C];
@@ -396,13 +415,13 @@ void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
 int  FieldUpdate(int noclip);
-void func_80069A7C(void);
-void func_80069EB4(void);
+int  FieldLoadColumn(void);
+int  FieldLoadRow(void);
 /* Swaps the playing tune pair (handles 15 and 16) between the floor's own
    (sequences 12, 13) and a zone's (15, 16) as the party steps on or off a
    TILE_ZONE_TUNE tile; the new tune starts unless `quiet`. */
 void FieldZoneTunes(int quiet);
-void func_8006D33C(int arg);
+void FieldSetupGfx(int reload);
 
 void FieldBobVerts(int ch, int v, int period);
 void FieldFadePrims(u_char *prim);

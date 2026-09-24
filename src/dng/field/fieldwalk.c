@@ -90,5 +90,5 @@ void FieldSetHeading(int turn)
     g_dng->view.vpz = -g_dng->pos[POS_Y] * STEP_LEN - ((g_scene->sin * 150) >> 12);
     g_dng->view.vrx = g_dng->view.vpx + ((g_scene->cos * 5000) >> 12);
     g_dng->view.vrz = g_dng->view.vpz + ((g_scene->sin * 5000) >> 12);
-    g_scene->sky.cx -= turn << 5;
+    g_scene->layers[LAYER_SKY].bg.scrollx -= turn << 5;
 }

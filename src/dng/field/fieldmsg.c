@@ -71,12 +71,12 @@ void FieldMsgNewLine(void)
     g_msg_col = 0;
     if (++g_msg_line >= MSG_LINES) {
         for (i = 0; i < 4; i++) {
-            g_scene->msg_scroll_a -= 4;
+            g_scene->layers[LAYER_MSG].bg.y -= 4;
             func_80065978();
         }
         FieldMsgClearLine(g_msg_line % MSG_LINES);
-        g_scene->msg_scroll_a += MSG_LINE_H;
-        g_scene->msg_scroll_b += MSG_LINE_H;
+        g_scene->layers[LAYER_MSG].bg.y += MSG_LINE_H;
+        g_scene->layers[LAYER_MSG].bg.scrolly += MSG_LINE_H;
     }
     FieldMsgTint(MSG_CELLS, g_msg_color, 0, g_msg_line, MSG_COLS);
 }

@@ -134,9 +134,9 @@ void ovl_dng_entry(void)
     LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", (void *)0x80180000);
     g_field_lit = 1;
     if (g_state_prev == GAME_STATE_BTL) {
-        func_8006D33C(1);
+        FieldSetupGfx(1);
     } else {
-        func_8006D33C(0);
+        FieldSetupGfx(0);
     }
     FieldOpenSound();
     FieldEnterTile();

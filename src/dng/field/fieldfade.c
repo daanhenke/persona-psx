@@ -29,8 +29,8 @@
             g_scene->sprites[i_].r = g_scene->sprites[i_].g =                  \
                 g_scene->sprites[i_].b = c = (level) / 32;                     \
         }                                                                      \
-        g_scene->backdrop.r = g_scene->backdrop.g = g_scene->backdrop.b = c;   \
-        g_scene->sky.r = g_scene->sky.g = g_scene->sky.b = c;                  \
+        g_scene->layers[LAYER_BACKDROP].bg.r = g_scene->layers[LAYER_BACKDROP].bg.g = g_scene->layers[LAYER_BACKDROP].bg.b = c;   \
+        g_scene->layers[LAYER_SKY].bg.r = g_scene->layers[LAYER_SKY].bg.g = g_scene->layers[LAYER_SKY].bg.b = c;                  \
     }
 
 void FieldFadeOut(void)

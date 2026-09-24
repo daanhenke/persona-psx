@@ -33,7 +33,7 @@ void FieldReload(void)
     TimLoad((u_long *)(PACK_BASE + g_pack_tims[2]), 0);
     TimLoad((u_long *)(PACK_BASE + g_pack_tims[3]), 0);
     DrawSync(0);
-    func_8006D33C(1);
+    FieldSetupGfx(1);
     g_field_hold = 0;
     FieldEnterTile();
     FieldFadeIn();

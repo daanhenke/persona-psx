@@ -164,7 +164,7 @@ int FieldUpdate(int noclip)
                     g_dng->pos[POS_Y] = g_dest_y;
                     g_dng->facing = g_dest_facings[g_dest_room][0];
                     FieldSetFloor();
-                    func_8006D33C(0);
+                    FieldSetupGfx(0);
                     FieldSyncMusic(0);
                     g_field_lit = 0;
                     for (i = 0; i < 3; i++) {
