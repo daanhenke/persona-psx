@@ -281,7 +281,6 @@ void TimLoadAt(u_long *tim, int x, int y);
 void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_80072064(void);
 void func_8007192C(void);
 void func_800713B0(int kind);
 void func_800739F8(int a, int b);
@@ -362,9 +361,10 @@ extern SVECTOR        g_fx_shift;
 void FieldFxBegin(void);
 void FieldFxRun(int kind);
 
-/* The wavy transition's per-column offset and tint. */
-extern int g_wave_dx[];
-extern int g_wave_tint[];
+/* The wavy transition's per-column stretch speed, and the frames each
+   column waits before it starts to stretch. */
+extern int g_wave_speed[];
+extern int g_wave_delay[];
 
 void FieldFadeFxBegin(void);
 void FieldFadeFxRun(void);
@@ -372,6 +372,11 @@ void FieldFadeFxStep(void);
 void FieldFadeFxSetup(void);
 void FieldWaveFxBegin(void);
 void FieldWaveFxRun(void);
+void FieldWaveFxStep(void);
+void FieldIrisFxBegin(void);
+void FieldIrisFxRun(void);
+void FieldIrisFxStep(void);
+void FieldIrisFxSetup(void);
 
 void FieldStartBattle(void);
 void FieldPlayJingle(u_char n, short loops);
