@@ -12,7 +12,10 @@
 
 typedef struct {
     /* 0x000 */ int      member;   /* which party member the screen is on */
-    /* 0x004 */ u_char   pad004[0x9C];
+    /* 0x004 */ u_char   pad004[0xC];
+    /* 0x010 */ MenuList status_page;   /* the member page's three stops    */
+    /* 0x020 */ MenuList status_who;    /* the member the status menu is on */
+    /* 0x030 */ u_char   pad030[0x70];
     /* 0x0A0 */ MenuList status_member; /* the status menu's party member   */
     /* 0x0B0 */ MenuList persona_cmd;   /* 0 equips the Persona, else views */
     /* 0x0C0 */ MenuList persona_slot;  /* which of the member's Personas   */
