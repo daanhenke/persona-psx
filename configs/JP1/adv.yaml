@@ -145,7 +145,7 @@ segments:
       - [0x17CF4, c, ../common/ui/partyhud]
       - [0x17FEC, asm, adv_20]
       - [0x18A34, c, ../common/gfx/mapcells]
-      - [0x18B34, asm, adv_21]
+      - [0x18B34, c, gfx/playclock]
       - [0x18C28, c, gfx/bgbox]
       - [0x18D30, asm, adv_22]
       - [0x18D58, c, ../common/gfx/backdrop]

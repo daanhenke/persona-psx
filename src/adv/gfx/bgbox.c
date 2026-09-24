@@ -46,7 +46,8 @@ extern u_short      g_bg_layer_otz[];
 extern u_long       g_bg_shown;
 extern short        g_panel_cells[];
 extern u_char       g_hud_digits[];
-extern u_int        g_money;
+/* Reached by hardcoded address, like the rest of the save-game area. */
+#define g_money (*(u_int *)0x801F2674)
 extern const u_char str_cell_run[];
 
 extern short FormatDecimal(u_int value, u_char *dst, u_short width);
