@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - ADV's Persona stock slot helpers.
  *
- *   ADV @ 0x800AF800, 0x800AF848, 0x800AF880, 0x800AF914
+ *   ADV @ 0x800AF77C, 0x800AF800, 0x800AF848, 0x800AF880, 0x800AF914
  *
  * The stock itself and its compaction are shared with DNG and S2D and live in
  * src/common/game/personastock.c. These three reach into the same fifteen
@@ -15,6 +15,28 @@
 #define NO_SLOT     0xFF
 
 extern u_char PersonaStockFindFree(void);
+
+/* Closes the stock's gaps, moving each Persona down into the first empty
+   slot before it. PersonaStockReturn repeats it inline. */
+inline void PersonaStockClose(void)
+{
+    u_char *stock;
+    u_char  i;
+    u_char  j;
+
+    stock = g_persona_stock;
+    for (i = 0; i < STOCK_SLOTS; i++) {
+        if (stock[i] == STOCK_FREE) {
+            for (j = i + 1; j < STOCK_SLOTS; j++) {
+                if (stock[j] != STOCK_FREE) {
+                    stock[i] = stock[j];
+                    stock[j] = STOCK_FREE;
+                    break;
+                }
+            }
+        }
+    }
+}
 
 /* The slot holding a Persona, or 0xFF. */
 u_char PersonaStockFind(u_char id)
@@ -44,24 +66,10 @@ void PersonaStockAdd(u_char id)
    lands where it should if the caller has just searched. */
 void PersonaStockReturn(u_char id)
 {
-    u_char *stock;
-    u_char  slot;
-    u_char  i;
-    u_char  j;
+    u_char slot;
 
     g_persona_stock[slot] = id;
-    stock = g_persona_stock;
-    for (i = 0; i < STOCK_SLOTS; i++) {
-        if (stock[i] == STOCK_FREE) {
-            for (j = i + 1; j < STOCK_SLOTS; j++) {
-                if (stock[j] != STOCK_FREE) {
-                    stock[i] = stock[j];
-                    stock[j] = STOCK_FREE;
-                    break;
-                }
-            }
-        }
-    }
+    PersonaStockClose();
 }
 
 /* The first empty slot, or 0xFF. */

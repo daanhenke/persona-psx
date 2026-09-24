@@ -76,7 +76,7 @@
  *  59   n ->                            jump if the stock holds n - 1
  *  5A   n ->                            the same after compacting it
  *  60   -                               close the message window
- *  61   -                               func_800AF1D8
+ *  61   -                               CinemaClose
  *  63   n                               start a room effect
  *  64   actor ...                       put an actor in the room
  *  65   actor ...                       put an actor on a tile, with a sprite
@@ -260,8 +260,8 @@ extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
 extern void   PersonaStockReturn(u_char id);
 extern void   func_800715EC(void);
 extern void   func_80091608(int a);
-extern void   func_800AEE9C(int a);
-extern void   func_800AF1D8(int a);
+extern void   CinemaOpen(int a);
+extern void   CinemaClose(int a);
 extern void   ActorPlace(u_char actor);
 extern void   AdvScreenEffect(u_char n);
 extern void   ActorStartMove(u_char a, u_char b, u_char c, u_char d, u_char e);
@@ -719,10 +719,10 @@ loop:
         g_bg_layers[4].scrolly = 0;
         msg->cursor = 0;
         QueueImageUpload((u_short *)&clut, g_msg_clut);
-        func_800AEE9C(0);
+        CinemaOpen(0);
         break;
     case 0x61:
-        func_800AF1D8(0);
+        CinemaClose(0);
         break;
     case 0x63:
         g_adv_effect = s[2];

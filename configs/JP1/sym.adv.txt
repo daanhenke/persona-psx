@@ -1361,8 +1361,8 @@ AdvScrollCamera          = 0x800AEDF0; // type:func size:0xAC
 //-----------------------------------------------------------
 //--- PA: 0x04AAFC   VA: 0x800AEE9C   subsegment: asm, adv_55
 //-----------------------------------------------------------
-func_800AEE9C            = 0x800AEE9C; // type:func size:0x33C
-func_800AF1D8            = 0x800AF1D8; // type:func size:0x280
+CinemaOpen               = 0x800AEE9C; // type:func size:0x33C
+CinemaClose              = 0x800AF1D8; // type:func size:0x280
 
 //---------------------------------------------------------------
 //--- PA: 0x04B0B8   VA: 0x800AF458   subsegment: c, gfx/growslot
@@ -1377,8 +1377,8 @@ AdvShrinkSlot            = 0x800AF568; // type:func size:0xD4
 //-----------------------------------------------------------
 //--- PA: 0x04B29C   VA: 0x800AF63C   subsegment: asm, adv_56
 //-----------------------------------------------------------
-func_800AF63C            = 0x800AF63C; // type:func size:0x140
-D_800AF77C               = 0x800AF77C; // type:func size:0x84
+CinemaDim                = 0x800AF63C; // type:func size:0x140
+PersonaStockClose        = 0x800AF77C; // type:func size:0x84
 
 //------------------------------------------------------------------
 //--- PA: 0x04B460   VA: 0x800AF800   subsegment: c, game/stockslots
