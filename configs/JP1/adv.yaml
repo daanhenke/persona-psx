@@ -77,6 +77,9 @@ segments:
       - [0x794, rodata, adv_rodata6a]
       - [0x7B0, .rodata, common/gfx/statbarsdata]
       - [0x7C4, rodata, adv_rodata6b]
+      # EquipDrawCompare's three arrows, which the C emits itself.
+      - [0x7E4, .rodata, ui/equipcompare]
+      - [0x7EC, rodata, adv_rodata6c]
       - [0x9A8, .rodata, common/game/spellusable]
       - [0xBD0, rodata, adv_rodata7]
       - [0x134C, .rodata, game/stats]
@@ -258,6 +261,8 @@ segments:
       - [0x2AE08, asm, adv_45_x1]
       - [0x2BC54, c, common/game/charstats]
       - [0x2C2A4, asm, adv_46]
+      - [0x2C974, c, ui/equipcompare]
+      - [0x2D268, asm, adv_46a]
       - [0x2F044, c, common/ui/equipcursor]
       - [0x2F194, asm, adv_47]
       - [0x2F268, c, common/ui/itemrow]
