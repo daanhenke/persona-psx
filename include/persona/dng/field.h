@@ -30,11 +30,14 @@ typedef struct {
     GsSPRITE      backdrop;           /* 0x36364 */
     u_char        pad36388[0x3649C - 0x36388];
     GsSPRITE      sky;                /* 0x3649C scrolls sideways as the party turns */
-    u_char        pad364C0[0x6E910 - 0x364C0];
+    u_char        pad364C0[0x6E4D4 - 0x364C0];
+    GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
+    u_char        pad6E4E4[0x6E910 - 0x6E4E4];
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
-    u_char        pad6E91C[0x6EA04 - 0x6E91C];
+    u_char        pad6E91C[0x6E97C - 0x6E91C];
+    u_long        scratch[34];        /* 0x6E97C an image decoded for upload */
     u_char        flag6EA04;          /* 0x6EA04 cleared for a new floor */
 } DngScene;
 
@@ -319,5 +322,17 @@ void FieldResetSound(void);
    area and reached by address. */
 #define SEQ_HANDLES     32
 #define g_seq_handles   ((short *)0x801F537C)
+#define g_vab_handles   ((short *)0x801F535C)
+
+/* The fog libgs is given, the scale its depth is built from, and the
+   distance it starts at. */
+extern GsFOGPARAM g_fog;
+extern double     g_fog_scale;
+extern int        g_fog_near;
+
+void FieldFadeSeqs(void);
+void FieldCloseSound(void);
+void FieldSetView(int keep_height);
+void FieldInitLight(void);
 
 #endif
