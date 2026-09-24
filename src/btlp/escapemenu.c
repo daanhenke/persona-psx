@@ -98,7 +98,13 @@ extern u_char D_800CFCD0[];
 /* Enemies the walk looks at. */
 #define ESCAPE_ENEMIES 9
 
-/* 70.15%. Reading a record's ailment as a signed byte of the record rather
+/* 70.21%. Step 0 is written as the image lays it out: the tests that rule
+   the roll out jump to a "cannot leave" tail, the ones that grant it to a
+   "can leave" tail, and both set the step to two. The two locals below are
+   set once to constants, so reload rebuilds them at each use; the image's
+   loop keeps them in s7 and fp, which loop.c's lift would give, but written
+   inline its budget is spent on the table constants first.
+   Reading a record's ailment as a signed byte of the record rather
    than through a pointer to it stops gcc lifting the table's own address out
    of the two walks, which is what the image does and what took this from
    67.17%. What is left is the shape of the arms themselves: the image shares
@@ -133,55 +139,61 @@ int BtlEscapeMenu(void)
             got = 0;
             BtlOpenMessage(0, 0, &D_800CFA2C, ESCAPE_MSG_WIDTH,
                            ESCAPE_MSG_STYLE);
-            if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE || g_btl_debug_flags[0] != 0) {
-                got = 1;
-            } else if (g_btl_no_escape != 0
-                       || g_btl_enemy_level - g_btl_party_level >= 10
-                       || g_btl_party_no_flee != 0) {
-                got = 0;
-            } else {
+            if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE
+                || g_btl_debug_flags[0] != 0) {
+                goto can_leave;
+            }
+            if (g_btl_no_escape != 0
+                || g_btl_enemy_level - g_btl_party_level >= 10
+                || g_btl_party_no_flee != 0) {
+                goto cannot_leave;
+            }
+            i = 0;
+            do {
+                if (g_btl_actors[i].c.key != 0
+                    && (signed char)g_btl_actors[i].c.status
+                           != BTL_STATUS_DOWN
+                    && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0
+                    && BtlStatusStops(&g_btl_actors[i]) != 0) {
+                    break;
+                }
+                i++;
+            } while (i < BTL_PARTY);
+            if (i >= BTL_PARTY) {
+                goto cannot_leave;
+            }
+            i = 0;
+            do {
+                if (g_btl_combatants[i].c.key != 0
+                    && BtlStatusStops(&g_btl_combatants[i]) != 0) {
+                    break;
+                }
+                i++;
+            } while (i < ESCAPE_ENEMIES);
+            if (i < ESCAPE_ENEMIES) {
+                chance = 0;
+                edge = (g_btl_party_agility + g_btl_party_luck) / 2
+                       - (g_btl_enemy_agility + g_btl_enemy_luck) / 2;
                 i = 0;
                 do {
-                    if (g_btl_actors[i].c.key != 0
-                        && (signed char)g_btl_actors[i].c.status
-                               != BTL_STATUS_DOWN
-                        && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0
-                        && BtlStatusStops(&g_btl_actors[i]) != 0) {
+                    if (edge >= D_800CFCAC[i]) {
+                        chance = D_800CFCB4[i];
                         break;
                     }
                     i++;
-                } while (i < BTL_PARTY);
-                if (i < BTL_PARTY) {
-                    i = 0;
-                    do {
-                        if (g_btl_combatants[i].c.key != 0
-                            && BtlStatusStops(&g_btl_combatants[i]) != 0) {
-                            break;
-                        }
-                        i++;
-                    } while (i < ESCAPE_ENEMIES);
-                    if (i < ESCAPE_ENEMIES) {
-                        chance = 0;
-                        edge = (g_btl_party_agility + g_btl_party_luck) / 2
-                               - (g_btl_enemy_agility + g_btl_enemy_luck) / 2;
-                        i = 0;
-                        do {
-                            if (edge >= D_800CFCAC[i]) {
-                                chance = D_800CFCB4[i];
-                                break;
-                            }
-                            i++;
-                        } while (i < ESCAPE_EDGES);
-                        g_btl_delay = wait;
-                        presses = 0;
-                        g_btl_step++;
-                        break;
-                    }
-                    got = 1;
-                } else {
-                    got = 0;
-                }
+                } while (i < ESCAPE_EDGES);
+                g_btl_delay = wait;
+                presses = 0;
+                g_btl_step++;
+                break;
             }
+        can_leave:
+            got = 1;
+            g_btl_delay = wait;
+            g_btl_step = 2;
+            break;
+        cannot_leave:
+            got = 0;
             g_btl_delay = wait;
             g_btl_step = 2;
             break;
