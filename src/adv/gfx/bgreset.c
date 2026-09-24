@@ -401,7 +401,7 @@ next:
         goto insert;
     case 12:
         st->script = s;
-        s = g_persona_defs[*s].unk08;
+        s = g_persona_defs[*s].name;
         st->left = 10;
         st->flags |= MSG_SUB | MSG_COUNTED;
         goto insert;

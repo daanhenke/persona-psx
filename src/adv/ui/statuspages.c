@@ -99,7 +99,7 @@ void StatusDrawPersona(short persona)
 
     p = &g_personas[persona];
     TileMapFillRect(AT(0, 17), 0, 10, 1, MAP_W);
-    TileMapWriteRow(p->unk19, AT(0, 17), 0, 10);
+    TileMapWriteRow(p->name, AT(0, 17), 0, 10);
 
     TileMapFillRect(AT(1, 19), 0, 2, 1, MAP_W);
     NUMBER(g_personas[persona].level, 2, 1, 20);

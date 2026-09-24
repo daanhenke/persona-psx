@@ -12,9 +12,14 @@
 
 typedef struct {
     /* 0x000 */ int      member;   /* which party member the screen is on */
-    /* 0x004 */ u_char   pad004[0xCC];
+    /* 0x004 */ u_char   pad004[0x9C];
+    /* 0x0A0 */ MenuList status_member; /* the status menu's party member   */
+    /* 0x0B0 */ MenuList persona_cmd;   /* 0 equips the Persona, else views */
+    /* 0x0C0 */ MenuList persona_slot;  /* which of the member's Personas   */
     /* 0x0D0 */ MenuList page;     /* the persona data view's page         */
-    /* 0x0E0 */ u_char   pad0E0[0x30];
+    /* 0x0E0 */ MenuList stock;         /* the status menu's Persona stock  */
+    /* 0x0F0 */ MenuList stock_release; /* the stock entry to let go of     */
+    /* 0x100 */ u_char   pad100[0x10];
     /* 0x110 */ MenuList arcana_row;  /* the persona screen's arcana grid */
     /* 0x120 */ MenuList arcana_col;
     /* 0x130 */ MenuList unk130;

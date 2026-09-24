@@ -121,6 +121,7 @@ segments:
       - [0x68B0, c, common/ui/itemrowuse]
       - [0x69FC, c, ui/pagescroll]
       - [0x6BA0, asm, adv_8]
+      - [0xB01C, c, ui/statuspersona]
       - [0xDB30, c, common/ui/menustatus]
       - [0xDBC8, asm, adv_9]
       - [0xED80, c, game/formationpick]

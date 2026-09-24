@@ -133,7 +133,7 @@ void StatusDrawMain(u_char slot)
             base = c->entry == i ? LABEL_BASE : 0;
             TileMapFillRect(AT(26, 3) + i * MAP_W, 0, 10, 1, MAP_W);
             if (key != 0) {
-                TileMapWriteRow(g_persona_defs[key].unk08,
+                TileMapWriteRow(g_persona_defs[key].name,
                                 AT(26, 3) + i * MAP_W, base, 10);
             }
         } else {

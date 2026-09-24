@@ -33,7 +33,7 @@ typedef struct {
     /* 0x12 */ u_short unk12;
     /* 0x14 */ u_char  pad14[4];
     /* 0x18 */ u_char  key;       /* identifies the record; 0 while unused */
-    /* 0x19 */ u_char  unk19[10]; /* straight out of the definition's +0x08 */
+    /* 0x19 */ u_char  name[10];  /* straight out of the definition's name */
     /* 0x23 */ u_char  sp_cost;   /* PersonaDef.sp_cost, copied the same way */
     /* 0x24 */ u_char  level;
     /* 0x25 */ u_char  kind;      /* the battle pairs a demon species with a
@@ -129,7 +129,7 @@ typedef struct {
     /* 0x00 */ u_char  pad00[4];
     /* 0x04 */ u_short unk04;     /* the pair a contact is weighed with      */
     /* 0x06 */ u_short unk06;
-    /* 0x08 */ u_char  unk08[10]; /* kept whole, on the battle's record at
+    /* 0x08 */ u_char  name[10];  /* tile bytes; kept whole, on the battle's record at
                                      +0x1F and the save game's at +0x19     */
     /* 0x12 */ u_char  sp_cost;   /* SP a cast through this Persona takes    */
     /* 0x13 */ u_char  level;
