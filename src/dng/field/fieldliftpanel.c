@@ -2,13 +2,14 @@
  *   0x8007270C func_8007270C
  *   0x80072D98 FieldLiftBoxes
  *   0x80073058 FieldLiftBoxesOff
- *   0x80073068 func_80073068
+ *   0x80073068 FieldLiftPanelStep
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <libsnd.h>
 #include <persona/dng/field.h>
 
 /* The arrival effect: 2 while it grows, 1 once it has, 0 off. */
@@ -89,4 +90,77 @@ void FieldLiftBoxesOff(void)
     g_box_state = 0;
 }
 
-INCLUDE_ASM("dng/nonmatchings/field/fieldliftpanel", func_80073068);
+/* The panel's buttons: two columns of floors and a close row below them,
+   the cursor a sprite; the sequences it clicks, confirms and buzzes with. */
+#define PANEL_CLOSE_ROW 3
+#define PANEL_CURSOR    72
+#define SEQ_CLICK   3
+#define SEQ_CONFIRM 4
+#define SEQ_BUZZ    5
+
+#define PANEL_FLOOR(x, y) (g_lift_from[g_scene->lift][(y) * 2 + (x)])
+
+/* A frame of the panel: OK on a floor other than this one leaves for it,
+   OK on the close row or back closes the panel, and up, down and the sides
+   move the cursor past the empty buttons. Returns the button + 1 chosen,
+   -1 when closed, 0 otherwise. */
+int FieldLiftPanelStep(void)
+{
+    int     b;
+    u_char *row;
+
+    if (g_scene->pad_new & BIND(lift_ok)) {
+        b = g_scene->lift_x + g_scene->lift_y * 2;
+        if (g_scene->lift_y == PANEL_CLOSE_ROW) {
+            SsPlayBack(g_seq_handles[SEQ_CONFIRM], 0, 1);
+            return -1;
+        }
+        row = g_lift_from[g_scene->lift];
+        if (row[b] != 0xFF && b != g_scene->lift_btn) {
+            SsPlayBack(g_seq_handles[SEQ_CONFIRM], 0, 1);
+            return b + 1;
+        }
+        SsPlayBack(g_seq_handles[SEQ_BUZZ], 0, 1);
+    }
+    if (g_scene->pad_new & BIND(lift_back)) {
+        SsPlayBack(g_seq_handles[SEQ_BUZZ], 0, 1);
+        return -1;
+    }
+    if ((g_scene->pad_new & PAD_UP) && g_scene->lift_y != 0) {
+        SsPlayBack(g_seq_handles[SEQ_CLICK], 0, 1);
+        g_scene->lift_y--;
+        while (g_scene->lift_y >= 0 &&
+               PANEL_FLOOR(g_scene->lift_x, g_scene->lift_y) == 0xFF) {
+            g_scene->lift_y--;
+        }
+    } else if ((g_scene->pad_new & PAD_DOWN) && g_scene->lift_y != PANEL_CLOSE_ROW) {
+        SsPlayBack(g_seq_handles[SEQ_CLICK], 0, 1);
+        g_scene->lift_y++;
+        while ((g_scene->lift_y < 4) &
+               (PANEL_FLOOR(g_scene->lift_x, g_scene->lift_y) == 0xFF)) {
+            g_scene->lift_y++;
+        }
+    } else if ((g_scene->pad_new & (PAD_LEFT | PAD_RIGHT)) &&
+               g_scene->lift_y != PANEL_CLOSE_ROW) {
+        SsPlayBack(g_seq_handles[SEQ_CLICK], 0, 1);
+        g_scene->lift_x ^= 1;
+        while (PANEL_FLOOR(g_scene->lift_x, g_scene->lift_y) == 0xFF) {
+            g_scene->lift_x ^= 1;
+        }
+    }
+    if (g_scene->lift_y == PANEL_CLOSE_ROW) {
+        g_scene->sprites[PANEL_CURSOR].x = 0x58;
+        g_scene->sprites[PANEL_CURSOR + 1].attribute &= 0x7FFFFFFF;
+        g_scene->sprites[PANEL_CURSOR + 2].attribute &= 0x7FFFFFFF;
+    } else {
+        if (g_scene->lift_one_col) {
+            g_scene->sprites[PANEL_CURSOR].x = 0x68;
+        } else {
+            g_scene->sprites[PANEL_CURSOR].x = g_scene->lift_x * 32 + 0x58;
+        }
+        g_scene->sprites[PANEL_CURSOR + 1].attribute |= 0x80000000;
+        g_scene->sprites[PANEL_CURSOR + 2].attribute |= 0x80000000;
+    }
+    g_scene->sprites[PANEL_CURSOR].y = g_scene->lift_y * 24 - 16;
+    return 0;
+}

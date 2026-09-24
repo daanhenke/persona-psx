@@ -91,8 +91,9 @@ typedef struct {
     GsLINE        boxes[3][4];        /* 0x6EA0C the lift's arrival boxes, a row of four lines each */
     signed char   lift_x, lift_y;     /* 0x6EACC which lift on the floor */
     u_char        lift;               /* 0x6EACE its row of g_lift_stops */
-    u_char        pad6EACF;
+    u_char        lift_btn;           /* 0x6EACF the button the lift stands at */
     u_char        lift_at;            /* 0x6EAD0 the floor its indicator shows */
+    u_char        lift_one_col;       /* 0x6EAD1 the panel has a single column */
 } DngScene;
 
 /* The game state block as the field sees it. Only the fields the overlay
@@ -415,6 +416,30 @@ void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
 int  FieldUpdate(int noclip);
+
+/* The save's pad layout option, and per layout the buttons of the field's
+   actions and of the lift's panel (the turns and the backward step are
+   fixed). */
+#define g_pad_layout (*(u_char *)0x801F2AC7)
+typedef struct {
+    u_long lift_ok;    /* 0x00 */
+    u_long lift_back;  /* 0x04 */
+    u_long unk08;      /* 0x08 */
+    u_long menu;       /* 0x0C */
+    u_long step_left;  /* 0x10 */
+    u_long unk14;      /* 0x14 */
+    u_long step_right; /* 0x18 */
+    u_long persona;    /* 0x1C */
+    u_long pause;      /* 0x20 */
+    u_long hold;       /* 0x24 */
+} FieldBinds;
+extern FieldBinds g_field_binds[];
+#define BIND(f) (g_field_binds[g_pad_layout].f)
+
+#define PAD_UP    0x1000
+#define PAD_RIGHT 0x2000
+#define PAD_DOWN  0x4000
+#define PAD_LEFT  0x8000
 int  FieldLoadColumn(void);
 int  FieldLoadRow(void);
 /* Swaps the playing tune pair (handles 15 and 16) between the floor's own

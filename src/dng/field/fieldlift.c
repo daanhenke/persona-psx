@@ -8,6 +8,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <persona/dng/field.h>
+#include <stdlib.h>
 
 /* The lift's floor indicator: seven sprites from LIFT_SPRITE on, each cut
    to a cell of the pattern for the number shown, and a sign sprite shown
@@ -40,20 +41,18 @@ void FieldSetLiftDigits(int n)
 /* Takes the lift the party stands in to button `button`: a jingle and a
    jolt, the indicator stepping a floor every thirty frames, a jolt the
    other way on arrival, and the floor it stops at loaded. */
-/* 93.7%: the difference and the floors left swap registers, and the image
-   reads g_dng before working out the floor it stops at, where here the
-   read follows. The departure floor is its own array, a half-row into the
-   lift table. */
-#ifdef NON_MATCHING
+/* The two tables are read through row pointers: indexed in place, the
+   table's address is loaded ahead of the row, where the image loads it
+   after. */
 void FieldRideLift(int button)
 {
     int diff, left, dir, i;
+    u_char *stops;
+    u_char *from;
 
-    diff = g_lift_stops[g_scene->lift][button] - g_scene->lift_at;
-    left = diff;
-    if (left < 0) {
-        left = -left;
-    }
+    stops = g_lift_stops[g_scene->lift];
+    diff = stops[button] - g_scene->lift_at;
+    left = abs(diff);
     dir = 1;
     if (diff < 0) {
         dir = -1;
@@ -71,7 +70,8 @@ void FieldRideLift(int button)
     for (i = 0; i < 20; i++) {
         func_80065978();
     }
-    g_dng->floor = g_lift_from[g_scene->lift][g_scene->lift_y * 2 + g_scene->lift_x];
+    from = g_lift_from[g_scene->lift];
+    g_dng->floor = from[g_scene->lift_y * 2 + g_scene->lift_x];
     g_floor_info = (u_char *)(INDEX_BASE + g_index_info_tab[DNG_FLOOR]);
     g_floor_grid = (void *)(INDEX_BASE + g_index_grid_tab[DNG_FLOOR]);
     g_floor_objs = (u_char *)(PACK_BASE + g_pack_obj_tab[DNG_FLOOR]);
@@ -82,6 +82,3 @@ void FieldRideLift(int button)
     FieldSyncMusic(0);
     FieldLoadWallCluts();
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldlift", FieldRideLift);
-#endif

@@ -8,27 +8,6 @@
 #include <persona/main/cd.h>
 #include <persona/dng/field.h>
 
-/* The save's pad layout option, and per layout the buttons of the field's
-   actions (the turns and the backward step are fixed). */
-#define g_pad_layout (*(u_char *)0x801F2AC7)
-typedef struct {
-    u_long menu;       /* 0x00 */
-    u_long step_left;  /* 0x04 */
-    u_long unk08;      /* 0x08 */
-    u_long step_right; /* 0x0C */
-    u_long persona;    /* 0x10 */
-    u_long pause;      /* 0x14 */
-    u_long hold;       /* 0x18 */
-    u_long pad1C[3];
-} FieldBinds;
-extern FieldBinds g_field_binds[];
-
-#define BIND(f) (g_field_binds[g_pad_layout].f)
-
-#define PAD_UP    0x1000
-#define PAD_RIGHT 0x2000
-#define PAD_DOWN  0x4000
-#define PAD_LEFT  0x8000
 
 /* Per destination room, the facing the party arrives with. */
 extern u_char g_dest_facings[][2];
@@ -198,7 +177,7 @@ int FieldUpdate(int noclip)
             g_clock_freeze = 0;
         } else if (pressed & BIND(menu)) {
             OPEN_SCREEN(func_80077D54);
-        } else if (pressed & BIND(unk08)) {
+        } else if (pressed & BIND(unk14)) {
             OPEN_SCREEN(func_80095578);
         } else if (pressed & BIND(persona)) {
             OPEN_SCREEN(PersonaDataOpen);
