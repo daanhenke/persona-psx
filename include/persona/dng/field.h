@@ -276,7 +276,6 @@ void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8006FFF4(void);
-void func_8006FCB8(int id, int w, int h, int page, int u, int a, int b, int c);
 void func_8006FED0(u_short clut);
 void func_80070BF0(int a, int b);
 void func_800739F8(int a, int b);
@@ -317,6 +316,10 @@ int  FieldOpenDoor(void);
 void FieldInitGraph(void);
 void FieldSetFloor(void);
 void FieldEnterFrom(void);
+
+u_long *FieldMapTmd(u_long *tmd);
+/* Defined old-style, so declared without a prototype: callers pass ints. */
+void FieldInitSprite();
 
 void FieldLoadWallCluts(void);
 void FieldInitStrip(void);

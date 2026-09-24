@@ -207,7 +207,7 @@ CoordSetRot              = 0x8006F9D8; // type:func size:0x100
 //-----------------------------------------------------------
 //--- PA: 0x00B738   VA: 0x8006FAD8   subsegment: asm, dng_s1
 //-----------------------------------------------------------
-func_8006FAD8            = 0x8006FAD8; // type:func size:0x30
+FieldMapTmd              = 0x8006FAD8; // type:func size:0x30
 
 //-----------------------------------------------------------------
 //--- PA: 0x00B768   VA: 0x8006FB08   subsegment: c, common/gfx/tim
@@ -227,7 +227,7 @@ UploadImageRows          = 0x8006FC14; // type:func size:0xA4
 //--------------------------------------------------------------
 //--- PA: 0x00B918   VA: 0x8006FCB8   subsegment: asm, dng_s1_x2
 //--------------------------------------------------------------
-func_8006FCB8            = 0x8006FCB8; // type:func size:0xCC
+FieldInitSprite          = 0x8006FCB8; // type:func size:0xCC
 
 //--------------------------------------------------------------------
 //--- PA: 0x00B9E4   VA: 0x8006FD84   subsegment: c, common/gfx/bgpack
