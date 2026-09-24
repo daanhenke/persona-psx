@@ -93,9 +93,9 @@ extern void SlotInitTagged(void *def, int slot, int attr, short x, short y);
 #else
 extern void SlotInitTagged(void *def, u_char slot, int attr, short x, short y);
 #endif
-/* And again: dng's persona data pick hands y over without narrowing it. */
+/* And again: dng's persona data screen hands x and y over unnarrowed. */
 #ifdef SLOT_SETPOS_INT
-extern void SlotSetPos(u_char slot, int attr, short x, int y);
+extern void SlotSetPos(u_char slot, int attr, int x, int y);
 #else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 #endif

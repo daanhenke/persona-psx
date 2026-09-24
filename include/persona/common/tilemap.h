@@ -37,10 +37,21 @@ extern void  TileMapWriteRow(const u_char *src, short *dst, int base,
                              u_short count);
 extern void  TileMapWriteCol(const u_char *src, short *dst, int base,
                              u_short count, u_short stride);
+/* dng's persona data page was built against int declarations of these:
+   FormatDecimal's count goes over unnarrowed. */
+#ifdef TILEMAP_INT_COUNT
+extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
+                                int count);
+#else
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
                                 u_short count);
+#endif
 extern void  TileMapFillRect(short *dst, short value, u_short w, u_short h,
                              u_short stride);
+#ifdef TILEMAP_INT_COUNT
+extern int   FormatDecimal(u_int value, u_char *dst, u_short width);
+#else
 extern short FormatDecimal(u_int value, u_char *dst, u_short width);
+#endif
 
 #endif
