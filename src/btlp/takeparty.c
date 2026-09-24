@@ -22,6 +22,17 @@
 #include <persona/common/char.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/menu.h>
+#include <persona/btlp/formation.h>
+#include <persona/common/formation.h>
+
+#define FORM_PRESETS 8
+#define FORM_LIVE    8
+
+/* The save block's copies, reached by address as storeparty.c writes them. */
+#define g_save_actor_flag ((u_char *)0x801F2AE6)
+#define g_save_fast_anim  (*(u_char *)0x801F2AEB)
+#define g_save_confirm    (*(u_char *)0x801F2AC9)
+#define g_save_msg_speed  (*(u_char *)0x801F2ACA)
 
 #define BTL_PARTY 5
 
@@ -38,31 +49,27 @@
 #define BTL_WEAK_KEY1      6
 #define BTL_WEAK_KEY2      9
 
-/* The formation preset and the seven words that follow it. */
-#define BTL_PRESET_BYTES 0xC0
-#define BTL_PRESET_TAIL  0xC8
-
-/* Where the preset lands: the formation itself sits partway into the block. */
-#define BTL_FORM_BASE ((u_char *)0x8004E0D0)
-
-/* g_options fields the battle takes a copy of. */
-#define OPTION_CONFIRM    1
-#define OPTION_MSG_SPEED  2
-#define OPTION_WINDOW_ANIM 0x23
-
-/* The per-member byte the options block carries, one each. */
-#define OPTION_MEMBER 0x1E
-
 extern const u_char g_btl_test_party_keys[][5];
 extern const u_char g_btl_test_party_keys2[][5];
 extern const u_char g_btl_test_party_personas[][5];
 extern const u_char g_btl_test_party_personas2[][5];
 extern u_char   g_btl_test_party;
-extern u_char   g_options[];
-extern u_char   g_formation_preset[];
 
 extern void PersonaCreate(Char *c, int persona);
 
+/* 88.76%, from 78.87%. What changed:
+   - the formation goes back as BtlStoreParty takes it: the eight presets in
+     one copy and the live row in another;
+   - the save bytes are reached by address, as there;
+   - the test block's slot counter is the same variable as the main loop's
+     (the image keeps both in s0);
+   - the weakening test reads the key into an int, so the compares are signed.
+   Still out:
+   - the save bytes are read after the live row's copy here and before it in
+     the image;
+   - the image walks the party through a copy of the pointer loop.c derives
+     and the actor through one register;
+   - the literal addresses count as misses against the image's D_ names. */
 #ifdef NON_MATCHING
 void BtlTakeParty(void)
 {
@@ -77,7 +84,6 @@ void BtlTakeParty(void)
     if (g_btl_test_party != 0 && g_btl_place_party != 0
         && g_btl_encounter != 5 && g_btl_encounter != 8) {
         Char *c;
-        int   slot;
         int   key;
 
         g_party[0] = 0;
@@ -85,16 +91,16 @@ void BtlTakeParty(void)
         g_party[2] = 2;
         g_party[3] = 3;
         g_party[4] = 4;
-        slot = 1;
+        i = 1;
         do {
             if (g_btl_encounter < BTL_TEST_HIGH) {
-                key = g_btl_test_party_keys[g_btl_encounter][slot];
+                key = g_btl_test_party_keys[g_btl_encounter][i];
             } else {
                 key = g_btl_test_party_keys2[g_btl_encounter
-                                             - BTL_TEST_HIGH][slot];
+                                             - BTL_TEST_HIGH][i];
             }
-            g_chars[slot].key = key;
-            c = &g_chars[slot];
+            g_chars[i].key = key;
+            c = &g_chars[i];
             if (key > 1) {
                 memcpy(c->name, g_btl_test_party_names[key],
                        sizeof(c->name));
@@ -104,14 +110,14 @@ void BtlTakeParty(void)
             }
             if (g_btl_encounter < BTL_TEST_HIGH) {
                 PersonaCreate(c,
-                    g_btl_test_party_personas[g_btl_encounter][slot]);
+                    g_btl_test_party_personas[g_btl_encounter][i]);
             } else {
                 PersonaCreate(c,
                     g_btl_test_party_personas2[g_btl_encounter
-                                               - BTL_TEST_HIGH][slot]);
+                                               - BTL_TEST_HIGH][i]);
             }
-            slot++;
-        } while (slot < BTL_PARTY);
+            i++;
+        } while (i < BTL_PARTY);
     }
 
     i = 0;
@@ -126,38 +132,27 @@ void BtlTakeParty(void)
         }
         party++;
         a->flags = 0;
-        a->tactic = g_options[OPTION_MEMBER + i];
+        a->tactic = g_save_actor_flag[i];
         i++;
         a++;
     } while (i < BTL_PARTY);
 
-    memcpy(BTL_FORM_BASE, g_formation_preset, BTL_PRESET_BYTES);
-    g_btl_confirm = g_options[OPTION_CONFIRM];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[0] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[0];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[1] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[1];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[2] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[2];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[3] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[3];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[4] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[4];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[5] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[5];
-    ((int *)(BTL_FORM_BASE + BTL_PRESET_TAIL))[6] =
-        ((int *)(g_formation_preset + BTL_PRESET_TAIL))[6];
-    g_btl_fast_anim = g_options[OPTION_WINDOW_ANIM];
-    g_btl_msg_speed = g_options[OPTION_MSG_SPEED];
+    memcpy(g_btl_formation_preset, g_formation_preset,
+           GRID_CELLS * FORM_PRESETS);
+    g_btl_confirm = g_save_confirm;
+    memcpy(g_btl_formation, &g_formation_preset[GRID_CELLS * FORM_LIVE],
+           GRID_CELLS);
+    g_btl_fast_anim = g_save_fast_anim;
+    g_btl_msg_speed = g_save_msg_speed;
 
     i = 0;
     if (g_btl_encounter == BTL_WEAK_ENCOUNTER) {
         a = g_btl_actors;
         n = 0;
         do {
-            if (g_btl_actors[i].c.key > BTL_WEAK_KEY0 - 1
-                && (g_btl_actors[i].c.key < BTL_WEAK_KEY1
-                    || g_btl_actors[i].c.key == BTL_WEAK_KEY2)) {
+            n = g_btl_actors[i].c.key;
+            if (n > BTL_WEAK_KEY0 - 1
+                && (n < BTL_WEAK_KEY1 || n == BTL_WEAK_KEY2)) {
                 n = g_btl_actors[i].c.hp_max;
                 if (n < 0) {
                     n += 3;

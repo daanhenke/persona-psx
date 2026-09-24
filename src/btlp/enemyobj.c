@@ -50,38 +50,41 @@
 extern BtlObjDef         g_btl_enemy_def;
 extern u_char           *g_btl_species_gfx[];
 
+/* 97.85%. The species pick is a switch whose every arm stores the scripts
+   itself. The arms' stores are merged after scheduling, so each is
+   scheduled in its own case, which the image shows. The shadow takes its
+   scripts and attribute before the rest. What is left is one load: the
+   image reads the body's scripts before storing its kind, column and row,
+   and stores the scripts after them. Written first, the store and the
+   attribute come up with the load (93.55%). Written last, as here, the load
+   waits behind the three stores. */
 #ifdef NON_MATCHING
 BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx, int depth)
 {
-    const u_long ***table;
     BtlObj *obj;
     BtlObj *shadow;
     long    pos[3];
     int     slot;
 
     g_btl_enemy_def.attr = 0;
-    if (species == BTL_SPECIES_PLAIN) {
-        table = (const u_long ***)g_btl_species_gfx[BTL_SPECIES_PLAIN];
-    } else {
-        if (species < BTL_SPECIES_PAIR0) {
-            if (species == BTL_SPECIES_ODD) {
-                g_btl_enemy_def.scripts = *(const u_long ***)
-                    (g_btl_species_gfx[BTL_SPECIES_ODD] + BTL_ODD_SCRIPTS);
-                goto placed;
-            }
-        } else if (species < BTL_SPECIES_PAIR1
-                   && species > BTL_SPECIES_PAIR0) {
-            g_btl_enemy_def.scripts = *(const u_long ***)
-                (g_btl_species_gfx[species] + BTL_PAIR_SCRIPTS);
-            goto placed;
-        }
-        table = (const u_long ***)
-            (g_btl_models[species].spawn * 4
-             + (int)g_btl_species_gfx[species]);
+    switch (species) {
+    case BTL_SPECIES_PLAIN:
+        g_btl_enemy_def.scripts = *(const u_long ***)g_btl_species_gfx[BTL_SPECIES_PLAIN];
+        break;
+    case BTL_SPECIES_ODD:
+        g_btl_enemy_def.scripts = *(const u_long ***)
+            (g_btl_species_gfx[BTL_SPECIES_ODD] + BTL_ODD_SCRIPTS);
+        break;
+    case BTL_SPECIES_PAIR0 + 1:
+    case BTL_SPECIES_PAIR0 + 2:
+        g_btl_enemy_def.scripts = *(const u_long ***)
+            (g_btl_species_gfx[species] + BTL_PAIR_SCRIPTS);
+        break;
+    default:
+        g_btl_enemy_def.scripts = *(const u_long ***)
+            (g_btl_species_gfx[species] + g_btl_models[species].spawn * 4);
+        break;
     }
-    g_btl_enemy_def.scripts = *table;
-
-placed:
     pos[0] = (col * BTL_GRID_X + BTL_GRID_LEFT) << 16;
     pos[1] = (row * BTL_GRID_Y + BTL_GRID_TOP) << 16;
     slot = depth + BTL_DEPTH_STEP;
@@ -98,6 +101,7 @@ placed:
     pos[2] = 0;
     shadow = BtlObjAlloc(&g_btl_enemy_def, BTL_ENEMY_GROUP, obj, 5, 0, pos,
                          gfx, BTL_SHADOW_SLOT);
+    shadow->scripts = (const u_long **)g_btl_species_gfx[species];
     shadow->scale_y = BTL_SHADOW_SCALE;
     shadow->kind = species;
     shadow->col2 = col;
@@ -105,7 +109,6 @@ placed:
     shadow->rot.vx = BTL_SHADOW_DROP;
     shadow->rot.vy = 0;
     shadow->rot.vz = 0;
-    shadow->scripts = (const u_long **)g_btl_species_gfx[species];
     shadow->attr |= BTL_SHADOW_ATTR;
     obj->shadow = shadow;
 

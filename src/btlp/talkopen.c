@@ -12,7 +12,6 @@
  * cannot run past the buffer.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 
 /* Commands a character offers. */
 #define TALK_LABELS 4
@@ -48,62 +47,45 @@ extern void    BtlQueueVramClear(short x, short y, short w, short h,
                                  int r, int g, int b);
 extern void    BtlTalkIdle(void);
 
-#ifdef NON_MATCHING
 void BtlTalkOpen(int key, int level, const char *name)
 {
     u_char digits[24];
     /* The two glyphs for LV, already escaped. */
     u_char head[4] = { TALK_ESCAPE, 0xB1, TALK_ESCAPE, 0xBB };
-    u_char spare[8];
-    BtlMenuCell *cell;
-    u_char *out;
+    u_char spare[8];     /* eight frame bytes past the glyphs nothing reads */
     const u_char *p;
     int i;
+    const u_char **labels;
 
-    i = 0;
-    cell = g_btl_talk_cells;
-    do {
-        BtlUploadText(cell, g_btl_talk_labels[key * TALK_LABELS + i]);
-        cell++;
-        i++;
-    } while (i < TALK_LABELS);
+    /* The table is taken into a local at the head of each pass: that is what
+       puts its address ahead of key * 4 when loop.c lifts the two out. */
+    for (i = 0; i < TALK_LABELS; i++) {
+        labels = g_btl_talk_labels;
+        BtlUploadText(&g_btl_talk_cells[i], labels[key * TALK_LABELS + i]);
+    }
 
     BtlFormatDecimal(level, digits, 0);
 
-    i = 0;
-    p = head;
-    do {
-        g_btl_talk_level_text[i] = *p;
-        i++;
-        p++;
-    } while (i < 4);
+    for (i = 0; i < 4; i++) {
+        g_btl_talk_level_text[i] = head[i];
+    }
 
     p = digits;
-    if (digits[0] != TALK_END) {
-        out = &g_btl_talk_level_text[i];
-        do {
-            *out++ = TALK_ESCAPE;
-            i += 2;
-            *out++ = *p++ - TALK_DIGIT_BIAS;
-        } while (*p != TALK_END);
+    while (*p != TALK_END) {
+        g_btl_talk_level_text[i++] = TALK_ESCAPE;
+        g_btl_talk_level_text[i++] = *p - TALK_DIGIT_BIAS;
+        p++;
     }
     g_btl_talk_level_text[i] = TALK_END;
     g_btl_talk_level_text[i + 1] = TALK_END2;
 
     i = 0;
-    if (*name != (char)TALK_END) {
-        out = g_btl_talk_name_text;
-        for (;;) {
-            if (i > TALK_NAME_MAX - 1) {
-                break;
-            }
-            *out++ = TALK_ESCAPE;
-            i += 2;
-            *out++ = *name++;
-            if (*name == (char)TALK_END) {
-                break;
-            }
+    while (*name != (char)TALK_END) {
+        if (i >= TALK_NAME_MAX) {
+            break;
         }
+        g_btl_talk_name_text[i++] = TALK_ESCAPE;
+        g_btl_talk_name_text[i++] = *name++;
     }
     g_btl_talk_name_text[i] = TALK_END;
     g_btl_talk_name_text[i + 1] = TALK_END2;
@@ -115,7 +97,4 @@ void BtlTalkOpen(int key, int level, const char *name)
     g_btl_talk_index = 0;
     BtlTalkIdle();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkopen", BtlTalkOpen);
-#endif
 

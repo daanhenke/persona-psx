@@ -102,6 +102,8 @@ segments:
       # `[0x5AC, .rodata, boxtick]` behind a four-byte pad the moment the
       # routine comes out of its guard.
       - [0x5A8, rodata, btlp_rodata4]
+      # BtlTalkOpen's LV glyphs, the local initialiser the C emits itself.
+      - [0x630, .rodata, talkopen]
       - [0x634, .rodata, windowstep]
       - [0x668, pad, btlp_pad_668]  # the assembler pads .rodata to 8
       - [0x66C, .rodata, menuupdate]

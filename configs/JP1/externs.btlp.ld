@@ -189,6 +189,7 @@ g_btl_debug_flags = 0x8004E260;
 g_btl_debug_idle = 0x8004E26A;
 g_btl_debug_no_flee = 0x8004E26B;
 g_btl_debug_party_only = 0x8004E263;
+g_btl_debug_keep_numbers = 0x8004E265;
 g_btl_debug_no_defeat = 0x8004E268;
 /* The options block's control-scheme byte, and the two fields beside the map
    id that the battle takes its encounter and its kind from. */

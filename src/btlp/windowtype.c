@@ -18,8 +18,8 @@
  * sequencer is stepping through itself.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/window.h>
+#include <persona/btlp/sound.h>
 
 /* What stands in for a character. */
 #define TEXT_CODE 0xFF
@@ -57,7 +57,7 @@
 #define WIN_KEY    8
 #define WIN_ANSWER 10
 #define WIN_CHOICE 0xB
-#define WIN_HOLD   0xC
+#define WIN_HOLD_BAR 0xC  /* holding with the indicator bar up; window.h's WIN_HOLD is 9 */
 #define WIN_FULL   0xD
 
 /* How long the pausing codes hold for. */
@@ -78,136 +78,133 @@ extern BtlInsert g_btl_insert[];
 
 extern const u_char *BtlWindowPutChar(BtlWindow *w, const u_char *p);
 extern void          BtlIndicatorBar(void);
-extern void          BtlQueueVoice(u_char line, int alt);
 
-#ifdef NON_MATCHING
+/* Every code breaks out to the one `return p` the plain character falls into.
+   Returning from each arm lets gcc hand back p + 1 without keeping it, where
+   the image moves p and shares the return. The inserts step past their code
+   first and share the tail that installs the text. */
 const u_char *BtlWindowType(BtlWindow *w, const u_char *p, int wait)
 {
     const u_char *ins;
-    u_char        c;
     int           placed;
 
-    for (;;) {
-        if (*p == TEXT_CODE) {
-            /* p stays on the control code; each arm says how far past it the
-               next token starts. */
-            p++;
-            c = *p;
-            switch (c) {
-            case CODE_END:
-            case CODE_END2:
-            case CODE_END3:
-                if (wait != 0) {
-                    w->state = WIN_KEY;
-                    BtlIndicatorBar();
-                    p++;
-                    goto done;
-                }
-                w->state = WIN_DONE;
-                p++;
-                goto done;
-            case CODE_WAIT:
-                p++;
-                w->state = WIN_DELAY;
-                w->timer = WAIT_FRAMES;
-                goto done;
-            case CODE_SPEED:
-                p++;
-                w->state = WIN_DELAY;
-                c = *p++;
-                w->delay = c;
-                w->timer = c;
-                goto done;
-            case CODE_HOLD:
+top:
+    if (*p == TEXT_CODE) {
+        /* p stays on the control code; each arm says how far past it the
+           next token starts. */
+        p++;
+        switch (*p) {
+        case CODE_END:
+        case CODE_END2:
+        case CODE_END3:
+            if (wait != 0) {
+                w->state = WIN_KEY;
                 BtlIndicatorBar();
                 p++;
-                w->state = WIN_HOLD;
-                w->timer = HOLD_FRAMES;
-                goto done;
-            case CODE_PAUSE:
-                p++;
-                w->state = WIN_PAUSE;
-                w->timer = PAUSE_FRAMES;
-                goto done;
-            case CODE_ROW:
-                placed = w->placed / WIN_ROW * WIN_ROW + WIN_ROW;
-                w->placed = placed;
-                p++;
-                if (placed > WIN_LAST) {
-                    BtlIndicatorBar();
-                    w->state = WIN_FULL;
-                    goto done;
-                }
-                continue;
-            case CODE_ATTR:
-                p++;
-                w->attr = *p++;
-                continue;
-            case CODE_INSERT0:
-                ins = g_btl_insert[0].cell;
                 break;
-            case CODE_INSERT3:
-                ins = g_btl_insert[3].cell;
-                break;
-            case CODE_INSERT4:
-                ins = g_btl_insert[4].cell;
-                break;
-            case CODE_INSERT5:
-                ins = g_btl_insert[5].cell;
-                break;
-            case CODE_INSERT1:
-                ins = g_btl_insert[1].cell;
-                break;
-            case CODE_INSERT6:
-                ins = g_btl_insert[6].cell;
-                break;
-            case CODE_INSERT2:
-                ins = g_btl_insert[2].cell;
-                break;
-            case CODE_ANSWER:
-                p++;
-                w->state = WIN_ANSWER;
-                w->answer = *p++;
-                BtlIndicatorBar();
-                goto done;
-            case CODE_CHOICE:
-                w->state = WIN_CHOICE;
-                BtlIndicatorBar();
-                p += 2;
-                goto done;
-            case CODE_VOICE_LO:
-            case CODE_VOICE_LO + 1:
-            case CODE_VOICE_LO + 2:
-            case CODE_VOICE_HI:
-                BtlQueueVoice(VOICE_TOP - c, 0);
-                p++;
-                goto done;
-            default:
-                goto done;
             }
+            w->state = WIN_DONE;
+            p++;
+            break;
+        case CODE_WAIT:
+            p++;
+            w->state = WIN_DELAY;
+            w->timer = WAIT_FRAMES;
+            break;
+        case CODE_SPEED:
+            p++;
+            w->state = WIN_DELAY;
+            w->timer = w->delay = *p++;
+            break;
+        case CODE_HOLD:
+            BtlIndicatorBar();
+            p++;
+            w->state = WIN_HOLD_BAR;
+            w->timer = HOLD_FRAMES;
+            break;
+        case CODE_PAUSE:
+            p++;
+            w->state = WIN_PAUSE;
+            w->timer = PAUSE_FRAMES;
+            break;
+        case CODE_ROW:
+            placed = w->placed / WIN_ROW * WIN_ROW + WIN_ROW;
+            w->placed = placed;
+            p++;
+            if (placed > WIN_LAST) {
+                BtlIndicatorBar();
+                w->state = WIN_FULL;
+                break;
+            }
+            goto top;
+        case CODE_ATTR:
+            p++;
+            w->attr = *p++;
+            goto top;
+        case CODE_INSERT0:
+            p++;
+            ins = g_btl_insert[0].cell;
+            goto insert;
+        case CODE_INSERT3:
+            p++;
+            ins = g_btl_insert[3].cell;
+            goto insert;
+        case CODE_INSERT4:
+            p++;
+            ins = g_btl_insert[4].cell;
+            goto insert;
+        case CODE_INSERT5:
+            p++;
+            ins = g_btl_insert[5].cell;
+            goto insert;
+        case CODE_INSERT1:
+            p++;
+            ins = g_btl_insert[1].cell;
+            goto insert;
+        case CODE_INSERT6:
+            p++;
+            ins = g_btl_insert[6].cell;
+            goto insert;
+        case CODE_INSERT2:
+            p++;
+            ins = g_btl_insert[2].cell;
+        insert:
             w->text = ins;
             w->state = WIN_INSERT;
+            break;
+        case CODE_ANSWER:
             p++;
-        done:
-            return p;
+            w->state = WIN_ANSWER;
+            w->answer = *p++;
+            BtlIndicatorBar();
+            break;
+        case CODE_CHOICE:
+            w->state = WIN_CHOICE;
+            p += 2;
+            BtlIndicatorBar();
+            break;
+        case CODE_VOICE_LO:
+        case CODE_VOICE_LO + 1:
+        case CODE_VOICE_LO + 2:
+        case CODE_VOICE_HI:
+            BtlQueueVoice((u_char)(VOICE_TOP - *p), 0);
+            p++;
+            break;
+        default:
+            break;
         }
-
-        /* A plain character. The original puts this after the codes rather
-           than before them. */
+    } else {
+        /* A plain character. */
         p = BtlWindowPutChar(w, p);
         if (w->placed > WIN_LAST) {
             BtlIndicatorBar();
             w->state = WIN_FULL;
         }
-        if (w->delay == 0) {
-            return p;
+        if (w->delay != 0) {
+            w->state = WIN_DELAY;
+            w->timer = w->delay;
         }
-        w->state = WIN_DELAY;
-        w->timer = w->delay;
-        return p;
     }
+    return p;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/windowtype", BtlWindowType);
-#endif
 

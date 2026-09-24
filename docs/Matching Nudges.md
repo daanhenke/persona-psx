@@ -3262,3 +3262,75 @@ search's row pointer. The permuter found this in 1710 iterations, from a
   deal. Written the same way it went from 88.62% to 98.56%, with the goto
   loops gone. The last row was a sign extension on the return: the definition
   said `short` while talk.h says `int`, and answering an int matched.
+
+## Returning from every switch arm loses the pointer the image keeps
+
+`case X: p++; return p;` compiles to `addiu v0, s0, 1` and a jump to the
+epilogue: the pointer never goes back into its register. If the image does
+`addiu s0, s0, 1` and jumps to a shared `move v0, s0`, the arms broke out to
+one `return p` at the end of the function. Here that is the tail of the
+plain-character path, written as the else of the code test.
+
+- [windowtype.c](/src/btlp/windowtype.c) - `BtlWindowType`, 94.04% to 96.93%.
+  The rest came from ordering: each insert case steps past its code before
+  loading the insert, the choice moves `p` before BtlIndicatorBar, and the
+  voice call reads `*p` before stepping.
+
+## A global index reloaded at every field store is a macro, not a pointer
+
+When every store into a primitive is preceded by `lw g_btl_effect_page` and
+the multiply by the element size, the source named the element as
+`e->prim[g_btl_effect_page]` each time, probably through a macro. A `prim`
+pointer local takes the address once, and the whole routine comes out a
+different length.
+
+- [effectframe.c](/src/btlp/effectframe.c) - `BtlEffectCursorBox`, 46.47% to
+  87.95% on this alone. Setting the corners in one field order (vx, vy, vz)
+  and copying all four as a single 32-byte block took it to 99.35%.
+
+## A 2-bit sign-extended shift is a bit test on a short
+
+`sll v1, v1, 16` then `sra v0, v1, 30` and `andi v0, v0, 1` is
+`((short)r >> 14) & 1`: a bit pulled from a short that was read once into a
+local. When the image then multiplies the bit (`mult`), the source multiplied
+it too; `(r & 0x4000) != 0` gives `andi` and `sltu` and no multiply.
+
+- [effectframe.c](/src/btlp/effectframe.c) - `BtlDrawEffectFrame`, 80.53% to
+  95.44%.
+
+## A clamp that reloads the value and jumps to a shared store is the ternary macro
+
+When a clamp tests for zero, then reloads the byte, compares it to the top,
+and jumps to one store with 99 in the delay slot, the source is
+`CHAR_GROW_CLAMP(v, 99)` from char.h. Five of those in a row are five macro
+uses. Written as if/else with a byte local, the value is read once and the
+branches come out different.
+
+- [applypersona.c](/src/btlp/applypersona.c) - `BtlApplyPersona`, 87.47% to
+  96.52%. The rest was a debug switch the old body had left out, and the
+  rank table walked as a plain `for` over its rows rather than by byte
+  offset.
+
+## A literal address that splat keeps naming
+
+A literal that the image adds index-first (see the maspsx entry) still
+reports as a miss, because splat names the address in the image's asm and
+the literal has no relocation. Mark the address `ignore:True` in the sym file,
+as g_btl_scratch is, and splat leaves it a number too. Check first that no
+unit reaches it as a symbol.
+
+- [storeparty.c](/src/btlp/storeparty.c) - the per-member flag and the three
+  settings, 99.45% to 99.76%.
+
+## A local initialiser's rodata belongs to the unit once the routine matches
+
+A routine with `u_char head[4] = {...}` reads the initialiser from .rodata.
+Until the unit owns that rodata, the image names it D_xxx and the C's
+reference is anonymous, which costs two rows. Split it out in the yaml as
+`[offset, .rodata, unit]`, in the same change that removes the guard: under
+INCLUDE_ASM nothing would emit it.
+
+- [talkopen.c](/src/btlp/talkopen.c) - `BtlTalkOpen`, 99.93% to exact. The
+  rest of that one came from plain loops, a `*p` read and a separate `p++` in
+  the digit copy, and the label table taken into a local at the head of
+  each pass (found by the permuter).

@@ -39,6 +39,12 @@ extern short         g_btl_effect_oy;
 extern void (*g_btl_effect_cursor_fn[])(void);
 
 
+/* 92.49%. The cursor is placed through an int-typed call: this unit was
+   built against a BtlCursorPlace that took ints, so the image passes the two
+   sums without narrowing them (input.h keeps the short one, which is the
+   definition's). What is left is registers: the image keeps the moved
+   selection apart from the temporary it is worked out in, and reads the step
+   into a0 before copying it to s0. */
 #ifdef NON_MATCHING
 void BtlEffectMoveCursor(int slot)
 {
@@ -110,10 +116,11 @@ void BtlEffectMoveCursor(int slot)
             step = g_btl_effect_step[g_btl_effect_cur];
         }
         g_btl_effect_cursor_fn[step->kind & 0xF]();
-        BtlCursorPlace(e->curx + g_btl_effect_ox + step->x * BTL_EFFECT_CELL
-                           + BTL_EFFECT_DX,
-                       e->cury + g_btl_effect_oy + step->y * BTL_EFFECT_CELL
-                           + BTL_EFFECT_DY);
+        ((void (*)(int, int))BtlCursorPlace)(
+            e->curx + g_btl_effect_ox + step->x * BTL_EFFECT_CELL
+                + BTL_EFFECT_DX,
+            e->cury + g_btl_effect_oy + step->y * BTL_EFFECT_CELL
+                + BTL_EFFECT_DY);
     }
 }
 #else

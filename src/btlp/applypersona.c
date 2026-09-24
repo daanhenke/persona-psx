@@ -19,7 +19,6 @@
  * The last two lines are what the negotiation weighs a contact with.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/common/item.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
@@ -33,12 +32,10 @@
 #define BTL_EQUIP 7
 
 /* As far as a stat goes either way. */
-#define STAT_MIN 1
 #define STAT_MAX 99
 
 /* Rows of the rank table. */
 #define BTL_PERSONA_RANKS      23
-#define BTL_PERSONA_RANK_BYTES 0xB8
 
 /* What the block goes back to with no Persona. */
 #define PERSONA_NONE_NUM 1
@@ -55,18 +52,19 @@ typedef struct {
 
 extern BtlPersonaRank g_btl_persona_ranks[];
 
+/* A debug switch beside the others at 0x8004E260: while it is set, the
+   Persona's two numbers are not written back over the fighter's own. */
+extern u_char g_btl_debug_keep_numbers;
+
 extern int BtlActorPersona(int slot);
 
-#ifdef NON_MATCHING
 void BtlApplyPersona(BtlActor *a)
 {
     BtlStats *p;
     int       which;
     int       n;
     int       i;
-    int       off;
-    int       key;
-    u_char    b;
+    int       rank;
     u_short  *e;
     int       item;
 
@@ -84,18 +82,12 @@ void BtlApplyPersona(BtlActor *a)
             a->persona_stat[2] = p->stat[2];
             a->persona_stat[3] = p->stat[3];
             a->persona_stat[4] = p->stat[4];
-            off = 0;
             a->c.resist = p->resist;
-            key = p->key;
-            /* Walked by byte offset against a plain constant: an index would be
-               scaled each time round, and sizeof would make the bound
-               unsigned. */
-            while (off < BTL_PERSONA_RANK_BYTES) {
-                if (key <= *(int *)((u_char *)g_btl_persona_ranks + off)) {
-                    a->persona_rank = *((u_char *)g_btl_persona_ranks + off + 4);
+            for (rank = 0; rank < BTL_PERSONA_RANKS; rank++) {
+                if (p->key <= g_btl_persona_ranks[rank].upto) {
+                    a->persona_rank = g_btl_persona_ranks[rank].rank;
                     break;
                 }
-                off += 8;
             }
         } else {
             a->persona_num[0] = PERSONA_NONE_NUM;
@@ -159,58 +151,16 @@ void BtlApplyPersona(BtlActor *a)
         }
         a->c.stat[4] = n;
 
-        /* Written out rather than looped; the original has it unrolled. */
-        if (a->c.stat[0] == 0) {
-            b = STAT_MIN;
-        } else {
-            b = a->c.stat[0];
-            if (b > STAT_MAX) {
-                b = STAT_MAX;
-            }
-        }
-        a->c.stat[0] = b;
-        if (a->c.stat[1] == 0) {
-            b = STAT_MIN;
-        } else {
-            b = a->c.stat[1];
-            if (b > STAT_MAX) {
-                b = STAT_MAX;
-            }
-        }
-        a->c.stat[1] = b;
-        if (a->c.stat[2] == 0) {
-            b = STAT_MIN;
-        } else {
-            b = a->c.stat[2];
-            if (b > STAT_MAX) {
-                b = STAT_MAX;
-            }
-        }
-        a->c.stat[2] = b;
-        if (a->c.stat[3] == 0) {
-            b = STAT_MIN;
-        } else {
-            b = a->c.stat[3];
-            if (b > STAT_MAX) {
-                b = STAT_MAX;
-            }
-        }
-        a->c.stat[3] = b;
-        if (a->c.stat[4] == 0) {
-            b = STAT_MIN;
-        } else {
-            b = a->c.stat[4];
-            if (b > STAT_MAX) {
-                b = STAT_MAX;
-            }
-        }
-        a->c.stat[4] = b;
+        a->c.stat[0] = CHAR_GROW_CLAMP(a->c.stat[0], STAT_MAX);
+        a->c.stat[1] = CHAR_GROW_CLAMP(a->c.stat[1], STAT_MAX);
+        a->c.stat[2] = CHAR_GROW_CLAMP(a->c.stat[2], STAT_MAX);
+        a->c.stat[3] = CHAR_GROW_CLAMP(a->c.stat[3], STAT_MAX);
+        a->c.stat[4] = CHAR_GROW_CLAMP(a->c.stat[4], STAT_MAX);
 
-        a->c.unk3A = a->persona_num[0];
-        a->c.unk3C = a->persona_num[1];
+        if (g_btl_debug_keep_numbers == 0) {
+            a->c.unk3A = a->persona_num[0];
+            a->c.unk3C = a->persona_num[1];
+        }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/applypersona", BtlApplyPersona);
-#endif
 

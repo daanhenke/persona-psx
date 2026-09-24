@@ -33,6 +33,12 @@ typedef struct {
     short   pad;
 } BtlFrameVec;
 
+/* The four corners copied as one block, the way the transform's vectors are
+   filled. */
+typedef struct {
+    SVECTOR v[4];
+} BtlFrameQuad;
+
 /* A cell is eight pixels square, and the frame is drawn two scanlines above
    where it is asked for. */
 #define FRAME_CELL 8
@@ -62,12 +68,19 @@ typedef struct {
 #define CURSOR_MID    0x20
 #define CURSOR_BRIGHT 0x40
 
-/* 72.82%. The eight pieces, the two runs stretched to the box, the cursor's
-   offset once it is open and the box's own quad are the image's; what is left
-   is where each corner's stores sit among the loads that feed them, and how
-   the copies into the transform's vectors are paired. Copying the four as one
-   array rather than one at a time, and counting the stretch in shorts, both
-   come out further away. */
+/* 97.02%. The levers:
+   - the corners set as vx, vy, vz in every box;
+   - the four copied into the transform's vectors as one 32-byte block;
+   - each piece's run read once into a short, with its corner bits tested as
+     (r >> 14) & 1 and multiplied by the stretch plus one;
+   - the stretch worked out as an int from the signed width, and narrowed to a
+     short where the loop uses it.
+   What is left:
+   - the prologue saves ra, s2 and s0 before memset's arguments, where gcc
+     puts them after;
+   - the width and height swap registers with the copy the image makes of the
+     height for the loop;
+   - the run table's .rodata is D_8006489C in the image and anonymous here. */
 #ifdef NON_MATCHING
 int BtlDrawEffectFrame(BtlEffect *e)
 {
@@ -83,29 +96,26 @@ int BtlDrawEffectFrame(BtlEffect *e)
         BtlFrameVec box[4];
 
         memset(&box[0], 0, sizeof(box[0]));
-        box[0].vz = 0;
         box[0].vx = g_btl_effect_ox;
         box[0].vy = g_btl_effect_oy - FRAME_RISE;
+        box[0].vz = 0;
         vec[0] = *(SVECTOR *)&box[0];
         memset(&box[1], 0, sizeof(box[1]));
-        box[1].vz = 0;
         box[1].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
         box[1].vy = g_btl_effect_oy - FRAME_RISE;
+        box[1].vz = 0;
         vec[1] = *(SVECTOR *)&box[1];
         memset(&box[2], 0, sizeof(box[2]));
         box[2].vx = g_btl_effect_ox;
-        box[2].vz = 0;
         box[2].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
+        box[2].vz = 0;
         vec[2] = *(SVECTOR *)&box[2];
         memset(&box[3], 0, sizeof(box[3]));
         box[3].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[3].vz = 0;
         box[3].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
+        box[3].vz = 0;
         vec[3] = *(SVECTOR *)&box[3];
-        corner[0] = vec[0];
-        corner[1] = vec[1];
-        corner[2] = vec[2];
-        corner[3] = vec[3];
+        *(BtlFrameQuad *)corner = *(BtlFrameQuad *)vec;
     }
     {
         /* Kept in .rodata and copied onto the stack, the way the piece drawer
@@ -115,36 +125,34 @@ int BtlDrawEffectFrame(BtlEffect *e)
         };
         int     x;
         int     y;
+        short   r;
 
         across = (short)e->dx - 2;
         if (across < 0) {
             across = 0;
         }
-        run[4] += across;
-        run[5] += across;
-        down = e->dy - 2;
+        run[4] = across + run[4];
+        run[5] = across + run[5];
+        down = (short)e->dy - 2;
         if (down < 0) {
             down = 0;
         }
         i = 0;
-        run[6] += down;
-        run[7] += down;
+        run[6] = down + run[6];
+        run[7] = down + run[7];
         do {
-            x = (((run[i] & FRAME_AT_RIGHT) != 0) * (across + 1)
-                 + ((run[i] & FRAME_STEP_X) != 0))
-                * FRAME_CELL;
-            y = (((run[i] & FRAME_AT_BOTTOM) != 0) * (down + 1)
-                 + ((run[i] & FRAME_STEP_Y) != 0))
-                * FRAME_CELL;
+            r = run[i];
+            x = (((r >> 14) & 1) * ((short)across + 1) + ((r >> 12) & 1)) * FRAME_CELL;
+            y = (((r >> 13) & 1) * ((short)down + 1) + ((r >> 11) & 1)) * FRAME_CELL;
             if (e->scale_y >= FRAME_FULL) {
                 if (BtlDrawFramePiece(i, g_btl_effect_ox + x + e->curx,
-                                      g_btl_effect_oy + y + e->cury, run[i], 1)
+                                      g_btl_effect_oy + y + e->cury, r, 1)
                     == 0) {
                     return 0;
                 }
             } else {
                 if (BtlDrawFramePiece(i, g_btl_effect_ox + x,
-                                      g_btl_effect_oy + y, run[i], 0)
+                                      g_btl_effect_oy + y, r, 0)
                     == 0) {
                     return 0;
                 }
@@ -180,16 +188,17 @@ int BtlDrawEffectFrame(BtlEffect *e)
 INCLUDE_ASM("btlp/nonmatchings/effectframe", BtlDrawEffectFrame);
 #endif
 
-/* 46.47%. The corners, the shaded quad and its twelve colour bytes are the
-   image's; the same staging question as above is most of what is left, and
-   the image reads the ordering table's page before the corners are copied
-   rather than after. Reading it into a local of its own, and copying the four
-   corners as one array, both come out further away. */
+/* 99.35%. The quad is reached through e->prim[g_btl_effect_page] at every
+   use, as the image re-reads the page each time. The corners are set as vx,
+   vy, vz and copied as one block, as in the frame above. What is left is the
+   prologue: the image saves ra straight after s0, and gcc here schedules the
+   save after memset's first two arguments. */
+#define CURSOR_QUAD (&e->prim[g_btl_effect_page].shaded)
+
 #ifdef NON_MATCHING
 int BtlEffectCursorBox(BtlEffect *e)
 {
     SVECTOR  corner[4];
-    POLY_G4 *prim;
     long     i;
 
     {
@@ -197,51 +206,47 @@ int BtlEffectCursorBox(BtlEffect *e)
         BtlFrameVec box[4];
 
         memset(&box[0], 0, sizeof(box[0]));
-        box[0].vz = 0;
         box[0].vx = g_btl_effect_ox;
         box[0].vy = g_btl_effect_oy - FRAME_RISE;
+        box[0].vz = 0;
         vec[0] = *(SVECTOR *)&box[0];
         memset(&box[1], 0, sizeof(box[1]));
-        box[1].vz = 0;
         box[1].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
         box[1].vy = g_btl_effect_oy - FRAME_RISE;
+        box[1].vz = 0;
         vec[1] = *(SVECTOR *)&box[1];
         memset(&box[2], 0, sizeof(box[2]));
         box[2].vx = g_btl_effect_ox;
-        box[2].vz = 0;
         box[2].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
+        box[2].vz = 0;
         vec[2] = *(SVECTOR *)&box[2];
         memset(&box[3], 0, sizeof(box[3]));
         box[3].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[3].vz = 0;
         box[3].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
+        box[3].vz = 0;
         vec[3] = *(SVECTOR *)&box[3];
-        corner[0] = vec[0];
-        corner[1] = vec[1];
-        corner[2] = vec[2];
-        corner[3] = vec[3];
+        *(BtlFrameQuad *)corner = *(BtlFrameQuad *)vec;
     }
 
-    prim = &e->prim[g_btl_effect_page].shaded;
-    setPolyG4(prim);
-    setSemiTrans(prim, 1);
-    setShadeTex(prim, 0);
+    setPolyG4(CURSOR_QUAD);
+    setSemiTrans(CURSOR_QUAD, 1);
+    setShadeTex(CURSOR_QUAD, 0);
     RotTransPers4(&corner[0], &corner[1], &corner[2], &corner[3],
-                  (long *)&prim->x0, (long *)&prim->x1, (long *)&prim->x2,
-                  (long *)&prim->x3, &i, &i);
-    prim->r0 = 0;
-    prim->g0 = 0;
-    prim->b0 = CURSOR_DIM;
-    prim->r1 = 0;
-    prim->g1 = CURSOR_MID;
-    prim->b1 = CURSOR_BRIGHT;
-    prim->r2 = CURSOR_BRIGHT;
-    prim->g2 = 0;
-    prim->b2 = CURSOR_BRIGHT;
-    prim->r3 = 0;
-    prim->g3 = 0;
-    prim->b3 = CURSOR_DIM;
-    addPrim(g_btl_effect_ot, prim);
+                  (long *)&CURSOR_QUAD->x0, (long *)&CURSOR_QUAD->x1, (long *)&CURSOR_QUAD->x2,
+                  (long *)&CURSOR_QUAD->x3, &i, &i);
+    CURSOR_QUAD->r0 = 0;
+    CURSOR_QUAD->g0 = 0;
+    CURSOR_QUAD->b0 = CURSOR_DIM;
+    CURSOR_QUAD->r1 = 0;
+    CURSOR_QUAD->g1 = CURSOR_MID;
+    CURSOR_QUAD->b1 = CURSOR_BRIGHT;
+    CURSOR_QUAD->r2 = CURSOR_BRIGHT;
+    CURSOR_QUAD->g2 = 0;
+    CURSOR_QUAD->b2 = CURSOR_BRIGHT;
+    CURSOR_QUAD->r3 = 0;
+    CURSOR_QUAD->g3 = 0;
+    CURSOR_QUAD->b3 = CURSOR_DIM;
+    addPrim(g_btl_effect_ot, CURSOR_QUAD);
     return 1;
 }
 #else

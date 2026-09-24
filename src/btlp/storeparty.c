@@ -33,7 +33,8 @@
 /* One byte per party slot, taken off the actor: g_options + 0x1E, the slot
    BtlTakeParty reads back. A number rather than a name - the image adds the
    index first, as maspsx does for a literal base (takeparty's load does the
-   same). */
+   same). sym.btlp.txt marks this and the three settings below ignore:True,
+   so splat leaves them as numbers in the image's asm as well. */
 #define g_save_actor_flag ((u_char *)0x801F2AE6)
 
 /* Where they live in the save block, beside the HUD style hudload.c reaches
@@ -44,13 +45,12 @@
 #define g_save_confirm    (*(u_char *)0x801F2AC9)
 #define g_save_msg_speed  (*(u_char *)0x801F2ACA)
 
-/* 99.45%. The party is walked by a pointer of its own: indexed by i, loop.c
-   makes the flag's address a constant offset from the party's and the flag
-   stops being indexed by i itself. What is left is one pair: the image loads
-   g_chars before the party pointer, where here the pointer's init comes first
-   (a source init sits ahead of anything loop.c hoists, so the image's pointer
-   looks like a reduced giv). The flag store also counts as a miss, because a
-   literal leaves no relocation to pair with the image's symbol. */
+/* 99.76%. The party is walked by a pointer of its own. Indexed by i, loop.c
+   makes the flag's address a constant offset from the party's, and the flag
+   stops being indexed by i itself. One pair is left: the image loads g_chars
+   before the party pointer, and here the pointer's init comes first. A
+   source init sits ahead of anything loop.c hoists, so the image's pointer
+   looks like a reduced giv. */
 #ifdef NON_MATCHING
 void BtlStoreParty(void)
 {
