@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - the lift's panel and its arrival effect.  DNG only.
- *   0x8007270C func_8007270C
+ *   0x8007270C FieldLiftPanelOpen
  *   0x80072D98 FieldLiftBoxes
  *   0x80073058 FieldLiftBoxesOff
  *   0x80073068 FieldLiftPanelStep
@@ -22,7 +22,102 @@ extern short g_box_x;
 extern short g_box_y;
 extern short g_box_row;
 
-INCLUDE_ASM("dng/nonmatchings/field/fieldliftpanel", func_8007270C);
+/* Where each lift stands: the map, floor and tile, and the lift's row of
+   g_lift_stops with LIFT_ONE_COL set for a panel of one column. */
+typedef struct {
+    u_char map, floor, x, y;
+    u_char lift;
+} LiftSpot;
+#define LIFT_ONE_COL 0x80
+extern LiftSpot g_lift_spots[];
+
+/* Per floor number, the u of its button's cell; and the indicator digits'
+   places on the panel. */
+extern int g_lift_btn_u[];
+extern int g_lift_digit_x[];
+extern int g_lift_digit_y[];
+
+/* The indicator's digit sprites, as in fieldlift.c. */
+#define LIFT_SPRITE 82
+#define LIFT_DIGITS 7
+
+#define PANEL_BUTTONS 6
+#define PANEL_BUTTON  0x4C
+
+/* Opens the panel of the lift the party stands in: which lift and which
+   of its buttons is this floor, the panel's frame, the cursor and close
+   button, a button for each floor the lift stops at (none where it does
+   not), and the indicator's digits. */
+void FieldLiftPanelOpen(void)
+{
+    int i;
+    int n;
+    u_char *row;
+
+    for (i = 0; ; i++) {
+        if (g_lift_spots[i].map == g_dng->map && g_lift_spots[i].floor == g_dng->floor &&
+            g_lift_spots[i].x == g_dng->pos[POS_X] && g_lift_spots[i].y == g_dng->pos[POS_Y]) {
+            break;
+        }
+    }
+    g_scene->lift = g_lift_spots[i].lift & ~LIFT_ONE_COL;
+    g_scene->lift_one_col = g_lift_spots[i].lift & LIFT_ONE_COL;
+    for (g_scene->lift_btn = 0; g_dng->floor != g_lift_from[g_scene->lift][g_scene->lift_btn];
+         g_scene->lift_btn++) {
+    }
+
+    FieldInitSprite(0x46, 0x40, 0x40, 0x15, 0, 0, 0, 0x1E1);
+    g_scene->sprites[0x46].x = 0x50;
+    g_scene->sprites[0x46].y = -0x58;
+    FieldInitSprite(0x47, 0x40, 0x68, 0x15, 0x40, 0, 0, 0x1E1);
+    g_scene->sprites[0x47].x = 0x50;
+    g_scene->sprites[0x47].y = -0x18;
+    FieldInitSprite(0x48, 0x10, 0x10, 5, 0xA0, 0x68, 0x100, 0x1EB);
+    g_scene->sprites[0x48].attribute = 0x40000000;
+    FieldInitSprite(0x49, 0x10, 0x10, 5, 0xA0, 0x68, 0x100, 0x1EB);
+    g_scene->sprites[0x49].attribute = 0x40000000;
+    g_scene->sprites[0x49].x = 0x68;
+    g_scene->sprites[0x49].y = 0x38;
+    FieldInitSprite(0x4A, 0x10, 0x10, 5, 0xA0, 0x68, 0x100, 0x1EB);
+    g_scene->sprites[0x4A].attribute = 0x40000000;
+    g_scene->sprites[0x4A].x = 0x78;
+    g_scene->sprites[0x4A].y = 0x38;
+    FieldInitSprite(0x4B, 0x30, 0x10, 5, 0x70, 0x68, 0x100, 0x1EB);
+    g_scene->sprites[0x4B].x = 0x58;
+    g_scene->sprites[0x4B].y = 0x38;
+    g_scene->sprites[0x4B].attribute = 0;
+    FieldInitSprite(0x59, 0x10, 0x10, 5, 0x60, 0x68, 0x100, 0x1EB);
+    g_scene->sprites[0x59].x = 0x58;
+    g_scene->sprites[0x59].y = -0x38;
+    g_scene->sprites[0x59].attribute = 0;
+
+    for (i = 0; i < PANEL_BUTTONS; i++) {
+        if (g_lift_stops[g_scene->lift][i] == 0) {
+            g_scene->sprites[PANEL_BUTTON + i].attribute = 0x80000000;
+        } else {
+            FieldInitSprite(PANEL_BUTTON + i, 0x10, 0x10, 5, g_lift_btn_u[g_lift_stops[g_scene->lift][i]],
+                            g_lift_stops[g_scene->lift][i] / 13 * 16 + 0x58, 0x100, 0x1EB);
+            g_scene->sprites[PANEL_BUTTON + i].attribute = 0;
+        }
+        if (g_scene->lift_one_col) {
+            g_scene->sprites[PANEL_BUTTON + i].x = 0x68;
+        } else {
+            g_scene->sprites[PANEL_BUTTON + i].x = (i & 1) * 32 + 0x58;
+        }
+        g_scene->sprites[PANEL_BUTTON + i].y = i / 2 * 24 - 16;
+    }
+    for (i = 0; i < LIFT_DIGITS; i++) {
+        n = LIFT_SPRITE + i;
+        FieldInitSprite(n, 0, 0, 5, 0, 0, 0x100, 0x1EB);
+        g_scene->sprites[n].x = g_lift_digit_x[i] + 0x50;
+        g_scene->sprites[n].y = g_lift_digit_y[i] - 0x58;
+        g_scene->sprites[n].attribute = 0;
+    }
+    g_scene->lift_x = g_scene->lift_btn & 1;
+    g_scene->lift_y = g_scene->lift_btn >> 1;
+    row = g_lift_stops[g_scene->lift];
+    g_scene->lift_at = row[g_scene->lift_btn];
+}
 
 /* Clears the three rows of box lines, then grows the box a row a frame -
    each row the next size up, a line down and to the left - until it has
