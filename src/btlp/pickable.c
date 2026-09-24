@@ -15,7 +15,6 @@
  * pick at all - a member who is only lifted or puppeted does not count, which
  * is the one test the pickable walk does not make.
  */
-#include <decomp/include_asm.h>
 #include <decomp/types.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/round.h>
@@ -56,39 +55,24 @@ void BtlSetPartyPickable(void)
     } while (i < BTL_PARTY);
 }
 
-/* Thirty-three of the thirty-four instructions. The one that is out is a copy:
-   the image loads the ailment into a scratch, compares that, and fills the
-   branch's delay slot with the move into the register it keeps it in, where
-   gcc here loads straight into that register and has nothing for the slot.
-   Six spellings - the local before the test, inside it, as a signed char, the
-   ailment written out at both tests, the flags through a local of their own -
-   all leave the load where it is. */
-#ifdef NON_MATCHING
+/* The same tests as pickother.c's pickers, written the same way: the ailment
+   taken into a `signed char` as it is first compared, lifted and puppet as two
+   tests that gcc folds into one range. The byte-wide local is the eight bytes
+   of frame nothing reads, and the copy into it fills the first branch's slot. */
 int BtlAnyMemberTargetable(void)
 {
-    /* Eight bytes of locals the routine reserves and never writes. */
-    long unused[2];
-    int  status;
+    signed char status;
     int  i;
 
     i = 0;
     do {
-        /* The ailment is taken into the local inside the test it is first
-           compared in. Assigned on a line of its own, gcc loads straight into
-           the local's register and the first branch has nothing to put in its
-           delay slot; this way the compare uses the loaded value and the copy
-           into the local fills it. */
         if (g_btl_actors[i].c.key != 0
-            && (status = (signed char)g_btl_actors[i].c.status)
-                   != BTL_STATUS_DOWN
+            && (status = g_btl_actors[i].c.status) != BTL_STATUS_DOWN
             && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
-            && (u_int)(status - BTL_STATUS_LIFTED) >= 2) {
+            && status != BTL_STATUS_LIFTED && status != BTL_STATUS_NOINPUT) {
             return 1;
         }
         i++;
     } while (i < BTL_PARTY);
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/pickable", BtlAnyMemberTargetable);
-#endif

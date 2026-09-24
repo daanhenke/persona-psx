@@ -33,7 +33,6 @@
  * puppet string as well; the burst passes over the puppet but not the lifted.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
@@ -163,21 +162,14 @@ int BtlMarkEnemiesAround(BtlActor *at, int shape)
     return deepest;
 }
 
-/* 99.38%, one instruction out, and the same one pickable.c's
-   BtlAnyMemberTargetable is out by: the image loads the ailment into a scratch,
-   compares that, and fills the branch's delay slot with the move into the
-   register it keeps it in for the range test; gcc here loads straight into
-   that register and leaves the slot empty. An ailment local assigned inside
-   the test, the same local as the first loop's row, and the byte read twice
-   with no local at all come out the same. */
-#ifdef NON_MATCHING
+/* The ailment is taken into a `signed char` as it is first compared, and
+   lifted and puppet are two tests gcc folds into one range - pickother.c's
+   shape. The byte-wide local is the eight bytes of frame nothing reads. */
 int BtlPickAiTarget(BtlActor *a, int shape)
 {
-    /* Eight bytes of locals the routine reserves and never writes. */
-    long          unused[2];
     u_char       *p;
     BtlObj       *o;
-    int           status;
+    signed char   status;
     int           left;
     int           first;
     int           row;
@@ -220,11 +212,10 @@ int BtlPickAiTarget(BtlActor *a, int shape)
         left = REACH_LANE(g_btl_actors[i].obj);
         first = g_btl_actors[i].obj->row + REACH_PARTY_ROW;
         if (g_btl_actors[i].c.key != 0
-            && (signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
+            && (status = g_btl_actors[i].c.status) != BTL_STATUS_DOWN
             && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0
             && g_btl_reach[left][first] != 0
-            && (u_int)((signed char)g_btl_actors[i].c.status
-                       - BTL_STATUS_LIFTED) >= 2) {
+            && status != BTL_STATUS_LIFTED && status != BTL_STATUS_NOINPUT) {
             g_btl_actors[i].pickable = 1;
             if (deepest < first) {
                 deepest = first;
@@ -234,9 +225,6 @@ int BtlPickAiTarget(BtlActor *a, int shape)
     } while (i < BTL_PARTY);
     return deepest;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/reach", BtlPickAiTarget);
-#endif
 
 int BtlMarkPartyAround(BtlActor *at, int shape)
 {

@@ -3052,16 +3052,24 @@ set right before its use, it is rebuilt every trip.
 - [fxspell10.c](/src/btlp/fxspell10.c) - `BtlFxStart10`, the top row's 3 with
   the enemy height worked out between it and the party height, 98.21% to exact.
 
-## A `char` local can cost eight frame bytes that nothing reads
+## A byte-wide local compared twice costs eight frame bytes nothing reads
 
-Not every unread frame slot is a dead aggregate. A `char` (unsigned here,
-under `-funsigned-char`) that is assigned a signed byte and then used as an
-`int` reserves eight bytes of locals (`# vars= 8` in the `.frame` comment)
-while living entirely in a register. The pickers that step over the down and
-the lifted all have exactly that frame and a copy of the ailment in the
-branch's delay slot, and declaring the ailment `char` reproduces both - but
-also an `andi 0xff` the image does not have, so it is the shape of the answer
-and not yet the answer. `long unused[2]` stands in for it meanwhile.
+Not every unread frame slot is a dead aggregate. A `signed char` local that
+is assigned inside the test it is first compared in, and then compared for
+equality twice more, reserves eight bytes of locals (`# vars= 8` in the
+`.frame` comment) while living entirely in a register - and it is also what
+puts the load in a scratch, the copy into the local in the branch's delay
+slot, and the later tests on the copy. The two equalities are folded by gcc
+into the range test the image shows (`addiu -0x12; sltiu 2`), so an image
+range test is not proof the source wrote one: `status != LIFTED && status !=
+NOINPUT` is the macro-shaped original, and `(u_int)(status - LIFTED) >= 2`
+with an `int` compiles to the same range without the copy or the frame.
 
-- [pickother.c](/src/btlp/pickother.c) - `BtlPickOtherMember`, frame and copy
-  right, one `andi` over.
+So a `long unused[2]` standing in for eight unexplained bytes next to a byte
+field's tests is a symptom: look for the narrow local. Compiling a few shapes
+straight through cc1 and reading the `vars=` count is the quick check.
+
+- [pickother.c](/src/btlp/pickother.c) - `BtlPickOtherMember` and
+  `BtlPickOtherEnemy`, 98.66% to exact (with their table read twice at the end).
+- [pickable.c](/src/btlp/pickable.c) - `BtlAnyMemberTargetable`, 98.06% to exact.
+- [reach.c](/src/btlp/reach.c) - `BtlPickAiTarget`, 99.38% to exact.
