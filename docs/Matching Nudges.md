@@ -3470,3 +3470,65 @@ the image loads a 16.16 field's top half with `lh`, write the shift.
   Together with writing all eight corner values in each arm, and with each
   arm of the ordering-table choice computing its own pointer, it went from
   90.39% to 100%.
+
+## A `do { } while (0)` weights a pseudo's uses
+
+flow counts each use of a pseudo by its loop depth, and a `do { } while (0)`
+emits loop notes, so a use inside one counts once more. global.c hands out
+saved registers by floor_log2(refs) * refs / live-length. When two long-lived
+pseudos come out in each other's registers and no order or merge moves them,
+read their `Register N used X times` lines in the `.lreg` dump, work out how
+many weighted refs the loser is short, and wrap its uses in do-while(0).
+Macro bodies are the natural place for that.
+
+- [opendialogue.c](/src/btlp/opendialogue.c) - `BtlOpenDialogue`. The play
+  and advance macros and the scene's own block raise `line` from 13 to 18
+  refs against the walker's 17. Every read of the speaker then goes through
+  the walker, as it does in the image: 99.94% to exact.
+
+## A register the image gives a set-once local wants more refs, not a hoist
+
+When the image keeps a constant in a saved register the whole loop and the
+build rebuilds it at every use, the local has too few refs to win a
+register. The copies it is missing are often cross-jumped away after
+reload: write each exit's tail out in full (`got = 0; g_btl_delay = wait;
+g_btl_step = 2; break;`) and let the tails fold back together. The folded
+exits show up as `j` stubs that each keep their own first store.
+
+- [escapemenu.c](/src/btlp/escapemenu.c) - `BtlEscapeMenu`. Five full tails
+  in step 0 put `wait` in s7.
+
+## Operand order in a commutative op says whether it was a literal
+
+`flags & x` puts `x` first when `x` is a register at expand time, because
+expand_binop swaps a register into op0 when op0 is memory. The image's
+`and v0, v0, fp` - memory operand first - means `x` was a constant that
+loop.c lifted into fp later. Write the literal.
+
+- [escapemenu.c](/src/btlp/escapemenu.c) - the leaving bit.
+
+## `addu rd, $zero, rs` is an add whose first operand reload made 0
+
+maspsx expands `move` as `addu rd, rs, $zero`. The other order is addsi3
+with operand 1 a pseudo that has a REG_EQUIV of 0 and no register, which
+reload replaced with the constant. The source added a local set once to 0.
+
+- [escapemenu.c](/src/btlp/escapemenu.c) - `n = bonus + chance`.
+
+## A stepped constant in a walk is a reduced giv
+
+When a walk's stepped value is initialised after the walk's pointer setup,
+not before it, it is loop.c's: `DELAY + n * STAGGER; n++` with `n` counted
+from 0. The counter is eliminated and the product is reduced into the stepped
+register, whose init loop.c emits with its other givs.
+
+- [escapemenu.c](/src/btlp/escapemenu.c) - the members' leaving timers.
+
+## `__nedf2` is `__eqdf2` in this ROM
+
+The ROM's libgcc has a single double compare at 0x800171DC. `x != 0.0` calls
+`__nedf2`, so btlp names that address `__nedf2` in its symbols and externs.
+`BtlBattleResults` was one of the rewrites from its lowest score, 67.41%:
+a signed conversion per field, the cast share as its own term, a pointer walk
+then an index walk. All of it came from reading the image rather than
+adjusting the old body.

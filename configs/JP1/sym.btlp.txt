@@ -19,6 +19,7 @@ __fixunsdfsi                  = 0x800168C0;
 __floatsidf                   = 0x800169D0;
 __ledf2                       = 0x80016C8C;
 __muldf3                      = 0x80016DD8;
+__nedf2                       = 0x800171DC; // __eqdf2 in main, the one routine the ROM's libgcc has for both
 SsSetMVol                     = 0x80018754;
 SsSetRVol                     = 0x80018B38;
 SsSepOpen                     = 0x80019188;
@@ -132,8 +133,7 @@ g_level_exp                   = 0x8004C200; // type:s32 size:0x4
 g_level_exp_1                 = 0x8004C204;
 // The same shape again for Char.unk56: what each of its levels costs, summed
 // up to the one the record is on.
-g_rank_exp                    = 0x8004C510; // type:s32 size:0x4
-g_rank_exp_1                  = 0x8004C514;
+g_rank_exp                    = 0x8004C510; // type:s32 size:0x314
 g_resist_labels               = 0x8004C824; // type:u8 size:0x19
 g_btl_formation_preset        = 0x8004E0D0; // size:0xC8
 g_btl_formation               = 0x8004E198; // size:0x1C

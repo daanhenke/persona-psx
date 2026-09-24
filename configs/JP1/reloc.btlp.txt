@@ -294,3 +294,8 @@ rom:0x5D7C reloc:MIPS_NONE symbol:D_801C0006
 // BtlFxResolveHit - the fixed lookup of g_spell_data[0x6E].element.
 rom:0x5ECC8 reloc:MIPS_HI16 symbol:g_spell_data addend:0x8A4
 rom:0x5ECCC reloc:MIPS_LO16 symbol:g_spell_data addend:0x8A4
+
+// BtlBattleResults - the second walk ends at &g_btl_actors[BTL_PARTY].unk78,
+// which splat names after the enemies' table
+rom:0x32D68 reloc:MIPS_HI16 symbol:g_btl_actors addend:0x514
+rom:0x32D6C reloc:MIPS_LO16 symbol:g_btl_actors addend:0x514

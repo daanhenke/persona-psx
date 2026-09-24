@@ -45,12 +45,9 @@ extern u_char g_btl_won_share_cells[];
 /* Raised while any member's experience changed, which the board reads. */
 extern u_char g_btl_exp_gained;
 
-/* 67.41%. The two walks, the weights and both curves are the image's; what is
-   left is where the doubles live - the image spills every one of them to a
-   stack slot of its own and this keeps several in saved registers - and the
-   first walk reaching the records by index rather than through a pointer the
-   loop steps. */
-#ifdef NON_MATCHING
+/* The first walk reaches the records through a pointer and the second by
+   index, which is how the image addresses them. Every conversion but the
+   globals' is signed. */
 void BtlBattleResults(void)
 {
     double    hp;
@@ -63,11 +60,15 @@ void BtlBattleResults(void)
     double    mine;
     double    even;
     double    weighed;
+    double    cast;
+    double    spent;
     BtlActor *a;
     int       i;
     int       n;
     int       owed;
     int       rank;
+    int      *next;
+    int       top;
 
     BtlAverageSides();
     if (g_btl_round == 0) {
@@ -85,11 +86,11 @@ void BtlBattleResults(void)
     casts = (double)(u_int)g_btl_won_casts;
 
     for (i = 0; i < BTL_PARTY; i++) {
-        if (g_btl_actors[i].c.key != 0) {
-            n = (int)((double)(u_char)g_btl_actors[i].unkD0 * hp
-                          / (rounds * members)
-                      + (double)(u_int)g_btl_actors[i].damage_dealt);
-            g_btl_actors[i].won_share = n;
+        a = &g_btl_actors[i];
+        if (a->c.key != 0) {
+            double dealt = (double)a->damage_dealt;
+            n = (int)((double)a->unkD0 * hp / (rounds * members) + dealt);
+            a->won_share = n;
             total += (double)n;
             BtlDrawNumberAlt(&g_btl_won_share_cells[i * RESULTS_CELLS], n,
                              RESULTS_DIGITS);
@@ -99,86 +100,86 @@ void BtlBattleResults(void)
     g_btl_level_up = 0;
     g_btl_exp_gained = 0;
     for (i = 0; i < BTL_PARTY; i++) {
-        a = &g_btl_actors[i];
-        if (a->c.key == 0) {
+        if (g_btl_actors[i].c.key == 0) {
             continue;
         }
-        if (a->c.level < RESULTS_LEVEL_CAP) {
+        if (g_btl_actors[i].c.level < RESULTS_LEVEL_CAP) {
+            next = &g_level_exp[g_btl_actors[i].c.level];
             if (g_btl_scripted != 0) {
-                a->unk74 += g_level_exp[a->c.level] - a->c.unk14;
-                a->c.unk10 += a->unk74;
-                a->c.unk14 += a->unk74;
+                g_btl_actors[i].unk74 += *next - g_btl_actors[i].c.unk14;
+                g_btl_actors[i].c.unk10 += g_btl_actors[i].unk74;
+                g_btl_actors[i].c.unk14 += g_btl_actors[i].unk74;
             } else {
-                if ((signed char)a->c.status != BTL_STATUS_DOWN
-                    && (a->flags & BTL_ACTOR_OUT) == 0) {
+                if ((signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
+                    && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
                     even = exp / (members * RESULTS_EVEN_PART);
                 } else {
                     even = 0.0;
                 }
-                mine = (double)(u_int)a->won_share;
+                mine = (double)g_btl_actors[i].won_share;
                 if (total != 0.0) {
                     weighed = (exp + exp) / RESULTS_EVEN_PART * (mine / total);
                 } else {
                     weighed = 0.0;
                 }
-                a->unk74 = (int)((double)(u_int)a->unk74 + (even + weighed));
-                a->c.unk10 += a->unk74;
-                a->c.unk14 += a->unk74;
-                if (a->unk74 != 0) {
+                g_btl_actors[i].unk74 = (int)((double)g_btl_actors[i].unk74
+                                              + (even + weighed));
+                g_btl_actors[i].c.unk10 += g_btl_actors[i].unk74;
+                g_btl_actors[i].c.unk14 += g_btl_actors[i].unk74;
+                if (g_btl_actors[i].unk74 != 0) {
                     g_btl_exp_gained = 1;
                 }
             }
-            a->c.unk18 = g_level_exp[a->c.level] - a->c.unk14;
-            if (a->c.unk18 <= 0) {
-                a->level_up = 1;
+            g_btl_actors[i].c.unk18 = *next - g_btl_actors[i].c.unk14;
+            if (g_btl_actors[i].c.unk18 <= 0) {
+                g_btl_actors[i].level_up = 1;
                 g_btl_level_up = 1;
             }
         }
-        if (a->c.unk56 < RESULTS_LEVEL_CAP) {
+        if (g_btl_actors[i].c.unk56 < RESULTS_LEVEL_CAP) {
             if (g_btl_scripted != 0) {
                 owed = 0;
-                for (rank = 0; rank < a->c.unk56; rank++) {
+                for (rank = 0; rank < g_btl_actors[i].c.unk56; rank++) {
                     owed += g_rank_exp[rank + 1];
                 }
-                a->c.unk1C = owed;
-                a->c.unk56++;
-            } else if ((a->flags & RESULTS_SCRIPTED) == 0) {
-                if (a->c.key != 0 && (signed char)a->c.status != BTL_STATUS_DOWN
-                    && (a->flags & BTL_ACTOR_OUT) == 0) {
+                g_btl_actors[i].c.unk1C = owed;
+                g_btl_actors[i].c.unk56++;
+            } else if ((g_btl_actors[i].flags & RESULTS_SCRIPTED) == 0) {
+                if (g_btl_actors[i].c.key != 0
+                    && (signed char)g_btl_actors[i].c.status != BTL_STATUS_DOWN
+                    && (g_btl_actors[i].flags & BTL_ACTOR_OUT) == 0) {
                     even = pot / (double)(g_btl_party_counted * 3);
                 } else {
                     even = 0.0;
                 }
-                mine = (double)(u_int)a->won_share;
+                mine = (double)g_btl_actors[i].won_share;
+                cast = (double)g_btl_actors[i].casts;
                 if (total != 0.0) {
                     weighed = pot / RESULTS_EVEN_PART * (mine / total);
                 } else {
                     weighed = 0.0;
                 }
                 if (casts != 0.0) {
-                    n = (int)(even + weighed
-                              + pot / RESULTS_EVEN_PART
-                                    * ((double)(u_int)a->casts / casts));
+                    spent = pot / RESULTS_EVEN_PART * (cast / casts);
                 } else {
-                    n = (int)(even + weighed);
+                    spent = 0.0;
                 }
-                a->unk78 = n;
-                a->c.unk1C += n;
+                g_btl_actors[i].unk78 = (int)(even + weighed + spent);
+                g_btl_actors[i].c.unk1C += g_btl_actors[i].unk78;
                 owed = 0;
-                for (rank = 0; rank < a->c.unk56; rank++) {
+                top = g_btl_actors[i].c.unk56;
+                for (rank = 0; rank < top; rank++) {
                     owed += g_rank_exp[rank + 1];
                 }
-                while (a->c.unk1C >= owed && a->c.unk56 < RESULTS_LEVEL_CAP) {
-                    a->unk56_up = 1;
-                    a->c.unk56++;
-                    owed += g_rank_exp[a->c.unk56];
+                while (g_btl_actors[i].c.unk1C >= owed
+                       && g_btl_actors[i].c.unk56 < RESULTS_LEVEL_CAP) {
+                    g_btl_actors[i].unk56_up = 1;
+                    g_btl_actors[i].c.unk56++;
+                    owed += g_rank_exp[g_btl_actors[i].c.unk56];
                 }
             } else {
-                a->unk78 = 0;
+                g_btl_actors[i].unk78 = 0;
             }
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/battleresults", BtlBattleResults);
-#endif

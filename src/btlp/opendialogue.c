@@ -18,10 +18,11 @@
  * it, because that is what the image does - one pointer and a field reference
  * gives an offset per access instead.
  *
- * 99.11%: the two walkers come out in each other's saved registers, and the
- * first of the two waits leaves its hoisted mask out of the guard's delay
- * slot where the image has it. Both are the allocator; nothing at the source
- * level moved either.
+ * Which walker gets which saved register is decided by use counts weighted
+ * by loop depth, and a `do { } while (0)` counts as a loop. The play and
+ * advance macros and the scene's own block are what put the record ahead of
+ * the speaker walker; written flat, the walker's reads outweigh it and the two
+ * swap registers.
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
@@ -90,7 +91,10 @@ extern void BtlFaceLoadFile(int file);
 extern void BtlFaceOpen(short x, short y, short scale);
 extern void BtlSetInsert(int which, const u_char *src);
 
-#ifdef NON_MATCHING
+/* Play one line and wait until it is done; step to the next one. */
+#define OPENING_PLAY(l) do { BtlSeqPlay((l)->script); BtlSeqRun(); } while (0)
+#define OPENING_NEXT(l) do { (l)++; } while (0)
+
 void BtlOpenDialogue(void)
 {
     BtlOpeningLine *line;
@@ -156,54 +160,47 @@ void BtlOpenDialogue(void)
                     }
                     break;
                 case OPENING_SCENE_ENCOUNTER:
-                    if (line->who == 0) {
-                        BtlHudHide();
-                        BtlLoadPackBank(OPENING_SCENE_BANK);
-                        BtlObjSetScript(
-                            g_btl_enemies[OPENING_SCENE_ENEMY].obj,
-                            g_btl_enemies[OPENING_SCENE_ENEMY].obj
-                                ->scripts[OPENING_SCRIPT_RISE]);
-                        while (g_btl_enemies[OPENING_SCENE_ENEMY].obj->attr
-                               & BTL_OBJ_ANIMATING) {
-                            BtlDrawFrame();
-                        }
-                        BtlHudShow();
-                        i = 0;
+                    if (*who == 0) {
                         do {
-                            /* This one frame comes before the count where
-                               every other wait here has it after. */
-                            BtlDrawFrame();
-                            i++;
-                        } while (i < OPENING_SETTLE);
+                            BtlHudHide();
+                            BtlLoadPackBank(OPENING_SCENE_BANK);
+                            BtlObjSetScript(
+                                g_btl_enemies[OPENING_SCENE_ENEMY].obj,
+                                g_btl_enemies[OPENING_SCENE_ENEMY].obj
+                                    ->scripts[OPENING_SCRIPT_RISE]);
+                            while (g_btl_enemies[OPENING_SCENE_ENEMY].obj->attr
+                                   & BTL_OBJ_ANIMATING) {
+                                BtlDrawFrame();
+                            }
+                            BtlHudShow();
+                            i = 0;
+                            do {
+                                /* This one frame comes before the count where
+                                   every other wait here has it after. */
+                                BtlDrawFrame();
+                                i++;
+                            } while (i < OPENING_SETTLE);
 
-                        BtlSeqPlay(line->script);
-                        BtlSeqRun();
+                            OPENING_PLAY(line);
 
-                        BtlObjSetScript(
-                            g_btl_enemies[OPENING_SCENE_ENEMY].obj,
-                            g_btl_enemies[OPENING_SCENE_ENEMY].obj
-                                ->scripts[OPENING_SCRIPT_LEAVE]);
-                        while (g_btl_enemies[OPENING_SCENE_ENEMY].obj->attr
-                               & BTL_OBJ_ANIMATING) {
-                            BtlDrawFrame();
-                        }
-                        BtlSoundClose(OPENING_SCENE_SLOT);
+                            BtlObjSetScript(
+                                g_btl_enemies[OPENING_SCENE_ENEMY].obj,
+                                g_btl_enemies[OPENING_SCENE_ENEMY].obj
+                                    ->scripts[OPENING_SCRIPT_LEAVE]);
+                            while (g_btl_enemies[OPENING_SCENE_ENEMY].obj->attr
+                                   & BTL_OBJ_ANIMATING) {
+                                BtlDrawFrame();
+                            }
+                            BtlSoundClose(OPENING_SCENE_SLOT);
+                        } while (0);
                         goto skip;
                     }
                     break;
                 }
 
-                BtlSeqPlay(line->script);
-                BtlSeqRun();
+                OPENING_PLAY(line);
             skip:
-                /* These two read the speaker through the record rather than
-                   through the walker; the two pointers come out in each
-                   other's saved registers otherwise. With no walker at all,
-                   every read written `line->who`, gcc's loop pass builds the
-                   same walker itself and the result is that same swap: the
-                   walker's 17 references outrank the record's 13, so it takes
-                   s1. Index forms and every loop spelling leave it there. */
-                if (line->who != 0) {
+                if (*who != 0) {
                     BtlFaceClose();
                 }
                 i = 0;
@@ -211,16 +208,13 @@ void BtlOpenDialogue(void)
                     i++;
                     BtlDrawFrame();
                 } while (i < OPENING_GAP);
-                line++;
+                OPENING_NEXT(line);
                 who += sizeof(BtlOpeningLine);
             } while (line->script != NULL);
         }
         BtlHudHide();
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/opendialogue", BtlOpenDialogue);
-#endif
 
 /* Whether the speaker's line is still worth playing. Three of the four
    speakers each have a flag of their own and play only once it is set; the

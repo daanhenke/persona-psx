@@ -133,6 +133,7 @@ __fixunsdfsi = 0x800168C0;
 __floatsidf = 0x800169D0;
 __ledf2 = 0x80016C8C;
 __muldf3 = 0x80016DD8;
+__nedf2 = 0x800171DC;
 
 rand = 0x80041368;
 srand = 0x80041378;

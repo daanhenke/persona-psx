@@ -63,12 +63,12 @@ extern u_char      D_800CFCB4[];
 
 /* What the number of presses is worth. The chance picks one of nine rows and
    the presses one of seven columns; the table is eight wide. */
-extern u_char D_800CFCBC[];
-extern u_char D_800CFCC8[];
-extern u_char D_800CFCD0[];
 #define ESCAPE_ROWS 9
 #define ESCAPE_COLS 7
 #define ESCAPE_ROW_BYTES 8
+extern u_char D_800CFCBC[];
+extern u_char D_800CFCC8[];
+extern u_char D_800CFCD0[][ESCAPE_ROW_BYTES];
 
 /* The chance is rolled out of a byte and pinned to the range. */
 #define ESCAPE_CHANCE_MAX 0x100
@@ -98,41 +98,31 @@ extern u_char D_800CFCD0[];
 /* Enemies the walk looks at. */
 #define ESCAPE_ENEMIES 9
 
-/* 70.21%. Step 0 is written as the image lays it out: the tests that rule
-   the roll out jump to a "cannot leave" tail, the ones that grant it to a
-   "can leave" tail, and both set the step to two. The two locals below are
-   set once to constants, so reload rebuilds them at each use; the image's
-   loop keeps them in s7 and fp, which loop.c's lift would give, but written
-   inline its budget is spent on the table constants first.
-   Reading a record's ailment as a signed byte of the record rather
-   than through a pointer to it stops gcc lifting the table's own address out
-   of the two walks, which is what the image does and what took this from
-   67.17%. What is left is the shape of the arms themselves: the image shares
-   one "how the question ends" tail between every way of reaching it and
-   reaches it through short stubs, where the build lays a copy of it at each
-   branch, and it keeps the frames a question stands for and the bit a member
-   on its way out carries in saved registers the whole loop long, which neither
-   naming them as locals nor writing them out as constants reproduces. */
-#ifdef NON_MATCHING
+/* Every exit of step 0 writes its own "wait, then step two" tail; the image
+   has them folded together by cross-jumping after reload, but the copies are
+   what make the wait worth a saved register. The leaving bit is a literal
+   that loop.c lifts into one. The walks' counter is shared by every step but
+   the second, whose frame count and the other steps' scratch values share a
+   variable of their own. */
 int BtlEscapeMenu(void)
 {
     const u_char *line;
     int           chance;
     int           got;
     int           presses;
-    int           row;
+    int           rank;
     int           col;
-    int           edge;
     int           i;
-    short         timer;
-    int           done;
-    /* The two the whole loop keeps in a register: the frames a question
-       stands for, and the bit a member on its way out carries. */
+    int           n;
+    /* Added to the chance before the presses are weighed, and never
+       anything but nought. */
+    int           bonus;
+    u_char       *row;
+    /* The frames a question stands for, kept in a register all loop long. */
     short         wait;
-    u_long        leaving;
 
     wait = ESCAPE_WAIT;
-    leaving = ESCAPE_LEAVE_BIT;
+    bonus = 0;
     do {
         switch (g_btl_step) {
         case 0:
@@ -141,15 +131,20 @@ int BtlEscapeMenu(void)
                            ESCAPE_MSG_STYLE);
             if (g_btl_battle_kind == ESCAPE_KIND_NO_LEAVE
                 || g_btl_debug_flags[0] != 0) {
-                goto can_leave;
+                got = 1;
+                g_btl_delay = wait;
+                g_btl_step = 2;
+                break;
             }
             if (g_btl_no_escape != 0
                 || g_btl_enemy_level - g_btl_party_level >= 10
                 || g_btl_party_no_flee != 0) {
-                goto cannot_leave;
+                got = 0;
+                g_btl_delay = wait;
+                g_btl_step = 2;
+                break;
             }
-            i = 0;
-            do {
+            for (i = 0; i < BTL_PARTY; i++) {
                 if (g_btl_actors[i].c.key != 0
                     && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
@@ -157,45 +152,37 @@ int BtlEscapeMenu(void)
                     && BtlStatusStops(&g_btl_actors[i]) != 0) {
                     break;
                 }
-                i++;
-            } while (i < BTL_PARTY);
-            if (i >= BTL_PARTY) {
-                goto cannot_leave;
             }
-            i = 0;
-            do {
+            if (i >= BTL_PARTY) {
+                got = 0;
+                g_btl_delay = wait;
+                g_btl_step = 2;
+                break;
+            }
+            for (i = 0; i < ESCAPE_ENEMIES; i++) {
                 if (g_btl_combatants[i].c.key != 0
                     && BtlStatusStops(&g_btl_combatants[i]) != 0) {
                     break;
                 }
-                i++;
-            } while (i < ESCAPE_ENEMIES);
-            if (i < ESCAPE_ENEMIES) {
-                chance = 0;
-                edge = (g_btl_party_agility + g_btl_party_luck) / 2
-                       - (g_btl_enemy_agility + g_btl_enemy_luck) / 2;
-                i = 0;
-                do {
-                    if (edge >= D_800CFCAC[i]) {
-                        chance = D_800CFCB4[i];
-                        break;
-                    }
-                    i++;
-                } while (i < ESCAPE_EDGES);
+            }
+            if (i >= ESCAPE_ENEMIES) {
+                got = 1;
                 g_btl_delay = wait;
-                presses = 0;
-                g_btl_step++;
+                g_btl_step = 2;
                 break;
             }
-        can_leave:
-            got = 1;
+            chance = 0;
+            n = (g_btl_party_agility + g_btl_party_luck) / 2
+                   - (g_btl_enemy_agility + g_btl_enemy_luck) / 2;
+            for (i = 0; i < ESCAPE_EDGES; i++) {
+                if (n >= D_800CFCAC[i]) {
+                    chance = D_800CFCB4[i];
+                    break;
+                }
+            }
             g_btl_delay = wait;
-            g_btl_step = 2;
-            break;
-        cannot_leave:
-            got = 0;
-            g_btl_delay = wait;
-            g_btl_step = 2;
+            presses = 0;
+            g_btl_step++;
             break;
         case 1:
             if (g_btl_delay != 0) {
@@ -205,31 +192,22 @@ int BtlEscapeMenu(void)
                 }
                 break;
             }
-            row = ESCAPE_ROWS;
-            i = 0;
-            do {
-                if (D_800CFCBC[i] >= chance) {
-                    row = i;
+            for (i = 0, rank = ESCAPE_ROWS, n = bonus + chance; i < ESCAPE_ROWS; i++) {
+                if (D_800CFCBC[i] >= n) {
+                    rank = i;
                     break;
                 }
-                i++;
-            } while (i < ESCAPE_ROWS);
-            col = ESCAPE_COLS;
-            i = 0;
-            do {
+            }
+            for (i = 0, col = ESCAPE_COLS; i < ESCAPE_COLS; i++) {
                 if (D_800CFCC8[i] >= presses) {
                     col = i;
                     break;
                 }
-                i++;
-            } while (i < ESCAPE_COLS);
-            chance += D_800CFCD0[row * ESCAPE_ROW_BYTES + col];
-            if (chance < 0) {
-                chance = 0;
-            } else if (chance > ESCAPE_CHANCE_MAX) {
-                chance = ESCAPE_CHANCE_MAX;
             }
-            if ((int)(rand() & ESCAPE_ROLL_MASK) < chance) {
+            n += D_800CFCD0[rank][col];
+            n = n < 0 ? 0
+                 : n > ESCAPE_CHANCE_MAX ? ESCAPE_CHANCE_MAX : n;
+            if ((int)(rand() & ESCAPE_ROLL_MASK) < n) {
                 got = 1;
             }
             g_btl_step++;
@@ -244,33 +222,31 @@ int BtlEscapeMenu(void)
             }
             BtlTextSetState(5, 0, 1);
             BtlTextWaitDone();
-            i = 1;
+            n = 1;
             do {
-                i++;
+                n++;
                 BtlDrawFrame();
-            } while (i != 7);
+            } while (n != 7);
             BtlOpenMessage(0, 0, line, ESCAPE_MSG_WIDTH, ESCAPE_MSG_STYLE);
-            if (got != 0) {
-                g_btl_step += 2;
-            } else {
+            if (got == 0) {
                 g_btl_delay = ESCAPE_HELD;
                 g_btl_step++;
+            } else {
+                g_btl_step += 2;
             }
             break;
         case 3:
             if (g_btl_delay != 0) {
                 break;
             }
-            i = 0;
-            do {
+            for (i = 0; i < BTL_PARTY; i++) {
                 if (g_btl_actors[i].c.key != 0
                     && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
                     && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0) {
                     g_btl_actors[i].flags |= ESCAPE_CAUGHT_BIT;
                 }
-                i++;
-            } while (i < BTL_PARTY);
+            }
             BtlPickSettle();
             BtlPartyResetGfx();
             BtlCloseMessage(0);
@@ -278,53 +254,44 @@ int BtlEscapeMenu(void)
             return 1;
         case 4:
             BtlHideMarkers();
-            i = 0;
-            timer = ESCAPE_DELAY;
-            do {
+            for (i = 0, n = 0; i < BTL_PARTY; i++) {
                 if (g_btl_actors[i].c.key != 0
                     && (signed char)g_btl_actors[i].c.status
                            != BTL_STATUS_DOWN
                     && (g_btl_actors[i].flags & ESCAPE_SPARED) == 0) {
+                    row = &g_btl_member_scripts[SCRIPT_LEAVE
+                        + g_btl_actors[i].c.key * MEMBER_SCRIPT_MODEL];
                     BtlObjSetScript(
                         g_btl_actors[i].obj,
                         (BtlSeqStep *)g_btl_actors[i].obj->scripts[
-                            g_btl_member_scripts[
-                                g_btl_actors[i].c.key * MEMBER_SCRIPT_MODEL
-                                + SCRIPT_LEAVE
-                                + g_btl_actors[i].script_pick
-                                      * MEMBER_SCRIPT_PICK]]);
+                            row[g_btl_actors[i].script_pick
+                                * MEMBER_SCRIPT_PICK]]);
                     g_btl_actors[i].obj->motion = ESCAPE_MOTION;
-                    g_btl_actors[i].obj->timer = timer;
-                    timer += ESCAPE_STAGGER;
-                    g_btl_actors[i].flags |= leaving;
+                    g_btl_actors[i].obj->timer = ESCAPE_DELAY + n * ESCAPE_STAGGER;
+                    n++;
+                    g_btl_actors[i].flags |= ESCAPE_LEAVE_BIT;
                 }
-                i++;
-            } while (i < BTL_PARTY);
+            }
             g_btl_step++;
             break;
         case 5:
-            done = 1;
-            i = 0;
-            do {
+            for (i = 0, n = 1; i < BTL_PARTY; i++) {
                 if (g_btl_actors[i].c.key != 0
-                    && (g_btl_actors[i].flags & leaving) != 0
+                    && (g_btl_actors[i].flags & ESCAPE_LEAVE_BIT) != 0
                     && g_btl_actors[i].obj->motion != 0) {
-                    done = 0;
+                    n = 0;
                     break;
                 }
-                i++;
-            } while (i < BTL_PARTY);
-            if (done == 0) {
+            }
+            if (n == 0) {
                 break;
             }
-            i = 0;
-            do {
+            for (i = 0; i < BTL_PARTY; i++) {
                 if (g_btl_actors[i].c.key != 0
-                    && (g_btl_actors[i].flags & leaving) != 0) {
+                    && (g_btl_actors[i].flags & ESCAPE_LEAVE_BIT) != 0) {
                     g_btl_actors[i].obj->attr &= ~ESCAPE_HIDDEN;
                 }
-                i++;
-            } while (i < BTL_PARTY);
+            }
             do {
                 BtlDrawFrame();
             } while (BtlMarkersHidden() == 0);
@@ -334,6 +301,3 @@ int BtlEscapeMenu(void)
         BtlDrawFrame();
     } while (1);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/escapemenu", BtlEscapeMenu);
-#endif

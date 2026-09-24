@@ -161,7 +161,8 @@ segments:
       - [0xF80, pad, btlp_pad_f80]
       # BtlPlaceMenu's switch table, which placemenu.c emits itself.
       - [0xF84, .rodata, placemenu]
-      - [0xFA4, rodata, btlp_rodata6b_a]
+      # BtlEscapeMenu's switch table, which escapemenu.c emits itself.
+      - [0xFA4, .rodata, escapemenu]
       # BtlCommandAttack's and BtlCommandItem's switch tables, which commands.c
       # emits itself - the word of padding behind the first inside the unit,
       # the word behind the last belonging to nobody.
