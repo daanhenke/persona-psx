@@ -74,7 +74,7 @@ void FieldDamageFloor(int div)
         }
     }
     if (hit) {
-        func_80070BF0(0x1B, 1);
+        FieldPlayJingle(0x1B, 1);
         FLASH(0x1000, 0, 0);
     }
 }
@@ -110,7 +110,7 @@ void FieldPoisonFloor(void)
     }
     if (hit) {
         D_800993C6 = 0x80;
-        func_80070BF0(0x1C, 1);
+        FieldPlayJingle(0x1C, 1);
         FLASH(0, 0x1000, 0);
     }
 }

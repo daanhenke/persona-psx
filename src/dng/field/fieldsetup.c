@@ -11,10 +11,6 @@
 #include <libsnd.h>
 #include <persona/dng/field.h>
 
-/* How many of the handles the field's own sequences use, and the VABs. */
-#define FIELD_SEQS 19
-#define FIELD_VABS 3
-
 /* Fades out every sequence the field has open. */
 void FieldFadeSeqs(void)
 {

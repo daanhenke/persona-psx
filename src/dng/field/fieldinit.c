@@ -28,7 +28,7 @@ int FieldOpenDoor(void)
         g_door_dx = -DOOR_SLIDE;
         g_door_dy = DOOR_SLIDE;
         g_door_frames = DOOR_FRAMES;
-        func_80070BF0(0x15, 1);
+        FieldPlayJingle(0x15, 1);
     }
 }
 

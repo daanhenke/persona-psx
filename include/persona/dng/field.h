@@ -113,8 +113,8 @@ extern u_char g_music_y;
 
 /* Per map, which of the two floor tunes it plays, and the two tunes. */
 extern u_char g_map_music[][2];
-extern short  g_floor_tune_a;
-extern short  g_floor_tune_b;
+#define g_floor_tune_a (g_seq_handles[13])
+#define g_floor_tune_b (g_seq_handles[14])
 
 extern u_char g_quest_bits;
 
@@ -159,7 +159,7 @@ extern int g_stair_floor;
 extern u_char g_noclip;
 
 /* The thud of walking into a wall. */
-extern short g_bump_seq;
+#define g_bump_seq (g_seq_handles[12])
 
 /* A tile that stops a step: off the grid, tile 0 or TILE_SOLID. A
    TILE_KIND_ONEWAY tile refuses the facings whose bit is set from bit 5. */
@@ -278,7 +278,10 @@ void TimLoadAt(u_long *tim, int x, int y);
 void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_80070BF0(int a, int b);
+void func_80071EF8(void);
+void func_800712B8(void);
+void func_80071368(int kind);
+void func_80072018(void);
 void func_800739F8(int a, int b);
 int  func_8006C9C8(void);
 void func_80070DAC(int arg);
@@ -336,6 +339,17 @@ void FieldResetSound(void);
 #define SEQ_HANDLES     32
 #define g_seq_handles   ((short *)0x801F537C)
 #define g_vab_handles   ((short *)0x801F535C)
+
+/* How many of the handles the field's own sequences use, and the VABs. */
+#define FIELD_SEQS 19
+#define FIELD_VABS 3
+
+/* Per sequence, the handle it is opened into. */
+extern signed char g_seq_slot[];
+
+void FieldStartBattle(void);
+void FieldPlayJingle(u_char n, short loops);
+void FieldPlaySeq(); /* old-style: callers pass ints */
 
 /* The fog libgs is given, the scale its depth is built from, and the
    distance it starts at. */
