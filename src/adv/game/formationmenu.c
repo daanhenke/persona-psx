@@ -35,8 +35,8 @@ extern int     D_800BB7F8;
 extern short   g_stock_last;
 extern GsMAP   D_800B8370;
 extern GsCELL  g_panel_cells[];
-extern short   D_800BB7F4, D_800BB954, D_800BB958, D_800BC224, D_800B8458,
-               D_800BC048;
+extern short   D_800BB7F4, g_item_top, D_800BB958, D_800BC224, D_800B8458,
+               g_item_scroll_step;
 extern short   g_arcana_top;
 extern short   g_header_scroll_y;
 extern short   g_cam_x, g_map_scroll_x, D_800BBC04;
@@ -199,12 +199,12 @@ void FormationMenu(void)
     g_menu_sel = 0;
     g_BB94C = 0;
     D_800BB7F4 = 0;
-    D_800BB954 = 0;
+    g_item_top = 0;
     D_800BB958 = 0;
     D_800BC224 = 0;
     g_arcana_top = 0;
     D_800B8458 = 0;
-    D_800BC048 = 0;
+    g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
     g_bg_map0.cellw = 8;

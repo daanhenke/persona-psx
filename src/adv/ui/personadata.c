@@ -82,8 +82,8 @@ extern GsOT   g_ot[];
 extern int    g_pad_held[];
 extern u_char g_BC204, g_BC5C8;
 extern int    g_BB94C;
-extern short  D_800BB7F4, D_800BB954, D_800BB958, D_800BC224, D_800B8458,
-              D_800BC048;
+extern short  D_800BB7F4, g_item_top, D_800BB958, D_800BC224, D_800B8458,
+              g_item_scroll_step;
 extern short  g_cam_x, g_map_scroll_x;
 extern short  g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern u_char PageScrollValue(short *value, short lo, short hi, short step);
@@ -176,12 +176,12 @@ void PersonaDataOpen(void)
     g_bg_layer_otz[4] = 0x20;
     g_BB94C = 0;
     D_800BB7F4 = 0;
-    D_800BB954 = 0;
+    g_item_top = 0;
     D_800BB958 = 0;
     D_800BC224 = 0;
     g_arcana_top = 0;
     D_800B8458 = 0;
-    D_800BC048 = 0;
+    g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
     g_bg_layers[0].attribute = 0x9000000;
