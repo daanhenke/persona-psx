@@ -52,6 +52,13 @@ extern void   func_8007B554(short member, short persona);
 extern void   func_800768F0(void);
 extern u_char D_800B12B8[];
 extern u_char D_800B1EB8[];
+extern u_char D_800B17E8[];
+extern u_char g_persona_list_rule[];
+extern void   func_8007B6C0(u_char key, short *dst, int base);
+extern void   DrawCharStatBars(Char *rec);
+
+/* The glyph between the header's Persona and its bank. */
+#define GLYPH_SEP 0xCD
 /* The spell whose description the skills screen's panel shows. */
 extern short  g_skill_help_spell;
 
@@ -72,7 +79,9 @@ void SkillMemberPick(void);
 void SkillPersonaPick(void);
 void func_8006DA28(void);
 void func_8006DDD8(void);
-void func_8006E10C(void);
+void StatusMemberPick(void);
+void StatusPageLayout(void);
+void StatusPageDraw(short member);
 void func_8006F020(void);
 
 void StatusMenuStep(void)
@@ -98,7 +107,7 @@ void StatusMenuStep(void)
         func_8006DDD8();
         break;
     case 6:
-        func_8006E10C();
+        StatusMemberPick();
         break;
     case 7:
         func_8006F020();
@@ -365,14 +374,218 @@ INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DA28);
 
 INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DDD8);
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E10C);
+/* The member pages' marker, a frame; accepting a member lays out their
+   page. */
+void StatusMemberPick(void)
+{
+    DrawStatusHud();
+    if (MenuStepMember(&g_menu->status_member.cur, g_party_last)) {
+        func_8008C23C(g_menu->status_member.cur);
+        SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->status_member.cur][0],
+                   (g_fm_mark_pos + 1)[g_menu->status_member.cur][1]);
+    }
+    if (InputCheckAcceptA(1)) {
+        StatusPageLayout();
+        StatusPageDraw(g_menu->status_member.cur);
+        SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0x58,
+                       g_menu->persona_cmd.cur * 12 + 0x24);
+        SlotInitTagged(g_pdata_bottom_def, PAGE_BOTTOM_SLOT, 0x50, 0x48, 0x9C);
+        SlotSetFlicker(PAGE_BOTTOM_SLOT, 1);
+        SlotSetFlicker(1, 1);
+        g_menu_subsel++;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        g_menu_subsel = 0;
+    }
+}
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E29C);
+/* A member's page: the five stats, the name, the two contact values and the
+   three Persona rows, the active one repeated in the header in the bright
+   glyph bank. An empty row, or every row while the list is blocked, shows the
+   dashed rule. */
+void StatusPageDraw(member)
+    short member;
+{
+    int      i = g_party_at[member];   /* the member, then a Persona */
+    Char    *c = &g_chars[i];
+    Persona *personas = g_personas;
+    int      row;
+    int      bank;
+    u_short  n;
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", D_8006E650);
+    TileMapFillRect(AT(g_tilemap1, 4, 11), 0, 10, 3, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 10, 12), 0, 8, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 3, 25), 0, 10, 7, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 10, 20), 0, 12, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 14), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 24), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 1, 31), 0, 4, 2, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 11, 23), 0, 2, 5, MAP_W);
+    n = FormatDecimal(g_chars[i].stat[0], g_hud_digits, 2);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 11, 24), GLYPH_DIGIT0, n);
+    n = FormatDecimal(g_chars[i].stat[1], g_hud_digits, 2);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 12, 24), GLYPH_DIGIT0, n);
+    n = FormatDecimal(g_chars[i].stat[2], g_hud_digits, 2);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 13, 24), GLYPH_DIGIT0, n);
+    n = FormatDecimal(g_chars[i].stat[3], g_hud_digits, 2);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 14, 24), GLYPH_DIGIT0, n);
+    n = FormatDecimal(g_chars[i].stat[4], g_hud_digits, 2);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 15, 24), GLYPH_DIGIT0, n);
+    TileMapWriteRow(c->name, AT(g_tilemap1, 10, 12), 0, 8);
+    n = FormatDecimal(g_chars[i].unk3A, g_hud_digits, 3);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
+    n = FormatDecimal(g_chars[i].unk3C, g_hud_digits, 3);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006E94C);
+    for (row = 0; row < 3; row++) {
+        i = c->list[row];
+        bank = 0;
+        if (i != 0xFF && !c->blocked) {
+            if (c->entry == row) {
+                bank = 3;
+                *AT(g_tilemap1, 10, 20) = GLYPH_SEP;
+                func_8007B6C0(personas[i].key, AT(g_tilemap1, 10, 22), 0);
+            }
+            func_8007B6C0(personas[i].key, AT(g_tilemap1, 4 + row, 11),
+                          bank * 0xD7);
+        } else {
+            TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, 4 + row, 12),
+                            0xD7, 8);
+        }
+    }
+    DrawCharStatBars(c);
+}
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006ED78);
+/* One of a member's Persona slots on their page: the Persona's name in the
+   header, its level and SP cost, its two contact values and its seven spells.
+   An empty slot shows zeroes, drawn from the counter itself. */
+void StatusSlotDraw(member, slot)
+    short member;
+    short slot;
+{
+    int     i = g_party_at[member];   /* the member, then the Persona */
+    Char   *c = &g_chars[i];
+    u_long  personas = (u_long)g_personas;
+    int     n;
+
+    TileMapFillRect(AT(g_tilemap1, 3, 25), 0, 10, 7, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 10, 22), 0, 10, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 14), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 24), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 1, 32), 0, 3, 2, MAP_W);
+    i = c->list[slot];
+    if (i != 0xFF) {
+        func_8007B6C0(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, n);
+        n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 2, 34), GLYPH_DIGIT0, n);
+        n = FormatDecimal(g_personas[i].unk10, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
+        n = FormatDecimal(g_personas[i].unk12, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
+    } else {
+        n = 0;
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 2, 34), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, 1);
+    }
+    for (n = 0; n < PERSONA_SPELLS; n++) {
+        DrawSpellName(((Persona *)(i * sizeof(Persona) + personas))->spell[n],
+                      AT(g_tilemap1, n + 3, 25), 0, 1);
+    }
+}
+
+/* The member's page for the preview, from a copy of their record: the
+   active Persona's name, level, spell slots, SP cost and contact values, the
+   member's five stats as the Persona leaves them, and its seven spells. */
+void StatusPreviewDraw(Char *c)
+{
+    u_long personas = (u_long)g_personas;
+    int    i;
+    int    n;
+
+    TileMapFillRect(AT(g_tilemap1, 3, 25), 0, 10, 7, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 10, 22), 0, 10, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 14), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 16, 24), 0, 3, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 1, 31), 0, 4, 2, MAP_W);
+    TileMapFillRect(AT(g_tilemap1, 11, 23), 0, 2, 5, MAP_W);
+    i = c->list[c->entry];
+    if (i != 0xFF) {
+        func_8007B6C0(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 32), GLYPH_DIGIT0, n);
+        *AT(g_tilemap1, 1, 33) = GLYPH_SEP;
+        FormatDecimal(g_personas[i].slots, g_hud_digits, 1);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, 1);
+        n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 2, 33), GLYPH_DIGIT0, n);
+        n = FormatDecimal(g_personas[i].unk10, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, n);
+        n = FormatDecimal(g_personas[i].unk12, g_hud_digits, 3);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, n);
+        n = FormatDecimal(c->stat[0], g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 11, 24), GLYPH_DIGIT0, n);
+        n = FormatDecimal(c->stat[1], g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 12, 24), GLYPH_DIGIT0, n);
+        n = FormatDecimal(c->stat[2], g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 13, 24), GLYPH_DIGIT0, n);
+        n = FormatDecimal(c->stat[3], g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 14, 24), GLYPH_DIGIT0, n);
+        n = FormatDecimal(c->stat[4], g_hud_digits, 2);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 15, 24), GLYPH_DIGIT0, n);
+    } else {
+        n = 0;
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 2, 34), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 16, 16), GLYPH_DIGIT0, 1);
+        TileMapWriteRowRev((u_char *)&n, AT(g_tilemap1, 16, 26), GLYPH_DIGIT0, 1);
+    }
+    for (n = 0; n < PERSONA_SPELLS; n++) {
+        DrawSpellName(((Persona *)(i * sizeof(Persona) + personas))->spell[n],
+                      AT(g_tilemap1, n + 3, 25), 0, 1);
+    }
+}
+
+/* A member's status page, laid out: the two commands, the member's three
+   Persona rows, the stats and the spell rows. */
+void StatusPageLayout(void)
+{
+    int     i;
+    u_char *arc;
+
+    func_8008EDBC(8);
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+    TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1E, 0x13, MAP_W);
+    TileMapDrawBox(AT(g_tilemap0, 1, 8), 0x1C, 0x11, MAP_W);
+    for (i = 0; i < 2; i++) {
+        TileMapWriteBar(AT(g_tilemap0, 2 + i, 11), 10);
+    }
+    for (i = 0; i < 3; i++) {
+        TileMapWriteBar(AT(g_tilemap0, 5 + i, 11), 10);
+        *AT(g_tilemap1, 4 + i, 10) = 0x418 + i;
+    }
+    for (i = 0; i < 7; i++) {
+        TileMapWriteBar(AT(g_tilemap0, 4 + i, 25), 10);
+    }
+    for (i = 0; i < 5; i++) {
+        TileMapWriteBar(AT(g_tilemap0, 12 + i, 9), 0x1A);
+    }
+    TileMapWriteRow(D_800B17E8, AT(g_tilemap1, 1, 13), 0, 6);
+    TileMapWriteRow(D_800B17E8 + 6, AT(g_tilemap1, 2, 13), 0, 6);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap1, 3, 13), 0x457, 6);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap1, 1, 25), 0x36F, 5);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap1, 2, 28), 0x37A, 2);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap1, 16, 9), 0x3CB, 3);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap1, 16, 19), 0x3D1, 3);
+    arc = &D_800B92A0[0x4C];
+    TileMapWriteRow(arc, AT(g_tilemap1, 11, 19), 0, 3);
+    TileMapWriteRow(arc + 3, AT(g_tilemap1, 12, 19), 0, 3);
+    TileMapWriteRow(arc + 6, AT(g_tilemap1, 13, 19), 0, 3);
+    TileMapWriteRow(arc + 9, AT(g_tilemap1, 14, 19), 0, 3);
+    TileMapWriteRow(arc + 12, AT(g_tilemap1, 15, 19), 0, 3);
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006F020);

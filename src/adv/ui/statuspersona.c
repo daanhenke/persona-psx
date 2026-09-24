@@ -41,18 +41,18 @@ extern void   CharRecalcStats(u_char chr);
 
 extern short   g_menu_subsel;
 
-void func_8006E29C(short member);
+void StatusPageDraw(short member);
 void StatusPersonaLayout(void);
 extern u_char D_800B16B0[];
 void StatusPersonaNames(Persona *p);
 extern void bcopy(void *src, void *dst, int len);
 extern void func_80090644(Char *c, int a, int b);
-extern void func_8006E94C(Char *c);
+extern void StatusPreviewDraw(Char *c);
 extern void DrawCharStatBars(Char *rec);
 extern void DrawPersonaStatBars(Persona *p);
 extern short func_80098B0C(short kind);
 extern u_char D_800B198B[];
-extern void   func_8006ED78(void);
+extern void   StatusPageLayout(void);
 extern void   func_8008C23C(short member);
 extern void   BgMapInit(void *script, short speed);
 extern void   PersonaDataLayout(void);
@@ -133,7 +133,7 @@ void StatusPersonaPick(void)
     } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
         return;
     }
-    func_8006E29C(g_menu->status_member.cur);
+    StatusPageDraw(g_menu->status_member.cur);
     SlotClear(PICK_CURSOR_SLOT);
     SlotSetFlicker(1, 1);
     g_menu_subsel--;
@@ -201,7 +201,7 @@ inline void StatusPersonaPreview(void)
     bcopy(&g_chars[g_party_at[g_menu->status_member.cur]], &c, sizeof(Char));
     c.entry = g_menu->persona_slot.cur;
     func_80090644(&c, 0xFF, 0xFF);
-    func_8006E94C(&c);
+    StatusPreviewDraw(&c);
     *AT(g_tilemap1, 10, 20) = GLYPH_SEP;
     DrawCharStatBars(&c);
 }
@@ -318,8 +318,8 @@ void StatusPersonaView(void)
     PAGE_MARKS();
 
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_8006ED78();
-        func_8006E29C(g_menu->status_member.cur);
+        StatusPageLayout();
+        StatusPageDraw(g_menu->status_member.cur);
         func_8008C23C(g_menu->status_member.cur);
         StatusPersonaPreview();
         SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0x58,
