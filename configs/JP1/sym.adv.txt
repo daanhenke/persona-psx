@@ -427,7 +427,7 @@ DrawPlaceLabel           = 0x800757B4; // type:func size:0x98
 //--- PA: 0x0114AC   VA: 0x8007584C   subsegment: asm, adv_11a
 //------------------------------------------------------------
 func_8007584C            = 0x8007584C; // type:func size:0x394
-func_80075BE0            = 0x80075BE0; // type:func size:0x1D0
+ConfigStepTactics        = 0x80075BE0; // type:func size:0x1D0
 
 //----------------------------------------------------------------------------
 //--- PA: 0x011A10   VA: 0x80075DB0   subsegment: c, ../common/ui/configchoice
@@ -1705,3 +1705,6 @@ g_key_page_back          = 0x800EB680; // size:0x2
 g_key_page_fwd           = 0x800EB684; // size:0x2
 g_stat_labels            = 0x800B24D0; // size:0x10
 g_item_descs             = 0x8004AE1C;
+g_adv_scene_file         = 0x8005E654; // size:0x18
+g_party_tactic           = 0x801F2AE6; // ignore:True size:0x8
+g_save_2AE4              = 0x801F2AE4; // ignore:True size:0x2

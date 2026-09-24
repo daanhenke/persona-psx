@@ -16,7 +16,9 @@ typedef struct {
     /* 0x1C0 */ int      slot_base;
     /* 0x1C4 */ u_char   pad1C4[0xC];
     /* 0x1D0 */ int      row;
-    /* 0x1D4 */ u_char   pad1D4[0x1CC];
+    /* 0x1D4 */ u_char   pad1D4[0xC];
+    /* 0x1E0 */ MenuList member_list; /* the config tactics page's member */
+    /* 0x1F0 */ u_char   pad1F0[0x1B0];
     /* 0x3A0 */ MenuList grid[2];  /* the formation grid's row, then column  */
     /* 0x3C0 */ MenuList list[4];
 } MenuCtx;
