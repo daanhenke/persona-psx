@@ -112,6 +112,4 @@ short MenuStepMember(int *sel, u_char last)
     }
     return moved;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/../common/ui/menumember", MenuStepMember);
 #endif

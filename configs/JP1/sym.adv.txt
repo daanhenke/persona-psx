@@ -875,7 +875,7 @@ AdvEffectFadeBlue        = 0x80086C4C; // type:func size:0x160
 func_80086DAC            = 0x80086DAC; // type:func size:0x1A0
 func_80086F4C            = 0x80086F4C; // type:func size:0x148
 func_80087094            = 0x80087094; // type:func size:0x148
-func_800871DC            = 0x800871DC; // type:func size:0x1120
+EffectSkyStep            = 0x800871DC; // type:func size:0x1120
 AdvSoundCommand          = 0x800882FC; // type:func size:0x258
 
 //-------------------------------------------------------------
@@ -1495,6 +1495,7 @@ str_cd0_b_data           = 0x800B63E0;
 str_cd0_s_data           = 0x800B63F4;
 str_cd0_c_data           = 0x800B6408;
 str_cd0_d_data           = 0x800B641C;
+g_effect3_frames         = 0x800B6560; // size:0x498
 g_effect4_script         = 0x800B69F8;
 g_effect5_script         = 0x800B7534;
 g_bgm_offsets            = 0x800B7E60;
@@ -1562,6 +1563,7 @@ D_800BAB90               = 0x800BAB90; // type:u32 size:0xC
 D_800BAB9C               = 0x800BAB9C; // type:u32 size:0xC70
 g_grow_slot_x            = 0x800BAD20;
 g_adv_field_state        = 0x800BB7EC;
+g_effect_tick            = 0x800BB7FC;
 g_page_fwd_repeat        = 0x800BB800;
 
 

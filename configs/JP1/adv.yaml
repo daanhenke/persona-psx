@@ -203,6 +203,8 @@ segments:
       - [0x2241C, asm, adv_35]
       - [0x225BC, c, gfx/screenfade]
       - [0x22A0C, asm, adv_36]
+      - [0x22E3C, c, gfx/effectsky]
+      - [0x23F5C, asm, adv_36a]
       - [0x241B4, c, audio/bank]
       - [0x2444C, asm, adv_37]
       - [0x26C08, c, common/gfx/coord]
