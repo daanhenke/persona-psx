@@ -33,7 +33,7 @@ extern u_char  g_BC5C8;
 extern int     g_BB94C;
 extern int     D_800BB7F8;
 extern short   g_stock_last;
-extern GsMAP   g_bg_map0, g_bg_map1, g_bg_map2, D_800B8370;
+extern GsMAP   D_800B8370;
 extern GsCELL  g_panel_cells[];
 extern short   D_800BB7F4, D_800BB954, D_800BB958, D_800BC224, D_800B8458,
                D_800BC048;

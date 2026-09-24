@@ -23,6 +23,9 @@ extern u_short g_bg_layer_otz[BG_LAYERS];
 extern u_long  g_bg_shown;
 extern u_int  *g_bg_maps[];
 
+/* The character maps of the menu screens' three text layers (0, 1 and 2). */
+extern GsMAP   g_bg_map0, g_bg_map1, g_bg_map2;
+
 /* The tiled map layer 4 draws: 16x16-pixel cells, BG_MAP_W across and
    BG_MAP_H down. g_bg_index says which cell goes where. */
 #define BG_MAP_W    15

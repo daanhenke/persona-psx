@@ -82,7 +82,6 @@ extern GsOT   g_ot[];
 extern int    g_pad_held[];
 extern u_char g_BC204, g_BC5C8;
 extern int    g_BB94C;
-extern GsMAP  g_bg_map0, g_bg_map1, g_bg_map2;
 extern short  D_800BB7F4, D_800BB954, D_800BB958, D_800BC224, D_800B8458,
               D_800BC048;
 extern short  g_cam_x, g_map_scroll_x;

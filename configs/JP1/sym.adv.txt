@@ -111,6 +111,7 @@ D_800643A4               = 0x800643A4; // type:u32 size:0x138C
 //-------------------------------------------------------------------
 jtbl_80064490            = 0x80064490; // size:0x24
 jtbl_800644B8            = 0x800644B8; // size:0x24
+jtbl_800644E0            = 0x800644E0; // size:0x24
 str_adv_advcmd           = 0x80064528;
 
 //-------------------------------------------------------------------
@@ -414,12 +415,12 @@ FormationLoadPrompt      = 0x800746C0; // type:func size:0x1B0
 //-----------------------------------------------------------
 //--- PA: 0x0104D0   VA: 0x80074870   subsegment: asm, adv_11
 //-----------------------------------------------------------
-func_80074870            = 0x80074870; // type:func size:0xE4
-func_80074954            = 0x80074954; // type:func size:0xDC
-func_80074A30            = 0x80074A30; // type:func size:0x154
+ConfigMenuStep           = 0x80074870; // type:func size:0xE4
+ConfigMenuOpen           = 0x80074954; // type:func size:0xDC
+MenuOtherStep            = 0x80074A30; // type:func size:0x154
 func_80074B84            = 0x80074B84; // type:func size:0x930
-func_800754B4            = 0x800754B4; // type:func size:0x108
-func_800755BC            = 0x800755BC; // type:func size:0x1F8
+ConfigOptionStep         = 0x800754B4; // type:func size:0x108
+ConfigPadStep            = 0x800755BC; // type:func size:0x1F8
 
 //--------------------------------------------------------------------------
 //--- PA: 0x011414   VA: 0x800757B4   subsegment: c, ../common/ui/placelabel

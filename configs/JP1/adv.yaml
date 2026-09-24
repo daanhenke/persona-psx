@@ -57,6 +57,7 @@ segments:
       - [0x4, rodata, adv_rodata]
       - [0xF0, .rodata, game/formationmenu]
       - [0x13C, rodata, adv_rodata0b]
+      - [0x140, .rodata, ui/configmenu]
       # partyhud's ten bytes end at 0x16E; the linker pads to the next word,
       # so the asm rodata after it begins at 0x170, not in the padding.
       - [0x164, .rodata, common/ui/partyhud]
@@ -133,7 +134,7 @@ segments:
       - [0xFDC0, c, game/formationsave]
       - [0xFF78, c, game/formationbrowse]
       - [0x10320, c, common/game/formationload]
-      - [0x104D0, asm, adv_11]
+      - [0x104D0, c, ui/configmenu]
       - [0x11414, c, common/ui/placelabel]
       - [0x114AC, asm, adv_11a]
       - [0x11840, c, ui/configtactics]
