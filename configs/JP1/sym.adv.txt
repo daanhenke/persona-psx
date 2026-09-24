@@ -390,11 +390,11 @@ MenuStatusTick           = 0x80071ED0; // type:func size:0x98
 MenuStatusOpen           = 0x80071F68; // type:func size:0x184
 MenuStatusSelect         = 0x800720EC; // type:func size:0x91C
 MenuStatusView           = 0x80072A08; // type:func size:0x374
-func_80072D7C            = 0x80072D7C; // type:func size:0x3A4
+FormationCmdStep         = 0x80072D7C; // type:func size:0x3A4
 FormationPickMember      = 0x80073120; // type:func size:0x5B4
-func_800736D4            = 0x800736D4; // type:func size:0x2F8
-func_800739CC            = 0x800739CC; // type:func size:0x344
-func_80073D10            = 0x80073D10; // type:func size:0x450
+FormationPlaceMember     = 0x800736D4; // type:func size:0x2F8
+FormationDonePrompt      = 0x800739CC; // type:func size:0x344
+FormationPresetPick      = 0x80073D10; // type:func size:0x450
 
 //---------------------------------------------------------------------
 //--- PA: 0x00FDC0   VA: 0x80074160   subsegment: c, game/formationsave

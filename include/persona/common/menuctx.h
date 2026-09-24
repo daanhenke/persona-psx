@@ -31,7 +31,9 @@ typedef struct {
     /* 0x120 */ MenuList arcana_col;
     /* 0x130 */ MenuList unk130;
     /* 0x140 */ MenuList unk140;
-    /* 0x150 */ u_char   pad150[0x70];
+    /* 0x150 */ u_char   pad150[0x20];
+    /* 0x170 */ MenuList unk170;
+    /* 0x180 */ u_char   pad180[0x40];
     /* 0x1C0 */ int      slot_base;
     /* 0x1C4 */ u_char   pad1C4[0xC];
     /* 0x1D0 */ int      row;

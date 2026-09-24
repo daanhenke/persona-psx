@@ -72,11 +72,11 @@ extern void  SsSetNck(short handle);
 extern u_char PartyLastSlot(void);
 extern short PersonaStockCompact(void);
 
-extern void func_80072D7C(void);
+extern void FormationCmdStep(void);
 extern void FormationPickMember(void);
-extern void func_800736D4(void);
-extern void func_800739CC(void);
-extern void func_80073D10(void);
+extern void FormationPlaceMember(void);
+extern void FormationDonePrompt(void);
+extern void FormationPresetPick(void);
 extern void FormationSavePrompt(void);
 extern void func_80074318(void);
 extern void FormationLoadPrompt(void);
@@ -99,19 +99,19 @@ inline void FormationMenuStep(void)
         g_menu_subsel++;
         break;
     case 1:
-        func_80072D7C();
+        FormationCmdStep();
         break;
     case 2:
         FormationPickMember();
         break;
     case 3:
-        func_800736D4();
+        FormationPlaceMember();
         break;
     case 4:
-        func_800739CC();
+        FormationDonePrompt();
         break;
     case 5:
-        func_80073D10();
+        FormationPresetPick();
         break;
     case 6:
         FormationSavePrompt();
