@@ -183,7 +183,7 @@ BtlObj *BtlSpawnCastCircle(int side, int col2, int row)
     o->attached = BtlObjAlloc(&g_btl_cast_circle_def, FX_OBJ_GROUP, 0,
                               FX_OBJ_DRAW, 0, pos, CIRCLE_CD, CIRCLE_CE);
     o->attached->rot.vx = g_btl_cam_rot.vx;
-    o->attached->rot.vz = g_btl_intro_dist;
+    o->attached->rot.vz = g_btl_intro_dist[0];
     o->attached->scale_x = CIRCLE_FLAT_SCALE;
     o->attached->scale_y = CIRCLE_FLAT_SCALE;
     o->attached->attr |= CIRCLE_FLAT_ATTR;

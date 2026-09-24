@@ -100,7 +100,7 @@ BtlObj *BtlFxStart33(void)
     o->rot.vx = n;
     n = g_btl_cam_rot.vy;
     o->rot.vy = n;
-    n = g_btl_intro_dist;
+    n = g_btl_intro_dist[0];
     o->rot.vz = n;
     return o;
 }

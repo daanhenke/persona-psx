@@ -58,7 +58,7 @@ BtlObj *BtlFxStart6E(void)
     o->rot.vx = n;
     n = g_btl_cam_rot.vy;
     o->rot.vy = n;
-    n = g_btl_intro_dist;
+    n = g_btl_intro_dist[0];
     o->rot.vz = n;
     n = FX_6E_LIT;
     g_btl_scene_rgb[1] = n;

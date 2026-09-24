@@ -16,7 +16,6 @@
  * played out.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/round.h>
@@ -80,11 +79,10 @@ BtlObj *BtlFxStart27(void)
     return o;
 }
 
-/* 92.40%: eight bytes of frame this does not need, the side test kept in a
-   register where the image works it out twice, and the dead first position's
-   own store lifted above the branch instead of landing at the label the arms
-   meet at. */
-#ifdef NON_MATCHING
+/* The spark's first position is written out in full in each arm of the
+   side test. gcc merges the two arms' stores, which is the store the image
+   has at the label the arms meet at, and the side is tested again for the
+   real position. */
 void BtlFxStep27(BtlObj *o)
 {
     BtlObj *spark;
@@ -99,10 +97,15 @@ void BtlFxStep27(BtlObj *o)
                 break;
             }
             g_btl_fx_def.scripts = (const u_long **)o->scripts[1];
-            row = (g_btl_actor_turn < BTL_PARTY) ? -FX_27_OFF : FX_27_OFF;
-            pos[0] = 0;
-            pos[1] = row;
-            pos[2] = 0;
+            if (g_btl_actor_turn < BTL_PARTY) {
+                pos[0] = 0;
+                pos[1] = -FX_27_OFF;
+                pos[2] = 0;
+            } else {
+                pos[0] = 0;
+                pos[1] = FX_27_OFF;
+                pos[2] = 0;
+            }
             pos[0] = (g_btl_fx_ring_cells[(o->steps & FX_27_CELLS) << 1]
                           * FX_27_COL_W - FX_27_LEFT) << 16;
             row = g_btl_fx_ring_cells[((o->steps & FX_27_CELLS) << 1) + 1]
@@ -152,6 +155,3 @@ void BtlFxStep27(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell27", BtlFxStep27);
-#endif

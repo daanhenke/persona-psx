@@ -24,7 +24,7 @@
 #define BTL_INTRO_STEP  0xD0
 
 extern u_char  g_btl_intro_step;
-extern short   g_btl_intro_dist;
+extern short   g_btl_intro_dist[];
 extern BtlObj *g_btl_intro_obj;
 
 void BtlTickObjects(void)
@@ -66,7 +66,7 @@ void BtlTickObjects(void)
         if (g_btl_intro_obj->rgb[0] == 0) {
             g_btl_intro_obj->attr |= BTL_OBJ_HIDDEN;
         }
-        dist = &g_btl_intro_dist;
+        dist = &g_btl_intro_dist[0];
         if (*dist == BTL_INTRO_END) {
             g_btl_intro_step = 0;
         } else {

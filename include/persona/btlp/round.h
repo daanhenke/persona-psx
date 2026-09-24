@@ -359,7 +359,9 @@ extern void    BtlRollDefeatDrop(struct BtlActor *by, struct BtlActor *dead);
 /* The object the opening is played on, and how far the camera has pulled
    back for it. */
 extern BtlObj *g_btl_intro_obj;
-extern short   g_btl_intro_dist;
+/* An array of one: read as a scalar, gcc moves its load above stores into an
+   object's rotation, and BtlFxStart36 needs it to stay behind them. */
+extern short   g_btl_intro_dist[];
 
 /* Where the intro camera comes to rest. */
 #define BTL_INTRO_SETTLED 0x200

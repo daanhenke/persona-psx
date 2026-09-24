@@ -19,7 +19,6 @@
  * copies free themselves once it has.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/object.h>
@@ -51,15 +50,11 @@
 #define FX_36_DISC_ATTR  (BTL_OBJ_ATTR_4000 | 0x4 | BTL_OBJ_NO_SHADOW)
 #define FX_36_DISC_SCALE 0x1800
 
-/* 75.20%. Every constant the two BtlObjAlloc calls take - the effect
-   template, the position's address, the group, 0x1D and 0xE - and the fade's
-   2 are kept in saved registers here and shared by both calls; the image
-   loads each afresh where it is used and holds only the 0x80 in a saved
-   register. It is not loop invariant motion: the loop written with a goto,
-   as a for and as a while all keep the sharing, and so does taking the 0x80
-   into a local. The pieces' fields are also stored through `after` in the
-   image once it has been advanced. */
-#ifdef NON_MATCHING
+/* The disc's position is written out in full in each arm of the side test.
+   That breaks the block CSE would otherwise carry the loop's call constants
+   across, so the second BtlObjAlloc builds its own, as the image does. The
+   camera distance is read as an array of one (see round.h), so it stays
+   behind the rotation stores. */
 BtlObj *BtlFxStart36(void)
 {
     BtlObj *o;
@@ -93,9 +88,15 @@ BtlObj *BtlFxStart36(void)
     } while (i >= 0);
 
     g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[0];
-    pos[0] = 0;
-    pos[1] = g_btl_actor_turn < BTL_PARTY ? -FX_36_Y : FX_36_Y;
-    pos[2] = 0;
+    if (g_btl_actor_turn < BTL_PARTY) {
+        pos[0] = 0;
+        pos[1] = -FX_36_Y;
+        pos[2] = 0;
+    } else {
+        pos[0] = 0;
+        pos[1] = FX_36_Y;
+        pos[2] = 0;
+    }
     o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0, pos,
                     FX_OBJ_CD, FX_OBJ_CE);
     o->attr = FX_36_DISC_ATTR;
@@ -112,13 +113,10 @@ BtlObj *BtlFxStart36(void)
     o->rgb_to[2] = FX_36_LIT;
     o->rot.vx = g_btl_cam_rot.vx;
     o->rot.vy = g_btl_cam_rot.vy;
-    o->rot.vz = g_btl_intro_dist;
+    o->rot.vz = g_btl_intro_dist[0];
     BtlObjSetTimer(o, FX_36_HOLD);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxstep36", BtlFxStart36);
-#endif
 
 void BtlFxStep36(BtlObj *o)
 {

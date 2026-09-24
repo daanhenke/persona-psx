@@ -102,7 +102,7 @@ void BtlStageOpen(void)
     int i;
 
     for (;;) {
-        if (g_btl_step == 0 && g_btl_intro_dist == BTL_INTRO_SETTLED) {
+        if (g_btl_step == 0 && g_btl_intro_dist[0] == BTL_INTRO_SETTLED) {
             if (g_btl_encounter < BTL_ENCOUNTER_SCRIPTED && g_btl_debug_skip != 0) {
                 g_btl_stage = BTL_STAGE_CLOSE;
                 g_btl_step = 0;

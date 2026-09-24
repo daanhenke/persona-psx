@@ -138,7 +138,7 @@ void BtlDrawDebugHud(void)
     }
     BtlDrawNumberAlt(g_btl_debug_cells, g_btl_cam_rot.vx, HUD_CAM_WIDTH);
     BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL, g_btl_cam_rot.vy, HUD_CAM_WIDTH);
-    BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL * 2, g_btl_intro_dist, HUD_CAM_WIDTH);
+    BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL * 2, g_btl_intro_dist[0], HUD_CAM_WIDTH);
     BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL * 3, g_btl_screen_dist, HUD_CAM_WIDTH);
     BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL * 4, g_btl_cam_shift.vx, HUD_CAM_WIDTH);
     BtlDrawNumberAlt(g_btl_debug_cells + HUD_CAM_CELL * 5, g_btl_cam_shift.vy, HUD_CAM_WIDTH);

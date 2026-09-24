@@ -37,7 +37,7 @@ void BtlFxObjTick(BtlObj *o)
        two registers the compiler runs the last of them ahead of the second. */
     short *dist;
 
-    dist = &g_btl_intro_dist;
+    dist = &g_btl_intro_dist[0];
     if (!(o->attr & BTL_OBJ_TRACKING))
     {
         step = g_btl_spell_fx[g_btl_fx_move].step;
