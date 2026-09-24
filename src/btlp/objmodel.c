@@ -18,7 +18,6 @@
  * what it belongs to.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/object.h>
@@ -31,7 +30,6 @@
 /* Draw into the arena's ordering table rather than the depth-sorted one. */
 #define BTL_OBJ_ARENA_OT 4
 
-#ifdef NON_MATCHING
 void BtlDrawObjModel(BtlObj *o)
 {
     const BtlGfxCell *cell;
@@ -100,20 +98,22 @@ void BtlDrawObjModel(BtlObj *o)
             if ((o->attr & BTL_OBJ_SHIFT_SCREEN) == 0) {
                 g_btl_obj_quad[0].vx = cell->x;
                 g_btl_obj_quad[0].vy = cell->y;
-                g_btl_obj_quad[3].vx = cell->w + cell->x;
+                g_btl_obj_quad[1].vx = cell->w + cell->x;
                 g_btl_obj_quad[1].vy = cell->y;
                 g_btl_obj_quad[2].vx = cell->x;
                 g_btl_obj_quad[2].vy = cell->h + cell->y;
+                g_btl_obj_quad[3].vx = g_btl_obj_quad[1].vx;
+                g_btl_obj_quad[3].vy = g_btl_obj_quad[2].vy;
             } else {
-                g_btl_obj_quad[0].vx = cell->x + ((short *)&o->shift_x)[1];
-                g_btl_obj_quad[0].vy = cell->y + ((short *)&o->shift)[1];
-                g_btl_obj_quad[3].vx = cell->w + g_btl_obj_quad[0].vx;
-                g_btl_obj_quad[2].vy = cell->h + g_btl_obj_quad[0].vy;
+                g_btl_obj_quad[0].vx = cell->x + (o->shift_x >> 16);
+                g_btl_obj_quad[0].vy = cell->y + (o->shift >> 16);
+                g_btl_obj_quad[1].vx = cell->w + g_btl_obj_quad[0].vx;
                 g_btl_obj_quad[1].vy = g_btl_obj_quad[0].vy;
                 g_btl_obj_quad[2].vx = g_btl_obj_quad[0].vx;
+                g_btl_obj_quad[2].vy = cell->h + g_btl_obj_quad[0].vy;
+                g_btl_obj_quad[3].vx = g_btl_obj_quad[1].vx;
+                g_btl_obj_quad[3].vy = g_btl_obj_quad[2].vy;
             }
-            g_btl_obj_quad[1].vx = g_btl_obj_quad[3].vx;
-            g_btl_obj_quad[3].vy = g_btl_obj_quad[2].vy;
             RotTransPers4(&g_btl_obj_quad[0], &g_btl_obj_quad[1],
                           &g_btl_obj_quad[2], &g_btl_obj_quad[3],
                           (long *)&g_btl_polyft4_next->x0,
@@ -142,24 +142,19 @@ void BtlDrawObjModel(BtlObj *o)
             /* The list picks the texture page too, three bits of it. */
             g_btl_polyft4_next->tpage =
                 g_btl_tpage[o->tpage + (((const u_short *)o->last)[1] & 7)];
-            if ((o->attr & BTL_OBJ_ARENA_OT) == 0) {
-                off = g_btl_frame * BTL_FRAME_STRIDE
-                      - (off * 4 - BTL_FRAME_STRIDE);
+            if ((o->attr & BTL_OBJ_ARENA_OT) != 0) {
+                ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                                + BTL_OT);
             } else {
-                /* Two steps on purpose - folding them changes the registers. */
-                off = BTL_OT;
-                off = g_btl_frame * BTL_FRAME_STRIDE + off;
+                ot = (u_long *)(g_btl_prim_pool + g_btl_frame * BTL_FRAME_STRIDE
+                                - (off * 4 - BTL_FRAME_STRIDE));
             }
-            ot = (u_long *)(g_btl_prim_pool + off);
-            cell++;
             addPrim(ot, g_btl_polyft4_next);
+            cell++;
             g_btl_polyft4_next++;
             g_btl_poly_count++;
             i++;
         } while (i < *(const u_char *)o->last);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/objmodel", BtlDrawObjModel);
-#endif
 

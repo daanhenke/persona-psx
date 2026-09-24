@@ -13,7 +13,6 @@
  * the name is copied, because it has to be terminated.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/effect.h>
 #include <persona/btlp/offer.h>
 #include <persona/common/persona.h>
@@ -39,28 +38,45 @@
 #define OFFER_CHARS 10
 #define OFFER_END   0xFF
 
-extern BtlEffectRow  g_btl_offer_rows[];
+/* The rows here are the short form of an effect row, as the stock menu's are:
+   the link, the four bytes and the text, with no data after them. */
+typedef struct BtlOfferRow {
+    /* 0x0 */ struct BtlOfferRow *next;
+    /* 0x4 */ u_char kind;
+    /* 0x5 */ u_char row;
+    /* 0x6 */ u_char x;
+    /* 0x7 */ u_char y;
+    /* 0x8 */ const u_char *text;
+} BtlOfferRow;                  /* 0xC bytes */
+
+/* The fixed rows: the heading, the Persona's level, its name, and the
+   "already held" line. Each is its own object - the twelve bytes between the
+   level and the name are something else, and nothing here reaches them. */
+extern BtlOfferRow   g_btl_offer_row_title;
+extern BtlOfferRow   g_btl_offer_row_level;
+extern BtlOfferRow   g_btl_offer_row_name;
+extern BtlOfferRow   g_btl_offer_row_held;
 extern BtlEffect     g_btl_offer_menu;
 extern u_char        g_btl_offer_name[];
-extern BtlEffectRow  g_btl_offer_gauges[];
+extern BtlOfferRow   g_btl_offer_gauges[];
 extern const u_char *g_btl_offer_labels[];
 extern int           g_btl_talk_menu_effect;
 
 extern int  BtlStockHolds(const BtlOffer *offer);
-#ifdef NON_MATCHING
+
+/* Hangs row x in after row p. */
+#define LINK(p, x) ((x)->next = (p)->next, (p)->next = (x))
+
 void BtlOfferMenu(int slot)
 {
     const u_char *name;
-    BtlEffectRow *gauge;
-    BtlEffectRow *link;
-    BtlEffectRow *prev;
-    BtlEffectRow *next;
+    BtlOfferRow  *gauge;
     int           i;
-    int           held;
+    int           effect;
     u_char        kind;
     u_char       *heldp;
 
-    g_btl_offer_rows[1].text =
+    g_btl_offer_row_level.text =
         &g_persona_data[g_btl_offer[slot].persona].level;
     name = g_persona_data[g_btl_offer[slot].persona].name;
     i = 0;
@@ -70,67 +86,45 @@ void BtlOfferMenu(int slot)
         i++;
     }
     g_btl_offer_name[i] = OFFER_END;
+    g_btl_offer_row_name.text = g_btl_offer_name;
     /* Reached through a pointer so its address is worked out once and kept
        across the call. */
-    heldp = &g_btl_offer_rows[4].kind;
-    g_btl_offer_rows[3].text = g_btl_offer_name;
+    heldp = &g_btl_offer_row_held.kind;
     *heldp = OFFER_LIT;
-    held = BtlStockHolds(&g_btl_offer[slot]);
-    if (held == 1) {
+    if (BtlStockHolds(&g_btl_offer[slot]) == 1) {
         kind = OFFER_HELD;
     } else {
         kind = OFFER_DIM;
     }
-    i = 0;
-    gauge = g_btl_offer_gauges;
     *heldp = kind;
+
     g_btl_offer_menu.next = (BtlEffectRow *)-1;
-    g_btl_offer_gauges[0].next = (BtlEffectRow *)-1;
-    g_btl_offer_menu.next = g_btl_offer_gauges;
-    do {
-        if (((g_btl_offer[slot].flags >> i) & 1) == 0) {
-            kind = OFFER_DIM;
-        } else {
-            kind = OFFER_LIT;
-        }
-        gauge->kind = kind;
+    g_btl_offer_gauges[0].next = (BtlOfferRow *)g_btl_offer_menu.next;
+    g_btl_offer_menu.next = (BtlEffectRow *)&g_btl_offer_gauges[0];
+    gauge = g_btl_offer_gauges;
+    for (i = 0; i < OFFER_GAUGES; i++) {
+        gauge->kind = ((g_btl_offer[slot].flags >> i) & 1) == 0 ? OFFER_DIM
+                                                                  : OFFER_LIT;
         gauge->x = (i >> 1) * OFFER_DX + OFFER_X0;
         gauge->row = OFFER_END;
         gauge->y = (i & 1) * OFFER_DY + OFFER_Y0;
         gauge->text = g_btl_offer_labels[i];
-        i++;
         gauge++;
-    } while (i < OFFER_GAUGES);
+    }
 
-    i = 0;
-    link = &g_btl_offer_gauges[1];
-    prev = link - 1;
-    do {
-        i++;
-        link->next = prev->next;
-        prev->next = link;
-        prev++;
-        link++;
-    } while (i < OFFER_GAUGES - 1);
+    for (i = 0; i < OFFER_GAUGES - 1; i++) {
+        LINK(&g_btl_offer_gauges[i], &g_btl_offer_gauges[i + 1]);
+    }
+    LINK(&g_btl_offer_gauges[i], &g_btl_offer_row_title);
+    LINK(&g_btl_offer_row_title, &g_btl_offer_row_level);
+    LINK(&g_btl_offer_row_level, &g_btl_offer_row_name);
+    LINK(&g_btl_offer_row_name, &g_btl_offer_row_held);
 
-    g_btl_offer_rows[0].next = g_btl_offer_gauges[i].next;
-    g_btl_offer_gauges[i].next = &g_btl_offer_rows[0];
-    next = g_btl_offer_rows[0].next;
-    g_btl_offer_rows[0].next = &g_btl_offer_rows[1];
-    g_btl_offer_rows[1].next = next;
-    g_btl_offer_rows[3].next = next;
-    g_btl_offer_rows[1].next = &g_btl_offer_rows[3];
-    g_btl_offer_rows[4].next = next;
-    g_btl_offer_rows[3].next = &g_btl_offer_rows[4];
-
-    i = BtlEffectOpen(&g_btl_offer_menu);
-    if (i != 0x100) {
-        g_btl_talk_menu_effect = i;
-        BtlEffectSetKind(i, 1);
+    effect = BtlEffectOpen(&g_btl_offer_menu);
+    if (effect != 0x100) {
+        g_btl_talk_menu_effect = effect;
+        BtlEffectSetKind(effect, 1);
     }
     BtlCursorShow(0);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/offermenu", BtlOfferMenu);
-#endif
 

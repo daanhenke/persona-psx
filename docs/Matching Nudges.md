@@ -3377,3 +3377,36 @@ of one and index it.
 
 - [highlight.c](/src/btlp/highlight.c) - `g_btl_highlight_colour[]`, which took
   `BtlHighlightDraw` from 93.97% to 99.74%.
+
+## Two pseudos on the same priority go in declaration order
+
+global alloc ranks pseudos by uses over live length. When two come out equal,
+the lower-numbered pseudo picks first, and a local's pseudo is numbered where
+it is declared. So when two registers are swapped and a greg dump
+(`cc1 -dg`) shows the pair tied, move one declaration above the other.
+
+- [likedequip.c](/src/btlp/likedequip.c) - the entry counter and the enemy's
+  record tied at a third; declaring `n` first finished `BtlTalkLikedEquip`.
+
+## Rows reached by fresh address loads are separate objects
+
+When one symbol's offsets each get their own `lui`/`addiu` in the image,
+where gcc would build them from one base register, the original had separate
+objects that the linker put next to each other. Split the symbol in the sym
+file and declare each part. Check the data first: bytes between the parts
+that nothing reads confirm it.
+
+- [offermenu.c](/src/btlp/offermenu.c) - `g_btl_offer_rows` was four rows and
+  twelve unread bytes. Splitting it, with the rows' real 0xC size, took
+  `BtlOfferMenu` from 88.96% to 100%.
+
+## The high half of a 16.16 value is a shift, not a cast pointer
+
+`o->x >> 16` on a long compiles to `lh` of the high halfword.
+`((short *)&o->x)[1]` compiles to `lhu` wherever only 16 bits are used. When
+the image loads a 16.16 field's top half with `lh`, write the shift.
+
+- [objmodel.c](/src/btlp/objmodel.c) - the screen shift in `BtlDrawObjModel`.
+  Together with writing all eight corner values in each arm, and with each
+  arm of the ordering-table choice computing its own pointer, it went from
+  90.39% to 100%.

@@ -18,7 +18,6 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/offer.h>
 #include <persona/common/item.h>
@@ -51,28 +50,27 @@ extern const u_char *g_btl_talk_gift_script;
 extern int          BtlOfferLevelTest(int test, u_short slot);
 extern void         BtlSetInsert(int kind, const u_char *text);
 
-/* 91.43%, written as the plain three loops it is: loop.c makes the entry
-   offset, the likes pointer and the signed pointer test of the species loop
-   itself, and the answer is returned straight rather than through a local.
-   Left: the equipment walk's pointer starts at the array (me + 0x20) in the
-   image and at the record here, and the record and the entry counter trade
-   registers. */
-#ifdef NON_MATCHING
+/* The equipment is walked with a pointer that starts at the array, and the
+   same pointer is then pointed at the offer's moods and stepped to the one
+   being answered. n is declared ahead of the second record: the two tie on
+   global alloc's priority, and a tie goes to the lower-numbered pseudo. */
 int BtlTalkLikedEquip(void)
 {
     BtlActor *me;
+    int       n;
     BtlActor *him;
     int       found;
-    int       n;
     int       i;
     int       k;
+    u_short  *eq;
 
     found = 0;
     me = &g_btl_actors[g_btl_actor_slot];
     him = &g_btl_actors[BTL_PARTY + g_btl_talk_target];
     for (n = 0; n < LIKED_ENTRIES; n++) {
-        for (i = 0; i < CHAR_EQUIP; i++) {
-            if (me->c.equip[i] == g_btl_liked_equip[n].item) {
+        eq = me->c.equip;
+        for (i = 0; i < CHAR_EQUIP; i++, eq++) {
+            if (*eq == g_btl_liked_equip[n].item) {
                 for (k = 0; k < LIKED_SPECIES; k++) {
                     if (g_btl_liked_equip[n].likes[k] == him->species) {
                         found = 1;
@@ -87,14 +85,13 @@ done:
         if ((u_short)(g_btl_talk_said - 1) < 2) {
             return 0;
         }
-        g_btl_offer[g_btl_offer_slot].mood[g_btl_talk_said] = BTL_MOOD_STRONG;
+        eq = (u_short *)g_btl_offer[g_btl_offer_slot].mood;
+        eq += g_btl_talk_said;
+        *eq = BTL_MOOD_STRONG;
         return 1;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/likedequip", BtlTalkLikedEquip);
-#endif
 
 /* The enemy is reached as a slot of g_btl_actors rather than through
    g_btl_enemies: the original builds one base and adds the five party records

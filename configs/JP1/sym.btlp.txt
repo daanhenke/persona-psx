@@ -3168,7 +3168,11 @@ g_btl_talk_pair_acts          = 0x800CB50C; // type:s16 size:0x14
 //--------------------------------------------------------------------------
 //--- PA: 0x067180   VA: 0x800CB520   subsegment: data, btlp_talkanswer_tail
 //--------------------------------------------------------------------------
-g_btl_offer_rows              = 0x800CB5D8; // size:0x3C
+g_btl_offer_row_title         = 0x800CB5D8; // size:0xC
+g_btl_offer_row_level         = 0x800CB5E4; // size:0xC
+D_800CB5F0                    = 0x800CB5F0; // size:0xC
+g_btl_offer_row_name          = 0x800CB5FC; // size:0xC
+g_btl_offer_row_held          = 0x800CB608; // size:0xC
 g_btl_offer_menu              = 0x800CB614;
 g_btl_offer_labels            = 0x800CB704;
 g_btl_panel_state             = 0x800CB724;
@@ -4148,7 +4152,7 @@ g_btl_seq_clip                = 0x800F5A84; // size:0x20
 g_btl_demand_roll             = 0x800F5AA4;
 g_btl_round                   = 0x800F5AA8; // type:s32 size:0x4
 g_btl_counter_targets         = 0x800F5AAC; // type:u16 size:0x2
-g_btl_offer_gauges            = 0x800F5AB0; // size:0x14
+g_btl_offer_gauges            = 0x800F5AB0; // size:0x60
 g_btl_summon_line             = 0x800F5B10;
 g_btl_obj_prev                = 0x800F5B14;
 g_btl_hold_obj                = 0x800F5B18; // type:u32 size:0x4
