@@ -769,7 +769,7 @@ ActorsSetDepth           = 0x80083150; // type:func size:0x84
 //------------------------------------------------------------
 //--- PA: 0x01EE34   VA: 0x800831D4   subsegment: asm, adv_30a
 //------------------------------------------------------------
-func_800831D4            = 0x800831D4; // type:func size:0x13C
+ImageIndexInit           = 0x800831D4; // type:func size:0x13C
 
 //------------------------------------------------------------------
 //--- PA: 0x01EF70   VA: 0x80083310   subsegment: c, game/actorstile
@@ -799,8 +799,8 @@ ImageCellsInit           = 0x80083568; // type:func size:0x280
 //-----------------------------------------------------------
 //--- PA: 0x01F448   VA: 0x800837E8   subsegment: asm, adv_31
 //-----------------------------------------------------------
-func_800837E8            = 0x800837E8; // type:func size:0x230
-func_80083A18            = 0x80083A18; // type:func size:0x3A8
+AdvRoomBgInit            = 0x800837E8; // type:func size:0x230
+CamFollowStep            = 0x80083A18; // type:func size:0x3A8
 
 //--------------------------------------------------------------
 //--- PA: 0x01FA20   VA: 0x80083DC0   subsegment: c, game/camera
@@ -1515,13 +1515,17 @@ g_adv_chest_empty_cells  = 0x800B4FC4;
 g_adv_chest_empty_def    = 0x800B4FEC;
 g_adv_shrink_away_def    = 0x800B500C;
 g_adv_squash_away_def    = 0x800B502C;
+g_room_anim              = 0x800B51D4;
 g_ebg_offsets            = 0x800B5DCC;
 g_mes_offsets            = 0x800B5F30;
 str_adv_ev01_bgd         = 0x800B6134;
 str_adv_ev02_bgd         = 0x800B6148;
 str_adv_ev03_bgd         = 0x800B615C;
+g_room_origins           = 0x800B6330; // size:0x14
+g_room_backdrops         = 0x800B6344; // size:0x8
 str_chest_empty          = 0x800B634C;
 g_dir_flip               = 0x800B6358; // size:0x4
+g_room_map_sizes         = 0x800B636C; // size:0xA
 g_dir_x                  = 0x800B6378;
 g_dir_y                  = 0x800B637C;
 g_walk_dy                = 0x800B6384;

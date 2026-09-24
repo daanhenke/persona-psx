@@ -126,3 +126,15 @@ rom:0x7E34 reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
 rom:0x7E38 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE
 rom:0x7E3C reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
 rom:0x7E40 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE
+
+// The BG layers split at +0x4 the same way: layer 0's x and y.
+// AdvRoomBgInit
+rom:0x1F530 reloc:MIPS_HI16 symbol:g_bg_layers addend:0x4
+rom:0x1F534 reloc:MIPS_LO16 symbol:g_bg_layers addend:0x4
+rom:0x1F538 reloc:MIPS_HI16 symbol:g_bg_layers addend:0x6
+rom:0x1F53C reloc:MIPS_LO16 symbol:g_bg_layers addend:0x6
+// func_8008EDBC
+rom:0x2AA44 reloc:MIPS_HI16 symbol:g_bg_layers addend:0x4
+rom:0x2AA48 reloc:MIPS_LO16 symbol:g_bg_layers addend:0x4
+rom:0x2AA50 reloc:MIPS_HI16 symbol:g_bg_layers addend:0x6
+rom:0x2AA54 reloc:MIPS_LO16 symbol:g_bg_layers addend:0x6

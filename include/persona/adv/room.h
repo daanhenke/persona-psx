@@ -31,4 +31,11 @@ extern const u_char g_dir_y[];
 extern const u_char g_walk_dx[];
 extern const u_char g_walk_dy[];
 
+/* The room picture's cell index for a picture kind (roommap.c), the backdrop
+   and BG layer 0 set up for the scene's room (roomsetup.c), and the camera
+   step taken with the followed actor's walk (roomsetup.c). */
+extern void ImageIndexInit(short kind);
+extern void AdvRoomBgInit(void);
+extern void CamFollowStep(void);
+
 #endif

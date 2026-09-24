@@ -73,7 +73,9 @@ typedef struct {
                                         scrolls while the followed actor is
                                         at least four tiles from either edge,
                                         which is what these bound. */
-    /* 0x28 */ u_char       pad28[4];
+    /* 0x28 */ u_char       backdrop; /* the colour behind the room picture,
+                                        from g_room_backdrops            */
+    /* 0x29 */ u_char       pad29[3];
     /* 0x2C */ u_char      *arrive;  /* the script run on arrival, or -1   */
     /* 0x30 */ u_char       pad30[4];
     /* 0x34 */ u_short      map_at;  /* the automap position, already

@@ -12,6 +12,7 @@
 #include <decomp/types.h>
 #include <persona/adv/actor.h>
 #include <persona/adv/scene.h>
+#include <persona/adv/room.h>
 #include <persona/common/slot.h>
 
 #define g_slots ((Slot *)0x800DC10C)
@@ -43,8 +44,6 @@ extern void AdvEffectSetupSlots(void);
 extern void AdvSceneStartImages(void);
 extern void ActorsPlaceSprites(void);
 extern void CamCenterOnActor(u_char actor);
-extern void func_800831D4(u_char kind);
-extern void func_800837E8(void);
 extern void func_80084694(void);
 extern void func_80088B8C(void);
 
@@ -105,10 +104,10 @@ void AdvRoomRebuild(void)
     SlotClearAll();
     FadeBlackout();
     ImageAnimStopAll();
-    func_800837E8();
+    AdvRoomBgInit();
     func_80088B8C();
     g_bg_shown = 1;
-    func_800831D4(g_adv_scene->kind);
+    ImageIndexInit(g_adv_scene->kind);
     AdvEffectSetupSlots();
     SlotInitTagged(g_bar_def, BAR_SLOT, 0x35, 0xE0, 0xC);
     SlotInit(g_bar_def2, BAR_SLOT2, 0x34, 0xE3, 0xC);

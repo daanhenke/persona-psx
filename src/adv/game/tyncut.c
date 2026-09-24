@@ -28,6 +28,7 @@
 #include <libsnd.h>
 #include <libcd.h>
 #include <persona/adv/scene.h>
+#include <persona/adv/room.h>
 #include <persona/common/bg.h>
 #include <persona/common/slot.h>
 #include <persona/common/imageanim.h>
@@ -105,7 +106,6 @@ extern void func_8008AE2C(void);
 extern void func_8008A9B4(void);
 extern void func_8008AC50(void);
 extern void func_8008A93C(int obj, int pad);
-extern void func_800831D4(u_char kind);
 extern void func_80084694(void);
 
 /* Grows a slot's scale a step towards 1.0, faster in y than in x. */
@@ -493,7 +493,7 @@ void AdvTynCutscene(void)
     FlushImageUploads();
     AdvPickEffect();
     AdvEffectSetupSlots();
-    func_800831D4(g_adv_scene->kind);
+    ImageIndexInit(g_adv_scene->kind);
     SlotClearAll();
     SlotInitTagged(g_bar_def, 0x29, 0x35, 0xE0, -0x20);
     SlotInit(g_bar_def2, 0x2A, 0x34, 0xE3, -0x20);

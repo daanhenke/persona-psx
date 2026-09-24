@@ -29,6 +29,7 @@
 #include <libgs.h>
 #include <libsnd.h>
 #include <persona/adv/scene.h>
+#include <persona/adv/room.h>
 #include <persona/common/char.h>
 #include <persona/common/persona.h>
 #include <persona/common/imageanim.h>
@@ -137,7 +138,6 @@ extern void AdvLoadBgm();  /* called without a prototype here */
 extern void AdvLoadEventBg(void);
 extern void AdvPickSceneByFlags(void);
 extern void ViewShakeStop(void);
-extern void func_800837E8(void);
 extern void func_80088B8C(void);
 extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
@@ -296,7 +296,7 @@ void ovl_adv_entry(void)
 loaded:
     ViewShakeStop();
     g_cam_actor = 0;
-    func_800837E8();
+    AdvRoomBgInit();
     func_80088B8C();
     PadLoadBindings(g_pad_config);
     PadSetPageButtons(g_pad_config);
