@@ -1583,7 +1583,7 @@ D_800BAB9C               = 0x800BAB9C; // type:u32 size:0xC70
 g_grow_slot_x            = 0x800BAD20;
 g_adv_field_state        = 0x800BB7EC;
 g_effect_tick            = 0x800BB7FC;
-g_page_fwd_repeat        = 0x800BB800;
+g_page_fwd_repeat        = 0x800BB800; // size:0x10
 
 
 
@@ -1595,7 +1595,6 @@ g_page_fwd_repeat        = 0x800BB800;
 //------------------------------------------------------------
 //--- PA: 0x05746C   VA: 0x800BB80C   subsegment: bss, adv_bss
 //------------------------------------------------------------
-D_800BB80C               = 0x800BB80C; // type:u32 size:0xFC
 g_room_origin_x          = 0x800BB814;
 g_room_origin_y          = 0x800BB818;
 g_menu_allow_hold        = 0x800BB824;
@@ -1645,8 +1644,7 @@ g_map_scroll_y           = 0x800BBC0C;
 g_image_queue_count      = 0x800BBC18;
 g_map_name_cells         = 0x800BBC1C;
 D_800BBC30               = 0x800BBC30; // type:u32 size:0x18
-g_page_back_repeat       = 0x800BBC3C;
-D_800BBC48               = 0x800BBC48; // type:u32 size:0x8
+g_page_back_repeat       = 0x800BBC3C; // size:0x10
 g_image_queue            = 0x800BBC4C; // size:0x300
 g_ot_index               = 0x800BBF54;
 g_bg_index               = 0x800BBF58; // size:0x78
@@ -1703,3 +1701,7 @@ g_adv_loading            = 0x800BC208; // size:0x1
 g_view_shake             = 0x800B632C; // size:0x2
 g_view2_dx               = 0x800BB93C; // size:0x2
 g_view2_dy               = 0x800BB948; // size:0x2
+g_key_page_back          = 0x800EB680; // size:0x2
+g_key_page_fwd           = 0x800EB684; // size:0x2
+g_stat_labels            = 0x800B24D0; // size:0x10
+g_item_descs             = 0x8004AE1C;
