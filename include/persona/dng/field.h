@@ -45,7 +45,8 @@ typedef struct {
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
-    u_char        pad19E58[0x1AE80 - 0x19E58];
+    GsOT          world_ot[2];        /* 0x19E58 the 3D field's, one per display buffer */
+    u_char        pad19E80[0x1AE80 - 0x19E80];
     GsOT          ot[2];              /* 0x1AE80 one per display buffer */
     u_char        pad1AEA8[0x36364 - 0x1AEA8];
     GsSPRITE      backdrop;           /* 0x36364 */
@@ -92,12 +93,17 @@ typedef struct {
                             be rolled; cleared coming back from S2D or ADV */
     u_char   pad15B1;
     u_char   map_seen_only; /* 0x15B2 the minimap hides tiles not yet seen */
-    u_char   pad15B3[0x15BC - 0x15B3];
+    u_char   pad15B3[0x15B9 - 0x15B3];
+    u_char   exit_bits;  /* 0x15B9 the 0xC0 bits of the room byte of the
+                            exit last taken into ADV */
+    u_char   pad15BA[0x15BC - 0x15BA];
     u_char   tick_flags; /* 0x15BC */
     u_char   pad15BD;
     u_short  area;       /* 0x15BE the automap's map id */
     u_short  room;       /* 0x15C0 and its room within the map */
-    u_char   pad15C2[0x15C8 - 0x15C2];
+    u_short  scene6_id;  /* 0x15C2 where an exit into scene 6 leads; ADV's
+                            scripts set it too */
+    u_char   pad15C4[0x15C8 - 0x15C4];
     /* The door being opened: for each of its two halves, which axis of the
        translation moves and which scene object it is. */
     short   door_axis[2]; /* 0x15C8 */
@@ -389,9 +395,6 @@ void func_80065978(void);
 void func_80067CC8(int a);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_8007192C(void);
-void func_800713B0(int kind);
-int  func_8006C9C8(void);
 /* Swaps the playing tune pair (handles 15 and 16) between the floor's own
    (sequences 12, 13) and a zone's (15, 16) as the party steps on or off a
    TILE_ZONE_TUNE tile; the new tune starts unless `quiet`. */
@@ -427,6 +430,43 @@ void FieldFadeOut(void);
 void FieldFadeIn(void);
 int  FieldPauseBgm(void);
 
+/* An exit of g_floor_spots, 18 bytes: its tile, the scene it leads to
+   (g_exit_scenes by the low bits of kind), the story flag choosing between
+   its two destination ids, where in the destination it lands, and the
+   rectangle of the automap taking it reveals. */
+typedef struct {
+    u_char  x, y;
+    u_char  kind;          /* 0x2 */
+    u_char  pad3;
+    u_short flag;          /* 0x4 */
+    u_short id[2];         /* 0x6 */
+    u_char  unk4;          /* 0xA */
+    u_char  to_x, to_y;    /* 0xB */
+    u_char  room;          /* 0xD low 3 bits the room, 0xC0 for ADV */
+    u_char  seen_x, seen_y; /* 0xE */
+    u_char  seen_w, seen_h; /* 0x10 */
+} FloorExit;
+
+/* Per exit kind, the scene it leads to. */
+extern int g_exit_scenes[];
+
+/* How many of the exits on the party's tile to pass over before the one
+   taken; used up as they are. */
+extern u_char g_exit_skip;
+
+/* Where a scene change leads, in the save area: the map id, the tile and
+   the room (the same bytes the encounter is handed in). */
+#define g_dest_id   g_enc_id
+#define g_dest_unk4 g_enc_map
+#define g_dest_room g_enc_surprise
+extern u_char g_dest_x;
+extern u_char g_dest_y;
+
+/* Per walk direction, the axis a door's halves slide along. */
+extern u_short g_door_axes[];
+
+void FieldTakeExit(void);
+int  FieldUseTile(void);
 int  FieldOpenDoor(void);
 void FieldInitGraph(void);
 void FieldSetFloor(void);
@@ -503,18 +543,30 @@ extern signed char g_seq_slot[];
 /* Which display buffer is being drawn into. */
 extern int g_draw_buf;
 
-/* What a battle transition moves: the scene's objects and the offset it
-   applies to them. */
-extern GsDOBJ2       *g_fx_objs;
-extern GsCOORDINATE2 *g_fx_coords;
-extern SVECTOR       *g_fx_rots;
-extern SVECTOR        g_fx_shift;
+/* The shattering battle transition: the screen cut into FX_TILES tiles,
+   each a POLY_FT4 with a position and a rotation, kept in the scene's
+   object, coordinate and rotation space; g_fx_shift turns them all. */
+#define FX_COLS  10
+#define FX_ROWS  8
+#define FX_TILES (FX_COLS * FX_ROWS)
+extern POLY_FT4 *g_fx_tiles;
+extern SVECTOR  *g_fx_pos;
+extern SVECTOR  *g_fx_rots;
+extern SVECTOR   g_fx_shift;
+
+/* Where the tiles are drawn from, and the top two corners of a tile. */
+extern VECTOR    g_fx_depth;
+extern SVECTOR   g_fx_top_left;
+extern SVECTOR   g_fx_top_right;
 
 void FieldFxBegin(void);
 void FieldFxRun(int kind);
+void FieldFxStep(int kind);
+void FieldFxSetup(void);
 
 /* The wavy transition's per-column stretch speed, and the frames each
-   column waits before it starts to stretch. */
+   column waits before it starts to stretch; the shattering one keeps each
+   tile's fall speed and delay in them. */
 extern int g_wave_speed[];
 extern int g_wave_delay[];
 

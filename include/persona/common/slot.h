@@ -90,7 +90,12 @@ extern void SlotInitTagged(void *def, int slot, int attr, short x, short y);
 #else
 extern void SlotInitTagged(void *def, u_char slot, int attr, short x, short y);
 #endif
+/* And again: dng's persona data pick hands y over without narrowing it. */
+#ifdef SLOT_SETPOS_INT
+extern void SlotSetPos(u_char slot, int attr, short x, int y);
+#else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
+#endif
 extern void SlotClear(u_char slot);
 extern void SlotClearAll(void);
 /* The same kind of per-unit difference: some callers were built against an

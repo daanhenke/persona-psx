@@ -126,6 +126,7 @@ g_state_next             = 0x80055C38;
 //--------------------------------------------------------------
 //--- PA: 0x000000   VA: 0x800643A0   subsegment: rodata, dng_id
 //--------------------------------------------------------------
+g_adv_scene_file         = 0x8005E654; // size:0x18
 g_overlay_base           = 0x800643A0;
 
 //------------------------------------------------------------------
@@ -178,8 +179,8 @@ default                  = 0x8006BB88;
 func_8006BBC0            = 0x8006BBC0; // type:func size:0x73C
 FieldDamageFloor         = 0x8006C2FC; // type:func size:0x220
 FieldPoisonFloor         = 0x8006C51C; // type:func size:0x1B8
-func_8006C6D4            = 0x8006C6D4; // type:func size:0x2F4
-func_8006C9C8            = 0x8006C9C8; // type:func size:0x578
+FieldTakeExit            = 0x8006C6D4; // type:func size:0x2F4
+FieldUseTile             = 0x8006C9C8; // type:func size:0x578
 FieldOpenDoor            = 0x8006CF40; // type:func size:0x90
 FieldInitGraph           = 0x8006CFD0; // type:func size:0xC8
 FieldSetFloor            = 0x8006D098; // type:func size:0x268
@@ -252,8 +253,8 @@ FieldZoneTunes           = 0x80070DAC; // type:func size:0x204
 CharInit                 = 0x80070FB0; // type:func size:0x308
 FieldFxBegin             = 0x800712B8; // type:func size:0xB0
 FieldFxRun               = 0x80071368; // type:func size:0x48
-func_800713B0            = 0x800713B0; // type:func size:0x57C
-func_8007192C            = 0x8007192C; // type:func size:0x268
+FieldFxStep              = 0x800713B0; // type:func size:0x57C
+FieldFxSetup             = 0x8007192C; // type:func size:0x268
 FieldFadeFxBegin         = 0x80071B94; // type:func size:0x68
 FieldFadeFxRun           = 0x80071BFC; // type:func size:0x54
 FieldFadeFxStep          = 0x80071C50; // type:func size:0x1B4
@@ -438,7 +439,7 @@ FlushImageUploads        = 0x80077B74; // type:func size:0x88
 //--- PA: 0x01385C   VA: 0x80077BFC   subsegment: asm, dng_1_s2
 //-------------------------------------------------------------
 D_80077BFC               = 0x80077BFC; // type:func size:0xA8
-func_80077CA4            = 0x80077CA4; // type:func size:0xB0
+TimQueueAt               = 0x80077CA4; // type:func size:0xB0
 func_80077D54            = 0x80077D54; // type:func size:0x260
 func_80077FB4            = 0x80077FB4; // type:func size:0xDD4
 
@@ -1041,10 +1042,10 @@ func_80097388            = 0x80097388; // type:func size:0x620
 func_800979A8            = 0x800979A8; // type:func size:0x150
 func_80097AF8            = 0x80097AF8; // type:func size:0x470
 func_80097F68            = 0x80097F68; // type:func size:0x390
-func_800982F8            = 0x800982F8; // type:func size:0x228
-func_80098520            = 0x80098520; // type:func size:0x334
-func_80098854            = 0x80098854; // type:func size:0x3F4
-func_80098C48            = 0x80098C48; // type:func size:0x4B8
+PersonaDataPick          = 0x800982F8; // type:func size:0x228
+PersonaDataView          = 0x80098520; // type:func size:0x334
+PersonaDataLayout        = 0x80098854; // type:func size:0x3F4
+PersonaDataDraw          = 0x80098C48; // type:func size:0x4B8
 
 //---------------------------------------------------------------------
 //--- PA: 0x034D60   VA: 0x80099100   subsegment: c, common/game/flags2
@@ -1091,12 +1092,17 @@ g_seq_slot               = 0x800993D8;
 g_fog                    = 0x800993F8;
 g_bob_count              = 0x80099458;
 g_bob_step               = 0x80099468;
+g_door_axes              = 0x80099478; // size:0x8
 g_lift_stops             = 0x8009955C;
 g_lift_from              = 0x80099562;
-g_map_music              = 0x8009958C; // size:0xA0
+g_map_music              = 0x8009958C; // size:0x54
+g_exit_scenes            = 0x800995E0; // size:0x10
 g_facing_bits            = 0x8009962C; // size:0x10
 g_enc_rate_div           = 0x8009963C; // size:0x8
 g_enc_moon_base          = 0x80099644;
+g_fx_depth               = 0x80099658; // size:0x10
+g_fx_top_left            = 0x80099668; // size:0x8
+g_fx_top_right           = 0x80099670; // size:0x8
 g_lift_cells             = 0x800996FC; // size:0xA0
 g_lift_patterns          = 0x8009979C;
 g_lift_pattern_of        = 0x80099898;
@@ -1106,6 +1112,8 @@ g_msg_cluts              = 0x80099A18;
 g_msg_styles             = 0x80099A28;
 g_flicker_ramp           = 0x80099A44;
 g_pow10                  = 0x80099A64;
+g_pdata_arrow_l_def      = 0x80099E00;
+g_pdata_arrow_r_def      = 0x80099E28;
 g_config_marker_def      = 0x80099E8C;
 g_menu_sel               = 0x8009A4CC;
 g_menu_subsel            = 0x8009A4CE;
@@ -1144,7 +1152,7 @@ g_page_fwd_repeat        = 0x8009FAB8;
 //--- PA: 0x03B724   VA: 0x8009FAC4   subsegment: bss, dng_bss
 //------------------------------------------------------------
 D_8009FAC4               = 0x8009FAC4; // type:u32 size:0x14
-g_fx_objs                = 0x8009FAC8;
+g_fx_tiles               = 0x8009FAC8;
 g_ambient_on             = 0x8009FACC;
 D_8009FAD0               = 0x8009FAD0;
 g_noclip                 = 0x8009FAD4;
@@ -1166,7 +1174,7 @@ g_menu                   = 0x8009FB28;
 g_fx_rots                = 0x8009FB2C;
 g_tile_defs              = 0x8009FB38;
 g_floor_grid             = 0x8009FB40;
-g_fx_coords              = 0x8009FB50;
+g_fx_pos                 = 0x8009FB50;
 g_party_last             = 0x8009FB54;
 g_msg_col                = 0x8009FB64;
 g_wave_speed             = 0x8009FB68;
@@ -1200,6 +1208,7 @@ g_ot_index               = 0x800A01DC;
 g_fx_shift               = 0x800A01E0; // size:0x8
 g_bg_index               = 0x800A01E8;
 g_persona_list_count     = 0x800A02CC;
+g_persona_data_step      = 0x800A02D0; // size:0x2
 g_walk_undo              = 0x800A02D4;
 g_bgm_seq                = 0x800A02D8;
 g_entry_pos              = 0x800A02DC; // size:0x3
@@ -1231,11 +1240,13 @@ g_pack_tims              = 0x800A0828;
 g_pack_spot_tab          = 0x800A082C;
 g_door_dx                = 0x800A0830;
 g_door_dy                = 0x800A0832;
+g_exit_skip              = 0x800A0840; // size:0x1
 g_scene                  = 0x800A0844;
 g_step_from_eye          = 0x800A0848;
 g_step_from_at           = 0x800A084C;
 g_ot                     = 0x800A0850;
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
+g_persona_list           = 0x800EAE4C; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 g_party                  = 0x801F256C; // ignore:True size:0x5
@@ -1256,6 +1267,8 @@ g_moon_phase             = 0x801F2B30; // ignore:True size:0x1
 g_map_seen               = 0x801F2B38; // ignore:True
 g_seq_offsets            = 0x801CD000; // ignore:True size:0x80
 g_enc_id                 = 0x801F5350; // ignore:True size:0x2
+g_dest_x                 = 0x801F5352; // size:0x1
+g_dest_y                 = 0x801F5353; // size:0x1
 g_enc_map                = 0x801F5354; // ignore:True size:0x1
 g_enc_surprise           = 0x801F5355; // ignore:True size:0x1
 g_vab_handles            = 0x801F535C; // ignore:True size:0x10

@@ -23,7 +23,7 @@ int FieldWalk(int ret)
     if (FieldTileOneWay() == 0) {
         g_walk_undo = g_dng->pos[g_dir_axis[g_dng->walk_dir]];
         g_dng->pos[g_dir_axis[g_dng->walk_dir]] += g_dir_tile_step[g_dng->walk_dir];
-        if (FieldTileSolid() == 0 && func_8006C9C8() == 0) {
+        if (FieldTileSolid() == 0 && FieldUseTile() == 0) {
             if (g_field_mode != 0) {
                 g_dng->pos[g_dir_axis[g_dng->walk_dir]] = g_walk_undo;
                 return ret;
