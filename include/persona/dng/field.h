@@ -17,12 +17,12 @@
 /* How many objects the scene has room for. */
 #define SCENE_OBJS 968
 
-/* The flat sprites drawn over the field. */
-#define FIELD_SPRITES 105
+/* The flat sprites drawn over the field: exactly as many as fit before the
+   objects. */
+#define FIELD_SPRITES 150
 
 typedef struct {
     GsSPRITE      sprites[FIELD_SPRITES]; /* 0x00000 */
-    u_char        padEC4[0x1518 - 0xEC4];
     GsDOBJ2       objs[SCENE_OBJS];   /* 0x01518 */
     GsCOORDINATE2 coords[SCENE_OBJS]; /* 0x05198 */
     SVECTOR       rots[SCENE_OBJS];   /* 0x18018 */
@@ -275,6 +275,8 @@ void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8006FFF4(void);
+void func_8006FCB8(int id, int w, int h, int page, int u, int a, int b, int c);
+void func_8006FED0(u_short clut);
 void func_80070BF0(int a, int b);
 int  func_8006C9C8(void);
 void func_80070DAC(int arg);
@@ -314,6 +316,8 @@ void FieldInitGraph(void);
 void FieldSetFloor(void);
 void FieldEnterFrom(void);
 
+void FieldLoadWallCluts(void);
+void FieldInitStrip(void);
 void FieldRebuildMap(void);
 void FieldSetCell(int x, int y);
 void FieldResetSound(void);

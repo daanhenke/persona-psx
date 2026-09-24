@@ -1,5 +1,7 @@
 /* Persona 1 (JP) - the minimap window's cells, and restarting the sound.
  * DNG only.
+ *   0x8006E484 FieldLoadWallCluts
+ *   0x8006E52C FieldInitStrip
  *   0x8006E61C FieldRebuildMap
  *   0x8006E988 FieldSetCell
  *   0x8006EA5C FieldResetSound
@@ -13,6 +15,57 @@
 /* The minimap shows an 11 by 11 window that wraps round the floor, one
    halfword per cell; tile (x, y) always lands in cell (x % 11, y % 11). */
 #define WINDOW 11
+
+/* Uploads the floor's ten wall palettes, each decoded into the scene's
+   scratch image first, side by side from (320, 72). */
+void FieldLoadWallCluts(void)
+{
+    RECT r;
+    int  i;
+
+    r.x = 320;
+    r.y = 72;
+    r.w = 4;
+    r.h = 16;
+    for (i = 0; i < 10; i++) {
+        func_8006FED0(((u_short *)g_floor_info)[i]);
+        LoadImage(&r, (u_long *)g_scene->scratch);
+        DrawSync(0);
+        r.x += 4;
+    }
+}
+
+/* The backdrop strip: 160 two-pixel columns of 240 lines across the whole
+   screen, cut from the backdrop's texture pages 32 columns to a page. There
+   are only FIELD_SPRITES sprites before the scene's objects, so the last ten
+   columns land on the first objects' handles.
+ *
+ * All but the green and blue go through one pointer, stepped to the column
+ * rather than taken as &sprites[i] (which adds the base second); the
+ * column's x is i * 2 - 159, which loop.c turns into the register the image
+ * steps by 2. */
+#define STRIP_COLUMNS 160
+
+void FieldInitStrip(void)
+{
+    int i;
+    GsSPRITE *sp;
+
+    for (i = 0; i < STRIP_COLUMNS; i++) {
+        func_8006FCB8(i, 2, 240, i / 32, (i & 31) * 2, 0, 0, 0);
+        sp = g_scene->sprites;
+        sp += i;
+        sp->y = -120;
+        sp->scaley = 0x1000;
+        sp->attribute |= 0x2000000;
+        sp->r = 0x80;
+        sp->rotate = 0;
+        sp->my = 0;
+        sp->x = i * 2 - (STRIP_COLUMNS - 1);
+        g_scene->sprites[i].g = 0x80;
+        g_scene->sprites[i].b = 0x80;
+    }
+}
 
 /* The maps whose automap rooms are not simply their floors. */
 #define MAP_SHARED 0x24 /* every floor draws on area 0 */

@@ -186,8 +186,8 @@ func_8006D33C            = 0x8006D33C; // type:func size:0x940
 func_8006DC7C            = 0x8006DC7C; // type:func size:0xEC
 func_8006DD68            = 0x8006DD68; // type:func size:0x1C8
 func_8006DF30            = 0x8006DF30; // type:func size:0x554
-func_8006E484            = 0x8006E484; // type:func size:0xA8
-func_8006E52C            = 0x8006E52C; // type:func size:0xF0
+FieldLoadWallCluts       = 0x8006E484; // type:func size:0xA8
+FieldInitStrip           = 0x8006E52C; // type:func size:0xF0
 FieldRebuildMap          = 0x8006E61C; // type:func size:0x36C
 FieldSetCell             = 0x8006E988; // type:func size:0xD4
 FieldResetSound          = 0x8006EA5C; // type:func size:0x50
@@ -377,7 +377,7 @@ TileMapWriteRow          = 0x80077344; // type:func size:0x4C
 //--------------------------------------------------------------
 //--- PA: 0x012FF0   VA: 0x80077390   subsegment: asm, dng_s4_x3
 //--------------------------------------------------------------
-D_80077390               = 0x80077390; // type:func size:0x54
+TileMapWriteCol          = 0x80077390; // type:func size:0x54
 
 //-------------------------------------------------------------------------
 //--- PA: 0x013044   VA: 0x800773E4   subsegment: c, common/gfx/tilemapblit

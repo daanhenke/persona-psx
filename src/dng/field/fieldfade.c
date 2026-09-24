@@ -14,6 +14,9 @@
 #define FADE_FULL 0x1000
 #define FADE_STEP 0x200
 
+/* The sprites a fade tints: the backdrop strip and what is drawn with it. */
+#define TINT_SPRITES 105
+
 /* Tints the field's sprites for light level `level`: GsSetAmbient takes
    0-0x1000, a sprite's colour 0-0x80. Each colour is one chained assignment,
    so g_scene is read once per sprite rather than once per channel. */
@@ -22,7 +25,7 @@
         int i_;                                                                \
                                                                                \
         GsSetAmbient(level, level, level);                                     \
-        for (i_ = 0; i_ < FIELD_SPRITES; i_++) {                               \
+        for (i_ = 0; i_ < TINT_SPRITES; i_++) {                               \
             g_scene->sprites[i_].r = g_scene->sprites[i_].g =                  \
                 g_scene->sprites[i_].b = c = (level) / 32;                     \
         }                                                                      \
