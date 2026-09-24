@@ -75,7 +75,7 @@ g_item_defs              = 0x800443E0; // size:0x20C
 g_level_growth           = 0x8004735C;
 g_spell_data             = 0x80047D20;
 g_bg_maps                = 0x8004AA54;
-g_persona_defs           = 0x8004B0A8;
+g_persona_defs           = 0x8004B0A8; // size:0x2C
 g_exp_curve              = 0x8004C204;
 g_exp_curve_alt          = 0x8004C38C;
 g_map_base               = 0x8004D83C;
@@ -384,7 +384,7 @@ MenuStatusOpen           = 0x80071F68; // type:func size:0x184
 MenuStatusSelect         = 0x800720EC; // type:func size:0x91C
 MenuStatusView           = 0x80072A08; // type:func size:0x374
 func_80072D7C            = 0x80072D7C; // type:func size:0x3A4
-func_80073120            = 0x80073120; // type:func size:0x5B4
+FormationPickMember      = 0x80073120; // type:func size:0x5B4
 func_800736D4            = 0x800736D4; // type:func size:0x2F8
 func_800739CC            = 0x800739CC; // type:func size:0x344
 func_80073D10            = 0x80073D10; // type:func size:0x450
@@ -570,7 +570,7 @@ DrawPartySlotStatus      = 0x8007C094; // type:func size:0x2F8
 //-----------------------------------------------------------
 //--- PA: 0x017FEC   VA: 0x8007C38C   subsegment: asm, adv_20
 //-----------------------------------------------------------
-func_8007C38C            = 0x8007C38C; // type:func size:0xA48
+StatusDrawMain           = 0x8007C38C; // type:func size:0xA48
 
 //-------------------------------------------------------------------------
 //--- PA: 0x018A34   VA: 0x8007CDD4   subsegment: c, ../common/gfx/mapcells
@@ -1452,6 +1452,9 @@ g_flicker_ramp           = 0x800B0D00; // type:u32 size:0x7620
 g_pow10                  = 0x800B0D20;
 g_bg_clut                = 0x800B0D48; // size:0x80
 g_config_marker_def      = 0x800B1148;
+g_fm_prompt_cur_def      = 0x800B1184;
+g_fm_mark_def            = 0x800B12DC;
+g_fm_mark_pos            = 0x800B15B4; // size:0x18
 g_menu_sel               = 0x800B1788;
 g_menu_subsel            = 0x800B178A;
 str_cell_run             = 0x800B17B8;
@@ -1466,7 +1469,10 @@ str_place_battle_top     = 0x800B18C0;
 str_place_in_battle      = 0x800B18CC;
 g_arcana_labels          = 0x800B18D8; // size:0x9C
 g_menu_bg_rle            = 0x800B1B80;
+g_fm_hint_def            = 0x800B1ED8;
+g_fm_hint2_def           = 0x800B2358;
 g_persona_list_rule      = 0x800B248C;
+g_fm_grid_cur_def        = 0x800B266C;
 g_formation_member_def   = 0x800B2754;
 g_grow_slot_def          = 0x800B2964;
 g_entry_label_cells      = 0x800B2F50;
@@ -1522,7 +1528,7 @@ D_800B8998               = 0x800B8998; // type:u32 size:0x4
 D_800B899C               = 0x800B899C; // type:u32 size:0x4
 D_800B89A0               = 0x800B89A0; // type:u32 size:0x4
 D_800B89A4               = 0x800B89A4; // type:u32 size:0x8FC
-g_status_names           = 0x800B89C8;
+g_status_names           = 0x800B89C8; // size:0xB8
 g_status_labels          = 0x800B8A84;
 str_cfg_message_speed    = 0x800B8AF0;
 str_cfg_battle           = 0x800B8B30;
@@ -1659,6 +1665,7 @@ g_adv_actors             = 0x801F15D8; // ignore:True size:0x5E8
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 g_personas               = 0x801F1DAC; // ignore:True size:0x7C0
 D_801F2564               = 0x801F2564; // ignore:True
+g_party                  = 0x801F256C; // ignore:True size:0x5
 g_money                  = 0x801F2674; // ignore:True size:0x4
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
 g_playtime_min           = 0x801F29BD;

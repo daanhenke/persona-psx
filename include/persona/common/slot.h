@@ -93,7 +93,13 @@ extern void SlotInitTagged(void *def, u_char slot, int attr, short x, short y);
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 extern void SlotClear(u_char slot);
 extern void SlotClearAll(void);
+/* The same kind of per-unit difference: some callers were built against an
+   int-taking declaration and hand over the slot unmasked. */
+#ifdef SLOT_FLICKER_INT
+extern void SlotSetFlicker(int slot, int on);
+#else
 extern void SlotSetFlicker(u_char slot, u_char on);
+#endif
 extern void SlotSetSemiTrans(u_char slot, u_char on);
 extern void SlotSetBrightness(u_char slot, u_char level);
 extern void SlotSetAnim(short slot, short unk18, short unk1A, u_char tpage_add,

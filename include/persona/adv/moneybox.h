@@ -15,5 +15,6 @@
 extern short g_panel_cells[BOX_CELLS_W * BOX_CELLS_H];
 
 void BgBoxShow(void);
+void DrawStatusHud(void);
 
 #endif

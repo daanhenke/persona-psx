@@ -130,4 +130,11 @@ extern int g_level_exp_1[];
    wrapped round to nought goes back to 1. */
 #define CHAR_GROW_CLAMP(v, max) ((v) != 0 ? ((v) < (max) + 1 ? (v) : (max)) : 1)
 
+/* The experience still owed to reach the level after `level`, given `have`
+   (explevel.c); the middle argument is not read. */
+int  ExpToLevel(u_char level, int unused, int have);
+
+/* A member's five stats as bars on the status screen (statbars.c). */
+void DrawCharStatBars(Char *rec);
+
 #endif

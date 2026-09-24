@@ -20,6 +20,9 @@
    what WORK_BIAS says. Reached by hardcoded address. */
 #define g_tilemap1 ((short *)(0x800EF580 + WORK_BIAS))
 
+/* The header layer: 40 cells by 32. */
+#define g_tilemap2 ((short *)(0x800F0980 + WORK_BIAS))
+
 /* Bank 0 of the font puts the ten digits at 0xC0..0xC9. */
 #define GLYPH_DIGIT0 0xC0
 
