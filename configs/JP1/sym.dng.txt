@@ -237,9 +237,9 @@ BgFromPack               = 0x8006FD84; // type:func size:0x108
 //--------------------------------------------------------------
 //--- PA: 0x00BAEC   VA: 0x8006FE8C   subsegment: asm, dng_s1_x3
 //--------------------------------------------------------------
-D_8006FE8C               = 0x8006FE8C; // type:func size:0x44
-func_8006FED0            = 0x8006FED0; // type:func size:0x124
-func_8006FFF4            = 0x8006FFF4; // type:func size:0x9C
+FieldSetPrimClut         = 0x8006FE8C; // type:func size:0x44
+FieldDecodeGlyph         = 0x8006FED0; // type:func size:0x124
+FieldSetMoonIcon         = 0x8006FFF4; // type:func size:0x9C
 func_80070090            = 0x80070090; // type:func size:0x18C
 func_8007021C            = 0x8007021C; // type:func size:0x444
 func_80070660            = 0x80070660; // type:func size:0x434
@@ -1076,6 +1076,7 @@ g_field_mode             = 0x8009936C;
 g_stair_floor            = 0x80099370;
 g_dir_tile_step          = 0x80099374;
 g_door_state             = 0x80099394;
+g_moon_cells             = 0x800993A8;
 g_clock_limit_hours      = 0x800993AE;
 g_clock_limit_min        = 0x800993B6;
 D_800993B8               = 0x800993B8;

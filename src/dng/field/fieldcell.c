@@ -28,8 +28,8 @@ void FieldLoadWallCluts(void)
     r.w = 4;
     r.h = 16;
     for (i = 0; i < 10; i++) {
-        func_8006FED0(((u_short *)g_floor_info)[i]);
-        LoadImage(&r, (u_long *)g_scene->scratch);
+        FieldDecodeGlyph(((u_short *)g_floor_info)[i]);
+        LoadImage(&r, (u_long *)g_scene->glyph);
         DrawSync(0);
         r.x += 4;
     }

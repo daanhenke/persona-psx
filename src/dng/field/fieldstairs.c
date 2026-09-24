@@ -129,8 +129,8 @@ int FieldStepTick(void)
     u_char *p;
 
     if ((g_dng->tick_flags & 0xF) == 0xF) {
-        STEP_CLOCK = (STEP_CLOCK + 1) & 0xF;
-        func_8006FFF4();
+        MOON_PHASE = (MOON_PHASE + 1) & 0xF;
+        FieldSetMoonIcon();
         if (EFFECT_STEPS != 0) {
             if (--EFFECT_STEPS == 0) {
                 g_effect_over = 1;

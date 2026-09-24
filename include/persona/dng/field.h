@@ -37,7 +37,8 @@ typedef struct {
     u_char        pad6E912[2];
     long          sin, cos;           /* 0x6E914 of the party's angle */
     u_char        pad6E91C[0x6E97C - 0x6E91C];
-    u_long        scratch[34];        /* 0x6E97C an image decoded for upload */
+    u_long        glyph[16][2];       /* 0x6E97C a glyph decoded for upload */
+    u_char        pad6E9FC[8];
     u_char        flag6EA04;          /* 0x6EA04 cleared for a new floor */
 } DngScene;
 
@@ -171,7 +172,9 @@ extern short g_bump_seq;
 /* Counted down a step at a time while the tick flags are all set; reaching
    zero raises g_effect_over. */
 #define EFFECT_STEPS (*(u_char *)0x801F29A9)
-#define STEP_CLOCK   (*(u_char *)0x801F2B30)
+/* The moon's phase, advanced a step at a time; 16 phases. */
+#define MOON_PHASE   (*(u_char *)0x801F2B30)
+extern u_char g_moon_cells[];
 extern u_char g_effect_over;
 
 /* Set while the field is faded in. */
@@ -275,8 +278,6 @@ void TimLoadAt(u_long *tim, int x, int y);
 void func_80065978(void);
 void func_80069A7C(void);
 void func_80069EB4(void);
-void func_8006FFF4(void);
-void func_8006FED0(u_short clut);
 void func_80070BF0(int a, int b);
 void func_800739F8(int a, int b);
 int  func_8006C9C8(void);
@@ -318,6 +319,9 @@ void FieldSetFloor(void);
 void FieldEnterFrom(void);
 
 u_long *FieldMapTmd(u_long *tmd);
+void FieldSetPrimClut(u_short *list, u_short clut);
+void FieldDecodeGlyph(u_short n);
+void FieldSetMoonIcon(void);
 /* Defined old-style, so declared without a prototype: callers pass ints. */
 void FieldInitSprite();
 
