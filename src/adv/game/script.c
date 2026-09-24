@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - the event script interpreter.  ADV only.
- *   0x800AB7E8 AdvRunScript
+ *   0x800AB7E8 AdvRunScript   0x800AD348 AdvScriptSpecial
  *
  * Every event in the field - a trigger tile, a step, a talk - runs a script
  * out of the scene pack. A command is a byte of padding, an opcode byte and
@@ -23,7 +23,7 @@
  *  24   flag16                          set a story flag
  *  25   flag16                          clear it
  *  26   flag16 ->                       jump if it is set
- *  27   n                               load ADVCMD entry n; n >= 0xD0 leaves (5)
+ *  27   n                               AdvScriptSpecial(n); n >= 0xD0 leaves (5)
  *  28   map                             leave for a map (2)
  *  29   map16 x y room                  leave for a map position (3)
  *  2A   id                              play an event cutscene
@@ -238,14 +238,13 @@ extern void   SsSetNck(short seq);
 extern void   SsSeqStop(short seq);
 extern int    MsgStep(void);
 extern void   AdvRunFrame(void);
-extern void   AdvSelectFile(short kind, short id);
+extern void   AdvSelectFile();  /* called without a prototype here */
 extern void   AdvLoadBgm(short id);
 extern void   AdvSoundCommand(short cmd);
 extern void   TimQueueAt(u_long *tim, short x, short y, short cx, short cy);
 extern void   ViewShakeStop(void);
 
 /* Not worked out yet. */
-extern void   func_800AD348(u_char n);
 extern void   func_80085958(void);
 extern int    func_80098B8C(u_char id);
 extern void   func_80085A60(void);
@@ -264,6 +263,8 @@ extern void   func_800AE300(u_char a, u_char b, u_char c, u_char d, u_char e);
 extern u_char func_800AE3C8(u_char actor);
 extern short  func_800B0A90(void);
 extern void   func_800B053C(u_char p, u_char n);
+
+void AdvScriptSpecial(u_char n);
 
 #ifdef NON_MATCHING
 int AdvRunScript(u_char *s)
@@ -310,7 +311,7 @@ loop:
         }
         break;
     case 0x27:
-        func_800AD348(s[2]);
+        AdvScriptSpecial(s[2]);
         if (s[2] >= 0xD0) {
             g_1B88 = 1;
             leave = LEAVE_ADVCMD;
@@ -948,3 +949,110 @@ end:
 #else
 INCLUDE_ASM("adv/nonmatchings/game/script", AdvRunScript);
 #endif
+
+/* The ADV command bar - two images out of ADVCMD.BIN, which stays loaded at
+   0x80118000 - and the sprites that show it. */
+#define ADVCMD_AT     ((u_long *)0x80118000)
+#define BAR_SLOT      0x29
+#define BAR_SLOT2     0x2A
+
+#define SPECIAL_WALK_FUNC 2
+#define SPECIAL_WALK_DIR  3
+#define SPECIAL_KAGE      0x80   /* ..0x84: KAGE.BIN entry n - 0x80 */
+#define SPECIAL_KAGE_END  0x85
+#define SPECIAL_LEAVE     0xD0   /* and up: handed back through g_script_534C */
+
+extern u_short g_adv_walk_dir;
+extern u_long  g_bg_shown;
+extern u_char  g_kage_sprite[];
+extern u_char  g_fade_sprites;
+extern u_char  g_adv_loading;
+
+extern void AdvFadeDownBlocking(short step, short floor);
+extern void FadeBlackout(void);
+extern void FadeStepDown(u_char step, u_char floor);
+extern void FadeStepUp(u_char step, u_char limit);
+extern int  FadeSpritesStep(short step, short limit);
+extern void SlotClearAll(void);
+extern void AdvPickEffect(void);
+extern void ImageAnimStopAll(void);
+extern void func_800AD680(void);
+
+/* The special commands behind script opcode 0x27. 0x80..0x84 put a KAGE.BIN
+   picture up over the whole room, with the room faded out and everything in
+   it cleared away; 0x85 brings the room back, reloads ADVCMD.BIN over the
+   picture and slides the command bar back down from the top. */
+#ifdef NON_MATCHING
+void AdvScriptSpecial(u_char n)
+{
+    int y;
+    int i;
+
+    switch (n) {
+    case SPECIAL_WALK_FUNC:
+        func_800AD680();
+        break;
+    case SPECIAL_WALK_DIR:
+        g_adv_walk_dir = 4;
+        break;
+    case 0x80 ... 0x84:
+        AdvSelectFile(6, n - SPECIAL_KAGE);
+        CdReadFileToAddrAsync(&g_adv_scene_file, g_adv_scene_file.size,
+                              ADVCMD_AT);
+        AdvFadeDownBlocking(4, 0);
+        while (g_cd_busy != -1) {
+            AdvRunFrame();
+        }
+        g_bg_shown = 0;
+        SlotClearAll();
+        FadeBlackout();
+        ImageAnimStopAll();
+        g_adv_loading = 1;
+        TimQueueAt((u_long *)0x80118008, 0x180, 0x100, 0, 0);
+        SlotInitTagged(g_kage_sprite, BAR_SLOT, 0x100, 0, 0);
+        AdvFadeUpBlocking(4, 0x80);
+        break;
+    case SPECIAL_KAGE_END:
+        AdvFadeDownBlocking(4, 0);
+        g_adv_loading = 0;
+        LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", (void *)ADVCMD_AT);
+        AdvPickEffect();
+        AdvEffectSetupSlots();
+        func_80085AE0();
+        SlotSetPos(BAR_SLOT, 0x35, 0xE0, -0x20);
+        SlotSetPos(BAR_SLOT2, 0x34, 0xE3, -0x20);
+        FadeStepDown(0, 0);
+        g_fade_sprites = 2;
+        while (!FadeSpritesStep(2, 0x80)) {
+            FadeStepUp(2, 0x80);
+            AdvRunFrame();
+        }
+        FadeStepUp(2, 0x80);
+        AdvRunFrame();
+        g_fade_sprites = 0;
+        while (g_cd_busy != -1) {
+            AdvRunFrame();
+        }
+        TimQueueAt((u_long *)((u_char *)ADVCMD_AT + ADVCMD_AT[1]), 0x380, 0x1C8,
+                   0x100, 0x1F8);
+        TimQueueAt((u_long *)((u_char *)ADVCMD_AT + ADVCMD_AT[0]), 0x380, 0x100,
+                   0x3C0, 0x1A0);
+        AdvRunFrame();
+        /* The bar slides down two pixels a frame onto y 14. */
+        for (i = 0x10, y = -0x14; i != -2; i--) {
+            SlotSetPos(BAR_SLOT, 0x35, 0xE0, y);
+            SlotSetPos(BAR_SLOT2, 0x34, 0xE3, y);
+            AdvRunFrame();
+            y += 2;
+        }
+        AdvRunFrame();
+        break;
+    case 0xD0 ... 0xFF:
+        g_script_534C = n;
+        break;
+    }
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/game/script", AdvScriptSpecial);
+#endif
+
