@@ -131,7 +131,7 @@ segments:
       - [0xED80, c, game/formationpick]
       - [0xF334, c, game/formationplace]
       - [0xFDC0, c, game/formationsave]
-      - [0xFF78, asm, adv_10]
+      - [0xFF78, c, game/formationbrowse]
       - [0x10320, c, common/game/formationload]
       - [0x104D0, asm, adv_11]
       - [0x11414, c, common/ui/placelabel]

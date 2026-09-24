@@ -404,7 +404,7 @@ FormationSavePrompt      = 0x80074160; // type:func size:0x1B8
 //-----------------------------------------------------------
 //--- PA: 0x00FF78   VA: 0x80074318   subsegment: asm, adv_10
 //-----------------------------------------------------------
-func_80074318            = 0x80074318; // type:func size:0x3A8
+FormationLoadPick        = 0x80074318; // type:func size:0x3A8
 
 //-------------------------------------------------------------------------------
 //--- PA: 0x010320   VA: 0x800746C0   subsegment: c, ../common/game/formationload

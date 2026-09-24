@@ -78,7 +78,7 @@ extern void FormationPlaceMember(void);
 extern void FormationDonePrompt(void);
 extern void FormationPresetPick(void);
 extern void FormationSavePrompt(void);
-extern void func_80074318(void);
+extern void FormationLoadPick(void);
 extern void FormationLoadPrompt(void);
 
 void FormationMenuOpen(void);
@@ -117,7 +117,7 @@ inline void FormationMenuStep(void)
         FormationSavePrompt();
         break;
     case 7:
-        func_80074318();
+        FormationLoadPick();
         break;
     case 8:
         FormationLoadPrompt();
