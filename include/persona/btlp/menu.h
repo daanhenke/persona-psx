@@ -209,7 +209,9 @@ extern BtlMenuCell g_btl_menu_cells[];
    choice table the box was opened on, and the directory slot each of its
    three entries reads its text from. */
 extern struct BtlWindow g_btl_choice_windows[];
-extern u_short *g_btl_choice_at;
+/* An array of one: the store the choice box makes to it has to stay ahead of
+   its reads of the row, which a scalar store does not hold back. */
+extern u_short *g_btl_choice_at[];
 extern u_int    g_btl_choice_lines[];
 extern int g_btl_menu_state;
 extern int g_btl_menu_index;

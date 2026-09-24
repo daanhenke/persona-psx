@@ -10,7 +10,6 @@
  * slid out of the way back square before it is shown.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/menu.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/input.h>
@@ -158,16 +157,14 @@ void BtlMenuOpen3(const u_char **text)
 #define CHOICE_ENTRY_TIGHT 0x10
 #define BTL_SCRATCH_LAST   0x801CFFFF
 
-/* 95.69%: the pointer to the row is stored after the three slots rather than
-   before them, and the loop's two byte offsets come out in each other's
-   registers. Neither the walking-pointer form this file uses for the plain
-   openers nor a byte offset for the row moved either one. */
-#ifdef NON_MATCHING
+/* The row pointer is stored ahead of the three slots because
+   g_btl_choice_at is an array of one (see menu.h). Each window's script
+   pointer is written straight into the window, tested there and written
+   again if it runs past the scratch buffer, with the directory offset read
+   from its global at each use. */
 void BtlMenuOpenChoices(u_short *row)
 {
     BtlWindow    *w;
-    const u_char *script;
-    int           dir;
     int           i;
 
     /* The count is written back before it is read again, which is why the
@@ -176,7 +173,7 @@ void BtlMenuOpenChoices(u_short *row)
     if (row[0] > CHOICE_MAX) {
         row[0] = CHOICE_MAX;
     }
-    g_btl_choice_at = row;
+    g_btl_choice_at[0] = row;
     g_btl_choice_lines[0] = row[1];
     g_btl_choice_lines[1] = row[2];
     g_btl_choice_lines[2] = row[3];
@@ -207,13 +204,12 @@ void BtlMenuOpenChoices(u_short *row)
         w->vram_x = g_btl_menu_cells[i].x * 2 + MENU_STAGE_X;
         w->vram_y = g_btl_menu_cells[i].y + MENU_STAGE_Y;
 
-        dir    = g_btl_choice_text;
-        script = BTL_SCRATCH + dir
-                 + *(u_long *)(BTL_SCRATCH + dir + row[1 + i] * 4);
-        if ((u_int)script > BTL_SCRATCH_LAST) {
-            script = BTL_SCRATCH + dir + *(u_long *)(BTL_SCRATCH + dir);
+        w->script = BTL_SCRATCH + g_btl_choice_text
+                    + *(u_long *)(BTL_SCRATCH + g_btl_choice_text + row[1 + i] * 4);
+        if ((u_int)w->script > BTL_SCRATCH_LAST) {
+            w->script = BTL_SCRATCH + g_btl_choice_text
+                        + *(u_long *)(BTL_SCRATCH + g_btl_choice_text);
         }
-        w->script = script;
 
         BtlWindowStep(w, 0);
         w++;
@@ -226,6 +222,3 @@ void BtlMenuOpenChoices(u_short *row)
     BtlCursorInitPrims();
     BtlCursorShow(1);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/menuopen", BtlMenuOpenChoices);
-#endif
