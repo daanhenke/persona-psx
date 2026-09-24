@@ -27,7 +27,6 @@
  * it draws is the round's.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/input.h>
@@ -90,11 +89,8 @@ int BtlPickTargetMember(BtlActor *a)
     return 1;
 }
 
-#ifdef NON_MATCHING
 int BtlPickTargetParty(BtlActor *a)
 {
-    BtlObj      **marks;
-    const u_char *tint;
     int           i;
 
     BtlDrawFrame();
@@ -102,27 +98,21 @@ int BtlPickTargetParty(BtlActor *a)
     BtlDimEnemies();
     BtlSetPartyPickable();
     i = 0;
-    marks = g_btl_marker_obj;
-    tint = g_btl_tint_pick_r;
     do {
-        marks[i]->attr &= ~(BTL_MARK_CHOSEN | BTL_OBJ_PICKED);
-        marks[i]->rgb[0] = BTL_TARGET_LIT;
-        marks[i]->rgb[1] = BTL_TARGET_LIT;
-        marks[i]->rgb[2] = BTL_TARGET_LIT;
+        g_btl_marker_obj[i]->attr &= ~(BTL_MARK_CHOSEN | BTL_OBJ_PICKED);
+        g_btl_marker_obj[i]->rgb[0] = BTL_TARGET_LIT;
+        g_btl_marker_obj[i]->rgb[1] = BTL_TARGET_LIT;
+        g_btl_marker_obj[i]->rgb[2] = BTL_TARGET_LIT;
         if (g_btl_actors[i].pickable != 0) {
             g_btl_actors[i].obj->attr &= ~BTL_OBJ_PICKED;
             g_btl_actors[i].obj->rgb[0] = BTL_TARGET_LIT;
             g_btl_actors[i].obj->rgb[1] = BTL_TARGET_LIT;
             g_btl_actors[i].obj->rgb[2] = BTL_TARGET_LIT;
             g_btl_actors[i].obj->motion = BTL_TARGET_MOTION;
-            BtlTintActorClut(i, tint[0], tint[1], tint[2]);
-            marks[i]->attr |= BTL_MARK_CHOSEN;
+            BtlTintActorClut(i, g_btl_tint_pick_r[0], g_btl_tint_pick_r[1], g_btl_tint_pick_r[2]);
+            g_btl_marker_obj[i]->attr |= BTL_MARK_CHOSEN;
         }
         i++;
-        /* Taken again at the bottom of every turn: assigned only before the
-           loop it is invariant and gcc walks it, and the actor's object stops
-           being the only walker. */
-        marks = g_btl_marker_obj;
     } while (i < BTL_PARTY);
 
     for (;;) {
@@ -148,9 +138,6 @@ int BtlPickTargetParty(BtlActor *a)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/targetpick", BtlPickTargetParty);
-#endif
 
 int BtlPickTargetEnemies(BtlActor *a)
 {

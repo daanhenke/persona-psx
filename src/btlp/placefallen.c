@@ -44,13 +44,13 @@
 extern BtlObj  *g_btl_pick_cursors[];
 extern u_char   g_btl_place_line[];
 
-/* 99.26%, registers only: the slot counter, the marker and the record offset
-   take s2, s1 and s0 in the image and a rotation of those here. Declaring them
-   in another order and walking the markers by pointer change nothing. */
-#ifdef NON_MATCHING
+/* The closing wait counts on a local of its own. With the slot counter reused
+   for it, the counter's life runs to the end, and it, the marker and the record
+   offset come out in a rotation of the image's saved registers. */
 void BtlPlaceFallen(void)
 {
     int       i;
+    int       j;
     BtlActor *a;
 
     BtlShowAilmentMarks(0);
@@ -99,16 +99,13 @@ void BtlPlaceFallen(void)
     }
     BtlCloseMessage(0);
     BtlDespawnPickGrid();
-    i = 0;
+    j = 0;
     BtlSePlay(PLACE_SE_SLOT, PLACE_SE_SHUT);
     do {
         BtlDrawFrame();
-        i++;
-    } while (i < PLACE_GRID_OUT);
+        j++;
+    } while (j < PLACE_GRID_OUT);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placefallen", BtlPlaceFallen);
-#endif
 
 /* 85.95%: the image steps down and right without a branch - the next row is
    masked with the negated test, the flag gcc makes for "keep it or clear it" -

@@ -52,62 +52,46 @@ extern int          BtlOfferLevelTest(int test, u_short slot);
 extern unsigned int BtlItemSlot(u_short id);
 extern void         BtlSetInsert(int kind, const u_char *text);
 
+/* 91.43%, written as the plain three loops it is: loop.c makes the entry
+   offset, the likes pointer and the signed pointer test of the species loop
+   itself, and the answer is returned straight rather than through a local.
+   Left: the equipment walk's pointer starts at the array (me + 0x20) in the
+   image and at the record here, and the record and the entry counter trade
+   registers. */
 #ifdef NON_MATCHING
 int BtlTalkLikedEquip(void)
 {
-    BtlActor   *me;
-    BtlActor   *him;
-    const char *like;
-    const char *end;
-    u_short    *equip;
-    char        species;
-    int         found;
-    int         result;
-    int         i;
-    int         n;
-    int         off;
+    BtlActor *me;
+    BtlActor *him;
+    int       found;
+    int       n;
+    int       i;
+    int       k;
 
     found = 0;
-    n = 0;
-    like = (const char *)g_btl_liked_equip[0].likes;
-    off = 0;
     me = &g_btl_actors[g_btl_actor_slot];
     him = &g_btl_actors[BTL_PARTY + g_btl_talk_target];
-    do {
-        equip = me->c.equip;
-        i = 0;
-        do {
-            if ((u_long)*equip ==
-                *(const u_long *)((const char *)g_btl_liked_equip + off)) {
-                end = like;
-                do {
-                    species = *end;
-                    end++;
-                    if (species == him->species) {
+    for (n = 0; n < LIKED_ENTRIES; n++) {
+        for (i = 0; i < CHAR_EQUIP; i++) {
+            if (me->c.equip[i] == g_btl_liked_equip[n].item) {
+                for (k = 0; k < LIKED_SPECIES; k++) {
+                    if (g_btl_liked_equip[n].likes[k] == him->species) {
                         found = 1;
                         goto done;
                     }
-                } while (end < like + LIKED_SPECIES);
+                }
             }
-            i++;
-            equip++;
-        } while (i < CHAR_EQUIP);
-        like += sizeof(BtlLikedEquip);
-        n++;
-        off += sizeof(BtlLikedEquip);
-    } while (n < LIKED_ENTRIES);
-done:
-    result = 0;
-    if (found == 1) {
-        result = 1;
-        if ((u_short)(g_btl_talk_said - 1) < 2) {
-            result = 0;
-        } else {
-            g_btl_offer[g_btl_offer_slot].mood[g_btl_talk_said] =
-                BTL_MOOD_STRONG;
         }
     }
-    return result;
+done:
+    if (found == 1) {
+        if ((u_short)(g_btl_talk_said - 1) < 2) {
+            return 0;
+        }
+        g_btl_offer[g_btl_offer_slot].mood[g_btl_talk_said] = BTL_MOOD_STRONG;
+        return 1;
+    }
+    return 0;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/likedequip", BtlTalkLikedEquip);

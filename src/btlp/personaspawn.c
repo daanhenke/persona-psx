@@ -85,6 +85,11 @@ extern u_long       *g_btl_persona_tim;
 extern const u_long **g_btl_effect_gfx;
 
 
+/* 98.91%, and structurally closer than the 99.64% it replaces: the table is
+   indexed by gfx itself, not a copy of it, which is what puts the model in the
+   image's saved register. What is left is inside the inlined memcpy: the image
+   loads the source into a0 and copies it to a2 for the block move, where gcc
+   here loads it straight into a2. */
 #ifdef NON_MATCHING
 BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
 {
@@ -94,9 +99,7 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
     long    pos[3];
     int     layer;
     int     y;
-    int     which;
 
-    which = gfx;
     g_btl_persona_image = PERSONA_IMAGE;
     memcpy(PERSONA_IMAGE, g_load_stage_1, PERSONA_IMAGE_BYTES);
     BtlBindGfx(GFX_EFFECT, gfx, &g_btl_persona_image);
@@ -136,7 +139,7 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
         obj->fade = PERSONA_FADE;
         obj->col2 = col;
         obj->row = row;
-        obj->attr |= g_btl_persona_gfx[which].attr;
+        obj->attr |= g_btl_persona_gfx[gfx].attr;
         if (layer != 0) {
             obj->attr |= BTL_OBJ_TRAIL;
             obj->tpage = PERSONA_TRAIL_CD;

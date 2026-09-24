@@ -18,14 +18,18 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/status.h>
 
+/* 90.05%, and structurally closer than the 91.89% it replaces, which stood a
+   `u_long pad[2]` in for eight bytes of frame. The level is a signed char,
+   which is what the frame bytes are and what gives the image's copy of it in
+   the branch slot. Left: the table row is built with its base loaded first,
+   and the record and the status trade saved registers. */
 #ifdef NON_MATCHING
 int BtlInflictStatus(BtlActor *a, int status)
 {
     const u_long *row;
     BtlObj       *mark;
-    int           level;
+    signed char   level;
     int           turns;
-    u_long        pad[2];
 
     if (a->c.key >= BTL_KEY_DEMON
         && (g_btl_demon_statuses[a->c.key] & (1 << status)) == 0) {
@@ -33,7 +37,7 @@ int BtlInflictStatus(BtlActor *a, int status)
     }
 
     row = &g_btl_status_over[status * BTL_AIL_LEVELS];
-    level = (signed char)a->c.ail_level;
+    level = a->c.ail_level;
     if ((1 << (signed char)a->c.status) & row[level]) {
         if ((signed char)a->c.status == status) {
             if (level == BTL_AIL_DEEPEST) {
