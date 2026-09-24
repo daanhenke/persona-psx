@@ -97,6 +97,7 @@ segments:
       - [0x12CC4, c, common/gfx/bgmapcell]
       - [0x12D4C, asm, dng_s4_x2]
       - [0x12FA4, c, common/gfx/tilemap]
+      - [0x12FF0, asm, dng_s4_x3]
       - [0x13044, c, common/gfx/tilemapblit]
       - [0x13178, c, common/ui/menulist]
       - [0x13198, c, ui/menucursor]
