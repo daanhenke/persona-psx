@@ -29,7 +29,7 @@ void FieldStartBattle(void)
 
     kind = rand() % 3;
     if (kind == 2) {
-        func_80071EF8();
+        FieldWaveFxBegin();
     } else {
         FieldFxBegin();
     }
@@ -46,7 +46,7 @@ void FieldStartBattle(void)
     SsSeqPlay(g_seq_handles[SEQ_BATTLE], 1, 0);
     SsSeqSetDecrescendo(g_seq_handles[SEQ_BATTLE], 0x7F, 0xF0);
     if (kind == 2) {
-        func_80072018();
+        FieldWaveFxRun();
     } else {
         FieldFxRun(kind);
     }
