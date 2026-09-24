@@ -5,7 +5,6 @@
  *   0x80072610 FieldIrisFxSetup
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -29,43 +28,47 @@ void FieldIrisFxBegin(void)
 
 /* Closes a circle of radius 200 down to nothing, two pixels a frame: each
    pair of columns either side of the middle is scaled to the circle's
-   height at that distance. */
-/* 85.1%: the image keeps the right-hand column as an int index counting
-   down from a register holding 79 and multiplies it out at each store;
-   loop.c strength-reduces an int index here, so it is a u_short, which
-   costs a mask at each use. The clamp's branches are also laid out the
-   other way round. */
-#ifdef NON_MATCHING
+   height at that distance. Each arm names the left-hand column's mirror
+   before its stores, which decides the order loop.c reduces the two
+   indices in. */
 void FieldIrisFxRun(void)
 {
     int r, rr, i, x, h;
-    u_short j;
 
     for (r = 200; r >= 0; r -= 2) {
         rr = r * r;
-        for (i = 0, x = 0, j = STRIP_MIDDLE - 1; i < STRIP_MIDDLE; i++, x += 2, j--) {
+        for (x = 0, i = 0; i < STRIP_MIDDLE; x += 2, i++) {
             if (x > r) {
+                int j = STRIP_MIDDLE - 1 - i;
+
                 g_scene->sprites[STRIP_MIDDLE + i].scaley = 0;
                 g_scene->sprites[j].scaley = 0;
                 continue;
             }
             h = csqrt((rr - x * x) << 12) / 120;
-            if (h >= 0x1000) {
+            if (h < 0x1000) {
+                if (h >= 0) {
+                    int j = STRIP_MIDDLE - 1 - i;
+
+                    g_scene->sprites[STRIP_MIDDLE + i].scaley = h;
+                    g_scene->sprites[j].scaley = h;
+                } else {
+                    int j = STRIP_MIDDLE - 1 - i;
+
+                    g_scene->sprites[STRIP_MIDDLE + i].scaley = 0;
+                    g_scene->sprites[j].scaley = 0;
+                }
+            } else {
+                int j = STRIP_MIDDLE - 1 - i;
+
                 h = 0x1000;
-            } else if (h < 0) {
-                g_scene->sprites[STRIP_MIDDLE + i].scaley = 0;
-                g_scene->sprites[j].scaley = 0;
-                continue;
+                g_scene->sprites[STRIP_MIDDLE + i].scaley = h;
+                g_scene->sprites[j].scaley = h;
             }
-            g_scene->sprites[STRIP_MIDDLE + i].scaley = h;
-            g_scene->sprites[j].scaley = h;
         }
         FieldIrisFxStep();
     }
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldfxiris", FieldIrisFxRun);
-#endif
 
 /* One frame of the circle: every column a little brighter. */
 void FieldIrisFxStep(void)
