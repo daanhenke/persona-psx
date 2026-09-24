@@ -45,7 +45,7 @@ int FieldWalk(int ret)
                 FieldStepView();
                 func_80065978();
             }
-            func_80070DAC(0);
+            FieldZoneTunes(0);
             for (i = 0; i < 4; i++) {
                 FieldStepView();
                 func_80065978();

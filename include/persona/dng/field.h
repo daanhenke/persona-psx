@@ -132,6 +132,7 @@ typedef struct {
 #define TILE_SPECIAL  0x800
 #define TILE_CLOCK    0x1000
 #define TILE_EVENT    0x4000 /* a spot in g_floor_events is on it */
+#define TILE_ZONE_TUNE 0x2000 /* the zone's tunes play on it */
 #define TILE_QUIET    0x400  /* its event does not start on stepping */
 
 #define TILE_KIND_DOOR 4
@@ -184,6 +185,7 @@ extern int g_field_mode;
 /* The floor's tune pauses while the party stands; the first step resumes
    it, slowed down, unless the tune is off. */
 #define BGM_RESUMED 0x80
+#define BGM_ZONE    0x01 /* the zone's tunes are the ones playing */
 extern u_char g_bgm_flags;
 extern u_char g_bgm_off;
 extern short  g_bgm_seq;
@@ -390,7 +392,10 @@ void func_80069EB4(void);
 void func_8007192C(void);
 void func_800713B0(int kind);
 int  func_8006C9C8(void);
-void func_80070DAC(int arg);
+/* Swaps the playing tune pair (handles 15 and 16) between the floor's own
+   (sequences 12, 13) and a zone's (15, 16) as the party steps on or off a
+   TILE_ZONE_TUNE tile; the new tune starts unless `quiet`. */
+void FieldZoneTunes(int quiet);
 void func_8006D33C(int arg);
 
 void FieldBobVerts(int ch, int v, int period);
@@ -482,6 +487,11 @@ extern u_char g_ambient_on;
 /* The floor's flag word in its info block. */
 #define FLOOR_FLAGS  (((u_short *)g_floor_info)[10])
 #define FLOOR_QUIET  0x8000
+
+/* The field's sequence data, loaded at SEQ_BASE with a table of offsets at
+   its head; an offset of 0 is a sequence the floor does not have. */
+#define SEQ_BASE    0x801CD000
+#define SEQ_OFFSETS ((u_long *)SEQ_BASE)
 
 /* How many of the handles the field's own sequences use, and the VABs. */
 #define FIELD_SEQS 19

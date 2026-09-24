@@ -39,6 +39,10 @@ options:
   # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
   # than the Shift-JIS ones the ROM holds.
   data_string_guesser_level: 0
+  # The resident executable, so a reference into the middle of one of its
+  # sized tables comes out as symbol plus offset (see btlp.yaml).
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   # overlay id 4
@@ -88,7 +92,7 @@ segments:
       - [0xBAEC, c, field/fieldglyph]
       - [0xBCF0, c, field/fieldmusic]
       - [0xC6F4, c, field/fieldsound]
-      - [0xCA0C, asm, dng_s1_x3b]
+      - [0xCA0C, c, field/fieldtune]
       - [0xCF18, c, field/fieldfx]
       - [0xD010, asm, dng_s1_x3c]
       - [0xD7F4, c, field/fieldfxfade]

@@ -99,6 +99,21 @@ typedef struct {
 
 #define g_chars ((Char *)0x801F1BCC)
 
+/* A character's starting record, in the main image; CharInit copies one
+   into a Char. */
+typedef struct {
+    /* 0x00 */ int     hp;
+    /* 0x04 */ int     sp;
+    /* 0x08 */ u_short equip[7];
+    /* 0x16 */ u_char  name[10];
+    /* 0x20 */ u_char  stat[5];
+    /* 0x25 */ u_char  pad25;
+    /* 0x26 */ u_char  resist;
+    /* 0x27 */ u_char  pad27;
+} CharTemplate;                   /* 0x28 bytes */
+
+extern CharTemplate g_char_templates[];
+
 #define CHAR_COUNT  5
 #define CHAR_EQUIP  7
 #define CHAR_LIST_N 3

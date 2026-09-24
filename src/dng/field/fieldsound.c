@@ -10,11 +10,6 @@
 #include <persona/main/state.h>
 #include <persona/dng/field.h>
 
-/* The field's sequence data, loaded at SEQ_BASE with a table of offsets at
-   its head; an offset of 0 is a sequence the floor does not have. */
-#define SEQ_BASE    0x801CD000
-#define SEQ_OFFSETS ((u_long *)SEQ_BASE)
-
 /* The handle a jingle plays in, and the battle's fanfare. */
 #define SEQ_JINGLE  17
 #define SEQ_BATTLE  18

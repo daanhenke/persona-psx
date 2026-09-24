@@ -58,7 +58,7 @@ void FieldStairs(int dir)
         FieldStepView();
         func_80065978();
     }
-    func_80070DAC(0);
+    FieldZoneTunes(0);
     FieldHop(dir);
     FieldStepEnd();
 
