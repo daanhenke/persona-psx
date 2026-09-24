@@ -102,10 +102,10 @@ void FieldEnterFrom(void)
     case GAME_STATE_BTL:
         break;
     case GAME_STATE_S2D:
-        g_dng->flag15B0 = 0;
+        g_dng->enc_calm = 0;
         break;
     case GAME_STATE_ADV:
-        g_dng->flag15B0 = 0;
+        g_dng->enc_calm = 0;
         break;
     }
 }

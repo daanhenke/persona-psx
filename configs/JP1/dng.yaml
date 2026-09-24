@@ -86,7 +86,7 @@ segments:
       - [0xB918, c, field/fieldsprite]
       - [0xB9E4, c, common/gfx/bgpack]
       - [0xBAEC, c, field/fieldglyph]
-      - [0xBCF0, asm, dng_s1_x3]
+      - [0xBCF0, c, field/fieldmusic]
       - [0xC6F4, c, field/fieldsound]
       - [0xCA0C, asm, dng_s1_x3b]
       - [0xCF18, c, field/fieldfx]

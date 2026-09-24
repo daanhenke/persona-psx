@@ -58,7 +58,9 @@ typedef struct {
     u_char        pad364C0[0x364D4 - 0x364C0];
     PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
     GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
-    u_char        pad6E4E4[0x6E50C - 0x6E4E4];
+    u_char        pad6E4E4[0x6E504 - 0x6E4E4];
+    int           word6E504;          /* 0x6E504 read by func_80067CC8 */
+    int           word6E508;          /* 0x6E508 */
     SceneModel    models[257];        /* 0x6E50C the floor's TMDs, from 1 */
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
@@ -86,7 +88,8 @@ typedef struct {
     u_char   walk_dir;   /* 0x15A8 the facing a step goes towards */
     u_char   pad15A9[3];
     long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
-    u_char   flag15B0;   /* 0x15B0 cleared coming back from S2D or ADV */
+    u_char   enc_calm;   /* 0x15B0 steps left before the next encounter can
+                            be rolled; cleared coming back from S2D or ADV */
     u_char   pad15B1;
     u_char   map_seen_only; /* 0x15B2 the minimap hides tiles not yet seen */
     u_char   pad15B3[0x15BC - 0x15B3];
@@ -128,8 +131,11 @@ typedef struct {
 #define TILE_MUSIC    0x200  /* stepping on it starts the floor's music */
 #define TILE_SPECIAL  0x800
 #define TILE_CLOCK    0x1000
+#define TILE_EVENT    0x4000 /* a spot in g_floor_events is on it */
+#define TILE_QUIET    0x400  /* its event does not start on stepping */
 
 #define TILE_KIND_DOOR 4
+#define TILE_KIND_LOCK 1  /* a locked door: its event opens it */
 
 extern u_char (*g_floor_grid)[FLOOR_W];
 extern TileDef *g_tile_defs;
@@ -267,6 +273,60 @@ extern u_char *g_floor_objs;
 extern u_char *g_floor_spots;
 extern u_char *g_floor_events;
 
+/* A spot of g_floor_events, eight bytes: its tile, the facings it answers
+   to (as g_facing_bits), the story flag that retires it and the event it
+   runs. */
+typedef struct {
+    u_char  x, y;
+    u_char  facings;
+    u_char  pad3;
+    u_short flag;   /* 0x4 */
+    u_char  event;  /* 0x6 */
+    u_char  pad7;
+} FloorSpot;
+
+/* Per facing, its bit in a spot's facings. */
+extern u_long g_facing_bits[];
+
+int FieldSpotEvent(int mode);
+int FieldRollEncounter(void);
+
+/* The floor's flag word: FLOOR_QUIET, and below it the story flag that
+   turns its encounters on. The next word is the story flag choosing
+   between its two encounter sets. A set is 31 encounter ids (0xFFFF
+   empty) and a rare one, rolled on tiles with ENC_RARE. */
+typedef struct {
+    u_short glyphs[10];
+    u_short flags;       /* 0x14 */
+    u_short enc_set;     /* 0x16 */
+    u_short enc[2][32];  /* 0x18 */
+} FloorInfo;
+#define FLOOR_INFO ((FloorInfo *)g_floor_info)
+#define FLOOR_ENC_FLAG  (FLOOR_FLAGS & 0x7FFF)
+#define ENC_NONE 0xFFFF
+
+/* Each tile of g_floor_objs: its encounter rate (1-3, 0 none) in the low
+   bits, ENC_RARE, and ENC_NO_COMMON for a tile that only has the rare one. */
+#define ENC_RATE      0x3
+#define ENC_RARE      0x80
+#define ENC_NO_COMMON 0x40
+
+/* One in g_enc_rate_div[rate] steps rolls an encounter. */
+extern u_short g_enc_rate_div[];
+
+/* The base of the hero's surprise roll, per moon phase group, and each
+   phase's group. */
+extern u_short g_enc_moon_base[];
+extern u_char  g_moon_group[];
+
+/* The encounter handed to the battle: its id, the map it came from, and
+   the hero's surprise roll - 0 not made, 1 held, 2 failed (the screen
+   flashes). In the save area and reached by address. */
+#define g_enc_id    (*(u_short *)0x801F5350)
+#define g_enc_map   (*(u_char *)0x801F5354)
+#define g_enc_surprise (*(u_char *)0x801F5355)
+int func_80073A64(int event);
+
 /* Cleared by FieldSetFloor; nothing here says more about them. */
 extern int    D_8009FDEC;
 extern int    D_800993B8;
@@ -324,6 +384,7 @@ void TimLoad(u_long *tim, int nopal);
 void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
+void func_80067CC8(int a);
 void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8007192C(void);
@@ -413,6 +474,15 @@ void FieldResetSound(void);
 #define g_seq_handles   ((short *)0x801F537C)
 #define g_vab_handles   ((short *)0x801F535C)
 
+/* The ambient sequence, faded out on floors with FLOOR_QUIET set, and
+   whether it is playing. */
+#define g_ambient_seq (g_seq_handles[0])
+extern u_char g_ambient_on;
+
+/* The floor's flag word in its info block. */
+#define FLOOR_FLAGS  (((u_short *)g_floor_info)[10])
+#define FLOOR_QUIET  0x8000
+
 /* How many of the handles the field's own sequences use, and the VABs. */
 #define FIELD_SEQS 19
 #define FIELD_VABS 3
@@ -469,7 +539,10 @@ void FieldSetLiftDigits(int n);
 void FieldBuildScene(int reload);
 void FieldPlaceObject(int obj, int model, int x, int y);
 void FieldRideLift(int button);
-void func_80070090(int a);
+/* Fades the floor's ambient sequence in or out as the floor asks (unless
+   `keep`), then stops or restarts the second floor tune by whether the
+   party stands on an entry. */
+void FieldSyncMusic(int keep);
 void FieldNudge(int frames, int dy);
 
 void FieldStartBattle(void);

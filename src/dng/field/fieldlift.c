@@ -79,7 +79,7 @@ void FieldRideLift(int button)
     g_floor_events = (u_char *)(PACK_BASE + g_pack_event_tab[DNG_FLOOR]);
     FieldRebuildMap();
     FieldBuildScene(1);
-    func_80070090(0);
+    FieldSyncMusic(0);
     FieldLoadWallCluts();
 }
 #else
