@@ -283,7 +283,6 @@ void func_80069A7C(void);
 void func_80069EB4(void);
 void func_8007192C(void);
 void func_800713B0(int kind);
-void func_800739F8(int a, int b);
 int  func_8006C9C8(void);
 void func_80070DAC(int arg);
 void func_8006D33C(int arg);
@@ -377,6 +376,9 @@ void FieldIrisFxBegin(void);
 void FieldIrisFxRun(void);
 void FieldIrisFxStep(void);
 void FieldIrisFxSetup(void);
+
+void FieldShake(int dir);
+void FieldNudge(int frames, int dy);
 
 void FieldStartBattle(void);
 void FieldPlayJingle(u_char n, short loops);

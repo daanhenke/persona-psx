@@ -28,13 +28,13 @@
    20, -40, 40, -20. */
 #define FLASH(r, g, b)                                                         \
     {                                                                          \
-        func_800739F8(1, 20);                                                  \
+        FieldNudge(1, 20);                                                  \
         GsSetAmbient(r, g, b);                                                 \
-        func_800739F8(1, -40);                                                 \
+        FieldNudge(1, -40);                                                 \
         GsSetAmbient(0x1000, 0x1000, 0x1000);                                  \
-        func_800739F8(1, 40);                                                  \
+        FieldNudge(1, 40);                                                  \
         GsSetAmbient(r, g, b);                                                 \
-        func_800739F8(1, -20);                                                 \
+        FieldNudge(1, -20);                                                 \
         GsSetAmbient(0x1000, 0x1000, 0x1000);                                  \
     }
 
