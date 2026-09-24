@@ -156,7 +156,7 @@ extern u_char g_cmd_len[];
 #define g_money2   (*(u_int *)0x801F2678)
 #define g_money    (*(int *)0x801F2674)
 #define g_adv_room (*(u_char *)0x801F5355)
-#define g_1B88     (*(u_char *)0x801F1B88)
+#define g_script_resuming     (*(u_char *)0x801F1B88)
 /* The 16 Persona slots ahead of the saved formations. */
 #define g_persona_slots ((u_char *)0x801F2574)
 #define g_formation_preset ((u_char *)0x801F2584)
@@ -318,7 +318,7 @@ loop:
     case 0x27:
         AdvScriptSpecial(s[2]);
         if (s[2] >= 0xD0) {
-            g_1B88 = 1;
+            g_script_resuming = 1;
             leave = LEAVE_ADVCMD;
         }
         break;

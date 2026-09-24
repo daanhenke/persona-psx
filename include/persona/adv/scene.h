@@ -42,7 +42,8 @@ typedef struct {
    - the two bytes of an actor's x and y read together. */
 typedef struct {
     /* 0x00 */ u_short tile;
-    /* 0x02 */ u_char  pad02;
+    /* 0x02 */ u_char  dirs;    /* the sides it is left from, as
+                                   AdvApproach's                          */
     /* 0x03 */ u_char  map_x;   /* where the party lands on the world map */
     /* 0x04 */ u_char  map_y;
     /* 0x05 */ u_char  mode;    /* how the destination is entered; remapped
@@ -50,7 +51,11 @@ typedef struct {
     /* 0x06 */ u_short map_id;
     /* 0x08 */ u_char  room;    /* which room of that map                 */
     /* 0x09 */ u_char  unk4;
-    /* 0x0A */ u_char  pad0A[4];
+    /* 0x0A */ u_char  leave;   /* the leader's walk-out sprite, or 0xFF
+                                   for none                               */
+    /* 0x0B */ u_char  leave_x; /* the tile the walk-out starts from      */
+    /* 0x0C */ u_char  leave_y;
+    /* 0x0D */ u_char  pad0D;
 } AdvEntry;                     /* 14 bytes */
 
 typedef struct {
@@ -77,7 +82,8 @@ typedef struct {
                                         from g_room_backdrops            */
     /* 0x29 */ u_char       pad29[3];
     /* 0x2C */ u_char      *arrive;  /* the script run on arrival, or -1   */
-    /* 0x30 */ u_char       pad30[4];
+    /* 0x30 */ u_char       exit_sound; /* played as the party walks out */
+    /* 0x31 */ u_char       pad31[3];
     /* 0x34 */ u_short      map_at;  /* the automap position, already
                                         resolved: the high byte is the base
                                         MapMarkTile adds the room to, and the

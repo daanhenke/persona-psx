@@ -43,7 +43,7 @@
 #define g_formation_preset ((u_char *)0x801F2584)
 #define g_persona_slots    ((u_char *)0x801F2574)
 #define g_adv_room         (*(u_char *)0x801F5355)
-#define g_1B88             (*(u_char *)0x801F1B88)
+#define g_script_resuming             (*(u_char *)0x801F1B88)
 #define g_script_resume    (*(u_char **)0x801F1B84)
 #define g_bgm_vab          (*(u_short *)0x801F5360)
 #define g_seq_handle       ((short *)0x801F537C)
@@ -204,7 +204,7 @@ void ovl_adv_entry(void)
             g_chars[i].unk5D = 0;
         }
     }
-    if (g_1B88) {
+    if (g_script_resuming) {
         resume = g_script_resume;
     }
 
@@ -342,7 +342,7 @@ loaded:
     } else if (g_adv_scene->arrive != (u_char *)-1) {
         g_script_leave = AdvRunScript(g_adv_scene->arrive);
     }
-    g_1B88 = 0;
+    g_script_resuming = 0;
     TimQueueAt(MEMBER(SCENE_AT, 1), 0x380, 0x1C8, 0x100, 0x1F8);
     TimQueueAt(MEMBER(SCENE_AT, 0), 0x380, 0x100, 0x3C0, 0x1A0);
     AdvFadeUpBlocking(8, 0x80);

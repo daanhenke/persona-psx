@@ -708,7 +708,7 @@ SceneFindEntry           = 0x80080598; // type:func size:0x74
 //-----------------------------------------------------------
 //--- PA: 0x01C26C   VA: 0x8008060C   subsegment: asm, adv_29
 //-----------------------------------------------------------
-func_8008060C            = 0x8008060C; // type:func size:0x114
+AdvExitPlaceLeader       = 0x8008060C; // type:func size:0x114
 func_80080720            = 0x80080720; // type:func size:0x5C0
 func_80080CE0            = 0x80080CE0; // type:func size:0x89C
 
@@ -1521,6 +1521,7 @@ g_mes_offsets            = 0x800B5F30;
 str_adv_ev01_bgd         = 0x800B6134;
 str_adv_ev02_bgd         = 0x800B6148;
 str_adv_ev03_bgd         = 0x800B615C;
+g_leave_defs             = 0x800B6314; // size:0x18
 g_room_origins           = 0x800B6330; // size:0x14
 g_room_backdrops         = 0x800B6344; // size:0x8
 str_chest_empty          = 0x800B634C;
