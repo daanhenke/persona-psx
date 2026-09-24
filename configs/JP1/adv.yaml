@@ -185,7 +185,7 @@ segments:
       - [0x1DC54, c, common/game/flags]
       - [0x1DD88, asm, adv_30]
       - [0x1E2D4, c, gfx/slotxscale]
-      - [0x1E358, asm, adv_30_x1]
+      - [0x1E358, c, game/actorsprites]
       - [0x1EBCC, c, game/scenetile]
       - [0x1EC48, c, game/actors]
       - [0x1EE34, asm, adv_30a]

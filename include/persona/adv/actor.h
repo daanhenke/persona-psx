@@ -10,7 +10,9 @@
 #include <decomp/types.h>
 
 typedef struct {
-    /* 0x00 */ u_char  pad00[0xC];
+    /* 0x00 */ u_char  pad00[4];
+    /* 0x04 */ u_int   flags;           /* ACTOR_FLIP_OK, ACTOR_SEMITRANS    */
+    /* 0x08 */ u_char  pad08[4];
     /* 0x0C */ u_short id;              /* 0xFFFF while the slot is unused  */
     /* 0x0E */ u_short world_x;         /* the renderer subtracts the camera
                                            from these to get a screen position */
@@ -26,14 +28,18 @@ typedef struct {
     /* 0x19 */ u_char  phase;           /* frame of the sixteen-step walk
                                            cycle, indexing g_walk_dx/dy      */
     /* 0x1A */ signed char steps;       /* frames left in the step under way */
-    /* 0x1B */ u_char  pad1B;
+    /* 0x1B */ u_char  bright;          /* its shadow is drawn at half as
+                                           much again                       */
     /* 0x1C */ u_char  x, y;
     /* 0x1E */ u_char  next_x, next_y;  /* where the step in progress leads */
     /* 0x20 */ u_char  pad20[6];
     /* 0x26 */ u_char  unk26;          /* gates the second leg of a diagonal
                                           step the way the tile under the
                                           actor gates the first            */
-    /* 0x27 */ u_char  pad27[5];
+    /* 0x27 */ u_char  pad27[2];
+    /* 0x29 */ u_char  shadow;          /* how the second sprite below the
+                                           actor is drawn: SHADOW_*          */
+    /* 0x2A */ u_char  pad2A[2];
 } AdvActor;                             /* 0x2C bytes */
 
 /* Reached by hardcoded address rather than through the linker symbol.
@@ -48,5 +54,19 @@ typedef struct {
 #define ACTOR_NONE   0xFFFF
 #define ACTOR_NA     0xFF
 #define DEPTH_BEHIND 0x20
+
+/* An actor that may be drawn mirrored, when its facing asks for it, and one
+   drawn semi-transparent. */
+#define ACTOR_FLIP_OK   0x100
+#define ACTOR_SEMITRANS 0x200
+
+/* What the second sprite does: nothing, a flattened shadow at the actor's
+   feet or one lower down, or a plain copy, at either height. The two brighter
+   kinds are the actor's reflection rather than its shadow. */
+#define SHADOW_NONE     0
+#define SHADOW_FLAT     1
+#define SHADOW_FLAT_LOW 2
+#define SHADOW_COPY     3
+#define SHADOW_COPY_LIT 4
 
 #endif

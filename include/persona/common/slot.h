@@ -94,6 +94,8 @@ extern void SlotSetPos(u_char slot, int attr, short x, short y);
 extern void SlotClear(u_char slot);
 extern void SlotClearAll(void);
 extern void SlotSetFlicker(u_char slot, u_char on);
+extern void SlotSetSemiTrans(u_char slot, u_char on);
+extern void SlotSetBrightness(u_char slot, u_char level);
 extern void SlotSetAnim(short slot, short unk18, short unk1A, u_char tpage_add,
                         u_char u_add, u_char v_add, u_short clut_x,
                         u_short clut_y);

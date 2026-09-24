@@ -740,7 +740,7 @@ SlotsApplyXScale         = 0x80082674; // type:func size:0x84
 //--------------------------------------------------------------
 //--- PA: 0x01E358   VA: 0x800826F8   subsegment: asm, adv_30_x1
 //--------------------------------------------------------------
-func_800826F8            = 0x800826F8; // type:func size:0x874
+ActorsPlaceSprites       = 0x800826F8; // type:func size:0x874
 
 //-----------------------------------------------------------------
 //--- PA: 0x01EBCC   VA: 0x80082F6C   subsegment: c, game/scenetile
@@ -1485,6 +1485,7 @@ str_adv_ev01_bgd         = 0x800B6134;
 str_adv_ev02_bgd         = 0x800B6148;
 str_adv_ev03_bgd         = 0x800B615C;
 str_chest_empty          = 0x800B634C;
+g_dir_flip               = 0x800B6358; // size:0x4
 g_dir_x                  = 0x800B6378;
 g_dir_y                  = 0x800B637C;
 g_walk_dy                = 0x800B6384;
@@ -1587,7 +1588,9 @@ D_800BB920               = 0x800BB920; // type:u32 size:0x8
 D_800BB928               = 0x800BB928; // type:u32 size:0x210
 g_slot_cur               = 0x800BB930;
 g_menu_blink             = 0x800BB934;
+g_view_dx                = 0x800BB938;
 g_menu                   = 0x800BB940;
+g_view_dy                = 0x800BB944;
 g_party_last             = 0x800BB970;
 g_adv_walk_dir           = 0x800BB974;
 g_cam_actor              = 0x800BB978;
@@ -1649,6 +1652,7 @@ g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
 g_tilemap0               = 0x800EE180; // ignore:True size:0x1400
 g_tilemap1               = 0x800EF580; // ignore:True size:0x1400
 g_tilemap2               = 0x800F0980; // ignore:True size:0xA00
+g_adv_actors             = 0x801F15D8; // ignore:True size:0x5E8
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 D_801F2564               = 0x801F2564; // ignore:True
 g_money                  = 0x801F2674; // ignore:True size:0x4
