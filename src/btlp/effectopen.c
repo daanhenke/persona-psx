@@ -14,7 +14,6 @@
  * twice, and with all four slots taken the answer is -1.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <persona/btlp/effect.h>
@@ -30,81 +29,60 @@
 /* Handed back when the record already holds a slot. */
 #define BTL_EFFECT_TAKEN 0x100
 
-#ifdef NON_MATCHING
+/* The kept copy of the draw mode is one structure assignment. gcc emits that
+   as a single block-move insn, which reorg will not put in a delay slot, so
+   the jump out of the slot loop fills its slot from the target instead. */
 int BtlEffectOpen(BtlEffect *e)
 {
-    BtlEffect **p;
-    BtlEffectRow **step;
     BtlEffectRow *node;
-    BtlEffect  *none;
-    int         i;
-    int         took;
+    int           i;
+    int           took;
 
-    i = 0;
-    p = g_btl_effect;
-    do {
-        i++;
-        if (*p == e) {
+    for (i = 0; i < BTL_EFFECT_SLOTS; i++) {
+        if (g_btl_effect[i] == e) {
             return BTL_EFFECT_TAKEN;
         }
-        p++;
-    } while (i < BTL_EFFECT_SLOTS);
+    }
 
     if (i == BTL_EFFECT_SLOTS) {
-        i = 0;
-        step = g_btl_effect_step;
-        do {
-            none = g_btl_effect[i];
-            if (none == (BtlEffect *)BTL_EFFECT_FREE) {
+        for (i = 0; i < BTL_EFFECT_SLOTS; i++) {
+            if (g_btl_effect[i] == (BtlEffect *)BTL_EFFECT_FREE) {
                 BtlCursorInitPrims();
                 node = (BtlEffectRow *)e;
                 g_btl_effect[i] = e;
-                *step = none;
-                if (node->next != (BtlEffectRow *)none) {
-                    do {
-                        node = node->next;
-                        if (node->row == 0) {
-                            *step = node;
-                            goto opened;
-                        }
-                    } while (node->next != (BtlEffectRow *)BTL_EFFECT_FREE);
+                g_btl_effect_step[i] = (BtlEffectRow *)BTL_EFFECT_FREE;
+                while (node->next != (BtlEffectRow *)BTL_EFFECT_FREE) {
+                    node = node->next;
+                    if (node->row == 0) {
+                        g_btl_effect_step[i] = node;
+                        break;
+                    }
                 }
-                goto opened;
+                e->answer = BTL_EFFECT_MARK;
+                e->unk28 = 100;
+                e->scale_x = 0x10;
+                e->scale_y = 0x40;
+                e->kind = 0;
+                e->sel = 0;
+                e->unk20 = 0;
+                e->unk24 = 0;
+                e->unk30 = 0;
+                e->unk32 = 0;
+                e->unk34 = 0;
+                e->scale = BTL_EFFECT_UNITY;
+                e->flags |= BTL_EFFECT_RUNNING;
+                SetDrawMode((DR_MODE *)e->mode, 0, 0,
+                            GetTPage(0, 0, BTL_EFFECT_TPX, BTL_EFFECT_TPY), 0);
+                *(DR_MODE *)e->mode_kept = *(DR_MODE *)e->mode;
+                break;
             }
-            step++;
-            i++;
-        } while (i < BTL_EFFECT_SLOTS);
+        }
     }
-    goto done;
 
-opened:
-    e->answer = BTL_EFFECT_MARK;
-    e->unk28 = 100;
-    e->scale_x = 0x10;
-    e->scale_y = 0x40;
-    e->kind = 0;
-    e->sel = 0;
-    e->unk20 = 0;
-    e->unk24 = 0;
-    e->unk30 = 0;
-    e->unk32 = 0;
-    e->unk34 = 0;
-    e->scale = BTL_EFFECT_UNITY;
-    e->flags |= BTL_EFFECT_RUNNING;
-    SetDrawMode((DR_MODE *)e->mode, 0, 0,
-                GetTPage(0, 0, BTL_EFFECT_TPX, BTL_EFFECT_TPY), 0);
-    e->mode_kept[0] = e->mode[0];
-    e->mode_kept[1] = e->mode[1];
-    e->mode_kept[2] = e->mode[2];
-
-done:
     took = -1;
     if (i != BTL_EFFECT_SLOTS) {
         took = i;
     }
     return took;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectopen", BtlEffectOpen);
-#endif
 

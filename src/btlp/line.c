@@ -14,8 +14,8 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/talk.h>
 
 #define BTL_LINES 3   /* lines in a situation */
 #define BTL_KINDS 3   /* situations a member has lines for */
@@ -32,71 +32,45 @@ typedef struct {
 
 extern BtlMember g_btl_member[];
 
-/* 88.62%, and the shape is the image's: the counter reset at the head of each
-   pass (reorg copies that into the back branch's slot, which makes it look
-   like the tail), the fresh number written through the record rather than a
-   `next` local, and nothing lifted out of the walks - the 3 and the scratch
-   array's address are rebuilt each pass, which goto loops give and for loops
-   do not. What is left says the outer walk was a real loop after all: the
-   image works out m + kind * 6 once ahead of it and adds the 0xE inside,
-   where real loops here lift the whole address, 0xE included, the other way
-   round. */
-#ifdef NON_MATCHING
-short BtlPickLine(int kind)
+/* The same deal as BtlSayDemonLine: one variable walks the candidates and
+   then holds the line picked, and the routine answers an int, which is how
+   talk.h has always declared it (a short answer sign-extends it on the way
+   out). */
+int BtlPickLine(int kind)
 {
     BtlMember *m;
-    short     *used;
-    short      pick;
-    int        i;
-    int        n;
-    int        v;
     short      fresh[BTL_LINES];
+    int        n;
+    int        i;
+    int        pick;
 
     m = &g_btl_member[g_btl_actor_slot];
     if (m->cursor[kind] == -1) {
         n = 0;
-        v = 0;
-    next_value:
-        i = 0;
-        used = m->used[kind];
-    next_place:
-        if (*used == v) {
-            goto found;
-        }
-        i++;
-        used++;
-        if (i < BTL_LINES) {
-            goto next_place;
-        }
-    found:
-        if (i == BTL_LINES) {
-            fresh[n] = v;
-            n++;
-        }
-        v++;
-        if (v < BTL_KINDS) {
-            goto next_value;
+        for (pick = 0; pick < BTL_LINES; pick++) {
+            for (i = 0; i < BTL_LINES; i++) {
+                if (m->used[kind][i] == pick) {
+                    break;
+                }
+            }
+            if (i == BTL_LINES) {
+                fresh[n] = pick;
+                n++;
+            }
         }
         pick = fresh[rand() % n];
-        i = 0;
-        used = m->used[kind];
-        do {
-            if (*used == -1) {
-                *used = pick;
+        for (i = 0; i < BTL_LINES; i++) {
+            if (m->used[kind][i] == -1) {
+                m->used[kind][i] = pick;
                 if (i == BTL_LINES - 1) {
                     m->cursor[kind] = 0;
                 }
                 break;
             }
-            i++;
-            used++;
-        } while (i < BTL_LINES);
+        }
         return pick;
     }
     m->cursor[kind] = (m->cursor[kind] + 1) % BTL_LINES;
     return m->used[kind][m->cursor[kind]];
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/line", BtlPickLine);
-#endif
 

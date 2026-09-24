@@ -3208,3 +3208,57 @@ loops that break peeled the first load. The same search in the matched
 BtlAfterTalk is a `for` over the columns inside a do/while over the rows,
 with a flag and two breaks. Copied, it went from 86.18% to 93.88% on the loop
 shapes alone.
+
+## A structure copy never sits in a delay slot
+
+Three word copies written out are three loads and three stores, and reorg
+will move the last store into the delay slot of a jump that follows it. A
+structure assignment of the same twelve bytes is one block-move insn that
+prints as six instructions, and reorg will not move it. The jump then fills
+its slot from its target. If the image jumps with the target's first
+instruction in the slot and the copy just above it, the copy was one
+assignment.
+
+- [effectopen.c](/src/btlp/effectopen.c) - `BtlEffectOpen`,
+  `*(DR_MODE *)e->mode_kept = *(DR_MODE *)e->mode`: 98.54% to exact.
+
+## A compare against a register that holds a constant is a copied loop test
+
+When a test compares against a saved register where the other tests load the
+constant (`beq v0, s1` for a -1 that `addiu a0, zero, -1` gives further on),
+the test is probably jump.c's copy of a `while` loop's condition. CSE rewrote
+the copy to use the register it knows holds -1. Written as
+`if (x) do { } while (x)`, both tests are the programmer's, and the
+constant is lifted and shared instead.
+
+- [effectopen.c](/src/btlp/effectopen.c) - `BtlEffectOpen`'s walk down the
+  step chain: 83.73% to 98.54%, together with writing the slot search as two
+  plain for loops that break out of the second.
+
+## A table of rows is declared with its rows
+
+`short used[]` indexed as `used[act * 5 + i]` and `short used[][5]` indexed as
+`used[act][i]` address the same bytes, but gcc builds them differently. The
+two-dimensional form works out the row (`act * 10 + base`) and then adds the
+column to it. That lets loop.c lift the row out of an inner loop over `i`. If
+the image computes a row address in the outer loop and adds `i * 2` inside,
+the table had rows.
+
+- [demonline.c](/src/btlp/demonline.c) - `BtlSayDemonLine`, 86.10% to 94.22%.
+  The declaration went into talk.h, and linehistory.c reads the table as
+  `g_btl_line_used[0]`.
+
+## A candidate counter that becomes the choice
+
+When the image holds a loop counter and the value picked after the loop in
+one register, they were one variable. BtlSayDemonLine walks the five lines
+with `pick` looking for unused ones, then assigns `pick = fresh[rand() % n]`.
+With separate `v` and `pick` locals, the two swapped registers with the
+search's row pointer. The permuter found this in 1710 iterations, from a
+99.83% start.
+
+- [demonline.c](/src/btlp/demonline.c) - `BtlSayDemonLine`, to exact.
+- [line.c](/src/btlp/line.c) - `BtlPickLine`, the party's version of the same
+  deal. Written the same way it went from 88.62% to 98.56%, with the goto
+  loops gone. The last row was a sign extension on the return: the definition
+  said `short` while talk.h says `int`, and answering an int matched.

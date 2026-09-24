@@ -20,11 +20,8 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/battle.h>
-
-/* Lines each reaction has. */
-#define BTL_LINES 5
+#include <persona/btlp/talk.h>
 
 /* Nothing dealt yet. */
 #define BTL_LINE_NONE (-1)
@@ -57,10 +54,6 @@ typedef struct {
                                             bit is not part of the number    */
 } BtlReactionLines;                         /* 6 bytes */
 
-extern short   g_btl_line_cycle[];
-extern short   g_btl_line_used[];
-extern u_char  g_btl_scratch[];
-extern u_char *g_btl_scratch_end;
 extern u_char *g_btl_talk_said_script;
 extern u_int   g_btl_talk_said_line;
 extern u_char  g_btl_talk_nothing_script[];
@@ -68,79 +61,74 @@ extern u_char  g_btl_talk_nothing_script[];
 extern int  VSync(int mode);
 extern void BtlHighlightBegin(int who);
 
-#ifdef NON_MATCHING
+/* One variable walks the candidates and then holds the line that was picked,
+   whichever way it was picked - the image keeps both in the same register.
+   The line table is two-dimensional, a row per demon, which is what makes the
+   row's address come out once per candidate. */
 void BtlSayDemonLine(u_char act, u_char line)
 {
     BtlReactionLines *ent;
     BtlReactionLines *more;
-    short         *base;
-    int            row;
-    u_char        *script;
-    u_long         dir;
-    u_short        slot;
-    short          fresh[8];
-    int            cycle;
-    int            pick;
-    int            draw;
-    u_short        n;
-    u_short        i;
-    u_short        v;
+    u_char           *script;
+    u_char           *at;
+    u_long            dir;
+    u_short           fresh[BTL_DEMON_LINES];
+    u_short           slot;
+    u_short           n;
+    u_short           pick;
+    u_short           i;
+    int               cycle;
 
-    ent = (BtlReactionLines *)(line * LINE_RECORD + LINE_FIRST + g_btl_scratch_end);
+    ent = (BtlReactionLines *)(line * LINE_RECORD + LINE_FIRST + (u_char *)g_btl_scratch_end);
     BtlHighlightBegin(act);
     srand(VSync(-1));
     cycle = g_btl_line_cycle[act];
     if (cycle == BTL_LINE_NONE) {
         n = 0;
-        v = 0;
-        /* The row's base and the table's own address are both held across the
-           search; recomputing either inside costs the match. */
-        base = g_btl_line_used;
-        row = act * BTL_LINES;
-        do {
-            /* A plain `while`: as a do/while gcc peels the first test, which
-               the original does not. */
-            i = 0;
-            while (i < BTL_LINES) {
-                if (base[row + i] == v) {
+        for (pick = 0; pick < BTL_DEMON_LINES; pick++) {
+            for (i = 0; i < BTL_DEMON_LINES; i++) {
+                if (g_btl_line_used[act][i] == pick) {
                     break;
                 }
-                i++;
             }
-            if (i == BTL_LINES) {
-                fresh[n] = v;
+            if (i == BTL_DEMON_LINES) {
+                fresh[n] = pick;
                 n++;
             }
-            v++;
-        } while (v < BTL_LINES);
-        draw = rand();
-        pick = fresh[draw % n];
-        i = 0;
-        do {
-            if (g_btl_line_used[act * BTL_LINES + i] == BTL_LINE_NONE) {
-                g_btl_line_used[act * BTL_LINES + i] = fresh[draw % n];
-                if (i == BTL_LINES - 1) {
+        }
+        pick = fresh[rand() % n];
+        for (i = 0; i < BTL_DEMON_LINES; i++) {
+            if (g_btl_line_used[act][i] == BTL_LINE_NONE) {
+                g_btl_line_used[act][i] = pick;
+                if (i == BTL_DEMON_LINES - 1) {
                     g_btl_line_cycle[act] = 0;
                 }
                 break;
             }
-            i++;
-        } while (i < BTL_LINES);
+        }
     } else {
-        pick = g_btl_line_used[act * BTL_LINES + cycle];
-        g_btl_line_cycle[act] = (cycle + 1) % BTL_LINES;
+        pick = g_btl_line_used[act][cycle];
+        g_btl_line_cycle[act] = (cycle + 1) % BTL_DEMON_LINES;
     }
 
     if (pick < LINE_DIRECT) {
-        slot = ent[act].slot[pick];
+        /* Through a pointer to the record's shorts: as ent[act].slot[pick]
+           gcc works out the record's address before the index's. */
+        slot = ((u_short *)&ent[act])[pick];
+        dir = *(u_long *)BTL_SCRATCH;
+        at = *(u_long *)(BTL_SCRATCH + dir + slot * 4) + BTL_SCRATCH;
     } else {
-        more = (BtlReactionLines *)(g_btl_scratch_end + LINE_MORE
-                                 + (ent[act].more & LINE_MORE_MASK)
-                                   * LINE_RECORD);
+        more = (BtlReactionLines *)((u_char *)g_btl_scratch_end
+                                    + (ent[act].more & LINE_MORE_MASK)
+                                      * LINE_RECORD
+                                    + LINE_MORE);
+        dir = *(u_long *)BTL_SCRATCH;
+        at = *(u_long *)(BTL_SCRATCH + dir
+                         + more[act].slot[pick - LINE_DIRECT] * 4)
+             + BTL_SCRATCH;
         slot = more[act].slot[pick - LINE_DIRECT];
     }
-    dir = *(u_long *)g_btl_scratch;
-    script = g_btl_scratch + dir + *(u_long *)(g_btl_scratch + dir + slot * 4);
+    script = at + dir;
     g_btl_talk_said_script = script;
     g_btl_talk_said_line = slot;
 
@@ -148,7 +136,7 @@ void BtlSayDemonLine(u_char act, u_char line)
     BtlDrawFrame();
     BtlDrawFrame();
 
-    if ((u_long)(script - g_btl_scratch) >= BTL_SCRATCH_SIZE) {
+    if ((u_long)(script - BTL_SCRATCH) >= BTL_SCRATCH_SIZE) {
         script = g_btl_talk_nothing_script;
     }
     if (slot == BTL_SLOT_NONE) {
@@ -159,7 +147,4 @@ void BtlSayDemonLine(u_char act, u_char line)
     g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
     g_btl_talk_depth++;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/demonline", BtlSayDemonLine);
-#endif
 

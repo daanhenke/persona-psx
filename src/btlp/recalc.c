@@ -25,30 +25,42 @@
 /* The queued command that needs a gun. */
 #define BTL_CMD_SHOOT 3
 
+/* 98.27%, written the way BtlDeriveStats' wolf case writes the same numbers:
+   the equipment term outside, the stats grouped inside, and the armour totals
+   summed first off a local copy of the table. The local is what makes the
+   armour block reload the table's address after the branches, as the image
+   does. What is left is the order of the first three stat loads for the
+   armour numbers (the image reads Agility, then Dexterity, then Luck), and
+   one shift that goes with them. A local for the luck quarter, the defence
+   written first, and the level moved inside the sum were all tried and are no
+   better. */
 #ifdef NON_MATCHING
 void BtlRecalcStats(BtlActor *a)
 {
-    ItemDef *items;
-    ItemDef *weapon;
-    ItemDef *gun;
-    ItemDef *ammo;
-    ItemDef *armour;
-    int      guard;
+    const ItemDef *weapon;
+    const ItemDef *gun;
+    const ItemDef *ammo;
+    int            armour_atk;
+    int            armour_hit;
+    const ItemDef *defs;
 
-    items = g_item_defs;
-    weapon = &items[a->c.equip[EQUIP_WEAPON]];
-    a->c.melee_atk = a->c.stat[2] / 2 + a->c.stat[0] + a->c.level / 5
-                     + weapon->power;
-    a->c.melee_hit = a->c.stat[3] / 2 + a->c.stat[2] + a->c.stat[4] / 4
-                     + weapon->rate;
+    weapon = &g_item_defs[a->c.equip[EQUIP_WEAPON]];
+    a->c.melee_atk = weapon->power
+                     + ((u_char)(a->c.level / 5)
+                        + (a->c.stat[STAT_STRENGTH] + a->c.stat[STAT_DEXTERITY] / 2));
+    a->c.melee_hit = weapon->rate
+                     + ((a->c.stat[STAT_DEXTERITY] + a->c.stat[STAT_AGILITY] / 2)
+                        + a->c.stat[STAT_LUCK] / 4);
 
     if (a->c.equip[EQUIP_GUN] != 0 && a->c.equip[EQUIP_AMMO] != 0) {
-        gun = &items[a->c.equip[EQUIP_GUN]];
-        ammo = &items[a->c.equip[EQUIP_AMMO]];
-        a->c.gun_atk = ammo->power + gun->power
-                       + a->c.stat[2] / 2 + a->c.stat[3] / 4;
-        a->c.gun_hit = a->c.stat[3] / 2 + a->c.stat[2] + a->c.stat[4] / 4
-                       + gun->rate;
+        gun  = &g_item_defs[a->c.equip[EQUIP_GUN]];
+        ammo = &g_item_defs[a->c.equip[EQUIP_AMMO]];
+        a->c.gun_atk = (a->c.stat[STAT_DEXTERITY] / 2
+                        + (gun->power + ammo->power))
+                       + a->c.stat[STAT_AGILITY] / 4;
+        a->c.gun_hit = gun->rate
+                       + ((a->c.stat[STAT_DEXTERITY] + a->c.stat[STAT_AGILITY] / 2)
+                          + a->c.stat[STAT_LUCK] / 4);
     } else {
         a->c.gun_atk = 0;
         a->c.gun_hit = 0;
@@ -60,19 +72,21 @@ void BtlRecalcStats(BtlActor *a)
         }
     }
 
-    /* The guard is worked out before the evasion and written after it, which
-       is the order the original has. */
-    guard = items[a->c.equip[EQUIP_ARMOUR + 3]].power
-            + items[a->c.equip[EQUIP_ARMOUR + 2]].power
-            + items[a->c.equip[EQUIP_ARMOUR + 1]].power
-            + items[a->c.equip[EQUIP_ARMOUR]].power
-            + a->c.stat[3] / 2 + a->c.stat[1] + a->c.level / 5;
-    a->c.evade = items[a->c.equip[EQUIP_ARMOUR + 3]].rate
-                 + items[a->c.equip[EQUIP_ARMOUR + 2]].rate
-                 + items[a->c.equip[EQUIP_ARMOUR + 1]].rate
-                 + items[a->c.equip[EQUIP_ARMOUR]].rate
-                 + a->c.stat[2] / 2 + a->c.stat[3] + a->c.stat[4] / 4;
-    a->c.defence = guard;
+    defs = g_item_defs;
+    armour_atk = defs[a->c.equip[EQUIP_ARMOUR]].power
+                 + defs[a->c.equip[EQUIP_ARMOUR + 1]].power
+                 + defs[a->c.equip[EQUIP_ARMOUR + 2]].power
+                 + defs[a->c.equip[EQUIP_ARMOUR + 3]].power;
+    armour_hit = defs[a->c.equip[EQUIP_ARMOUR]].rate
+                 + defs[a->c.equip[EQUIP_ARMOUR + 1]].rate
+                 + defs[a->c.equip[EQUIP_ARMOUR + 2]].rate
+                 + defs[a->c.equip[EQUIP_ARMOUR + 3]].rate;
+    a->c.evade = (a->c.stat[STAT_AGILITY] + a->c.stat[STAT_DEXTERITY] / 2)
+                 + a->c.stat[STAT_LUCK] / 4
+                 + armour_hit;
+    a->c.defence = (u_char)(a->c.level / 5)
+                   + (a->c.stat[STAT_VITALITY] + a->c.stat[STAT_AGILITY] / 2)
+                   + armour_atk;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/recalc", BtlRecalcStats);

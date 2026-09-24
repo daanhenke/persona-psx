@@ -11,15 +11,12 @@
  * reset beside BtlClearMemberLines, which does the same for the party.
  */
 #include <decomp/types.h>
+#include <persona/btlp/talk.h>
 
 /* Demons that can be in one offer. */
 #define BTL_LINE_DEMONS 4
 
-/* Talk lines each of them has. */
-#define BTL_LINES 5
 
-extern short g_btl_line_cycle[];
-extern short g_btl_line_used[];
 
 void BtlClearLineHistory(void)
 {
@@ -34,16 +31,16 @@ void BtlClearLineHistory(void)
        that order is what the original has, and inlining it costs the match. */
     demon = 0;
     none = -1;
-    used = g_btl_line_used;
+    used = g_btl_line_used[0];
     cycle = g_btl_line_cycle;
     do {
         *cycle = none;
-        i = BTL_LINES - 1;
-        slot = used + BTL_LINES - 1;
+        i = BTL_DEMON_LINES - 1;
+        slot = used + BTL_DEMON_LINES - 1;
         for (; i >= 0; i--) {
             *slot-- = none;
         }
-        used += BTL_LINES;
+        used += BTL_DEMON_LINES;
         demon++;
         cycle++;
     } while (demon < BTL_LINE_DEMONS);

@@ -42,6 +42,13 @@ extern u_short g_btl_panel_gauges;
 
 #define BTL_MOOD_BYTES 8
 
+/* The lines each demon of an offer has for a reaction, and the ones it has
+   already said: a row of five per demon, -1 where nothing has been dealt, and
+   the cycle it steps round once the row is full (-1 until then). */
+#define BTL_DEMON_LINES 5
+extern short g_btl_line_cycle[];
+extern short g_btl_line_used[][BTL_DEMON_LINES];
+
 /* Who is talking to whom. */
 extern u_short g_btl_talk_level;
 extern u_char  g_btl_offer_count;
