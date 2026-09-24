@@ -200,12 +200,12 @@ int FieldRollEncounter(void)
                         g_enc_surprise = 1;
                     } else {
                         g_enc_surprise = 2;
-                        g_scene->word6E508 = 0;
-                        g_scene->word6E504 = 0x8000;
-                        func_80067CC8(0);
+                        g_scene->pad_new = 0;
+                        g_scene->pad_held = 0x8000;
+                        FieldUpdate(0);
                         func_80065978();
-                        g_scene->word6E504 = 0x8000;
-                        func_80067CC8(0);
+                        g_scene->pad_held = 0x8000;
+                        FieldUpdate(0);
                         func_80065978();
                     }
                 }

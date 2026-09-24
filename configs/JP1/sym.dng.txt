@@ -132,7 +132,7 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, dng_rodata
 //------------------------------------------------------------------
-D_800643A4               = 0x800643A4; // type:u32 size:0x988
+D_800643D8               = 0x800643D8; // type:u32 size:0x954
 
 
 
@@ -151,7 +151,7 @@ FieldFadePrims           = 0x80067798; // type:func size:0xA4
 FieldClockTick           = 0x8006783C; // type:func size:0x238
 FieldDoorSlide           = 0x80067A74; // type:func size:0xF4
 FieldClockHands          = 0x80067B68; // type:func size:0x160
-func_80067CC8            = 0x80067CC8; // type:func size:0x9CC
+FieldUpdate              = 0x80067CC8; // type:func size:0x9CC
 FieldReload              = 0x80068694; // type:func size:0xBC
 FieldEnterTile           = 0x80068750; // type:func size:0x28C
 FieldStepView            = 0x800689DC; // type:func size:0xB4
@@ -194,7 +194,7 @@ FieldInitStrip           = 0x8006E52C; // type:func size:0xF0
 FieldRebuildMap          = 0x8006E61C; // type:func size:0x36C
 FieldSetCell             = 0x8006E988; // type:func size:0xD4
 FieldResetSound          = 0x8006EA5C; // type:func size:0x50
-func_8006EAAC            = 0x8006EAAC; // type:func size:0x6A4
+FieldOpenSound           = 0x8006EAAC; // type:func size:0x6A4
 FieldFadeSeqs            = 0x8006F150; // type:func size:0x6C
 FieldCloseSound          = 0x8006F1BC; // type:func size:0xA0
 FieldSetView             = 0x8006F25C; // type:func size:0x16C
@@ -1038,7 +1038,7 @@ MapTileSeen              = 0x80097290; // type:func size:0x78
 //--- PA: 0x032F68   VA: 0x80097308   subsegment: asm, dng_2_s23_x1
 //-----------------------------------------------------------------
 D_80097308               = 0x80097308; // type:func size:0x80
-func_80097388            = 0x80097388; // type:func size:0x620
+PersonaDataOpen          = 0x80097388; // type:func size:0x620
 func_800979A8            = 0x800979A8; // type:func size:0x150
 func_80097AF8            = 0x80097AF8; // type:func size:0x470
 func_80097F68            = 0x80097F68; // type:func size:0x390
@@ -1093,6 +1093,8 @@ g_fog                    = 0x800993F8;
 g_bob_count              = 0x80099458;
 g_bob_step               = 0x80099468;
 g_door_axes              = 0x80099478; // size:0x8
+g_dest_facings           = 0x80099488; // size:0x10
+g_field_binds            = 0x800994B8; // size:0x50
 g_lift_stops             = 0x8009955C;
 g_lift_from              = 0x80099562;
 g_map_music              = 0x8009958C; // size:0x54
@@ -1190,6 +1192,7 @@ g_floor_events           = 0x8009FE34;
 D_8009FE3C               = 0x8009FE3C;
 g_floor_spots            = 0x8009FE40;
 g_tile_kind              = 0x8009FE50;
+g_step_kind              = 0x8009FE5C; // size:0x1
 g_walk_from_x            = 0x8009FE8C;
 g_bob_verts_a            = 0x8009FE90;
 g_bob_verts_b            = 0x8009FE94;
@@ -1247,7 +1250,10 @@ g_step_from_at           = 0x800A084C;
 g_ot                     = 0x800A0850;
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
 g_persona_list           = 0x800EAE4C; // ignore:True
+D_80130004               = 0x80130004; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
+D_801F15A0               = 0x801F15A0; // ignore:True
+D_801F15A4               = 0x801F15A4; // ignore:True
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 g_party                  = 0x801F256C; // ignore:True size:0x5
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
@@ -1263,6 +1269,8 @@ g_clock_frame            = 0x801F29C3;
 g_clock_on               = 0x801F29C4;
 g_event_flags            = 0x801F29C8; // ignore:True
 g_quest_bits             = 0x801F29CA;
+g_pad_layout             = 0x801F2AC7; // ignore:True
+g_cfg_stereo             = 0x801F2AC8; // size:0x1
 g_moon_phase             = 0x801F2B30; // ignore:True size:0x1
 g_map_seen               = 0x801F2B38; // ignore:True
 g_seq_offsets            = 0x801CD000; // ignore:True size:0x80

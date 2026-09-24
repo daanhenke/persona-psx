@@ -60,8 +60,8 @@ typedef struct {
     PACKET        packets[2][0x1C000]; /* 0x364D4 one per display buffer */
     GsF_LIGHT     light;              /* 0x6E4D4 the field's one flat light */
     u_char        pad6E4E4[0x6E504 - 0x6E4E4];
-    int           word6E504;          /* 0x6E504 read by func_80067CC8 */
-    int           word6E508;          /* 0x6E508 */
+    int           pad_held;           /* 0x6E504 the pad buttons held */
+    int           pad_new;            /* 0x6E508 and newly pressed */
     SceneModel    models[257];        /* 0x6E50C the floor's TMDs, from 1 */
     u_char        from_x, from_y;     /* 0x6E910 the tile a step leaves */
     u_char        pad6E912[2];
@@ -91,9 +91,12 @@ typedef struct {
     long     angle;      /* 0x15AC 0-0xFFF, the view's heading */
     u_char   enc_calm;   /* 0x15B0 steps left before the next encounter can
                             be rolled; cleared coming back from S2D or ADV */
-    u_char   pad15B1;
+    u_char   no_enc;     /* 0x15B1 set, no encounters are rolled */
     u_char   map_seen_only; /* 0x15B2 the minimap hides tiles not yet seen */
-    u_char   pad15B3[0x15B9 - 0x15B3];
+    u_char   pad15B3;
+    u_short  last_map;   /* 0x15B4 the map the pack index was last copied for */
+    u_short  last_floor; /* 0x15B6 and its floor then */
+    u_char   pad15B8;
     u_char   exit_bits;  /* 0x15B9 the 0xC0 bits of the room byte of the
                             exit last taken into ADV */
     u_char   pad15BA[0x15BC - 0x15BA];
@@ -392,7 +395,7 @@ void TimLoad(u_long *tim, int nopal);
 void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
-void func_80067CC8(int a);
+int  FieldUpdate(int noclip);
 void func_80069A7C(void);
 void func_80069EB4(void);
 /* Swaps the playing tune pair (handles 15 and 16) between the floor's own
@@ -631,6 +634,13 @@ int  FieldFindEntry(void);
 void FieldLoadGfx(void);
 
 void FieldFadeSeqs(void);
+void FieldOpenSound(void);
+/* Whether the sound was left running by the ADV scene the field comes back
+   from: D_801F5358 clear and the exit taken into it without bit 0. Needs
+   persona/main/state.h. */
+extern short D_801F5358;
+#define SOUND_KEPT \
+    (g_state_prev == GAME_STATE_ADV && D_801F5358 == 0 && !(g_dng->exit_bits & 1))
 void FieldCloseSound(void);
 void FieldSetView(int keep_height);
 void FieldInitLight(void);
