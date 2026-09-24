@@ -174,7 +174,7 @@ segments:
       - [0x194C4, c, common/ui/textnumber]
       - [0x1956C, c, common/game/explevel]
       - [0x19614, c, common/game/eventflag2]
-      - [0x1964C, asm, adv_25_x1]
+      - [0x1964C, c, game/advmain]
       - [0x1A204, c, audio/silencebgm]
       - [0x1A278, asm, adv_26]
       - [0x1A33C, c, game/fieldtick]

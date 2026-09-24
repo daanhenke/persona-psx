@@ -1039,11 +1039,11 @@ void AdvScriptSpecial(u_char n)
                    0x3C0, 0x1A0);
         AdvRunFrame();
         /* The bar slides down two pixels a frame onto y 14. */
-        for (i = 0x10, y = -0x14; i != -2; i--) {
+        for (i = 0x10; i != -2; i--) {
+            y = 0xC - i * 2;
             SlotSetPos(BAR_SLOT, 0x35, 0xE0, y);
             SlotSetPos(BAR_SLOT2, 0x34, 0xE3, y);
             AdvRunFrame();
-            y += 2;
         }
         AdvRunFrame();
         break;

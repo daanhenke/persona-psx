@@ -73,7 +73,9 @@ typedef struct {
                                         scrolls while the followed actor is
                                         at least four tiles from either edge,
                                         which is what these bound. */
-    /* 0x28 */ u_char       pad28[0xC];
+    /* 0x28 */ u_char       pad28[4];
+    /* 0x2C */ u_char      *arrive;  /* the script run on arrival, or -1   */
+    /* 0x30 */ u_char       pad30[4];
     /* 0x34 */ u_short      map_at;  /* the automap position, already
                                         resolved: the high byte is the base
                                         MapMarkTile adds the room to, and the
@@ -93,7 +95,8 @@ extern AdvScene *g_adv_scene;
    g_adv_scene points at. It names the other files the scene needs, most of
    them in two versions: `flag` is a story flag, and once it is set the
    scene takes `alt` instead of `id`. 0xFFFF is "none" for any of them.
-   AdvPickSceneByFlags reads the MES half, AdvLoadEventBg the rest. */
+   ovl_adv_entry reads the music, AdvPickSceneByFlags the MES entry and
+   AdvLoadEventBg the rest. */
 typedef struct {
     /* 0x00 */ u_short flag;
     /* 0x02 */ u_short id;
@@ -101,7 +104,7 @@ typedef struct {
 } AdvVariant;
 
 typedef struct {
-    /* 0x00 */ u_short    pad00[3];
+    /* 0x00 */ AdvVariant bgm;         /* the room's music                 */
     /* 0x06 */ u_short    mes_flag[2]; /* pick one of four MES entries:   */
     /* 0x0A */ u_short    mes[4];      /* neither, first, second or both  */
     /* 0x12 */ AdvVariant bg;          /* the EBG entry                   */
