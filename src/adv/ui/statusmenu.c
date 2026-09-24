@@ -3,7 +3,10 @@
  *   0x8006CFAC StatusStockScreen
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
+
+/* This unit's calls to SlotSetFlicker pass the slot unmasked. */
+#define SLOT_FLICKER_INT
+
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -13,6 +16,7 @@
 #include <persona/common/formation.h>
 #include <persona/common/bg.h>
 #include <persona/adv/personapage.h>
+#include <persona/common/spell.h>
 
 /* The stock screen's first step. */
 #define STOCK_PICK 10
@@ -53,6 +57,16 @@ extern void   func_800768F0(void);
 extern u_char D_800B12B8[];
 extern u_char D_800B1EB8[];
 extern u_char D_800B17E8[];
+extern u_char ItemUsableAny(short item);
+extern u_char ItemUsableOn(short slot, short item);
+extern void   func_800946C4(short target, short caster, short spell);
+extern void   MenuScreenDraw(void);
+extern void   StatusPersonaPreview(void);
+
+/* The two escape spells need no target. */
+#define SPELL_ESCAPE_A 0x6F
+#define SPELL_ESCAPE_B 0x73
+#define TARGET_PARTY   4
 extern u_char g_persona_list_rule[];
 extern void   func_8007B6C0(u_char key, short *dst, int base);
 extern void   DrawCharStatBars(Char *rec);
@@ -77,12 +91,12 @@ void StatusTopStep(void);
 short StatusStockOpen();
 void SkillMemberPick(void);
 void SkillPersonaPick(void);
-void func_8006DA28(void);
-void func_8006DDD8(void);
+void SkillSpellPick(void);
+void SkillTargetPick(void);
 void StatusMemberPick(void);
 void StatusPageLayout(void);
 void StatusPageDraw(short member);
-void func_8006F020(void);
+void StatusPageStep(void);
 
 void StatusMenuStep(void)
 {
@@ -101,16 +115,16 @@ void StatusMenuStep(void)
         SkillPersonaPick();
         break;
     case 4:
-        func_8006DA28();
+        SkillSpellPick();
         break;
     case 5:
-        func_8006DDD8();
+        SkillTargetPick();
         break;
     case 6:
         StatusMemberPick();
         break;
     case 7:
-        func_8006F020();
+        StatusPageStep();
         break;
     case 8:
         StatusPersonaPick();
@@ -370,9 +384,134 @@ void SkillPersonaPick(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DA28);
+/* The Persona's spells, a frame: the description panel follows the cursor.
+   Accepting a spell the field allows, with the SP for it, either marks every
+   member (a spell for the whole party) or puts the target cursor on the
+   first; the two escape spells need no target. */
+void SkillSpellPick(void)
+{
+    u_long chars = (u_long)g_chars;
+    u_long personas = (u_long)g_personas;
+    int    who = g_party_at[g_menu->skill_member.cur];
+    int    i = ((Char *)(who * sizeof(Char) + chars))->list[g_menu->skill_persona.cur];
+    int    prev;
+    int    slot;
+    Persona *p;
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006DDD8);
+    prev = g_menu->skill_spell.cur;
+    if (g_menu->skill_spell.hi != 0xFF && MenuStepCursor(&g_menu->skill_spell) &&
+        prev != g_menu->skill_spell.cur) {
+        if (i != 0xFF) {
+            g_skill_help_spell = ((Persona *)(i * sizeof(Persona) + personas))
+                                     ->spell[g_menu->skill_spell.cur];
+        } else {
+            g_skill_help_spell = 0;
+        }
+        BgPanelSet(g_skill_help_spell, 0x3C, 0xE);
+        SlotSetPos(3, 0x42, 0xC8, g_menu->skill_spell.cur * 12 + 0x24);
+    }
+    DrawStatusHud();
+    MsgStep();
+    if (InputCheckAcceptA(1)) {
+        p = (Persona *)(i * sizeof(Persona) + personas);
+        g_skill_help_spell = p->spell[g_menu->skill_spell.cur];
+        if (ItemUsableAny(g_skill_help_spell) &&
+            ((Char *)(who * sizeof(Char) + chars))->sp >= p->sp_cost) {
+            SlotSetFlicker(3, 0);
+            if ((u_short)g_skill_help_spell != SPELL_ESCAPE_A &&
+                (u_short)g_skill_help_spell != SPELL_ESCAPE_B) {
+                if (g_spell_data[(u_short)g_skill_help_spell].target == TARGET_PARTY) {
+                    for (i = 0; i <= g_party_last; i++) {
+                        slot = i + 4;
+                        SlotInitTagged(g_fm_mark_def, slot, 0x42,
+                                       (g_fm_mark_pos + 1)[i][0],
+                                       (g_fm_mark_pos + 1)[i][1]);
+                        SlotSetFlicker(slot, 1);
+                        g_slot_cur = &g_slots[i + 4];
+                        g_slot_cur->flicker = 0;
+                    }
+                } else {
+                    MenuListInit(&g_menu->list[1], 0, 0, g_party_last, 0x10);
+                    SlotInitTagged(g_fm_mark_def, 4, 0x42, g_fm_mark_pos[1][0],
+                                   g_fm_mark_pos[1][1]);
+                    SlotSetFlicker(4, 1);
+                }
+            }
+            g_slot_cur = &g_slots[1];
+            g_slot_cur->attr |= SLOT_ATTR_HIDE;
+            g_menu_subsel++;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        SlotClear(3);
+        SlotClear(0x2E);
+        SlotSetFlicker(1, 1);
+        SlotSetFlicker(2, 1);
+        g_bg_shown ^= 0x10;
+        g_menu_subsel--;
+    }
+}
+
+/* Casting the spell, a frame: the target cursor walks the party, unless the
+   spell takes them all. Casting pays the Persona's SP cost; the screen stays
+   on the spell while the member can afford another. */
+void SkillTargetPick(void)
+{
+    u_long   chars = (u_long)g_chars;
+    u_long   personas = (u_long)g_personas;
+    int      who = g_party_at[g_menu->skill_member.cur];
+    int      p = ((Char *)(who * sizeof(Char) + chars))->list[g_menu->skill_persona.cur];
+    int      i;
+    Char    *c;
+    Persona *pp;
+
+    DrawStatusHud();
+    MsgStep();
+    if ((u_short)g_skill_help_spell == SPELL_ESCAPE_A ||
+        (u_short)g_skill_help_spell == SPELL_ESCAPE_B) {
+        goto cast;
+    }
+    if (g_spell_data[(u_short)g_skill_help_spell].target != TARGET_PARTY &&
+        MenuStepMember(&g_menu->list[1].cur, g_party_last)) {
+        SlotSetPos(4, 0x42, (g_fm_mark_pos + 1)[g_menu->list[1].cur][0],
+                   (g_fm_mark_pos + 1)[g_menu->list[1].cur][1]);
+    }
+    if (InputCheckAcceptA(1)) {
+        if (g_spell_data[(u_short)g_skill_help_spell].target == TARGET_PARTY) {
+            for (i = 0; i <= g_party_last; i++) {
+                func_800946C4(i, g_menu->skill_member.cur, g_skill_help_spell);
+            }
+        } else {
+            if (!ItemUsableOn(g_menu->list[1].cur,
+                              (u_short)g_skill_help_spell)) {
+                return;
+            }
+        cast:
+            func_800946C4(g_menu->list[1].cur, g_menu->skill_member.cur,
+                          g_skill_help_spell);
+        }
+        c = (Char *)(who * sizeof(Char) + chars);
+        pp = (Persona *)(p * sizeof(Persona) + personas);
+        c->sp -= pp->sp_cost;
+        MenuScreenDraw();
+        func_8007AF78();
+        func_8007B288(g_menu->skill_member.cur);
+        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        if (!ItemUsableAny(g_skill_help_spell) || c->sp < pp->sp_cost) {
+            goto back;
+        }
+        return;
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+back:
+    SlotSetFlicker(3, 1);
+    for (who = 0; who < 5; who++) {
+        SlotClear(who + 4);
+    }
+    g_slot_cur = &g_slots[1];
+    g_slot_cur->attr ^= SLOT_ATTR_HIDE;
+    g_menu_subsel--;
+}
 
 /* The member pages' marker, a frame; accepting a member lays out their
    page. */
@@ -588,4 +727,54 @@ void StatusPageLayout(void)
     TileMapWriteRow(arc + 12, AT(g_tilemap1, 15, 19), 0, 3);
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/statusmenu", func_8006F020);
+/* A member's page, a frame: the marker moves between members and the cursor
+   between the two commands. Accepting opens the member's Personas, when they
+   have any; backing out returns to the member list. */
+void StatusPageStep(void)
+{
+    int i;
+
+    if (MenuStepCursor(&g_menu->status_member)) {
+        StatusPageDraw(g_menu->status_member.cur);
+    } else if (MenuStepCursor(&g_menu->persona_cmd)) {
+        SlotSetPos(1, 0x42, 0x58, g_menu->persona_cmd.cur * 12 + 0x24);
+        g_menu->persona_slot.cur = 0;
+    }
+    if (InputCheckAcceptA(1)) {
+        i = CharTopEntry(g_menu->status_member.cur);
+        if (i != 0xFF) {
+            MenuListInit(&g_menu->persona_slot, 0, 0, i, 0x16);
+            StatusPersonaPreview();
+            SlotInitTagged(g_pdata_cursor_def, 2, 0x42, 0x58,
+                           g_menu->persona_slot.cur * 12 + 0x48);
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(2, 1);
+            g_menu_subsel++;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        func_800768F0();
+        func_8008EDBC(7);
+        SlotClearAll();
+        TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+        TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);
+        TileMapDrawBox(AT(g_tilemap0, 1, 8), 0x18, 5, MAP_W);
+        TileMapBlitRle(g_menu_bg_rle, AT(g_tilemap0, 8, 0), MAP_W);
+        TileMapWriteRow(str_cell_run, AT(g_tilemap2, 0, 3), 0x457, 6);
+        for (i = 0; i < 3; i++) {
+            TileMapWriteBar(AT(g_tilemap0, 2 + i, 10), 10);
+            TileMapWriteBar(AT(g_tilemap0, 2 + i, 21), 10);
+            *AT(g_tilemap2, 1 + i, 0) = 0x418 + i;
+        }
+        func_8008C23C(g_menu->status_member.cur);
+        BgBoxShow();
+        DrawStatusHud();
+        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
+        SlotInitTagged(g_fm_mark_def, 1, 0x42,
+                       (g_fm_mark_pos + 1)[g_menu->status_member.cur][0],
+                       (g_fm_mark_pos + 1)[g_menu->status_member.cur][1]);
+        SlotSetFlicker(1, 1);
+        g_menu_subsel--;
+    }
+}
