@@ -43,6 +43,9 @@ extern void     CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest);
 /* The completion callback the two async reads install. It is a unit of its own
    in the image, between them, so both need it declared here. */
 extern void     CdReadDoneCallback(u_char status);
+/* The same, but on success it seeks to g_cd_next_file for the read after. */
+extern void     CdReadSeekCallback(u_char status);
+extern CdlFILE  g_cd_next_file;
 
 /* Defined in cdqueue.c. */
 extern void CdQueueSubmit(int count);

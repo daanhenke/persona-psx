@@ -1,5 +1,6 @@
 /* Persona 1 (JP) - a whole file to memory, and a resolved read started.
- *   SLPS_005.00 @ 0x80011EDC LoadFileToAddr, 0x80011F7C CdReadFileToAddrAsync
+ *   SLPS_005.00 @ 0x80011E3C LoadFileToAddr, 0x80011EDC CdReadFileToAddrAsync,
+ *   0x80011FA8 CdReadFileToAddrAsyncSeek
  *
  * A unit of its own; see cdfilesearch.c.
  */
@@ -44,4 +45,26 @@ void CdReadFileToAddrAsync(CdlFILE *file, int sectors, u_long *dest)
     } while (res == -1);
 
     CdReadCallback(CdReadDoneCallback);
+}
+
+/* The same, and `next` is where the head goes once the read is done (see
+   CdReadSeekCallback). */
+void CdReadFileToAddrAsyncSeek(CdlFILE *file, int sectors, u_long *dest, CdlLOC *next)
+{
+    int res;
+
+    while (g_cd_busy != -1)
+        ;
+    g_cd_busy = 0;
+    g_cd_next_file.pos = *next;
+
+    do {
+        while (!CdControlB(CdlSetloc, (u_char *)file, (u_char *)0))
+            ;
+        while (!CdRead(sectors, dest, 0x80))
+            ;
+        res = CdReadSync(1, (u_char *)0);
+    } while (res == -1);
+
+    CdReadCallback(CdReadSeekCallback);
 }
