@@ -105,7 +105,7 @@ bzero                    = 0x80041338; // type:func
 rand                     = 0x80041368; // type:func
 g_persona_data           = 0x80041760; // size:0x38
 g_char_templates         = 0x80044278; // size:0x168
-g_item_defs              = 0x800443E0;
+g_item_defs              = 0x800443E0; // size:0x20C
 g_spell_data             = 0x80047D20;
 g_bg_maps                = 0x8004AA54;
 g_exp_curve              = 0x8004C204;
@@ -133,7 +133,7 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, dng_rodata
 //------------------------------------------------------------------
-D_800643D8               = 0x800643D8; // type:u32 size:0x954
+D_800643D8               = 0x800643D8; // type:u32 size:0x2C
 
 
 
@@ -275,7 +275,7 @@ FieldSetLiftDigits       = 0x8007360C; // type:func size:0x108
 FieldRideLift            = 0x80073714; // type:func size:0x278
 FieldShake               = 0x8007398C; // type:func size:0x6C
 FieldNudge               = 0x800739F8; // type:func size:0x6C
-func_80073A64            = 0x80073A64; // type:func size:0x1054
+FieldRunScript           = 0x80073A64; // type:func size:0x1054
 FieldMsgPutGlyph         = 0x80074AB8; // type:func size:0x108
 FieldMsgClear            = 0x80074BC0; // type:func size:0x7C
 FieldMsgNewLine          = 0x80074C3C; // type:func size:0x128
@@ -1352,3 +1352,17 @@ g_enc_surprise           = 0x801F5355; // ignore:True size:0x1
 g_vab_handles            = 0x801F535C; // ignore:True size:0x10
 g_seq_handles            = 0x801F537C; // ignore:True size:0x40
 g_font_bits              = 0x801E0000; // ignore:True
+
+// fieldscript: the text/event script runner's tables and save-area bytes.
+g_common_events          = 0x80099930; // size:0x8
+g_event_walks            = 0x80099998; // size:0x44
+g_member_names           = 0x8004901C; // size:0x64
+g_msg_choices            = 0x8004D73C; // size:0x100
+g_floor_event_tab        = 0x800A0538; // size:0x4
+g_text_speed             = 0x801F2ACC; // size:0x1
+g_script_2B34            = 0x801F2B34; // size:0x1
+D_801F1DC4               = 0x801F1DC4; // ignore:True
+D_801F2A68               = 0x801F2A68; // ignore:True
+D_80130000               = 0x80130000; // ignore:True
+D_80130001               = 0x80130001; // ignore:True
+D_80130002               = 0x80130002; // ignore:True

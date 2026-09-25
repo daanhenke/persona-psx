@@ -34,9 +34,6 @@ extern void func_80015384(short map, int kind, short *vab);
 #define INDEX_DISC  ((void *)0x801CA000)
 #define INDEX_SIZE  0x3000
 
-/* One more of the pack's offset tables; nothing here says more. */
-extern u_long *D_800A0538;
-
 /* The VAB headers' offsets in the sequence data. */
 extern u_long D_801CD080;
 extern u_long D_801CD084;
@@ -102,8 +99,8 @@ void ovl_dng_entry(void)
     g_pack_obj_tab = g_pack_model_tab + 1;
     g_pack_spot_tab = g_pack_obj_tab + PACK_INDEX[g_pack_sel + 4];
     g_pack_event_tab = g_pack_spot_tab + PACK_INDEX[g_pack_sel + 4];
-    D_800A0538 = g_pack_event_tab + PACK_INDEX[g_pack_sel + 4];
-    g_pack_tims = D_800A0538 + PACK_INDEX[g_pack_sel + 5];
+    g_floor_event_tab = g_pack_event_tab + PACK_INDEX[g_pack_sel + 4];
+    g_pack_tims = g_floor_event_tab + PACK_INDEX[g_pack_sel + 5];
     g_index_tile_tab = (u_long *)(INDEX_BASE + 4);
     g_index_info_tab = (u_long *)(INDEX_BASE + 8);
     g_index_grid_tab = g_index_info_tab + PACK_INDEX[g_pack_sel + 4];
@@ -177,7 +174,7 @@ void ovl_dng_entry(void)
                 SsSeqSetVol(h[0], 0x7F, 0x7F);
                 SsSeqSetVol(g_seq_handles[4], 0x7F, 0x7F);
                 SsPlayBack(h[0], 0, 0);
-                func_80073A64(0);
+                FieldRunScript(0);
                 SsSeqSetDecrescendo(h[0], 0x7F, 0x3C);
                 g_state_next = GAME_STATE_NONE;
                 break;

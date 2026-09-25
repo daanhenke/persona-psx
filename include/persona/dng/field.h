@@ -275,6 +275,8 @@ extern u_long *g_pack_cell_tab;
 extern u_long *g_pack_obj_tab;
 extern u_long *g_pack_spot_tab;
 extern u_long *g_pack_event_tab;
+/* The floor's event scripts, as offsets from PACK_BASE. */
+extern u_long *g_floor_event_tab;
 extern u_long *g_index_tile_tab;
 extern u_long *g_index_info_tab;
 extern u_long *g_index_grid_tab;
@@ -356,7 +358,7 @@ extern u_char  g_moon_group[];
 #define g_enc_id    (*(u_short *)0x801F5350)
 #define g_enc_map   (*(u_char *)0x801F5354)
 #define g_enc_surprise (*(u_char *)0x801F5355)
-int func_80073A64(int event);
+int FieldRunScript(int event);
 
 /* Cleared by FieldSetFloor; nothing here says more about them. */
 extern int    D_8009FDEC;
@@ -508,6 +510,8 @@ extern u_char g_exit_skip;
 #define g_dest_room g_enc_surprise
 extern u_char g_dest_x;
 extern u_char g_dest_y;
+/* Per room byte, the facing a scene change arrives with. */
+extern u_char g_dest_facings[][2];
 
 /* Per walk direction, the axis a door's halves slide along. */
 extern u_short g_door_axes[];
@@ -651,7 +655,8 @@ void FieldRideLift(int button);
 /* Fades the floor's ambient sequence in or out as the floor asks (unless
    `keep`), then stops or restarts the second floor tune by whether the
    party stands on an entry. */
-void FieldSyncMusic(int keep);
+/* FieldRunScript calls it with no argument, so no prototype. */
+void FieldSyncMusic(); /* (int keep) */
 void FieldNudge(int frames, int dy);
 
 void FieldStartBattle(void);

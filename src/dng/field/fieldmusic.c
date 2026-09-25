@@ -92,7 +92,7 @@ int FieldSpotEvent(int mode)
                     }
                 }
                 FieldPauseBgm();
-                r = func_80073A64(SPOT(i).event);
+                r = FieldRunScript(SPOT(i).event);
                 if (!(flags & TILE_QUIET) && kind == TILE_KIND_LOCK) {
                     if (r == 0) {
                         FieldPlayJingle(0x1E, 1);

@@ -14,3 +14,7 @@ rom:0x136AC reloc:MIPS_HI16 symbol:g_image_anim addend:0xE
 rom:0x136B4 reloc:MIPS_LO16 symbol:g_image_anim addend:0xE
 rom:0x13728 reloc:MIPS_HI16 symbol:g_image_anim addend:0x148
 rom:0x1372C reloc:MIPS_LO16 symbol:g_image_anim addend:0x148
+
+// FieldRunScript: the common events are indexed by event - 0x100.
+rom:0xF784 reloc:MIPS_HI16 symbol:g_common_events addend:-0x400
+rom:0xF78C reloc:MIPS_LO16 symbol:g_common_events addend:-0x400

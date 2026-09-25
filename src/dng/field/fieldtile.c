@@ -118,7 +118,7 @@ int FieldTileEffect(void)
         g_effect_over = 0;
         FieldPauseBgm();
         effect_ran = 1;
-        func_80073A64(CLOCK_EVENT_ALT ? 0x101 : 0x100);
+        FieldRunScript(CLOCK_EVENT_ALT ? 0x101 : 0x100);
     }
     if (FieldSpotEvent(0x81)) {
         return 1;

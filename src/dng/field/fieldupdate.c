@@ -9,9 +9,6 @@
 #include <persona/dng/field.h>
 
 
-/* Per destination room, the facing the party arrives with. */
-extern u_char g_dest_facings[][2];
-
 extern u_char D_8001555C[];
 extern int  func_8006A53C(void);
 extern void func_80077D54(void);
