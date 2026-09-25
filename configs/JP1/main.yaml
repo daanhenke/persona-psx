@@ -26,9 +26,9 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".text", ".data", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".bss"]
   subalign: 4
-  ld_align_section_vram_end: True
+  ld_align_section_vram_end: False
   ld_align_segment_vram_end: True
   ld_bss_is_noload: False
   symbol_name_format: $VRAM
@@ -54,7 +54,9 @@ segments:
     start: 0x800
     vram: 0x80010000
     subsegments:
-      - [0x800, asm, main]
+      - [0x800, .rodata, main]
+      - [0x94C, rodata, main_rodata]
+      - [0x1A8C, c, main]
       - [0x2064, c, boot]
       # The C runtime's entry, and below it every Psy-Q library object
       # linked into the executable. Neither is ours to decompile, which is

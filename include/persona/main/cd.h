@@ -10,6 +10,13 @@
  */
 #include <libcd.h>
 
+/* An overlay file and the entry point its image starts with. main keeps a
+   table of these; overlay.c loads one and calls in. */
+typedef struct {
+    const char *name;
+    void      (*entry)(void);
+} Overlay;
+
 typedef struct {
     /* 0x00 */ const char *name;
     /* 0x04 */ void       *dest;

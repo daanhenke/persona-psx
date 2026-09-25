@@ -16,6 +16,9 @@
 #define GAME_STATE_BTL  1
 #define GAME_STATE_S2D  2
 #define GAME_STATE_ADV  3
+#define GAME_STATE_CASINO 4
+#define GAME_STATE_NAME 5
+#define GAME_STATE_MOVIE 6   /* a movie, then g_movie_next_state */
 #define GAME_STATE_NONE (-1)
 
 /* Where the battle was entered from, and where it goes when it is over. */

@@ -12,11 +12,6 @@
 /* Resident game global. */
 extern u_long *g_overlay_dest;      /* 0x8001014C - points at g_overlay_base   */
 
-typedef struct {
-    const char *name;
-    void      (*entry)(void);
-} Overlay;
-
 void LoadOverlay(Overlay *ovl)
 {
     CdlFILE file;
