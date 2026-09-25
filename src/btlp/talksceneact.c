@@ -22,7 +22,6 @@
  * and says the line as usual.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/offer.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
@@ -54,24 +53,21 @@
 /* What BtlOfferRank answers for the offer's best gauge. */
 #define OFFER_RANK_BEST 1
 
-/* Not matched yet: the original reaches every field of the record as
-   %lo(BTL_SCRATCH + n)(reg), which is the array-indexed form rather than a
-   pointer. Writing it that way gets the addressing right and the surrounding
-   register allocation wrong, so this keeps the pointer for now. */
+/* Each ten-byte choice contains a mask, two moods, two amounts and two
+   halfword line numbers. Keep byte-pointer reads: structure-member reads let
+   gcc move the script lookup ahead of the scene-depth store. */
+#define ACT_CHOICE_SIZE 10
+#define ACT_MOOD         2
+#define ACT_AMOUNT       4
+#define ACT_LINE         6
 
-/* One choice: ten bytes of the pack holding two variants of the same act. */
-typedef struct {
-    /* 0x0 */ u_short want;      /* shares a bit with the offer's flags, or
-                                    does not - that is what picks a variant */
-    /* 0x2 */ u_char  mood[2];   /* which gauge the act moves               */
-    /* 0x4 */ u_char  amount[2]; /* by how much                             */
-    /* 0x6 */ u_short line[2];   /* the directory slot of what is said      */
-} BtlTalkActChoice;                 /* 10 bytes */
+/* Read the directory at each use so the lookup keeps the image's evaluation
+   order. Each scene arm performs its own lookup and play; gcc joins the calls. */
+#define ACT_SCRIPT(rec, which) \
+    (BTL_SCRATCH + *(u_long *)BTL_SCRATCH \
+     + *(u_long *)(BTL_SCRATCH + *(u_long *)BTL_SCRATCH \
+                   + *(u_short *)((rec) + (which) * 2 + ACT_LINE) * 4))
 
-/* The scratch area is reached by address, the way BtlOpenChoice reaches it and
-   the way the rest of the work area is reached. */
-
-#define g_btl_choice_acts   (*(int *)0x801C0010)
 extern int     g_btl_menu_aside;
 extern u_char *g_btl_talk_said_script;
 
@@ -90,21 +86,11 @@ extern void BtlPanelSetImage(int group, u_char image);
 extern void BtlPushRecent(int value);
 extern void BtlTalkAnswer(int slot, u_int act);
 
-/* 90.50%, from 71.48%. The rank test asks for the best rank, so its long arm
-   comes first and the other lands at the end, as the image lays them out.
-   The gauges are tested as a signed short. The record's fields are plain
-   offsets off its address; the image's %lo names for them (g_btl_choice_text,
-   D_801C0006) are un-named in reloc.btlp.txt. What is left: each arm steps
-   the talk depth and works out its script before the shared BtlSeqPlay, and
-   the lookup's loads stay behind the depth's store. Written that way here,
-   gcc lifts the loads above the byte store. The acts word is read after the
-   choice's offset in the image. */
-#ifdef NON_MATCHING
 void BtlTalkSceneAct(void)
 {
     u_char        *script;
-    u_long         dir;
-    BtlTalkActChoice *rec;
+    u_char        *rec;
+    u_char        *row_start;
     int            choice;
     short         *mood_of;
     int            which;
@@ -123,8 +109,8 @@ void BtlTalkSceneAct(void)
     g_btl_menu_aside = 0;
     choice = BtlMenuChoice();
     mood_of = g_btl_offer[g_btl_offer_slot].mood;
-    rec = (BtlTalkActChoice *)(BTL_SCRATCH + g_btl_choice_row * CHOICE_ROW
-                            + g_btl_choice_acts + choice * 10);
+    row_start = BTL_SCRATCH + g_btl_choice_row * CHOICE_ROW;
+    rec = row_start + g_btl_choice_acts + choice * ACT_CHOICE_SIZE;
     BtlFaceClose();
     BtlRunFrames(ACT_SETTLE);
     BtlMenuDismiss();
@@ -135,33 +121,27 @@ void BtlTalkSceneAct(void)
     }
     BtlRunFrames(ACT_SETTLE);
 
-    which = (g_btl_offer[g_btl_offer_slot].flags & rec->want) == 0;
-    mood = rec->mood[which];
-    mood_of[mood] += rec->amount[which];
+    which = (g_btl_offer[g_btl_offer_slot].flags & *(u_short *)rec) == 0;
+    mood = *(rec + which + ACT_MOOD);
+    mood_of += mood;
+    *mood_of += *(rec + which + ACT_AMOUNT);
     BtlRefreshMoodGauges();
-    if (rec->amount[which] >= ACT_NOTICED) {
+    if (*(rec + which + ACT_AMOUNT) >= ACT_NOTICED) {
         BtlQueueVoice(mood, 0);
     }
-    if (rec->amount[which] != 0) {
+    if (*(rec + which + ACT_AMOUNT) != 0) {
         BtlHighlightBegin(mood);
     }
-    dir = *(u_long *)BTL_SCRATCH;
-    g_btl_talk_said_script =
-        BTL_SCRATCH + dir
-        + *(u_long *)(BTL_SCRATCH + dir
-                      + rec->line[which] * 4);
+    g_btl_talk_said_script = ACT_SCRIPT(rec, which);
     BtlRunFrames(ACT_PAUSE);
-    BtlTalkScoreLine(rec->mood[which],
-                     rec->amount[which]);
+    BtlTalkScoreLine(*(rec + which + ACT_MOOD),
+                     *(rec + which + ACT_AMOUNT));
 
     if (BtlOfferRank(g_btl_offer_slot) == OFFER_RANK_BEST) {
         if (((short)g_btl_panel_gauges >> mood & 1) != 0) {
             if ((1 << mood & g_btl_offer[g_btl_offer_slot].kinds) != 0
-                && rec->amount[which] >= ACT_NOTICED) {
-                dir = *(u_long *)BTL_SCRATCH;
-                BtlSeqPlay(BTL_SCRATCH + dir
-                           + *(u_long *)(BTL_SCRATCH + dir
-                                         + rec->line[which] * 4));
+                && *(rec + which + ACT_AMOUNT) >= ACT_NOTICED) {
+                BtlSeqPlay(ACT_SCRIPT(rec, which));
                 BtlSeqRun();
                 BtlEndTalking();
                 g_btl_talk_depth--;
@@ -172,9 +152,10 @@ void BtlTalkSceneAct(void)
             }
         }
         if (((short)g_btl_panel_gauges >> mood & 1) == 0) {
+            u_int kinds = g_btl_offer[g_btl_offer_slot].kinds;
             bit = 1 << mood;
-            if ((bit & g_btl_offer[g_btl_offer_slot].kinds) != 0
-                && rec->amount[which] >= ACT_NOTICED) {
+            if ((bit & kinds) != 0
+                && *(rec + which + ACT_AMOUNT) >= ACT_NOTICED) {
                 g_btl_panel_gauges |= bit;
                 BtlPanelSetImage(PANEL_GAUGES, g_btl_panel_gauges);
                 BtlPushRecent(mood);
@@ -185,23 +166,17 @@ void BtlTalkSceneAct(void)
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
-        dir = *(u_long *)BTL_SCRATCH;
-        script = BTL_SCRATCH + dir
-                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
+        g_btl_talk_depth++;
+        script = ACT_SCRIPT(rec, which);
+        BtlSeqPlay(script);
     } else {
         g_btl_talk_depth--;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_WAIT;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
-        dir = *(u_long *)BTL_SCRATCH;
-        script = BTL_SCRATCH + dir
-                 + *(u_long *)(BTL_SCRATCH + dir + rec->line[which] * 4);
+        g_btl_talk_depth++;
+        script = ACT_SCRIPT(rec, which);
+        BtlSeqPlay(script);
     }
-    g_btl_talk_depth++;
-    BtlSeqPlay(script);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talksceneact", BtlTalkSceneAct);
-#endif
-
