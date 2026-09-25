@@ -13,6 +13,8 @@ g_overlay_dest             = 0x8001014C;
 str_dng_tmpl               = 0x80010164;
 str_dngs_tmpl              = 0x80010174;
 str_dngm_tmpl              = 0x80010184;
+str_dng_vb_tmpl            = 0x80010194; // size:0x10
+str_dng_vbq_tmpl           = 0x800101A4; // size:0x14
 str_advchr_bin             = 0x800101B8;
 str_adv_e0_bin             = 0x800101CC;
 str_adv_e1_bin             = 0x800101DC;
@@ -67,7 +69,13 @@ CdReadFileToAddr           = 0x80012090; // type:func size:0xB4
 //--- PA: 0x002118   VA: 0x80012118   subsegment: asm, psyq/crt0
 //--------------------------------------------------------------
 CdReadToAddr               = 0x80012144; // type:func size:0x58
-D_8001219C                 = 0x8001219C; // type:func size:0x44C
+VabStreamLoad              = 0x8001219C; // type:func size:0xF4
+VabStreamLoadAsync         = 0x80012290; // type:func size:0xC4
+CdDaSetFile                = 0x80012354; // type:func size:0x74
+CdDaPlay                   = 0x800123C8; // type:func size:0xA8
+CdDaPause                  = 0x80012470; // type:func size:0x30
+CdDaResume                 = 0x800124A0; // type:func size:0x84
+VabStreamReadyCallback     = 0x80012524; // type:func size:0xC4
 
 //----------------------------------------------------------
 //--- PA: 0x0024FC   VA: 0x800124FC   subsegment: c, cdqueue
@@ -90,7 +98,7 @@ CdQueueClearCallback       = 0x80012974; // type:func size:0x70
 //--------------------------------------------------------------
 //--- PA: 0x00299C   VA: 0x8001299C   subsegment: asm, main_2_x2
 //--------------------------------------------------------------
-D_800129E4                 = 0x800129E4; // type:func size:0x148
+CdDaReadyCallback          = 0x800129E4; // type:func size:0x148
 CdSearchFileLoc            = 0x80012B2C; // type:func size:0xC0
 CdLoadPsExe                = 0x80012BEC; // type:func size:0x13C
 CdReadPolled               = 0x80012D28; // type:func size:0x54
@@ -113,9 +121,9 @@ D_80013300                 = 0x80013300; // type:func size:0x1D20
 //--------------------------------------------------------------
 PreloadDng                 = 0x80015020; // type:func size:0x2F0
 FormatHexDigits            = 0x80015310; // type:func size:0x74
-func_80015384              = 0x80015384; // type:func size:0xEC
-D_80015470                 = 0x80015470; // type:func size:0xEC
-func_8001555C              = 0x8001555C; // type:func size:0x150
+DngLoadVab                 = 0x80015384; // type:func size:0xEC
+DngQueueVabName            = 0x80015470; // type:func size:0xEC
+DngSeqMarkCallback         = 0x8001555C; // type:func size:0x150
 EventFlagTest              = 0x800156AC; // type:func size:0x28
 PreloadS2d                 = 0x800156D4; // type:func size:0x1BC
 PreloadAdv                 = 0x80015890; // type:func size:0xAC
@@ -3056,12 +3064,17 @@ g_btl_debug_hud            = 0x80055BEC;
 g_btl_chain_battle         = 0x80055BED;
 g_btl_actors_cleared       = 0x80055BEE;
 g_state_cur                = 0x80055C04;
+g_cd_da_start              = 0x80055C08; // size:0x4
 g_cd_busy                  = 0x80055C10;
 g_cd_queue_count           = 0x80055C14;
+g_cd_da_repeat             = 0x80055C18; // size:0x4
 g_cd_stream_sectors        = 0x80055C1C;
-g_cd_stream_mode           = 0x80055C20;
+g_cd_stream_vab            = 0x80055C20;
+g_cd_da_pos                = 0x80055C24; // size:0x4
+g_cd_da_end_loc            = 0x80055C28; // size:0x4
 g_cd_queue_index           = 0x80055C2C;
 g_state_prev               = 0x80055C30;
+g_cd_da_end                = 0x80055C34; // size:0x4
 g_state_next               = 0x80055C38;
 g_cd_name_buf              = 0x80055C5C;
 D_80055C84                 = 0x80055C84; // type:u32 size:0x4
@@ -3086,6 +3099,7 @@ g_adv_scene_arg            = 0x8005E714;
 g_cd_next_file             = 0x8005E73C; // size:0x18
 g_cd_filenames             = 0x8005FFC0;
 g_cd_queue                 = 0x800622F0; // size:0x90
+g_cd_stream_buf            = 0x800623A4; // size:0x800
 g_cd_file_lba              = 0x80062BA4;
 g_cd_file_size             = 0x800633B4;
 g_save_map_id              = 0x801F15A0; // size:0x2
@@ -3104,3 +3118,4 @@ g_map_pos_y                = 0x801F5353; // size:0x1
 g_enc_map                  = 0x801F5354; // ignore:True size:0x1
 g_enc_surprise             = 0x801F5355; // ignore:True size:0x1
 g_dng_third_gate           = 0x801F5358; // size:0x2
+g_seq_handles              = 0x801F537C; // ignore:True size:0x40

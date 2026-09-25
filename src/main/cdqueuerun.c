@@ -16,8 +16,6 @@
    not the overlays, not any of the four sub-EXEs - so they are a record of the
    streaming request in flight and nothing more; volatile is what keeps the
    stores in a build that never reads them back. */
-extern volatile u_short g_cd_stream_mode;    /* mode, streaming flag stripped */
-extern volatile int     g_cd_stream_sectors; /* size rounded up to sectors    */
 
 /* Defined at the end of this file, but called from the top of it. */
 void CdQueueClearCallback(void);
@@ -86,7 +84,7 @@ void CdQueueDispatch(void)
         CdReadCallback(CdQueueNextCallback);
         break;
     case 0x80:
-        g_cd_stream_mode = g_cd_queue[g_cd_queue_index].mode & 0x7F;
+        g_cd_stream_vab = g_cd_queue[g_cd_queue_index].mode & 0x7F;
         g_cd_stream_sectors =
             (g_cd_queue[g_cd_queue_index].size + 0x7FF) >> 11;
         mode[0] = CdlModeSpeed;

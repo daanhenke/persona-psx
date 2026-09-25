@@ -8,6 +8,7 @@
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libcd.h>
+#include <libsnd.h>
 #include <persona/main/cd.h>
 
 extern char *strcpy(char *dst, const char *src);
@@ -47,6 +48,17 @@ typedef struct { char c[16]; } DngName16;
 extern const DngName15 str_dng_tmpl;
 extern const DngName16 str_dngs_tmpl;
 extern const DngName16 str_dngm_tmpl;
+
+/* A floor's sound bank, "\Dxx\DyyA.VB;1" with the letter patched in, and
+   the queued form "\Dxx\Dyy_zz.VB;1". */
+typedef struct { char c[17]; } DngName17;
+extern const DngName15 str_dng_vb_tmpl;
+extern const DngName17 str_dng_vbq_tmpl;
+
+/* The three sequences DngSeqMarkCallback hands the music between. */
+#define g_seq_handles ((short *)0x801F537C)
+
+#define DNG_VB_BUF ((u_char *)0x80170000)
 
 #define DNG_DEST   ((void *)0x80130000)
 #define DNG_M_DEST ((void *)0x801CA000)
@@ -154,3 +166,53 @@ void FormatHexDigits(int value, char *end, short digits)
 INCLUDE_ASM("main/nonmatchings/preloaddng", FormatHexDigits);
 #endif
 
+/* Loads floor `floor`'s bank `letter` and transfers its body into VAB *vab. */
+void DngLoadVab(short floor, u_char letter, short *vab)
+{
+    DngName15 name;
+
+    name = str_dng_vb_tmpl;
+    FormatHexDigits(floor / 8, &name.c[3], 2);
+    FormatHexDigits(floor, &name.c[7], 2);
+    name.c[8] = letter;
+    LoadFileToAddr(name.c, DNG_VB_BUF);
+    SsVabTransBody(DNG_VB_BUF, *vab);
+    SsVabTransCompleted(SS_WAIT_COMPLETED);
+}
+
+/* Writes a bank's name into queue entry `slot`'s name buffer. Every digit
+   pair comes from `floor`; `unused` is not read. */
+void DngQueueVabName(short floor, int unused, int slot)
+{
+    *(DngName17 *)g_cd_queue[slot].name = str_dng_vbq_tmpl;
+    FormatHexDigits(floor, (char *)g_cd_queue[slot].name + 3, 2);
+    FormatHexDigits(floor, (char *)g_cd_queue[slot].name + 7, 2);
+    FormatHexDigits(floor, (char *)g_cd_queue[slot].name + 10, 2);
+}
+
+/* Marks 0x6D-0x6F in the dungeon music hand the playback from one of the
+   three sequences to the next. */
+void DngSeqMarkCallback(short access, short seq, short data)
+{
+    switch (data) {
+    case 0x6D:
+        SsSeqStop(g_seq_handles[0]);
+        SsSeqSetVol(g_seq_handles[1], 0x7F, 0x7F);
+        SsSeqPlay(g_seq_handles[1], SSPLAY_PLAY, 0);
+        SsSetMarkCallback(g_seq_handles[0], 0, 0);
+        break;
+    case 0x6E:
+        SsSeqSetVol(g_seq_handles[1], 0, 0);
+        SsSeqStop(g_seq_handles[1]);
+        SsSeqSetVol(g_seq_handles[2], 0x7F, 0x7F);
+        SsPlayBack(g_seq_handles[2], 0, 1);
+        SsSetMarkCallback(g_seq_handles[1], 0, 0);
+        SsSetMarkCallback(g_seq_handles[2], 0, (SsMarkCallbackProc)DngSeqMarkCallback);
+        break;
+    case 0x6F:
+        SsSeqSetVol(g_seq_handles[0], 0x7F, 0x7F);
+        SsSeqPlay(g_seq_handles[0], SSPLAY_PLAY, 0);
+        SsSetMarkCallback(g_seq_handles[2], 0, 0);
+        break;
+    }
+}

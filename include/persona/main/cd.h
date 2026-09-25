@@ -29,6 +29,12 @@ extern volatile int       g_cd_queue_index;
 extern volatile int       g_cd_queue_count;
 extern volatile CdRequest g_cd_queue[];
 
+/* A streamed read (mode bit 7): the VAB the body goes to - the entry's mode
+   with that bit stripped - and how many sectors are still to come. The ready
+   callback counts the second down. cdstream.c, cdqueuerun.c. */
+extern volatile short g_cd_stream_vab;
+extern volatile int   g_cd_stream_sectors;
+
 /* Defined in cdfile.c. */
 /* Game wrapper around CdSearchFile that retries until the file resolves. */
 extern CdlFILE *CdSearchFileLoc(CdlFILE *fp, const char *name);
@@ -36,6 +42,8 @@ extern void     CdReadToAddr(int size, u_long *dest);
 extern int      CdReadPolled(int size, u_long *dest, int mode);
 /* Blocking read of `sectors` sectors of a resolved file. cdfileread.c. */
 extern void     CdReadFileToAddr(CdlFILE *file, int sectors, u_long *dest);
+/* Blocking whole-file read. cdfileload.c. */
+extern void     LoadFileToAddr(const char *name, void *dest);
 extern void     LoadFileToAddrAsync(const char *name, void *dest);
 /* Reads `sectors` sectors from where `file` points into `dest` without
    waiting; g_cd_busy says when it is done. cdfileload.c. */
