@@ -23,15 +23,6 @@
 /* The primitives are staged in the scratchpad and copied into the buffer, so
    only one of each is ever needed: the four corners first, then the quad whose
    screen coordinates RotTransPers4 writes into it, then the sprite. */
-/* The two coordinates and the transform out-parameters share one scratch
-   block on the stack. */
-typedef struct {
-    u_short vx;
-    u_short vy;
-    u_short vz;
-    u_short pad;
-} BtlFrameVec;
-
 typedef struct {
     /* 0x00 */ SVECTOR  corner[4];
     /* 0x20 */ POLY_FT4 quad;
@@ -66,6 +57,13 @@ typedef struct {
 extern char    *g_btl_prim_next;
 extern u_long  *g_btl_effect_ot;
 
+/* 98.29%. x and y are plain short parameters that lose their registers
+   (the image reloads them with lhu from their spill slots through t5), the
+   sums are short, the grid step is i * across rather than a counter of its
+   own, and one addressable long serves as the corner counter and both
+   transform out-parameters. Left: the image gives across and piece s3/s4 and
+   lets col take s4 once piece is dead; here the loop's reduced col, row and
+   end pointer outrank them (about 7 weighted refs each) and take s3-s5. */
 #ifdef NON_MATCHING
 int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
 {
@@ -82,13 +80,13 @@ int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
         { 0x98, 0x00, 0x60, 0x00 },
     };
     BtlFramePad *pad;
-    BtlFrameVec  scratch[5];
+    long         otz;
     int          across;
     int          down;
     int          i;
     u_int        dir;
-    int          px;
-    int          py;
+    short        px;
+    short        py;
 
     /* The descriptor's sign bit picks the direction, so one of the two step
        counts is one and the other zero. */
@@ -96,56 +94,42 @@ int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
     across = (dir >> 15 ^ 1) & 1;
     down = 1 - across;
     pad = FRAME_PAD;
-    scratch[1].vx = x;
-    scratch[2].vx = y;
 
     if (flat != 0) {
-        int col;
-        int row;
-
         setlen(&pad->sprite, FRAME_SPRITE_LEN);
         setcode(&pad->sprite, FRAME_SPRITE_CODE);
         pad->sprite.clut = g_btl_clut[FRAME_CLUT];
-        row = 0;
-        col = 0;
         for (i = 0; i < (run & FRAME_RUN_LEN); i++) {
-            pad->sprite.x0 = scratch[1].vx + col * FRAME_CELL;
-            pad->sprite.y0 = scratch[2].vx + row * FRAME_CELL - FRAME_RISE;
+            pad->sprite.x0 = x + i * across * FRAME_CELL;
+            pad->sprite.y0 = y + i * down * FRAME_CELL - FRAME_RISE;
             pad->sprite.u0 = cell[piece][0];
             pad->sprite.v0 = cell[piece][2];
             memcpy(g_btl_prim_next, &pad->sprite, sizeof(SPRT_8));
             addPrim(g_btl_effect_ot, g_btl_prim_next);
             g_btl_prim_next += sizeof(SPRT_8);
-            col += across;
-            row += down;
         }
     } else {
-        int col;
-        int row;
-
         setlen(&pad->quad, FRAME_QUAD_LEN);
         setcode(&pad->quad, FRAME_QUAD_CODE);
         pad->quad.tpage = getTPage(FRAME_TP, FRAME_ABR, FRAME_VX, FRAME_VY);
         pad->quad.clut = g_btl_clut[FRAME_CLUT];
-        row = 0;
-        col = 0;
         for (i = 0; i < (run & FRAME_RUN_LEN); i++) {
-            px = scratch[1].vx + col * FRAME_CELL;
-            py = scratch[2].vx + row * FRAME_CELL;
+            px = x + i * across * FRAME_CELL;
+            py = y + i * down * FRAME_CELL;
             /* The transform's two out-parameters are never read, so the
                counter shares their storage. */
-            for ((*(long *)&scratch[0]) = 0; (*(long *)&scratch[0]) < 4; (*(long *)&scratch[0])++) {
-                pad->corner[(*(long *)&scratch[0])].vx =
-                    px + (*(long *)&scratch[0]) % 2 * FRAME_CELL;
-                pad->corner[(*(long *)&scratch[0])].vy =
-                    py + (*(long *)&scratch[0]) / 2 * FRAME_CELL - FRAME_RISE;
-                pad->corner[(*(long *)&scratch[0])].vz = 0;
+            for (otz = 0; otz < 4; otz++) {
+                pad->corner[otz].vx =
+                    px + otz % 2 * FRAME_CELL;
+                pad->corner[otz].vy =
+                    py + otz / 2 * FRAME_CELL - FRAME_RISE;
+                pad->corner[otz].vz = 0;
             }
             RotTransPers4(&pad->corner[0], &pad->corner[1],
                           &pad->corner[2], &pad->corner[3],
                           (long *)&pad->quad.x0, (long *)&pad->quad.x1,
                           (long *)&pad->quad.x2, (long *)&pad->quad.x3,
-                          (long *)scratch, (long *)scratch);
+                          &otz, &otz);
             pad->quad.u0 = cell[piece][0];
             pad->quad.v0 = cell[piece][2];
             pad->quad.u1 = cell[piece][0] + FRAME_CELL;
@@ -157,8 +141,6 @@ int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
             memcpy(g_btl_prim_next, &pad->quad, sizeof(POLY_FT4));
             addPrim(g_btl_effect_ot, g_btl_prim_next);
             g_btl_prim_next += sizeof(POLY_FT4);
-            col += across;
-            row += down;
         }
     }
     return 1;

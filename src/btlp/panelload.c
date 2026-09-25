@@ -61,7 +61,11 @@ extern int      g_btl_panel_state;
 
 extern void BtlHighlightInitPrims(void);
 
-#ifdef NON_MATCHING
+/* A buffer's corner triangle. The walk's inner loop is a plain goto, so loop.c
+   leaves the table's address in it, and the do-while(0) is what weights the
+   buffer offset enough to take its saved register before the glow's. */
+#define PANEL_CORNER(t, i, k)     do {         (t) = (POLY_G3 *)((char *)g_btl_panel_corner                           + (i) * PANEL_CORNERS * sizeof(POLY_G3) + (k));     } while (0)
+
 void BtlPanelLoad(void)
 {
     POLY_FT4 *p;
@@ -70,20 +74,14 @@ void BtlPanelLoad(void)
     int       i;
     int       j;
     int       k;
-    int       off;
-    int       glow;
-    int       corner;
 
-    i = 0;
-    corner = 0;
-    glow = 0;
-    off = 0;
     BtlUnpack(PANEL_CLUT, g_btl_panel_pack);
     BtlQueueVramLoad(PANEL_TILES, PANEL_TILES_X, PANEL_TILES_Y,
                      PANEL_TILES_W, PANEL_TILES_H);
     BtlQueueVramLoad(PANEL_CLUT, 0, PANEL_CLUT_Y, PANEL_CLUT_W, 1);
+    i = 0;
     do {
-        p = (POLY_FT4 *)((char *)g_btl_panel_poly + off);
+        p = &g_btl_panel_poly[i];
         SetPolyFT4(p);
         SetSemiTrans(p, 0);
         SetShadeTex(p, 1);
@@ -91,37 +89,36 @@ void BtlPanelLoad(void)
         p->v0 = PANEL_V0;
         p->u1 = PANEL_U1;
         p->v1 = PANEL_V0;
+        p->r0 = PANEL_GREY;
+        p->g0 = PANEL_GREY;
+        p->b0 = PANEL_GREY;
         p->u2 = PANEL_U0;
         p->v2 = PANEL_V1;
         p->u3 = PANEL_U1;
         p->v3 = PANEL_V1;
-        p->r0 = PANEL_GREY;
-        p->g0 = PANEL_GREY;
-        p->b0 = PANEL_GREY;
         /* Indexed rather than reached through `p`: the original rebuilds the
            address for these two, having let go of the record's. */
         g_btl_panel_poly[i].tpage = GetTPage(1, 2, PANEL_TILES_X, PANEL_TILES_Y);
         g_btl_panel_poly[i].clut = GetClut(0, PANEL_CLUT_Y);
 
-        g = (POLY_G4 *)((char *)g_btl_panel_glow + glow);
+        g = &g_btl_panel_glow[i];
         SetPolyG4(g);
         SetSemiTrans(g, 0);
         SetShadeTex(g, 1);
 
         j = 0;
         k = 0;
-        do {
-            t = (POLY_G3 *)((char *)g_btl_panel_corner + corner + k);
-            SetPolyG3(t);
-            SetSemiTrans(t, 0);
-            SetShadeTex(t, 0);
-            j++;
-            k += sizeof(POLY_G3);
-        } while (j < PANEL_CORNERS);
+    next:
+        PANEL_CORNER(t, i, k);
+        SetPolyG3(t);
+        SetSemiTrans(t, 0);
+        SetShadeTex(t, 0);
+        j++;
+        k += sizeof(POLY_G3);
+        if (j < PANEL_CORNERS) {
+            goto next;
+        }
 
-        corner += PANEL_CORNERS * sizeof(POLY_G3);
-        glow += sizeof(POLY_G4);
-        off += sizeof(POLY_FT4);
         i++;
     } while (i < PANEL_BUFFERS);
 
@@ -141,7 +138,4 @@ void BtlPanelLoad(void)
     g_btl_panel_state = 0;
     BtlHighlightInitPrims();
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/panelload", BtlPanelLoad);
-#endif
 

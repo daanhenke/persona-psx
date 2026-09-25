@@ -180,14 +180,15 @@ void BtlTalkersJoin(void)
     g_btl_talk_outcome = 3;
 }
 
-/* 92.36%, from 85.84%. The cases are written in the image's order: 0, then
-   3 (which goes to the refusal when either slot is empty), then 1, then the
-   refusal. That lets 0 and 3 share the item call. Left: gcc lifts the 1 that
-   puts the marker up into a saved register and the image writes it out
-   afresh. The loop dump shows why: the marker's 1 is materialised in SImode
-   and matches the case-1 compare the switch emits at its end, so the pair
-   has savings 2 at life 2. Moving the marker store, a local for the kind, or
-   a byte-wide switch value leaves the match in place.
+/* 99.95%. The cases are written in the image's order: 0, then 3, then 1,
+   then the refusal, so 0 and 3 share the item call. Case 3 writes the refusal
+   out in full rather than jumping to it; cross-jumping folds the copies back
+   into one, but at loop time they are what keep loop.c from lifting the 1
+   (the marker's and the case-1 compare's, matched into one movable) into a
+   saved register. Left: the image loads the kept order, move and target mask
+   above the kind byte's store and the kept ailment line below it, which
+   gives them a0, a1, a2 and v1; here the four copies land in other
+   registers.
 
    The same again: the kept copies go back over the live ones and the action
    is aimed afresh, because the negotiation moved everybody about and a target
@@ -222,12 +223,14 @@ void BtlTalkersLeaveField(void)
                     BtlReadyItemAction(a, &g_item_defs[a->c.equip[1]]);
                     break;
                 }
-                goto refuse;
+                a->mark_kind = 5;
+                BtlShowMarker(g_btl_actor_turn, 1, 5);
+                a->obj->motion = 4;
+                break;
             case 1:
                 BtlReadySpellAction(a);
                 break;
             default:
-            refuse:
                 a->mark_kind = 5;
                 BtlShowMarker(g_btl_actor_turn, 1, 5);
                 a->obj->motion = 4;

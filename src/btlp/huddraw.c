@@ -92,7 +92,9 @@ typedef struct {
 #define HUD_CORNER_X(j) ((j) % 2)
 #define HUD_CORNER_Y(j) ((j) / 2)
 
-/* 92.98%. The two passes, the cell walk and every primitive are the image's;
+/* 93.63%. The bar pass picks each corner's offset with one ternary and one
+   store, as the image does. The two passes, the cell walk and every primitive
+   are the image's;
    what is left is which saved register each of the two bases takes - the image
    keeps the record in s1 and the scratchpad in s2, this the other way round -
    and a handful of instructions the scheduler puts on the far side of a store.
@@ -249,11 +251,9 @@ void BtlHudDraw(void)
         do {
             i = 0;
             do {
-                if (n == HUD_BAR_LAST) {
-                    pad->u[i] = HUD_CORNER_X(i) * HUD_BAR_LAST_W;
-                } else {
-                    pad->u[i] = HUD_CORNER_X(i) * HUD_BAR_W;
-                }
+                pad->u[i] = n == HUD_BAR_LAST
+                                ? HUD_CORNER_X(i) * HUD_BAR_LAST_W
+                                : HUD_CORNER_X(i) * HUD_BAR_W;
                 pad->v[i] = HUD_CORNER_Y(i) * HUD_BAR_H + HUD_BAR_V;
                 i++;
             } while (i < 4);
@@ -269,11 +269,9 @@ void BtlHudDraw(void)
             pad->quad.u3 = pad->u[3];
             pad->quad.v3 = pad->v[3];
             do {
-                if (n == HUD_BAR_LAST) {
-                    pad->pos[i].vx = pad->ox + HUD_CORNER_X(i) * HUD_BAR_LAST_W;
-                } else {
-                    pad->pos[i].vx = pad->ox + HUD_CORNER_X(i) * HUD_BAR_W;
-                }
+                pad->pos[i].vx = n == HUD_BAR_LAST
+                                     ? pad->ox + HUD_CORNER_X(i) * HUD_BAR_LAST_W
+                                     : pad->ox + HUD_CORNER_X(i) * HUD_BAR_W;
                 pad->pos[i].vy = pad->oy + HUD_CORNER_Y(i) * HUD_BAR_H;
                 i++;
             } while (i < 4);
