@@ -10,6 +10,7 @@ str_open_exe               = 0x800100E0;
 str_movie_exe              = 0x800100F0;
 str_end_exe                = 0x80010104;
 g_overlay_dest             = 0x8001014C;
+str_card_file_tmpl         = 0x80010150; // size:0x14
 str_dng_tmpl               = 0x80010164;
 str_dngs_tmpl              = 0x80010174;
 str_dngm_tmpl              = 0x80010184;
@@ -102,23 +103,43 @@ CdDaReadyCallback          = 0x800129E4; // type:func size:0x148
 CdSearchFileLoc            = 0x80012B2C; // type:func size:0xC0
 CdLoadPsExe                = 0x80012BEC; // type:func size:0x13C
 CdReadPolled               = 0x80012D28; // type:func size:0x54
-D_80012D7C                 = 0x80012D7C; // type:func size:0x27C
 
 //-------------------------------------------------------------
 //--- PA: 0x002EB8   VA: 0x80012EB8   subsegment: c, cdqueuerun
 //-------------------------------------------------------------
-func_80012FF8              = 0x80012FF8; // type:func size:0x168
-func_80013160              = 0x80013160; // type:func size:0xB8
 
 //--------------------------------------------------------------
 //--- PA: 0x0031E4   VA: 0x800131E4   subsegment: asm, main_2_x5
 //--------------------------------------------------------------
-func_80013218              = 0x80013218; // type:func size:0xE8
-D_80013300                 = 0x80013300; // type:func size:0x1D20
 
 //--------------------------------------------------------------
 //--- PA: 0x00357C   VA: 0x8001357C   subsegment: asm, main_3_x2
 //--------------------------------------------------------------
+CardEvIoe                  = 0x80012D7C; // type:func size:0x9C
+CardEvError                = 0x80012E18; // type:func size:0xA0
+CardEvTimeout              = 0x80012EB8; // type:func size:0xA0
+CardEvNew                  = 0x80012F58; // type:func size:0xA0
+CardOpenEvents             = 0x80012FF8; // type:func size:0x168
+CardCloseEvents            = 0x80013160; // type:func size:0xB8
+CardEnableEvents           = 0x80013218; // type:func size:0xE8
+CardPollPorts              = 0x80013300; // type:func size:0x280
+CardLoad                   = 0x80013580; // type:func size:0x218
+CardCheckFree              = 0x80013798; // type:func size:0xD8
+CardFormat                 = 0x80013870; // type:func size:0xEC
+CardScanSaves              = 0x8001395C; // type:func size:0x288
+CardCheckSave              = 0x80013BE4; // type:func size:0x204
+CardSave                   = 0x80013DE8; // type:func size:0x6A4
+CardDeleteFile             = 0x8001448C; // type:func size:0x16C
+CardLoadSave               = 0x800145F8; // type:func size:0x2B0
+CardWaitSwEvent            = 0x800148A8; // type:func size:0x88
+CardClearSwEvents          = 0x80014930; // type:func size:0x68
+CardWaitHwEvent            = 0x80014998; // type:func size:0xE4
+CardClearHwEvents          = 0x80014A7C; // type:func size:0x68
+CardOpen                   = 0x80014AE4; // type:func size:0xC4
+CardWrite                  = 0x80014BA8; // type:func size:0xE0
+CardRead                   = 0x80014C88; // type:func size:0x190
+CardSeek                   = 0x80014E18; // type:func size:0xC8
+CardTitleSetNumber         = 0x80014EE0; // type:func size:0x140
 PreloadDng                 = 0x80015020; // type:func size:0x2F0
 FormatHexDigits            = 0x80015310; // type:func size:0x74
 DngLoadVab                 = 0x80015384; // type:func size:0xEC
@@ -2993,7 +3014,7 @@ ReturnFromException        = 0x800414F4; // type:func size:0x10
 ResetEntryInt              = 0x80041504; // type:func size:0x10
 HookEntryInt               = 0x80041514; // type:func size:0x10
 EnterCriticalSection       = 0x80041524; // type:func size:0x10
-func_80041534              = 0x80041534; // type:func size:0x10
+ExitCriticalSection        = 0x80041534; // type:func size:0x10
 open                       = 0x80041544; // type:func size:0x10
 lseek                      = 0x80041554; // type:func size:0x10
 read                       = 0x80041564; // type:func size:0x10
@@ -3029,6 +3050,7 @@ g_persona_defs             = 0x8004B0A8;
 g_exp_curve                = 0x8004C204;
 g_exp_curve_alt            = 0x8004C38C;
 g_map_base                 = 0x8004D83C;
+g_card_header              = 0x8004D864; // size:0x180
 g_dng_floor_maps           = 0x8004D9E4; // size:0x30
 g_dng_room_entry           = 0x8004DA14; // size:0x10
 str_2dmdl_tmpl             = 0x8004DA24; // size:0x14
@@ -3059,12 +3081,14 @@ D_80055974                 = 0x80055974; // type:u32 size:0x68
 D_800559DC                 = 0x800559DC; // type:u32 size:0x4
 D_800559E0                 = 0x800559E0; // type:u32 size:0x4
 D_800559E4                 = 0x800559E4; // type:u32 size:0x4
-D_800559E8                 = 0x800559E8; // type:u32 size:0x29C
+D_800559E8                 = 0x800559E8; // type:u32 size:0x1F8
+g_card_devs                = 0x80055BE0; // size:0x8
 g_btl_debug_hud            = 0x80055BEC;
 g_btl_chain_battle         = 0x80055BED;
 g_btl_actors_cleared       = 0x80055BEE;
 g_state_cur                = 0x80055C04;
 g_cd_da_start              = 0x80055C08; // size:0x4
+g_card_chan                = 0x80055C0C; // size:0x4
 g_cd_busy                  = 0x80055C10;
 g_cd_queue_count           = 0x80055C14;
 g_cd_da_repeat             = 0x80055C18; // size:0x4
@@ -3076,6 +3100,8 @@ g_cd_queue_index           = 0x80055C2C;
 g_state_prev               = 0x80055C30;
 g_cd_da_end                = 0x80055C34; // size:0x4
 g_state_next               = 0x80055C38;
+g_card_hw_ev               = 0x80055C3C; // size:0x10
+g_card_sw_ev               = 0x80055C4C; // size:0x10
 g_cd_name_buf              = 0x80055C5C;
 D_80055C84                 = 0x80055C84; // type:u32 size:0x4
 D_80055C88                 = 0x80055C88; // type:u32 size:0x4
@@ -3094,6 +3120,9 @@ D_80055E44                 = 0x80055E44; // type:u32 size:0x4
 D_80055E48                 = 0x80055E48; // type:u32 size:0x4
 D_80055E4C                 = 0x80055E4C; // type:u32 size:0x1B4
 g_btl_actors               = 0x8005D654; // size:0x49C
+g_card_save                = 0x8005E35C; // size:0x80
+g_card_state               = 0x8005E3E4; // size:0xC
+g_card_result              = 0x8005E620; // size:0xC
 g_adv_scene_file           = 0x8005E654; // size:0x18
 g_adv_scene_arg            = 0x8005E714;
 g_cd_next_file             = 0x8005E73C; // size:0x18
@@ -3105,13 +3134,18 @@ g_cd_file_size             = 0x800633B4;
 g_save_map_id              = 0x801F15A0; // size:0x2
 g_save_unk4                = 0x801F15A2; // size:0x2
 g_save_pos_x               = 0x801F15A4; // size:0x1
+g_save_unk5                = 0x801F15A5; // size:0x1
 g_save_pos_y               = 0x801F15A6; // size:0x1
 g_save_unk5_idx            = 0x801F15A7; // size:0x1
+g_save_unk11               = 0x801F15B1; // size:0x1
+g_save_unk12               = 0x801F15B2; // size:0x1
 g_dng_third_flags          = 0x801F15B9; // size:0x1
 g_btl_map_id               = 0x801F15D4;
 g_btl_pos_y                = 0x801F15D7;
+g_play_time                = 0x801F29BC; // ignore:True size:0x4
 g_event_flags              = 0x801F29C8; // ignore:True
 g_moon                     = 0x801F2B30;
+g_save_sum                 = 0x801F534B; // size:0x1
 g_map_id                   = 0x801F5350;
 g_map_pos_x                = 0x801F5352; // size:0x1
 g_map_pos_y                = 0x801F5353; // size:0x1

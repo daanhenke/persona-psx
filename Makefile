@@ -115,6 +115,8 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 # base + WORK_BIAS, so each overlay has to say how far its own area is above the
 # one the others share.
 #
+# - main's memory card code (src/main/card) was built at -O0, like atlus and open.
+#
 # - main's sources keep a tentative definition as a real common (maspsx's
 #   --use-comm-section). That is how the image reaches main's own small data
 #   gp-relative from C, and the common merges into the label splat emits.
@@ -124,7 +126,7 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 define FlagsSwitch
     $(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /open/,$(1))),$(eval DL_FLAGS = -G8),$(eval DL_FLAGS = -G0))
 
-	$(if $(or $(findstring /atlus/,$(1)),$(findstring /open/,$(1))),$(eval OPT = -O0),$(eval OPT = $(OPT_FLAGS)))
+	$(if $(or $(findstring /atlus/,$(1)),$(findstring /open/,$(1)),$(findstring /main/card/,$(1))),$(eval OPT = -O0),$(eval OPT = $(OPT_FLAGS)))
 
 	$(eval LD_FLAGS = $(ENDIAN) $(DL_FLAGS) $(OPT_FLAGS) $(LD_FLAGS_GCSECTIONS) -nostdlib --no-check-sections)
 	$(eval AS_FLAGS = $(ENDIAN) $(INCLUDE_FLAGS) $(OPT_FLAGS) $(DL_FLAGS) -march=r3000 -mtune=r3000 -no-pad-sections)

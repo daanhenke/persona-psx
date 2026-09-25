@@ -72,7 +72,7 @@ segments:
       - [0x332C, c, cdfilesearch]
       - [0x33EC, c, psexe]
       - [0x3528, c, cdfilepolled]
-      - [0x357C, asm, main_3_x2]
+      - [0x357C, c, card/card]
       - [0x5820, c, preloaddng]
       - [0x5EAC, c, common/game/eventflag]
       - [0x5ED4, c, preload]
