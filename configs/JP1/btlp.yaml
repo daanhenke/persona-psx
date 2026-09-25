@@ -98,10 +98,10 @@ segments:
       - [0x488, .rodata, talkboard]
       - [0x4CC, rodata, btlp_rodata3a]
       - [0x58C, .rodata, insert]
-      # BtlBoxTick's thirty-three-entry step table sits in here; it becomes
-      # `[0x5AC, .rodata, boxtick]` behind a four-byte pad the moment the
-      # routine comes out of its guard.
-      - [0x5A8, rodata, btlp_rodata4]
+      - [0x5A8, pad, btlp_pad_5a8]  # the next unit's .rodata is 8-aligned
+      # BtlBoxTick's thirty-three-entry step table, which boxtick.c emits
+      # itself.
+      - [0x5AC, .rodata, boxtick]
       # BtlTalkOpen's LV glyphs, the local initialiser the C emits itself.
       - [0x630, .rodata, talkopen]
       - [0x634, .rodata, windowstep]

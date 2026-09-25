@@ -56,22 +56,24 @@
 
 /* The column's tile. The last column takes the closing entry of each table
    rather than the one its own index names. */
+/* The drawer reads the box's state as members of the record it sits in
+   (g_btl_box_flags heads it), not as scalars of their own. That is what makes
+   gcc reload the column count after every store to a corner rather than
+   lifting it out of the loop, and read the flags as a whole halfword. */
+typedef struct { short v; } BoxField;
+#define BOX_FIELD(g) (((BoxField *)&(g))->v)
+#define BOX_COLS     BOX_FIELD(g_btl_box_cols)
 #define BOX_COL(tbl, i) \
-    (*((i) == g_btl_box_cols - 1 ? &(tbl)[BOX_COL_LAST] : &(tbl)[i]))
+    ((tbl)[(i) == BOX_COLS - 1 ? BOX_COL_LAST : (i)])
+
+/* The matrix values as the drawer's record sees them, off the offset pair. */
+#define BOX_XF ((BtlBoxXform *)&g_btl_box_ox)
 
 char BtlBoxState(void)
 {
     return g_btl_box_step;
 }
 
-/* 97.37%. Every arm and every store is the image's; what is left is how the
-   three axes of the scale are addressed in the collapse. The image keeps one
-   of them - the height, which it touches four times - in a register and
-   reaches the other two absolutely; gcc relates the other two to that
-   register instead and comes out four `lui`s shorter. Holding either axis in
-   a local, reaching the height through a pointer, and reordering the clears
-   all leave it exactly where it is. */
-#ifdef NON_MATCHING
 /* One frame of the box's open or close. */
 void BtlBoxTick(void)
 {
@@ -136,20 +138,24 @@ void BtlBoxTick(void)
         g_btl_box_scale.vy = BTL_BOX_FULL;
         break;
     case BTL_BOX_COLLAPSE_STEP:
+        /* The width and depth go through the drawer's view of the record and
+           the height by its own name. gcc then cannot relate the two, so it
+           keeps the height's address in a register across the reset and
+           reaches the others absolutely. */
         g_btl_box_scale.vy = g_btl_box_scale.vy - g_btl_box_scale.vy / 2;
         if (g_btl_box_scale.vy >= BTL_BOX_THIN) {
             return;
         }
         g_btl_box_scale.vy = BTL_BOX_THIN;
-        g_btl_box_scale.vx = g_btl_box_scale.vx - g_btl_box_scale.vx / 2;
-        if (g_btl_box_scale.vx >= BTL_BOX_GONE) {
+        BOX_XF->scale.vx = BOX_XF->scale.vx - BOX_XF->scale.vx / 2;
+        if (BOX_XF->scale.vx >= BTL_BOX_GONE) {
             return;
         }
         BtlTextReset();
         g_btl_text_page = 1;
-        g_btl_box_scale.vx = 0;
+        BOX_XF->scale.vx = 0;
         g_btl_box_scale.vy = 0;
-        g_btl_box_scale.vz = 0;
+        BOX_XF->scale.vz = 0;
         g_btl_box_flags = 0;
         break;
     case 0:
@@ -158,15 +164,7 @@ void BtlBoxTick(void)
     }
     g_btl_box_step = 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/boxtick", BtlBoxTick);
-#endif
 
-/* 82.12%. The arms, the tables and the two transforms are the image's; what
-   is left is how the column tables are reached - the image keeps a base for
-   each in a register and picks the closing entry off it, where gcc builds the
-   closing entry's address fresh and reloads the column count. */
-#ifdef NON_MATCHING
 /* The box on screen: one textured quad a column, and the shaded quad the
    whole row stands on. */
 void BtlBoxDraw(void)
@@ -200,28 +198,28 @@ void BtlBoxDraw(void)
                                   * BTL_BOX_COL,
                               BTL_BOX_TILES_Y);
         tile.clut = GetClut(0, BTL_BOX_CLUT_Y);
-        for (i = 0; i < g_btl_box_cols; i++) {
+        for (i = 0; i < BOX_COLS; i++) {
             for (otz = 0; otz < 4; otz++) {
                 corner[otz].vx = g_btl_box_col_x[i]
                                  + (otz % 2) * BOX_COL(g_btl_box_col_w, i)
-                                 - BOX_ORIGIN
-                                 - (g_btl_box_cols - 2) * BOX_HALF_COL;
+                                 - (BOX_ORIGIN
+                                    + (BOX_COLS - 2) * BOX_HALF_COL);
                 corner[otz].vy = (otz / 2) * BOX_TILE_H - BOX_TILE_H / 2;
                 corner[otz].vz = 0;
             }
             RotTransPers4(&corner[0], &corner[1], &corner[2], &corner[3],
                           (long *)&tile.x0, (long *)&tile.x1,
                           (long *)&tile.x2, (long *)&tile.x3, &otz, &otz);
-            tile.v0 = BOX_TILE_V;
             tile.u0 = BOX_COL(g_btl_box_col_u, i);
-            tile.v1 = BOX_TILE_V;
+            tile.v0 = BOX_TILE_V;
             tile.u1 = BOX_COL(g_btl_box_col_u, i)
                       + BOX_COL(g_btl_box_col_w, i);
-            tile.v2 = BOX_TILE_V + BOX_TILE_H;
+            tile.v1 = BOX_TILE_V;
             tile.u2 = BOX_COL(g_btl_box_col_u, i);
-            tile.v3 = BOX_TILE_V + BOX_TILE_H;
+            tile.v2 = BOX_TILE_V + BOX_TILE_H;
             tile.u3 = BOX_COL(g_btl_box_col_u, i)
                       + BOX_COL(g_btl_box_col_w, i);
+            tile.v3 = BOX_TILE_V + BOX_TILE_H;
             memcpy(g_btl_prim_next, &tile, sizeof(POLY_FT4));
             AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
             g_btl_prim_next += sizeof(POLY_FT4);
@@ -230,7 +228,7 @@ void BtlBoxDraw(void)
         SetPolyG4(&back);
         SetSemiTrans(&back, 0);
         SetShadeTex(&back, 1);
-        switch ((g_btl_box_flags >> BTL_BOX_STYLE_SHIFT) & 3) {
+        switch ((BOX_FIELD(g_btl_box_flags) >> BTL_BOX_STYLE_SHIFT) & 3) {
         case 0:
             back.r0 = 0;
             back.g0 = 0;
@@ -275,11 +273,10 @@ void BtlBoxDraw(void)
             break;
         }
         for (otz = 0; otz < 4; otz++) {
+            corner[otz].vx = BOX_BACK_W * BOX_COLS * (otz % 2)
+                             - (BOX_ORIGIN + (BOX_COLS - 2) * BOX_HALF_COL);
             corner[otz].vy = (otz / 2) * BOX_TILE_H - BOX_TILE_H / 2;
             corner[otz].vz = 0;
-            corner[otz].vx = g_btl_box_cols * ((otz % 2) * BOX_BACK_W)
-                             - BOX_ORIGIN
-                             - (g_btl_box_cols - 2) * BOX_HALF_COL;
         }
         RotTransPers4(&corner[0], &corner[1], &corner[2], &corner[3],
                       (long *)&back.x0, (long *)&back.x1, (long *)&back.x2,
@@ -290,6 +287,3 @@ void BtlBoxDraw(void)
     }
     SetGeomOffset(ofx, ofy);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/boxtick", BtlBoxDraw);
-#endif

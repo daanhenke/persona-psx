@@ -3532,3 +3532,31 @@ The ROM's libgcc has a single double compare at 0x800171DC. `x != 0.0` calls
 a signed conversion per field, the cast share as its own term, a pointer walk
 then an index walk. All of it came from reading the image rather than
 adjusting the old body.
+
+## A global the image rereads inside a loop is a struct member
+
+gcc 2.6's scheduler and loop.c let a store to a struct member at a varying
+address pass a load of a scalar at a fixed address. So a count read from a
+plain global comes out lifted out of the loop, or scheduled across stores into
+a local array, where the image reloads it every time. Reading it through a
+one-field struct view at the same address puts it on the struct side and
+restores the reloads. The same view read a halfword flag word whole where the
+plain global had been narrowed to a byte load.
+
+- [boxtick.c](/src/btlp/boxtick.c) - `BtlBoxDraw`, `BOX_FIELD(g_btl_box_cols)`
+  and the style switch: 82.12% to exact. `BtlBoxTick` then matched by reaching
+  the width and depth through the drawer's record view, so CSE could not relate
+  them to the height's register (reloc overrides name them).
+
+## Per-case locals and stepwise sums are in the registers
+
+When one variable serves several switch arms, it is one pseudo, and if any arm
+keeps it across a call it lands in a saved register everywhere. The image
+giving it a1 in one arm and s0 in another means separate locals. When an
+intermediate product and the final value share a register, the source assigned
+the variable in steps (`gain = price * roll; gain = gain / 100; ...`).
+
+- [talkscenegift.c](/src/btlp/talkscenegift.c) - `BtlTalkSceneGift`, 89.31% to
+  99.73%. Also: a `short row[]` table with 32 bytes of frame below it is an
+  unused local; `&g_btl_actors[BTL_PARTY + t]` rather than `&g_btl_enemies[t]`
+  lets CSE rebase one register onto the member.

@@ -36,13 +36,14 @@
 
 extern int BtlMoodBand(short value);
 
-/* 90.22%, from 89.23%. Both band tests are switches, each with a case 0
-   beside 1 and 2, which gives the image's three-way compare trees. The
-   constant steps go to one store-and-return tail, and the plain step is held
-   in a local across the BtlMoodBand call. Left: on the non-mood path the
-   image fills the weight test's delay slot with the return value, and gcc
-   here fills it with the strong step, because weight and step land in
-   different registers. */
+/* 96.85%. The mood answers store their constant and return in each case,
+   so cross-jumping leaves one shared store-and-return tail; each switch's
+   default body is written first, which is where the compare tree falls
+   into; and `plain` is only set on the slot-0 path, or CSE would reuse it
+   for the second switch's 3. Left: on the non-mood path the image has the
+   step in v1 and `return 1` hoisted into the first branch's delay slot.
+   Here g_btl_talk_result's loaded value takes v1 and the step gets a0 (the
+   weight and the result swap registers in global alloc). */
 #ifdef NON_MATCHING
 int BtlTalkTakeLine(short slot, short verb, short said, short weight,
                     short mood)
@@ -72,36 +73,33 @@ int BtlTalkTakeLine(short slot, short verb, short said, short weight,
     }
 
     g_btl_talk_result |= TALK_NEW;
-    plain = TALK_STEP_PLAIN;
     if (slot == 0) {
+        plain = TALK_STEP_PLAIN;
         g_btl_talk_said = plain;
         switch (BtlMoodBand(mood)) {
-        case 1:
-            step = TALK_STEP_STRONG;
-            goto set;
-        case 2:
-            step = TALK_STEP_BEST;
-            goto set;
         case 0:
         default:
             g_btl_talk_step = plain;
+            return 1;
+        case 1:
+            g_btl_talk_step = TALK_STEP_STRONG;
+            return 1;
+        case 2:
+            g_btl_talk_step = TALK_STEP_BEST;
             return 1;
         }
     }
     g_btl_talk_said = said;
     switch (BtlMoodBand(mood)) {
-    case 1:
-    case 2:
-        step = TALK_STEP_PLAIN;
-        goto set;
     case 0:
     default:
         g_btl_talk_result |= TALK_TOO_WEAK;
         return 1;
+    case 1:
+    case 2:
+        g_btl_talk_step = TALK_STEP_PLAIN;
+        return 1;
     }
-set:
-    g_btl_talk_step = step;
-    return 1;
 }
 #else
 INCLUDE_ASM("btlp/nonmatchings/talktake", BtlTalkTakeLine);

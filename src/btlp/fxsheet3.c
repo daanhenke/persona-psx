@@ -19,11 +19,14 @@
 /* How long every cell waits on top of its own entry in the scatter. */
 #define FX_GRID_LATE 8
 
-/* 89.85%, in the shape BtlFxStartSweep matched in: real do/while loops,
-   the order index as a counter of its own (k, as BtlOpenFxGrid has it), the
-   position's third word set in both arms. Left: loop.c still lifts the row
-   step, 0xFFEC0000 - its outer loop is 51 insns against the budget at life 2,
-   where the image's must have been larger or its budget spent. */
+/* 95.74%. The link to the previous cell is written in both arms of an
+   identical test; cross-jumping folds them, but at loop time they are what
+   push the outer loop over loop.c's budget, so the row step stays in the loop
+   as the image has it. Left: the image loads the cell's attribute word into
+   v1 straight after the allocation call, ahead of the copy of its result;
+   here it is built in v0 at the store. That is the shape of a constant
+   loop.c lifted and reload rebuilt in a spare register, which sched2 then
+   hoists, but the inner loop is too large for loop.c to lift it here. */
 #ifdef NON_MATCHING
 BtlObj *BtlFxStartSheetLate(void)
 {
@@ -63,7 +66,11 @@ BtlObj *BtlFxStartSheetLate(void)
             }
             o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
                             pos, FX_OBJ_CD, FX_OBJ_CE);
-            o->attached = after;
+            if (g_btl_actor_turn < BTL_PARTY) {
+                o->attached = after;
+            } else {
+                o->attached = after;
+            }
             after = o;
             x += FX_GRID_DX;
             col++;

@@ -57,19 +57,17 @@ extern u_char   g_btl_test_party;
 
 extern void PersonaCreate(Char *c, int persona);
 
-/* 88.76%, from 78.87%. What changed:
-   - the formation goes back as BtlStoreParty takes it: the eight presets in
-     one copy and the live row in another;
-   - the save bytes are reached by address, as there;
-   - the test block's slot counter is the same variable as the main loop's
-     (the image keeps both in s0);
-   - the weakening test reads the key into an int, so the compares are signed.
-   Still out:
-   - the save bytes are read after the live row's copy here and before it in
-     the image;
-   - the image walks the party through a copy of the pointer loop.c derives
-     and the actor through one register;
-   - the literal addresses count as misses against the image's D_ names. */
+/* 91.36%. The party is walked as party[i] against &g_btl_actors[i], the
+   quarter is a plain / 4, and g_chars/g_party are ignore:True so splat prints
+   the literals the source uses. What is left is scheduling:
+   - the image loads the three save bytes and stores g_btl_confirm before the
+     live row's copy. sched1 gives that copy no dependences at all here (its
+     `movstrsi` has a symbol destination and conflicts with nothing), so it
+     is the last insn picked and lands first. In the image something tied it
+     to the settings. A copy through a varying address would do it, but gcc
+     folds every pointer form back into the symbol;
+   - in the test block the image sets PersonaCreate's first argument before
+     the table pick and steps the Char walker in the call's delay slot. */
 #ifdef NON_MATCHING
 void BtlTakeParty(void)
 {
@@ -121,20 +119,18 @@ void BtlTakeParty(void)
     }
 
     i = 0;
-    a = g_btl_actors;
     do {
-        n = *party;
+        a = &g_btl_actors[i];
+        n = party[i];
         if (g_chars[n].key == a->c.key) {
             memcpy(a, &g_chars[n], sizeof(Char));
         } else {
             memcpy(a, &g_chars[n], sizeof(Char));
             a->c.unk5D = 0;
         }
-        party++;
         a->flags = 0;
         a->tactic = g_save_actor_flag[i];
         i++;
-        a++;
     } while (i < BTL_PARTY);
 
     memcpy(g_btl_formation_preset, g_formation_preset,
@@ -147,21 +143,14 @@ void BtlTakeParty(void)
 
     i = 0;
     if (g_btl_encounter == BTL_WEAK_ENCOUNTER) {
-        a = g_btl_actors;
-        n = 0;
         do {
             n = g_btl_actors[i].c.key;
             if (n > BTL_WEAK_KEY0 - 1
                 && (n < BTL_WEAK_KEY1 || n == BTL_WEAK_KEY2)) {
-                n = g_btl_actors[i].c.hp_max;
-                if (n < 0) {
-                    n += 3;
-                }
-                if (n >> 2 < a->c.hp) {
-                    a->c.hp = n >> 2;
+                if (g_btl_actors[i].c.hp_max / 4 < g_btl_actors[i].c.hp) {
+                    g_btl_actors[i].c.hp = g_btl_actors[i].c.hp_max / 4;
                 }
             }
-            a++;
             i++;
         } while (i < BTL_PARTY);
     }

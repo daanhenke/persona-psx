@@ -113,11 +113,6 @@ extern BtlSoundBank g_btl_open_banks[];
 
 /* What the sound debug print reads - three bytes out of each of the five
    party records, and a byte out of the table each record indexes. */
-extern u_char D_801F1C0A, D_801F1C23, D_801F1C24;
-extern u_char D_801F1C6A, D_801F1C83, D_801F1C84;
-extern u_char D_801F1CCA, D_801F1CE3, D_801F1CE4;
-extern u_char D_801F1D2A, D_801F1D43, D_801F1D44;
-extern u_char D_801F1D8A, D_801F1DA3, D_801F1DA4;
 /* The record each party member's sound is described by, reached by address:
    the assembler expands a numeric base with an index the other way round from a
    named one, and the image has the numeric form. */
@@ -334,16 +329,16 @@ void ovl_btlp_entry(void)
     if (g_btl_debug != 0) {
         BtlDebugWait("SND INIT\n");
         if (g_btl_debug != 0) {
-            BtlDebugWaitArgs("%02x %02x %02x\n", D_801F1C0A, D_801F1C23,
-                             BtlSoundRec(D_801F1C24));
-            BtlDebugWaitArgs("%02x %02x %02x\n", D_801F1C6A, D_801F1C83,
-                             BtlSoundRec(D_801F1C84));
-            BtlDebugWaitArgs("%02x %02x %02x\n", D_801F1CCA, D_801F1CE3,
-                             BtlSoundRec(D_801F1CE4));
-            BtlDebugWaitArgs("%02x %02x %02x\n", D_801F1D2A, D_801F1D43,
-                             BtlSoundRec(D_801F1D44));
-            BtlDebugWaitArgs("%02x %02x %02x\n", D_801F1D8A, D_801F1DA3,
-                             BtlSoundRec(D_801F1DA4));
+            BtlDebugWaitArgs("%02x %02x %02x\n", g_chars[0].key, g_chars[0].entry,
+                             BtlSoundRec(g_chars[0].list[0]));
+            BtlDebugWaitArgs("%02x %02x %02x\n", g_chars[1].key, g_chars[1].entry,
+                             BtlSoundRec(g_chars[1].list[0]));
+            BtlDebugWaitArgs("%02x %02x %02x\n", g_chars[2].key, g_chars[2].entry,
+                             BtlSoundRec(g_chars[2].list[0]));
+            BtlDebugWaitArgs("%02x %02x %02x\n", g_chars[3].key, g_chars[3].entry,
+                             BtlSoundRec(g_chars[3].list[0]));
+            BtlDebugWaitArgs("%02x %02x %02x\n", g_chars[4].key, g_chars[4].entry,
+                             BtlSoundRec(g_chars[4].list[0]));
         }
     }
 

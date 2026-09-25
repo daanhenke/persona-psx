@@ -299,3 +299,21 @@ rom:0x5ECCC reloc:MIPS_LO16 symbol:g_spell_data addend:0x8A4
 // which splat names after the enemies' table
 rom:0x32D68 reloc:MIPS_HI16 symbol:g_btl_actors addend:0x514
 rom:0x32D6C reloc:MIPS_LO16 symbol:g_btl_actors addend:0x514
+
+// BtlBoxTick - the collapse reaches the width and depth through the
+// drawer's view of the record, off g_btl_box_ox
+rom:0x16934 reloc:MIPS_HI16 symbol:g_btl_box_ox addend:0x1C
+rom:0x16938 reloc:MIPS_LO16 symbol:g_btl_box_ox addend:0x1C
+rom:0x16950 reloc:MIPS_HI16 symbol:g_btl_box_ox addend:0x1C
+rom:0x16954 reloc:MIPS_LO16 symbol:g_btl_box_ox addend:0x1C
+rom:0x16978 reloc:MIPS_HI16 symbol:g_btl_box_ox addend:0x1C
+rom:0x1697C reloc:MIPS_LO16 symbol:g_btl_box_ox addend:0x1C
+rom:0x16984 reloc:MIPS_HI16 symbol:g_btl_box_ox addend:0x24
+rom:0x16988 reloc:MIPS_LO16 symbol:g_btl_box_ox addend:0x24
+
+// BtlTakeParty - the second pair of test tables indexed by the encounter,
+// eighteen and up: [encounter - 0x11] reads from 0x11 rows before each
+rom:0x22028 reloc:MIPS_HI16 symbol:g_btl_test_party_keys2 addend:-0x55
+rom:0x2202C reloc:MIPS_LO16 symbol:g_btl_test_party_keys2 addend:-0x55
+rom:0x22188 reloc:MIPS_HI16 symbol:g_btl_test_party_personas2 addend:-0x55
+rom:0x2218C reloc:MIPS_LO16 symbol:g_btl_test_party_personas2 addend:-0x55
