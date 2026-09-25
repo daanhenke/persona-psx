@@ -19,6 +19,7 @@
 #include <decomp/libc.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include <persona/btlp/draw.h>
 
 /* The whole working area, and the band the panel takes of it. */
 #define MENU_AREA_W 0x140
@@ -42,16 +43,20 @@ extern int      g_btl_menu_state;
 extern u_short  g_btl_menu_shift;
 extern u_short  g_btl_menu_slide;
 extern RECT     g_btl_menu_clip[][2];
-extern u_short  g_btl_draw_x;
-extern u_short  g_btl_draw_y;
 extern char    *g_btl_prim_next;
 extern u_long   g_btl_ot[][3];
 extern int      g_btl_ot_index;
 
+/* 94.10%. The clip rects are filled x, y, w, h, and the draw origin is the
+   drawing environment's offset (draw.h), so its y read stays behind the store
+   of x; the clip table is walked from a base that the second rect steps by
+   one. Left: the image loads the origin's x before it finishes the clip's
+   address, which gives the index a1 rather than v0. */
 #ifdef NON_MATCHING
 void BtlMenuDraw(void)
 {
     RECT    *clip;
+    RECT    *base;
     /* The draw origin is read through a pointer of its own; reading the
        global directly rebuilds its address at each use. */
     u_short *org;
@@ -61,11 +66,12 @@ void BtlMenuDraw(void)
 
     if (g_btl_menu_state != 0) {
         org = &g_btl_draw_x;
-        clip = &g_btl_menu_clip[g_btl_ot_index][0];
+        base = g_btl_menu_clip[0];
+        clip = &base[g_btl_ot_index * 2];
         clip->x = *org;
+        clip->y = g_btl_draw_y;
         clip->w = MENU_AREA_W;
         clip->h = MENU_AREA_H;
-        clip->y = g_btl_draw_y;
         SetDrawArea(&area, clip);
         memcpy(g_btl_prim_next, &area, sizeof(DR_AREA));
         AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
@@ -89,11 +95,12 @@ void BtlMenuDraw(void)
         AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
         g_btl_prim_next += sizeof(DR_MODE);
 
-        clip = &g_btl_menu_clip[g_btl_ot_index][1];
+        base++;
+        clip = &base[g_btl_ot_index * 2];
         clip->x = *org;
+        clip->y = g_btl_draw_y + MENU_PANEL_Y;
         clip->w = MENU_AREA_W;
         clip->h = MENU_PANEL_H;
-        clip->y = g_btl_draw_y + MENU_PANEL_Y;
         SetDrawArea(&area, clip);
         memcpy(g_btl_prim_next, &area, sizeof(DR_AREA));
         AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);

@@ -10,15 +10,20 @@
  * gone by the time the GPU walks the list.
  *
  * g_btl_draw_x/y is where this page's drawing area sits in VRAM, so a draw
- * area that should cover the screen starts there.
+ * area that should cover the screen starts there. They are the drawing
+ * environment's offset, and read as its members: that is what keeps a load
+ * of them behind a store into a RECT, as the image has it.
  */
 #include <decomp/types.h>
+#include <libgte.h>
+#include <libgpu.h>
 
 extern char   *g_btl_prim_next;
 extern u_long  g_btl_ot[][3];
 extern int     g_btl_ot_index;
-extern u_short g_btl_draw_x;
-extern u_short g_btl_draw_y;
+extern DRAWENV g_btl_drawenv;
+#define g_btl_draw_x (g_btl_drawenv.ofs[0])
+#define g_btl_draw_y (g_btl_drawenv.ofs[1])
 
 /* The whole working area, as a draw area covers it. */
 #define BTL_AREA_W 0x140

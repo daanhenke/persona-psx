@@ -28,13 +28,6 @@
 /* Two areas per display page: the whole working area, and the window's band. */
 extern RECT g_btl_seq_clip[][2];
 
-/* Not matched yet (96%): the glyph loop and the draw mode are the image's, and
-   so is every register. What is left is the order the two draw areas' stores
-   come out in - gcc's second scheduling pass lifts the y load and its store
-   ahead of the x store, where the image stores y last, in the call's delay
-   slot. The source order below is already x, w, h, y; no reordering of the
-   stores, of the mode's bump or of the pointer variables moves it. */
-#ifdef NON_MATCHING
 void BtlSeqWindowDraw(void)
 {
     BtlWindowCell *cell;
@@ -49,9 +42,9 @@ void BtlSeqWindowDraw(void)
     if (g_btl_seq_window.staged != 0) {
         clip = &g_btl_seq_clip[g_btl_ot_index][0];
         clip->x = g_btl_draw_x;
+        clip->y = g_btl_draw_y;
         clip->w = BTL_AREA_W;
         clip->h = BTL_AREA_H;
-        clip->y = g_btl_draw_y;
         SetDrawArea(&area, clip);
         memcpy(g_btl_prim_next, &area, sizeof(DR_AREA));
         AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
@@ -79,7 +72,7 @@ void BtlSeqWindowDraw(void)
         band = &g_btl_seq_clip[g_btl_ot_index][1];
         band->x = g_btl_draw_x;
         g_btl_prim_next += sizeof(DR_MODE);
-        band->y = g_btl_seq_window.dy + g_btl_draw_y;
+        band->y = g_btl_draw_y + g_btl_seq_window.dy;
         band->w = BTL_AREA_W;
         band->h = SEQ_BAND_H;
         SetDrawArea(&area, band);
@@ -88,6 +81,3 @@ void BtlSeqWindowDraw(void)
         g_btl_prim_next += sizeof(DR_AREA);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/seqwindowdraw", BtlSeqWindowDraw);
-#endif
