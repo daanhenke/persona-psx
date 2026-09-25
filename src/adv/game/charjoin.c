@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - a character joining the party.  ADV only.
- *   0x800AFAD0 CharJoin    0x800AFE8C CharGrow
+ *   0x800AFAD0 CharJoin    0x800AFE8C CharGrow    0x800B0014 CharRegrow
  *
  * Script command 31 fills record `n` for the character `key` out of their
  * starting template (DNG's CharInit does the same for a new game): full hp
@@ -103,16 +103,9 @@ void CharJoin(u_char n, u_char key, u_char level)
 
 /* Levels record `n` up from `from` to `to` the way the battle does: each
    level adds the character's growth rows to the hit points and the five base
-   stats, and four plus a share of the magic pair to the SP. */
-/* 92.91%: the original moves g_char_stat_growth's address out of the loop
-   and this keeps it in: loop.c sees its set with a lifetime of one insn and
-   a saving of one and finds it not worth a register (cc1 -dL). Every row
-   form that keeps the one address computation - index, pointer arithmetic,
-   base first, a two-dimensional view - and every loop shape gives the same
-   lifetime; a local for the base moves it but frees the budget for mag_def,
-   which the original keeps in the loop. */
-#ifdef NON_MATCHING
-void CharGrow(u_char from, u_char to, u_char n, u_char key)
+   stats, and four plus a share of the magic pair to the SP. CharRegrow
+   repeats it inline, as the original's CharGrow is an inline function. */
+static inline void CharGrowSteps(u_char from, u_char to, u_char n, u_char key)
 {
     Char   *c;
     u_char *row;
@@ -130,6 +123,56 @@ void CharGrow(u_char from, u_char to, u_char n, u_char key)
         c->stat_base[4] += row[4 * GROWTH_COLS];
     }
 }
+
+/* 92.91%: the original moves g_char_stat_growth's address out of the loop
+   and this keeps it in: loop.c sees its set with a lifetime of one insn and
+   a saving of one and finds it not worth a register (cc1 -dL). Every row
+   form that keeps the one address computation - index, pointer arithmetic,
+   base first, a two-dimensional view - and every loop shape gives the same
+   lifetime; a local for the base moves it but frees the budget for mag_def,
+   which the original keeps in the loop. */
+#ifdef NON_MATCHING
+void CharGrow(u_char from, u_char to, u_char n, u_char key)
+{
+    CharGrowSteps(from, to, n, key);
+}
 #else
 INCLUDE_ASM("adv/nonmatchings/game/charjoin", CharGrow);
+#endif
+
+/* 94.79%, the inlined grow loop carrying CharGrow's residual: the original
+   moves g_char_stat_growth out of the loop here too, and one copy of the
+   record's address follows from it. */
+#ifdef NON_MATCHING
+/* Script command 31 for a character whose Personas came back with them:
+   the record is set back to the template's hit points, SP and stats and
+   grown again to `to`, capped at 999. */
+void CharRegrow(u_char from, u_char to, u_char n, u_char key)
+{
+    CharTemplate *t;
+    Char         *c;
+
+    t = &g_char_templates[g_chars[n].key - 1];
+    g_chars[n].hp_max = t->hp;
+    g_chars[n].sp_max = t->sp;
+    g_chars[n].stat_base[0] = t->stat[0];
+    g_chars[n].stat_base[1] = t->stat[1];
+    g_chars[n].stat_base[2] = t->stat[2];
+    g_chars[n].stat_base[3] = t->stat[3];
+    g_chars[n].stat_base[4] = t->stat[4];
+    c = &g_chars[n];
+    CharApplyStats(n);
+    CharRecalcStats(n);
+    CharGrowSteps(from, to, n, key);
+    if (c->hp_max > STAT_CAP) {
+        c->hp_max = STAT_CAP;
+    }
+    if (c->sp_max > STAT_CAP) {
+        c->sp_max = STAT_CAP;
+    }
+    CharApplyStats(n);
+    CharRecalcStats(n);
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/game/charjoin", CharRegrow);
 #endif

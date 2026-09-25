@@ -1410,7 +1410,7 @@ CharFind                 = 0x800AFA80; // type:func size:0x50
 //------------------------------------------------------------
 CharJoin                 = 0x800AFAD0; // type:func size:0x3BC
 CharGrow                 = 0x800AFE8C; // type:func size:0x188
-func_800B0014            = 0x800B0014; // type:func size:0x2D0
+CharRegrow               = 0x800B0014; // type:func size:0x2D0
 
 //----------------------------------------------------------------
 //--- PA: 0x04BF44   VA: 0x800B02E4   subsegment: c, game/setlevel

@@ -256,7 +256,7 @@ extern void   AdvQueueCmdBar(void);
 extern void   AdvTynCutscene(void);
 extern void   AdvRoomRebuild(void);
 extern void   CharJoin(u_char chr, u_char key, u_char level);
-extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
+extern void   CharRegrow(int a, u_char level, u_char chr, u_char key);
 extern void   PersonaStockReturn(u_char id);
 extern void   func_800715EC(void);
 extern void   func_80091608(int a);
@@ -404,7 +404,7 @@ loop:
         }
         if (c) {
             g_chars[a].entry = 0;
-            func_800B0014(1, g_chars[0].level, a, s[2]);
+            CharRegrow(1, g_chars[0].level, a, s[2]);
         }
         g_chars[a].entry = 0;
         g_chars[a].unk1C = ExpToLevel(g_chars[a].unk56 - 1, 0, 0);

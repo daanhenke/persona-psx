@@ -340,7 +340,6 @@ segments:
       - [0x4B5B8, c, common/game/partyfind]
       - [0x4B634, c, game/charfind]
       - [0x4B730, c, game/charjoin]
-      - [0x4BC74, asm, adv_56c]
       - [0x4BF44, c, game/setlevel]
       - [0x4C058, c, game/charslots]
       - [0x4C19C, c, game/personanew]

@@ -146,3 +146,8 @@ rom:0x4B754 reloc:MIPS_LO16 symbol:g_char_templates addend:-0x28
 // CharGrow's hit point rows, two characters before g_char_hp_growth.
 rom:0x4BB24 reloc:MIPS_HI16 symbol:g_char_hp_growth addend:-0x64
 rom:0x4BB28 reloc:MIPS_LO16 symbol:g_char_hp_growth addend:-0x64
+// CharRegrow: the template, and the grow loop's hit point rows.
+rom:0x4BCC8 reloc:MIPS_HI16 symbol:g_char_templates addend:-0x28
+rom:0x4BCCC reloc:MIPS_LO16 symbol:g_char_templates addend:-0x28
+rom:0x4BD8C reloc:MIPS_HI16 symbol:g_char_hp_growth addend:-0x64
+rom:0x4BD90 reloc:MIPS_LO16 symbol:g_char_hp_growth addend:-0x64
