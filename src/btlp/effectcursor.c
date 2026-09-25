@@ -39,16 +39,15 @@ extern short         g_btl_effect_oy;
 extern void (*g_btl_effect_cursor_fn[])(void);
 
 
-/* 93.21%. The cursor is placed through an int-typed call: this unit was
+/* 93.29%. The cursor is placed through an int-typed call: this unit was
    built against a BtlCursorPlace that took ints, so the image passes the two
    sums without narrowing them (input.h keeps the short one, which is the
    definition's). The step and the walked row are one variable, as the
-   image's s0 is (93.21%, from 92.49%). What is left is registers: the image
-   keeps the moved selection apart from the temporary it is worked out in.
-   Here the two are merged: CSE takes the selection as the canonical copy
-   because it lives longer, so the temporary dies at the copy and is tied to
-   it. Block-scoped temporaries and a temporary reused for the walk leave
-   that as it is. */
+   image's s0 is, and the kept selection is an int, so copying it needs no
+   mask. Left: the image keeps each step's temporary apart from the selection
+   (CSE merges them here, ternaries included), and its row walk is not
+   rotated - the test sits at the top with the byte and the -1 lifted out -
+   where gcc here duplicates the first test and jumps into the loop. */
 #ifdef NON_MATCHING
 void BtlEffectMoveCursor(int slot)
 {
@@ -59,7 +58,7 @@ void BtlEffectMoveCursor(int slot)
     int           rows;
     int           sel;
     int           t;
-    u_char        keep;
+    int           keep;
 
     e = g_btl_effect[slot];
     if (slot == g_btl_effect_cur
@@ -110,8 +109,11 @@ void BtlEffectMoveCursor(int slot)
                     g_btl_effect_step[g_btl_effect_cur] = row;
                     break;
                 }
+                if (row->next == (BtlEffectRow *)-1) {
+                    break;
+                }
                 row = row->next;
-            } while (row != (BtlEffectRow *)-1);
+            } while (1);
             e->sel = keep;
             row = g_btl_effect_step[g_btl_effect_cur];
         }

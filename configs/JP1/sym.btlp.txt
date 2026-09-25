@@ -58,6 +58,7 @@ CdSync                        = 0x800260AC;
 CdControl                     = 0x8002611C;
 CdIntToPos                    = 0x80026550;
 CdPosToInt                    = 0x80026654;
+rsin                          = 0x80028D88;
 InitGeom                      = 0x800290E4;
 PushMatrix                    = 0x800299F0;
 PopMatrix                     = 0x80029A90;

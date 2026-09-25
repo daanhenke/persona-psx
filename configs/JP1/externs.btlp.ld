@@ -135,6 +135,7 @@ __ledf2 = 0x80016C8C;
 __muldf3 = 0x80016DD8;
 __nedf2 = 0x800171DC;
 
+rsin = 0x80028D88;
 rand = 0x80041368;
 srand = 0x80041378;
 CdSearchFileLoc = 0x80012B2C;
