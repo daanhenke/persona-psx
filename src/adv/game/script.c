@@ -60,7 +60,7 @@
  *  49   key - stat ->                   jump if a stat is below
  *  4A   key stat take n                 raise or lower a stat
  *  4B   -                               screen 0x24 (func_80098B8C); may leave (7)
- *  4C   -                               func_800715EC's screen, two images in
+ *  4C   -                               FormationMenu's screen, two images in
  *  4D   frames16                        wait
  *  4E   ->                              jump if the stock is full
  *  4F   key id                          a new Persona for a character
@@ -258,8 +258,8 @@ extern void   AdvRoomRebuild(void);
 extern void   CharJoin(u_char chr, u_char key, u_char level);
 extern void   CharRegrow(int a, u_char level, u_char chr, u_char key);
 extern void   PersonaStockReturn(u_char id);
-extern void   func_800715EC(void);
-extern void   func_80091608(int a);
+extern void   FormationMenu(void);
+extern void   EquipScreen(short standalone);
 extern void   CinemaOpen(int a);
 extern void   CinemaClose(int a);
 extern void   ActorPlace(u_char actor);
@@ -627,8 +627,8 @@ loop:
 
         AdvSceneFadeOut();
         AdvQueueCmdBar();
-        func_800715EC();
-        func_80091608(1);
+        FormationMenu();
+        EquipScreen(1);
         AdvRoomRebuild();
         TimQueueAt((u_long *)(0x80118000 + ((u_long *)0x80118000)[1]),
                    0x380, 0x1C8, 0x100, 0x1F8);

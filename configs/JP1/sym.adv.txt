@@ -1157,7 +1157,7 @@ CharApplyStats           = 0x8008FFF4; // type:func size:0x650
 //-----------------------------------------------------------
 func_80090644            = 0x80090644; // type:func size:0x6D0
 EquipDrawCompare         = 0x80090D14; // type:func size:0x8F4
-func_80091608            = 0x80091608; // type:func size:0x63C
+EquipScreen              = 0x80091608; // type:func size:0x63C
 func_80091C44            = 0x80091C44; // type:func size:0x7C8
 func_8009240C            = 0x8009240C; // type:func size:0x790
 func_80092B9C            = 0x80092B9C; // type:func size:0x338
@@ -1717,6 +1717,7 @@ D_800BC5A4               = 0x800BC5A4;
 g_adv_char_seq           = 0x800BC5B4;
 g_ot                     = 0x800BC5CC; // size:0x28
 g_stock_last             = 0x800BC5F4;
+g_equip_step             = 0x800BC5F8;
 g_pad_held               = 0x800DC000; // size:0x4
 g_pad_pressed            = 0x800DC004; // size:0x4
 g_slots                  = 0x800DC10C; // ignore:True size:0x1540

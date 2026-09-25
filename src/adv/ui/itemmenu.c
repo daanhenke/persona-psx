@@ -26,7 +26,7 @@ extern u_char  D_800B2330[];
 
 extern void   DrawStatusHud(void);
 extern u_char MenuStepMember(int *sel, u_char last);
-extern void   func_80091608(int a);
+extern void   EquipScreen(short standalone);
 extern void   func_800768F0(void);
 extern void   func_80077F8C(int a, int b);
 extern void   func_8007A62C(int a, int b);
@@ -91,7 +91,7 @@ void ItemMemberPick(void)
     SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->unk050.cur][0],
                y[g_menu->unk050.cur * 2]);
     if (InputCheckAcceptA(1)) {
-        func_80091608(0);
+        EquipScreen(0);
         func_800768F0();
         SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
         func_80077F8C(0, 1);
