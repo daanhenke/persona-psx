@@ -21,6 +21,8 @@ extern int    g_state_next;
 /* Where the dungeon was left: the floor, its sub-map, the position and the
    entry the room maps to. PreloadDng saves them on the way in from the field. */
 extern u_short g_save_map_id;
+/* The same halfword, signed. */
+extern short   g_save_floor;
 extern u_short g_save_unk4;
 extern u_char  g_save_pos_x;
 extern u_char  g_save_pos_y;
@@ -68,18 +70,19 @@ extern const DngName17 str_dng_vbq_tmpl;
    the floor in hex and xx the floor group (floor >> 3). Each template is
    copied into a local first, so every call starts from a clean one. The third
    file is skipped when entering from ADV with the gate flags clear. */
-/* 93.31%. The first FormatHexDigits argument is a fresh `lh` in the image;
-   here -G8 makes g_save_map_id a small-data symbol_ref, every read is the same
-   (mem:HI sym) and CSE carries the lhu from the second test across the
-   `g_save_unk4 = 0` block, so it comes out as sll/sra of that register. The
-   tail's queue stores and the count register (a0 against a3) follow from it. */
+/* 99.68%. The first FormatHexDigits argument is a fresh `lh` in the image:
+   g_save_floor, a signed second name for the halfword (reloc.main.txt pins
+   it on the expected side), keeps CSE from folding that read into the
+   second test's lhu. The queue submit is two calls that jump2 merges, which
+   leaves 3 in the branch's delay slot. What is left is the second test's
+   registers: the image has the floor in a0, unk4 in v0 and the table byte in
+   v1 - a0 as though the floor were still headed for the call. */
 #ifdef NON_MATCHING
 void PreloadDng(void)
 {
     DngName15 name;
     DngName16 names;
     DngName16 namem;
-    int       count;
 
     name = str_dng_tmpl;
     names = str_dngs_tmpl;
@@ -96,11 +99,11 @@ void PreloadDng(void)
     if (g_dng_floor_maps[g_save_map_id] == 0 || g_dng_floor_maps[g_save_map_id] > 0x24) {
         g_save_map_id = 0;
     }
-    if (g_dng_floor_maps[g_save_map_id] <= g_save_unk4) {
+    if (g_save_unk4 >= g_dng_floor_maps[g_save_map_id]) {
         g_save_unk4 = 0;
     }
 
-    FormatHexDigits((short)g_save_map_id, &name.c[7], 2);
+    FormatHexDigits(g_save_floor, &name.c[7], 2);
     names.c[7] = name.c[7];
     namem.c[7] = name.c[7];
     names.c[6] = name.c[6];
@@ -122,11 +125,11 @@ void PreloadDng(void)
     names.c[2] = name.c[2];
     namem.c[2] = name.c[2];
 
-    count = 3;
     if (g_state_next == 3 && g_dng_third_gate == 0 && (g_dng_third_flags & 1) == 0) {
-        count = 2;
+        CdQueueSubmit(2);
+    } else {
+        CdQueueSubmit(3);
     }
-    CdQueueSubmit(count);
 }
 #else
 INCLUDE_ASM("main/nonmatchings/preloaddng", PreloadDng);

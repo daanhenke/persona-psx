@@ -3073,7 +3073,6 @@ D_800559DC                 = 0x800559DC; // type:u32 size:0x4
 D_800559E0                 = 0x800559E0; // type:u32 size:0x4
 D_800559E4                 = 0x800559E4; // type:u32 size:0x4
 D_800559E8                 = 0x800559E8; // type:u32 size:0x1F8
-g_card_devs                = 0x80055BE0; // size:0x8
 g_btl_debug_hud            = 0x80055BEC;
 g_btl_chain_battle         = 0x80055BED;
 g_btl_actors_cleared       = 0x80055BEE;

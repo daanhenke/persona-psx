@@ -26,7 +26,7 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".rodata", ".text", ".data", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".sdata", ".bss"]
   subalign: 4
   ld_align_section_vram_end: False
   ld_align_segment_vram_end: True
@@ -79,5 +79,8 @@ segments:
       - [0x5EAC, c, common/game/eventflag]
       - [0x5ED4, c, preload]
       - [0x66E0, asm, psyq/libs]
+      # gp small data from here on. The card unit's device names come first.
+      - [0x463D0, .sdata, card/card]
+      - [0x463E8, sdata, main_sdata]
 
   - [0x46800]

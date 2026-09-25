@@ -48,12 +48,6 @@ extern CardHeader g_card_header;
 #define CARD_NAME_SLOT 18
 extern char str_card_file_tmpl[];
 
-/* The two ports' device names, "bu00:" and "bu10:". */
-typedef struct {
-    char *name[2];
-} CardDevs;
-extern CardDevs g_card_devs;
-
 /* Save slots per kind, and the start of each save's data, which is what the
    menus list. */
 #define CARD_SLOTS 7
@@ -271,29 +265,20 @@ int CardCheckFree(u_char chan)
     return fd == -1 ? -1 : 0;
 }
 
-/* 97.71%. The image initialises devs from an anonymous constant (the source
-   was char *devs[2] = { "bu00:", "bu10:" }), which puts one more address
-   computation in front of the copy. That constant and the two strings are
-   this unit's own data at 0x80055BD0, still inside psyq/libs' asm; until the
-   data is split out, the copy comes from g_card_devs instead. */
-#ifdef NON_MATCHING
 /* Formats the card in port `chan`; 1 once it has worked. */
 int CardFormat(u_char chan)
 {
-    CardDevs devs = g_card_devs;
-    int      ok;
-    int      i;
+    char *devs[] = { "bu00:", "bu10:" };
+    int   ok;
+    int   i;
 
     for (i = 0; i < CARD_TRIES; i++) {
-        if ((ok = format(devs.name[chan]) == 1)) {
+        if ((ok = format(devs[chan]) == 1)) {
             break;
         }
     }
     return ok;
 }
-#else
-INCLUDE_ASM("main/nonmatchings/card/card", CardFormat);
-#endif
 
 /* Reads the summary of every save of kind `kind` on port `chan` into `out`,
    one a slot. Returns bit i for each slot that exists, and

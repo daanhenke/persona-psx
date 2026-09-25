@@ -1,0 +1,7 @@
+// Relocations splat cannot infer.
+
+// PreloadDng's first FormatHexDigits argument reads the save floor through a
+// signed alias: a fresh lh where every other read is the u_short's lhu. The
+// alias is a second symbol, so CSE cannot fold the read into the earlier one.
+rom:0x59F0 reloc:MIPS_HI16 symbol:g_save_floor
+rom:0x59F4 reloc:MIPS_LO16 symbol:g_save_floor
