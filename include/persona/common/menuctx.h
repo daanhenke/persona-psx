@@ -34,7 +34,10 @@ typedef struct {
     /* 0x140 */ MenuList unk140;
     /* 0x150 */ u_char   pad150[0x20];
     /* 0x170 */ MenuList unk170;
-    /* 0x180 */ u_char   pad180[0x40];
+    /* 0x180 */ MenuList unk180;
+    /* 0x190 */ MenuList unk190;
+    /* 0x1A0 */ MenuList unk1A0;
+    /* 0x1B0 */ u_char   pad1B0[0x10];
     /* 0x1C0 */ MenuList cfg_list;      /* the config list page's row       */
     /* 0x1D0 */ MenuList cfg_row;       /* the config battle page's row     */
     /* 0x1E0 */ MenuList member_list; /* the config tactics page's member */
@@ -45,7 +48,12 @@ typedef struct {
     /* 0x250 */ MenuList unk250;
     /* 0x260 */ MenuList item_row;      /* the item bag's cursor            */
     /* 0x270 */ MenuList item_col;
-    /* 0x280 */ u_char   pad280[0xA0];
+    /* 0x280 */ u_char   pad280[0x50];
+    /* 0x2D0 */ MenuList unk2D0;
+    /* 0x2E0 */ MenuList unk2E0;
+    /* 0x2F0 */ MenuList unk2F0;
+    /* 0x300 */ MenuList unk300;
+    /* 0x310 */ MenuList unk310;
     /* 0x320 */ MenuList formation_cmd; /* 0 arranges the party, 1 presets  */
     /* 0x330 */ u_char   pad330[0x70];
     /* 0x3A0 */ MenuList grid[2];  /* the formation grid's row, then column  */

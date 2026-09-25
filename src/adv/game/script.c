@@ -59,7 +59,7 @@
  *  48   key st ->                       cure it, or jump if not so
  *  49   key - stat ->                   jump if a stat is below
  *  4A   key stat take n                 raise or lower a stat
- *  4B   -                               screen 0x24 (func_80098B8C); may leave (7)
+ *  4B   -                               screen 0x24 (FacilityScreen); may leave (7)
  *  4C   -                               FormationMenu's screen, two images in
  *  4D   frames16                        wait
  *  4E   ->                              jump if the stock is full
@@ -251,7 +251,7 @@ extern void   ViewShakeStop(void);
 
 /* Not worked out yet. */
 extern void   AdvSceneFadeOut(void);
-extern int    func_80098B8C(u_char id);
+extern int    FacilityScreen(u_char id);
 extern void   AdvQueueCmdBar(void);
 extern void   AdvTynCutscene(void);
 extern void   AdvRoomRebuild(void);
@@ -338,7 +338,7 @@ loop:
         g_cutscene_on = 1;
         a = s[2];
         AdvSceneFadeOut();
-        func_80098B8C(a);
+        FacilityScreen(a);
         AdvQueueCmdBar();
         if (g_cutscene_alt) {
             AdvTynCutscene();
@@ -615,7 +615,7 @@ loop:
         break;
     case 0x4B:
         AdvSceneFadeOut();
-        a = func_80098B8C(0x24);
+        a = FacilityScreen(0x24);
         AdvQueueCmdBar();
         AdvRoomRebuild();
         AdvFadeUpBlocking(4, 0x80);

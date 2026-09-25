@@ -1316,7 +1316,7 @@ DrawPersonaList          = 0x80098A40; // type:func size:0xCC
 //--- PA: 0x03476C   VA: 0x80098B0C   subsegment: asm, adv_53
 //-----------------------------------------------------------
 func_80098B0C            = 0x80098B0C; // type:func size:0x80
-func_80098B8C            = 0x80098B8C; // type:func size:0x125C
+FacilityScreen           = 0x80098B8C; // type:func size:0x125C
 D_80099DE8               = 0x80099DE8; // type:u32 size:0x111EC
 
 //-------------------------------------------------------------
@@ -1621,9 +1621,11 @@ g_pdata_name_cells       = 0x800B95D8;
 g_pdata_page_rle         = 0x800B964C;
 g_arcana_help_msgs       = 0x800B97C8;
 g_flag_groups            = 0x800B9830;
-D_800BA074               = 0x800BA074; // type:u32 size:0x4C
+g_facility_defs          = 0x800BA074; // type:u32 size:0x4C
 D_800BA0C0               = 0x800BA0C0; // type:u32 size:0x24
-D_800BA0E4               = 0x800BA0E4; // type:u32 size:0xA90
+D_800BA0E4               = 0x800BA0E4; // type:u32 size:0x538
+g_money_msg              = 0x800BA61C; // size:0x14
+g_money_label            = 0x800BA668; // size:0x4
 g_cinema_parts           = 0x800BAB74; // size:0x64
 g_grow_slot_x            = 0x800BAD20;
 g_actor_defs             = 0x800BAD3C;
@@ -1700,6 +1702,7 @@ g_panel_cells            = 0x800BBFD8; // size:0x60
 g_persona_list_count     = 0x800BC038;
 g_adv_chest_count        = 0x800BC03C;
 g_persona_data_step      = 0x800BC040;
+g_facility_leave         = 0x800BC044;
 g_item_scroll_step       = 0x800BC048;
 g_adv_chest_money        = 0x800BC04C;
 g_image_anim             = 0x800BC058; // size:0x140
@@ -1724,6 +1727,9 @@ g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
 g_persona_list           = 0x800EAE4C; // ignore:True
 g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
+g_facility_kind          = 0x800EB581;
+g_facility_count         = 0x800EB582;
+g_shop_items             = 0x800EB590; // ignore:True
 g_tilemap0               = 0x800EE180; // ignore:True size:0x1400
 g_tilemap1               = 0x800EF580; // ignore:True size:0x1400
 g_tilemap2               = 0x800F0980; // ignore:True size:0xA00
