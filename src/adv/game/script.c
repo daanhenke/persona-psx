@@ -982,7 +982,7 @@ extern int  FadeSpritesStep(short step, short limit);
 extern void SlotClearAll(void);
 extern void AdvPickEffect(void);
 extern void ImageAnimStopAll(void);
-extern void func_800AD680(void);
+extern void AdvSpecialProps(void);
 
 /* The special commands behind script opcode 0x27. 0x80..0x84 put a KAGE.BIN
    picture up over the whole room, with the room faded out and everything in
@@ -996,7 +996,7 @@ void AdvScriptSpecial(u_char n)
 
     switch (n) {
     case SPECIAL_WALK_FUNC:
-        func_800AD680();
+        AdvSpecialProps();
         break;
     case SPECIAL_WALK_DIR:
         g_adv_walk_dir = 4;

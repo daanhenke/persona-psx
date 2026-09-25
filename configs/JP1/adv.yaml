@@ -324,7 +324,7 @@ segments:
       - [0x46C34, c, game/money]
       - [0x46C68, asm, adv_54]
       - [0x47448, c, game/script]
-      - [0x492E0, asm, adv_54_x1]
+      - [0x492E0, c, game/specialprops]
       - [0x49820, c, game/chars]
       - [0x4985C, asm, adv_54a]
       - [0x49890, c, common/game/partycompact]

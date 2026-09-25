@@ -1330,7 +1330,7 @@ MoneyAdd                 = 0x800AAFD4; // type:func size:0x34
 D_800AB008               = 0x800AB008; // type:func size:0x7E0
 AdvRunScript             = 0x800AB7E8; // type:func size:0x1B60
 AdvScriptSpecial         = 0x800AD348; // type:func size:0x338
-func_800AD680            = 0x800AD680; // type:func size:0x540
+AdvSpecialProps          = 0x800AD680; // type:func size:0x540
 
 //-------------------------------------------------------------
 //--- PA: 0x049820   VA: 0x800ADBC0   subsegment: c, game/chars
