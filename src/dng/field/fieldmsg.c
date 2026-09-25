@@ -147,16 +147,18 @@ void FieldMsgPrintBytes(u_char *s, u_char n)
 
 /* Prints up to `n` glyph codes, a frame each. Old-style, like the rest of
    the printers: n is narrowed at every test. */
-/* 74.2%: the image reads the byte twice - once against MSG_END, kept for a
-   one-byte glyph, and again for the two-byte test - where every spelling
-   here shares one load and masks it. */
+/* 87.8%: the double read is the int c against the QImode top-bit test, as
+   in FieldMsgPrintCodes. What is left is MSG_END: the image's loop.c hoists
+   the 0xFF into s3, and here the move is "not desirable" at every loop size
+   tried (28-30 insns), so the compare loads it each pass. */
 #ifdef NON_MATCHING
 void FieldMsgPrint(s, n)
     u_char *s;
     u_char  n;
 {
     int    i;
-    u_char c;
+    int    c;
+    int    g;
 
     for (i = 0; i < n; i++) {
         c = *s;
@@ -167,8 +169,9 @@ void FieldMsgPrint(s, n)
             s++;
             FieldMsgPutGlyph(c);
         } else {
-            FieldMsgPutGlyph(((*s & 0x7F) << 8) | s[1]);
+            g = ((*s & 0x7F) << 8) | s[1];
             s += 2;
+            FieldMsgPutGlyph(g);
         }
         func_80065978();
     }
@@ -193,46 +196,43 @@ int FieldFindMember(u_char key)
     return -1;
 }
 
-/* Prints up to `n` glyph codes or control codes, a frame each. */
-/* 85.3%: the image reads the byte twice - once against MSG_END, kept for a
-   one-byte glyph, and again for the two-byte test - where every spelling
-   here shares one load and masks it. */
-#ifdef NON_MATCHING
-void FieldMsgPrintCodes(s, n)
+/* Prints up to `n` glyph codes or control codes, a frame each. Returns
+   nothing, but is declared implicit int: v0 stays live at the exit. The
+   glyph byte is read into an int, which the QImode top-bit test does not
+   share, so the image reads it twice. */
+FieldMsgPrintCodes(s, n)
     u_char *s;
     u_char  n;
 {
     int     i;
-    u_char  c;
-    u_short g;
+    int     c;
+    int     g;
+    int     k;
 
     for (i = 0; i < n; i++) {
         c = *s;
         if (c == MSG_END) {
-            c = *++s;
-            if (c == MSG_CODE_END) {
+            k = *++s;
+            if (k == MSG_CODE_END) {
                 break;
             }
             s++;
-            if (c == MSG_CODE_NL) {
+            if (k == MSG_CODE_NL) {
                 FieldMsgNewLine();
             }
         } else {
             if (!(*s & 0x80)) {
                 s++;
-                g = c;
+                FieldMsgPutGlyph(c);
             } else {
                 g = ((*s & 0x7F) << 8) | s[1];
                 s += 2;
+                FieldMsgPutGlyph(g);
             }
-            FieldMsgPutGlyph(g);
         }
         func_80065978();
     }
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldmsg", FieldMsgPrintCodes);
-#endif
 
 /* A style byte: the low five bits one setting, the top three an index into
    a table for the other. */

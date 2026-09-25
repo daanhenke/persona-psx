@@ -10,7 +10,6 @@
 
 
 extern u_char D_8001555C[];
-extern int  func_8006A53C(void);
 extern void func_80077D54(void);
 extern void func_80095578(void);
 extern void PersonaDataOpen(void);
@@ -81,7 +80,7 @@ int FieldUpdate(int noclip)
         g_step_kind = FieldWalk(6);
     } else if (held & PAD_UP) {
         g_dng->walk_dir = g_dng->facing;
-        r = func_8006A53C();
+        r = FieldStepDoor();
         switch (r) {
         case 1:
             FieldPauseBgm();

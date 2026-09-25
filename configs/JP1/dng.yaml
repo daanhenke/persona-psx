@@ -55,6 +55,8 @@ segments:
       # 0x4..0x98C is the leading rodata block; the entry point is at 0x98C.
       - [0x4, .rodata, field/fieldmain]
       - [0x38, rodata, dng_rodata]
+      - [0x3C, .rodata, field/fielddoor]
+      - [0x60, rodata, dng_rodata0b]
       - [0x64, .rodata, field/fieldexit]
       - [0x78, rodata, dng_rodata0c]
       - [0x88, .rodata, field/fieldscript]
@@ -76,7 +78,7 @@ segments:
       - [0x4DA8, c, field/fieldstairs]
       - [0x56DC, c, field/fieldscroll]
       - [0x5F30, c, field/fieldfade]
-      - [0x619C, asm, dng_0_s3]
+      - [0x619C, c, field/fielddoor]
       - [0x7820, c, field/fieldtile]
       - [0x7F5C, c, field/fieldhazard]
       - [0x8334, c, field/fieldexit]

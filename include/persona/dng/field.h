@@ -418,6 +418,7 @@ void TimLoadAt(u_long *tim, int x, int y);
 
 void func_80065978(void);
 int  FieldUpdate(int noclip);
+int  FieldStepDoor(void);
 
 /* The save's pad layout option, and per layout the buttons of the field's
    actions and of the lift's panel (the turns and the backward step are
@@ -514,7 +515,7 @@ extern u_char g_dest_y;
 extern u_char g_dest_facings[][2];
 
 /* Per walk direction, the axis a door's halves slide along. */
-extern u_short g_door_axes[];
+extern short   g_door_axes[];
 
 void FieldTakeExit(void);
 int  FieldUseTile(void);
@@ -546,7 +547,7 @@ void FieldMsgTint(u_char *cells, u_char color, int col, int line, int count);
 void FieldMsgPrintBytes(u_char *s, u_char n);
 void FieldMsgPrint();      /* old-style */
 int  FieldFindMember(u_char key);
-void FieldMsgPrintCodes(); /* old-style */
+int  FieldMsgPrintCodes(); /* old-style, implicit int */
 void FieldMsgSetStyle(u_int style);
 
 /* Set together by FieldMsgSetStyle; nothing here says more. */
@@ -652,6 +653,10 @@ void FieldSetLiftDigits(int n);
 void FieldBuildScene(int reload);
 void FieldPlaceObject(int obj, int model, int x, int y);
 void FieldRideLift(int button);
+void FieldLiftPanelOpen(void);
+void FieldLiftBoxes(void);
+void FieldLiftBoxesOff(void);
+int  FieldLiftPanelStep(void);
 /* Fades the floor's ambient sequence in or out as the floor asks (unless
    `keep`), then stops or restarts the second floor tune by whether the
    party stands on an entry. */

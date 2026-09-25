@@ -133,7 +133,7 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, dng_rodata
 //------------------------------------------------------------------
-D_800643D8               = 0x800643D8; // type:u32 size:0x2C
+D_800643D8               = 0x800643D8; // type:u32 size:0x4
 
 
 
@@ -174,9 +174,7 @@ FieldLoadRow             = 0x80069EB4; // type:func size:0x41C
 FieldFadeOut             = 0x8006A2D0; // type:func size:0xFC
 FieldFadeIn              = 0x8006A3CC; // type:func size:0x104
 FieldPauseBgm            = 0x8006A4D0; // type:func size:0x6C
-func_8006A53C            = 0x8006A53C; // type:func size:0x1684
-switchD                  = 0x8006A60C;
-default                  = 0x8006BB88;
+FieldStepDoor            = 0x8006A53C; // type:func size:0x1684
 FieldTileEffect          = 0x8006BBC0; // type:func size:0x73C
 FieldDamageFloor         = 0x8006C2FC; // type:func size:0x220
 FieldPoisonFloor         = 0x8006C51C; // type:func size:0x1B8
@@ -1366,3 +1364,8 @@ D_801F2A68               = 0x801F2A68; // ignore:True
 D_80130000               = 0x80130000; // ignore:True
 D_80130001               = 0x80130001; // ignore:True
 D_80130002               = 0x80130002; // ignore:True
+
+// fielddoor: the door tables and the lift's cell.
+g_door_signs             = 0x80099480; // size:0x8
+g_bits_facing            = 0x80099498; // size:0x14
+g_lift_objs              = 0x8009FE38; // size:0x4
