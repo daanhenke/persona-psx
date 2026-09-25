@@ -83,16 +83,16 @@ int FieldTileEffect(void)
             eye += 12;
             j = (j -= 0x100) > 0 ? j : 0;
             GsSetAmbient(j, j, j);
-            func_80065978();
+            FieldFrame();
         } while (j != 0);
         GsSetAmbient(0, 0, 0);
         g_field_lit = 0;
-        func_80065978();
+        FieldFrame();
         g_dng->floor = g_dng->floor != 0 ? g_dng->floor - 1 : 0;
         FieldSetFloor();
         FieldSetupGfx(0);
         for (i = 0; i < 5; i++) {
-            func_80065978();
+            FieldFrame();
         }
         j = 0;
         g_field_lit = 1;
@@ -100,12 +100,12 @@ int FieldTileEffect(void)
         do {
             j = (j += 0x100) < 0x1000 ? j : 0x1000;
             GsSetAmbient(j, j, j);
-            func_80065978();
+            FieldFrame();
         } while ((g_dng->view.vpy += 30) != -60);
         while ((g_dng->view.vpy -= 5) != -150) {
             j = (j += 0x100) < 0x1000 ? j : 0x1000;
             GsSetAmbient(j, j, j);
-            func_80065978();
+            FieldFrame();
         }
         g_scene->pad_new = 0;
         g_scene->pad_held = 0;

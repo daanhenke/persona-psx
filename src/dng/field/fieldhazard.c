@@ -109,7 +109,7 @@ void FieldPoisonFloor(void)
         }
     }
     if (hit) {
-        D_800993C6 = 0x80;
+        g_hurt_flash = 0x80;
         FieldPlayJingle(0x1C, 1);
         FLASH(0, 0x1000, 0);
     }

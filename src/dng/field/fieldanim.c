@@ -133,7 +133,7 @@ void FieldDoorSlide(void)
    countdown, a full turn to six hours, and rebuilds the matrices of it and
    the object after it. Only for an object whose flags carry bit 12, and only
    when the low five bits are clear. */
-void FieldClockHands(u_short flags, int obj)
+void FieldClockHands(u_short flags, int obj, int col, int row)
 {
     int left;
 

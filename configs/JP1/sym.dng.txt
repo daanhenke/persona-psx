@@ -146,7 +146,7 @@ D_800643D8               = 0x800643D8; // type:u32 size:0x4
 //--- PA: 0x00098C   VA: 0x80064D2C   subsegment: asm, dng
 //--------------------------------------------------------
 ovl_dng_entry            = 0x80064D2C; // type:func size:0xC4C
-func_80065978            = 0x80065978; // type:func size:0x1D64
+FieldFrame               = 0x80065978; // type:func size:0x1D64
 FieldBobVerts            = 0x800676DC; // type:func size:0xBC
 FieldFadePrims           = 0x80067798; // type:func size:0xA4
 FieldClockTick           = 0x8006783C; // type:func size:0x238
@@ -1103,7 +1103,8 @@ g_field_binds            = 0x800994AC; // size:0x50
 g_lift_spots             = 0x800994FC; // size:0x60
 g_lift_stops             = 0x8009955C;
 g_lift_from              = 0x80099562;
-g_map_music              = 0x8009958C; // size:0x54
+g_map_music              = 0x8009958C; // size:0x4C
+g_bob_tick               = 0x800995D8; // size:0x2
 g_exit_scenes            = 0x800995E0; // size:0x10
 g_hud_text_a             = 0x800995F0; // size:0x14
 g_hud_text_b             = 0x80099604; // size:0x24
@@ -1369,3 +1370,16 @@ D_80130002               = 0x80130002; // ignore:True
 g_door_signs             = 0x80099480; // size:0x8
 g_bits_facing            = 0x80099498; // size:0x14
 g_lift_objs              = 0x8009FE38; // size:0x4
+
+// FieldFrame: the view's culling tables, the clear colour, the alarm pulse.
+g_view_margin            = 0x80099384; // size:0x8
+g_ot_xdiv                = 0x8009938C; // size:0x8
+g_clear_r                = 0x800993BD; // size:0x1
+g_clear_g                = 0x800993BE; // size:0x1
+g_clear_b                = 0x800993BF; // size:0x1
+g_alarm_level            = 0x800993C0; // size:0x2
+g_alarm_step             = 0x800993C2; // size:0x2
+g_map_north_up           = 0x801F2ACB; // size:0x1
+g_minimap_x              = 0x8009FE68; // size:0x2
+g_minimap_y              = 0x8009FE6C; // size:0x2
+g_hurt_flash             = 0x800993C6; // size:0x1

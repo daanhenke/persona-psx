@@ -42,11 +42,11 @@ void FieldFadeOut(void)
     do {
         FIELD_TINT(level, c);
         level -= FADE_STEP;
-        func_80065978();
+        FieldFrame();
     } while (level > 0);
     GsSetAmbient(0, 0, 0);
     g_field_lit = 0;
-    func_80065978();
+    FieldFrame();
 }
 
 void FieldFadeIn(void)
@@ -59,10 +59,10 @@ void FieldFadeIn(void)
     do {
         FIELD_TINT(level, c);
         level += FADE_STEP;
-        func_80065978();
+        FieldFrame();
     } while (level < FADE_FULL);
     GsSetAmbient(FADE_FULL, FADE_FULL, FADE_FULL);
-    func_80065978();
+    FieldFrame();
 }
 
 /* Stops the floor's tune while the party stands still, playing the idle

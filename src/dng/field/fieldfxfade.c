@@ -13,9 +13,9 @@
 /* As FieldFxBegin, for the transition that fades the backdrop strip. */
 void FieldFadeFxBegin(void)
 {
-    func_80065978();
+    FieldFrame();
     do {
-        func_80065978();
+        FieldFrame();
     } while (g_draw_buf != 0);
     FieldFadeFxSetup();
     VSync(3);

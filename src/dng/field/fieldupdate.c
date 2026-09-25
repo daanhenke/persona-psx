@@ -140,7 +140,7 @@ int FieldUpdate(int noclip)
                     FieldSyncMusic(0);
                     g_field_lit = 0;
                     for (i = 0; i < 3; i++) {
-                        func_80065978();
+                        FieldFrame();
                     }
                     FieldFadeIn();
                     return 0;
@@ -168,7 +168,7 @@ int FieldUpdate(int noclip)
             FieldPauseBgm();
             g_clock_freeze = 1;
             while (g_scene->pad_held & BIND(pause)) {
-                func_80065978();
+                FieldFrame();
             }
             g_clock_freeze = 0;
         } else if (pressed & BIND(menu)) {

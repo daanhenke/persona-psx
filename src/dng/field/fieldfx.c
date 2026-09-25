@@ -18,9 +18,9 @@
    clocks while it sets up. The display then covers 256 lines. */
 void FieldFxBegin(void)
 {
-    func_80065978();
+    FieldFrame();
     do {
-        func_80065978();
+        FieldFrame();
     } while (g_draw_buf != 0);
     g_fx_tiles = (POLY_FT4 *)g_scene->objs;
     g_fx_pos = (SVECTOR *)g_scene->coords;

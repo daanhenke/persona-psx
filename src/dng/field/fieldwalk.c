@@ -43,12 +43,12 @@ int FieldWalk(int ret)
             FieldStepBegin();
             for (i = 0; i < 5; i++) {
                 FieldStepView();
-                func_80065978();
+                FieldFrame();
             }
             FieldZoneTunes(0);
             for (i = 0; i < 4; i++) {
                 FieldStepView();
-                func_80065978();
+                FieldFrame();
             }
             FieldStepEnd();
             FieldStepTick();
@@ -72,7 +72,7 @@ void FieldTurn(int turn)
     for (i = 0; i < 9; i++) {
         g_dng->angle += turn * TURN_SPEED;
         FieldSetHeading(turn);
-        func_80065978();
+        FieldFrame();
     }
     g_dng->angle = (start + turn * QUARTER_TURN) & 0xFFF;
     FieldSetHeading(turn);

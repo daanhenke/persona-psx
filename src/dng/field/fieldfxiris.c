@@ -16,9 +16,9 @@
 /* As FieldFxBegin, for the closing circle. */
 void FieldIrisFxBegin(void)
 {
-    func_80065978();
+    FieldFrame();
     do {
-        func_80065978();
+        FieldFrame();
     } while (g_draw_buf != 0);
     FieldIrisFxSetup();
     VSync(3);

@@ -12,9 +12,6 @@
 #include <libsnd.h>
 #include <persona/dng/field.h>
 
-/* The arrival effect: 2 while it grows, 1 once it has, 0 off. */
-extern u_char g_box_state;
-
 /* The growing box: its size step, the corner of the next row, and which
    of the three rows is drawn next. */
 extern int   g_box_t;
@@ -146,9 +143,9 @@ void FieldLiftBoxes(void)
     g_box_x = 0x48;
     g_box_y = 0;
     g_box_row = 0;
-    func_80065978();
-    func_80065978();
-    func_80065978();
+    FieldFrame();
+    FieldFrame();
+    FieldFrame();
     g_box_state = 2;
     while (g_box_t <= 0x8000) {
         t = g_box_t;
@@ -175,7 +172,7 @@ void FieldLiftBoxes(void)
         g_box_x = x + 1;
         g_box_y = y - 8;
         g_box_row = (n + 1) % 3;
-        func_80065978();
+        FieldFrame();
     }
     g_box_state = 1;
 }

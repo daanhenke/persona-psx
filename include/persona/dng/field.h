@@ -289,7 +289,7 @@ typedef struct {
     u_char  tmd;
     u_char  pad1[3];
     u_long  attr;     /* 0x4 */
-    u_char  pad8[4];
+    u_long  attr_far; /* 0x8 the attribute bits once the model is far off */
     short   x, y, z;  /* 0xC */
     short   rx, ry, rz; /* 0x12 */
 } ModelDef;
@@ -416,7 +416,7 @@ void UploadImageRows(void *desc, u_short x, u_short y, short rows);
 void TimLoad(u_long *tim, int nopal);
 void TimLoadAt(u_long *tim, int x, int y);
 
-void func_80065978(void);
+void FieldFrame(void);
 int  FieldUpdate(int noclip);
 int  FieldStepDoor(void);
 
@@ -455,7 +455,7 @@ void FieldBobVerts(int ch, int v, int period);
 void FieldFadePrims(u_char *prim);
 void FieldClockTick(int frames);
 void FieldDoorSlide(void);
-void FieldClockHands(u_short flags, int obj);
+void FieldClockHands(u_short flags, int obj, int col, int row);
 
 void FieldReload(void);
 void FieldEnterTile(void);
@@ -678,8 +678,25 @@ extern int        g_fog_near;
    [2]; 0xFF when the floor has none. */
 extern u_char g_entry_pos[3];
 
-/* Set when poison lands on the field; nothing here says more. */
-extern u_char D_800993C6;
+/* The damage flash: 0x80 set as poison or a damage floor lands, then a
+   count of frames that flash the ambient red (FieldFrame counts it down). */
+extern u_char g_hurt_flash;
+
+/* The lift's arrival effect: 2 while its boxes grow, 1 once they have (the
+   frame then draws the panel's digits), 0 off. */
+extern u_char g_box_state;
+
+/* The first scene object of the lift's cell; while the lift runs, the
+   frame draws only its two doors of that cell. */
+extern int g_lift_objs;
+
+/* The two TMDs whose vertices bob on the maps that have them, -1 for none. */
+extern int g_bob_tmd_a;
+extern int g_bob_tmd_b;
+
+/* The minimap's place on screen. */
+extern short g_minimap_x;
+extern short g_minimap_y;
 
 void FieldDamageFloor(int div);
 void FieldPoisonFloor(void);

@@ -23,9 +23,6 @@ extern short g_door_signs[];
 /* A lift door's facing bits (flags 0x1E0 >> 5) turned into the facing. */
 extern short g_bits_facing[];
 
-/* The first scene object of the lift's cell, for the frame's drawing. */
-extern int g_lift_objs;
-
 /* A tile with this bit is a door of kind flags & TILE_KIND. */
 #define TILE_DOORWAY 0x400
 /* The lift's doors and the event doors, with their other bits clear. */
@@ -106,7 +103,7 @@ int FieldStepDoor(void)
             for (i = 0; i < 6; i++) {
                 OBJ_T(b, g_door_axes[facing]) += g_door_signs[facing] * 20;
                 OBJ_SET(b);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 1:
@@ -121,7 +118,7 @@ int FieldStepDoor(void)
                 g_scene->rots[b + 3].vy += 0xAA;
                 OBJ_SET(b + 2);
                 OBJ_SET(b + 3);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 2:
@@ -136,7 +133,7 @@ int FieldStepDoor(void)
                 g_scene->rots[b + 3].vy += 0xAA;
                 OBJ_SET(b + 2);
                 OBJ_SET(b + 3);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 3:
@@ -149,7 +146,7 @@ int FieldStepDoor(void)
             for (i = 0; i < 6; i++) {
                 g_scene->rots[b + 3].vy += 0xAA;
                 OBJ_SET(b + 3);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 4:
@@ -163,13 +160,13 @@ int FieldStepDoor(void)
                 for (i = 0; i < 6; i++) {
                     g_scene->rots[b + 3].vy -= 0xAA;
                     OBJ_SET(b + 3);
-                    func_80065978();
+                    FieldFrame();
                 }
             } else {
                 for (i = 0; i < 6; i++) {
                     g_scene->rots[b + 3].vy += 0xAA;
                     OBJ_SET(b + 3);
-                    func_80065978();
+                    FieldFrame();
                 }
             }
             return STEP_THROUGH;
@@ -197,7 +194,7 @@ int FieldStepDoor(void)
             for (i = 0; i < 6; i++) {
                 OBJ_T(b, g_door_axes[facing]) += sign * 20;
                 OBJ_SET(b);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 7:
@@ -213,7 +210,7 @@ int FieldStepDoor(void)
                 OBJ_T(b + 3, g_door_axes[facing]) += g_door_signs[facing] * 20;
                 OBJ_SET(b + 2);
                 OBJ_SET(b + 3);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         case 8:
@@ -226,7 +223,7 @@ int FieldStepDoor(void)
             for (i = 0; i < 9; i++) {
                 OBJ_T(b, 1) -= 30;
                 OBJ_SET(b);
-                func_80065978();
+                FieldFrame();
             }
             return STEP_THROUGH;
         }
@@ -260,7 +257,7 @@ int FieldStepDoor(void)
         g_scene->pad_new = 0;
         g_scene->pad_held = PAD_UP;
         FieldUpdate(1);
-        func_80065978();
+        FieldFrame();
         MarkSeen(g_dng->area, g_dng->room, g_dng->pos[POS_X], g_dng->pos[POS_Y]);
         OBJ_T(b + 2, g_door_axes[facing]) = t0;
         OBJ_T(b + 3, g_door_axes[facing]) = t1;
@@ -276,15 +273,15 @@ int FieldStepDoor(void)
         g_scene->pad_new = 0;
         g_scene->pad_held = PAD_LEFT;
         FieldUpdate(0);
-        func_80065978();
+        FieldFrame();
         g_scene->pad_held = PAD_LEFT;
         FieldUpdate(0);
-        func_80065978();
+        FieldFrame();
         hold = g_field_hold;
         g_field_hold = 0x81;
         FieldLiftBoxes();
         while ((r = FieldLiftPanelStep()) == 0) {
-            func_80065978();
+            FieldFrame();
         }
         if (r != -1) {
             FieldRideLift(r - 1);
@@ -314,7 +311,7 @@ int FieldStepDoor(void)
         g_scene->pad_new = 0;
         g_scene->pad_held = PAD_UP;
         FieldUpdate(0);
-        func_80065978();
+        FieldFrame();
         OBJ_T(b + 2, g_door_axes[facing]) = t0;
         OBJ_T(b + 3, g_door_axes[facing]) = t1;
         OBJ_SET(b + 2);
@@ -335,10 +332,10 @@ int FieldStepDoor(void)
         OBJ_T(b + 3, g_door_axes[facing]) += g_door_signs[facing] * 20;
         OBJ_SET(b + 2);
         OBJ_SET(b + 3);
-        func_80065978();
+        FieldFrame();
     }
     FieldBumpWall();
-    func_80065978();
+    FieldFrame();
     for (i = 0; ; i++) {
         if (SPOT(i).x == g_dng->pos[POS_X] && SPOT(i).y == g_dng->pos[POS_Y]) {
             FieldPauseBgm();
@@ -352,7 +349,7 @@ int FieldStepDoor(void)
         OBJ_T(b + 3, g_door_axes[facing]) -= g_door_signs[facing] * 20;
         OBJ_SET(b + 2);
         OBJ_SET(b + 3);
-        func_80065978();
+        FieldFrame();
     }
     return STEP_EVENT;
     }

@@ -152,7 +152,7 @@ int FieldRunScript(int event)
     g_msg_color = 0;
     FieldMsgClear();
     FieldMsgSetWindow(0);
-    func_80065978();
+    FieldFrame();
     nowait = 0;
     g_scene->layers[3].bg.scrolly = 0;
     g_scene->layers[3].bg.scrollx = 0;
@@ -177,7 +177,7 @@ int FieldRunScript(int event)
                     n = 0;
                     while (g_scene->pad_new == 0) {
                         FieldMsgSetWindow(n);
-                        func_80065978();
+                        FieldFrame();
                         n = (n + 1) % 12;
                     }
                     SsPlayBack(g_seq_handles[SEQ_CONFIRM], 0, 1);
@@ -201,7 +201,7 @@ int FieldRunScript(int event)
                     s++;
                     n = lo + (*s << 8);
                     for (i = 0; i <= n; i += 3) {
-                        func_80065978();
+                        FieldFrame();
                     }
                     break;
                 }
@@ -278,7 +278,7 @@ int FieldRunScript(int event)
                             sp->y = row * 16 + 0x40;
                             sp->r = sp->g = sp->b = n < 0x80 ? n : -n;
                         }
-                        func_80065978();
+                        FieldFrame();
                         n = (n + 0x18) & 0xFF;
                     }
                     D_8009FE3C = 0;
@@ -300,12 +300,12 @@ int FieldRunScript(int event)
                     if (n == 0) {
                         FieldMsgPrint(HERO_FIRST, 5);
                         FieldMsgPutGlyph(0);
-                        func_80065978();
+                        FieldFrame();
                         FieldMsgPrint(HERO_SURNAME, 5);
                     } else {
                         FieldMsgPrint(g_member_names[n], 5);
                         FieldMsgPutGlyph(0);
-                        func_80065978();
+                        FieldFrame();
                         FieldMsgPrint(g_member_names[n + 1], 5);
                     }
                     break;
@@ -365,7 +365,7 @@ int FieldRunScript(int event)
                     FieldSyncMusic();
                     g_field_lit = 0;
                     for (i = 0; i < 3; i++) {
-                        func_80065978();
+                        FieldFrame();
                     }
                     FieldFadeIn();
                     break;
@@ -425,7 +425,7 @@ int FieldRunScript(int event)
                     s++;
                     w = *(u_short *)s;
                     for (i = 0; i <= w; i += 3) {
-                        func_80065978();
+                        FieldFrame();
                     }
                     s += 2;
                     break;
@@ -482,7 +482,7 @@ int FieldRunScript(int event)
                             }
                             g_scene->pad_new = 0;
                             FieldUpdate(0);
-                            func_80065978();
+                            FieldFrame();
                         }
                     }
                     for (i = 1; g_event_walks[n][i] != 0xFF; ) {
@@ -492,7 +492,7 @@ int FieldRunScript(int event)
                             g_scene->pad_new = 0;
                             g_scene->pad_held = D_8009FAE4;
                             FieldUpdate(0);
-                            func_80065978();
+                            FieldFrame();
                             MarkWalked(g_dng->pos[POS_X], g_dng->pos[POS_Y]);
                             D_8009FAE0--;
                         }
@@ -517,7 +517,7 @@ int FieldRunScript(int event)
             FieldMsgPutGlyph(c);
             if (speed) {
                 for (i = 0; i < speed; i++) {
-                    func_80065978();
+                    FieldFrame();
                 }
             }
         } else {
@@ -526,12 +526,12 @@ int FieldRunScript(int event)
             FieldMsgPutGlyph(g);
             if (speed) {
                 for (i = 0; i < speed; i++) {
-                    func_80065978();
+                    FieldFrame();
                 }
             }
         }
         if (!nowait) {
-            func_80065978();
+            FieldFrame();
         }
         nowait = 0;
     }

@@ -72,7 +72,7 @@ void FieldMsgNewLine(void)
     if (++g_msg_line >= MSG_LINES) {
         for (i = 0; i < 4; i++) {
             g_scene->layers[LAYER_MSG].bg.y -= 4;
-            func_80065978();
+            FieldFrame();
         }
         FieldMsgClearLine(g_msg_line % MSG_LINES);
         g_scene->layers[LAYER_MSG].bg.y += MSG_LINE_H;
@@ -141,7 +141,7 @@ void FieldMsgPrintBytes(u_char *s, u_char n)
         }
         s++;
         FieldMsgPutGlyph(c);
-        func_80065978();
+        FieldFrame();
     }
 }
 
@@ -173,7 +173,7 @@ void FieldMsgPrint(s, n)
             s += 2;
             FieldMsgPutGlyph(g);
         }
-        func_80065978();
+        FieldFrame();
     }
 }
 #else
@@ -230,7 +230,7 @@ FieldMsgPrintCodes(s, n)
                 FieldMsgPutGlyph(g);
             }
         }
-        func_80065978();
+        FieldFrame();
     }
 }
 

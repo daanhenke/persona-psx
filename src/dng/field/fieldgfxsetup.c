@@ -13,13 +13,6 @@ extern void BgFromPack(u_long *pack, u_char *hdr, GsMAP *map, GsBG *bg, short x,
 /* The save's message window style: it picks the window frame's cells. */
 #define g_win_style (*(u_char *)0x801F2AC6)
 
-/* Where the backdrop layer is drawn. */
-extern short D_8009FE68;
-extern short D_8009FE6C;
-
-/* The two TMDs whose vertices bob on the maps that have them, -1 for none. */
-extern int g_bob_tmd_a;
-extern int g_bob_tmd_b;
 
 #define PACK(tab, n) ((u_long *)(PACK_BASE + (tab)[n]))
 
@@ -89,7 +82,7 @@ void FieldSetupGfx(int reload)
 
     BgFromPack(PACK(g_pack_msg_tab, 0), (u_char *)PACK(g_pack_cell_tab, 0),
                &g_scene->layers[0].map, &g_scene->layers[0].bg,
-               D_8009FE68 = 0x1C, D_8009FE6C = -0x78);
+               g_minimap_x = 0x1C, g_minimap_y = -0x78);
     g_scene->layers[0].bg.attribute = 0x60000000;
     g_scene->layers[0].bg.w = 0x84;
     g_scene->layers[0].bg.h = 0x84;

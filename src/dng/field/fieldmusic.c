@@ -203,10 +203,10 @@ int FieldRollEncounter(void)
                         g_scene->pad_new = 0;
                         g_scene->pad_held = 0x8000;
                         FieldUpdate(0);
-                        func_80065978();
+                        FieldFrame();
                         g_scene->pad_held = 0x8000;
                         FieldUpdate(0);
-                        func_80065978();
+                        FieldFrame();
                     }
                 }
             }

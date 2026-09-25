@@ -30,6 +30,6 @@ void FieldNudge(int frames, int dy)
 
     for (i = 0; i < frames; i++) {
         g_dng->view.vpy = dy + g_dng->view.vpy;
-        func_80065978();
+        FieldFrame();
     }
 }

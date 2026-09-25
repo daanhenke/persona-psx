@@ -56,7 +56,7 @@ void FieldStairs(int dir)
     FieldStepBegin();
     for (i = 0; i < 4; i++) {
         FieldStepView();
-        func_80065978();
+        FieldFrame();
     }
     FieldZoneTunes(0);
     FieldHop(dir);
@@ -92,7 +92,7 @@ void FieldStairs(int dir)
     FieldHop(dir);
     for (i = 0; i < 4; i++) {
         FieldStepView();
-        func_80065978();
+        FieldFrame();
     }
     FieldStepEnd();
     g_field_mode = 0;
@@ -115,7 +115,7 @@ void FieldHop(int dir)
         FieldStepView();
         g_dng->view.vpy -= dir * (bob + 15);
         g_dng->view.vry = g_dng->view.vpy;
-        func_80065978();
+        FieldFrame();
     }
     g_dng->view.vpy = g_view_eye[1] - dir * 75;
     g_dng->view.vry = g_dng->view.vpy;
@@ -202,13 +202,13 @@ void FieldBumpWall(void)
         g_view_eye[g_dir_axis[g_dng->walk_dir]] += g_dir_step[g_dng->walk_dir] * BUMP_SPEED;
         g_view_at[g_dir_axis[g_dng->walk_dir]] += g_dir_step[g_dng->walk_dir] * BUMP_SPEED;
         FieldSaveView();
-        func_80065978();
+        FieldFrame();
     }
     for (i = 0; i < 2; i++) {
         g_view_eye[g_dir_axis[g_dng->walk_dir]] -= g_dir_step[g_dng->walk_dir] * BUMP_SPEED;
         g_view_at[g_dir_axis[g_dng->walk_dir]] -= g_dir_step[g_dng->walk_dir] * BUMP_SPEED;
         FieldSaveView();
-        func_80065978();
+        FieldFrame();
     }
     g_view_eye[g_dir_axis[g_dng->walk_dir]] = eye;
     g_view_at[g_dir_axis[g_dng->walk_dir]] = at;

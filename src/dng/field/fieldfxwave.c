@@ -22,9 +22,9 @@ void FieldWaveFxBegin(void)
     int phase;
     int step, amp, delay;
 
-    func_80065978();
+    FieldFrame();
     do {
-        func_80065978();
+        FieldFrame();
     } while (g_draw_buf != 0);
     FieldInitStrip();
     phase = 0x801;

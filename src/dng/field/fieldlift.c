@@ -61,14 +61,14 @@ void FieldRideLift(int button)
     FieldShake(dir);
     for (; left > 0; left--) {
         for (i = 0; i < 30; i++) {
-            func_80065978();
+            FieldFrame();
         }
         g_scene->lift_at += dir;
     }
     FieldPlayJingle(0x1A, 1, 1);
     FieldShake(-dir);
     for (i = 0; i < 20; i++) {
-        func_80065978();
+        FieldFrame();
     }
     from = g_lift_from[g_scene->lift];
     g_dng->floor = from[g_scene->lift_y * 2 + g_scene->lift_x];
