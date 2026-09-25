@@ -255,7 +255,7 @@ extern int    func_80098B8C(u_char id);
 extern void   AdvQueueCmdBar(void);
 extern void   AdvTynCutscene(void);
 extern void   AdvRoomRebuild(void);
-extern void   func_800AFAD0(u_char chr, u_char key, u_char level);
+extern void   CharJoin(u_char chr, u_char key, u_char level);
 extern void   func_800B0014(int a, u_char level, u_char chr, u_char key);
 extern void   PersonaStockReturn(u_char id);
 extern void   func_800715EC(void);
@@ -391,7 +391,7 @@ loop:
         b = 0;
         a = CharFindFree();
         PartyAdd(a);
-        func_800AFAD0(a, s[2], g_chars[0].level);
+        CharJoin(a, s[2], g_chars[0].level);
         c = 0;
         d = 0;
         PartyCompact();

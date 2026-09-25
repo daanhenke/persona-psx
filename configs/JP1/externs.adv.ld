@@ -83,3 +83,5 @@ SsSeqSetDecrescendo = 0x8001DA68;
 /* resolved from the adv link */
 g_formation_marker_def = 0x800B8978;
 g_slot_cur = 0x800BB930;
+g_char_templates = 0x80044278;
+g_char_hp_growth = 0x800473C0;

@@ -116,7 +116,7 @@ extern int    g_BB94C, g_BB998;
 
 extern void func_80033A50(int a, int b, int c, int d);
 extern void func_80034850(u_long *base);
-extern void func_800AFAD0(u_char chr, u_char key, u_char level);
+extern void CharJoin(u_char chr, u_char key, u_char level);
 extern void CharSetLevelExp(u_char level, u_char slot);
 extern void VramClearRect(int x, int y, int w, int h);
 extern void LoadFileToAddr(const char *name, void *dest);
@@ -181,7 +181,7 @@ void ovl_adv_entry(void)
         g_party_at[2] = 0xFF;
         g_party_at[3] = 0xFF;
         g_party_at[4] = 0xFF;
-        func_800AFAD0(0, 1, 5);
+        CharJoin(0, 1, 5);
         CharSetLevelExp(5, 0);
         g_chars[0].unk1C = ExpToLevel(4, 0, 0);
         for (i = 0; i < 0xE1; i++) {

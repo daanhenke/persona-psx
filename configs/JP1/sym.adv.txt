@@ -72,8 +72,10 @@ bzero                    = 0x80041338; // type:func
 rand                     = 0x80041368; // type:func
 g_persona_data           = 0x80041760; // size:0x38
 g_insert8_names          = 0x80044266; // size:0x140
+g_char_templates         = 0x80044278; // size:0x168
 g_item_defs              = 0x800443E0; // size:0x20C
-g_level_growth           = 0x8004735C;
+g_char_stat_growth       = 0x8004735C;
+g_char_hp_growth         = 0x800473C0;
 g_spell_data             = 0x80047D20; // size:0x14
 g_member_names           = 0x8004901C; // size:0x64
 g_bg_maps                = 0x8004AA54;
@@ -1406,7 +1408,7 @@ CharFind                 = 0x800AFA80; // type:func size:0x50
 //------------------------------------------------------------
 //--- PA: 0x04B730   VA: 0x800AFAD0   subsegment: asm, adv_56c
 //------------------------------------------------------------
-func_800AFAD0            = 0x800AFAD0; // type:func size:0x3BC
+CharJoin                 = 0x800AFAD0; // type:func size:0x3BC
 CharGrow                 = 0x800AFE8C; // type:func size:0x188
 func_800B0014            = 0x800B0014; // type:func size:0x2D0
 
