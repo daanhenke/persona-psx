@@ -22,13 +22,13 @@
 
 #define BTL_SCRATCH_W ((u_long *)BTL_SCRATCH)
 
-extern CdlFILE g_btl_files[];
+/* The overlay's own filenames, one fixed-length record each. */
+#define BTL_FILE_LEN 0x18
+extern char    g_btl_files[][BTL_FILE_LEN];
 extern CdlFILE g_btl_scratch_file;
 extern int     g_btl_scratch_loaded;
 extern u_long *g_btl_scratch_end;
 extern int     g_cd_busy;
-
-extern void LoadFileToAddr(CdlFILE *file, u_long *addr);
 
 void BtlLoadScratch(int index, int from_table)
 {
@@ -48,7 +48,7 @@ void BtlLoadScratch(int index, int from_table)
             g_btl_scratch_loaded = 1;
         }
     } else {
-        LoadFileToAddr(&g_btl_files[index], BTL_SCRATCH_W);
+        LoadFileToAddr(g_btl_files[index], BTL_SCRATCH_W);
     }
     g_btl_scratch_end = (u_long *)((int)BTL_SCRATCH_W + g_btl_scratch_size);
 }
