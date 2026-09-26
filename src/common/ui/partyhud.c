@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - one party member's block in the field status HUD.
  *
- *   ADV @ 0x8007C094   S2D @ 0x8007AAF0
+ *   ADV @ 0x8007C094   S2D @ 0x8007AAF0   DNG @ 0x8008A6B0
  *
  * Both HUD redraws call this five times in a row, once per party slot, and the
  * five blocks sit at fixed places in the character-map layer: cells 2 and 14 on
@@ -53,11 +53,19 @@ extern const u_char str_cell_run[];
 
 extern void TileMapWriteRow(const u_char *src, short *dst, u_short base,
                             u_short count);
-extern void TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
-                               u_short count);
 extern void TileMapFillRect(short *dst, short value, u_short w, u_short h,
                             u_short stride);
+#ifdef PARTYHUD_INT
+/* DNG's copy was built against an int-returning formatter and a writer that
+   takes the base and count as ints, so neither is narrowed at the call. */
+extern void TileMapWriteRowRev(const u_char *src, short *dst, int base,
+                               int count);
+extern int   FormatDecimal(u_int value, u_char *dst, u_short width);
+#else
+extern void TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
+                               u_short count);
 extern short FormatDecimal(u_int value, u_char *dst, u_short width);
+#endif
 
 void DrawPartySlotStatus(u_char slot, short cell_offset)
 {

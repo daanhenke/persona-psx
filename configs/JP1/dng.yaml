@@ -68,7 +68,9 @@ segments:
       # the step table is nine words; the pad word after it is not the C's.
       - [0x2E8, rodata, dng_rodata0f]
       - [0x2EC, .rodata, ui/configmenu]
-      - [0x310, rodata, dng_rodata0g]
+      # partyhud is ten bytes; the linker pads to the next word.
+      - [0x310, .rodata, common/ui/partyhud]
+      - [0x31C, rodata, dng_rodata0g]
       - [0x4F0, .rodata, common/game/spellusable]
       - [0x718, rodata, dng_rodata1]
       - [0x770, .rodata, game/itemusableany]
@@ -196,7 +198,8 @@ segments:
       - [0x25E7C, c, common/ui/spellname]
       - [0x25F3C, c, ui/menuscreen]
       - [0x25FD0, c, ui/menulayouts]
-      - [0x26310, asm, dng_2_s8b]
+      - [0x26310, c, common/ui/partyhud]
+      - [0x265F0, c, ui/statusmain]
       - [0x26FCC, c, common/gfx/mapcells]
       - [0x270CC, asm, dng_2_s9]
       - [0x272C0, c, common/gfx/backdrop]

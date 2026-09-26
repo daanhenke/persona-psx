@@ -1,15 +1,13 @@
-/* Persona 1 (JP) - the status screen's main page.  ADV only.
- *   ADV 0x8007C38C
+/* Persona 1 (JP) - the status screen's main page.  DNG's copy.
+ *   DNG 0x8008A990
  *
- * Everything the screen shows about one party member at once: the stat bars,
- * level and the three experience figures with what the next level still
- * needs, the eight derived numbers, the seven things equipped, the five
- * stats, hp and sp over their maxima - each drawn in the warning bank once it
- * has fallen to a quarter of its maximum - the ailment if it is one of the two
- * the screen names, the three Personas the member carries with the one in use
- * picked out, and the member's name on the header layer.
+ * The field's build of ADV's page (src/adv/ui/statusmain.c, which describes
+ * it), against the field's formatter and writers.
  */
+#define TILEMAP_INT_COUNT
+#define NAME_KR
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <persona/common/char.h>
 #include <persona/common/itemname.h>
 #include <persona/common/persona.h>
@@ -30,6 +28,8 @@ extern u_char g_status_names[][8];
 
 extern const u_char g_persona_list_rule[];
 
+extern void DrawPersonaKeyName();
+
 /* Clear a field and draw one number into it, its last digit at `last`. */
 #define FIELD(value, width, row, col, last)                                    \
     TileMapFillRect(AT(row, col), 0, width, 1, MAP_W);                         \
@@ -40,13 +40,10 @@ extern const u_char g_persona_list_rule[];
     TileMapWriteRowRev(g_hud_digits, AT(row, last), GLYPH_DIGIT0,              \
                        FormatDecimal(value, g_hud_digits, width))
 
-/* One local carries the member's index, then each digit count, then the
-   Persona row, and `bank` carries the row's list entry: that reuse is what
-   puts the index and the record offset in the original's saved registers.
-   The later fields are read through c for the same reason. */
+#ifdef NON_MATCHING
 void StatusDrawMain(u_char slot)
 {
-    int      member = g_party[slot];
+    int      member = g_party[slot];   /* then each digit count, then a row */
     Char    *c = &g_chars[member];
     Persona *personas = g_personas;
     int      next;
@@ -103,7 +100,7 @@ void StatusDrawMain(u_char slot)
         bank = BANK_DANGER;
     }
     TileMapWriteRowRev(g_hud_digits, AT(26, 22),
-                       (u_short)(GLYPH_DIGIT0 + bank * GLYPH_BANK), (u_short)member);
+                       GLYPH_DIGIT0 + bank * GLYPH_BANK, member);
     NUMBER(c->hp_max, 3, 26, 26);
     member = FormatDecimal(c->sp, g_hud_digits, 3);
     bank = 0;
@@ -111,7 +108,7 @@ void StatusDrawMain(u_char slot)
         bank = BANK_DANGER;
     }
     TileMapWriteRowRev(g_hud_digits, AT(27, 22),
-                       (u_short)(GLYPH_DIGIT0 + bank * GLYPH_BANK), (u_short)member);
+                       GLYPH_DIGIT0 + bank * GLYPH_BANK, member);
     NUMBER(c->sp_max, 3, 27, 26);
 
     TileMapFillRect(AT(28, 18), 0, 10, 1, MAP_W);
@@ -128,13 +125,9 @@ void StatusDrawMain(u_char slot)
     for (member = 0; member < CHAR_LIST_N; member++) {
         bank = c->list[member];
         if (bank != 0xFF && !c->blocked) {
-            base = c->entry == member ? LABEL_BASE : 0;
             key = personas[bank].key;
-            TileMapFillRect(AT(26, 3) + member * MAP_W, 0, 10, 1, MAP_W);
-            if (key != 0) {
-                TileMapWriteRow(g_persona_defs[key].name,
-                                AT(26, 3) + member * MAP_W, base, 10);
-            }
+            base = c->entry == member ? LABEL_BASE : 0;
+            DrawPersonaKeyName(key, AT(26 + member, 3), base);
         } else {
             TileMapWriteRow(g_persona_list_rule, AT(26 + member, 4), GLYPH_BANK, 8);
         }
@@ -143,3 +136,6 @@ void StatusDrawMain(u_char slot)
     TileMapFillRect(g_tilemap2, 0, 8, 1, MAP_W);
     TileMapWriteRow(c->name, g_tilemap2, 0, 8);
 }
+#else
+INCLUDE_ASM("dng/nonmatchings/ui/statusmain", StatusDrawMain);
+#endif

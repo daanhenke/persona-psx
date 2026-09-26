@@ -162,6 +162,18 @@ local reused for two unrelated things often will. Both directions come up.
 - [backdrop.c:41](/src/common/gfx/backdrop.c#L41) - one local for the gradient's blue and then the grid's grey; two locals do not compile to this.
 - [itemcell.c:51](/src/common/ui/itemcell.c#L51), [itemrowuse.c:12](/src/common/ui/itemrowuse.c#L12) - one scratch carries the id test in and the glyph bank out.
 - [formationrepair.c:20](/src/common/game/formationrepair.c#L20) - one counter serves both loops, which only happens if it is the same variable.
+- [statusmain.c](/src/adv/ui/statusmain.c) - `StatusDrawMain` (ADV and DNG):
+  the member's index, each digit count and the Persona row counter are one
+  local, and `bank` also carries the row's list entry. With the index kept
+  live in a saved register the record offset and every later saved register
+  land where the original has them; the fields read after the index is
+  reused go through `c`, which cse turns back into the offset form. ADV's
+  98.54% (guarded since the first draft) and DNG's 91.71% to exact.
+- [skilldraw.c](/src/dng/ui/skilldraw.c) - DNG's `SkillSpellsDraw`: the
+  party index and then the Persona id in one block-scoped local. Written
+  inline the index outranks the two record bases in local-alloc; in a
+  function-wide local it goes to a saved register; in a block of its own it
+  lands in a0 behind the bases, as in the original. 99.28% to exact.
 - [pickmember.c:74](/src/btlp/pickmember.c#L74) - the mask is a local so it stays in a register across the loop.
 - [commandmenu.c](/src/btlp/commandmenu.c) - the formation walk's cell counter is the `i` the party walks use; a `cell` of its own put every loop counter a register over (99.35% to 99.65%).
 

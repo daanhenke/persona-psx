@@ -12,7 +12,6 @@
 #define ITEM_USABLE_INT
 #define TILEMAP_INT_COUNT
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -110,21 +109,25 @@ void SkillPersonasDraw(member)
 /* The Persona's seven spells, greyed while the member cannot pay its cost,
    while the list is blocked, or where the spell does nothing out here.
 
-   99.28%: registers only, in the block that finds the two records. The
-   image gives the g_chars base v1 and the party index a0; here the index
-   (three uses over four insns) outranks the base (two over fourteen) in
-   local-alloc and takes v1, which pushes the bases to a2/a3. Reaching the
-   records through an index variable, pointer locals, += or int parameters
-   all leave the ranking as it is. */
-#ifdef NON_MATCHING
+   The party index and then the Persona id go through one block-scoped
+   local: kept local to the entry block, it ranks below the two record
+   bases in local-alloc, as the original's does. */
 void SkillSpellsDraw(member, persona)
     short member;
     short persona;
 {
-    Char    *c = &g_chars[g_party_at[member]];
-    Persona *p = &g_personas[c->list[persona]];
+    Char    *c;
+    Persona *p;
     int      i;
     int      grey;
+
+    {
+        int k = g_party_at[member];
+
+        c = &g_chars[k];
+        k = c->list[persona];
+        p = &g_personas[k];
+    }
 
     for (i = 0; i < PERSONA_SPELLS; i++) {
         grey = 0;
@@ -140,6 +143,3 @@ void SkillSpellsDraw(member, persona)
         }
     }
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/ui/skilldraw", SkillSpellsDraw);
-#endif

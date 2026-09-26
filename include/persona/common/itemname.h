@@ -12,6 +12,11 @@
  * declaration, so they keep it rather than include this. */
 #include <decomp/types.h>
 
+#ifdef NAME_KR
+/* DNG's units see no prototype: the id goes over as it was loaded. */
+void DrawItemName();
+#else
 void DrawItemName(short id, short *dst, u_short base, short nothing);
+#endif
 
 #endif
