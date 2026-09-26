@@ -1320,7 +1320,6 @@ DrawPersonaList          = 0x80098A40; // type:func size:0xCC
 //-----------------------------------------------------------
 func_80098B0C            = 0x80098B0C; // type:func size:0x80
 FacilityScreen           = 0x80098B8C; // type:func size:0x125C
-D_80099DE8               = 0x80099DE8; // type:u32 size:0x111EC
 
 //-------------------------------------------------------------
 //--- PA: 0x046C34   VA: 0x800AAFD4   subsegment: c, game/money
