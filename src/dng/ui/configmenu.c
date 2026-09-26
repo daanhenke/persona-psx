@@ -44,7 +44,7 @@ extern void PadDrawLayout(int layout);
 extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
 extern void DrawPlaceLabel(short in_battle);
-extern void func_80093D18(int n);
+extern void TacticsSetCels(int n);
 extern void ConfigStepTactics(void);
 extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
@@ -185,7 +185,7 @@ void ConfigListStep(void)
     if (InputCheckAcceptA(1)) {
         switch (g_menu->cfg_list.cur) {
         case 2:
-            func_80092E5C(0x10);
+            MenuSetLayers(0x10);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 9), 0x12, 4, MAP_W);
@@ -251,7 +251,7 @@ void ConfigListStep(void)
             g_menu_subsel += 2;
             break;
         case 3:
-            func_80092E5C(0xF);
+            MenuSetLayers(0xF);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 5), 0x1B, 9, MAP_W);
@@ -288,7 +288,7 @@ void ConfigListStep(void)
                 g_cinema_cels0.h = 0x38;
             }
             g_cinema_cels6.h = 0x38;
-            func_80093D18(D_801F2AC6);
+            TacticsSetCels(D_801F2AC6);
             g_menu_subsel++;
             break;
         case 4:
@@ -307,7 +307,7 @@ void ConfigOptionStep(void)
     if (MenuStepCursor(&g_menu->list[0]) || MenuStepCursor(&g_menu->list[1])) {
         SlotSetPos(1, 0x42, g_menu->list[1].cur * 88 + 0x50,
                    g_menu->list[0].cur * 12 + 0x3C);
-        func_80093D18(g_menu->list[1].cur + g_menu->list[0].cur * 2);
+        TacticsSetCels(g_menu->list[1].cur + g_menu->list[0].cur * 2);
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         ConfigPageOpen();

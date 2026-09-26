@@ -38,7 +38,7 @@ extern void PadDrawLayout(u_char layout);
 extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
 extern void DrawPlaceLabel(short in_battle);
-extern void func_8008FC78(u_char n);
+extern void TacticsSetCels(u_char n);
 extern void ConfigStepTactics(void);
 extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
@@ -283,7 +283,7 @@ void ConfigListStep(void)
                 g_cinema_cels0.h = 0x38;
             }
             g_cinema_cels6.h = 0x38;
-            func_8008FC78(D_801F2AC6);
+            TacticsSetCels(D_801F2AC6);
             g_menu_subsel++;
             break;
         case 4:
@@ -302,7 +302,7 @@ void ConfigOptionStep(void)
     if (MenuStepCursor(&g_menu->list[0]) || MenuStepCursor(&g_menu->list[1])) {
         SlotSetPos(1, 0x42, g_menu->list[1].cur * 88 + 0x50,
                    g_menu->list[0].cur * 12 + 0x3C);
-        func_8008FC78(g_menu->list[1].cur + g_menu->list[0].cur * 2);
+        TacticsSetCels(g_menu->list[1].cur + g_menu->list[0].cur * 2);
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         ConfigPageOpen();

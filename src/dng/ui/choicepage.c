@@ -19,13 +19,13 @@ extern u_char g_fm_prompt_cur_def[];
 extern u_char D_8009AA4C[];
 extern u_char D_8009B074[];
 
-extern void func_80092E5C(int);
+extern void MenuSetLayers(int);
 
 void MenuChoicePageOpen(void)
 {
     int i;
 
-    func_80092E5C(0x11);
+    MenuSetLayers(0x11);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 0, 3), 0x1A, 0xD, MAP_W);

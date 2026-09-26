@@ -49,7 +49,7 @@ extern void   CharApplyStats(u_char chr);
 extern void   CharRecalcStats(u_char chr);
 extern void   bcopy(void *src, void *dst, int len);
 extern void   func_800946E4(Char *c, int a, int b);
-extern void   func_80092E5C(int);
+extern void   MenuSetLayers(int);
 extern int    func_800992D4(short kind);
 extern void   func_80090464(int member);
 extern void   StockEmptyNotice(void);
@@ -156,7 +156,7 @@ void StatusPersonaLayout(void)
 {
     int i;   /* the row, then the page's scroll stop */
 
-    func_80092E5C(9);
+    MenuSetLayers(9);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 1, 0), 0x1E, 0x24, MAP_W);
@@ -526,7 +526,7 @@ void StatusStockView(void)
 
     if ((g_cam_y == 0 || g_cam_y == PAGE_LOW) &&
         (InputCheckAcceptB(1) || g_menu_allow_hold)) {
-        func_80092E5C(0xA);
+        MenuSetLayers(0xA);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);

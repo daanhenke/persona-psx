@@ -68,7 +68,7 @@ extern u_char D_80099FFC[];
 extern u_char D_8009ABFC[];
 extern u_char D_8009A52C[];
 extern u_char D_8009B330[];
-extern void   func_8008EF98(int target, int caster, int spell);
+extern void   SpellApplyField(int target, int caster, int spell);
 extern void   MenuScreenDraw(void);
 extern void   StatusPersonaPreview(void);
 /* The field's message stepper. */
@@ -178,7 +178,7 @@ void StatusTopStep(void)
             g_menu_subsel++;
             break;
         case STATUS_PERSONAS:
-            func_80092E5C(7);
+            MenuSetLayers(7);
             SlotClearAll();
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);
@@ -252,7 +252,7 @@ short StatusStockOpen(first)
 {
     int i;
 
-    func_80092E5C(0xA);
+    MenuSetLayers(0xA);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -301,7 +301,7 @@ void SkillMemberPick(void)
                    (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
     }
     if (InputCheckAcceptA(1)) {
-        func_80092E5C(6);
+        MenuSetLayers(6);
         SkillScreenLayout();
         SkillPersonasDraw(g_menu->skill_member.cur);
         MenuListInit(&g_menu->skill_persona, 0, 0,
@@ -489,7 +489,7 @@ void SkillTargetPick(void)
     if (InputCheckAcceptA(1)) {
         if (g_spell_data[(u_short)g_skill_help_spell].target == TARGET_PARTY) {
             for (i = 0; i <= g_party_last; i++) {
-                func_8008EF98(i, g_menu->skill_member.cur, g_skill_help_spell);
+                SpellApplyField(i, g_menu->skill_member.cur, g_skill_help_spell);
             }
         } else {
             if (!ItemUsableOn(g_menu->list[1].cur,
@@ -497,7 +497,7 @@ void SkillTargetPick(void)
                 return;
             }
         cast:
-            func_8008EF98(g_menu->list[1].cur, g_menu->skill_member.cur,
+            SpellApplyField(g_menu->list[1].cur, g_menu->skill_member.cur,
                           g_skill_help_spell);
         }
         c = (Char *)(who * sizeof(Char) + chars);
@@ -705,7 +705,7 @@ void StatusPageLayout(void)
     int     i;
     u_char *arc;
 
-    func_80092E5C(8);
+    MenuSetLayers(8);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1E, 0x13, MAP_W);
@@ -764,7 +764,7 @@ void StatusPageStep(void)
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         MenuTopRedraw();
-        func_80092E5C(7);
+        MenuSetLayers(7);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);

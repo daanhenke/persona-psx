@@ -56,7 +56,7 @@ extern u_char  g_pad_config;
 extern u_char  D_8009AA4C[];
 extern u_char  D_8009B074[];
 extern u_char  D_8009B388[];
-extern void    func_80092E5C(int);
+extern void    MenuSetLayers(int);
 extern u_char  g_fm_prompt_cur_def[];
 extern u_char  g_fm_hint_def[];
 extern u_char  g_fm_hint2_def[];
@@ -140,7 +140,7 @@ void FormationMenuOpen(void)
     u_char *grid = g_formation;
     u_char  i;
 
-    func_80092E5C(0);
+    MenuSetLayers(0);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);

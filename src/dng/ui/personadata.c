@@ -86,7 +86,7 @@ extern void TileMapDrawWindow(short *dst, u_char w, u_char h, u_char stride);
 extern void TileMapDrawBox(short *dst, u_short w, short h, u_short stride);
 extern void TileMapBlitRle(const u_short *src, short *dst, u_short stride);
 extern void TileMapWriteBar(short *dst, u_char width);
-extern void func_80092E5C(int);
+extern void MenuSetLayers(int);
 extern short func_800992D4(short kind);
 extern void DrawSpellName(short spell, short *dst, u_short base, short rule);
 extern void CellsClear(GsCELL *dst, u_char count);
@@ -333,7 +333,7 @@ void ArcanaGridOpen(void)
 {
     int i; /* the row, then the arcana under the cursor */
 
-    func_80092E5C(0xB);
+    MenuSetLayers(0xB);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
@@ -538,7 +538,7 @@ void PersonaDataLayout(void)
 {
     int i; /* the row, then the page's scroll stop */
 
-    func_80092E5C(9);
+    MenuSetLayers(9);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 1, 0), 0x1E, 0x24, MAP_W);

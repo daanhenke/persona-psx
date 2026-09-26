@@ -4,4 +4,4 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
-#include "../../common/game/charrecalc.c"
+#include "../../../common/game/equippick.c"

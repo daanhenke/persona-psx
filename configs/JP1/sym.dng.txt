@@ -741,7 +741,7 @@ ItemsStrongestUsable     = 0x8008E53C; // type:func size:0xF4
 //--------------------------------------------------------------
 //--- PA: 0x02A290   VA: 0x8008E630   subsegment: asm, dng_2_s12
 //--------------------------------------------------------------
-func_8008E630            = 0x8008E630; // type:func size:0x1AC
+EquipPickStronger        = 0x8008E630; // type:func size:0x1AC
 
 //-------------------------------------------------------------------
 //--- PA: 0x02A43C   VA: 0x8008E7DC   subsegment: c, common/gfx/gauge
@@ -751,7 +751,7 @@ DrawGauge                = 0x8008E7DC; // type:func size:0x16C
 //--------------------------------------------------------------
 //--- PA: 0x02A5A8   VA: 0x8008E948   subsegment: asm, dng_2_s13
 //--------------------------------------------------------------
-func_8008E948            = 0x8008E948; // type:func size:0x3DC
+ItemUseOn                = 0x8008E948; // type:func size:0x3DC
 
 //--------------------------------------------------------------------------
 //--- PA: 0x02A984   VA: 0x8008ED24   subsegment: c, common/game/spellusable
@@ -762,7 +762,7 @@ CharSpellUsable          = 0x8008EE7C; // type:func size:0x11C
 //--------------------------------------------------------------
 //--- PA: 0x02ABF8   VA: 0x8008EF98   subsegment: asm, dng_2_s14
 //--------------------------------------------------------------
-func_8008EF98            = 0x8008EF98; // type:func size:0x1BC
+SpellApplyField          = 0x8008EF98; // type:func size:0x1BC
 
 //---------------------------------------------------------------------
 //--- PA: 0x02ADB4   VA: 0x8008F154   subsegment: c, common/game/status
@@ -958,10 +958,11 @@ InputCheckAcceptB        = 0x80092BFC; // type:func size:0x7C
 //--------------------------------------------------------------
 //--- PA: 0x02E8D8   VA: 0x80092C78   subsegment: asm, dng_2_s19
 //--------------------------------------------------------------
-D_80092C78               = 0x80092C78; // type:func size:0x8C
+DrawItemCellRows         = 0x80092C78; // type:func size:0x8C
 DrawItemCell             = 0x80092D04; // type:func size:0x10C
-D_80092E10               = 0x80092E10; // type:func size:0x4C
-func_80092E5C            = 0x80092E5C; // type:func size:0x158
+BgLineShow               = 0x80092E10; // type:func size:0x34
+BgLineHide               = 0x80092E44; // type:func size:0x18
+MenuSetLayers            = 0x80092E5C; // type:func size:0x158
 
 //------------------------------------------------------------------------
 //--- PA: 0x02EC14   VA: 0x80092FB4   subsegment: c, common/gfx/checkermap
@@ -988,8 +989,8 @@ CellsWriteRow            = 0x80093188; // type:func size:0xC0
 //-----------------------------------------------------------------
 D_80093248               = 0x80093248; // type:func size:0x970
 DrawItemName             = 0x80093BB8; // type:func size:0x64
-D_80093C1C               = 0x80093C1C; // type:func size:0xFC
-func_80093D18            = 0x80093D18; // type:func size:0xD0
+DrawBagItemRow           = 0x80093C1C; // type:func size:0xFC
+TacticsSetCels           = 0x80093D18; // type:func size:0xD0
 CharRecalcStats          = 0x80093DE8; // type:func size:0x2AC
 
 //------------------------------------------------------------------------
@@ -1183,6 +1184,7 @@ g_bg_map                 = 0x8009B890; // size:0x10
 g_panel_map              = 0x8009B8A0; // size:0x10
 g_bg_layers              = 0x8009B8B0; // size:0xD8
 g_use_scroll_step        = 0x8009B988; // size:0x2
+g_menu_layers            = 0x8009B98C;
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
 g_status_names           = 0x8009BEF8; // size:0x88

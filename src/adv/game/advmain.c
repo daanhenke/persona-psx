@@ -142,7 +142,7 @@ extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
 extern void AdvFieldEnter(void);
 extern void AdvFieldTick(void);
-extern void func_8008FC78(u_char n);
+extern void TacticsSetCels(u_char n);
 extern void AdvPickEffect(void);
 extern void AdvEffectSetupSlots(void);
 extern void AdvRunFrame(void);
@@ -305,7 +305,7 @@ loaded:
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
     AdvFieldEnter();
-    func_8008FC78(cfg[2]);
+    TacticsSetCels(cfg[2]);
     g_advcmd_loaded = 1;
     LoadFileToAddrAsync("\\ADV\\ADVCMD.BIN;1", SCENE_AT);
     AdvPickEffect();

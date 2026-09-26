@@ -79,13 +79,13 @@ extern short MenuStepMember(int *sel, u_char last);
 extern void  StatusDrawMain(int slot);
 extern void  DrawStatusHud(void);
 extern void  BgMapInit(void *script, short speed);
-extern void  func_80092E5C(int);
+extern void  MenuSetLayers(int);
 /* The field's message stepper. */
 extern int   func_80076380(void);
 
 void MenuStatusOpen(void)
 {
-    func_80092E5C(0);
+    MenuSetLayers(0);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -133,7 +133,7 @@ void MenuStatusSelect(void)
         g_face_clut_fix = FACE_CLUT_FIX;
         TimQueueAt(PORTRAIT_TIM, 0x140, 0x168, 0, 0x1E6);
 
-        func_80092E5C(1);
+        MenuSetLayers(1);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);

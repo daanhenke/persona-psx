@@ -104,7 +104,7 @@ extern void RoomRotatePoint(short from, short x, short y, short to,
                             short *ox, short *oy);
 extern void func_80096B4C(short map, short turn);
 extern void func_80096818(void);
-extern void func_80092E5C(int);
+extern void MenuSetLayers(int);
 /* The field's message stepper. */
 extern int  func_80076380(void);
 
@@ -312,7 +312,7 @@ void MapScreenLayout(void)
     g_view2_dy = 0;
     g_view2_dx = 0;
     g_menu_allow_hold = 0;
-    func_80092E5C(0x13);
+    MenuSetLayers(0x13);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0x3DC, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0x3DC, MAP_W, 0x20, MAP_W);

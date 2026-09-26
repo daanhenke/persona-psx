@@ -99,9 +99,12 @@ segments:
       - [0x7C4, rodata, adv_rodata6b]
       # EquipDrawCompare's three arrows, which the C emits itself.
       - [0x7E4, .rodata, ui/equipcompare]
-      - [0x7EC, rodata, adv_rodata6c]
+      - [0x7EC, .rodata, common/game/equippick]
+      - [0x808, .rodata, common/game/itemuse]
       - [0x9A8, .rodata, common/game/spellusable]
-      - [0xBD0, rodata, adv_rodata7]
+      # the effect table is 21 words; the pad word after it is not the C's.
+      - [0xBD0, .rodata, common/game/spelleffect]
+      - [0xC24, rodata, adv_rodata7]
       - [0xD30, .rodata, ui/facility]
       - [0xD8C, rodata, adv_rodata7p]
       - [0xD90, .rodata, ui/savescreen]
@@ -296,7 +299,7 @@ segments:
       - [0x2ACE4, c, gfx/cellsdigits]
       - [0x2AD48, c, common/gfx/cellsrow]
       - [0x2AE08, c, ui/statuspages]
-      - [0x2B778, asm, adv_45_x1]
+      - [0x2B778, c, common/ui/itemname]
       - [0x2B9A8, c, game/charrecalc]
       - [0x2BC54, c, common/game/charstats]
       - [0x2C2A4, asm, adv_46]
@@ -309,11 +312,11 @@ segments:
       - [0x2F334, asm, adv_47_x1]
       - [0x2F784, c, common/game/equipauto]
       - [0x2F8C8, c, common/game/equipbest]
-      - [0x2F9BC, asm, adv_48]
+      - [0x2F9BC, c, common/game/equippick]
       - [0x2FB68, c, common/gfx/gauge]
-      - [0x2FCD4, asm, adv_49]
+      - [0x2FCD4, c, common/game/itemuse]
       - [0x300B0, c, common/game/spellusable]
-      - [0x30324, asm, adv_50]
+      - [0x30324, c, common/game/spelleffect]
       # ItemUsableOn and the three party helpers are one unit, cut by a routine
       # between them that is not worked out yet.
       - [0x304E0, c, common/game/status]

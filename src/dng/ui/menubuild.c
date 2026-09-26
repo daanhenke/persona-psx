@@ -20,14 +20,14 @@
 extern u_char g_menu_top_def[];
 extern u_char g_menu_blink;
 
-extern void func_80092E5C(int);
+extern void MenuSetLayers(int);
 extern void MenuScreenDraw(void);
 extern int  func_80085AF4(void);
 extern void func_80086614(void);
 
 void MenuBuild(void)
 {
-    func_80092E5C(0);
+    MenuSetLayers(0);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);

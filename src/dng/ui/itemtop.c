@@ -81,9 +81,9 @@ extern void   MenuTopRedraw(void);
 extern void   func_80086B08(int a, int b);
 extern void   func_800891A8(int a, int b);
 extern void   ItemUseLayout(void);
-extern void   func_80092E5C(int);
+extern void   MenuSetLayers(int);
 extern void   func_800929D8(void);
-extern void   func_8008E948(int member, int item);
+extern void   ItemUseOn(int member, int item);
 extern void   CopyShorts(u_short *src, u_short *dst, u_short count);
 extern void   DrawItemRowUsable(short slot, short *dst);
 extern void   TextSlotStatRow(short slot);
@@ -164,7 +164,7 @@ void ItemTopStep(void)
         switch (g_menu->unk030.cur) {
         case ITEM_USE:
             SlotClearAll();
-            func_80092E5C(2);
+            MenuSetLayers(2);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
@@ -382,14 +382,14 @@ void ItemTargetStep(void)
     if (InputCheckAcceptA(1)) {
         if (g_item_defs[id].unk06 & ITEM_WHOLE_PARTY) {
             for (i = 0; i <= g_party_last; i++) {
-                func_8008E948(i, id);
+                ItemUseOn(i, id);
             }
         } else {
             if (!CharSpellUsable(g_menu->list[1].cur, id)) {
                 return;
             }
         use:
-            func_8008E948(g_menu->list[1].cur, id);
+            ItemUseOn(g_menu->list[1].cur, id);
         }
         ItemUseLayout();
         if (g_item_defs[id].unk06 & ITEM_CONSUMED) {

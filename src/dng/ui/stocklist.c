@@ -47,7 +47,7 @@ extern u_char  g_menu_top_def[];
 extern u_char  D_8009AA4C[];
 extern u_char  D_8009B074[];
 
-extern void func_80092E5C(int);
+extern void MenuSetLayers(int);
 extern void MenuScreenDraw(void);
 
 /* The menu's top page put back behind a sub-screen that is closing: the
@@ -55,7 +55,7 @@ extern void MenuScreenDraw(void);
    page's own sprite back in their slots, and the view scrolled home. */
 void MenuTopRedraw(void)
 {
-    func_80092E5C(0);
+    MenuSetLayers(0);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);

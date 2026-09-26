@@ -136,7 +136,7 @@ void FormationDonePrompt(void)
         SlotClear(PROMPT_SLOT + 5);
         SlotClear(PROMPT_CUR);
         if (g_menu->list[0].cur == 0) {
-            func_80092E5C(0x12);
+            MenuSetLayers(0x12);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(g_tilemap0, 0xE, 0xC, MAP_W);

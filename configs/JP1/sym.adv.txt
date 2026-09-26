@@ -1156,8 +1156,8 @@ StatusDrawMember         = 0x8008F1A8; // type:func size:0x6A0
 StatusDrawName           = 0x8008F848; // type:func size:0x78
 StatusDrawPersona        = 0x8008F8C0; // type:func size:0x258
 DrawItemName             = 0x8008FB18; // type:func size:0x64
-D_8008FB7C               = 0x8008FB7C; // type:func size:0xFC
-func_8008FC78            = 0x8008FC78; // type:func size:0xD0
+DrawBagItemRow           = 0x8008FB7C; // type:func size:0xFC
+TacticsSetCels           = 0x8008FC78; // type:func size:0xD0
 CharRecalcStats          = 0x8008FD48; // type:func size:0x2AC
 
 //---------------------------------------------------------------------------
@@ -1210,7 +1210,7 @@ ItemsStrongestUsable     = 0x80093C68; // type:func size:0xF4
 //-----------------------------------------------------------
 //--- PA: 0x02F9BC   VA: 0x80093D5C   subsegment: asm, adv_48
 //-----------------------------------------------------------
-func_80093D5C            = 0x80093D5C; // type:func size:0x1AC
+EquipPickStronger        = 0x80093D5C; // type:func size:0x1AC
 
 //----------------------------------------------------------------------
 //--- PA: 0x02FB68   VA: 0x80093F08   subsegment: c, ../common/gfx/gauge
@@ -1220,7 +1220,7 @@ DrawGauge                = 0x80093F08; // type:func size:0x16C
 //-----------------------------------------------------------
 //--- PA: 0x02FCD4   VA: 0x80094074   subsegment: asm, adv_49
 //-----------------------------------------------------------
-func_80094074            = 0x80094074; // type:func size:0x3DC
+ItemUseOn                = 0x80094074; // type:func size:0x3DC
 
 //-----------------------------------------------------------------------------
 //--- PA: 0x0300B0   VA: 0x80094450   subsegment: c, ../common/game/spellusable
@@ -1231,7 +1231,7 @@ CharSpellUsable          = 0x800945A8; // type:func size:0x11C
 //-----------------------------------------------------------
 //--- PA: 0x030324   VA: 0x800946C4   subsegment: asm, adv_50
 //-----------------------------------------------------------
-func_800946C4            = 0x800946C4; // type:func size:0x1BC
+SpellApplyField          = 0x800946C4; // type:func size:0x1BC
 
 //------------------------------------------------------------------------
 //--- PA: 0x0304E0   VA: 0x80094880   subsegment: c, ../common/game/status

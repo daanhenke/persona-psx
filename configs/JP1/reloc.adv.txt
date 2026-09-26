@@ -151,3 +151,12 @@ rom:0x4BCC8 reloc:MIPS_HI16 symbol:g_char_templates addend:-0x28
 rom:0x4BCCC reloc:MIPS_LO16 symbol:g_char_templates addend:-0x28
 rom:0x4BD8C reloc:MIPS_HI16 symbol:g_char_hp_growth addend:-0x64
 rom:0x4BD90 reloc:MIPS_LO16 symbol:g_char_hp_growth addend:-0x64
+
+// ItemUseOn and SpellApplyField (shared with DNG) reach the two field-spell
+// flags by address; ADV names them, so these accesses are kept free of the names.
+rom:0x2FDC4 reloc:MIPS_NONE symbol:D_801F29A8
+rom:0x2FDC8 reloc:MIPS_NONE symbol:D_801F29A8
+rom:0x304B0 reloc:MIPS_NONE symbol:D_801F29A9
+rom:0x304B4 reloc:MIPS_NONE symbol:D_801F29A9
+rom:0x304BC reloc:MIPS_NONE symbol:D_801F29A8
+rom:0x304C0 reloc:MIPS_NONE symbol:D_801F29A8

@@ -59,7 +59,7 @@ extern u_char D_800B1EB8[];
 extern u_char D_800B17E8[];
 extern u_char ItemUsableAny(short item);
 extern u_char ItemUsableOn(short slot, short item);
-extern void   func_800946C4(short target, short caster, short spell);
+extern void   SpellApplyField(short target, short caster, short spell);
 extern void   MenuScreenDraw(void);
 extern void   StatusPersonaPreview(void);
 
@@ -478,7 +478,7 @@ void SkillTargetPick(void)
     if (InputCheckAcceptA(1)) {
         if (g_spell_data[(u_short)g_skill_help_spell].target == TARGET_PARTY) {
             for (i = 0; i <= g_party_last; i++) {
-                func_800946C4(i, g_menu->skill_member.cur, g_skill_help_spell);
+                SpellApplyField(i, g_menu->skill_member.cur, g_skill_help_spell);
             }
         } else {
             if (!ItemUsableOn(g_menu->list[1].cur,
@@ -486,7 +486,7 @@ void SkillTargetPick(void)
                 return;
             }
         cast:
-            func_800946C4(g_menu->list[1].cur, g_menu->skill_member.cur,
+            SpellApplyField(g_menu->list[1].cur, g_menu->skill_member.cur,
                           g_skill_help_spell);
         }
         c = (Char *)(who * sizeof(Char) + chars);
