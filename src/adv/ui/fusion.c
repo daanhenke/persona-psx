@@ -98,7 +98,7 @@ extern void   D_80076EB0(short n);
 extern void   FusePairsOpen(void);
 /* PersonaFindFree, PersonaFill and PersonaFind are called without
    prototypes here. */
-extern short  func_800A26A0(short persona);
+extern short  FuseSpecialHas(short persona);
 extern short  FuseRollAccident(short kind);
 extern short  FuseRollKind(void);
 extern short  func_800A26DC(u_char a, u_char b);
@@ -615,7 +615,7 @@ void FuseExecute(void)
         D_800BC5C0 = 0;
         g_fuse_args[4] = 0;
         g_fuse_args[3] = D_800BC050;
-        if (func_800A26A0(g_fuse.persona)) {
+        if (FuseSpecialHas(g_fuse.persona)) {
             g_fuse.flag = 1;
             goto plain;
         }

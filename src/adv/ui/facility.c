@@ -115,7 +115,7 @@ extern void  ShopCountInit2(u_char n);
 extern void  func_800A81C8(void);
 extern void  func_800A6728(void);
 extern void  func_800A5560(void);
-extern int   func_800A5B34(void);
+extern int   CoinsAffordable(void);
 extern void  PersonaSlotsCompact(void);
 extern void  func_800A2A48(void);
 extern void  FusionOpen(void);
@@ -291,7 +291,7 @@ u_char FacilityScreen(u_char id)
         n = FormatDecimal(100, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 0, 16), 0xC0,
                            (u_short)n);
-        D_800BBB1C = func_800A5B34();
+        D_800BBB1C = CoinsAffordable();
         i = (short)FormatDecimal(D_800BBB1C, g_hud_digits, 8);
         TileMapFillRect(AT(g_tilemap1, 3, 19) - i, 0xC0, i, 1, MAP_W);
         MenuListInit(&g_menu->arcana_row, i, 0, i, 0x18);

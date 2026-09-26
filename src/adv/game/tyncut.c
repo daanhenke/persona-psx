@@ -105,7 +105,7 @@ extern void TynSetView(void);
 extern void TynInitPolys(void);
 extern void TynInitDivide(void);
 extern void TynSyncPlanes(int obj, int pad);
-extern void func_80084694(void);
+extern void AdvPlaceActors(void);
 
 /* Grows a slot's scale a step towards 1.0, faster in y than in x. */
 #define GROW(s)                                                                \
@@ -497,7 +497,7 @@ void AdvTynCutscene(void)
     SlotInitTagged(g_bar_def, 0x29, 0x35, 0xE0, -0x20);
     SlotInit(g_bar_def2, 0x2A, 0x34, 0xE3, -0x20);
     AdvSceneStartImages();
-    func_80084694();
+    AdvPlaceActors();
     CamCenterOnActor(0);
     ActorsSetDepth(0, 0xF);
     ActorsPlaceSprites();

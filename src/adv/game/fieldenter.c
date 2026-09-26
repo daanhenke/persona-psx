@@ -29,7 +29,7 @@ extern void AdvSceneStartImages(void);
 extern void CamCenterOnActor(u_char actor);
 extern void ActorsPlaceSprites(void);
 extern void SlotsApplyXScale(void);
-extern void func_80084694(void);
+extern void AdvPlaceActors(void);
 
 void AdvFieldEnter(void)
 {
@@ -42,7 +42,7 @@ void AdvFieldEnter(void)
         AdvBuildActors();
     }
     AdvSceneStartImages();
-    func_80084694();
+    AdvPlaceActors();
     CamCenterOnActor(0);
     /* A stray second argument, as tyncut.c has it too. */
     ((void (*)())ActorsSetDepth)(0, 0xF);

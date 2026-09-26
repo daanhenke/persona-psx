@@ -44,7 +44,7 @@ extern void AdvEffectSetupSlots(void);
 extern void AdvSceneStartImages(void);
 extern void ActorsPlaceSprites(void);
 extern void CamCenterOnActor(u_char actor);
-extern void func_80084694(void);
+extern void AdvPlaceActors(void);
 extern void MoonSetCells(void);
 
 void AdvQueueShadows(void);
@@ -114,7 +114,7 @@ void AdvRoomRebuild(void)
     AdvQueueShadows();
     CamCenterOnActor(0);
     AdvSceneStartImages();
-    func_80084694();
+    AdvPlaceActors();
     RoomSetDepth(g_cam_actor);
     ActorsPlaceSprites();
     RoomApplyXScale();
