@@ -17,7 +17,12 @@ extern u_char g_options[];
 /* This unit was built against int-taking prototypes, so the slot argument is
    passed unmasked and the callee narrows it. */
 extern void SlotSetFlicker(int slot, int on);
+#ifdef PERSONAPAGE_DNG
+/* DNG's copy passes the position unnarrowed. */
+extern void SlotSetPos(u_char slot, int attr, int x, int y);
+#else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
+#endif
 
 /* Where a marker sits for value n. */
 #define OPT_X0   0xA0

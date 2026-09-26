@@ -167,8 +167,7 @@ segments:
       - [0x205B8, c, common/ui/configchoice]
       - [0x20708, c, ui/configpage]
       - [0x208AC, c, common/ui/configlist]
-      # DNG's battle-page redraw is eight bytes longer than the C.
-      - [0x20A88, asm, dng_2_s3_x2]
+      - [0x20A88, c, common/ui/configbattle]
       - [0x20C30, c, common/ui/config]
       - [0x20EB4, asm, dng_2_s3_x1]
       - [0x21080, c, common/ui/padconfig]
