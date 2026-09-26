@@ -48,7 +48,7 @@
 extern void   CharApplyStats(u_char chr);
 extern void   CharRecalcStats(u_char chr);
 extern void   bcopy(void *src, void *dst, int len);
-extern void   func_800946E4(Char *c, int a, int b);
+extern void   CharPreviewEquip(Char *c, short slot, u_short item);
 extern void   MenuSetLayers(int);
 extern int    func_800992D4(short kind);
 extern void   func_80090464(int member);
@@ -210,7 +210,7 @@ void StatusPersonaPreview(void)
 
     bcopy(&g_chars[g_party_at[g_menu->status_member.cur]], &c, sizeof(Char));
     c.entry = g_menu->persona_slot.cur;
-    func_800946E4(&c, 0xFF, 0xFF);
+    CharPreviewEquip(&c, 0xFF, 0xFF);
     StatusPreviewDraw(&c);
     *AT(g_tilemap1, 10, 20) = GLYPH_SEP;
     DrawCharStatBars(&c);

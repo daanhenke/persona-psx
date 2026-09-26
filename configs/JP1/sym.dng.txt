@@ -149,6 +149,7 @@ D_800643D8               = 0x800643D8; // type:u32 size:0x4
 //--------------------------------------------------------
 //--- PA: 0x00098C   VA: 0x80064D2C   subsegment: asm, dng
 //--------------------------------------------------------
+D_80064CA2               = 0x80064CA2; // type:s16 size:0x2
 ovl_dng_entry            = 0x80064D2C; // type:func size:0xC4C
 FieldFrame               = 0x80065978; // type:func size:0x1D64
 FieldBobVerts            = 0x800676DC; // type:func size:0xBC
@@ -1005,8 +1006,8 @@ CharApplyStats           = 0x80094094; // type:func size:0x650
 //--------------------------------------------------------------
 //--- PA: 0x030344   VA: 0x800946E4   subsegment: asm, dng_2_s21
 //--------------------------------------------------------------
-func_800946E4            = 0x800946E4; // type:func size:0x6D0
-func_80094DB4            = 0x80094DB4; // type:func size:0x7C4
+CharPreviewEquip         = 0x800946E4; // type:func size:0x6D0
+CharPreviewDraw          = 0x80094DB4; // type:func size:0x7C4
 MapScreenOpen            = 0x80095578; // type:func size:0x60C
 MapScreen                = 0x80095B84; // type:func size:0xEC
 MapFindPlayer            = 0x80095C70; // type:func size:0x10C
