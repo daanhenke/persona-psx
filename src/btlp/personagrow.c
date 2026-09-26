@@ -85,13 +85,15 @@ void BtlPersonaGrow(BtlStats *p)
     }
 }
 
-/* 98.50%, registers only. Indexing the highest-stat search off `base`, with
-   i cleared before best, put the fighter in a2 as in the image. What is left:
-   the level read at the top sits in a0 rather than a3, the two clamps swap
-   a0/a1, and the stat loop's key product and level swap v0/v1. A local for
-   the level changes nothing (CSE already keeps it). Folding the column into
-   one index (`rows[key * ROW + half]`) moves the product out of order
-   (88.6%). */
+/* 98.76%, registers only. Indexing the highest-stat search off `base`, with
+   i cleared before best, put the fighter in a2 as in the image; sp and hp
+   declared in each arm (so each pair is local to its block) fixed the two
+   clamps. What is left: the level read at the top sits in a0 rather than a3,
+   the hp row's sum lands in t0 where the image has a0 (its own local in a
+   block ties it, to v0), and the stat loop's key and its product swap v0/v1.
+   A local for the level changes nothing (CSE already keeps it). Folding the
+   column into one index (`rows[key * ROW + half]`) moves the product out of
+   order (88.6%). */
 #ifdef NON_MATCHING
 void BtlDrainLevel(BtlActor *a)
 {
@@ -103,8 +105,6 @@ void BtlDrainLevel(BtlActor *a)
     u_char  best;
     int     which;
     int     row;
-    int     sp;
-    int     hp;
     int     i;
 
     curve = g_level_exp_1;
@@ -120,6 +120,9 @@ void BtlDrainLevel(BtlActor *a)
                 }
             }
             base[(u_char)which] -= DRAIN_STAT;
+            {
+            int sp, hp;
+
             sp = a->c.sp;
             a->c.hp_max -= DRAIN_MAXIMA;
             a->c.sp_max -= DRAIN_MAXIMA;
@@ -132,7 +135,10 @@ void BtlDrainLevel(BtlActor *a)
                 hp = a->c.hp_max;
             }
             a->c.hp = hp;
+            }
         } else {
+            int sp, hp;
+
             row = a->c.key - DRAIN_FIRST;
             sp = a->c.sp;
             rows = g_char_hp_growth + row * DRAIN_HP_ROW;

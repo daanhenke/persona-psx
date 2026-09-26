@@ -18,19 +18,17 @@
 #include <persona/btlp/object.h>
 #include <persona/btlp/status.h>
 
-/* 98.57%, from 90.05%. The level is a signed char, which is what the frame
-   bytes are and what gives the image's copy of it in the branch slot. The
-   turn count is stored in each arm, which is what ranks the record above the
-   status in global alloc, and the row test reads the row first. The row is
-   the table's base stepped on in a second statement, which is what loads the
-   base before the multiply. Left: the row lands in a0 where the image has v0,
-   so the constant 1 for the shift is set early instead of after the row's
-   last use. A byte-offset spelling gets the registers right but loads the
-   base late again. */
-#ifdef NON_MATCHING
+/* The level is a signed char, which is what the frame bytes are and what
+   gives the image's copy of it in the branch slot. The turn count is stored in
+   each arm, which is what ranks the record above the status in global alloc,
+   and the row test reads the row first. The row is the table's base, taken
+   into a local first so it loads ahead of the multiply, indexed once: a row
+   assigned once is one local-alloc can tie the scaled index to, which puts it
+   in v0 and sets the shift's 1 after its last use as the image does. */
 int BtlInflictStatus(BtlActor *a, int status)
 {
     const u_long *row;
+    const u_long *base;
     BtlObj       *mark;
     signed char   level;
 
@@ -39,8 +37,8 @@ int BtlInflictStatus(BtlActor *a, int status)
         return 0;
     }
 
-    row = g_btl_status_over;
-    row += status * BTL_AIL_LEVELS;
+    base = g_btl_status_over;
+    row = &base[status * BTL_AIL_LEVELS];
     level = a->c.ail_level;
     if (row[level] & (1 << (signed char)a->c.status)) {
         if ((signed char)a->c.status == status) {
@@ -80,6 +78,3 @@ int BtlInflictStatus(BtlActor *a, int status)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/inflict", BtlInflictStatus);
-#endif
