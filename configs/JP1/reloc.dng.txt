@@ -45,3 +45,18 @@ rom:0x11BF8 reloc:MIPS_NONE symbol:g_clock_sec
 rom:0x11BFC reloc:MIPS_NONE symbol:g_clock_sec
 rom:0x11C0C reloc:MIPS_NONE symbol:g_clock_min
 rom:0x11C10 reloc:MIPS_NONE symbol:g_clock_min
+
+// PageScrollValue: the bss split falls at g_page_fwd_repeat+0xC, so its
+// delay and flags would come out as a label of their own.
+rom:0x15F98 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x15F9C reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x15FA8 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xC
+rom:0x15FAC reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xC
+rom:0x15FB4 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x15FB8 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x160A8 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x160AC reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x160BC reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xC
+rom:0x160C0 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xC
+rom:0x160D4 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
+rom:0x160D8 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE

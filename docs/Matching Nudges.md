@@ -3741,3 +3741,18 @@ the counter adds insns and keeps a constant the image leaves in the loop.
 
 - [fxsheet3.c](/src/btlp/fxsheet3.c) - `BtlFxStartSheetLate`: the column's x
   as `(col * W + ORG) * FIXED`, replacing an identical-arms workaround.
+
+## A pointer assigned inside the last argument
+
+When the image reads a table entry straight from the symbol (`lui at` /
+`addu at` / `lh %lo(sym+off)(at)`) although a register already holds that
+very address, the pointer was not known when the read was expanded. Call
+arguments are expanded left to right, so a pointer assigned *inside a later
+argument* is still unknown to cse while the earlier argument is built; sched1
+then lifts the pointer's set above the read (a pseudo that already crosses a
+call may move over one), which is why it still looks set first.
+
+- [itemmenu.c](/src/dng/ui/itemmenu.c) - `ItemMemberPick` (DNG and ADV):
+  `SlotSetPos(1, 0x42, (tab + 1)[i][0], (y = x + 1)[i * 2])`. The `int
+  unused[2]` ADV's draft carried for the frame goes too. ADV's 97.86% and
+  DNG's 97.22% to exact.

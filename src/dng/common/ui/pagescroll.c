@@ -4,5 +4,4 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
-#define ITEMROW_INT
-#include "../../../common/ui/itemrowuse.c"
+#include "../../../common/ui/pagescroll.c"

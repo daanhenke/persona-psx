@@ -1,11 +1,16 @@
-/* Persona 1 (JP) - the item menu's steps.  ADV only.
- *   0x8006AF40 ItemMemberPick   0x8006B1A0 ItemBagOpen
- *   0x8006B738 ItemBagStep      0x8006BFB0 ItemSwapStep
+/* Persona 1 (JP) - the item menu's steps.  DNG's copy.
+ *   0x8007A49C ItemMemberPick   0x8007A670 ItemBagOpen
+ *   0x8007AB90 ItemBagStep      0x8007B21C ItemSwapStep
  *
- * The item bag: two columns of items twelve rows high over a work list that
- * scrolls by rows and by pages, the stats of the item under the cursor, and
- * a second cursor for moving an item to another entry.
+ * The field's build of ADV's item menu (src/adv/ui/itemmenu.c): the same
+ * source against the field's callees and data. Where ADV spells out the way
+ * back to the menu's command list, the field calls ItemMenuOpen, and it calls
+ * PageScrollValue where ADV's copy has it expanded.
  */
+#define SLOT_SETPOS_INT
+#define SLOT_TAGGED_INTXY
+#define TILEMAP_INT_COUNT
+#define PERSONAPAGE_DNG
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
@@ -19,20 +24,21 @@ extern short   g_menu_subsel;
 extern u_char  g_fm_mark_def[];
 extern short   g_fm_mark_pos[][2];
 extern short   g_header_scroll_y;
-extern short   D_800BB9A8;
-extern short   D_800BC224;
-extern u_char  D_800B1D08[];
-extern u_char  D_800B2330[];
+extern short   D_8009FE20;
+extern short   D_800A04D4;
+extern u_char  D_8009AA4C[];
+extern u_char  D_8009B074[];
 
 extern void   DrawStatusHud(void);
-extern u_char MenuStepMember(int *sel, u_char last);
+extern int    MenuStepMember(int *sel, u_char last);
 extern void   EquipScreen(short standalone);
-extern void   func_800768F0(void);
-extern void   func_80077F8C(int a, int b);
-extern void   func_8007A62C(int a, int b);
+extern void   ItemMenuOpen(void);
+/* The field's message stepper. */
+extern int    func_80076380(void);
+extern u_char PageScrollValue(short *value, short lo, short hi, short step);
 extern void   ItemsMergePending(void);
 extern void   CopyShorts(u_short *src, u_short *dst, u_short count);
-extern void   DrawItemCell(short *dst, short col, short row, u_char bank);
+extern void   DrawItemCell(short *dst, int col, int row, int bank);
 extern void   DrawItemName(int id, short *dst, u_short base, int b);
 extern void   TextItemStatRow(short item, short x, short y);
 
@@ -56,22 +62,18 @@ extern short    g_item_scroll_step;
 extern u_char   str_nothing[];
 
 extern void  SoundPlaySeq(u_short slot, u_short seq, short vab);
-extern short MenuScrollCursor(MenuList *m, short *row, short first, short last,
+extern int   MenuScrollCursor(MenuList *m, short *row, short first, short last,
                               u_short *offset);
 extern void  MenuResetRepeat(MenuList *m);
 
 extern short   g_item_top;
 /* The swap cursor's scroll row. */
 extern short   g_swap_top;
-extern u_char  D_800B188C[];
-extern u_char  D_800B12A8[];
-extern u_char  D_800B1EB8[];
+extern u_char  D_8009A5D0[];
+extern u_char  D_80099FEC[];
+extern u_char  D_8009ABFC[];
 
-/* The member whose items are shown, a frame.
-
-   y is set inside the marker's last argument: arguments are expanded left
-   to right, so the x read before it goes to the table rather than through
-   x, and sched1 lifts the two pointer sets above it afterwards. */
+/* The member whose items are shown, a frame. */
 void ItemMemberPick(void)
 {
     short *x;
@@ -80,8 +82,8 @@ void ItemMemberPick(void)
     DrawStatusHud();
     if (MenuStepMember(&g_menu->unk050.cur, g_party_last)) {
         g_header_scroll_y = 0;
-        D_800BB9A8 = 0;
-        D_800BC224 = 0;
+        D_8009FE20 = 0;
+        D_800A04D4 = 0;
         g_menu->unk230.cur = 0;
         g_menu->unk240.cur = 0;
     }
@@ -90,23 +92,17 @@ void ItemMemberPick(void)
                (y = x + 1)[g_menu->unk050.cur * 2]);
     if (InputCheckAcceptA(1)) {
         EquipScreen(0);
-        func_800768F0();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ItemMenuOpen();
         SlotClearAll();
-        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
-        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_8009B074, 0x2D, 0x2FF, 0, 0x10);
         SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0, 0, 0);
         SlotClear(0x2F);
         SlotInitTagged(g_fm_mark_def, 1, 0x42, x[g_menu->unk050.cur * 2],
                        y[g_menu->unk050.cur * 2]);
         SlotSetFlicker(1, 1);
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ItemMenuOpen();
         g_menu_subsel -= 2;
     }
 }
@@ -123,9 +119,9 @@ void ItemBagOpen(void)
     if (MenuStepCursor(&g_menu->unk040)) {
         SlotSetPos(3, 0x23, 0xF0, g_menu->unk040.cur * 16 + 0x4A);
     }
-    MsgStep();
+    func_80076380();
     if (InputCheckAcceptA(1)) {
-        func_8008EDBC(5);
+        func_80092E5C(5);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
         TileMapDrawWindow(AT(g_tilemap0, 0, 6), 0x1E, 0x11, MAP_W);
@@ -139,7 +135,7 @@ void ItemBagOpen(void)
             *AT(g_tilemap0, 2 + i, 21) = 0x17;
         }
         TileMapWriteBar(AT(g_tilemap0, 14, 22), 12);
-        TileMapWriteRow(D_800B188C, g_tilemap1, 0, 9);
+        TileMapWriteRow(D_8009A5D0, g_tilemap1, 0, 9);
         if (g_menu->unk040.cur == 0) {
             ItemsMergePending();
             CopyShorts(g_item_list, g_items, BAG_SIZE);
@@ -161,10 +157,10 @@ void ItemBagOpen(void)
         SlotClear(0xB);
         SlotClear(0xC);
         SlotClear(0xD);
-        SlotInitTagged(D_800B12A8, 1, 0x42, g_menu->item_col.cur * 112 + 0x40,
+        SlotInitTagged(D_80099FEC, 1, 0x42, g_menu->item_col.cur * 112 + 0x40,
                        g_menu->item_row.cur * 12 + 0x38);
         SlotSetFlicker(1, 1);
-        SlotInitTagged(D_800B1EB8, 0x2E, 0x24, 0x2E, 0x10);
+        SlotInitTagged(D_8009ABFC, 0x2E, 0x24, 0x2E, 0x10);
         SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0xA0, 0x36);
         SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0xA0,
                        0xB0);
@@ -193,62 +189,9 @@ void ItemBagOpen(void)
         g_menu_subsel++;
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ItemMenuOpen();
         g_menu_subsel = 1;
     }
-}
-
-/* PageScrollValue (pagescroll.c), which the original expanded here. */
-static inline u_char ItemPageScroll(short *value, short lo, short hi,
-                                    short step)
-{
-    MenuList *r;
-    short     d;
-
-    if (g_key_page_back & g_pad_held[0]) {
-        g_page_fwd_repeat.delay = 0;
-        g_page_fwd_repeat.flags |= MENU_FIRST_REPEAT;
-        d = -step;
-        r = &g_page_back_repeat;
-    } else if (g_key_page_fwd & g_pad_held[0]) {
-        g_page_back_repeat.delay = 0;
-        g_page_back_repeat.flags |= MENU_FIRST_REPEAT;
-        d = step;
-        r = &g_page_fwd_repeat;
-    } else {
-        goto none;
-    }
-
-    if (r->delay == 0) {
-        *value += d;
-        SoundPlaySeq(0x18, 1, 1);
-        if (r->flags & MENU_FIRST_REPEAT) {
-            r->delay = 0x20;
-            r->flags ^= MENU_FIRST_REPEAT;
-        } else {
-            r->delay = 2;
-        }
-    } else {
-        r->delay--;
-    }
-
-    if (*value < lo) {
-        *value = lo;
-    }
-    if (*value > hi) {
-        *value = hi;
-    }
-    return 1;
-
-none:
-    g_page_back_repeat.delay = 0;
-    g_page_fwd_repeat.delay = 0;
-    g_page_back_repeat.flags |= MENU_FIRST_REPEAT;
-    g_page_fwd_repeat.flags |= MENU_FIRST_REPEAT;
-    return 0;
 }
 
 /* The item bag, a frame: the cursor walks two columns and the list scrolls
@@ -270,7 +213,7 @@ void ItemBagStep(void)
             }
             g_item_scroll_step = 0;
         }
-        if (ItemPageScroll(&g_item_top, 0, ITEM_TOP_MAX, ITEM_PAGE)) {
+        if (PageScrollValue(&g_item_top, 0, ITEM_TOP_MAX, ITEM_PAGE)) {
             for (i = 0; i < 12; i++) {
                 DrawItemCell(AT(g_tilemap2, (g_item_top + i) & 0x1F, 8), 0,
                              g_item_top + i, 0);
@@ -326,7 +269,7 @@ void ItemBagStep(void)
             DrawItemName(0, AT(g_tilemap1, 0, 11), 0xD7, 1);
         }
     }
-    MsgStep();
+    func_80076380();
     if (InputCheckAcceptA(1)) {
         u_short *it;
 
@@ -351,10 +294,7 @@ void ItemBagStep(void)
         g_menu_subsel++;
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         CopyShorts(g_item_list, g_items, BAG_SIZE);
-        func_800768F0();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ItemMenuOpen();
         g_menu_subsel = 1;
     }
 }
@@ -382,7 +322,7 @@ void ItemSwapStep(void)
             }
             g_item_scroll_step = 0;
         }
-        if (ItemPageScroll(&g_swap_top, 0, ITEM_TOP_MAX, ITEM_PAGE)) {
+        if (PageScrollValue(&g_swap_top, 0, ITEM_TOP_MAX, ITEM_PAGE)) {
             for (i = 0; i < 11; i++) {
                 j = (g_swap_top + i) * 2;
                 DrawItemCell(AT(g_tilemap2, (g_swap_top + i) & 0x1F, 8), 0,
@@ -445,7 +385,7 @@ void ItemSwapStep(void)
             TextItemStatRow(0, 0x30, 0x12);
         }
     }
-    MsgStep();
+    func_80076380();
     if (InputCheckAcceptA(1)) {
         sel = g_item_top * 2 + g_menu->item_col.cur + g_menu->item_row.cur * 2;
         if (sel != prev) {

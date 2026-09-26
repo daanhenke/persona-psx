@@ -1,7 +1,7 @@
 /* Persona 1 (JP) - one row of the item list, greyed when it would do nothing.
  *
- * Compiled into two overlays rather than called across the boundary:
- *   ADV 0x8006AC50   S2D 0x8006A1DC
+ * Compiled into three overlays rather than called across the boundary:
+ *   ADV 0x8006AC50   S2D 0x8006A1DC   DNG 0x8007A1B4
  *
  * The same row as DrawItemRow - name at the left, count right-aligned two
  * digits along - but drawn out of one of two glyph banks. An entry marked as
@@ -37,13 +37,25 @@
 
 extern u_char g_hud_digits[];
 
+#ifdef ITEMROW_INT
+/* DNG's build was made against int-returning, int-taking declarations: the
+   answer is used unmasked and the glyph base and count go over unnarrowed. */
+extern int    SpellUsable(short spell);
+extern int    FormatDecimal(u_int value, u_char *dst, u_short width);
+extern void   TileMapWriteRowRev(const u_char *src, short *dst, int base,
+                                 int count);
+extern void   DrawItemName(int id, short *dst, int base, int b);
+#define COUNT_T int
+#else
 extern u_char SpellUsable(short spell);
 extern short  FormatDecimal(u_int value, u_char *dst, u_short width);
 extern void   TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
                                  u_short count);
+extern void   DrawItemName(int id, short *dst, u_short base, int b);
+#define COUNT_T short
+#endif
 extern void   TileMapFillRect(short *dst, short value, u_short w, u_short h,
                               u_short stride);
-extern void   DrawItemName(int id, short *dst, u_short base, int b);
 
 void DrawItemRowUsable(short slot, short *dst)
 {
@@ -51,7 +63,7 @@ void DrawItemRowUsable(short slot, short *dst)
     u_short *count;
     int      bank;
     int      base;
-    short    n;
+    COUNT_T  n;
 
     TileMapFillRect(dst, 0, ROW_CELLS, 1, ROW_STRIDE);
     count = &g_items_pending[slot];

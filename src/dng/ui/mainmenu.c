@@ -91,7 +91,7 @@ extern void RunFrame(void);
 extern int  func_80085AF4(void);
 extern int  func_80086190(void);
 extern void MenuTick(void);
-extern void func_80078F94(void);
+extern void ItemMenuStep(void);
 extern void StatusMenuStep(void);
 extern void ConfigMenuStep(void);
 extern void FormationMenuStep(void);
@@ -300,7 +300,7 @@ opening:
             MenuTick();
             break;
         case 1:
-            func_80078F94();
+            ItemMenuStep();
             break;
         case 2:
             StatusMenuStep();
