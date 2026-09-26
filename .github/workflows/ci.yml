@@ -106,8 +106,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # Each version stands alone: one failing must not cancel the other.
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         game_version: [ JP1, US ]
 
@@ -157,8 +158,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # Each version stands alone: one failing must not cancel the other.
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         game_version: [ JP1, US ]
 
