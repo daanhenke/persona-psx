@@ -112,6 +112,8 @@ segments:
       - [0xDC0, .rodata, ui/fusesearch]
       - [0xDD8, .rodata, ui/fusion]
       - [0xDEC, rodata, adv_rodata7c]
+      - [0x1070, .rodata, ui/facilitymisc]
+      - [0x10BC, rodata, adv_rodata7c2]
       - [0x1304, .rodata, game/actorplace]
       - [0x1348, rodata, adv_rodata7a]
       - [0x134C, .rodata, game/stats]

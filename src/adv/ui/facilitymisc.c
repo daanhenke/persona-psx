@@ -38,6 +38,24 @@ extern void func_800A52F0(void);
 extern void func_800A5BCC(void);
 extern void func_800A6308(void);
 extern void func_800768F0(void);
+extern void func_800A2A48(void);
+extern void func_800A2CD0(void);
+extern void func_800A2FF8(void);
+extern void func_800A3388(void);
+extern void func_800A3984(void);
+extern void func_800A3D0C(void);
+extern void func_800A6728(void);
+extern void func_800A6788(void);
+extern void func_800A7118(void);
+extern void func_800A76F4(void);
+extern void func_800A79CC(void);
+extern void func_800A7D7C(void);
+extern void func_800A8200(void);
+extern void func_800A8448(void);
+extern void func_800A8928(void);
+extern void func_800A8B88(void);
+extern void func_800A91C8(void);
+extern void func_800A95B8(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern int  MsgStep(void);
@@ -106,7 +124,30 @@ int ItemsListSellable(void)
     return n;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2994);
+void FacilityStep6(void)
+{
+    switch (g_persona_data_step) {
+    case 0:
+        func_800A2A48();
+        g_persona_data_step++;
+        break;
+    case 1:
+        func_800A2CD0();
+        break;
+    case 2:
+        func_800A2FF8();
+        break;
+    case 3:
+        func_800A3388();
+        break;
+    case 4:
+        func_800A3984();
+        break;
+    case 5:
+        func_800A3D0C();
+        break;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2A48);
 
@@ -253,7 +294,30 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A5BCC);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6308);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6674);
+void FacilityStep3(void)
+{
+    switch (g_persona_data_step) {
+    case 0:
+        func_800A6728();
+        g_persona_data_step++;
+        break;
+    case 1:
+        func_800A6788();
+        break;
+    case 2:
+        func_800A7118();
+        break;
+    case 3:
+        func_800A76F4();
+        break;
+    case 4:
+        func_800A79CC();
+        break;
+    case 5:
+        func_800A7D7C();
+        break;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6728);
 
@@ -277,7 +341,33 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7BD0);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7D7C);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8104);
+void ShopStep(void)
+{
+    switch (g_persona_data_step) {
+    case 0:
+        ShopScreenOpen();
+        g_persona_data_step++;
+        break;
+    case 1:
+        func_800A8200();
+        break;
+    case 2:
+        func_800A8448();
+        break;
+    case 3:
+        func_800A8928();
+        break;
+    case 4:
+        func_800A8B88();
+        break;
+    case 5:
+        func_800A91C8();
+        break;
+    case 6:
+        func_800A95B8();
+        break;
+    }
+}
 
 void ShopScreenOpen(void)
 {

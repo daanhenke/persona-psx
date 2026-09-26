@@ -122,11 +122,11 @@ extern void  FusionOpen(void);
 extern short FuseListResults(void);
 extern void  FuseResultsOpen(void);
 extern void  SaveScreenOpen(void);
-extern void  func_800A8104(void);
-extern void  func_800A6674(void);
+extern void  ShopStep(void);
+extern void  FacilityStep3(void);
 extern void  CoinExchangeStep(void);
 extern void  ShopStep2(void);
-extern void  func_800A2994(void);
+extern void  FacilityStep6(void);
 extern void  FusionStep(void);
 extern void  FuseSearchStep(void);
 extern void  SaveScreenStep(void);
@@ -396,16 +396,16 @@ u_char FacilityScreen(u_char id)
         RunFrame();
         switch (fac[1]) {
         case 0:
-            func_800A8104();
+            ShopStep();
             break;
         case 1:
-            func_800A8104();
+            ShopStep();
             break;
         case 2:
-            func_800A8104();
+            ShopStep();
             break;
         case 3:
-            func_800A6674();
+            FacilityStep3();
             break;
         case 4:
             CoinExchangeStep();
@@ -414,7 +414,7 @@ u_char FacilityScreen(u_char id)
             ShopStep2();
             break;
         case 6:
-            func_800A2994();
+            FacilityStep6();
             break;
         case 7:
             FusionStep();
