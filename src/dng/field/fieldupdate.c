@@ -10,7 +10,7 @@
 
 
 extern u_char D_8001555C[];
-extern void func_80077D54(void);
+extern void MainMenuOpen(void);
 extern void func_80095578(void);
 extern void PersonaDataOpen(void);
 
@@ -172,7 +172,7 @@ int FieldUpdate(int noclip)
             }
             g_clock_freeze = 0;
         } else if (pressed & BIND(menu)) {
-            OPEN_SCREEN(func_80077D54);
+            OPEN_SCREEN(MainMenuOpen);
         } else if (pressed & BIND(unk14)) {
             OPEN_SCREEN(func_80095578);
         } else if (pressed & BIND(persona)) {

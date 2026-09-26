@@ -36,6 +36,7 @@ g_bg_map = 0x8009B890;
 g_menu_sel = 0x8009A4CC;
 g_pad_binding_table = 0x8009BEBC;
 g_pad_held = 0x800DC000;
+g_pad_config = 0x801F2AC7;
 
 /* resolved from the dng link */
 DrawSync = 0x8002CBD8;

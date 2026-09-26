@@ -438,10 +438,13 @@ FlushImageUploads        = 0x80077B74; // type:func size:0x88
 //-------------------------------------------------------------
 //--- PA: 0x01385C   VA: 0x80077BFC   subsegment: asm, dng_1_s2
 //-------------------------------------------------------------
-D_80077BFC               = 0x80077BFC; // type:func size:0xA8
+func_80077BFC            = 0x80077BFC; // type:func size:0x8
+func_80077C04            = 0x80077C04; // type:func size:0x8
+func_80077C0C            = 0x80077C0C; // type:func size:0x8
+TimQueue                 = 0x80077C14; // type:func size:0x90
 TimQueueAt               = 0x80077CA4; // type:func size:0xB0
-func_80077D54            = 0x80077D54; // type:func size:0x260
-func_80077FB4            = 0x80077FB4; // type:func size:0xDD4
+MainMenuOpen             = 0x80077D54; // type:func size:0x260
+MainMenu                 = 0x80077FB4; // type:func size:0xDD4
 
 //---------------------------------------------------------------------
 //--- PA: 0x0149E8   VA: 0x80078D88   subsegment: c, common/ui/menutick
@@ -481,7 +484,7 @@ func_8007A49C            = 0x8007A49C; // type:func size:0x1D4
 func_8007A670            = 0x8007A670; // type:func size:0x520
 func_8007AB90            = 0x8007AB90; // type:func size:0x68C
 func_8007B21C            = 0x8007B21C; // type:func size:0x8CC
-func_8007BAE8            = 0x8007BAE8; // type:func size:0xF4
+StatusMenuStep           = 0x8007BAE8; // type:func size:0xF4
 func_8007BBDC            = 0x8007BBDC; // type:func size:0x60
 func_8007BC3C            = 0x8007BC3C; // type:func size:0x3C8
 func_8007C004            = 0x8007C004; // type:func size:0xF8
@@ -506,7 +509,7 @@ StatusStockPick          = 0x8007F364; // type:func size:0x354
 StatusStockReleasePick   = 0x8007F6B8; // type:func size:0x298
 StatusStockReleaseConfirm = 0x8007F950; // type:func size:0x1D8
 StatusStockView          = 0x8007FB28; // type:func size:0x514
-func_8008003C            = 0x8008003C; // type:func size:0x130
+FormationMenuStep        = 0x8008003C; // type:func size:0x130
 func_8008016C            = 0x8008016C; // type:func size:0x2C0
 D_8008042C               = 0x8008042C; // type:func size:0x7DC
 
@@ -529,7 +532,7 @@ func_800829AC            = 0x800829AC; // type:func size:0x430
 func_80082DDC            = 0x80082DDC; // type:func size:0x1A8
 func_80082F84            = 0x80082F84; // type:func size:0x38C
 func_80083310            = 0x80083310; // type:func size:0x1A0
-func_800834B0            = 0x800834B0; // type:func size:0xE4
+ConfigMenuStep           = 0x800834B0; // type:func size:0xE4
 func_80083594            = 0x80083594; // type:func size:0xDC
 func_80083670            = 0x80083670; // type:func size:0x14C
 func_800837BC            = 0x800837BC; // type:func size:0x904
@@ -1162,6 +1165,7 @@ g_bg_map0                = 0x8009B850; // size:0x10
 g_bg_map1                = 0x8009B860; // size:0x10
 g_bg_map2                = 0x8009B870; // size:0x10
 g_bg_map                 = 0x8009B890; // size:0x10
+g_panel_map              = 0x8009B8A0; // size:0x10
 g_bg_layers              = 0x8009B8B0; // size:0xD8
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
@@ -1224,6 +1228,8 @@ g_view_dy                = 0x8009FB30; // size:0x2
 g_view2_dy               = 0x8009FB34; // size:0x2
 g_tile_defs              = 0x8009FB38;
 g_floor_grid             = 0x8009FB40;
+g_item_top               = 0x8009FB44; // size:0x2
+g_swap_top               = 0x8009FB48; // size:0x2
 g_fx_pos                 = 0x8009FB50;
 g_party_last             = 0x8009FB54;
 g_msg_col                = 0x8009FB64;
@@ -1267,12 +1273,14 @@ g_fog_scale              = 0x800A01D4; // size:0x8
 g_ot_index               = 0x800A01DC;
 g_fx_shift               = 0x800A01E0; // size:0x8
 g_bg_index               = 0x800A01E8;
+g_panel_cells            = 0x800A026C;
 g_persona_list_count     = 0x800A02CC;
 g_persona_data_step      = 0x800A02D0; // size:0x2
 g_walk_undo              = 0x800A02D4;
 g_bgm_seq                = 0x800A02D8;
 g_entry_pos              = 0x800A02DC; // size:0x3
 D_800A02E0               = 0x800A02E0;
+g_item_scroll_step       = 0x800A02E4; // size:0x2
 g_tile_flags             = 0x800A02E8;
 g_idle_seq               = 0x800A02F0;
 g_image_anim             = 0x800A02F4; // size:0x140

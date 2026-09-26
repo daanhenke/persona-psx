@@ -111,8 +111,8 @@ extern int     g_ot_index;
 extern GsOT    g_ot[];
 extern u_char  D_800A04B8, D_800A083C;
 extern int     D_8009FB3C;
-extern short   D_8009CD48, D_8009FB44, D_8009FB48, D_800A04D4, D_8009B988,
-               D_800A02E4;
+extern short   D_8009CD48, g_item_top, g_swap_top, D_800A04D4, D_8009B988,
+               g_item_scroll_step;
 extern short   g_cam_x, g_map_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern void VramClearRect(int x, int y, int w, int h);
@@ -229,12 +229,12 @@ void PersonaDataOpen(void)
     g_bg_layer_otz[4] = 0x20;
     D_8009FB3C = 0;
     D_8009CD48 = 0;
-    D_8009FB44 = 0;
-    D_8009FB48 = 0;
+    g_item_top = 0;
+    g_swap_top = 0;
     D_800A04D4 = 0;
     g_arcana_top = 0;
     D_8009B988 = 0;
-    D_800A02E4 = 0;
+    g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
     g_bg_layers[0].attribute = 0x9000000;

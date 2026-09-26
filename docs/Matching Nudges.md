@@ -474,6 +474,18 @@ each use and the routine comes out a callee-saved register short.
 - [debugmenu.c](/src/btlp/debugmenu.c) - exact with the two spellings, 94.19%
   with either one alone.
 
+The mirror case: a literal byte read at several places in one routine is forced
+into a register in the initial RTL, and CSE merges the copies into one saved
+register (volatile does not stop it). The image rebuilding `lui` before each
+`lbu` means those reads went through a symbol. When the byte has to stay
+`ignore:True` for a routine that builds a literal pointer to it, pin the
+symbol-reading instructions in `reloc.<target>.txt` and define the name in
+`externs.<target>.ld`.
+
+- [mainmenu.c](/src/dng/ui/mainmenu.c) - `MainMenu` reads the pad layout as
+  `g_pad_config` (98.80% to exact), while `FieldUpdate` points at the same
+  byte as `0x801F2AC7`.
+
 ## An `int` local where the record has a byte
 
 gcc knows a `u_char` loaded with `lbu` is not negative and narrows a signed
