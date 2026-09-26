@@ -47,18 +47,14 @@ extern char    *g_btl_prim_next;
 extern u_long   g_btl_ot[][3];
 extern int      g_btl_ot_index;
 
-/* 99.68%. The clip rects are filled x, y, w, h, and the draw origin is the
-   drawing environment's offset (draw.h), so its y read stays behind the store
-   of x. Each rect has a pointer of its own: local-alloc ties the index sum to
-   the pointer only when the pointer dies once in its block, and that tie is
-   what puts the index in a1. Both index the clip table directly.
-   Left: s0 and s1 swapped between the clip table's address and g_btl_ot's.
-   The table register is stepped by 8 in place for the second rect, which
-   ties the two into one quantity (5 refs over the body, same priority as
-   g_btl_ot's, and born first, so it takes s0). The image gives g_btl_ot s0,
-   so its table quantity must not have been tied (local-alloc.c qty_compare_1,
-   combine_regs). */
-#ifdef NON_MATCHING
+/* The clip rects are filled x, y, w, h, and the draw origin is the drawing
+   environment's offset (draw.h), so its y read stays behind the store of x.
+   Each rect has a pointer of its own: local-alloc ties the index sum to the
+   pointer only when the pointer dies once in its block, and that tie is what
+   puts the index in a1. Both index the clip table directly. The last AddPrim
+   sits in a do/while (0): the loop notes split the body, so the clip table's
+   and g_btl_ot's addresses go to global alloc instead of local, and there
+   g_btl_ot's uses win it s0 as in the image. */
 void BtlMenuDraw(void)
 {
     RECT    *clip;
@@ -103,11 +99,10 @@ void BtlMenuDraw(void)
         clip2->h = MENU_PANEL_H;
         SetDrawArea(&area, clip2);
         memcpy(g_btl_prim_next, &area, sizeof(DR_AREA));
-        AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
+        do {
+            AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
+        } while (0);
         g_btl_prim_next += sizeof(DR_AREA);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/menudraw", BtlMenuDraw);
-#endif
 

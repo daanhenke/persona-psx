@@ -44,14 +44,13 @@ extern int     g_btl_gfx_sector;
 
 extern void    BtlReadSectors(u_long *dest, int sector, int sectors);
 
-/* 99.65%, from 99.20%. The owner's variable is used again for the file's first
-   sector, which is what gives it the copy of the member the image makes, and
-   the TIM is read through g_load_stage the way BtlLoadMemberGfx reads it.
-   What is left is one register choice: global alloc takes the slot table's
-   walking pointer before the owner (priority 2 to 1.6), so the owner lands
-   in a3 and the pointer in v1, where the image has the owner in v1 and the
-   pointer in a0. The loop and wrap shapes tried leave that as it is. */
-#ifdef NON_MATCHING
+/* The owner's variable is used again for the file's first sector, which is
+   what gives it the copy of the member the image makes, and the TIM is read
+   through g_load_stage the way BtlLoadMemberGfx reads it. The wrap sits in a
+   do/while (0): flow weights a register's uses by loop depth, and those three
+   uses lift the owner's priority (9 uses over 17 insns, 1.59) past the slot
+   walk's pointer (2), so global alloc gives the owner v1 and the pointer a0
+   as the image has them. */
 short BtlReloadMemberGfx(int member, int actor)
 {
     u_long *tim;
@@ -60,9 +59,11 @@ short BtlReloadMemberGfx(int member, int actor)
     int     i;
 
     owner = member;
-    if (owner >= BTL_MEMBER_WRAP) {
-        owner -= BTL_MEMBER_WRAP;
-    }
+    do {
+        if (owner >= BTL_MEMBER_WRAP) {
+            owner -= BTL_MEMBER_WRAP;
+        }
+    } while (0);
     for (i = BTL_MEMBER_SLOT0; i < BTL_MEMBER_SLOT1; i++) {
         if (g_btl_slot_owner[i] == owner) {
             break;
@@ -96,6 +97,3 @@ short BtlReloadMemberGfx(int member, int actor)
            (u_char *)g_btl_slot_clut[i], BTL_CLUT_BYTES);
     return i;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/memberreload", BtlReloadMemberGfx);
-#endif

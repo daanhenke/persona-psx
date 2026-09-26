@@ -90,14 +90,16 @@ void BtlHighlightEnd(void)
    brightness is 0x1000 and sixteen frames carry it either way. Corners 0 and
    3 are left grey and 1 and 2 take the row's colour, which is what makes the
    bar read as a diagonal sheen rather than a flat block. */
-/* 99.74%. The colour index is an array of one (see its declaration): as a
-   scalar gcc lifts its load above the corner stores, and the image does not.
-   The quad's address starts from the table's base. What is left is only which
-   of v0 and a1 hold the base and the scaled index while they are added. */
-#ifdef NON_MATCHING
+/* The colour index is an array of one (see its declaration): as a scalar
+   gcc lifts its load above the corner stores, and the image does not. The
+   quad's address is the table's base, taken into a local first, indexed once:
+   a pointer assigned once is one local-alloc can tie the scaled index to, which
+   is what builds the index in the pointer's own register (a1, the AddPrim
+   argument). */
 void BtlHighlightDraw(int buf, u_long *ot)
 {
     POLY_G4 *p;
+    POLY_G4 *base;
     u_char  *rgb;
     int     *state;
     int      top;
@@ -130,8 +132,8 @@ void BtlHighlightDraw(int buf, u_long *ot)
         break;
     }
 
-    p = g_btl_highlight_poly;
-    p += buf;
+    base = g_btl_highlight_poly;
+    p = &base[buf];
     top = g_btl_highlight_row * HIGHLIGHT_PITCH + HIGHLIGHT_TOP;
     bottom = g_btl_highlight_row * HIGHLIGHT_PITCH + HIGHLIGHT_BOTTOM;
     p->x0 = g_btl_highlight_x[0] + HIGHLIGHT_LEFT;
@@ -159,6 +161,3 @@ void BtlHighlightDraw(int buf, u_long *ot)
     AddPrim(ot, p);
     AddPrim(ot, &g_btl_highlight_mode[buf]);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/highlight", BtlHighlightDraw);
-#endif

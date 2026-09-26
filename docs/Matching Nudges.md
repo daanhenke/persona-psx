@@ -3628,3 +3628,31 @@ hand; one is exact.
 
 - [talkorders.c](/src/btlp/talkorders.c) - `BtlTalkersLeaveField`, 99.95% to
   exact (move, ailment line, order, targets).
+
+## A pointer assigned once can take its index's register
+
+local-alloc ties the output of an add to an input that dies in it, but only
+when both registers are local-alloc's - used in one block and dying once. A
+pointer built in two steps (`p = base; p += i;`) is set twice, so the scaled
+index keeps a register of its own. Assigned once (`p = &base[i]`), the index
+is built in the pointer's own register, which is the image's shape when the
+index sits in the call-argument register the pointer is headed for. Taking the
+table's base into a local first also loads it ahead of the index. The same
+rule wants one pointer per rect when two are filled in turn.
+
+- [highlight.c](/src/btlp/highlight.c) - `BtlHighlightDraw`, 99.74% to exact.
+- [menudraw.c](/src/btlp/menudraw.c) - `BtlMenuDraw` (with the next lever).
+
+## A do/while (0) weighs a register's uses, and splits the block
+
+flow counts a register's uses weighted by loop depth, and a `do { } while
+(0)` counts as a loop. Putting a few of one register's uses inside one raises
+its priority for global alloc without changing the code, which settles a
+register swap between two values of near-equal priority. The loop notes also
+end the basic block, so registers that were local-alloc's (one block) become
+global-alloc's, which orders them by priority and not by birth.
+
+- [memberreload.c](/src/btlp/memberreload.c) - `BtlReloadMemberGfx`: the
+  owner's wrap in one, 99.65% to exact.
+- [menudraw.c](/src/btlp/menudraw.c) - `BtlMenuDraw`: the last AddPrim in
+  one, 99.68% to exact.
