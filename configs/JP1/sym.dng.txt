@@ -220,7 +220,7 @@ TimLoad                  = 0x8006FB08; // type:func size:0xA4
 //--------------------------------------------------------------
 //--- PA: 0x00B80C   VA: 0x8006FBAC   subsegment: asm, dng_s1_x1
 //--------------------------------------------------------------
-TimLoadAt                = 0x8006FBAC; // type:func size:0x68
+UploadImageOne           = 0x8006FBAC; // type:func size:0x68
 
 //-------------------------------------------------------------------
 //--- PA: 0x00B874   VA: 0x8006FC14   subsegment: c, common/gfx/image
@@ -510,8 +510,8 @@ StatusStockReleasePick   = 0x8007F6B8; // type:func size:0x298
 StatusStockReleaseConfirm = 0x8007F950; // type:func size:0x1D8
 StatusStockView          = 0x8007FB28; // type:func size:0x514
 FormationMenuStep        = 0x8008003C; // type:func size:0x130
-func_8008016C            = 0x8008016C; // type:func size:0x2C0
-D_8008042C               = 0x8008042C; // type:func size:0x7DC
+FormationMenuOpen        = 0x8008016C; // type:func size:0x2C0
+FormationMenu            = 0x8008042C; // type:func size:0x7DC
 
 //-----------------------------------------------------------------------
 //--- PA: 0x01C868   VA: 0x80080C08   subsegment: c, common/ui/menustatus
@@ -524,14 +524,14 @@ MenuStatusTick           = 0x80080C08; // type:func size:0x98
 MenuStatusOpen           = 0x80080CA0; // type:func size:0x184
 MenuStatusSelect         = 0x80080E24; // type:func size:0x904
 MenuStatusView           = 0x80081728; // type:func size:0x360
-func_80081A88            = 0x80081A88; // type:func size:0x388
-func_80081E10            = 0x80081E10; // type:func size:0x594
-func_800823A4            = 0x800823A4; // type:func size:0x2DC
-func_80082680            = 0x80082680; // type:func size:0x32C
-func_800829AC            = 0x800829AC; // type:func size:0x430
-func_80082DDC            = 0x80082DDC; // type:func size:0x1A8
-func_80082F84            = 0x80082F84; // type:func size:0x38C
-func_80083310            = 0x80083310; // type:func size:0x1A0
+FormationCmdStep         = 0x80081A88; // type:func size:0x388
+FormationPickMember      = 0x80081E10; // type:func size:0x594
+FormationPlaceMember     = 0x800823A4; // type:func size:0x2DC
+FormationDonePrompt      = 0x80082680; // type:func size:0x32C
+FormationPresetPick      = 0x800829AC; // type:func size:0x430
+FormationSavePrompt      = 0x80082DDC; // type:func size:0x1A8
+FormationLoadPick        = 0x80082F84; // type:func size:0x38C
+FormationLoadPrompt      = 0x80083310; // type:func size:0x1A0
 ConfigMenuStep           = 0x800834B0; // type:func size:0xE4
 func_80083594            = 0x80083594; // type:func size:0xDC
 func_80083670            = 0x80083670; // type:func size:0x14C
@@ -831,7 +831,7 @@ D_80090374               = 0x80090374; // type:func size:0xF0
 func_80090464            = 0x80090464; // type:func size:0x224
 D_80090688               = 0x80090688; // type:func size:0xE4
 func_8009076C            = 0x8009076C; // type:func size:0xE8
-func_80090854            = 0x80090854; // type:func size:0x38
+FormationRepair          = 0x80090854; // type:func size:0x38
 
 //------------------------------------------------------------------------
 //--- PA: 0x02C4EC   VA: 0x8009088C   subsegment: c, common/game/formation

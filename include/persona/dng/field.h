@@ -414,7 +414,10 @@ extern int      g_bob_step[];
 void CoordSetRot(SVECTOR *rot, GsCOORDINATE2 *coord);
 void UploadImageRows(void *desc, u_short x, u_short y, short rows);
 void TimLoad(u_long *tim, int nopal);
-void TimLoadAt(u_long *tim, int x, int y);
+/* imageone.c: a TIM's pixel block to the given place, or where the block
+   says for a negative coordinate. The field calls it unprototyped, with the
+   coordinates as ints. */
+void UploadImageOne();
 
 void FieldFrame(void);
 int  FieldUpdate(int noclip);

@@ -60,7 +60,7 @@ void FieldLoadGfx(void)
         DrawSync(0);
     }
     for (i = 5; i < PACK_INDEX[g_pack_sel + 6]; i++) {
-        TimLoadAt((u_long *)(PACK_BASE + g_pack_tims[i]), (i - 5) * 0x80 + 0x180, 0);
+        UploadImageOne((u_long *)(PACK_BASE + g_pack_tims[i]), (i - 5) * 0x80 + 0x180, 0);
         DrawSync(0);
     }
     UploadImageRows((void *)(PACK_BASE + g_pack_images[0]), 0, 0x1E1,
