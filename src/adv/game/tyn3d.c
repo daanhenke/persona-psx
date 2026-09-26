@@ -15,7 +15,6 @@
  * takes its UVs from the tables here instead and is not affected.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -119,10 +118,6 @@ void TynInitPolys(void)
     g_tyn_polys[1][1] = g_tyn_polys[0][1];
 }
 
-/* cc1's output for this is the image's, but maspsx puts a load-delay nop
-   between each lwl/lwr copy and the swl to a symbol that follows it: it
-   does not count the lui $at the swl expands to, as it does for sw. */
-#ifdef NON_MATCHING
 void TynInitDivide(void)
 {
     setVector(&g_quad_verts[0], 0xC0, -0x120, 0);
@@ -149,9 +144,6 @@ void TynInitDivide(void)
     g_tyn_div.pih = 0x140;
     g_tyn_div.piv = 0xF0;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/tyn3d", TynInitDivide);
-#endif
 
 void TynSetView(void)
 {
