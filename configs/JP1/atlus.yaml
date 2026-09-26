@@ -25,17 +25,21 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".text", ".data", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".sdata", ".bss"]
   subalign: 4
-  ld_align_section_vram_end: True
+  ld_align_section_vram_end: False
   ld_align_segment_vram_end: True
   ld_bss_is_noload: False
   symbol_name_format: $VRAM
   string_encoding: SHIFT-JIS
   data_string_encoding: SHIFT-JIS
   rodata_string_guesser_level: 2
-  data_string_guesser_level: 2
+  data_string_guesser_level: 0
   gp_value: 0x800A5598
+  # The bss runs on past the image (the MDEC buffers and the decode state), so
+  # sized symbols there name their fields as offsets.
+  global_vram_start: 0x80080000
+  global_vram_end: 0x80110000
 
 segments:
   - name: header
@@ -48,10 +52,17 @@ segments:
     start: 0x800
     vram: 0x80080000
     subsegments:
-      - [0x800, asm, atlus]
-      - [0x1A38, c, str]
-      - [0x1AEC, asm, atlus_1]
-      # Psy-Q from the library entry down; not ours to decompile.
-      - [0x1E40, asm, psyq/libs]
+      - [0x800, .rodata, atlus]
+      # The Psy-Q libraries' rodata, in link order after ours.
+      - [0x814, rodata, psyq/rodata]
+      - [0x13C8, c, atlus]
+      - [0x194C, c, str]
+      # __main and start, then every Psy-Q library object. Not ours to
+      # decompile, which is what the psyq/ prefix says.
+      - [0x1E38, asm, psyq/crt0]
+      - [0x1E50, asm, psyq/libs]
+      - [0x12B44, data, psyq/data]
+      # gp small data, then the bss that the image's zero padding covers.
+      - [0x25D98, sdata, atlus_sdata]
 
   - [0x26000]

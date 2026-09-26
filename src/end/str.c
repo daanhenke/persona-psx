@@ -4,7 +4,7 @@
 
 /* Decodes one streamed frame into the back buffer and releases the ring slot.
    Gives up after 0x800000 polls so a stalled stream cannot hang the loop. */
-void StrDecodeNextFrame(StrDecodeTarget *target)
+void StrDecodeNextFrame(StrDecodeTarget *dec)
 {
     u_long *bs;
     int     tries;
@@ -21,8 +21,8 @@ poll:
     goto poll;
 
 decode:
-    target->index = (target->index == 0);
-    DecDCTvlc(bs, target->buf[target->index]);
+    dec->vlc_id = (dec->vlc_id == 0);
+    DecDCTvlc(bs, dec->vlc_buf[dec->vlc_id]);
     StFreeRing(bs);
 
 out:

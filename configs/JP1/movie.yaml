@@ -25,17 +25,21 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".text", ".data", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".sdata", ".bss"]
   subalign: 4
-  ld_align_section_vram_end: True
+  ld_align_section_vram_end: False
   ld_align_segment_vram_end: True
   ld_bss_is_noload: False
   symbol_name_format: $VRAM
   string_encoding: SHIFT-JIS
   data_string_encoding: SHIFT-JIS
   rodata_string_guesser_level: 2
-  data_string_guesser_level: 2
+  data_string_guesser_level: 0
   gp_value: 0x800A9E7C
+  # The bss runs on past the image (the MDEC buffers and the decode state), so
+  # sized symbols there name their fields as offsets.
+  global_vram_start: 0x80080000
+  global_vram_end: 0x80110000
 
 segments:
   - name: header
@@ -48,9 +52,19 @@ segments:
     start: 0x800
     vram: 0x80080000
     subsegments:
-      - [0x800, asm, movie]
+      # MoviePlay's file name; .rodata of the movie unit once MoviePlay is C.
+      - [0x800, rodata, movie_rodata]
+      # The Psy-Q libraries' rodata, in link order after ours.
+      - [0x814, rodata, psyq/rodata]
+      - [0x163C, c, movie]
       - [0x1CB4, c, str]
-      # Psy-Q from here down; not ours to decompile.
-      - [0x1D3C, asm, psyq/libs]
+      # __main and start, then every Psy-Q library object. Not ours to
+      # decompile, which is what the psyq/ prefix says.
+      - [0x1F64, asm, psyq/crt0]
+      - [0x1F7C, asm, psyq/libs]
+      - [0x17264, .data, movie]
+      - [0x173F8, data, psyq/data]
+      # gp small data, then the bss that the image's zero padding covers.
+      - [0x2A67C, sdata, movie_sdata]
 
   - [0x2A800]

@@ -114,7 +114,7 @@ DUMPSXISO_FLAGS     := -x "$(ROM_DIR)/$(GAME_VERSION)" -s "$(ROM_DIR)/$(GAME_VER
 MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 
 # Adjusts compiler and assembler flags based on source file location.
-# - Files under main executable paths use -G8; overlay files use -G0.
+# - The executables (main, atlus, open, movie, end) use -G8; overlays use -G0.
 #
 # WORK_BIAS: src/common is compiled into several overlays, and their work areas
 # do not sit at the same address. Those sources reach a hardcoded address as
@@ -123,14 +123,15 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 #
 # - main's memory card code (src/main/card) was built at -O0, like atlus and open.
 #
-# - main's sources keep a tentative definition as a real common (maspsx's
-#   --use-comm-section). That is how the image reaches main's own small data
-#   gp-relative from C, and the common merges into the label splat emits.
+# - main's, atlus's, movie's and end's sources keep a tentative definition as a real
+#   common (maspsx's --use-comm-section). That is how the image reaches their
+#   own small data gp-relative from C, and the common merges into the label
+#   splat emits.
 #
 # Keep prose out of the body below - it is expanded into every recipe, so a
 # comment there is handed to the shell and echoed once per file built.
 define FlagsSwitch
-    $(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /open/,$(1))),$(eval DL_FLAGS = -G8),$(eval DL_FLAGS = -G0))
+    $(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /open/,$(1)),$(findstring /movie/,$(1)),$(findstring /end/,$(1))),$(eval DL_FLAGS = -G8),$(eval DL_FLAGS = -G0))
 
 	$(if $(or $(findstring /atlus/,$(1)),$(findstring /open/,$(1)),$(findstring /main/card/,$(1))),$(eval OPT = -O0),$(eval OPT = $(OPT_FLAGS)))
 
@@ -139,7 +140,7 @@ define FlagsSwitch
 	$(eval CC_FLAGS = $(OPT) $(DL_FLAGS) -mips1 -mcpu=3000 -w -funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return -fcommon -fverbose-asm -msoft-float -mgas -fgnu-linker -fdollars-in-identifiers -quiet)
 	$(eval ASPSX_VERSION := 2.34)
 	$(eval MASPSX_FLAGS = --gnu-as-path $(AS) --aspsx-version=$(ASPSX_VERSION) $(COMMON_FLAG) --run-assembler --expand-div $(AS_FLAGS))
-	$(if $(findstring /main/,$(1)),$(eval MASPSX_FLAGS += --use-comm-section))
+	$(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /movie/,$(1)),$(findstring /end/,$(1))),$(eval MASPSX_FLAGS += --use-comm-section))
 	$(if $(findstring /s2d/,$(1)),$(eval OVL_FLAGS := -DWORK_BIAS=0x20000),$(eval OVL_FLAGS := -DWORK_BIAS=0))
 endef
 

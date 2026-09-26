@@ -20,7 +20,7 @@ u_long *StrWaitFrame(void)
 
     tries = 0x800000;
     for (;;) {
-        if (StGetNext(&frame, &header) == 0) {
+        if (StGetNext(&frame, (u_long **)&header) == 0) {
             break;
         }
         if (--tries == 0) {
@@ -28,7 +28,7 @@ u_long *StrWaitFrame(void)
         }
     }
 
-    if (header->size >= 0x825) {
+    if (header->frame_count >= 0x825) {
         g_str_overrun = 1;
     }
     return frame;
