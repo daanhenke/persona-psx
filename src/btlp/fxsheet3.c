@@ -19,21 +19,19 @@
 /* How long every cell waits on top of its own entry in the scatter. */
 #define FX_GRID_LATE 8
 
-/* 95.74%. The link to the previous cell is written in both arms of an
-   identical test; cross-jumping folds them, but at loop time they are what
-   push the outer loop over loop.c's budget, so the row step stays in the loop
-   as the image has it. Left: the image loads the cell's attribute word into
-   v1 straight after the allocation call, ahead of the copy of its result;
-   here it is built in v0 at the store. That is the shape of a constant
-   loop.c lifted and reload rebuilt in a spare register, which sched2 then
-   hoists, but the inner loop is too large for loop.c to lift it here. */
-#ifdef NON_MATCHING
+/* The column's x is worked out from the counter, which is what keeps the
+   row step inside the loop: loop.c lifts an insn only when threshold * uses *
+   lifetime reaches the loop's insn count, and the stepped x left the outer
+   loop short enough to lift it. The attribute is written first. sched1 fills
+   each block from the end, ties going to the later insn, and pulls a
+   register set once down to its first use (adjust_priority): the result's
+   copy is pulled to its stores, while the attribute constant - built in two
+   insns, so set twice - stays where it was written, at the top. */
 BtlObj *BtlFxStartSheetLate(void)
 {
     BtlObj *o;
     BtlObj *after;
     long    pos[3];
-    long    x;
     long    y_party;
     long    y_enemy;
     int     row;
@@ -53,28 +51,22 @@ BtlObj *BtlFxStartSheetLate(void)
     do {
         col = 0;
         k   = cell + FX_MARK_FAR;
-        x   = FX_GRID_X0;
         do {
             if (g_btl_actor_turn < BTL_PARTY) {
-                pos[0] = x;
+                pos[0] = (col * PLACE_COL_W + PLACE_COL_ORG) * PLACE_FIXED;
                 pos[1] = y_enemy;
                 pos[2] = 0;
             } else {
-                pos[0] = x;
+                pos[0] = (col * PLACE_COL_W + PLACE_COL_ORG) * PLACE_FIXED;
                 pos[1] = y_party;
                 pos[2] = 0;
             }
             o = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, after, FX_OBJ_DRAW, 0,
                             pos, FX_OBJ_CD, FX_OBJ_CE);
-            if (g_btl_actor_turn < BTL_PARTY) {
-                o->attached = after;
-            } else {
-                o->attached = after;
-            }
-            after = o;
-            x += FX_GRID_DX;
-            col++;
             o->attr     = FX_OBJ_ATTR;
+            o->attached = after;
+            after = o;
+            col++;
             o->mark_num = k;
             o->timer    = (g_btl_fx_grid_order[k] >> 1) + FX_GRID_LATE;
             k--;
@@ -86,6 +78,3 @@ BtlObj *BtlFxStartSheetLate(void)
     } while (row >= 0);
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxsheet3", BtlFxStartSheetLate);
-#endif

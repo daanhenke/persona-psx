@@ -33,15 +33,15 @@
 /* What the last phase leaves behind. */
 #define FX_44_DONE 0x80
 
-/* 97.58%: the tail's stores in the order the image's loads allow (a sweep
-   of every order of the six statements tops out here). What is left is where
-   the allocation's result is copied into `prev`: the image does it after it
-   has built the attribute constant, and gcc here does it straight after the
-   call. */
-#ifdef NON_MATCHING
+/* Each copy's allocation lands in a variable of its own, set once: sched1
+   (sched.c adjust_priority) pulls the setting of a register set only once
+   down to its first use, so the copy of the result follows the attribute
+   constant as in the image, where `prev`, set twice, left it straight after
+   the call. The attribute is stored first. */
 void BtlFxStep44(BtlObj *o)
 {
     BtlObj *prev;
+    BtlObj *n;
     long    pos[3];
     int     i;
 
@@ -75,13 +75,14 @@ void BtlFxStep44(BtlObj *o)
                 pos[1] = g_btl_actors[g_btl_fx_target].obj->y
                          + g_btl_fx_ring[i % FX_44_RING][1];
                 pos[2] = 0;
-                prev = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, prev,
-                                   FX_OBJ_DRAW, 0, pos, FX_OBJ_CD, FX_OBJ_CE);
-                prev->motion = FX_44_MOTION;
-                prev->attr = FX_OBJ_ATTR;
-                prev->kind = o->kind;
-                prev->mark_num = FX_COPY_MARK;
-                prev->timer = i * FX_44_STAGGER;
+                n = BtlObjAlloc(&g_btl_fx_def, FX_OBJ_GROUP, prev,
+                                FX_OBJ_DRAW, 0, pos, FX_OBJ_CD, FX_OBJ_CE);
+                n->attr = FX_OBJ_ATTR;
+                n->motion = FX_44_MOTION;
+                n->kind = o->kind;
+                n->mark_num = FX_COPY_MARK;
+                n->timer = i * FX_44_STAGGER;
+                prev = n;
                 i++;
             }
         }
@@ -106,6 +107,3 @@ void BtlFxStep44(BtlObj *o)
         return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxstep44", BtlFxStep44);
-#endif
