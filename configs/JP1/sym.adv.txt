@@ -885,7 +885,8 @@ AdvEffectSetupSlots      = 0x800866D8; // type:func size:0xE4
 //--- PA: 0x02241C   VA: 0x800867BC   subsegment: asm, adv_35
 //-----------------------------------------------------------
 AdvDrawEffect            = 0x800867BC; // type:func size:0xB0
-D_8008686C               = 0x8008686C; // type:func size:0xF0
+AdvEffectNone            = 0x8008686C; // type:func size:0x8
+EffectWaveBuild          = 0x80086874; // type:func size:0xE8
 
 //-----------------------------------------------------------------
 //--- PA: 0x0225BC   VA: 0x8008695C   subsegment: c, gfx/screenfade
@@ -897,9 +898,9 @@ AdvEffectFadeBlue        = 0x80086C4C; // type:func size:0x160
 //-----------------------------------------------------------
 //--- PA: 0x022A0C   VA: 0x80086DAC   subsegment: asm, adv_36
 //-----------------------------------------------------------
-func_80086DAC            = 0x80086DAC; // type:func size:0x1A0
-func_80086F4C            = 0x80086F4C; // type:func size:0x148
-func_80087094            = 0x80087094; // type:func size:0x148
+EffectColorCycle         = 0x80086DAC; // type:func size:0x1A0
+EffectWaveSlow           = 0x80086F4C; // type:func size:0x148
+EffectWaveFast           = 0x80087094; // type:func size:0x148
 EffectSkyStep            = 0x800871DC; // type:func size:0x1120
 AdvSoundCommand          = 0x800882FC; // type:func size:0x258
 
@@ -914,7 +915,8 @@ AdvCloseBanks            = 0x80088734; // type:func size:0xB8
 //--- PA: 0x02444C   VA: 0x800887EC   subsegment: asm, adv_37
 //-----------------------------------------------------------
 AdvLoadBgm               = 0x800887EC; // type:func size:0x3A0
-func_80088B8C            = 0x80088B8C; // type:func size:0xE4
+MoonSetCells             = 0x80088B8C; // type:func size:0xDC
+MoonNone                 = 0x80088C68; // type:func size:0x8
 AdvTynCutscene           = 0x80088C70; // type:func size:0x1A8C
 func_8008A6FC            = 0x8008A6FC; // type:func size:0x240
 func_8008A93C            = 0x8008A93C; // type:func size:0x78
@@ -1596,6 +1598,8 @@ g_cinema_cels7           = 0x800B2A2C; // size:0x10
 g_entry_label_cells      = 0x800B2F50;
 g_entry_label_def        = 0x800B2F90;
 g_entry_label_x          = 0x800B2FA0;
+g_moon_name_cells        = 0x800B2FCC; // size:0x20
+g_moon_cell              = 0x800B301C; // size:0x8
 g_adv_chest_item_cells   = 0x800B4EBC;
 g_adv_chest_count_cells  = 0x800B4F24;
 g_adv_chest_item_def     = 0x800B4F34;
@@ -1627,7 +1631,7 @@ g_dir_x                  = 0x800B6378;
 g_dir_y                  = 0x800B637C;
 g_walk_dy                = 0x800B6384;
 g_walk_dx                = 0x800B6394;
-g_entry_labels           = 0x800B63A4;
+g_entry_labels           = 0x800B63A4; // size:0x1B
 str_cd0_p_data           = 0x800B63CC;
 str_cd0_b_data           = 0x800B63E0;
 str_cd0_s_data           = 0x800B63F4;
@@ -1635,7 +1639,10 @@ str_cd0_c_data           = 0x800B6408;
 str_cd0_d_data           = 0x800B641C;
 g_effect3_frames         = 0x800B6560; // size:0x498
 g_effect4_script         = 0x800B69F8;
+g_wave_rows              = 0x800B6E34; // size:0x300
+g_wave_strips            = 0x800B7134; // size:0x400
 g_effect5_script         = 0x800B7534;
+g_wave_bank_rows         = 0x800B7538; // size:0x894
 g_bgm_offsets            = 0x800B7E60;
 g_bvb_offsets            = 0x800B7EE4;
 g_se_offsets             = 0x800B7F68;
@@ -1692,6 +1699,8 @@ g_pdata_bottom_def       = 0x800B91B4;
 g_stat_bar_cells         = 0x800B91FC;
 str_config_title         = 0x800B9210;
 str_nothing              = 0x800B921C;
+g_moon_frames            = 0x800B9224; // size:0x10
+g_moon_names             = 0x800B9234; // size:0x44
 D_800B92A0               = 0x800B92A0; // type:u32 size:0x6C
 g_map_title_def          = 0x800B930C; // size:0x10
 g_map_arrow_defs         = 0x800B935C; // size:0x40
@@ -1831,6 +1840,7 @@ g_room_actor_defs        = 0x801001F0; // ignore:True size:0x900
 g_prop_defs              = 0x80100AF0; // ignore:True size:0xE0
 g_mark_defs              = 0x80100BD0; // ignore:True size:0x50
 g_spot_defs              = 0x80100C20; // ignore:True size:0x20
+g_scene_ramp             = 0x80100CB0; // size:0x4
 g_fuse_results           = 0x80130000; // ignore:True size:0x200
 g_fuse_pairs             = 0x80130200; // ignore:True size:0x400
 g_adv_actors             = 0x801F15D8; // ignore:True size:0x5E8

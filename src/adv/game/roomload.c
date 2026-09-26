@@ -45,7 +45,7 @@ extern void AdvSceneStartImages(void);
 extern void ActorsPlaceSprites(void);
 extern void CamCenterOnActor(u_char actor);
 extern void func_80084694(void);
-extern void func_80088B8C(void);
+extern void MoonSetCells(void);
 
 void AdvQueueShadows(void);
 
@@ -105,7 +105,7 @@ void AdvRoomRebuild(void)
     FadeBlackout();
     ImageAnimStopAll();
     AdvRoomBgInit();
-    func_80088B8C();
+    MoonSetCells();
     g_bg_shown = 1;
     ImageIndexInit(g_adv_scene->kind);
     AdvEffectSetupSlots();

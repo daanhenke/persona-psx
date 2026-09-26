@@ -138,7 +138,7 @@ extern void AdvLoadBgm();  /* called without a prototype here */
 extern void AdvLoadEventBg(void);
 extern void AdvPickSceneByFlags(void);
 extern void ViewShakeStop(void);
-extern void func_80088B8C(void);
+extern void MoonSetCells(void);
 extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
 extern void AdvFieldEnter(void);
@@ -297,7 +297,7 @@ loaded:
     ViewShakeStop();
     g_cam_actor = 0;
     AdvRoomBgInit();
-    func_80088B8C();
+    MoonSetCells();
     PadLoadBindings(g_pad_config);
     PadSetPageButtons(g_pad_config);
     g_field_exit = 0;

@@ -48,7 +48,7 @@ extern short  g_map_id;
 extern u_char g_map_pos_x;
 extern u_char g_map_pos_y;
 extern u_char g_map_unk4;
-extern u_char g_map_room;
+#define g_map_room (*(u_char *)0x801F5355)
 extern u_short g_adv_walk_dir;
 
 #define g_seq_handle (*(short *)0x801F5390)
