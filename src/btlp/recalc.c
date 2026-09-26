@@ -11,7 +11,6 @@
  * taken away with them.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/common/char.h>
 #include <persona/common/item.h>
 #include <persona/btlp/actor.h>
@@ -25,16 +24,9 @@
 /* The queued command that needs a gun. */
 #define BTL_CMD_SHOOT 3
 
-/* 98.27%, written the way BtlDeriveStats' wolf case writes the same numbers:
-   the equipment term outside, the stats grouped inside, and the armour totals
-   summed first off a local copy of the table. The local is what makes the
-   armour block reload the table's address after the branches, as the image
-   does. What is left is the order of the first three stat loads for the
-   armour numbers (the image reads Agility, then Dexterity, then Luck), and
-   one shift that goes with them. A local for the luck quarter, the defence
-   written first, and the level moved inside the sum were all tried and are no
-   better. */
-#ifdef NON_MATCHING
+/* The equipment term is outside the grouped stats, as in the wolf case of
+   BtlDeriveBattleStats. The armour totals use a fresh local table base so gcc
+   reloads its address after the gun branches. */
 void BtlRecalcStats(BtlActor *a)
 {
     const ItemDef *weapon;
@@ -72,23 +64,37 @@ void BtlRecalcStats(BtlActor *a)
         }
     }
 
-    defs = g_item_defs;
-    armour_atk = defs[a->c.equip[EQUIP_ARMOUR]].power
-                 + defs[a->c.equip[EQUIP_ARMOUR + 1]].power
-                 + defs[a->c.equip[EQUIP_ARMOUR + 2]].power
-                 + defs[a->c.equip[EQUIP_ARMOUR + 3]].power;
-    armour_hit = defs[a->c.equip[EQUIP_ARMOUR]].rate
-                 + defs[a->c.equip[EQUIP_ARMOUR + 1]].rate
-                 + defs[a->c.equip[EQUIP_ARMOUR + 2]].rate
-                 + defs[a->c.equip[EQUIP_ARMOUR + 3]].rate;
-    a->c.evade = (a->c.stat[STAT_AGILITY] + a->c.stat[STAT_DEXTERITY] / 2)
-                 + a->c.stat[STAT_LUCK] / 4
-                 + armour_hit;
-    a->c.defence = (u_char)(a->c.level / 5)
-                   + (a->c.stat[STAT_VITALITY] + a->c.stat[STAT_AGILITY] / 2)
-                   + armour_atk;
-}
-#else
-INCLUDE_ASM("btlp/nonmatchings/recalc", BtlRecalcStats);
-#endif
+    /* These loop scopes emit no branches. Their reference weights keep the
+       luck contribution in a3 rather than the second armour index's t0. */
+    do
+    {
+        u_short agility_half;
+        int     armour_offset;
+        u_char  luck;
 
+        do
+        {
+            luck = a->c.stat[STAT_LUCK] / 4;
+        } while (0);
+        /* The half-word local puts the defence's agility load ahead of the
+           dexterity and luck loads without sharing the evade's narrow read. */
+        agility_half = a->c.stat[STAT_AGILITY] / 2;
+        /* Form this byte offset before the table base: the shift then stays
+           ahead of the level division's multiply in the second scheduler. */
+        armour_offset = a->c.equip[EQUIP_ARMOUR] * sizeof(ItemDef);
+        defs = g_item_defs;
+        armour_atk = ((const ItemDef *)((const u_char *)defs + armour_offset))->power
+                     + defs[a->c.equip[EQUIP_ARMOUR + 1]].power
+                     + defs[a->c.equip[EQUIP_ARMOUR + 2]].power
+                     + defs[a->c.equip[EQUIP_ARMOUR + 3]].power;
+        armour_hit = defs[a->c.equip[EQUIP_ARMOUR]].rate
+                     + defs[a->c.equip[EQUIP_ARMOUR + 1]].rate
+                     + defs[a->c.equip[EQUIP_ARMOUR + 2]].rate
+                     + defs[a->c.equip[EQUIP_ARMOUR + 3]].rate;
+        a->c.evade = (a->c.stat[STAT_AGILITY] + a->c.stat[STAT_DEXTERITY] / 2)
+                     + luck + armour_hit;
+        a->c.defence = (u_char)(a->c.level / 5)
+                       + (a->c.stat[STAT_VITALITY] + agility_half)
+                       + armour_atk;
+    } while (0);
+}
