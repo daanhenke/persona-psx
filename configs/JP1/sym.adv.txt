@@ -1121,8 +1121,9 @@ DrawItemCell             = 0x8008EC64; // type:func size:0x10C
 //--------------------------------------------------------------
 //--- PA: 0x02A9D0   VA: 0x8008ED70   subsegment: asm, adv_43_x1
 //--------------------------------------------------------------
-D_8008ED70               = 0x8008ED70; // type:func size:0x4C
-func_8008EDBC            = 0x8008EDBC; // type:func size:0x158
+BgLineShow               = 0x8008ED70; // type:func size:0x34
+BgLineHide               = 0x8008EDA4; // type:func size:0x18
+MenuSetLayers            = 0x8008EDBC; // type:func size:0x158
 
 //---------------------------------------------------------------------------
 //--- PA: 0x02AB74   VA: 0x8008EF14   subsegment: c, ../common/gfx/checkermap
@@ -1692,6 +1693,7 @@ g_bg_map2                = 0x800B8340; // type:u32 size:0x20
 g_bg_map                 = 0x800B8360; // type:u32 size:0x10
 D_800B8370               = 0x800B8370; // type:u32 size:0x14
 g_bg_layers              = 0x800B8380; // size:0xD8
+g_menu_layer_defs        = 0x800B845C;
 g_formation_marker_def   = 0x800B8978;
 g_pad_binding_table      = 0x800B898C; // type:u32 size:0x4
 D_800B8990               = 0x800B8990; // type:u32 size:0x4

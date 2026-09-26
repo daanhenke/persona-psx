@@ -893,8 +893,9 @@ DrawItemCell             = 0x80083218; // type:func size:0x10C
 //-----------------------------------------------------------------
 //--- PA: 0x01EF84   VA: 0x80083324   subsegment: asm, s2d_2_s22_x1
 //-----------------------------------------------------------------
-D_80083324               = 0x80083324; // type:func size:0x4C
-func_80083370            = 0x80083370; // type:func size:0x158
+BgLineShow               = 0x80083324; // type:func size:0x34
+BgLineHide               = 0x80083358; // type:func size:0x18
+MenuSetLayers            = 0x80083370; // type:func size:0x158
 
 //------------------------------------------------------------------------
 //--- PA: 0x01F128   VA: 0x800834C8   subsegment: c, common/gfx/checkermap
@@ -1226,6 +1227,7 @@ g_persona_list_rule      = 0x8009DEDC;
 g_formation_member_def   = 0x8009E200;
 g_bg_map                 = 0x8009E59C; // size:0x10
 g_bg_layers              = 0x8009E5BC; // size:0xD8
+g_menu_layer_defs        = 0x8009E698;
 g_formation_marker_def   = 0x8009EBB4;
 g_pad_binding_table      = 0x8009EBC8;
 str_cfg_message_speed    = 0x8009ED2C;

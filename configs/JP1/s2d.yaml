@@ -182,7 +182,7 @@ segments:
       - [0x1ECF4, c, common/ui/input]
       - [0x1EDEC, asm, s2d_2_s22]
       - [0x1EE78, c, common/ui/itemcell]
-      - [0x1EF84, asm, s2d_2_s22_x1]
+      - [0x1EF84, c, common/ui/menulayers]
       - [0x1F128, c, common/gfx/checkermap]
       - [0x1F180, c, common/gfx/cells]
       - [0x1F1B0, asm, s2d_2_s23_x1]
