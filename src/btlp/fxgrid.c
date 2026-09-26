@@ -20,7 +20,6 @@
  * the first.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
 #include <persona/btlp/object.h>
@@ -38,30 +37,12 @@
    apart. */
 #define FX_MARK_OWN 0x20
 
-/* 99.32%: every instruction is the image's; what is left is which saved
-   register the column counter and the two y positions get. Two things in the
-   image are not what gcc makes of a plain pair of for loops: the delay table
-   is read through a counter of its own, k, reset from the cell at each row and
-   stepped beside it, and nothing at all is lifted out of either loop - the 9
-   the move is tested against, the lift and the steps are all rebuilt every
-   trip. As goto loops that is what comes out. BtlFxStartSweep says the loops
-   are real, though: its allocation needs the loop depth that only real loops
-   give, and it matched once nothing in them was worth lifting. Here the 9 is
-   still lifted out of any real loop - the two tests against it match, which
-   doubles its savings - and that is the part not yet found.
-   Register priorities (lreg): the image wants x, k, col, y_party, cell,
-   y_enemy, after, row. The column test in a do/while (0) doubles col's
-   weight and puts it third; left, y_enemy (5 uses over 76 insns, .132) still
-   outranks cell (5 over 78, .128). Setting y_enemy first fixes that but
-   reorders the prologue; its decrement placed last does not stretch it. */
-#ifdef NON_MATCHING
 BtlObj *BtlOpenFxGrid(int table)
 {
     BtlObj *o;
     BtlObj *after;
     long    pos[3];
     long    x;
-    long    z;
     long    y_party;
     long    y_enemy;
     int     row;
@@ -76,23 +57,26 @@ BtlObj *BtlOpenFxGrid(int table)
 
     g_btl_fx_def.scripts = ((const u_long ***)g_btl_unused_gfx)[table];
 
-    y_party = FX_GRID_Y_PARTY;
+    do {
+        y_party = FX_GRID_Y_PARTY;
+    } while (0);
 
 next_row:
-    col = 0;
-    k   = cell + FX_MARK_FAR;
+    do {
+        col = 0;
+        k = cell + FX_MARK_FAR;
+    } while (0);
     x   = FX_GRID_X0;
 next_col:
     if (g_btl_fx_move == FX_MOVE_OWN_SIDE) {
-        z = FX_GRID_Z_LIFT;
         if (g_btl_actor_turn < BTL_PARTY) {
             pos[0] = x;
             pos[1] = y_party;
-            pos[2] = z;
+            pos[2] = FX_GRID_Z_LIFT;
         } else {
             pos[0] = x;
             pos[1] = y_enemy;
-            pos[2] = z;
+            pos[2] = FX_GRID_Z_LIFT;
         }
     } else {
         if (g_btl_actor_turn < BTL_PARTY) {
@@ -129,6 +113,3 @@ next_col:
     }
     return o;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxgrid", BtlOpenFxGrid);
-#endif

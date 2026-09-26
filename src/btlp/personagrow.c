@@ -19,7 +19,6 @@
  * the level the fighter is left at - at level 1 that is all that happens.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/stats.h>
 
@@ -85,16 +84,6 @@ void BtlPersonaGrow(BtlStats *p)
     }
 }
 
-/* 98.76%, registers only. Indexing the highest-stat search off `base`, with
-   i cleared before best, put the fighter in a2 as in the image; sp and hp
-   declared in each arm (so each pair is local to its block) fixed the two
-   clamps. What is left: the level read at the top sits in a0 rather than a3,
-   the hp row's sum lands in t0 where the image has a0 (its own local in a
-   block ties it, to v0), and the stat loop's key and its product swap v0/v1.
-   A local for the level changes nothing (CSE already keeps it). Folding the
-   column into one index (`rows[key * ROW + half]`) moves the product out of
-   order (88.6%). */
-#ifdef NON_MATCHING
 void BtlDrainLevel(BtlActor *a)
 {
     int    *curve;
@@ -141,8 +130,8 @@ void BtlDrainLevel(BtlActor *a)
 
             row = a->c.key - DRAIN_FIRST;
             sp = a->c.sp;
-            rows = g_char_hp_growth + row * DRAIN_HP_ROW;
-            a->c.hp_max -= rows[a->c.level - DRAIN_FIRST];
+            growth = g_char_hp_growth + row * DRAIN_HP_ROW;
+            a->c.hp_max -= growth[a->c.level - DRAIN_FIRST];
             a->c.sp_max -= DRAIN_MAXIMA;
             if (a->c.sp_max < sp) {
                 sp = a->c.sp_max;
@@ -158,7 +147,8 @@ void BtlDrainLevel(BtlActor *a)
             rows = g_char_stat_growth;
             do {
                 i++;
-                growth = rows + a->c.key * DRAIN_STAT_ROW;
+                growth = (u_char *)((u_long)a->c.key * DRAIN_STAT_ROW
+                                    + (u_long)rows);
                 *stat -= growth[(a->c.level - DRAIN_FIRST) / 2];
                 rows += DRAIN_HP_ROW;
                 stat++;
@@ -174,6 +164,3 @@ void BtlDrainLevel(BtlActor *a)
         a->c.unk10 += curve[i];
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personagrow", BtlDrainLevel);
-#endif
