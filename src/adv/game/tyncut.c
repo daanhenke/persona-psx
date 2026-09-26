@@ -9,7 +9,7 @@
  *    0x80118000 (entries 1 and 10 are the VAB, 0 and 2..9 the sequences);
  *    TYNCHR.BIN's images go to VRAM, and three pictures named by
  *    g_event_args are read through AdvResolveSceneLoc.
- *  - The scene is drawn in 3D (GsInit3D; func_8008A93C draws, spun by
+ *  - The scene is drawn in 3D (GsInit3D; the two pictures in tyn3d.c, spun by
  *    g_char_rot) with sprites from the scene pack's table at 0x801000A0,
  *    grown, faded and slid by hand one frame at a time. A burst of sparks is
  *    thrown with rsin/rcos and rand, and two message windows play over a
@@ -18,7 +18,7 @@
  *    and unpacked, and the room is rebuilt the way ovl_adv_entry builds it,
  *    down to AdvScriptSpecial(0x85) bringing the command bar back.
  *
- * func_8008A93C is handed a local the original never sets.
+ * TynSyncPlanes is handed a local the original never sets.
  */
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
@@ -101,11 +101,11 @@ extern void ActorsPlaceSprites(void);
 extern void SlotsApplyXScale(void);
 extern int  MsgStep(void);
 extern void func_80034850(u_long *base);
-extern void func_8008AE80(void);
-extern void func_8008AE2C(void);
-extern void func_8008A9B4(void);
-extern void func_8008AC50(void);
-extern void func_8008A93C(int obj, int pad);
+extern void TynInitCoords(void);
+extern void TynSetView(void);
+extern void TynInitPolys(void);
+extern void TynInitDivide(void);
+extern void TynSyncPlanes(int obj, int pad);
 extern void func_80084694(void);
 
 /* Grows a slot's scale a step towards 1.0, faster in y than in x. */
@@ -203,10 +203,10 @@ void AdvTynCutscene(void)
     SlotClearAll();
     FadeBlackout();
     ImageAnimStopAll();
-    func_8008AE80();
-    func_8008AE2C();
-    func_8008A9B4();
-    func_8008AC50();
+    TynInitCoords();
+    TynSetView();
+    TynInitPolys();
+    TynInitDivide();
     LoadFileToAddrAsync("\\ADV\\TYN01.BIN;1", TYN_AT);
 
     SlotInitTagged(g_tyn_face_def, 2, 0x3FE, -0xA0, -0x78);
@@ -418,7 +418,7 @@ void AdvTynCutscene(void)
         g_char_rot[1].vy += 0x80;
         g_char_rot[0].vy += 0x80;
         AdvRenderCharFrame(1);
-        func_8008A93C(obj, g_pad_held[0]);
+        TynSyncPlanes(obj, g_pad_held[0]);
         g_slot_cur = &g_slots[0x12];
         g_slots[0x12].y -= i / 16;
     }
@@ -445,7 +445,7 @@ void AdvTynCutscene(void)
         }
         g_char_rot[1].vy += 0x80;
         g_char_rot[0].vy += 0x80;
-        func_8008A93C(obj, g_pad_held[0]);
+        TynSyncPlanes(obj, g_pad_held[0]);
         AdvRenderCharFrame(1);
         n++;
     }
@@ -465,7 +465,7 @@ void AdvTynCutscene(void)
         g_quad_verts[2].vy += 3;
         g_quad_verts[3].vx += 3;
         g_quad_verts[3].vy += 3;
-        func_8008A93C(obj, g_pad_held[0]);
+        TynSyncPlanes(obj, g_pad_held[0]);
         AdvRenderCharFrame(1);
     }
     AdvFadeDownBlocking(8, 0);
