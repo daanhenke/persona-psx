@@ -281,6 +281,7 @@ objdiff-generate:
 
 report:
 	$(MAKE) GAME_VERSION=$(GAME_VERSION) objdiff-config
+	mkdir -p $(BUILD_DIR)
 	$(OBJDIFF) report generate > $(BUILD_DIR)/progress.json
 
 progress:

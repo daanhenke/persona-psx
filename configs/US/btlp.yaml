@@ -1,0 +1,56 @@
+name: "Revelations: Persona (US) - btlp"
+sha1: 3038f8ffbf863d7cb1e4600cebee9b121f4f350b
+
+options:
+  platform: psx
+  basename: btlp
+  base_path: ../..
+  target_path: rom/US/BTLP.BIN
+  asm_path: asm/US/btlp
+  src_path: src/btlp
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/btlp.ld
+  symbol_addrs_path: configs/US/sym.btlp.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.btlp.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.btlp.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80065A84
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: btlp
+    type: code
+    start: 0x0
+    vram: 0x80065A84
+    subsegments:
+      - [0x0, rodata, btlp_id]
+      - [0x4, rodata, btlp_rodata]
+      - [0x19C8, asm, btlp]
+      - [0x61DC4, data, btlp_data]
+      - [0x8462C, bss, btlp_bss]
+
+  - [0x92B4C]

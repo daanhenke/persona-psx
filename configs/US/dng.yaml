@@ -1,0 +1,56 @@
+name: "Revelations: Persona (US) - dng"
+sha1: 7589e688f73185602695194dff7931a2632a757b
+
+options:
+  platform: psx
+  basename: dng
+  base_path: ../..
+  target_path: rom/US/DNG.BIN
+  asm_path: asm/US/dng
+  src_path: src/dng
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/dng.ld
+  symbol_addrs_path: configs/US/sym.dng.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.dng.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.dng.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80065A84
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: dng
+    type: code
+    start: 0x0
+    vram: 0x80065A84
+    subsegments:
+      - [0x0, rodata, dng_id]
+      - [0x4, rodata, dng_rodata]
+      - [0x990, asm, dng]
+      - [0x34DFC, data, dng_data]
+      - [0x388B4, bss, dng_bss]
+
+  - [0x3C4AC]

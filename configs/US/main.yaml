@@ -1,0 +1,63 @@
+name: "Revelations: Persona (US) - main"
+sha1: a23695c94455332fe1bbbac6dfc80e0048a385de
+
+options:
+  platform: psx
+  basename: main
+  base_path: ../..
+  target_path: rom/US/SLUS_003.39
+  asm_path: asm/US/main
+  src_path: src/main
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/main.ld
+  symbol_addrs_path: configs/US/sym.main.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.main.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.main.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".sdata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: True
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+  gp_value: 0x80056FF0
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80065A84
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: header
+    type: header
+    start: 0x0
+    vram: 0x80010000
+
+  - name: main
+    type: code
+    start: 0x800
+    vram: 0x80010000
+    subsegments:
+      - [0x800, rodata, main_rodata]
+      - [0x1A9C, asm, main]
+      - [0x21AC, asm, psyq/crt0]
+      - [0x2270, asm, main_1]
+      - [0x6B2C, asm, psyq/libs]
+      - [0x32440, data, psyq/data]
+
+  - [0x48000]

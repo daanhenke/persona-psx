@@ -1,0 +1,58 @@
+name: "Revelations: Persona (US) - end"
+sha1: edb2785f8fe640a13237a804aa127646bb66e749
+
+options:
+  platform: psx
+  basename: end
+  base_path: ../..
+  target_path: rom/US/EXE/END.EXE
+  asm_path: asm/US/end
+  src_path: src/end
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/end.ld
+  symbol_addrs_path: configs/US/sym.end.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.end.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.end.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".text", ".data", ".rodata", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: True
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+  gp_value: 0x800ADEE0
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: header
+    type: header
+    start: 0x0
+    vram: 0x80080000
+
+  - name: end
+    type: code
+    start: 0x800
+    vram: 0x80080000
+    subsegments:
+      - [0x800, asm, end]
+      - [0x33C8, asm, psyq/libs]
+      - [0x1AA40, data, psyq/data]
+
+  - [0x2E800]

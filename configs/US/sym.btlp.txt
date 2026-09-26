@@ -1,0 +1,2 @@
+// Revelations: Persona (US) - btlp. Nothing named yet.
+g_overlay_base       = 0x80065A84;

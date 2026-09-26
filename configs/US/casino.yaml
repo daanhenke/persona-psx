@@ -1,0 +1,53 @@
+name: "Revelations: Persona (US) - casino"
+sha1: a0027622a79d8617973f81f4102b3848bef38246
+
+options:
+  platform: psx
+  basename: casino
+  base_path: ../..
+  target_path: rom/US/CASINO.BIN
+  asm_path: asm/US/casino
+  src_path: src/casino
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/casino.ld
+  symbol_addrs_path: configs/US/sym.casino.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.casino.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.casino.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: casino
+    type: code
+    start: 0x0
+    vram: 0x80065A84
+    subsegments:
+      - [0x0, rodata, casino_id]
+      - [0x4, asm, casino]
+      - [0x2F76C, data, casino_data]
+      - [0x43E24, bss, casino_bss]
+
+  - [0x50318]

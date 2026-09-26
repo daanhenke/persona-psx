@@ -109,7 +109,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        game_version: [ JP1 ]
+        game_version: [ JP1, US ]
 
     runs-on: ubuntu-latest
     steps:
@@ -160,7 +160,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        game_version: [ JP1 ]
+        game_version: [ JP1, US ]
 
     runs-on: ubuntu-latest
     steps:
@@ -203,7 +203,8 @@ jobs:
                                              m['matched_code_percent']))
           PY
 
-      # decomp.dev reads the report from this artifact.
+      # decomp.dev reads the report from this artifact, one per version
+      # (JP1_report, US_report).
       - name: Upload progress report
         uses: actions/upload-artifact@v4
         with:

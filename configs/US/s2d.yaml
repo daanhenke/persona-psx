@@ -1,0 +1,54 @@
+name: "Revelations: Persona (US) - s2d"
+sha1: 1dc365ad4c23db795de337824fa0521ebb264131
+
+options:
+  platform: psx
+  basename: s2d
+  base_path: ../..
+  target_path: rom/US/S2D.BIN
+  asm_path: asm/US/s2d
+  src_path: src/s2d
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/s2d.ld
+  symbol_addrs_path: configs/US/sym.s2d.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.s2d.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.s2d.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 0
+  data_string_guesser_level: 0
+
+# Not decompiled for US yet: plain asm, so the US progress report counts
+# the whole target. Boundaries mapped from the JP1 config by matching code;
+# psyq/ is kept out of the report, as in JP1.
+segments:
+  - name: s2d
+    type: code
+    start: 0x0
+    vram: 0x80065A84
+    subsegments:
+      - [0x0, rodata, s2d_id]
+      - [0x4, rodata, s2d_rodata]
+      - [0xE84, asm, s2d]
+      - [0x380A0, data, s2d_data]
+      - [0x4C6C8, bss, s2d_bss]
+
+  - [0x557C0]
