@@ -654,17 +654,18 @@ BoxRowBottom             = 0x800899DC; // type:func size:0x70
 //-------------------------------------------------------------
 //--- PA: 0x0256AC   VA: 0x80089A4C   subsegment: asm, dng_2_s8
 //-------------------------------------------------------------
-D_80089A4C               = 0x80089A4C; // type:func size:0xA8
-func_80089AF4            = 0x80089AF4; // type:func size:0x1D8
-func_80089CCC            = 0x80089CCC; // type:func size:0x2C0
-func_80089F8C            = 0x80089F8C; // type:func size:0x168
-func_8008A0F4            = 0x8008A0F4; // type:func size:0x98
+TileMapWriteBarCapped    = 0x80089A4C; // type:func size:0x54
+TileMapWriteBarCapped2   = 0x80089AA0; // type:func size:0x54
+SkillScreenLayout        = 0x80089AF4; // type:func size:0x1D8
+SkillPersonasDraw        = 0x80089CCC; // type:func size:0x2C0
+SkillSpellsDraw          = 0x80089F8C; // type:func size:0x168
+DrawPersonaKeyName       = 0x8008A0F4; // type:func size:0x98
 DrawPersonaName          = 0x8008A18C; // type:func size:0x90
 DrawSpellName            = 0x8008A21C; // type:func size:0xC0
 MenuScreenDraw           = 0x8008A2DC; // type:func size:0x94
-func_8008A370            = 0x8008A370; // type:func size:0x1C4
-func_8008A534            = 0x8008A534; // type:func size:0x17C
-func_8008A6B0            = 0x8008A6B0; // type:func size:0x2E0
+EquipScreenLayout        = 0x8008A370; // type:func size:0x1C4
+ItemUseLayout            = 0x8008A534; // type:func size:0x17C
+DrawPartySlotStatus      = 0x8008A6B0; // type:func size:0x2E0
 StatusDrawMain           = 0x8008A990; // type:func size:0x9DC
 
 //----------------------------------------------------------------------

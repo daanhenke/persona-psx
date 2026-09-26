@@ -60,9 +60,9 @@ extern int    MenuStepMember(int *sel, u_char last);
 extern u_char CharTopEntry(short slot);
 extern u_char PersonaTopSpell(short id);
 extern void   BgPanelSet(u_short id, short x, short y);
-extern void   func_80089AF4(void);
-extern void   func_80089CCC(int member);
-extern void   func_80089F8C(int member, int persona);
+extern void   SkillScreenLayout(void);
+extern void   SkillPersonasDraw(int member);
+extern void   SkillSpellsDraw(int member, int persona);
 extern void   MenuTopRedraw(void);
 extern u_char D_80099FFC[];
 extern u_char D_8009ABFC[];
@@ -79,7 +79,7 @@ extern int    func_80076380(void);
 #define SPELL_ESCAPE_B 0x73
 #define TARGET_PARTY   4
 extern u_char g_persona_list_rule[];
-extern void   func_8008A0F4(u_char key, short *dst, int base);
+extern void   DrawPersonaKeyName(u_char key, short *dst, int base);
 extern void   DrawCharStatBars(Char *rec);
 
 /* The glyph between the header's Persona and its bank. */
@@ -302,11 +302,11 @@ void SkillMemberPick(void)
     }
     if (InputCheckAcceptA(1)) {
         func_80092E5C(6);
-        func_80089AF4();
-        func_80089CCC(g_menu->skill_member.cur);
+        SkillScreenLayout();
+        SkillPersonasDraw(g_menu->skill_member.cur);
         MenuListInit(&g_menu->skill_persona, 0, 0,
                      CharTopEntry(g_menu->skill_member.cur), 0x16);
-        func_80089F8C(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
         SlotInitTagged(D_80099FFC, 2, 0x42, 0x58,
                        g_menu->skill_persona.cur * 12 + 0x54);
         SlotSetFlicker(2, 1);
@@ -337,8 +337,8 @@ void SkillPersonaPick(void)
             g_menu->skill_spell.cur = 0;
             MenuListInit(&g_menu->skill_persona, 0, 0,
                          CharTopEntry(g_menu->skill_member.cur), 0x16);
-            func_80089CCC(g_menu->skill_member.cur);
-            func_80089F8C(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+            SkillPersonasDraw(g_menu->skill_member.cur);
+            SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
             SlotSetPos(1, 0x42,
                        (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
                        (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
@@ -352,7 +352,7 @@ void SkillPersonaPick(void)
     } else if (g_menu->skill_persona.hi != 0xFF &&
                MenuStepCursor(&g_menu->skill_persona)) {
         g_menu->skill_spell.cur = 0;
-        func_80089F8C(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
     }
     SlotSetPos(2, 0x42, 0x58, g_menu->skill_persona.cur * 12 + 0x54);
     DrawStatusHud();
@@ -504,9 +504,9 @@ void SkillTargetPick(void)
         pp = (Persona *)(p * sizeof(Persona) + personas);
         c->sp -= pp->sp_cost;
         MenuScreenDraw();
-        func_80089AF4();
-        func_80089CCC(g_menu->skill_member.cur);
-        func_80089F8C(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillScreenLayout();
+        SkillPersonasDraw(g_menu->skill_member.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
         if (!ItemUsableAny(g_skill_help_spell) || c->sp < pp->sp_cost) {
             goto back;
         }
@@ -593,9 +593,9 @@ void StatusPageDraw(member)
             if (c->entry == row) {
                 bank = 3;
                 *AT(g_tilemap1, 10, 20) = GLYPH_SEP;
-                func_8008A0F4(personas[i].key, AT(g_tilemap1, 10, 22), 0);
+                DrawPersonaKeyName(personas[i].key, AT(g_tilemap1, 10, 22), 0);
             }
-            func_8008A0F4(personas[i].key, AT(g_tilemap1, 4 + row, 11),
+            DrawPersonaKeyName(personas[i].key, AT(g_tilemap1, 4 + row, 11),
                           bank * 0xD7);
         } else {
             TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, 4 + row, 12),
@@ -624,7 +624,7 @@ void StatusSlotDraw(member, slot)
     TileMapFillRect(AT(g_tilemap1, 1, 32), 0, 3, 2, MAP_W);
     i = c->list[slot];
     if (i != 0xFF) {
-        func_8008A0F4(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        DrawPersonaKeyName(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
         n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, n);
         n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
@@ -663,7 +663,7 @@ void StatusPreviewDraw(Char *c)
     TileMapFillRect(AT(g_tilemap1, 11, 23), 0, 2, 5, MAP_W);
     i = c->list[c->entry];
     if (i != 0xFF) {
-        func_8008A0F4(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        DrawPersonaKeyName(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
         n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 32), GLYPH_DIGIT0, n);
         *AT(g_tilemap1, 1, 33) = GLYPH_SEP;

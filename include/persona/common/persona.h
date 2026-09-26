@@ -163,6 +163,12 @@ extern u_char g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W];
 
 /* A Persona's name into a menu row, from glyph bank `base`; the row is
    cleared first, so id 0 leaves it blank. */
+#ifdef NAME_KR
+/* DNG's copy is defined old-style (personaname.c); its own object is
+   built without the prototype. */
+extern void DrawPersonaName();
+#else
 extern void DrawPersonaName(short persona, short *dst, u_short base);
+#endif
 
 #endif

@@ -1,7 +1,7 @@
 /* Persona 1 (JP) - a spell's name in a menu row.
  *
- * Compiled into two overlays rather than called across the boundary:
- *   ADV 0x8007B7E0   S2D 0x8007A660
+ * Compiled into three overlays rather than called across the boundary:
+ *   ADV 0x8007B7E0   S2D 0x8007A660   DNG 0x8008A21C
  *
  * The row is cleared first, so an empty slot is blank unless the caller asks
  * for a rule instead - the same eight long-vowel marks the Persona list draws
@@ -22,12 +22,25 @@
 
 extern u_char g_persona_list_rule[];
 
-extern void TileMapWriteRow(const u_char *src, short *dst, u_short base,
-                            u_short count);
 extern void TileMapFillRect(short *dst, short value, u_short w, u_short h,
                             u_short stride);
 
+#ifdef NAME_KR
+/* DNG's copy is defined old-style, as DrawPersonaName's is. */
+extern void TileMapWriteRow(const u_char *src, short *dst, int base,
+                            u_short count);
+
+void DrawSpellName(spell, dst, base, rule)
+    short  spell;
+    short *dst;
+    short  base;
+    short  rule;
+#else
+extern void TileMapWriteRow(const u_char *src, short *dst, u_short base,
+                            u_short count);
+
 void DrawSpellName(short spell, short *dst, u_short base, short rule)
+#endif
 {
     TileMapFillRect(dst, 0, NAME_CELLS, 1, MAP_W);
     if (spell != 0) {

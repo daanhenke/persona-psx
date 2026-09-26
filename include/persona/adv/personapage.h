@@ -63,7 +63,13 @@ extern void TileMapDrawBox(short *dst, u_short w, short h, u_short stride);
 extern void TileMapBlitRle(const u_short *src, short *dst, u_short stride);
 extern void TileMapWriteBar(short *dst, u_char width);
 extern void func_8008EDBC(int);
+#ifdef NAME_KR
+/* DNG defines it old-style (spellname.c); units built against that see no
+   prototype and hand the base over unnarrowed. */
+extern void DrawSpellName();
+#else
 extern void DrawSpellName(short spell, short *dst, u_short base, short rule);
+#endif
 extern void CellsClear(GsCELL *dst, u_char count);
 extern void CellsWriteRow(GsCELL *dst, const u_char *src, u_char page,
                           u_short count);

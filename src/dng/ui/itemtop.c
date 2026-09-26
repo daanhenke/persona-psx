@@ -80,7 +80,7 @@ extern void   func_80086E20(int a, int b);
 extern void   MenuTopRedraw(void);
 extern void   func_80086B08(int a, int b);
 extern void   func_800891A8(int a, int b);
-extern void   func_8008A534(void);
+extern void   ItemUseLayout(void);
 extern void   func_80092E5C(int);
 extern void   func_800929D8(void);
 extern void   func_8008E948(int member, int item);
@@ -168,7 +168,7 @@ void ItemTopStep(void)
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
-            func_8008A534();
+            ItemUseLayout();
             CopyShorts(g_items, g_item_list, BAG_SIZE);
             for (; i < USE_ROWS; i++) {
                 DrawItemRowUsable((g_use_top + i) * 2,
@@ -391,7 +391,7 @@ void ItemTargetStep(void)
         use:
             func_8008E948(g_menu->list[1].cur, id);
         }
-        func_8008A534();
+        ItemUseLayout();
         if (g_item_defs[id].unk06 & ITEM_CONSUMED) {
             ItemsRemovePending(id, 1);
         }
