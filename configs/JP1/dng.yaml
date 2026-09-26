@@ -219,7 +219,7 @@ segments:
       - [0x27A54, c, common/ui/textnumber]
       - [0x27B08, c, common/game/explevel]
       - [0x27BB0, c, common/game/eventflag2]
-      - [0x27BE8, asm, dng_2_s11_x1]
+      - [0x27BE8, c, ui/equipscreen]
       - [0x2A19C, c, common/game/equipbest]
       - [0x2A290, c, common/game/equippick]
       - [0x2A43C, c, common/gfx/gauge]
