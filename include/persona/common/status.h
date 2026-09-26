@@ -52,7 +52,16 @@ extern u_char g_party_last;
    the prototype is what decides how the arguments are converted. */
 extern u_char CharHasStatus(u_char slot, u_char status);
 extern u_char CharBelowMax(u_char slot, u_char kind);
+#ifdef ITEM_USABLE_INT
+/* dng's status menu was built against int-taking, int-returning declarations
+   of the two item tests: it hands both arguments over unnarrowed and uses the
+   answer unmasked. */
+extern int    ItemUsableOn(int slot, int item);
+extern int    ItemUsableAny(int item);
+#else
 extern u_char ItemUsableOn(u_char slot, short item);
+extern u_char ItemUsableAny(short item);
+#endif
 extern u_char PartyAnyStatus(u_char status);
 extern u_char PartyAnyBelowMax(u_char kind);
 

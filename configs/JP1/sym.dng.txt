@@ -106,7 +106,7 @@ rand                     = 0x80041368; // type:func
 g_persona_data           = 0x80041760; // size:0x38
 g_char_templates         = 0x80044278; // size:0x168
 g_item_defs              = 0x800443E0; // size:0x20C
-g_spell_data             = 0x80047D20;
+g_spell_data             = 0x80047D20; // size:0x14
 g_bg_maps                = 0x8004AA54;
 g_persona_defs           = 0x8004B0A8; // size:0x2C
 g_exp_curve              = 0x8004C204;
@@ -487,20 +487,20 @@ func_8007A670            = 0x8007A670; // type:func size:0x520
 func_8007AB90            = 0x8007AB90; // type:func size:0x68C
 func_8007B21C            = 0x8007B21C; // type:func size:0x8CC
 StatusMenuStep           = 0x8007BAE8; // type:func size:0xF4
-func_8007BBDC            = 0x8007BBDC; // type:func size:0x60
-func_8007BC3C            = 0x8007BC3C; // type:func size:0x3C8
-func_8007C004            = 0x8007C004; // type:func size:0xF8
-func_8007C0FC            = 0x8007C0FC; // type:func size:0x270
-func_8007C36C            = 0x8007C36C; // type:func size:0x228
-func_8007C594            = 0x8007C594; // type:func size:0x4B8
-func_8007CA4C            = 0x8007CA4C; // type:func size:0x3A4
-func_8007CDF0            = 0x8007CDF0; // type:func size:0x318
-func_8007D108            = 0x8007D108; // type:func size:0x17C
+StatusMenuOpen           = 0x8007BBDC; // type:func size:0x60
+StatusTopStep            = 0x8007BC3C; // type:func size:0x3C8
+StatusStockScreen        = 0x8007C004; // type:func size:0xF8
+StatusStockOpen          = 0x8007C0FC; // type:func size:0x270
+SkillMemberPick          = 0x8007C36C; // type:func size:0x228
+SkillPersonaPick         = 0x8007C594; // type:func size:0x4B8
+SkillSpellPick           = 0x8007CA4C; // type:func size:0x3A4
+SkillTargetPick          = 0x8007CDF0; // type:func size:0x318
+StatusMemberPick         = 0x8007D108; // type:func size:0x17C
 StatusPageDraw           = 0x8007D284; // type:func size:0x3B4
-D_8007D638               = 0x8007D638; // type:func size:0x2DC
+StatusSlotDraw           = 0x8007D638; // type:func size:0x2DC
 StatusPreviewDraw        = 0x8007D914; // type:func size:0x3E4
 StatusPageLayout         = 0x8007DCF8; // type:func size:0x2A8
-func_8007DFA0            = 0x8007DFA0; // type:func size:0x384
+StatusPageStep           = 0x8007DFA0; // type:func size:0x384
 StatusPersonaPick        = 0x8007E324; // type:func size:0x304
 StatusPersonaLayout      = 0x8007E628; // type:func size:0x3C8
 StatusPersonaPreview     = 0x8007E9F0; // type:func size:0x90
@@ -676,7 +676,7 @@ FontCellsInit            = 0x8008B36C; // type:func size:0x100
 //--- PA: 0x0270CC   VA: 0x8008B46C   subsegment: asm, dng_2_s9
 //-------------------------------------------------------------
 DrawStatusHud            = 0x8008B46C; // type:func size:0xEC
-func_8008B558            = 0x8008B558; // type:func size:0x108
+BgBoxShow                = 0x8008B558; // type:func size:0x108
 RunFrame                 = 0x8008B660; // type:func size:0x28
 
 //----------------------------------------------------------------------
@@ -693,7 +693,7 @@ PartyLastSlot            = 0x8008B86C; // type:func size:0x2C
 //--- PA: 0x0274F8   VA: 0x8008B898   subsegment: asm, dng_2_s9a
 //--------------------------------------------------------------
 MenuStepMember           = 0x8008B898; // type:func size:0x204
-func_8008BA9C            = 0x8008BA9C; // type:func size:0xD0
+BgPanelSet               = 0x8008BA9C; // type:func size:0xD0
 TextItemStatRow          = 0x8008BB6C; // type:func size:0x244
 
 //-----------------------------------------------------------------
@@ -1162,6 +1162,7 @@ str_place_in_battle      = 0x8009A610;
 g_arcana_labels          = 0x8009A61C; // size:0x9C
 g_kind_labels            = 0x8009A700;
 g_char_face_files        = 0x8009A8B7;
+g_menu_bg_rle            = 0x8009A8C4;
 g_fm_hint_def            = 0x8009AC1C;
 g_menu_top_def           = 0x8009AECC;
 g_fm_hint2_def           = 0x8009B09C;
@@ -1308,7 +1309,8 @@ g_view_at                = 0x800A0448; // size:0xC
 D_800A04B8               = 0x800A04B8; // size:0x1
 D_800A04C4               = 0x800A04C4; // type:u32 size:0x4
 g_hud_digits             = 0x800A04C8; // size:0xC
-D_800A04D4               = 0x800A04D4; // size:0x35C
+D_800A04D4               = 0x800A04D4; // size:0x4
+g_skill_help_spell       = 0x800A04D8; // size:0x2
 g_dng                    = 0x800A04DC;
 g_pack_cell_tab          = 0x800A04E4;
 g_pack_msg_tab           = 0x800A04E8;

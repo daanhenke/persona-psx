@@ -110,7 +110,12 @@ extern void SlotSetPos(u_char slot, int attr, int x, int y);
 #else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 #endif
+#ifdef SLOT_CLEAR_INT
+/* dng's status menu hands the slot over unmasked. */
+extern void SlotClear(int slot);
+#else
 extern void SlotClear(u_char slot);
+#endif
 extern void SlotClearAll(void);
 /* The same kind of per-unit difference: some callers were built against an
    int-taking declaration and hand over the slot unmasked. */

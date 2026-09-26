@@ -63,6 +63,7 @@ segments:
       - [0x1D8, rodata, dng_rodata0d]
       - [0x22C, .rodata, ui/mainmenu]
       - [0x244, rodata, dng_rodata0e]
+      - [0x264, .rodata, ui/statusmenu]
       - [0x2C4, .rodata, ui/formationmenu]
       # the step table is nine words; the pad word after it is not the C's.
       - [0x2E8, rodata, dng_rodata0f]
@@ -155,6 +156,7 @@ segments:
       - [0x14BF4, asm, dng_2]
       - [0x15DB0, c, common/ui/itemstats]
       - [0x15E14, asm, dng_2_s1]
+      - [0x17748, c, ui/statusmenu]
       - [0x19F84, c, ui/statuspersona]
       - [0x1BC9C, c, ui/formationmenu]
       - [0x1C868, c, common/ui/menustatus]
