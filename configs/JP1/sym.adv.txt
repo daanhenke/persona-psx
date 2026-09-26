@@ -1369,6 +1369,8 @@ FuseResultRowDraw        = 0x800A14C4; // type:func
 FuseResultLineDraw       = 0x800A1690; // type:func
 FusionStockDraw          = 0x800A1824; // type:func
 
+ShopBuyOpen              = 0x800A9978; // type:func
+ShopSellOpen             = 0x800A9EF0; // type:func
 ShopMoneyDraw            = 0x800AA468; // type:func
 ShopTotalDraw            = 0x800AA4DC; // type:func
 ShopTotalRedraw          = 0x800AA584; // type:func

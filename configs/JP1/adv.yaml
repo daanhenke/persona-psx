@@ -341,6 +341,7 @@ segments:
       - [0x3C0B0, c, ui/fuserules]
       - [0x3CAC0, c, ui/fusedraw]
       - [0x3D5F0, asm, adv_53b]
+      - [0x455D8, c, ui/shoppages]
       - [0x460C8, c, ui/shopcount]
       - [0x46C34, c, game/money]
       - [0x46C68, asm, adv_54]
