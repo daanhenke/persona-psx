@@ -1339,6 +1339,15 @@ SaveSlotsOpen            = 0x8009B4C4; // type:func
 SaveSlotsDraw            = 0x8009B61C; // type:func
 SaveMessage              = 0x8009B9E4; // type:func
 SavePortOpen             = 0x8009BAD0; // type:func
+FuseListResults          = 0x8009BCE4; // type:func
+FuseListHas              = 0x8009BDF8; // type:func
+FuseSearchStep           = 0x8009BE48; // type:func
+FuseResultPick           = 0x8009BEE4; // type:func
+FusePairPick             = 0x8009C30C; // type:func
+FuseConfirmStep          = 0x8009CA6C; // type:func
+FuseListPairs            = 0x8009CD00; // type:func
+FusePairRowDraw          = 0x8009CE0C; // type:func
+FusePairsOpen            = 0x8009D120; // type:func
 
 //-------------------------------------------------------------
 //--- PA: 0x046C34   VA: 0x800AAFD4   subsegment: c, game/money
@@ -1775,6 +1784,8 @@ g_room_actor_defs        = 0x801001F0; // ignore:True size:0x900
 g_prop_defs              = 0x80100AF0; // ignore:True size:0xE0
 g_mark_defs              = 0x80100BD0; // ignore:True size:0x50
 g_spot_defs              = 0x80100C20; // ignore:True size:0x20
+g_fuse_results           = 0x80130000; // ignore:True size:0x200
+g_fuse_pairs             = 0x80130200; // ignore:True size:0x400
 g_adv_actors             = 0x801F15D8; // ignore:True size:0x5E8
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 g_personas               = 0x801F1DAC; // ignore:True size:0x7C0
