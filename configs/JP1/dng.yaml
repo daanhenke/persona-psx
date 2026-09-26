@@ -142,6 +142,8 @@ segments:
       - [0x14BF4, asm, dng_2]
       - [0x15DB0, c, common/ui/itemstats]
       - [0x15E14, asm, dng_2_s1]
+      - [0x19F84, c, ui/statuspersona]
+      - [0x1BC9C, asm, dng_2_s1_x1]
       - [0x1C868, c, common/ui/menustatus]
       - [0x1C900, asm, dng_2_s2]
       - [0x1FFF8, c, common/ui/placelabel]

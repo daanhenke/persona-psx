@@ -68,13 +68,20 @@ extern void CellsClear(GsCELL *dst, u_char count);
 extern void CellsWriteRow(GsCELL *dst, const u_char *src, u_char page,
                           u_short count);
 
+#ifdef PERSONAPAGE_DNG
+/* DNG's copy tests the results unmasked and hands the id over unnarrowed. */
+extern int    InputCheckAcceptA(int repeat);
+extern int    InputCheckAcceptB(int repeat);
+extern void   DrawPersonaDataStatBars(int id);
+#else
 extern u_char InputCheckAcceptA(u_char repeat);
 extern u_char InputCheckAcceptB(u_char repeat);
+extern void   DrawPersonaDataStatBars(short id);
+#endif
 extern int    MsgStep(void);
 extern void   RunFrame(void);
 extern void   TimQueueAt(u_long *tim, short x, short y, short cx, short cy);
 extern void   AdvResolveSceneLoc(short kind, int index, void *unused);
-extern void   DrawPersonaDataStatBars(short id);
 
 extern CdlFILE g_adv_scene_file;
 extern short   g_cam_y;
