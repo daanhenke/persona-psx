@@ -186,7 +186,8 @@ segments:
       # with the word of padding behind it inside the unit.
       - [0x11B4, .rodata, membermotion03]
       - [0x11D0, pad, btlp_pad_11d0]  # the table is seven words, the gcc one eight
-      - [0x11D4, rodata, btlp_rodata6b1]
+      # BtlPersonaSpellMove's phase table, which personaact.c emits itself.
+      - [0x11D4, .rodata, personaact]
       # BtlEnemyMotion02's switch table, which enemymotion2.c emits itself, and
       # the word of padding behind it that belongs to nobody.
       - [0x1238, .rodata, enemymotion2]

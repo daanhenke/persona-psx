@@ -190,18 +190,13 @@ void BtlPersonaPlayMove(BtlObj *o)
     }
 }
 
-/* 99.80%. The walk, its shared tail and the second pass over the mask are the
-   image's - the second pass steps its one counter past the test rather than
-   before it, which is what the image does and what lets gcc reduce the same
-   counter to the record's own stride. What is left is one branch: the arm that
-   aims at a single slot tests the same three things the image tests, and gcc
-   threads the jump to the shared "nothing to hit" tail into the branch where
-   the image leaves it standing - written as three ors with the goto, as an
-   and with the else, and with the flag set ahead of the test, all three come
-   out the same, and so does `continue` with the goto after it. The table's
-   name comes right when the rodata is carved, which
-   waits on the match. */
-#ifdef NON_MATCHING
+/* The single-slot arm sets `picked` once the first two tests have passed and
+   leaves by `continue`, with `goto none` after it: jump.c then turns the
+   jump around the jump into the image's branch to the loop test (picked in
+   its delay slot) followed by the standing jump to the shared tail. And the
+   repeat arm sets `picked` after it has worked out 1 << order, so cse does
+   not take that 1 from picked's register: it comes from the one loop.c
+   lifts for the hit mask, as in the image. */
 void BtlPersonaSpellMove(BtlObj *o)
 {
     BtlActor        *a;
@@ -256,13 +251,14 @@ void BtlPersonaSpellMove(BtlObj *o)
             if ((sp->aim & PERSONA_AIM_ONE) != 0) {
                 if (g_btl_actors[g_btl_hit_slot].c.key != 0
                     && (signed char)g_btl_actors[g_btl_hit_slot].c.status
-                           != BTL_STATUS_DOWN
-                    && (g_btl_actors[g_btl_hit_slot].flags & BTL_ACTOR_OUT)
-                           == 0) {
+                           != BTL_STATUS_DOWN) {
                     picked = 1;
-                } else {
-                    goto none;
+                    if ((g_btl_actors[g_btl_hit_slot].flags & BTL_ACTOR_OUT)
+                        == 0) {
+                        continue;
+                    }
                 }
+                goto none;
             } else {
                 for (; g_btl_hit_walk < BTL_ACTORS;
                      g_btl_hit_walk++, g_btl_hit_mask *= 2) {
@@ -280,9 +276,9 @@ void BtlPersonaSpellMove(BtlObj *o)
                 if (g_btl_hit_walk < BTL_ACTORS) {
                     continue;
                 }
-                picked = 1;
                 if ((sp->aim & PERSONA_AIM_AGAIN) != 0) {
                     a->targets |= 1 << a->order;
+                    picked = 1;
                     i = 0;
                     held = g_btl_hits_left;
                     g_btl_hits_left = 0;
@@ -372,6 +368,3 @@ void BtlPersonaSpellMove(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personaact", BtlPersonaSpellMove);
-#endif

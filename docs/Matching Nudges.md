@@ -3818,3 +3818,26 @@ variable that sched keeps past the store.
   store, as in the image. The face's `v` is
   `(row + HUD_CORNER_Y(i)) * 16 + (*cell >= 0x50 ? 8 : 0)`, one statement, so
   its address is formed before the branch. Together: 93.63% to 98.08%.
+## A branch to the loop test with a jump standing after it is `continue; goto`
+
+When the image leaves a test as `beqz v0, <loop test>` with the flag in the
+delay slot and an unconditional `j <shared tail>` right after it, both targets
+out of line, the arm was written as a jump around a jump. `if (ok) continue;
+goto none;` expands to "if not ok, skip; jump to the loop test; skip: jump to
+none", and jump.c turns that into the inverted branch plus the standing jump.
+`if (ok) picked = 1; else goto none;` falls into the flag instead, and gcc
+threads the jump to the tail into the test. Set the flag where the image
+fills the slot from: just ahead of the last test.
+
+- [personaact.c](/src/btlp/personaact.c) - `BtlPersonaSpellMove`'s
+  single-slot arm; with the next entry, 99.80% to exact.
+
+## A flag set to 1 before a `1 << n` lends the shift its register
+
+cse1 has a register known to hold 1 as soon as `flag = 1` has run, and it
+uses that register for the 1 of a later `1 << n`. The image instead takes the
+1 from a copy loop.c lifted for another store of 1 in the loop. Set the flag
+after the shift and cse has nothing to borrow.
+
+- [personaact.c](/src/btlp/personaact.c) - `BtlPersonaSpellMove`: `picked = 1`
+  after `a->targets |= 1 << a->order`.
