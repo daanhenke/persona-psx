@@ -72,7 +72,7 @@ extern void   SpellApplyField(int target, int caster, int spell);
 extern void   MenuScreenDraw(void);
 extern void   StatusPersonaPreview(void);
 /* The field's message stepper. */
-extern int    func_80076380(void);
+extern int    MsgStep(void);
 
 /* The two escape spells need no target. */
 #define SPELL_ESCAPE_A 0x6F
@@ -422,7 +422,7 @@ void SkillSpellPick(void)
         SlotSetPos(3, 0x42, 0xC8, g_menu->skill_spell.cur * 12 + 0x24);
     }
     DrawStatusHud();
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         p = (Persona *)(i * sizeof(Persona) + personas);
         g_skill_help_spell = p->spell[g_menu->skill_spell.cur];
@@ -476,7 +476,7 @@ void SkillTargetPick(void)
     Persona *pp;
 
     DrawStatusHud();
-    func_80076380();
+    MsgStep();
     if ((u_short)g_skill_help_spell == SPELL_ESCAPE_A ||
         (u_short)g_skill_help_spell == SPELL_ESCAPE_B) {
         goto cast;

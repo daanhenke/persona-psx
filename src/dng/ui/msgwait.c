@@ -12,19 +12,19 @@ extern int  g_pad_pressed[];
 
 extern void RunFrame(void);
 /* The field's message stepper. */
-extern int  func_80076380(void);
+extern int  MsgStep(void);
 
 void MsgWaitPress(step)
     short step;
 {
     do {
         if (step) {
-            func_80076380();
+            MsgStep();
         }
         RunFrame();
     } while (g_pad_pressed[0] == 0);
     if (step) {
-        func_80076380();
+        MsgStep();
     }
     RunFrame();
 }

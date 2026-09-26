@@ -159,7 +159,7 @@ extern void   DrawPersonaDataStatBars(int id);
 extern void   PersonaDataLayout(void);
 /* Defined old-style, as in ADV: the id goes over as the u_char it is. */
 extern void   PersonaDataDraw();
-extern int    func_80076380(void);
+extern int    MsgStep(void);
 extern void   ArcanaGridOpen(void);
 extern void   ArcanaGridStep(void);
 extern void   PersonaDataView(void);
@@ -381,7 +381,7 @@ void ArcanaGridOpen(void)
     g_header_scroll_y = g_arcana_top * 12;
     g_bg_shown |= 0x10;
     BgMapInit(g_arcana_help_msgs[i], 0);
-    func_80076380();
+    MsgStep();
     g_cam_y = 0;
     g_map_scroll_y = 0;
 }
@@ -423,7 +423,7 @@ void ArcanaGridStep(void)
         g_persona_list_count = FlagsCollectGroup(arcana);
         DrawPersonaList();
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         if (g_persona_list_count != 0) {
             MenuListInit(&g_menu->list[1], 0, 0, g_persona_list_count - 1,
@@ -446,7 +446,7 @@ void PersonaDataPick(void)
 
     MenuStepCursor(&g_menu->list[1]);
     SlotSetPos(PICK_CURSOR_SLOT, 0x42, 0xD8, g_menu->list[1].cur * 12 + 0x30);
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         MenuListInit(&g_menu->list[0], g_menu->list[1].cur, 0,
                      g_persona_list_count - 1, 0x1A);

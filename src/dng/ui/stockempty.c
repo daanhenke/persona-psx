@@ -22,7 +22,7 @@ extern int    g_pad_pressed[];
 extern void BgMapInit(void *script, short speed);
 extern void RunFrame(void);
 /* The field's message stepper. */
-extern int  func_80076380(void);
+extern int  MsgStep(void);
 
 void StockEmptyNotice(void)
 {
@@ -44,7 +44,7 @@ void StockEmptyNotice(void)
     SlotClear(0xD);
     goto wait;
     do {
-        func_80076380();
+        MsgStep();
     wait:
         RunFrame();
     } while (g_pad_pressed[0] == 0);

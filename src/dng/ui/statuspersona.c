@@ -54,7 +54,7 @@ extern int    func_800992D4(short kind);
 extern void   func_80090464(int member);
 extern void   StockEmptyNotice(void);
 /* The field's message stepper. */
-extern int    func_80076380(void);
+extern int    MsgStep(void);
 extern void   BgMapInit(void *script, short speed);
 extern void   PersonaDataLayout(void);
 /* Defined old-style, as in the persona data screen. */
@@ -416,7 +416,7 @@ void StatusStockReleasePick(void)
         SlotSetPos(PICK_CURSOR_SLOT, 0x42, 0x48,
                    g_menu->stock_release.cur * 12 + 0x24);
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         MenuListInit(&g_menu->list[1], 1, 0, 1, 0x1E);
         SlotInitTagged(g_fm_prompt_cur_def, PROMPT_CUR_SLOT, 0x23, 0xE8,
@@ -449,7 +449,7 @@ void StatusStockReleaseConfirm(void)
     if (MenuStepCursor(&g_menu->list[1])) {
         SlotSetPos(PROMPT_CUR_SLOT, 0x23, 0xE8, g_menu->list[1].cur * 16 + 0xC2);
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         if (g_menu->list[1].cur == 0) {
             g_persona_stock[g_menu->stock_release.cur] = STOCK_FREE;

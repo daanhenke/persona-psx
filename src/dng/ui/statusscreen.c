@@ -81,7 +81,7 @@ extern void  DrawStatusHud(void);
 extern void  BgMapInit(void *script, short speed);
 extern void  MenuSetLayers(int);
 /* The field's message stepper. */
-extern int   func_80076380(void);
+extern int   MsgStep(void);
 
 void MenuStatusOpen(void)
 {
@@ -290,7 +290,7 @@ void MenuStatusView(void)
     SlotSetPos(PAGE_TOP_SLOT, 1, 0x40, 0x20 - g_cam_y);
     SlotSetPos(PAGE_BOTTOM_SLOT, 0x50, 0x40, 0x84 - g_cam_y);
     STATUS_MARKS();
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         MenuStatusOpen();
         g_bg_layer_otz[2] = 0x40;

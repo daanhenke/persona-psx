@@ -34,7 +34,7 @@ extern int    MenuStepMember(int *sel, u_char last);
 extern void   EquipScreen(short standalone);
 extern void   ItemMenuOpen(void);
 /* The field's message stepper. */
-extern int    func_80076380(void);
+extern int    MsgStep(void);
 extern u_char PageScrollValue(short *value, short lo, short hi, short step);
 extern void   ItemsMergePending(void);
 extern void   CopyShorts(u_short *src, u_short *dst, u_short count);
@@ -119,7 +119,7 @@ void ItemBagOpen(void)
     if (MenuStepCursor(&g_menu->unk040)) {
         SlotSetPos(3, 0x23, 0xF0, g_menu->unk040.cur * 16 + 0x4A);
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         MenuSetLayers(5);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
@@ -269,7 +269,7 @@ void ItemBagStep(void)
             DrawItemName(0, AT(g_tilemap1, 0, 11), 0xD7, 1);
         }
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         u_short *it;
 
@@ -385,7 +385,7 @@ void ItemSwapStep(void)
             TextItemStatRow(0, 0x30, 0x12);
         }
     }
-    func_80076380();
+    MsgStep();
     if (InputCheckAcceptA(1)) {
         sel = g_item_top * 2 + g_menu->item_col.cur + g_menu->item_row.cur * 2;
         if (sel != prev) {

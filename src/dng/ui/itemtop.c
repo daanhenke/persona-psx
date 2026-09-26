@@ -98,7 +98,7 @@ extern int    MenuScrollCursor(MenuList *m, short *row, short first, short last,
                                u_short *offset);
 extern void   MenuResetRepeat(MenuList *m);
 /* The field's message stepper. */
-extern int    func_80076380(void);
+extern int    MsgStep(void);
 
 extern void ItemMemberPick(void);
 extern void ItemBagOpen(void);
@@ -318,7 +318,7 @@ void ItemUseStep(void)
         prev = USE_SEL();
         TextSlotStatRow(prev);
     }
-    func_80076380();
+    MsgStep();
     if ((short)(g_header_scroll_y % ITEM_ROW_H) != 0) {
         return;
     }
@@ -369,7 +369,7 @@ void ItemTargetStep(void)
 
     sel = cur = USE_SEL();
     DrawStatusHud();
-    func_80076380();
+    MsgStep();
     id = g_item_list[cur] & ITEM_ID;
     if (id == ITEM_NO_TARGET_A || id == ITEM_NO_TARGET_B) {
         goto use;

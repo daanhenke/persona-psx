@@ -106,7 +106,7 @@ extern void func_80096B4C(short map, short turn);
 extern void func_80096818(void);
 extern void MenuSetLayers(int);
 /* The field's message stepper. */
-extern int  func_80076380(void);
+extern int  MsgStep(void);
 
 void MapScreen(void);
 void MapFindPlayer(void);
@@ -236,7 +236,7 @@ void MapScreen(void)
     MapDrawMarkers();
     g_persona_data_step = 0;
     for (i = 0; i < 10; i++) {
-        func_80076380();
+        MsgStep();
         RunFrame();
     }
     while (g_persona_data_step != MAP_CLOSED) {
