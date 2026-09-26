@@ -81,7 +81,7 @@ extern short  MenuScrollCursor(MenuList *m, short *row, short first,
 extern void   MenuResetRepeat(MenuList *m);
 extern void   StatusPersonaLayout(void);
 extern void   DrawPersonaStatBars(Persona *p);
-extern short  func_80098B0C(short kind);
+extern short  PersonaTypeLabel(short kind);
 /* PersonaFind is called without a prototype here. */
 extern void   DrawItemRow(short n, short *dst);
 extern void   TextItemStatRow(short item, short x, short y);
@@ -101,7 +101,7 @@ extern void   FusePairsOpen(void);
 extern short  FuseSpecialHas(short persona);
 extern short  FuseRollAccident(short kind);
 extern short  FuseRollKind(void);
-extern short  func_800A26DC(u_char a, u_char b);
+extern short  FuseMoonLookup(short a, short b);
 extern void   FuseApplyBonus(short p, short kind, short level);
 extern void   func_800AB23C(short persona, u_char src, short *spell,
                             short *rank);
@@ -542,7 +542,7 @@ void FusePersonaDraw(short id, short unused, short built)
         D_8008D924(d, 4);
         i = D_800B198B[d->kind];
         TileMapWriteRow(&D_800B1A98[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-        i = func_80098B0C(d->pad27[0]);
+        i = PersonaTypeLabel(d->pad27[0]);
         TileMapWriteRow(&D_800B1A98[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
         TileMapFillRect(AT(g_tilemap1, 33, 3), 0, 0x19, 1, MAP_W);
         TileMapWriteRow(&g_resist_labels[d->resist * 25], AT(g_tilemap1, 33, 3),
@@ -575,7 +575,7 @@ void FusePersonaDraw(short id, short unused, short built)
         DrawPersonaStatBars(p);
         i = D_800B198B[p->kind];
         TileMapWriteRow(&D_800B1A98[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-        i = func_80098B0C(g_persona_defs[p->key].pad27[0]);
+        i = PersonaTypeLabel(g_persona_defs[p->key].pad27[0]);
         TileMapWriteRow(&D_800B1A98[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
         TileMapFillRect(AT(g_tilemap1, 33, 3), 0, 0x19, 1, MAP_W);
         TileMapWriteRow(&g_resist_labels[g_persona_defs[p->key].resist * 25],
@@ -770,7 +770,7 @@ void FuseExecute(void)
         if (personas[p].stat[4] == 0 || personas[p].stat[4] >= 0x80) {
             personas[p].stat[4] = 1;
         }
-        p = func_800A26DC(g_persona_stock[g_menu->status_page.cur],
+        p = FuseMoonLookup(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur]);
         if (p && (personas[q].unk3B & 0xF0) != 0x10) {
             personas[q].unk3B = p;

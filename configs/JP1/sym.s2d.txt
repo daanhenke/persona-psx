@@ -545,7 +545,7 @@ D_80079E88               = 0x80079E88; // type:func size:0xA8
 func_80079F30            = 0x80079F30; // type:func size:0x1D8
 func_8007A108            = 0x8007A108; // type:func size:0x2CC
 func_8007A3D4            = 0x8007A3D4; // type:func size:0x16C
-func_8007A540            = 0x8007A540; // type:func size:0x94
+DrawPersonaKeyName       = 0x8007A540; // type:func size:0x94
 
 //------------------------------------------------------------------------
 //--- PA: 0x016234   VA: 0x8007A5D4   subsegment: c, common/ui/personaname
@@ -1002,7 +1002,7 @@ DrawPersonaList          = 0x800896B8; // type:func size:0xCC
 //--------------------------------------------------------------
 //--- PA: 0x0253E4   VA: 0x80089784   subsegment: asm, s2d_2_s27
 //--------------------------------------------------------------
-func_80089784            = 0x80089784; // type:func size:0x80
+PersonaTypeLabel         = 0x80089784; // type:func size:0x80
 func_80089804            = 0x80089804; // type:func size:0x3C
 func_80089840            = 0x80089840; // type:func size:0x168
 func_800899A8            = 0x800899A8; // type:func size:0x18

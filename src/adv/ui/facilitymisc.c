@@ -29,6 +29,8 @@
 #define ITEM_ID       0x1FF
 #define ITEM_NO_SALE  0x1000
 
+extern u_char g_moon;
+extern u_char g_fuse_moon_picks[];
 extern u_char D_800BA0E4[];     /* the fusion tables */
 extern int  g_pad_pressed[];
 extern void RunFrame(void);
@@ -45,7 +47,7 @@ void FacilityOpen3(void);
 extern void D_80078948(int a, int b);
 extern void D_8007A738(int a, int b);
 extern short func_800A6FFC(short i);
-extern void PersonaNameDraw(u_char persona, short *dst, int base);
+extern void DrawPersonaKeyName(u_char persona, short *dst, int base);
 extern void DrawItemName(int id, short *dst, u_short base, int b);
 extern const u_char g_persona_list_rule[];
 extern short g_item_top;
@@ -106,7 +108,17 @@ u_char FuseSpecialHas(short persona)
     return 0;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A26DC);
+/* The fusion tables' pick for the moon's phase and the second Persona's
+   arcana; the fusion keeps it on the result when it is not 0. The first
+   Persona plays no part. */
+short FuseMoonLookup(short a, short b)
+{
+    int row;
+
+    row = D_800BA0E4[0x230 + (g_moon & 0xF)];
+    return g_fuse_moon_picks[D_800BA0E4[0x240 + row] * 7 +
+                             D_800BA0E4[0x243 + g_persona_data[b].arcana * 9 + row]];
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A275C);
 
@@ -233,7 +245,7 @@ void PersonaSlotsDraw(void)
     TileMapFillRect(AT(g_tilemap1, 0, 1), 0, 10, 16, MAP_W);
     for (i = 0; i < 16; i++) {
         if (g_persona_slots[i] != SLOT_EMPTY) {
-            PersonaNameDraw(personas[g_persona_slots[i]].key,
+            DrawPersonaKeyName(personas[g_persona_slots[i]].key,
                             AT(g_tilemap1, i, 1), 0);
         } else {
             TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, i, 2), 0xD7, 8);

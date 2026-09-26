@@ -87,7 +87,7 @@ extern void TileMapDrawBox(short *dst, u_short w, short h, u_short stride);
 extern void TileMapBlitRle(const u_short *src, short *dst, u_short stride);
 extern void TileMapWriteBar(short *dst, u_char width);
 extern void MenuSetLayers(int);
-extern short func_800992D4(short kind);
+extern short PersonaTypeLabel(short kind);
 extern void DrawSpellName(short spell, short *dst, u_short base, short rule);
 extern void CellsClear(GsCELL *dst, u_char count);
 extern void CellsWriteRow(GsCELL *dst, const u_char *src, u_char page,
@@ -629,7 +629,7 @@ void PersonaDataDraw(id)
     i = g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W - 1 +
                         g_persona_data[id].arcana];
     TileMapWriteRow(&D_8009A7DC[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-    i = func_800992D4(g_persona_data[id].pad36[0]);
+    i = PersonaTypeLabel(g_persona_data[id].pad36[0]);
     TileMapWriteRow(&D_8009A7DC[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
     DrawPersonaDataStatBars(id);
 

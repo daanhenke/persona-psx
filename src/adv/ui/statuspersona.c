@@ -50,7 +50,7 @@ extern void CharPreviewEquip(Char *c, short slot, u_short item);
 extern void StatusPreviewDraw(Char *c);
 extern void DrawCharStatBars(Char *rec);
 extern void DrawPersonaStatBars(Persona *p);
-extern short func_80098B0C(short kind);
+extern short PersonaTypeLabel(short kind);
 extern u_char D_800B198B[];
 extern void   StatusPageLayout(void);
 extern void   func_8008C23C(short member);
@@ -248,7 +248,7 @@ void StatusPersonaDraw(persona)
 
     i = D_800B198B[p->kind];
     TileMapWriteRow(&D_800B1A98[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-    i = func_80098B0C(g_persona_defs[p->key].pad27[0]);
+    i = PersonaTypeLabel(g_persona_defs[p->key].pad27[0]);
     TileMapWriteRow(&D_800B1A98[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
     TileMapFillRect(AT(g_tilemap1, 33, 3), 0, 0x19, 1, MAP_W);
     TileMapWriteRow(&g_resist_labels[g_persona_defs[p->key].resist * 25],

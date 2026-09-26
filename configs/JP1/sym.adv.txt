@@ -558,7 +558,7 @@ D_8007AED0               = 0x8007AED0; // type:func size:0xA8
 func_8007AF78            = 0x8007AF78; // type:func size:0x310
 func_8007B288            = 0x8007B288; // type:func size:0x2CC
 func_8007B554            = 0x8007B554; // type:func size:0x16C
-PersonaNameDraw          = 0x8007B6C0; // type:func size:0x94
+DrawPersonaKeyName       = 0x8007B6C0; // type:func size:0x94
 
 //---------------------------------------------------------------------------
 //--- PA: 0x0173B4   VA: 0x8007B754   subsegment: c, ../common/ui/personaname
@@ -1328,7 +1328,7 @@ DrawPersonaList          = 0x80098A40; // type:func size:0xCC
 //-----------------------------------------------------------
 //--- PA: 0x03476C   VA: 0x80098B0C   subsegment: asm, adv_53
 //-----------------------------------------------------------
-func_80098B0C            = 0x80098B0C; // type:func size:0x80
+PersonaTypeLabel         = 0x80098B0C; // type:func size:0x80
 FacilityScreen           = 0x80098B8C; // type:func size:0x125C
 SaveScreenStep           = 0x80099DE8; // type:func
 SaveScreenOpen           = 0x80099E9C; // type:func
@@ -1375,6 +1375,7 @@ FusionStockDraw          = 0x800A1824; // type:func
 
 PersonaDefHasSpell       = 0x800A1E20; // type:func
 FuseSpecialHas           = 0x800A26A0; // type:func
+FuseMoonLookup           = 0x800A26DC; // type:func size:0x80
 ItemsListSellable        = 0x800A2904; // type:func
 FacilityStep6            = 0x800A2994; // type:func
 PersonaSlotsCount        = 0x800A470C; // type:func
@@ -1752,7 +1753,9 @@ g_arcana_help_msgs       = 0x800B97C8;
 g_flag_groups            = 0x800B9830;
 g_facility_defs          = 0x800BA074; // type:u32 size:0x4C
 D_800BA0C0               = 0x800BA0C0; // type:u32 size:0x24
-D_800BA0E4               = 0x800BA0E4; // type:u32 size:0x538
+D_800BA0E4               = 0x800BA0E4; // type:u32 size:0x2F8
+g_fuse_moon_picks        = 0x800BA3DC; // size:0x194
+g_fuse_random_personas   = 0x800BA570; // size:0x90
 g_money_msg              = 0x800BA61C; // size:0x14
 g_money_label            = 0x800BA668; // size:0x4
 g_save_port_msg          = 0x800BA6D8;

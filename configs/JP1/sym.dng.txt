@@ -1074,7 +1074,7 @@ DrawPersonaList          = 0x80099208; // type:func size:0xCC
 //--------------------------------------------------------------
 //--- PA: 0x034F34   VA: 0x800992D4   subsegment: asm, dng_2_s24
 //--------------------------------------------------------------
-func_800992D4            = 0x800992D4; // type:func size:0x80
+PersonaTypeLabel         = 0x800992D4; // type:func size:0x80
 
 
 

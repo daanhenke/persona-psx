@@ -44,6 +44,7 @@ extern short   g_use_top;
 extern u_char  g_moon;
 extern u_char  g_kind_labels[];
 extern u_char  D_800BA0E4[];
+extern u_char  g_fuse_random_personas[];
 extern u_char  D_800B9CAB[][0x16];
 
 extern int   rand(void);
@@ -283,7 +284,7 @@ void FuseItemBonus(short arcana, short item, int unused2, int unused3,
         r = rand() & 0xFF;
         if (r >= 0xC9) {
             r = D_800BA0E4[0x230 + (g_moon & 0xF)];
-            out->persona = D_800BA0E4[(rand() & 0xFF) / 16 * 9 + r + 0x48C];
+            out->persona = g_fuse_random_personas[(rand() & 0xFF) / 16 * 9 + r];
         } else {
             switch (r / 8) {
             case 0:

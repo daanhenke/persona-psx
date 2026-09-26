@@ -98,7 +98,7 @@ extern u_char  g_fm_prompt_cur_def[];
 extern u_char  D_800B1D08[];
 extern u_char  D_800B2330[];
 extern u_char  D_800B1EF8[];
-extern short func_80098B0C(short kind);
+extern short PersonaTypeLabel(short kind);
 
 extern u_char  D_800B9628[];
 
@@ -570,7 +570,7 @@ void PersonaDataDraw(id)
     i = g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W - 1 +
                         g_persona_data[id].arcana];
     TileMapWriteRow(&D_800B1A98[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-    i = func_80098B0C(g_persona_data[id].pad36[0]);
+    i = PersonaTypeLabel(g_persona_data[id].pad36[0]);
     TileMapWriteRow(&D_800B1A98[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
     DrawPersonaDataStatBars(id);
 

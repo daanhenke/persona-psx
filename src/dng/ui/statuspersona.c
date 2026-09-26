@@ -50,7 +50,7 @@ extern void   CharRecalcStats(u_char chr);
 extern void   bcopy(void *src, void *dst, int len);
 extern void   CharPreviewEquip(Char *c, short slot, u_short item);
 extern void   MenuSetLayers(int);
-extern int    func_800992D4(short kind);
+extern int    PersonaTypeLabel(short kind);
 extern void   func_80090464(int member);
 extern void   StockEmptyNotice(void);
 /* The field's message stepper. */
@@ -258,7 +258,7 @@ void StatusPersonaDraw(persona)
 
     i = D_8009A6CF[p->kind];
     TileMapWriteRow(&D_8009A7DC[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
-    i = func_800992D4(g_persona_defs[p->key].pad27[0]);
+    i = PersonaTypeLabel(g_persona_defs[p->key].pad27[0]);
     TileMapWriteRow(&D_8009A7DC[0x32 + i * 10], AT(g_tilemap1, 31, 18), 0, 10);
     TileMapFillRect(AT(g_tilemap1, 33, 3), 0, 0x19, 1, MAP_W);
     TileMapWriteRow(&g_resist_labels[g_persona_defs[p->key].resist * 25],

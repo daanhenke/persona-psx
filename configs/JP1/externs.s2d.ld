@@ -47,6 +47,7 @@ g_exp_curve = 0x8004C204;
 g_exp_curve_alt = 0x8004C38C;
 g_item_defs = 0x800443E0;
 g_persona_data = 0x80041760;
+g_persona_defs = 0x8004B0A8;
 g_spell_data = 0x80047D20;
 
 /* s2d work area sits 0x20000 above the one dng and adv share; the
