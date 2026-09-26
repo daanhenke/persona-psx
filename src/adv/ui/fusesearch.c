@@ -76,11 +76,11 @@ extern void   func_800A14C4(short row);
 extern short  func_800A2904(void);
 extern void   func_800A0E60(void);
 extern void   func_800AB1EC(void);
-extern void   func_8009DE28(void);
-extern void   func_8009F0FC(short persona, short a, short b);
-extern void   func_8009E2CC(void);
-extern void   func_8009EAB8(void);
-extern void   func_8009F7D0(void);
+extern void   FuseItemsOpen(void);
+extern void   FusePersonaDraw(short persona, short a, short b);
+extern void   FuseItemPick(void);
+extern void   FuseResultView(void);
+extern void   FuseExecute(void);
 
 short FuseListHas(short id);
 void  FuseResultPick(void);
@@ -156,13 +156,13 @@ void FuseSearchStep(void)
         FuseConfirmStep();
         break;
     case 3:
-        func_8009E2CC();
+        FuseItemPick();
         break;
     case 4:
-        func_8009EAB8();
+        FuseResultView();
         break;
     case 5:
-        func_8009F7D0();
+        FuseExecute();
         break;
     }
 }
@@ -309,7 +309,7 @@ void FusePairPick(void)
                 SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
                 MenuListInit(&g_menu->page, 0, 0, 1, 0x14);
                 StatusPersonaLayout();
-                func_8009F0FC(g_fuse.persona, 1, 0);
+                FusePersonaDraw(g_fuse.persona, 1, 0);
                 g_persona_data_step += 3;
             }
         } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
@@ -327,7 +327,7 @@ void FuseConfirmStep(void)
     if (InputCheckAcceptA(1)) {
         if (g_menu->list[1].cur == 0) {
             D_800BC050++;
-            func_8009DE28();
+            FuseItemsOpen();
             g_persona_data_step++;
             return;
         }
@@ -343,7 +343,7 @@ void FuseConfirmStep(void)
         SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
         MenuListInit(&g_menu->page, 0, 0, 1, 0x14);
         StatusPersonaLayout();
-        func_8009F0FC(g_fuse.persona, 0, 0);
+        FusePersonaDraw(g_fuse.persona, 0, 0);
         g_bg_map1.ncellh = 0x40;
         g_persona_data_step += 2;
         return;

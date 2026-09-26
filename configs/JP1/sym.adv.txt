@@ -1348,6 +1348,16 @@ FuseConfirmStep          = 0x8009CA6C; // type:func
 FuseListPairs            = 0x8009CD00; // type:func
 FusePairRowDraw          = 0x8009CE0C; // type:func
 FusePairsOpen            = 0x8009D120; // type:func
+FusionStep               = 0x8009D5A8; // type:func
+FusionPairPick           = 0x8009D634; // type:func
+FusionConfirm            = 0x8009DAE4; // type:func
+FuseItemsOpen            = 0x8009DE28; // type:func
+FuseItemPick             = 0x8009E2CC; // type:func
+FuseResultView           = 0x8009EAB8; // type:func
+FusePersonaDraw          = 0x8009F0FC; // type:func
+FuseExecute              = 0x8009F7D0; // type:func
+PersonaSlotsFree         = 0x800A0388; // type:func
+PersonaSlotsCompact      = 0x800A03C8; // type:func
 
 //-------------------------------------------------------------
 //--- PA: 0x046C34   VA: 0x800AAFD4   subsegment: c, game/money

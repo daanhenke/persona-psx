@@ -116,7 +116,7 @@ extern void  func_800A81C8(void);
 extern void  func_800A6728(void);
 extern void  func_800A5560(void);
 extern int   func_800A5B34(void);
-extern void  func_800A03C8(void);
+extern void  PersonaSlotsCompact(void);
 extern void  func_800A2A48(void);
 extern void  func_800A11EC(void);
 extern short FuseListResults(void);
@@ -127,7 +127,7 @@ extern void  func_800A6674(void);
 extern void  func_800A5B7C(void);
 extern void  func_800A4E2C(void);
 extern void  func_800A2994(void);
-extern void  func_8009D5A8(void);
+extern void  FusionStep(void);
 extern void  FuseSearchStep(void);
 extern void  SaveScreenStep(void);
 
@@ -333,7 +333,7 @@ u_char FacilityScreen(u_char id)
         TextItemStatRow(g_shop_items[i], 0x38, 0xE);
         break;
     case 6:
-        func_800A03C8();
+        PersonaSlotsCompact();
         MenuListInit(&g_menu->unk2E0, 0, 0, 9, 0x14);
         D_800BB7F4 = 0;
         func_800A2A48();
@@ -341,7 +341,7 @@ u_char FacilityScreen(u_char id)
         g_persona_data_step++;
         break;
     case 7:
-        func_800A03C8();
+        PersonaSlotsCompact();
         /* Called without a prototype here: the count comes back as an
            int, not extended from a short. */
         i = ((int (*)())PersonaStockCompact)();
@@ -364,7 +364,7 @@ u_char FacilityScreen(u_char id)
         }
         break;
     case 8:
-        func_800A03C8();
+        PersonaSlotsCompact();
         PersonaStockCompact();
         D_800BB950 = n = FuseListResults();
         if (n > 6) {
@@ -417,7 +417,7 @@ u_char FacilityScreen(u_char id)
             func_800A2994();
             break;
         case 7:
-            func_8009D5A8();
+            FusionStep();
             break;
         case 8:
             FuseSearchStep();
