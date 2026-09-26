@@ -90,7 +90,10 @@ extern void SlotInit(void *def, u_char slot, int attr, short x, short y);
    That is what makes it different from a unit declaring a prototype its
    neighbours declare differently, which is nearly always an accident of how
    the decompilation was written rather than something the object needs. */
-#if defined(SLOT_TAGGED_INTXY)
+#if defined(SLOT_TAGGED_INTXY) && defined(SLOT_TAGGED_INT)
+/* dng's config rows hand the slot over unmasked as well. */
+extern void SlotInitTagged(void *def, int slot, int attr, int x, int y);
+#elif defined(SLOT_TAGGED_INTXY)
 /* dng's persona data view hands x and y over unnarrowed too. */
 extern void SlotInitTagged(void *def, u_char slot, int attr, int x, int y);
 #elif defined(SLOT_TAGGED_INT)
@@ -99,7 +102,10 @@ extern void SlotInitTagged(void *def, int slot, int attr, short x, short y);
 extern void SlotInitTagged(void *def, u_char slot, int attr, short x, short y);
 #endif
 /* And again: dng's persona data screen hands x and y over unnarrowed. */
-#ifdef SLOT_SETPOS_INT
+#if defined(SLOT_SETPOS_INT) && defined(SLOT_SETPOS_SLOT_INT)
+/* dng's config rows and tactics hand the slot over unmasked as well. */
+extern void SlotSetPos(int slot, int attr, int x, int y);
+#elif defined(SLOT_SETPOS_INT)
 extern void SlotSetPos(u_char slot, int attr, int x, int y);
 #else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);

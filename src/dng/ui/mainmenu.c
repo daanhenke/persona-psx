@@ -30,6 +30,7 @@
 
 #define PACK_AT        ((u_long *)0x80180000)
 #define g_seq_handle   ((short *)0x801F537C)
+#define g_party_tactic ((u_char *)0x801F2AE6)
 
 /* The page g_menu_sel names once the menu has been closed. */
 #define MENU_CLOSED 0xFF
@@ -67,8 +68,6 @@ extern u_char  g_text_speed, g_map_north_up, g_cfg_stereo;
 /* The pad layout option, read here by name where the field reaches it by
    address (field.h's g_pad_layout). */
 extern u_char  g_pad_config;
-extern u_char  D_801F2AE6, D_801F2AE7, D_801F2AE8, D_801F2AE9, D_801F2AEA,
-               D_801F2AEB, D_801F2AEC;
 
 extern void VramClearRect(int x, int y, int w, int h);
 extern void TimQueueAt(u_long *tim, short x, short y, short cx, short cy);
@@ -261,8 +260,8 @@ void MainMenu(void)
     MenuListInit(&g_menu->unk2C0, g_cfg_stereo, 0, 1, 0x1A);
     MenuListInit(&g_menu->unk2D0, D_801F2AC9, 0, 1, 0x1A);
     MenuListInit(&g_menu->unk2E0, D_801F2ACA, 0, 2, 0x1A);
-    MenuListInit(&g_menu->unk2F0, D_801F2AEB, 0, 1, 0x1A);
-    MenuListInit(&g_menu->unk300, D_801F2AEC, 0, 1, 0x1A);
+    MenuListInit(&g_menu->unk2F0, g_party_tactic[5], 0, 1, 0x1A);
+    MenuListInit(&g_menu->unk300, g_party_tactic[6], 0, 1, 0x1A);
     MenuListInit(&g_menu->unk310, g_pad_config, 0, 1, 0x1E);
     MenuListInit(&g_menu->formation_cmd, 0, 0, 1, 0x1E);
     MenuListInit(&g_menu->list[2], 0, 0, 0, 6);
@@ -271,11 +270,11 @@ void MainMenu(void)
     MenuListInit(&D_800A0510, 0, 0, 0xB, 0x16);
     MenuListInit(&D_800A0520, 0, 0, 1, 0x1A);
     MenuListInit(&D_800A0458, 0, 0, 5, 0x16);
-    MenuListInit(&D_800A0468, D_801F2AE6, 0, 2, 0x1A);
-    MenuListInit(&D_800A0478, D_801F2AE7, 0, 2, 0x1A);
-    MenuListInit(&D_800A0488, D_801F2AE8, 0, 2, 0x1A);
-    MenuListInit(&D_800A0498, D_801F2AE9, 0, 2, 0x1A);
-    MenuListInit(&D_800A04A8, D_801F2AEA, 0, 2, 0x1A);
+    MenuListInit(&D_800A0468, g_party_tactic[0], 0, 2, 0x1A);
+    MenuListInit(&D_800A0478, g_party_tactic[1], 0, 2, 0x1A);
+    MenuListInit(&D_800A0488, g_party_tactic[2], 0, 2, 0x1A);
+    MenuListInit(&D_800A0498, g_party_tactic[3], 0, 2, 0x1A);
+    MenuListInit(&D_800A04A8, g_party_tactic[4], 0, 2, 0x1A);
     PadLoadBindings(g_pad_config);
     PadSetPageButtons(g_pad_config);
     SlotClearAll();

@@ -162,7 +162,10 @@ segments:
       - [0x1EF70, c, common/game/formationload]
       - [0x1F110, c, ui/configmenu]
       - [0x1FFF8, c, common/ui/placelabel]
-      - [0x20090, asm, dng_2_s3]
+      - [0x20090, c, ui/configrows]
+      - [0x203FC, c, ui/configtactics]
+      - [0x205B8, c, common/ui/configchoice]
+      - [0x20708, c, ui/configpage]
       - [0x208AC, c, common/ui/configlist]
       # DNG's battle-page redraw is eight bytes longer than the C.
       - [0x20A88, asm, dng_2_s3_x2]

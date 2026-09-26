@@ -4,4 +4,5 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
+#define PERSONAPAGE_DNG
 #include "../../../common/ui/configchoice.c"

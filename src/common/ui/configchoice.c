@@ -2,6 +2,7 @@
  *
  * Compiled into two overlays rather than called across the boundary:
  *   ADV @ 0x80075DB0 / 0x80075E94   S2D @ 0x80074D68 / 0x80074E4C
+ *   DNG @ 0x80084958 / 0x80084A2C
  *
  * The screen runs as nine states in g_menu_subsel. These are the two that
  * handle the row of choices along the top: state 7 walks a cursor across it,
@@ -21,9 +22,16 @@ extern char     g_menu_allow_hold;
 extern u_short  g_menu_subsel;
 
 extern int  MenuStepCursor(int *cursor);
+#ifdef PERSONAPAGE_DNG
+/* DNG's copy passes the position and tests the results unnarrowed. */
+extern void SlotSetPos(u_char slot, int attr, int x, int y);
+extern int  InputCheckAcceptA(int pad);
+extern int  InputCheckAcceptB(int pad);
+#else
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 extern char InputCheckAcceptA(short pad);
 extern char InputCheckAcceptB(short pad);
+#endif
 extern void SlotSetFlicker(u_char slot, u_char on);
 extern void TileMapDrawWindow(short *dst, u_short w, u_short h, u_short stride);
 extern void TileMapFillRect(short *dst, short value, u_short w, u_short h,
