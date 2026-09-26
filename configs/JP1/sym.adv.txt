@@ -1244,10 +1244,10 @@ PartyAnyBelowMax         = 0x80094A88; // type:func size:0x84
 //--- PA: 0x03076C   VA: 0x80094B0C   subsegment: asm, adv_50c
 //------------------------------------------------------------
 CharBelowMax             = 0x80094B0C; // type:func size:0xE4
-func_80094BF0            = 0x80094BF0; // type:func size:0x618
-func_80095208            = 0x80095208; // type:func size:0xEC
-func_800952F4            = 0x800952F4; // type:func size:0x10C
-func_80095400            = 0x80095400; // type:func size:0x454
+MapScreenOpen            = 0x80094BF0; // type:func size:0x618
+MapScreen                = 0x80095208; // type:func size:0xEC
+MapFindPlayer            = 0x800952F4; // type:func size:0x10C
+MapScreenLayout          = 0x80095400; // type:func size:0x454
 
 //----------------------------------------------------------------------------
 //--- PA: 0x0314B4   VA: 0x80095854   subsegment: c, ../common/game/roomrotate
@@ -1617,7 +1617,9 @@ g_pdata_bottom_def       = 0x800B91B4;
 g_stat_bar_cells         = 0x800B91FC;
 str_config_title         = 0x800B9210;
 str_nothing              = 0x800B921C;
-D_800B92A0               = 0x800B92A0; // type:u32 size:0xDD4
+D_800B92A0               = 0x800B92A0; // type:u32 size:0x6C
+g_map_title_def          = 0x800B930C; // size:0x10
+g_map_arrow_defs         = 0x800B935C; // size:0x40
 g_compass_cels           = 0x800B93DC;
 g_map_marker_defs        = 0x800B945C;
 g_tile_walls             = 0x800B94F8;

@@ -313,6 +313,7 @@ segments:
       - [0x30570, asm, adv_50a]
       - [0x30628, c, common/game/partystatus]
       - [0x3076C, asm, adv_50c]
+      - [0x30850, c, ui/mapscreen]
       - [0x314B4, c, common/game/roomrotate]
       - [0x31658, c, common/gfx/compass]
       - [0x31740, c, common/gfx/mapmarker]

@@ -45,7 +45,7 @@ extern void func_800768F0(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern void func_800782A4(int a, int b);
-extern void func_80095208(void);
+extern void MapScreen(void);
 extern void ConfigPageOpen(void);
 extern void ConfigStepRows(void);
 
@@ -120,7 +120,7 @@ void MenuOtherStep(void)
         case OTHER_MAP:
             if (g_state_next != 2 &&
                 (g_state_next != 3 || D_80100066 != 0xFFFF)) {
-                func_80095208();
+                MapScreen();
             }
             g_menu_subsel = 0;
             break;
