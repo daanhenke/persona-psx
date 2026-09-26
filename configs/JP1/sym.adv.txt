@@ -1369,6 +1369,28 @@ FuseResultRowDraw        = 0x800A14C4; // type:func
 FuseResultLineDraw       = 0x800A1690; // type:func
 FusionStockDraw          = 0x800A1824; // type:func
 
+ShopMoneyDraw            = 0x800AA468; // type:func
+ShopTotalDraw            = 0x800AA4DC; // type:func
+ShopTotalRedraw          = 0x800AA584; // type:func
+SlotSetUV                = 0x800AA620; // type:func
+ShopLoadItems            = 0x800AA660; // type:func
+ShopLoadPrices           = 0x800AA6E0; // type:func
+ShopLoadItems2           = 0x800AA760; // type:func
+ShopLoadPrices2          = 0x800AA7E0; // type:func
+ShopBuyListDraw          = 0x800AA860; // type:func
+ShopBuyListDraw2         = 0x800AA9C4; // type:func
+ShopMemberNames          = 0x800AAB40; // type:func
+ShopHave                 = 0x800AABD0; // type:func
+ShopHavePending          = 0x800AAC34; // type:func
+ShopAffordable           = 0x800AAC98; // type:func
+ShopAffordable2          = 0x800AACD4; // type:func
+ShopCountInit            = 0x800AAD10; // type:func
+ShopCountInit2           = 0x800AAD50; // type:func
+ShopCanBuy               = 0x800AAD90; // type:func
+ShopCanBuy2              = 0x800AAE80; // type:func
+ShopSellCountInit        = 0x800AAF70; // type:func
+ShopSellCount            = 0x800AAFB8; // type:func
+
 //-------------------------------------------------------------
 //--- PA: 0x046C34   VA: 0x800AAFD4   subsegment: c, game/money
 //-------------------------------------------------------------

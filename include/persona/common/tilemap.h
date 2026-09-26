@@ -42,6 +42,10 @@ extern void  TileMapWriteCol(const u_char *src, short *dst, int base,
 #ifdef TILEMAP_INT_COUNT
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
                                 int count);
+#elif defined(TILEMAP_BYTE_COUNT)
+/* adv's item counters narrow the count to a byte. */
+extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
+                                u_char count);
 #else
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
                                 u_short count);
