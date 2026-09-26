@@ -1,4 +1,5 @@
-/* Persona 1 (JP) - taking a way out, and naming it on screen.
+/* Persona 1 (JP) - walking the leader, taking a way out, and naming it.
+ *   0x8007F244 LeaderWalkStep
  *   0x8007FA1C SceneLeaderArrive
  *   0x8007FA78 SceneApplyEntry
  *   0x8007FB90 SceneDrawEntryLabel
@@ -55,6 +56,201 @@ extern u_short g_adv_walk_dir;
 
 extern void SsSeqStop(short seq);
 extern void ActorSetStandSprite(u_char a);
+
+#define L g_adv_actors[0]
+
+/* The leader's kind while it stands and while it walks. */
+#define LEADER_STANDS 1
+#define LEADER_WALKS  2
+
+#define SHADOW_SLOT  24
+#define TILE_SLOPE_V 7
+#define TILE_SLOPE_H 8
+#define TRIGGER_NONE 0xFF
+
+/* Frames a stopped walk waits before it tries to slide round a corner. */
+#define WALK_HOLD 0x14
+
+extern u_char   g_walk_hold;
+extern u_short  g_key_dash;
+extern u_char   g_trigger_dirs[];  /* by walk direction: bit 0 refuses a
+                                      trigger whose unk2 is clear */
+extern int      g_pad_held[];
+extern void    *g_actor_defs[];    /* by kind * 4 + facing */
+extern void    *g_walk_defs[];     /* by facing; +4 for the shadow's */
+extern u_char   g_dir_flip[];
+extern Slot    *g_slot_cur;
+
+extern void   SsSeqPlay(short seq, char mode, short times);
+extern void   SlotInit(void *def, u_char slot, int attr, short x, short y);
+extern void   ActorStepToward(u_char actor, u_char dir);
+extern u_char ActorAtTile(u_char x, u_char y);
+extern u_char SceneTileAt(u_char x, u_char y);
+extern u_char SceneTileToward(u_char x, u_char y, u_char dir);
+extern u_char SceneFindTrigger(u_char x, u_char y);
+extern u_char SceneTriggerArmed(u_char trigger);
+extern u_char SceneTryDiagCW(AdvActor *a);
+extern u_char SceneTryDiagCCW(AdvActor *a);
+extern void   WalkAdvance(u_short *wy, u_short *wx, u_char dir, int phase,
+                          u_char steps);
+extern void   WalkSlopeAdvance(u_short *wy, u_short *wx, u_char dir,
+                               u_char phase, u_char steps, u_char slope);
+extern void   CamFollowStep(void);
+
+/* One frame of the player walking the leader in g_adv_walk_dir. The tile
+   ahead decides whether it goes: nobody may be standing there, and the
+   tile's kind has its rules (see diagstep.c). A step that goes starts the
+   walking sprite if it was not already walking this way and moves a frame;
+   one that does not waits WALK_HOLD frames - fewer with the dash key held -
+   and then tries the two diagonals, standing the leader still if neither
+   is open. */
+void LeaderWalkStep(void)
+{
+    u_char here;
+    u_char trigger;
+    int    turn;
+    u_short d;
+
+retry:
+    ActorStepToward(0, g_adv_walk_dir);
+    if (ActorAtTile(L.next_x, L.next_y) >= 0x10) {
+        here = SceneTileAt(L.x, L.y);
+        switch (SceneTileToward(L.x, L.y, g_adv_walk_dir)) {
+        case 4:
+            if (L.lift == 0) goto blocked;
+        case 2:
+            trigger = SceneFindTrigger(L.next_x, L.next_y);
+            if (trigger == TRIGGER_NONE) goto blocked;
+            if (SceneTriggerArmed(trigger)) goto blocked;
+            if (g_adv_scene->triggers[trigger].pad02[0] != 0) goto open;
+            if (g_trigger_dirs[g_adv_walk_dir] & 1) goto blocked;
+            goto open;
+        case 5:
+            if (L.dir != g_adv_walk_dir || L.kind == LEADER_STANDS) {
+                L.kind = LEADER_WALKS;
+                L.dir = g_adv_walk_dir;
+                SsSeqPlay(g_seq_handle, 1, 0);
+                SlotInit(g_actor_defs[L.kind * 4 + g_adv_walk_dir], 0, L.z,
+                         L.world_x, L.world_y);
+                switch (L.shadow) {
+                case SHADOW_FLAT:
+                    SlotInit(g_walk_defs[g_adv_walk_dir + 4], SHADOW_SLOT,
+                             L.z, L.world_x, L.world_y);
+                    break;
+                case SHADOW_FLAT_LOW:
+                    SlotInit(g_walk_defs[g_adv_walk_dir], SHADOW_SLOT, L.z,
+                             L.world_x, L.world_y);
+                    break;
+                }
+                if (g_dir_flip[g_adv_walk_dir]) {
+                    g_slot_cur = &g_slots[0];
+                    g_slot_cur->attr |= SLOT_ATTR_XSCALE;
+                    g_slot_cur = &g_slots[SHADOW_SLOT];
+                    g_slot_cur->attr |= SLOT_ATTR_XSCALE;
+                }
+            }
+            goto walk;
+        case 8:
+            d = g_adv_walk_dir;
+            if (d < 2) goto open;
+            if (here != TILE_SLOPE_H) goto blocked;
+            turn = (u_short)(d - 2) < 2;
+            goto gate;
+        case 7:
+            d = g_adv_walk_dir;
+            if ((u_short)(d - 2) < 2) goto open;
+            if (here != TILE_SLOPE_V) goto blocked;
+            turn = d < 2;
+            goto gate;
+        case 3:
+        case 6:
+        case 9:
+            turn = L.lift;
+        gate:
+            if (turn) goto open;
+        case 10:
+        blocked:
+            if (g_walk_hold == 0) {
+                {
+                    u_char way;
+
+                    way = SceneTryDiagCW(&L);
+                    if (way != 0xFF) goto retry;
+                    if (SceneTryDiagCCW(&L) != way) goto retry;
+                }
+            } else {
+                g_walk_hold--;
+                if ((g_key_dash & g_pad_held[0]) && g_walk_hold != 0) {
+                    g_walk_hold--;
+                }
+            }
+            if (L.kind == LEADER_WALKS) {
+                SsSeqStop(g_seq_handle);
+            }
+            L.dir = g_adv_walk_dir;
+            ActorSetStandSprite(0);
+            L.kind = LEADER_STANDS;
+            return;
+        default:
+            if (here == TILE_SLOPE_H && (u_short)(g_adv_walk_dir - 2) < 2) goto blocked;
+            if (here == TILE_SLOPE_V) {
+                if (g_adv_walk_dir == 0) goto blocked;
+                if (g_adv_walk_dir == 1) goto blocked;
+            }
+            if (L.lift == 0) goto open;
+            if (here == TILE_SLOPE_H && g_adv_walk_dir == 1) goto open;
+            if (here == TILE_SLOPE_V && g_adv_walk_dir == 2) goto open;
+            if (L.lift != 0xFF) goto blocked;
+        }
+    open:
+        g_walk_hold = WALK_HOLD;
+        if (here != TILE_SLOPE_V) {
+            if (here != TILE_SLOPE_H) goto start;
+            turn = g_adv_walk_dir < 2;
+        } else {
+            turn = (u_short)(g_adv_walk_dir - 2) < 2;
+        }
+        if (turn) L.slope = g_adv_walk_dir + 1;
+    start:
+        if (L.dir != g_adv_walk_dir || L.kind == LEADER_STANDS) {
+            L.kind = LEADER_WALKS;
+            L.dir = g_adv_walk_dir;
+            SsSeqPlay(g_seq_handle, 1, 0);
+            SlotInit(g_actor_defs[L.kind * 4 + g_adv_walk_dir], 0, L.z,
+                     L.world_x, L.world_y);
+            switch (L.shadow) {
+            case SHADOW_FLAT:
+                SlotInit(g_walk_defs[g_adv_walk_dir + 4], SHADOW_SLOT, L.z,
+                         L.world_x, L.world_y);
+                break;
+            case SHADOW_FLAT_LOW:
+                SlotInit(g_walk_defs[g_adv_walk_dir], SHADOW_SLOT, L.z,
+                         L.world_x, L.world_y);
+                break;
+            }
+            g_slot_cur = &g_slots[SHADOW_SLOT];
+            if (g_dir_flip[g_adv_walk_dir]) {
+                g_slot_cur = &g_slots[0];
+                g_slot_cur->attr |= SLOT_ATTR_XSCALE;
+                g_slot_cur = &g_slots[SHADOW_SLOT];
+                g_slot_cur->attr |= SLOT_ATTR_XSCALE;
+            }
+        }
+    walk:
+        WalkAdvance(&L.world_y, &L.world_x, L.dir, L.phase, L.steps);
+        WalkSlopeAdvance(&L.world_y, &L.world_x, L.dir, L.phase, L.steps,
+                         L.slope);
+        CamFollowStep();
+        L.phase = (L.phase + L.steps) & 0xF;
+    } else {
+        SsSeqStop(g_seq_handle);
+        L.kind = LEADER_STANDS;
+        L.dir = g_adv_walk_dir;
+        ActorSetStandSprite(0);
+    }
+}
+
+#undef L
 
 /* The leader comes in through a way in: the footsteps stop and it stands,
    facing the way the player was walking. */

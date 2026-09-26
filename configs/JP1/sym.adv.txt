@@ -696,7 +696,7 @@ AdvPickEffect            = 0x8007F1DC; // type:func size:0x68
 //-----------------------------------------------------------
 //--- PA: 0x01AEA4   VA: 0x8007F244   subsegment: asm, adv_28
 //-----------------------------------------------------------
-func_8007F244            = 0x8007F244; // type:func size:0x7D8
+LeaderWalkStep           = 0x8007F244; // type:func size:0x7D8
 SceneLeaderArrive        = 0x8007FA1C; // type:func size:0x5C
 
 //-----------------------------------------------------------------
@@ -1638,9 +1638,11 @@ g_dir_flip               = 0x800B6358; // size:0x4
 g_room_map_sizes         = 0x800B636C; // size:0xA
 g_dir_x                  = 0x800B6378;
 g_dir_y                  = 0x800B637C;
+g_walk_hold              = 0x800B6380; // size:0x1
 g_walk_dy                = 0x800B6384;
 g_walk_dx                = 0x800B6394;
 g_entry_labels           = 0x800B63A4; // size:0x1B
+g_trigger_dirs           = 0x800B63C4; // size:0x4
 str_cd0_p_data           = 0x800B63CC;
 str_cd0_b_data           = 0x800B63E0;
 str_cd0_s_data           = 0x800B63F4;
@@ -1850,6 +1852,7 @@ g_persona_stock          = 0x801F297C; // ignore:True size:0xF
 g_playtime_min           = 0x801F29BD;
 g_playtime_sec           = 0x801F29BE;
 g_playtime_frame         = 0x801F29BF;
+g_key_dash               = 0x801F2A8C; // size:0x2
 g_key_menu_close         = 0x801F2A94;
 g_pad_config             = 0x801F2AC7;
 g_adv_room               = 0x801F5355; // ignore:True size:0x1
