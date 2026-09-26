@@ -44,7 +44,21 @@
    by its memory equivalent (update_equiv_regs route A) - what keeps local
    alloc off it is still open. One variable reused for all three puts the
    pointer in v0 but the value in v1 (88.74%). Also open: the timer copy
-   (addu s4,a3) sits after s1's setup in the image. */
+   (addu s4,a3) sits after s1's setup in the image.
+   2026-09-26, traced further: t0 is simply reload's first free register (no
+   REG_ALLOC_ORDER on MIPS, and all nine saved registers are taken), so the
+   image's colours are spilled pseudos, not memory read into a temporary.
+   K&R `short r, g, b;` parameters (the int prototype stays compatible)
+   reproduce that half exactly - lhu t0 with the pointer in v0, and the
+   image's addu a1 ahead of the third load - but the pseudo is HImode, so its
+   slot is written with sh where the image has sw (88.28%). A spilled pseudo
+   is stored in its own mode and a narrow subreg of a spilled SImode one
+   reloads with lw (reload.c find_reloads, LOAD_EXTEND_OP), so sw + lhu needs
+   an HImode pseudo set through a paradoxical (subreg:SI); combine's
+   simplify_set only makes that from an operation, which would leave an insn
+   the image lacks. A 2-byte copy is never a movstr (MOVE_RATIO 2). The timer
+   copy sorts last in sched2 only if its insn comes after loop.c's preheader;
+   a running local set just before the loop moves it part of the way. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
 {

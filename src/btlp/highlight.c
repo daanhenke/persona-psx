@@ -16,6 +16,7 @@
 #include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include <persona/btlp/panel.h>
 
 /* tpage 0x20 is the page the HUD's own texture sits in. */
 #define HIGHLIGHT_TPAGE 0x20
@@ -45,7 +46,6 @@ extern int     g_btl_highlight_row;
    image's do, which a plain int's do not. */
 extern int     g_btl_highlight_colour[];
 extern u_char  g_btl_highlight_x[];
-extern u_char  g_btl_highlight_rgb[];
 
 void BtlHighlightInitPrims(void)
 {
@@ -145,7 +145,7 @@ void BtlHighlightDraw(int buf, u_long *ot)
     p->x3 = g_btl_highlight_x[3] + HIGHLIGHT_LEFT;
     p->y3 = bottom;
 
-    rgb = &g_btl_highlight_rgb[g_btl_highlight_colour[0] * 4];
+    rgb = (u_char *)&g_btl_highlight_rgb[g_btl_highlight_colour[0]];
     p->r0 = (u_int)g_btl_highlight_level >> 6;
     p->g0 = (u_int)g_btl_highlight_level >> 6;
     p->b0 = (u_int)g_btl_highlight_level >> 6;

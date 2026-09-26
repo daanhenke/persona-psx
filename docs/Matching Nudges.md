@@ -3796,6 +3796,7 @@ call may move over one), which is why it still looks set first.
   copy is made inside the formatter's third argument,
   `FormatDecimal((short)value, g_hud_digits, w = (u_char)width)`. 90.89% (the
   same copy as a statement ahead of the call) to exact.
+
 ## A ternary multiplied in is worked out before the branch
 
 `x * (c ? A : B)`, or `x + (c ? A : B)`, where `x` is not a plain variable is

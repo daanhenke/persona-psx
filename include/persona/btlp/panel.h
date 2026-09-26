@@ -52,10 +52,24 @@ extern short  g_btl_panel_rgb[];
 /* One set of prims per frame buffer, and the one template the flat sprite is
    copied from. */
 extern POLY_FT4 g_btl_panel_poly[];
+extern POLY_G4  g_btl_panel_glow[];
 extern POLY_G3  g_btl_panel_corner[][BTL_PANEL_CORNERS];
 extern SPRT     g_btl_panel_flat[];
 extern SPRT     g_btl_panel_sprite;
 extern DR_MODE  g_btl_panel_mode[];
+
+/* Where BtlPlacePanel's transforms put the panel's four corners and each
+   wedge's three points on screen; BtlDrawPanelBox copies them into the prims.
+   The GTE writes each point as one word, so the transforms are handed them as
+   longs. */
+extern DVECTOR  g_btl_panel_face_xy[];
+extern DVECTOR  g_btl_panel_wedge_xy[][3];
+
+/* The wedges' pulse: advanced a step a frame, turned into a sine. */
+extern u_short  g_btl_panel_phase;
+
+/* The highlight bar's colours, which the wedges take theirs from. */
+extern CVECTOR  g_btl_highlight_rgb[];
 
 extern int  BtlPanelStepOpen(void);
 extern int  BtlPanelStepClose(void);

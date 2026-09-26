@@ -14,6 +14,7 @@
 #include <decomp/types.h>
 #include <libgte.h>
 #include <libgpu.h>
+#include <persona/btlp/panel.h>
 
 /* The panel is 0x38 tall about its own centre, so everything given in panel
    coordinates is lifted by half of that. */
@@ -53,13 +54,8 @@ typedef struct {
 } BtlPanelWedge;           /* 12 bytes */
 
 extern SVECTOR       g_btl_panel_rot;
-extern VECTOR        g_btl_panel_scale;
-extern u_char        g_btl_panel_image;
 extern SVECTOR       g_btl_panel_face[];
-extern long          g_btl_panel_face_xy[];
 extern BtlPanelWedge g_btl_panel_wedges[];
-extern long          g_btl_panel_wedge_xy[][3];
-extern SPRT          g_btl_panel_sprite;
 extern short         g_btl_mood_gauge[];
 
 /* The wedge walk is indexed by i and nothing else. The walking pointers and
@@ -97,8 +93,10 @@ void BtlPlacePanel(void)
     if (g_btl_panel_scale.vx < PANEL_UNITY) {
         RotTransPers4(&g_btl_panel_face[3], &g_btl_panel_face[2],
                       &g_btl_panel_face[0], &g_btl_panel_face[1],
-                      &g_btl_panel_face_xy[0], &g_btl_panel_face_xy[1],
-                      &g_btl_panel_face_xy[2], &g_btl_panel_face_xy[3],
+                      (long *)&g_btl_panel_face_xy[0],
+                      (long *)&g_btl_panel_face_xy[1],
+                      (long *)&g_btl_panel_face_xy[2],
+                      (long *)&g_btl_panel_face_xy[3],
                       &p, &flag);
     } else {
         SetSprt(&g_btl_panel_sprite);
@@ -145,9 +143,9 @@ void BtlPlacePanel(void)
         foot.vz = 0;
         foot.vy -= PANEL_MID;
         RotTransPers3(&tip, &base, &foot,
-                      &g_btl_panel_wedge_xy[i][0],
-                      &g_btl_panel_wedge_xy[i][1],
-                      &g_btl_panel_wedge_xy[i][2], &p, &flag);
+                      (long *)&g_btl_panel_wedge_xy[i][0],
+                      (long *)&g_btl_panel_wedge_xy[i][1],
+                      (long *)&g_btl_panel_wedge_xy[i][2], &p, &flag);
         i++;
     } while (i < BTL_MOODS);
 

@@ -20,6 +20,7 @@
 #include <libgpu.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/gfx.h>
+#include <persona/btlp/panel.h>
 
 /* One set of primitives per frame buffer, and four corner triangles each. */
 #define PANEL_BUFFERS 2
@@ -46,18 +47,9 @@
 
 /* Grey leaves the texture untinted; the panel itself starts white and shut. */
 #define PANEL_GREY  0x80
-#define PANEL_WHITE 0xFF
-#define PANEL_FULL  0x1000
 
 extern u_char  *g_btl_panel_pack;
-extern POLY_FT4 g_btl_panel_poly[];
-extern POLY_G4  g_btl_panel_glow[];
-extern DR_MODE  g_btl_panel_mode[];
-extern POLY_G3  g_btl_panel_corner[];
 extern SVECTOR  g_btl_panel_rot;
-extern VECTOR   g_btl_panel_scale;
-extern short    g_btl_panel_rgb[];
-extern int      g_btl_panel_state;
 
 extern void BtlHighlightInitPrims(void);
 

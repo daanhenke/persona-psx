@@ -29,8 +29,7 @@
 #include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
-
-#define BTL_PANEL_CORNERS 4
+#include <persona/btlp/panel.h>
 
 /* One full brightness in the 12-bit fraction the mixes work in. */
 #define BTL_MIX_ONE 0x1000
@@ -50,25 +49,30 @@
 #define BTL_PANEL_PULSE 1
 #define BTL_PANEL_CYCLE 2
 
-extern POLY_FT4 g_btl_panel_poly[];
-extern POLY_G4  g_btl_panel_glow[];
-extern POLY_G3  g_btl_panel_corner[];
-extern short    g_btl_panel_face_xy[];
-extern short    g_btl_panel_wedge_xy[][6];
-extern short    g_btl_panel_rgb[];
-extern CVECTOR  g_btl_highlight_rgb[];
-extern u_short  g_btl_panel_phase;
-extern u_char   g_btl_panel_image;
-extern u_char   g_btl_panel_lit;
 
 extern int rsin(int a);
 
+/* 96.56%. The wedge loop reads the corners as the table they are
+   (g_btl_panel_corner[panel][i], through a pointer to the whole table set
+   before the loop): the image works out panel * 112 and steps i * 28 on its
+   own, where the flat [panel * 4 + i] folded both into one stepped offset.
+   Left:
+   - the image works panel * 112 out again every round. loop.c lifts that
+     chain here because threshold * savings * lifetime = 52 * 2 * 2 = 208
+     reaches the loop's 204 insns, so the image's loop is at least five insns
+     longer at loop time. Clamps written as ternaries lengthen it enough but
+     leave a copy of n and stop the table address being lifted; stores written
+     in both arms cost far more.
+   - the face and the glow each load their prim table's address ahead of the
+     panel * size product in the image, and after it here. Pointer arithmetic
+     in place of &table[panel] changes nothing. */
 #ifdef NON_MATCHING
 void BtlDrawPanelBox(int panel)
 {
     POLY_FT4 *face;
     POLY_G4  *glow;
     POLY_G3  *w;
+    POLY_G3 (*corners)[BTL_PANEL_CORNERS];
     CVECTOR  *src;
     u_char   *pick;
     u_char   *pick2;
@@ -82,24 +86,24 @@ void BtlDrawPanelBox(int panel)
     int       n;
 
     face = &g_btl_panel_poly[panel];
-    face->x0 = g_btl_panel_face_xy[0];
-    face->y0 = g_btl_panel_face_xy[1];
-    face->x1 = g_btl_panel_face_xy[2];
-    face->y1 = g_btl_panel_face_xy[3];
-    face->x2 = g_btl_panel_face_xy[4];
-    face->y2 = g_btl_panel_face_xy[5];
-    face->x3 = g_btl_panel_face_xy[6];
-    face->y3 = g_btl_panel_face_xy[7];
+    face->x0 = g_btl_panel_face_xy[0].vx;
+    face->y0 = g_btl_panel_face_xy[0].vy;
+    face->x1 = g_btl_panel_face_xy[1].vx;
+    face->y1 = g_btl_panel_face_xy[1].vy;
+    face->x2 = g_btl_panel_face_xy[2].vx;
+    face->y2 = g_btl_panel_face_xy[2].vy;
+    face->x3 = g_btl_panel_face_xy[3].vx;
+    face->y3 = g_btl_panel_face_xy[3].vy;
 
     glow = &g_btl_panel_glow[panel];
-    glow->x0 = g_btl_panel_face_xy[0];
-    glow->y0 = g_btl_panel_face_xy[1];
-    glow->x1 = g_btl_panel_face_xy[2];
-    glow->y1 = g_btl_panel_face_xy[3];
-    glow->x2 = g_btl_panel_face_xy[4];
-    glow->y2 = g_btl_panel_face_xy[5];
-    glow->x3 = g_btl_panel_face_xy[6];
-    glow->y3 = g_btl_panel_face_xy[7];
+    glow->x0 = g_btl_panel_face_xy[0].vx;
+    glow->y0 = g_btl_panel_face_xy[0].vy;
+    glow->x1 = g_btl_panel_face_xy[1].vx;
+    glow->y1 = g_btl_panel_face_xy[1].vy;
+    glow->x2 = g_btl_panel_face_xy[2].vx;
+    glow->y2 = g_btl_panel_face_xy[2].vy;
+    glow->x3 = g_btl_panel_face_xy[3].vx;
+    glow->y3 = g_btl_panel_face_xy[3].vy;
     glow->r0 = g_btl_panel_rgb[0];
     glow->g0 = g_btl_panel_rgb[1];
     glow->b0 = g_btl_panel_rgb[2];
@@ -125,9 +129,10 @@ void BtlDrawPanelBox(int panel)
         break;
 
     case BTL_PANEL_CYCLE:
+        i = 0;
         pick2 = lit + 1;
         pick = lit;
-        for (i = 0; i < BTL_PANEL_CORNERS; i++) {
+        for (; i < BTL_PANEL_CORNERS; i++) {
             if ((g_btl_panel_lit >> i) & 1) {
                 *pick = i;
                 *pick2 = i;
@@ -145,37 +150,40 @@ void BtlDrawPanelBox(int panel)
         break;
     }
 
+    /* The table's address is held in a pointer of its own for the whole walk,
+       which is the saved base the image adds each corner's offset to. */
+    corners = g_btl_panel_corner;
     for (i = 0; i < BTL_PANEL_CORNERS; i++) {
         /* The three vertices go through a pointer and the colours through
            the array: each clamp puts its store in a block of its own, where
            gcc 2.6 has no CSE to carry the pointer, so only the run of six
            coordinates shares a base. */
-        w = &g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i];
-        w->x0 = g_btl_panel_wedge_xy[i][0];
-        w->y0 = g_btl_panel_wedge_xy[i][1];
-        w->x1 = g_btl_panel_wedge_xy[i][2];
-        w->y1 = g_btl_panel_wedge_xy[i][3];
-        w->x2 = g_btl_panel_wedge_xy[i][4];
-        w->y2 = g_btl_panel_wedge_xy[i][5];
+        w = &corners[panel][i];
+        w->x0 = g_btl_panel_wedge_xy[i][0].vx;
+        w->y0 = g_btl_panel_wedge_xy[i][0].vy;
+        w->x1 = g_btl_panel_wedge_xy[i][1].vx;
+        w->y1 = g_btl_panel_wedge_xy[i][1].vy;
+        w->x2 = g_btl_panel_wedge_xy[i][2].vx;
+        w->y2 = g_btl_panel_wedge_xy[i][2].vy;
 
         n = (col[i].r * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].r0 = n;
+        g_btl_panel_corner[panel][i].r0 = n;
         n = (col[i].g * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].g0 = n;
+        g_btl_panel_corner[panel][i].g0 = n;
         n = (col[i].b * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].b0 = n;
+        g_btl_panel_corner[panel][i].b0 = n;
 
         /* The two outer vertices sit at a quarter of the corner's colour, so
            the wedge fades away from the panel. */
@@ -184,37 +192,37 @@ void BtlDrawPanelBox(int panel)
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].r1 = n;
+        g_btl_panel_corner[panel][i].r1 = n;
         n = ((col[i].g >> 2) * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].g1 = n;
+        g_btl_panel_corner[panel][i].g1 = n;
         n = ((col[i].b >> 2) * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].b1 = n;
+        g_btl_panel_corner[panel][i].b1 = n;
         n = ((col[i].r >> 2) * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].r2 = n;
+        g_btl_panel_corner[panel][i].r2 = n;
         n = ((col[i].g >> 2) * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].g2 = n;
+        g_btl_panel_corner[panel][i].g2 = n;
         n = ((col[i].b >> 2) * level[i] >> BTL_MIX_SHIFT)
             + (flash[i] * BTL_WHITE >> BTL_MIX_SHIFT);
         if (n > BTL_WHITE) {
             n = BTL_WHITE;
         }
-        g_btl_panel_corner[panel * BTL_PANEL_CORNERS + i].b2 = n;
+        g_btl_panel_corner[panel][i].b2 = n;
     }
 }
 #else
