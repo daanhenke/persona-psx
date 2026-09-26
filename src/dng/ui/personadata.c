@@ -111,7 +111,7 @@ extern int     g_ot_index;
 extern GsOT    g_ot[];
 extern u_char  D_800A04B8, D_800A083C;
 extern int     D_8009FB3C;
-extern short   D_8009CD48, g_item_top, g_swap_top, D_800A04D4, D_8009B988,
+extern short   g_use_top, g_item_top, g_swap_top, D_800A04D4, g_use_scroll_step,
                g_item_scroll_step;
 extern short   g_cam_x, g_map_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
@@ -228,12 +228,12 @@ void PersonaDataOpen(void)
     g_bg_layer_otz[3] = 0xA0;
     g_bg_layer_otz[4] = 0x20;
     D_8009FB3C = 0;
-    D_8009CD48 = 0;
+    g_use_top = 0;
     g_item_top = 0;
     g_swap_top = 0;
     D_800A04D4 = 0;
     g_arcana_top = 0;
-    D_8009B988 = 0;
+    g_use_scroll_step = 0;
     g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;

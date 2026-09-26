@@ -238,11 +238,11 @@ void MainMenu(void)
     MenuListInit(&g_menu->cfg_list, 0, 0, 4, 0x16);
     MenuListInit(&g_menu->cfg_row, 0, 0, 3, 0x16);
     MenuListInit(&g_menu->member_list, 0, 0, g_party_last, 0x16);
-    /* Twice over; unk200 onwards follow. */
+    /* Twice over; use_row onwards follow. */
     MenuListInit(&g_menu->unk1F0, 0, 0, 2, 0x1E);
     MenuListInit(&g_menu->unk1F0, 0, 0, 2, 0x1E);
-    MenuListInit(&g_menu->unk200, 0, 0, 5, 0x14);
-    MenuListInit(&g_menu->unk210, 0, 0, 1, 0x1A);
+    MenuListInit(&g_menu->use_row, 0, 0, 5, 0x14);
+    MenuListInit(&g_menu->use_col, 0, 0, 1, 0x1A);
     MenuListInit(&g_menu->unk220, 0, 0, 8, 0x16);
     MenuListInit(&g_menu->unk230, 0, 0, 3, 0x14);
     MenuListInit(&g_menu->unk240, 0, 0, 1, 0x1A);

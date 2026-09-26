@@ -55,7 +55,7 @@ extern void  func_80086E20(int a, int b);
 extern void  func_80090464(int member);
 extern short PersonaStockCompact(void);
 extern void  PersonaStockDraw(void);
-extern void  func_8008585C(void);
+extern void  StockEmptyNotice(void);
 extern int    MenuStepMember(int *sel, u_char last);
 extern u_char CharTopEntry(short slot);
 extern u_char PersonaTopSpell(short id);
@@ -63,7 +63,7 @@ extern void   BgPanelSet(u_short id, short x, short y);
 extern void   func_80089AF4(void);
 extern void   func_80089CCC(int member);
 extern void   func_80089F8C(int member, int persona);
-extern void   func_8008546C(void);
+extern void   MenuTopRedraw(void);
 extern u_char D_80099FFC[];
 extern u_char D_8009ABFC[];
 extern u_char D_8009A52C[];
@@ -148,7 +148,7 @@ void StatusMenuStep(void)
 
 void StatusMenuOpen(void)
 {
-    func_8008546C();
+    MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0xC, 0, 0);
     func_80086B08(1, 2);
     func_800891A8(1, 6);
@@ -272,7 +272,7 @@ short StatusStockOpen(first)
     SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0xC, 0, 0);
     if (g_stock_last == -1) {
         if (first) {
-            func_8008585C();
+            StockEmptyNotice();
             g_menu_subsel = 0;
             return 1;
         }
@@ -381,7 +381,7 @@ void SkillPersonaPick(void)
             g_menu_subsel++;
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_8008546C();
+        MenuTopRedraw();
         SlotClear(2);
         SlotClear(0x2F);
         SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0x18, 0x18);
@@ -763,7 +763,7 @@ void StatusPageStep(void)
             g_menu_subsel++;
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_8008546C();
+        MenuTopRedraw();
         func_80092E5C(7);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);

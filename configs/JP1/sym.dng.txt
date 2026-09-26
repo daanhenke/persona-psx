@@ -468,9 +468,9 @@ MenuPollInput            = 0x80078EE8; // type:func size:0xAC
 //----------------------------------------------------------
 ItemMenuStep             = 0x80078F94; // type:func size:0xD4
 ItemMenuOpen             = 0x80079068; // type:func size:0x60
-func_800790C8            = 0x800790C8; // type:func size:0x704
-func_800797CC            = 0x800797CC; // type:func size:0x670
-func_80079E3C            = 0x80079E3C; // type:func size:0x314
+ItemTopStep              = 0x800790C8; // type:func size:0x704
+ItemUseStep              = 0x800797CC; // type:func size:0x670
+ItemTargetStep           = 0x80079E3C; // type:func size:0x314
 
 //----------------------------------------------------------------------
 //--- PA: 0x015DB0   VA: 0x8007A150   subsegment: c, common/ui/itemstats
@@ -577,7 +577,7 @@ ConfigApplyOption        = 0x800851D0; // type:func size:0x84
 //----------------------------------------------------------------
 //--- PA: 0x020EB4   VA: 0x80085254   subsegment: asm, dng_2_s3_x1
 //----------------------------------------------------------------
-D_80085254               = 0x80085254; // type:func size:0x1CC
+MenuChoicePageOpen       = 0x80085254; // type:func size:0x1CC
 
 //----------------------------------------------------------------------
 //--- PA: 0x021080   VA: 0x80085420   subsegment: c, common/ui/padconfig
@@ -587,7 +587,7 @@ PadSetPageButtons        = 0x80085420; // type:func size:0x4C
 //-------------------------------------------------------------
 //--- PA: 0x0210CC   VA: 0x8008546C   subsegment: asm, dng_2_s4
 //-------------------------------------------------------------
-func_8008546C            = 0x8008546C; // type:func size:0xF8
+MenuTopRedraw            = 0x8008546C; // type:func size:0xF8
 PersonaStockDraw         = 0x80085564; // type:func size:0x23C
 
 //---------------------------------------------------------------------------
@@ -598,7 +598,7 @@ PersonaStockCompact      = 0x800857A0; // type:func size:0xBC
 //-------------------------------------------------------------
 //--- PA: 0x0214BC   VA: 0x8008585C   subsegment: asm, dng_2_s5
 //-------------------------------------------------------------
-func_8008585C            = 0x8008585C; // type:func size:0x108
+StockEmptyNotice         = 0x8008585C; // type:func size:0x108
 
 //------------------------------------------------------------------------
 //--- PA: 0x0215C4   VA: 0x80085964   subsegment: c, common/game/charentry
@@ -613,7 +613,7 @@ PersonaTopSpell          = 0x800859E8; // type:func size:0x44
 //-------------------------------------------------------------
 //--- PA: 0x02168C   VA: 0x80085A2C   subsegment: asm, dng_2_s6
 //-------------------------------------------------------------
-D_80085A2C               = 0x80085A2C; // type:func size:0x78
+MsgWaitPress             = 0x80085A2C; // type:func size:0x78
 
 //-------------------------------------------------------------------------
 //--- PA: 0x021704   VA: 0x80085AA4   subsegment: c, common/gfx/tilemapruns
@@ -704,7 +704,7 @@ TextCopyUntilEnd         = 0x8008BDB0; // type:func size:0x44
 //--------------------------------------------------------------
 //--- PA: 0x027A54   VA: 0x8008BDF4   subsegment: asm, dng_2_s10
 //--------------------------------------------------------------
-func_8008BDF4            = 0x8008BDF4; // type:func size:0xB4
+TextAppendNumber         = 0x8008BDF4; // type:func size:0xB4
 
 //-----------------------------------------------------------------------
 //--- PA: 0x027B08   VA: 0x8008BEA8   subsegment: c, common/game/explevel
@@ -1148,6 +1148,7 @@ g_pdata_top_def          = 0x8009A414;
 g_menu_sel               = 0x8009A4CC;
 g_menu_subsel            = 0x8009A4CE;
 str_cell_run             = 0x8009A4FC;
+g_stock_empty_msg        = 0x8009A538;
 g_persona_msg_key        = 0x8009A566;
 str_cfg_command_confirm  = 0x8009A56C;
 str_cfg_window_anim      = 0x8009A578;
@@ -1177,6 +1178,7 @@ g_bg_map2                = 0x8009B870; // size:0x10
 g_bg_map                 = 0x8009B890; // size:0x10
 g_panel_map              = 0x8009B8A0; // size:0x10
 g_bg_layers              = 0x8009B8B0; // size:0xD8
+g_use_scroll_step        = 0x8009B988; // size:0x2
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
 str_cfg_message_speed    = 0x8009C020;
@@ -1205,6 +1207,7 @@ g_box_t                  = 0x8009CD38; // size:0x4
 g_box_x                  = 0x8009CD3C; // size:0x2
 g_box_y                  = 0x8009CD40; // size:0x2
 g_box_row                = 0x8009CD44; // size:0x2
+g_use_top                = 0x8009CD48; // size:0x2
 D_8009CD50               = 0x8009CD50;
 D_8009DC70               = 0x8009DC70;
 D_8009EB90               = 0x8009EB90;

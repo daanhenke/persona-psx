@@ -43,8 +43,8 @@ typedef struct {
     /* 0x1D0 */ MenuList cfg_row;       /* the config battle page's row     */
     /* 0x1E0 */ MenuList member_list; /* the config tactics page's member */
     /* 0x1F0 */ MenuList unk1F0;
-    /* 0x200 */ MenuList unk200;
-    /* 0x210 */ MenuList unk210;
+    /* 0x200 */ MenuList use_row;       /* the item use list's cursor       */
+    /* 0x210 */ MenuList use_col;
     /* 0x220 */ MenuList unk220;
     /* 0x230 */ MenuList unk230;
     /* 0x240 */ MenuList unk240;

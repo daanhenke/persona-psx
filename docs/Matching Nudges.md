@@ -3756,3 +3756,8 @@ call may move over one), which is why it still looks set first.
   `SlotSetPos(1, 0x42, (tab + 1)[i][0], (y = x + 1)[i * 2])`. The `int
   unused[2]` ADV's draft carried for the frame goes too. ADV's 97.86% and
   DNG's 97.22% to exact.
+- [textnumber.c](/src/common/ui/textnumber.c) - DNG's `TextAppendNumber`:
+  the width's mask comes after the value's narrowing in the image, so the masked
+  copy is made inside the formatter's third argument,
+  `FormatDecimal((short)value, g_hud_digits, w = (u_char)width)`. 90.89% (the
+  same copy as a statement ahead of the call) to exact.

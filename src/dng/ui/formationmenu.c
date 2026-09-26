@@ -40,7 +40,7 @@ extern int     D_8009CD4C;
 extern short   g_stock_last;
 extern GsMAP   g_panel_map;
 extern GsCELL  g_panel_cells[];
-extern short   D_8009CD48, g_item_top, g_swap_top, D_800A04D4, D_8009B988,
+extern short   g_use_top, g_item_top, g_swap_top, D_800A04D4, g_use_scroll_step,
                g_item_scroll_step;
 extern short   g_arcana_top;
 extern short   g_header_scroll_y;
@@ -205,12 +205,12 @@ void FormationMenu(void)
     g_bg_layers[0].attribute = 0x9000000;
     g_menu_sel = 0;
     D_8009FB3C = 0;
-    D_8009CD48 = 0;
+    g_use_top = 0;
     g_item_top = 0;
     g_swap_top = 0;
     D_800A04D4 = 0;
     g_arcana_top = 0;
-    D_8009B988 = 0;
+    g_use_scroll_step = 0;
     g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;

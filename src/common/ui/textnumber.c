@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - a number appended to a character-map row.
  *
- *   ADV @ 0x8007D864   S2D @ 0x8007C264
+ *   ADV @ 0x8007D864   S2D @ 0x8007C264   DNG @ 0x8008BDF4
  *
  * Two bytes go down per digit: a 0x80 and then the digit's glyph, which the
  * font keeps at 0xC0 for zero. Digit positions the value did not need get a
@@ -24,6 +24,24 @@
 
 extern u_char g_hud_digits[];
 
+#ifdef TEXTNUMBER_INT
+/* DNG's copy takes both numbers as ints and narrows them where it uses them,
+   against an int-returning formatter. The width goes to the formatter through
+   a masked copy made inside the argument, after the value's narrowing. */
+extern int   FormatDecimal(u_int value, u_char *dst, u_short width);
+
+u_char *TextAppendNumber(u_char *dst, int value, int width)
+{
+    int n;
+    int w;
+
+    n = FormatDecimal((short)value, g_hud_digits, w = (u_char)width);
+    while (n < (u_char)width) {
+        *dst = GLYPH_BLANK;
+        dst++;
+        width--;
+    }
+#else
 extern short FormatDecimal(u_int value, u_char *dst, u_short width);
 
 u_char *TextAppendNumber(u_char *dst, short value, u_char width)
@@ -36,6 +54,7 @@ u_char *TextAppendNumber(u_char *dst, short value, u_char width)
         dst++;
         width--;
     }
+#endif
     if (n != 0) {
         do {
             *dst = GLYPH_LEAD;

@@ -52,7 +52,7 @@ extern void   func_800946E4(Char *c, int a, int b);
 extern void   func_80092E5C(int);
 extern int    func_800992D4(short kind);
 extern void   func_80090464(int member);
-extern void   func_8008585C(void);
+extern void   StockEmptyNotice(void);
 /* The field's message stepper. */
 extern int    func_80076380(void);
 extern void   BgMapInit(void *script, short speed);
@@ -459,7 +459,7 @@ void StatusStockReleaseConfirm(void)
                          0x1E);
             MenuListInit(&g_menu->stock_release, 0, 0, g_stock_last, 0x1E);
             if (g_stock_last == -1) {
-                func_8008585C();
+                StockEmptyNotice();
                 g_menu_subsel = 0;
                 return;
             }

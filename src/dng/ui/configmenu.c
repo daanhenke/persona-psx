@@ -48,7 +48,7 @@ extern void func_80093D18(int n);
 extern void ConfigStepTactics(void);
 extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
-extern void func_8008546C(void);
+extern void MenuTopRedraw(void);
 extern void func_80086B08(int a, int b);
 extern void func_800891A8(int a, int b);
 extern void func_80086E20(int a, int b);
@@ -116,7 +116,7 @@ void ConfigMenuStep(void)
 
 void ConfigMenuOpen(void)
 {
-    func_8008546C();
+    MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x18, 0, 0);
     g_bg_layer_otz[2] = 0x40;
     g_bg_map0.ncellh = 0x40;

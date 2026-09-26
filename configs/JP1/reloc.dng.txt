@@ -60,3 +60,7 @@ rom:0x160BC reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xC
 rom:0x160C0 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xC
 rom:0x160D4 reloc:MIPS_HI16 symbol:g_page_fwd_repeat addend:0xE
 rom:0x160D8 reloc:MIPS_LO16 symbol:g_page_fwd_repeat addend:0xE
+
+// TextAppendNumber reads the digits from one below g_hud_digits.
+rom:0x27AC8 reloc:MIPS_HI16 symbol:g_hud_digits addend:-0x1
+rom:0x27AD0 reloc:MIPS_LO16 symbol:g_hud_digits addend:-0x1
