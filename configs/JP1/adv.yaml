@@ -335,6 +335,8 @@ segments:
       - [0x317E8, asm, adv_50b]
       - [0x318E4, c, ui/mapmarkers]
       - [0x31B04, asm, adv_51]
+      - [0x31F54, c, common/ui/mapview]
+      - [0x31FBC, asm, adv_51b]
       - [0x3255C, c, common/game/tilewalls]
       - [0x32698, c, common/game/automap]
       - [0x32710, c, common/game/automapmark]

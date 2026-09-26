@@ -96,7 +96,7 @@ extern void MapPlaceMarker(short map_dir, short player_dir, short x, short y,
                            int unused);
 extern void RoomRotatePoint(short from, short x, short y, short to,
                             short *ox, short *oy);
-extern void func_800962F4(short map, short turn);
+extern void MapDrawTurned(short map, short turn);
 extern void func_80095EA4(void);
 
 void MapScreen(void);
@@ -327,12 +327,12 @@ void MapScreenLayout(void)
     RoomRotatePoint(0, D_800BB99C, D_800BB9A0, turn, &x, &y);
     MenuListInit(&g_menu->list[1], x, 0, 0x17, 0x18);
     MenuListInit(&g_menu->list[0], y, 0, 0x17, 0x14);
-    func_800962F4(D_800BBC14, g_menu->MAP_TURN.cur);
+    MapDrawTurned(D_800BBC14, g_menu->MAP_TURN.cur);
     MapDrawMarkers();
     DrawCompass(g_menu->MAP_TURN.cur);
     MapPlaceMarker(g_menu->MAP_TURN.cur, D_800BB990, D_800BB99C, D_800BB9A0,
                    0);
-    func_800962F4(D_800BBC14, g_menu->MAP_TURN.cur);
+    MapDrawTurned(D_800BBC14, g_menu->MAP_TURN.cur);
     MapDrawName(D_800BBC14);
     sy = g_menu->list[0].cur << 4;
     sx = g_menu->list[1].cur << 4;

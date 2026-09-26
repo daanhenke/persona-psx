@@ -194,6 +194,8 @@ segments:
       - [0x22468, c, common/gfx/compass]
       - [0x22550, c, common/gfx/mapmarker]
       - [0x225F8, asm, s2d_2_s25]
+      - [0x22C4C, c, common/ui/mapview]
+      - [0x22CB4, asm, s2d_2_s25b]
       - [0x23254, c, common/game/tilewalls]
       - [0x23390, c, common/game/automap]
       - [0x23408, asm, s2d_2_s26_x1]
