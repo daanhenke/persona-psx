@@ -12,7 +12,7 @@ u_char NameEntryComplete(void)
     int i;
 
     for (i = 0; i < NAME_SHORT; i++) {
-        if (g_name_entry.text[0][i] != 0) {
+        if (g_name_text[0][i] != 0) {
             break;
         }
     }
@@ -20,7 +20,7 @@ u_char NameEntryComplete(void)
         return 0;
     }
     for (i = 0; i < NAME_SHORT; i++) {
-        if (g_name_entry.text[1][i] != 0) {
+        if (g_name_text[1][i] != 0) {
             break;
         }
     }
@@ -28,7 +28,7 @@ u_char NameEntryComplete(void)
         return 0;
     }
     for (i = 0; i < NAME_CELLS; i++) {
-        if (g_name_entry.text[2][i] != 0) {
+        if (g_name_text[2][i] != 0) {
             break;
         }
     }

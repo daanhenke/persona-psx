@@ -1,6 +1,6 @@
 /* Persona 1 (JP) - the "load this layout?" prompt on the formation screen.
  *
- *   ADV 0x800746C0   S2D 0x80073678
+ *   ADV 0x800746C0   S2D 0x80073678   DNG 0x80083310
  *
  * Everything it touches is either the shared save-game work area or a menu
  * global the linker resolves per overlay, so one source covers both. The
@@ -22,9 +22,16 @@
 
 extern short  g_menu_subsel;
 extern u_char g_menu_allow_hold;
+#ifdef FORMATION_INT
+/* DNG's copy tests the results unmasked; slot.h's SLOT_SETPOS_INT covers the
+   position call. */
+extern int    InputCheckAcceptA(int repeat);
+extern int    InputCheckAcceptB(int repeat);
+#else
 extern u_char InputCheckAcceptA(u_char repeat);
 extern u_char InputCheckAcceptB(u_char repeat);
 extern void   SlotSetPos(u_char slot, int attr, short x, short y);
+#endif
 
 void FormationLoadPrompt(void)
 {

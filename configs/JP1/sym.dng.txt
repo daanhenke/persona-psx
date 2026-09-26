@@ -861,7 +861,7 @@ FormationPresetFits      = 0x80090D1C; // type:func size:0xA4
 //-----------------------------------------------------------------
 //--- PA: 0x02CA20   VA: 0x80090DC0   subsegment: asm, dng_2_s17_x2
 //-----------------------------------------------------------------
-func_80090DC0            = 0x80090DC0; // type:func size:0x164
+FormationDrawPresets     = 0x80090DC0; // type:func size:0x164
 
 //--------------------------------------------------------------------
 //--- PA: 0x02CB84   VA: 0x80090F24   subsegment: c, common/game/equip
@@ -1160,6 +1160,7 @@ g_char_face_files        = 0x8009A8B7;
 g_fm_hint_def            = 0x8009AC1C;
 g_fm_hint2_def           = 0x8009B09C;
 g_persona_list_rule      = 0x8009B1D0;
+g_fm_grid_cur_def        = 0x8009B40C;
 g_grow_slot_def          = 0x8009B704;
 g_bg_map0                = 0x8009B850; // size:0x10
 g_bg_map1                = 0x8009B860; // size:0x10
@@ -1323,6 +1324,7 @@ g_ot                     = 0x800A0850; // size:0x28
 g_stock_last             = 0x800A0878; // size:0x2
 g_pad_held               = 0x800DC000; // size:0x4
 g_pad_pressed            = 0x800DC004; // size:0x4
+g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 D_800DC994               = 0x800DC994; // ignore:True
 D_800DC9D8               = 0x800DC9D8; // ignore:True
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40

@@ -76,9 +76,22 @@ extern u_char FormationCellOf(u_char member);
 extern void   FormationSyncCells(void);
 extern u_char FormationOtherAt(u_char member, u_char cell);
 extern u_char FormationPresetCellOf(u_char member, u_char preset);
+#ifdef FORMATION_INT
+/* DNG's menus hand the preset over as the whole cursor word. */
+extern void   FormationLoadPreset(int preset);
+#else
 extern void   FormationLoadPreset(u_char preset);
+#endif
+#ifdef FORMATION_INT
+extern int    FormationCellFree(u_char cell);
+#else
 extern u_char FormationCellFree(u_char cell);
+#endif
+#ifdef FORMATION_INT
+extern int    FormationPresetFits(int preset);
+#else
 extern int    FormationPresetFits(u_char preset);
+#endif
 extern u_char FormationFirstFree(void);
 extern void   FormationPlaceMarkers(void);
 extern void   FormationRepair(void);

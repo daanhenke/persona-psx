@@ -74,7 +74,12 @@ typedef struct {
    0, and the renderer's slot loop ends with `if (i > 0x4f) return`. */
 #define SLOT_COUNT 80
 
+#ifdef SLOT_INIT_INTXY
+/* dng's formation screen hands x and y over unnarrowed. */
+extern void SlotInit(void *def, u_char slot, int attr, int x, int y);
+#else
 extern void SlotInit(void *def, u_char slot, int attr, short x, short y);
+#endif
 /* Some overlays were built against an int-taking declaration of this and pass
    the slot unmasked, leaving the callee to narrow it; others against the
    u_char one and narrow at the call. Measured: dng's copy is eight bytes short

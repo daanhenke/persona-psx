@@ -25,7 +25,7 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".data", ".text", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".bss"]
   subalign: 4
   ld_align_section_vram_end: False
   ld_align_segment_vram_end: False
@@ -46,20 +46,28 @@ segments:
     start: 0x0
     vram: 0x800643A0
     subsegments:
-      - [0x0, data, name_id]
-      - [0x4, asm, name]
+      - [0x0, rodata, name_id]
+      - [0x4, c, ui/screen]
       - [0x1D94, c, ui/entry]
-      - [0x1E40, asm, name_1]
+      - [0x1E40, c, ui/confirm]
+      - [0x218C, c, ui/caret]
+      - [0x23B8, c, ui/kanjilist]
+      - [0x27D0, c, ui/dakuten]
+      - [0x2BC8, c, ui/page]
+      - [0x2D58, c, ui/init]
+      - [0x31BC, c, ui/frame]
       - [0x354C, c, gfx/upload]
       - [0x3588, c, common/gfx/tim]
       - [0x362C, c, common/gfx/imageone]
       - [0x3694, c, common/gfx/image]
       - [0x3738, c, common/gfx/bgpack]
-      - [0x3840, asm, name_2]
+      - [0x3840, c, gfx/sprite]
+      - [0x3A84, c, gfx/glyph]
       - [0x3B80, c, ui/keyboard]
-      # The overlay's own workspace: what the disc carries a value for,
-      # and behind it the run of zeroes the loader never has to write.
-      - [0x3C5C, rodata, name_data]
-      - [0x5A9C, bss, name_bss]
+      # The tables and initialised state, then the workspace. The file
+      # carries the workspace's zeroes too, so the split sits at the first
+      # variable with no initial value (the pad words at 0x80069DA0).
+      - [0x3C5C, .data, ui/namedata]
+      - [0x5A00, bss, name_bss]
 
   - [0x16900]

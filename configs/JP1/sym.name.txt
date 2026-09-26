@@ -19,11 +19,11 @@ g_overlay_base       = 0x800643A0;
 
 
 //---------------------------------------------------------
-//--- PA: 0x000004   VA: 0x800643A4   subsegment: asm, name
+//--- PA: 0x000004   VA: 0x800643A4   subsegment: c, ui/screen
 //---------------------------------------------------------
 ovl_name_entry       = 0x800643A4; // type:func size:0x4D8
-func_8006487C        = 0x8006487C; // type:func size:0x1884
-func_80066100        = 0x80066100; // type:func size:0x34
+NameEntryInput       = 0x8006487C; // type:func size:0x1884
+NamePlaySe           = 0x80066100; // type:func size:0x34
 
 //-----------------------------------------------------------
 //--- PA: 0x001D94   VA: 0x80066134   subsegment: c, ui/entry
@@ -31,21 +31,21 @@ func_80066100        = 0x80066100; // type:func size:0x34
 NameEntryComplete    = 0x80066134; // type:func size:0xAC
 
 //-----------------------------------------------------------
-//--- PA: 0x001E40   VA: 0x800661E0   subsegment: asm, name_1
+//--- PA: 0x001E40   VA: 0x800661E0   subsegment: c, ui/*
 //-----------------------------------------------------------
-func_800661E0        = 0x800661E0; // type:func size:0x34C
-func_8006652C        = 0x8006652C; // type:func size:0x100
-func_8006662C        = 0x8006662C; // type:func size:0xB4
-func_800666E0        = 0x800666E0; // type:func size:0x78
-func_80066758        = 0x80066758; // type:func size:0x24C
-func_800669A4        = 0x800669A4; // type:func size:0x1CC
-func_80066B70        = 0x80066B70; // type:func size:0x294
-func_80066E04        = 0x80066E04; // type:func size:0x164
-func_80066F68        = 0x80066F68; // type:func size:0xE4
+NameConfirm          = 0x800661E0; // type:func size:0x34C
+NameCaretPlace       = 0x8006652C; // type:func size:0x100
+NameListPreview      = 0x8006662C; // type:func size:0xB4
+NameListClose        = 0x800666E0; // type:func size:0x78
+NameListScroll       = 0x80066758; // type:func size:0x24C
+NameListFill         = 0x800669A4; // type:func size:0x1CC
+NameAddDakuten       = 0x80066B70; // type:func size:0x294
+NameAddHandakuten    = 0x80066E04; // type:func size:0x164
+NameSetPage          = 0x80066F68; // type:func size:0xE4
 NameDrawCursor       = 0x8006704C; // type:func size:0xAC
-func_800670F8        = 0x800670F8; // type:func size:0x464
-func_8006755C        = 0x8006755C; // type:func size:0x270
-func_800677CC        = 0x800677CC; // type:func size:0x120
+NameEntryInit        = 0x800670F8; // type:func size:0x464
+NameDrawFrame        = 0x8006755C; // type:func size:0x270
+NamePadRead          = 0x800677CC; // type:func size:0x120
 
 //-------------------------------------------------------------
 //--- PA: 0x00354C   VA: 0x800678EC   subsegment: c, gfx/upload
@@ -73,10 +73,10 @@ UploadImageRows      = 0x80067A34; // type:func size:0xA4
 BgFromPack           = 0x80067AD8; // type:func size:0x108
 
 //-----------------------------------------------------------
-//--- PA: 0x003840   VA: 0x80067BE0   subsegment: asm, name_2
+//--- PA: 0x003840   VA: 0x80067BE0   subsegment: c, gfx/sprite
 //-----------------------------------------------------------
-func_80067BE0        = 0x80067BE0; // type:func size:0x148
-func_80067D28        = 0x80067D28; // type:func size:0xFC
+NameSpriteSet        = 0x80067BE0; // type:func size:0x148
+NameSpriteFromDef    = 0x80067D28; // type:func size:0xFC
 ExpandGlyph          = 0x80067E24; // type:func size:0xFC
 
 //--------------------------------------------------------------
@@ -94,8 +94,27 @@ NameDrawKeyboardPage = 0x80067F20; // type:func size:0xDC
 //-----------------------------------------------------------------
 //--- PA: 0x003C5C   VA: 0x80067FFC   subsegment: rodata, name_data
 //-----------------------------------------------------------------
-g_name_entry         = 0x80067FFC; // type:u32 size:0x1E40
-g_keyboard           = 0x80068438;
+g_name_repeat        = 0x80067FFC; // size:0x1
+g_name_first         = 0x80067FFD; // size:0x1
+g_name_mode          = 0x80067FFE; // size:0x1
+g_name_field         = 0x80067FFF; // size:0x1
+g_name_page          = 0x80068000; // size:0x1
+g_name_text          = 0x80068004; // size:0x30
+g_name_cursor        = 0x80068034; // size:0x3
+g_name_col           = 0x80068038; // size:0x2
+g_name_row           = 0x8006803A; // size:0x2
+g_name_blink         = 0x8006803C; // size:0x1
+g_name_blink_step    = 0x8006803D; // size:0x1
+g_name_x             = 0x80068040; // size:0x3
+g_name_y             = 0x80068044; // size:0x3
+g_name_len           = 0x80068048; // size:0x3
+g_name_code_base     = 0x8006804C; // size:0x4
+g_name_sprite_defs   = 0x80068050; // size:0x3E8
+g_keyboard           = 0x80068438; // size:0x1E0
+g_kanji              = 0x80068618; // size:0x1694
+g_kanji_row_counts   = 0x80069CAC; // size:0x2C
+g_kanji_rows         = 0x80069CD8; // size:0xB0
+g_name_labels        = 0x80069D88; // size:0x18
 
 
 
@@ -105,25 +124,88 @@ g_keyboard           = 0x80068438;
 
 
 //-------------------------------------------------------------
-//--- PA: 0x005A9C   VA: 0x80069E3C   subsegment: bss, name_bss
+//--- PA: 0x005A00   VA: 0x80069DA0   subsegment: bss, name_bss
 //-------------------------------------------------------------
-D_80069E3C           = 0x80069E3C; // type:u32 size:0x24
-D_80069E60           = 0x80069E60; // type:u32 size:0x10114
-D_80079F74           = 0x80079F74; // type:u32 size:0x34
-D_80079FA8           = 0x80079FA8; // type:u32 size:0x5CC
-g_glyph_cell         = 0x80079FE0;
-D_8007A574           = 0x8007A574; // type:u32 size:0x4
-D_8007A578           = 0x8007A578; // type:u32 size:0x4
-D_8007A57C           = 0x8007A57C; // type:u32 size:0x4
-D_8007A580           = 0x8007A580; // type:u32 size:0x4
-D_8007A584           = 0x8007A584; // type:u32 size:0x4
-D_8007A588           = 0x8007A588; // type:u32 size:0x4
-D_8007A58C           = 0x8007A58C; // type:u32 size:0xFC
-D_8007A688           = 0x8007A688; // type:u32 size:0x90
-D_8007A718           = 0x8007A718; // type:u32 size:0x204
-D_8007A91C           = 0x8007A91C; // type:u32 size:0x18
-D_8007A934           = 0x8007A934; // type:u32 size:0xC
-D_8007A940           = 0x8007A940; // type:u32 size:0x24
-D_8007A964           = 0x8007A964; // type:u32 size:0x3C
-D_8007A9A0           = 0x8007A9A0; // type:u32 size:0x300
+g_pad_prev           = 0x80069DA0; // size:0x4
+g_pad_trig           = 0x80069DA4; // size:0x4
+g_name_list_pos      = 0x80069DA8; // size:0x4
+g_ot_tags            = 0x80069DAC; // size:0x80
+g_bg_frame           = 0x80069E2C; // size:0x24
+g_bg_fields          = 0x80069E50; // size:0x24
+g_packets            = 0x80069E74; // size:0x10000
+g_ot                 = 0x80079E74; // size:0x28
+g_sprite_attr        = 0x80079E9C; // size:0xC8
+g_bg_keys            = 0x80079F64; // size:0x24
+g_map_frame          = 0x80079F88; // size:0x10
+g_map_fields         = 0x80079F98; // size:0x10
+g_list_rows          = 0x80079FA8; // size:0x10
+g_bg_list            = 0x80079FB8; // size:0x24
+g_blink_tick         = 0x80079FDC; // size:0x4
+g_glyph_cell         = 0x80079FE0; // size:0x580
+g_map_keys           = 0x8007A560; // size:0x10
+g_sprites            = 0x8007A570; // size:0x708
+g_list_top           = 0x8007AC78; // size:0x4
+g_map_list           = 0x8007AC7C; // size:0x10
+g_pad_held           = 0x8007AC8C; // size:0x4
+g_pad_raw            = 0x8007AC90; // size:0x4
+g_list_code          = 0x8007AC94; // size:0x4
+g_caret_x            = 0x8007AC98; // size:0x4
+g_caret_y            = 0x8007AC9C; // size:0x4
+
+
+
+//================================================
+//=== outside the overlay
+//================================================
+
+SsSetMVol            = 0x80018754; // type:func
+SsSeqOpen            = 0x800195E0; // type:func
+SsInit               = 0x8001BAA4; // type:func
+SsQuit               = 0x8001BAF4; // type:func
+SsStart              = 0x8001BDF8; // type:func
+SsSetTickMode        = 0x8001C7F8; // type:func
+SsEnd                = 0x8001C964; // type:func
+SsSetTableSize       = 0x8001CA14; // type:func
+SsSeqPlay            = 0x8001CE20; // type:func
+SsPlayBack           = 0x8001CE90; // type:func
+SsSeqSetVol          = 0x8001D278; // type:func
+SsSeqSetDecrescendo  = 0x8001DA68; // type:func
+SsSetStereo          = 0x8001DAE4; // type:func
+SsVabOpenHead        = 0x8001DF4C; // type:func
+SsVabTransBody       = 0x8001E6F4; // type:func
+SsVabTransCompleted  = 0x8001EA34; // type:func
+SsUtSetReverbType    = 0x8001EF34; // type:func
+SsUtReverbOn         = 0x8001FD1C; // type:func
+SsUtSetReverbDepth   = 0x8001FD9C; // type:func
+PadRead              = 0x8002511C; // type:func
+VSync                = 0x8002516C; // type:func
+ResetCallback        = 0x80025350; // type:func
+ResetGraph           = 0x8002C73C; // type:func
+SetDispMask          = 0x8002CB3C; // type:func
+DrawSync             = 0x8002CBD8; // type:func
+ClearImage           = 0x8002CD6C; // type:func
+LoadImage            = 0x8002CE00; // type:func
+GsSortFastBg         = 0x80031438; // type:func
+GsSortSprite         = 0x8003262C; // type:func
+GsSortFastSprite     = 0x80032B38; // type:func
+GsInitGraph          = 0x80032CB4; // type:func
+GsSortClear          = 0x80033178; // type:func
+GsGetActiveBuff      = 0x800332B4; // type:func
+GsSwapDispBuff       = 0x80033468; // type:func
+GsDefDispBuff        = 0x80033A50; // type:func
+GsDrawOt             = 0x80034418; // type:func
+GsClearOt            = 0x8003443C; // type:func
+GsGetTimInfo         = 0x8003476C; // type:func
+GsSetWorkBase        = 0x80034850; // type:func
+bcopy                = 0x80041328; // type:func
+g_text_hero_name     = 0x8004428E; // size:0x8
+g_member_names       = 0x8004901C; // size:0x64
+
+// The load buffer's file table and the save's name fields are reached by
+// literal address; keep them numbers.
+D_80140000           = 0x80140000; // ignore:True size:0x40
 g_persona_stock      = 0x801F297C; // ignore:True size:0xF
+D_801F298C           = 0x801F298C; // ignore:True size:0x1C
+D_801F1C0B           = 0x801F1C0B; // ignore:True
+g_vab_id             = 0x801F535C; // ignore:True size:0x10
+g_seq_handles        = 0x801F537C; // ignore:True size:0x40

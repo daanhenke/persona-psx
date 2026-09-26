@@ -1,4 +1,5 @@
-/* Persona 1 (JP) - placing a member on the formation grid.  ADV only.
+/* Persona 1 (JP) - placing a member on the formation grid.  DNG only.
+ * DNG's copy of src/adv/game/formationplace.c.
  *   0x800736D4 FormationPlaceMember   0x800739CC FormationDonePrompt
  *   0x80073D10 FormationPresetPick
  *
@@ -8,6 +9,11 @@
  * the first answer files it under one of the eight saved layouts, the second
  * just makes it the live one.
  */
+#define SLOT_SETPOS_INT
+#define SLOT_TAGGED_INTXY
+#define TILEMAP_INT_COUNT
+#define PERSONAPAGE_DNG
+#define FORMATION_INT
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 
@@ -130,7 +136,7 @@ void FormationDonePrompt(void)
         SlotClear(PROMPT_SLOT + 5);
         SlotClear(PROMPT_CUR);
         if (g_menu->list[0].cur == 0) {
-            func_8008EDBC(0x12);
+            func_80092E5C(0x12);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(g_tilemap0, 0xE, 0xC, MAP_W);
