@@ -3647,6 +3647,8 @@ table's base into a local first also loads it ahead of the index. The same
 rule wants one pointer per rect when two are filled in turn.
 
 - [highlight.c](/src/btlp/highlight.c) - `BtlHighlightDraw`, 99.74% to exact.
+- [inflict.c](/src/btlp/inflict.c) - `BtlInflictStatus`, the status row: 98.57%
+  to exact.
 - [menudraw.c](/src/btlp/menudraw.c) - `BtlMenuDraw` (with the next lever).
 
 ## A do/while (0) weighs a register's uses, and splits the block

@@ -117,19 +117,20 @@ extern void  BtlSePlay(int slot, int seq);
 extern void  BtlSoundOpen(u_char *banks, int slot, u_char key);
 extern void  BtlSoundClose(int slot);
 
-/* 99.73%. What moved it from 89.31%: the rewards are built in steps on
-   their own variables (money's amount never crosses a call and lives in a1,
-   the others in s0); the experience line inserts the amount, not nought; the
-   bless and hit arms reach members through a pointer; the hit arm's enemy is
-   &g_btl_actors[BTL_PARTY + target], so gcc rebases the same register onto
-   the member; each arm closes its own sound; the item index masks the whole
-   roll; and the first two item arms' tails are kept apart so cross-jumping
-   leaves both tests in place. The 32 unused bytes of frame below the row
-   table are an unused local. Left: the heal and hit arms give the roll's
-   copy a2 where this gives it a1 (global-alloc order among the short-lived
-   locals), the roll case swaps the row index and the odds base between v1
-   and a0, and the second item arm jumps to the shared test rather than
-   straight to the money fallback. */
+/* 99.78%. What moved it from 89.31%: the rewards are built in steps on their
+   own variables (money's amount never crosses a call and lives in a1, the
+   others in s0); the experience line inserts the amount, not nought; the bless
+   and hit arms reach members through a pointer; the hit arm's enemy is
+   &g_btl_actors[BTL_PARTY + target], so gcc rebases the same register onto the
+   member; each arm closes its own sound; the item index masks the whole roll;
+   and the first two item arms' tails are kept apart so cross-jumping leaves
+   both tests in place; the hit arm's locals are its own (scoped to the case),
+   which settles its registers. The 32 unused bytes of frame below the row
+   table are an unused local. Left: the heal and hit arms give the roll's copy
+   a2 where this gives it a1 (global-alloc order among the short-lived locals;
+   scoping the heal arm's locals the same way is worse), the roll case swaps
+   the row index and the odds base between v1 and a0, and the second item arm
+   jumps to the shared test rather than straight to the money fallback. */
 #ifdef NON_MATCHING
 void BtlTalkSceneGift(void)
 {
@@ -311,7 +312,9 @@ void BtlTalkSceneGift(void)
         e->c.hp = hp;
         break;
 
-    case GIFT_HIT:
+    case GIFT_HIT: {
+        int gain, amount, slot, hp;
+
         g_btl_talk_depth--;
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
@@ -346,6 +349,7 @@ void BtlTalkSceneGift(void)
         BtlSeqPlay(g_btl_talk_parting_hit_script);
         BtlSeqWaitDone();
         BtlSoundClose(GIFT_HIT_SND);
+    }
     }
 }
 #else
