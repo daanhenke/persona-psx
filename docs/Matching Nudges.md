@@ -1112,6 +1112,29 @@ The generated loop body is identical either way - `lui %hi(sym+field)`,
 Read it off the preheader: a set-up instruction that comes *between* two the
 source clearly owns is not the compiler's.
 
+A second tell, read out of loop.c: the image's loop stores no stray constant
+of the table's symbol that code after the loop then reuses. Counted by
+element, `tbl[j]` makes `j * 4` a giv and every `sym+field + j*4` address a giv
+combined with it, so strength reduction then tries to eliminate `j`. For the
+exit test it tries the givs in reverse order of discovery, which puts the
+last address (a symbolic add) first. That cannot go in an `slt`, so
+`emit_iv_add_mult` leaves `reg = sym+field` behind at `where`. `where` is the
+compare itself when the loop's insn count is over `3 + 25` (a loop with a
+call). cse2's block runs from the loop label through the exit, so the stray
+becomes the related value for any `sym+N` wanted after the loop:
+`addiu v1,s5,-0x92` where the image has a fresh `lui/addiu` of `sym+0x74`, and
+one more saved register, which reshuffles the rest. Counted in bytes, the
+addresses are givs with mult 1 and nothing to combine with. Each one's
+benefit is spent by `add_cost` ("not worth while"), so `all_reduced` is 0,
+elimination is never tried, and nothing is emitted. The code in the loop is
+the same either way.
+
+- [huddraw.c](/src/btlp/huddraw.c) - `BtlHudDraw`'s flat pass: the six
+  pieces walked with `off += 4` over the three tables (`HUD_ENTRY`). This was
+  the whole s1/s2 swap: 98.08% to exact. Shrinking the loop under 29 insns
+  proved the mechanism (the post-loop `lui` and the allocation came right)
+  before the byte counter was found.
+
 ## Walk the id when two tables are indexed by it
 
 Covered above for spell lines; the same thing decides
@@ -3761,3 +3784,24 @@ call may move over one), which is why it still looks set first.
   copy is made inside the formatter's third argument,
   `FormatDecimal((short)value, g_hud_digits, w = (u_char)width)`. 90.89% (the
   same copy as a statement ahead of the call) to exact.
+## A ternary multiplied in is worked out before the branch
+
+`x * (c ? A : B)`, or `x + (c ? A : B)`, where `x` is not a plain variable is
+rewritten by fold-const (fold, the COND_EXPR operand case) into
+`(SAVE_EXPR x, c ? x*A : x*B)`. `x` is computed once, *before* the test, and
+each arm only applies its constant; identical tails of the two arms are then
+cross-jumped into the join. A `short` field in `x` is read with `lh`, since it
+is widened to `int` for the arithmetic, and not with the `lhu` a narrowed store
+gets. So an image that works out `i % 2` (or loads a field) ahead of a
+two-way branch and multiplies or adds by a different constant in each arm
+wants the ternary inside the product, not two products in a ternary.
+`c ? x*A : x*B` computes `x` in each arm, and `w = B; if (c) w = A;` makes a
+variable that sched keeps past the store.
+
+- [huddraw.c](/src/btlp/huddraw.c) - `BtlHudDraw`'s bar:
+  `HUD_CORNER_X(i) * HUD_BAR_PIECE_W(n)` for the texture corner and
+  `pad->ox + HUD_CORNER_X(i) * HUD_BAR_PIECE_W(n)` for the vertex (`lh` of
+  `ox` before the branch). The sprite's `w = HUD_BAR_PIECE_W(n)` is the first
+  store, as in the image. The face's `v` is
+  `(row + HUD_CORNER_Y(i)) * 16 + (*cell >= 0x50 ? 8 : 0)`, one statement, so
+  its address is formed before the branch. Together: 93.63% to 98.08%.

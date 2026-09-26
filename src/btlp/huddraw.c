@@ -85,6 +85,14 @@ typedef struct {
 #define HUD_PIECE_DY 0xA0
 #define HUD_PIECES   6
 
+/* The flat pass walks the three piece tables by byte offset, a four-byte entry
+   to a piece, and reads each field at its offset within the entry. */
+#define HUD_PIECE_ENTRY 4
+#define HUD_ENTRY(tbl, off, type) (*(type *)((u_char *)(tbl) + (off)))
+
+/* How wide piece N of the bar is: the last is half as wide as the rest. */
+#define HUD_BAR_PIECE_W(n) ((n) == HUD_BAR_LAST ? HUD_BAR_LAST_W : HUD_BAR_W)
+
 /* Full brightness for a piece that is drawn shaded. */
 #define HUD_GREY 0x80
 
@@ -92,16 +100,6 @@ typedef struct {
 #define HUD_CORNER_X(j) ((j) % 2)
 #define HUD_CORNER_Y(j) ((j) / 2)
 
-/* 93.63%. The bar pass picks each corner's offset with one ternary and one
-   store, as the image does. The two passes, the cell walk and every primitive
-   are the image's;
-   what is left is which saved register each of the two bases takes - the image
-   keeps the record in s1 and the scratchpad in s2, this the other way round -
-   and a handful of instructions the scheduler puts on the far side of a store.
-   Declaring the two in either order, assigning them at their declaration or in
-   the body, reaching the record through a pointer or by name, and spelling the
-   scratchpad through the macro all leave the pair as they are. */
-#ifdef NON_MATCHING
 void BtlHudDraw(void)
 {
     BtlHudPad *pad = HUD_PAD;
@@ -109,9 +107,12 @@ void BtlHudDraw(void)
     int        ox;
     int        oy;
     int        n;
-    int        j;
+    /* The flat pass counts its six pieces by the byte offset of each one's
+       entry. Counting by piece makes loop.c try to replace the counter with
+       one of the table addresses, and the constant it leaves behind at the
+       loop's end is picked up by the draw-mode copy after it. */
+    int        off;
     int        x;
-    int        w;
     /* The corner walk counts in the same word the transform is handed for the
        depth and the flag it writes back: the panel is flat, so neither is
        read. */
@@ -140,20 +141,22 @@ void BtlHudDraw(void)
         SetDrawMode(&g_btl_hud.mode[0][g_btl_ot_index], 0, 0,
                     GetTPage(HUD_FACE_TP, 0, HUD_FACE_TP_X, HUD_FACE_TP_Y), 0);
         pad->sprite.clut = GetClut(HUD_FACE_CLUT_X, HUD_FACE_CLUT_Y);
-        j = 0;
+        off = 0;
         do {
-            pad->sprite.x0 = g_btl_hud.piece_xy[j][0] + HUD_PIECE_DX;
-            pad->sprite.y0 = g_btl_hud.piece_xy[j][1] + HUD_PIECE_DY;
-            pad->sprite.u0 = g_btl_hud.piece_uv[j][0];
-            pad->sprite.v0 = g_btl_hud.piece_uv[j][2];
-            pad->sprite.w  = g_btl_hud.piece_wh[j][0];
-            pad->sprite.h  = g_btl_hud.piece_wh[j][1];
+            pad->sprite.x0 = HUD_ENTRY(g_btl_hud.piece_xy, off, short)
+                             + HUD_PIECE_DX;
+            pad->sprite.y0 = HUD_ENTRY(g_btl_hud.piece_xy, off + 2, short)
+                             + HUD_PIECE_DY;
+            pad->sprite.u0 = HUD_ENTRY(g_btl_hud.piece_uv, off, u_char);
+            pad->sprite.v0 = HUD_ENTRY(g_btl_hud.piece_uv, off + 2, u_char);
+            pad->sprite.w  = HUD_ENTRY(g_btl_hud.piece_wh, off, u_short);
+            pad->sprite.h  = HUD_ENTRY(g_btl_hud.piece_wh, off + 2, u_short);
             memcpy(g_btl_prim_next, &pad->sprite, sizeof(SPRT));
             AddPrim(g_btl_ot[g_btl_ot_index], g_btl_prim_next);
             g_btl_prim_next += sizeof(SPRT);
             pad->cell++;
-            j++;
-        } while (j < HUD_PIECES);
+            off += HUD_PIECE_ENTRY;
+        } while (off < HUD_PIECES * HUD_PIECE_ENTRY);
 
         memcpy(g_btl_prim_next, &g_btl_hud.mode[0][g_btl_ot_index],
                sizeof(DR_MODE));
@@ -174,11 +177,7 @@ void BtlHudDraw(void)
         n = 0;
         x = HUD_BAR_FLAT_X;
         do {
-            w = HUD_BAR_W;
-            if (n == HUD_BAR_LAST) {
-                w = HUD_BAR_LAST_W;
-            }
-            pad->sprite.w  = w;
+            pad->sprite.w  = HUD_BAR_PIECE_W(n);
             pad->sprite.x0 = x;
             x += HUD_BAR_W;
             pad->sprite.h  = HUD_BAR_H;
@@ -209,11 +208,10 @@ void BtlHudDraw(void)
                 do {
                     pad->u[i] = ((*pad->cell & 0xF) + HUD_CORNER_X(i))
                                 * HUD_FACE_CELL;
-                    w = ((*pad->cell >> 4) + HUD_CORNER_Y(i)) * HUD_FACE_CELL;
-                    if (*pad->cell >= HUD_CELL_SPLIT) {
-                        w += HUD_CELL_SHIFT;
-                    }
-                    pad->v[i] = w;
+                    pad->v[i] = ((*pad->cell >> 4) + HUD_CORNER_Y(i))
+                                * HUD_FACE_CELL
+                                + (*pad->cell >= HUD_CELL_SPLIT
+                                       ? HUD_CELL_SHIFT : 0);
                     i++;
                 } while (i < 4);
                 i = 0;
@@ -251,9 +249,7 @@ void BtlHudDraw(void)
         do {
             i = 0;
             do {
-                pad->u[i] = n == HUD_BAR_LAST
-                                ? HUD_CORNER_X(i) * HUD_BAR_LAST_W
-                                : HUD_CORNER_X(i) * HUD_BAR_W;
+                pad->u[i] = HUD_CORNER_X(i) * HUD_BAR_PIECE_W(n);
                 pad->v[i] = HUD_CORNER_Y(i) * HUD_BAR_H + HUD_BAR_V;
                 i++;
             } while (i < 4);
@@ -269,9 +265,8 @@ void BtlHudDraw(void)
             pad->quad.u3 = pad->u[3];
             pad->quad.v3 = pad->v[3];
             do {
-                pad->pos[i].vx = n == HUD_BAR_LAST
-                                     ? pad->ox + HUD_CORNER_X(i) * HUD_BAR_LAST_W
-                                     : pad->ox + HUD_CORNER_X(i) * HUD_BAR_W;
+                pad->pos[i].vx = pad->ox
+                                 + HUD_CORNER_X(i) * HUD_BAR_PIECE_W(n);
                 pad->pos[i].vy = pad->oy + HUD_CORNER_Y(i) * HUD_BAR_H;
                 i++;
             } while (i < 4);
@@ -287,6 +282,3 @@ void BtlHudDraw(void)
     }
     SetGeomOffset(ox, oy);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/huddraw", BtlHudDraw);
-#endif
