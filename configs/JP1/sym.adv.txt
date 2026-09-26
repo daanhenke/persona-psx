@@ -559,7 +559,7 @@ D_8007AED0               = 0x8007AED0; // type:func size:0xA8
 func_8007AF78            = 0x8007AF78; // type:func size:0x310
 func_8007B288            = 0x8007B288; // type:func size:0x2CC
 func_8007B554            = 0x8007B554; // type:func size:0x16C
-func_8007B6C0            = 0x8007B6C0; // type:func size:0x94
+PersonaNameDraw          = 0x8007B6C0; // type:func size:0x94
 
 //---------------------------------------------------------------------------
 //--- PA: 0x0173B4   VA: 0x8007B754   subsegment: c, ../common/ui/personaname
@@ -1380,14 +1380,18 @@ FacilityStep6            = 0x800A2994; // type:func
 PersonaSlotsCount        = 0x800A470C; // type:func
 PersonaSpellsFull        = 0x800A4754; // type:func
 FacilityCursorPlace      = 0x800A4778; // type:func
+PersonaSlotsDraw         = 0x800A4BD0; // type:func
 CharCanUsePersona        = 0x800A4DA0; // type:func
 ShopStep2                = 0x800A4E2C; // type:func
 MsgWaitPress             = 0x800A5AEC; // type:func
 CoinsAffordable          = 0x800A5B34; // type:func
 CoinExchangeStep         = 0x800A5B7C; // type:func
 FacilityStep3            = 0x800A6674; // type:func
+FacilityOpen3            = 0x800A6728; // type:func
+FacilityItemsDraw        = 0x800A6E50; // type:func
 ShopStep                 = 0x800A8104; // type:func
 ShopScreenOpen           = 0x800A81C8; // type:func
+ShopCountRowDraw         = 0x800A97A4; // type:func
 ShopBuyOpen              = 0x800A9978; // type:func
 ShopSellOpen             = 0x800A9EF0; // type:func
 ShopMoneyDraw            = 0x800AA468; // type:func

@@ -113,7 +113,7 @@ extern void  ShopLoadPrices2(u_char shop);
 extern void  ShopCountInit(u_char n);
 extern void  ShopCountInit2(u_char n);
 extern void  ShopScreenOpen(void);
-extern void  func_800A6728(void);
+extern void  FacilityOpen3(void);
 extern void  func_800A5560(void);
 extern int   CoinsAffordable(void);
 extern void  PersonaSlotsCompact(void);
@@ -260,7 +260,7 @@ u_char FacilityScreen(u_char id)
         MenuListInit(&g_menu->unk190, 0, 0, 1, 0x1A);
         MenuListInit(&g_menu->skill_persona, 0, 0, 1, 0x2E);
         MenuListInit(&g_menu->unk1A0, 0, 0, 6, 0x16);
-        func_800A6728();
+        FacilityOpen3();
         goto next;
     case 4:
         func_8008EDBC(0x16);

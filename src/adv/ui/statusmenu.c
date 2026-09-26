@@ -68,7 +68,7 @@ extern void   StatusPersonaPreview(void);
 #define SPELL_ESCAPE_B 0x73
 #define TARGET_PARTY   4
 extern u_char g_persona_list_rule[];
-extern void   func_8007B6C0(u_char key, short *dst, int base);
+extern void   PersonaNameDraw(u_char key, short *dst, int base);
 extern void   DrawCharStatBars(Char *rec);
 
 /* The glyph between the header's Persona and its bank. */
@@ -582,9 +582,9 @@ void StatusPageDraw(member)
             if (c->entry == row) {
                 bank = 3;
                 *AT(g_tilemap1, 10, 20) = GLYPH_SEP;
-                func_8007B6C0(personas[i].key, AT(g_tilemap1, 10, 22), 0);
+                PersonaNameDraw(personas[i].key, AT(g_tilemap1, 10, 22), 0);
             }
-            func_8007B6C0(personas[i].key, AT(g_tilemap1, 4 + row, 11),
+            PersonaNameDraw(personas[i].key, AT(g_tilemap1, 4 + row, 11),
                           bank * 0xD7);
         } else {
             TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, 4 + row, 12),
@@ -613,7 +613,7 @@ void StatusSlotDraw(member, slot)
     TileMapFillRect(AT(g_tilemap1, 1, 32), 0, 3, 2, MAP_W);
     i = c->list[slot];
     if (i != 0xFF) {
-        func_8007B6C0(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        PersonaNameDraw(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
         n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 34), GLYPH_DIGIT0, n);
         n = FormatDecimal(g_personas[i].sp_cost, g_hud_digits, 3);
@@ -652,7 +652,7 @@ void StatusPreviewDraw(Char *c)
     TileMapFillRect(AT(g_tilemap1, 11, 23), 0, 2, 5, MAP_W);
     i = c->list[c->entry];
     if (i != 0xFF) {
-        func_8007B6C0(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
+        PersonaNameDraw(g_personas[i].key, AT(g_tilemap1, 10, 22), 0);
         n = FormatDecimal(g_personas[i].level, g_hud_digits, 2);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 1, 32), GLYPH_DIGIT0, n);
         *AT(g_tilemap1, 1, 33) = GLYPH_SEP;

@@ -14,6 +14,8 @@
 #include <persona/common/char.h>
 #include <persona/common/item.h>
 #include <persona/common/menuctx.h>
+#include <persona/common/tilemap.h>
+#include <persona/common/slot.h>
 
 #define g_persona_slots ((u_char *)0x801F2574)
 #define g_item_list     ((u_short *)0x800EAE4C)
@@ -23,6 +25,7 @@
 #define SLOT_EMPTY    0xFF
 #define FUSE_SPECIALS 40
 #define COINS_MAX     99999999
+#define AT(map, row, col) (&(map)[(row) * MAP_W + (col)])
 #define ITEM_ID       0x1FF
 #define ITEM_NO_SALE  0x1000
 
@@ -38,13 +41,22 @@ extern void func_800A52F0(void);
 extern void func_800A5BCC(void);
 extern void func_800A6308(void);
 extern void func_800768F0(void);
+void FacilityOpen3(void);
+extern void D_80078948(int a, int b);
+extern void D_8007A738(int a, int b);
+extern short func_800A6FFC(short i);
+extern void PersonaNameDraw(u_char persona, short *dst, int base);
+extern void DrawItemName(int id, short *dst, u_short base, int b);
+extern const u_char g_persona_list_rule[];
+extern short g_item_top;
+extern int   D_800BB858;
+extern short D_800B9C7C[];
 extern void func_800A2A48(void);
 extern void func_800A2CD0(void);
 extern void func_800A2FF8(void);
 extern void func_800A3388(void);
 extern void func_800A3984(void);
 extern void func_800A3D0C(void);
-extern void func_800A6728(void);
 extern void func_800A6788(void);
 extern void func_800A7118(void);
 extern void func_800A76F4(void);
@@ -210,7 +222,24 @@ void FacilityCursorPlace(void)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A47F8);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A4BD0);
+/* The Persona slots page: each filled slot's name, and a rule for each
+   empty one. */
+void PersonaSlotsDraw(void)
+{
+    Persona *personas;
+    int      i;
+
+    personas = g_personas;
+    TileMapFillRect(AT(g_tilemap1, 0, 1), 0, 10, 16, MAP_W);
+    for (i = 0; i < 16; i++) {
+        if (g_persona_slots[i] != SLOT_EMPTY) {
+            PersonaNameDraw(personas[g_persona_slots[i]].key,
+                            AT(g_tilemap1, i, 1), 0);
+        } else {
+            TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, i, 2), 0xD7, 8);
+        }
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A4C98);
 
@@ -298,7 +327,7 @@ void FacilityStep3(void)
 {
     switch (g_persona_data_step) {
     case 0:
-        func_800A6728();
+        FacilityOpen3();
         g_persona_data_step++;
         break;
     case 1:
@@ -319,11 +348,32 @@ void FacilityStep3(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6728);
+void FacilityOpen3(void)
+{
+    func_800768F0();
+    SlotSetAnim(0x2D, 0, 0, 0, 0, 0x30, 0, 0);
+    D_80078948(0, 4);
+    D_8007A738(0, 8);
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6788);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6E50);
+/* Thirty-two item names in two columns, dimmed where the item is out. */
+void FacilityItemsDraw(void)
+{
+    short *ids;
+    int    i;
+    int    dim;
+
+    TileMapFillRect(g_tilemap1, 0, 0x16, 0x20, MAP_W);
+    i = 0;
+    ids = D_800B9C7C;
+    for (; i < 32; i++) {
+        dim = func_800A6FFC(i) == 0;
+        DrawItemName(*ids, &g_tilemap1[i / 2 * MAP_W] + (i & 1) * 12, dim * 0xD7, 0);
+        ids++;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6F2C);
 
@@ -388,6 +438,17 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A91C8);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A95B8);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A97A4);
+/* The count on the list row under the cursor, with its brackets. */
+void ShopCountRowDraw(void)
+{
+    short row;
+
+    row = g_item_top + g_menu->unk100.cur;
+    TileMapFillRect(AT(g_tilemap1, 0, 23), 0, 3, 16, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, row, 25), GLYPH_DIGIT0,
+                       FormatDecimal(D_800BB858, g_hud_digits, 2));
+    *AT(g_tilemap1, row, 23) = 0xCE;
+    *AT(g_tilemap2, 13, 8) = 0xCE;
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A9868);
