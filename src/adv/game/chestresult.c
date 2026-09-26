@@ -1,6 +1,7 @@
 /* Persona 1 (JP) - what a chest holds, and what it tells the player.
  *
- *   ADV @ 0x8008157C, 0x80081864, 0x80081A20, 0x80081BB0
+ *   ADV @ 0x80080CE0 AdvChestOpen
+ *         0x8008157C, 0x80081864, 0x80081A20, 0x80081BB0
  *
  * The search handler at 0x8007E814 walks the player onto the tile, finds the
  * actor standing there and reads its flag. A flag already set means the chest
@@ -113,7 +114,146 @@ typedef struct {
 extern void ItemsAdd(u_short id, u_short count);
 extern void MoneyAdd(u_int amount);
 
-/* The switch table these four share does not yet come out of the C, so both
+/* The opening animations, one per kind, played in slot 62. */
+extern u_char g_chest_anim_item[];
+extern u_char g_chest_anim_money[];
+extern u_char g_chest_anim_quarter[];
+extern u_char g_chest_anim_half[];
+extern u_char g_chest_anim_party[];
+extern u_char g_chest_anim_poison[];
+extern u_char g_chest_anim_one[];
+extern u_char g_chest_anim_to_one[];
+
+/* An object's actor is its record's index plus this. */
+#define CHEST_ACTOR 8
+
+extern void SlotInit(void *def, u_char slot, int attr, short x, short y);
+extern void AdvSoundCommand(short cmd);
+extern void AdvScreenEffect(u_char n);
+extern void ViewShakeStop(void);
+extern void AdvEffectShrinkAway(u_char actor);
+extern void AdvEffectSquashAway(u_char actor);
+
+#define A g_adv_actors[chest + CHEST_ACTOR]
+
+/* Puts an opening animation over the object's actor, just in front of it. */
+#define CHEST_ANIM(def)     SlotInit(def, EFFECT_SLOT, A.z - 1, A.world_x - g_cam_x, A.world_y - g_cam_y)
+
+/* Plays what opening a chest looks like: its sound and animation, the room
+   shaking for the traps that hurt, and the object shrinking or squashing
+   away. The trap-and-reward kinds play the trap and then the reward. */
+void AdvChestOpen(u_char chest)
+{
+    int n;
+
+    switch (g_chest_defs[chest].kind) {
+    case CHEST_ITEM:
+        AdvSoundCommand(6);
+        CHEST_ANIM(g_chest_anim_item);
+        for (n = 0; n < 0x5D; n++) {
+            AdvRunFrame();
+        }
+        break;
+    case CHEST_MONEY:
+        AdvSoundCommand(7);
+        CHEST_ANIM(g_chest_anim_money);
+        for (n = 0; n < 0x65; n++) {
+            AdvRunFrame();
+        }
+        break;
+    case CHEST_TRAP_QUARTER:
+        AdvSoundCommand(8);
+        CHEST_ANIM(g_chest_anim_quarter);
+        AdvScreenEffect(7);
+        for (n = 0; n < 0x3C; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_HALF:
+        AdvSoundCommand(9);
+        CHEST_ANIM(g_chest_anim_half);
+        AdvScreenEffect(8);
+        for (n = 0; n < 0x46; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_PARTY:
+        AdvSoundCommand(0xA);
+        CHEST_ANIM(g_chest_anim_party);
+        AdvScreenEffect(8);
+        for (n = 0; n < 0xDB; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_POISON:
+        AdvSoundCommand(0xB);
+        CHEST_ANIM(g_chest_anim_poison);
+        AdvScreenEffect(7);
+        for (n = 0; n < 0xA9; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectSquashAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_ONE:
+        AdvSoundCommand(0xC);
+        CHEST_ANIM(g_chest_anim_one);
+        for (n = 0; n < 0xC7; n++) {
+            AdvRunFrame();
+        }
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_TO_ONE:
+        AdvSoundCommand(0xD);
+        CHEST_ANIM(g_chest_anim_to_one);
+        g_slot_cur = &g_slots[EFFECT_SLOT];
+        for (n = 0; n < 0x77; n++) {
+            AdvRunFrame();
+        }
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        break;
+    case CHEST_TRAP_ITEM:
+        AdvSoundCommand(8);
+        CHEST_ANIM(g_chest_anim_quarter);
+        AdvScreenEffect(7);
+        for (n = 0; n < 0x40; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        AdvSoundCommand(6);
+        CHEST_ANIM(g_chest_anim_item);
+        for (n = 0; n < 0x4D; n++) {
+            AdvRunFrame();
+        }
+        break;
+    case CHEST_TRAP_MONEY:
+        AdvSoundCommand(8);
+        CHEST_ANIM(g_chest_anim_quarter);
+        AdvScreenEffect(7);
+        for (n = 0; n < 0x40; n++) {
+            AdvRunFrame();
+        }
+        ViewShakeStop();
+        AdvEffectShrinkAway(chest + CHEST_ACTOR);
+        AdvSoundCommand(7);
+        CHEST_ANIM(g_chest_anim_money);
+        for (n = 0; n < 0x55; n++) {
+            AdvRunFrame();
+        }
+        break;
+    }
+}
+
+#undef A
+
+/* The switch table these three share does not yet come out of the C, so both
    the code and the table are taken from the original. */
 #ifdef NON_MATCHING
 u_char AdvChestApply(u_char chest)
@@ -248,6 +388,12 @@ void AdvChestShowMoney(u_char actor)
     SlotClear(EFFECT_SLOT);
 }
 
+#else
+INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestApply);
+INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowItem);
+INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowMoney);
+#endif
+
 void AdvChestShowEmpty(u_char actor)
 {
     Slot *s;
@@ -279,9 +425,3 @@ void AdvChestShowEmpty(u_char actor)
     } while (i < SPIN_FRAMES);
     SlotClear(EFFECT_SLOT);
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestApply);
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowItem);
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowMoney);
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowEmpty);
-#endif

@@ -725,7 +725,7 @@ SceneFindEntry           = 0x80080598; // type:func size:0x74
 //-----------------------------------------------------------
 AdvExitPlaceLeader       = 0x8008060C; // type:func size:0x114
 ActorWalkStep            = 0x80080720; // type:func size:0x5C0
-func_80080CE0            = 0x80080CE0; // type:func size:0x89C
+AdvChestOpen             = 0x80080CE0; // type:func size:0x89C
 
 //-------------------------------------------------------------------
 //--- PA: 0x01D1DC   VA: 0x8008157C   subsegment: c, game/chestresult
@@ -1601,6 +1601,14 @@ g_entry_label_def        = 0x800B2F90;
 g_entry_label_x          = 0x800B2FA0;
 g_moon_name_cells        = 0x800B2FCC; // size:0x20
 g_moon_cell              = 0x800B301C; // size:0x8
+g_chest_anim_item        = 0x800B405C;
+g_chest_anim_money       = 0x800B417C;
+g_chest_anim_quarter     = 0x800B42C4;
+g_chest_anim_half        = 0x800B435C;
+g_chest_anim_party       = 0x800B444C;
+g_chest_anim_poison      = 0x800B483C;
+g_chest_anim_one         = 0x800B4984;
+g_chest_anim_to_one      = 0x800B4C9C;
 g_adv_chest_item_cells   = 0x800B4EBC;
 g_adv_chest_count_cells  = 0x800B4F24;
 g_adv_chest_item_def     = 0x800B4F34;
