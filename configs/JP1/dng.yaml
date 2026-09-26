@@ -188,7 +188,7 @@ segments:
       - [0x256AC, asm, dng_2_s8]
       - [0x26FCC, c, common/gfx/mapcells]
       - [0x270CC, asm, dng_2_s9]
-      - [0x272E8, c, common/gfx/backdrop]
+      - [0x272C0, c, common/gfx/backdrop]
       - [0x274CC, c, common/game/party]
       - [0x274F8, asm, dng_2_s9a]
       - [0x27A10, c, common/ui/text]

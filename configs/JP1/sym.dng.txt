@@ -785,7 +785,7 @@ PartyAnyBelowMax         = 0x8008F35C; // type:func size:0x84
 CharBelowMax             = 0x8008F3E0; // type:func size:0xE4
 func_8008F4C4            = 0x8008F4C4; // type:func size:0x8
 VramClearRect            = 0x8008F4CC; // type:func size:0x64
-func_8008F530            = 0x8008F530; // type:func size:0x36C
+RenderFrame              = 0x8008F530; // type:func size:0x36C
 D_8008F89C               = 0x8008F89C; // type:func size:0x48
 
 //----------------------------------------------------------------

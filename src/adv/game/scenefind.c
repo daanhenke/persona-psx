@@ -1,4 +1,5 @@
 /* Persona 1 (JP) - taking a way out, and naming it on screen.
+ *   0x8007FA1C SceneLeaderArrive
  *   0x8007FA78 SceneApplyEntry
  *   0x8007FB90 SceneDrawEntryLabel
  *
@@ -48,6 +49,23 @@ extern u_char g_map_pos_x;
 extern u_char g_map_pos_y;
 extern u_char g_map_unk4;
 extern u_char g_map_room;
+extern u_short g_adv_walk_dir;
+
+#define g_seq_handle (*(short *)0x801F5390)
+
+extern void SsSeqStop(short seq);
+extern void ActorSetStandSprite(u_char a);
+
+/* The leader comes in through a way in: the footsteps stop and it stands,
+   facing the way the player was walking. */
+void SceneLeaderArrive(void)
+{
+    g_adv_actors[0].steps = 1;
+    SsSeqStop(g_seq_handle);
+    g_adv_actors[0].kind = 1;
+    g_adv_actors[0].dir = g_adv_walk_dir;
+    ActorSetStandSprite(0);
+}
 
 /* Where the party ends up, and how, once it walks onto an entry tile. The
    record is re-indexed for every field rather than held in a pointer. */

@@ -673,7 +673,8 @@ AdvSilenceBgm            = 0x8007E5A4; // type:func size:0x74
 //-----------------------------------------------------------
 //--- PA: 0x01A278   VA: 0x8007E618   subsegment: asm, adv_26
 //-----------------------------------------------------------
-D_8007E618               = 0x8007E618; // type:func size:0xC4
+AdvFadeBgmOut            = 0x8007E618; // type:func size:0x38
+AdvLeaveMapFlag          = 0x8007E650; // type:func size:0x8C
 
 //-----------------------------------------------------------------
 //--- PA: 0x01A33C   VA: 0x8007E6DC   subsegment: c, game/fieldtick
@@ -695,7 +696,7 @@ AdvPickEffect            = 0x8007F1DC; // type:func size:0x68
 //--- PA: 0x01AEA4   VA: 0x8007F244   subsegment: asm, adv_28
 //-----------------------------------------------------------
 func_8007F244            = 0x8007F244; // type:func size:0x7D8
-func_8007FA1C            = 0x8007FA1C; // type:func size:0x5C
+SceneLeaderArrive        = 0x8007FA1C; // type:func size:0x5C
 
 //-----------------------------------------------------------------
 //--- PA: 0x01B6D8   VA: 0x8007FA78   subsegment: c, game/scenefind
@@ -793,7 +794,7 @@ ActorSetTile             = 0x80083310; // type:func size:0xA4
 //------------------------------------------------------------
 //--- PA: 0x01F014   VA: 0x800833B4   subsegment: asm, adv_30b
 //------------------------------------------------------------
-D_800833B4               = 0x800833B4; // type:func size:0xAC
+ActorSetTileFacing       = 0x800833B4; // type:func size:0xAC
 
 //------------------------------------------------------------------
 //--- PA: 0x01F0C0   VA: 0x80083460   subsegment: c, game/actorswalk
@@ -1414,7 +1415,7 @@ PartyAdd                 = 0x800ADBC0; // type:func size:0x3C
 //------------------------------------------------------------
 //--- PA: 0x04985C   VA: 0x800ADBFC   subsegment: asm, adv_54a
 //------------------------------------------------------------
-D_800ADBFC               = 0x800ADBFC; // type:func size:0x34
+PartyRemove              = 0x800ADBFC; // type:func size:0x34
 
 //------------------------------------------------------------------------------
 //--- PA: 0x049890   VA: 0x800ADC30   subsegment: c, ../common/game/partycompact

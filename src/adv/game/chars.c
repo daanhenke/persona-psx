@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - putting a character in the party.  ADV only.
- *   0x800ADBC0 PartyAdd
+ *   0x800ADBC0 PartyAdd   0x800ADBFC PartyRemove
  *
  * One of three units cut out of the same original source: the record searches
  * are in charfind.c and the Persona and list searches in charslots.c. They sit
@@ -19,4 +19,11 @@ extern u_char PartyFindSlot(u_char chr);
 void PartyAdd(u_char chr)
 {
     g_party[PartyFindSlot(0xFF)] = chr;
+}
+
+/* Empties the party slot holding a character. One not in the party gets
+   0xFF back, and the write lands one past the end. */
+void PartyRemove(u_char chr)
+{
+    g_party[PartyFindSlot(chr)] = PARTY_EMPTY;
 }

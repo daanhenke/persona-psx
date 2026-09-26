@@ -152,8 +152,8 @@ extern void AdvFadeUpBlocking(short step, short limit);
 extern void AdvFadeDownBlocking(short step, short floor);
 extern void MapRevealScene(void);
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
-extern void func_8007E650(void);
-extern void D_8007E618(void);
+extern void AdvLeaveMapFlag(void);
+extern void AdvFadeBgmOut(void);
 extern void PreloadDng(void);
 extern void PreloadS2d(void);
 extern void PreloadBtlField(void);
@@ -409,25 +409,25 @@ leave:
 
     switch (g_adv_enter_mode) {
     case ENTER_DNG:
-        func_8007E650();
+        AdvLeaveMapFlag();
         PreloadDng();
     case ENTER_6:
     common:
-        D_8007E618();
+        AdvFadeBgmOut();
         break;
     case ENTER_S2D:
-        func_8007E650();
+        AdvLeaveMapFlag();
         PreloadS2d();
         goto common;
     case ENTER_FIELD:
-        func_8007E650();
+        AdvLeaveMapFlag();
         PreloadBtlField();
         goto common;
     case ENTER_NAME:
         PreloadName();
         goto common;
     case ENTER_ADV:
-        func_8007E650();
+        AdvLeaveMapFlag();
         PreloadAdv();
         break;
     case ENTER_EVENT:

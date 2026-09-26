@@ -1,7 +1,9 @@
 /* Persona 1 (JP) - the background the menus are drawn over.
  *
  * Compiled into three overlays rather than called across the boundary:
- *   DNG @ 0x8008B688   ADV @ 0x8007D0F8   S2D @ 0x8007BAF8
+ *                 DNG         ADV         S2D
+ *   RunFrame      0x8008B660  0x8007D0D0  0x8007BAD0
+ *   DrawBackdrop  0x8008B688  0x8007D0F8  0x8007BAF8
  *
  * 155 lines, sorted into the OT ahead of everything else. The first 120 are a
  * blue gradient down the top half of the screen, brightest at the top and
@@ -34,6 +36,17 @@ extern int      g_ot_index;
 #define GRADIENT_H 120     /* the gradient's last line, and its divisor    */
 #define OT_BACK    0x400   /* behind the grid, which sits at 0x3FF         */
 #define OT_GRID    0x3FF
+
+extern void RenderFrame(void);
+
+void DrawBackdrop(void);
+
+/* One frame of a menu screen: the backdrop, then everything else. */
+void RunFrame(void)
+{
+    DrawBackdrop();
+    RenderFrame();
+}
 
 void DrawBackdrop(void)
 {

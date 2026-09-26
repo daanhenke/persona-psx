@@ -127,7 +127,7 @@ segments:
       - [0x16A48, asm, s2d_2_s11]
       - [0x17434, c, common/gfx/mapcells]
       - [0x17534, asm, s2d_2_s12]
-      - [0x17758, c, common/gfx/backdrop]
+      - [0x17730, c, common/gfx/backdrop]
       - [0x1793C, c, common/game/party]
       - [0x17968, asm, s2d_2_s12a]
       - [0x17E80, c, common/ui/text]
