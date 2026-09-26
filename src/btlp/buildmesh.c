@@ -60,28 +60,25 @@ extern const char    g_btl_mesh_cells[];
 extern u_char        g_btl_arena_show;
 extern u_char        g_btl_mesh_show;
 
-/* 98.76%. Taken from the image:
-   - the page is read before the palette, each straight from its table;
-   - each row keeps a copy of its lower edge (yb) for the two lower corners;
-   - the first texture pointer is worked out from the table, not from the
-     second;
-   - the strip loop counts in the row counter.
-   What is left:
-   - the image derives the first texture pointer's base from the second's
-     (base + 1, less one);
-   - the quad goes through v1 where this uses a0;
-   - the vertex pointer and the buffer counter take each other's stack slot. */
-#ifdef NON_MATCHING
+/* Each row's two texture pointers are set in blocks of their own. cse1 stops
+   at the end of a loop, so it does not see that one table address is the
+   other plus one; loop.c then leaves both in the row loop, where cse2 derives
+   the first from the second as the image does. Written as plain statements,
+   cse1 relates them and loop.c lifts the pair out of the row loop instead.
+   The quad's first and second halves are reached through pointers of their
+   own, so each stays local to its block. */
 void BtlBuildMesh(void)
 {
+    int            buf;
     BtlMeshVertex *v;
     BtlMeshVertex *rest;
     POLY_FT4      *p;
+    POLY_FT4      *q;
     const char    *u;
     const char    *w;
-    int            buf;
     int            off;
     int            cell;
+    int            idx;
     int            col;
     int            row;
     short          x1;
@@ -102,8 +99,13 @@ void BtlBuildMesh(void)
             y0 = row * MESH_CELL;
             yb = y1;
             x1 = MESH_CELL;
-            w = &g_btl_mesh_cells[cell * 2 + 1];
-            u = &g_btl_mesh_cells[cell * 2];
+            idx = cell * 2;
+            do {
+                w = &g_btl_mesh_cells[idx + 1];
+            } while (0);
+            do {
+                u = &g_btl_mesh_cells[idx];
+            } while (0);
             do {
                 cell++;
                 SetPolyFT4(g_btl_polyft4_next);
@@ -126,11 +128,11 @@ void BtlBuildMesh(void)
                 g_btl_polyft4_next->v2 = *w * MESH_CELL + MESH_CELL;
                 g_btl_polyft4_next->u3 = *u * MESH_CELL + MESH_CELL;
                 g_btl_polyft4_next->v3 = *w * MESH_CELL + MESH_CELL;
-                p = g_btl_polyft4_next;
-                p->tpage = g_btl_tpage[MESH_SLOT];
+                q = g_btl_polyft4_next;
+                q->tpage = g_btl_tpage[MESH_SLOT];
                 col++;
                 g_btl_polyft4_next->clut = g_btl_clut[MESH_SLOT];
-                p->r0 = MESH_GREY;
+                q->r0 = MESH_GREY;
                 g_btl_polyft4_next->g0 = MESH_GREY;
                 x1 += MESH_CELL;
                 u += 2;
@@ -175,7 +177,4 @@ void BtlBuildMesh(void)
     g_btl_arena_show = 0;
     g_btl_mesh_show = 0;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/buildmesh", BtlBuildMesh);
-#endif
 
