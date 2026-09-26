@@ -72,9 +72,9 @@ extern short  MenuScrollCursor(MenuList *m, short *row, short first,
 extern void   StatusPersonaLayout(void);
 extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
-extern void   func_800A14C4(short row);
+extern void   FuseResultRowDraw(short row);
 extern short  func_800A2904(void);
-extern void   func_800A0E60(void);
+extern void   FuseResultsOpen(void);
 extern void   func_800AB1EC(void);
 extern void   FuseItemsOpen(void);
 extern void   FusePersonaDraw(short persona, short a, short b);
@@ -187,16 +187,16 @@ void FuseResultPick(void)
                 if (PageScrollValue(&g_swap_top, 0, D_800BB950 - RESULT_ROWS,
                                     RESULT_ROWS)) {
                     for (i = 0; i < RESULT_ROWS; i++) {
-                        func_800A14C4(g_swap_top + i);
+                        FuseResultRowDraw(g_swap_top + i);
                     }
                     g_map_scroll_y = g_swap_top * ROW_H;
                 } else if (MenuScrollCursor(&g_menu->status_who, &g_swap_top, 0,
                                             D_800BB950 - RESULT_ROWS,
                                             (u_short *)&D_800B8458)) {
                     if (D_800B8458 < 0) {
-                        func_800A14C4(g_swap_top);
+                        FuseResultRowDraw(g_swap_top);
                     } else if (D_800B8458 > 0) {
-                        func_800A14C4(g_swap_top + RESULT_ROWS - 1);
+                        FuseResultRowDraw(g_swap_top + RESULT_ROWS - 1);
                     }
                 }
             }
@@ -313,7 +313,7 @@ void FusePairPick(void)
                 g_persona_data_step += 3;
             }
         } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-            func_800A0E60();
+            FuseResultsOpen();
             g_persona_data_step -= 1;
         }
     }

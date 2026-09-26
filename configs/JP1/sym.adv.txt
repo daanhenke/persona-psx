@@ -1358,6 +1358,16 @@ FusePersonaDraw          = 0x8009F0FC; // type:func
 FuseExecute              = 0x8009F7D0; // type:func
 PersonaSlotsFree         = 0x800A0388; // type:func
 PersonaSlotsCompact      = 0x800A03C8; // type:func
+FuseApplyBonus           = 0x800A0450; // type:func
+FuseRollKind             = 0x800A0744; // type:func
+FuseRollAccident         = 0x800A080C; // type:func
+FuseItemsDraw            = 0x800A08E4; // type:func
+FuseItemBonus            = 0x800A0BB8; // type:func
+FuseResultsOpen          = 0x800A0E60; // type:func
+FusionOpen               = 0x800A11EC; // type:func
+FuseResultRowDraw        = 0x800A14C4; // type:func
+FuseResultLineDraw       = 0x800A1690; // type:func
+FusionStockDraw          = 0x800A1824; // type:func
 
 //-------------------------------------------------------------
 //--- PA: 0x046C34   VA: 0x800AAFD4   subsegment: c, game/money
@@ -1804,6 +1814,7 @@ g_party                  = 0x801F256C; // ignore:True size:0x5
 g_money                  = 0x801F2674; // ignore:True size:0x4
 g_money2                 = 0x801F2678; // ignore:True size:0x4
 g_items                  = 0x801F267C; // ignore:True size:0x2A0
+g_persona_stock_m1       = 0x801F297B; // ignore:True size:0x1
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
 g_playtime_min           = 0x801F29BD;
 g_playtime_sec           = 0x801F29BE;

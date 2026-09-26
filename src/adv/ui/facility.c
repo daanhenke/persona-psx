@@ -118,9 +118,9 @@ extern void  func_800A5560(void);
 extern int   func_800A5B34(void);
 extern void  PersonaSlotsCompact(void);
 extern void  func_800A2A48(void);
-extern void  func_800A11EC(void);
+extern void  FusionOpen(void);
 extern short FuseListResults(void);
-extern void  func_800A0E60(void);
+extern void  FuseResultsOpen(void);
 extern void  SaveScreenOpen(void);
 extern void  func_800A8104(void);
 extern void  func_800A6674(void);
@@ -351,7 +351,7 @@ u_char FacilityScreen(u_char id)
         MenuListInit(&g_menu->unk2E0, 0, 0, 1, 0x1A);
         D_800BB7F4 = 0;
         D_800BB820 = 0;
-        func_800A11EC();
+        FusionOpen();
         if (i != 0) {
             SlotInitTagged(D_800B148C, 1, 0x42, 0xC8, 0x30);
             SlotInitTagged(D_800B1528, 2, 0x42, 0x20, 0x30);
@@ -378,7 +378,7 @@ u_char FacilityScreen(u_char id)
         g_item_top = 0;
         g_swap_top = 0;
         D_800BB820 = 1;
-        func_800A0E60();
+        FuseResultsOpen();
         break;
     case 9:
         MenuListInit(&g_menu->stock, 0, 0, g_stock_last + 1, 0x1E);

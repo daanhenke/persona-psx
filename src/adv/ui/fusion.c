@@ -88,9 +88,9 @@ extern void   TextItemStatRow(short item, short x, short y);
 extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
 extern short  func_800A2904(void);
-extern void   func_800A1690(short persona);
-extern void   func_800A08E4(void);
-extern void   func_800A11EC(void);
+extern void   FuseResultLineDraw(short persona);
+extern void   FuseItemsDraw(void);
+extern void   FusionOpen(void);
 extern void   func_800AB0D0(short n);
 extern void   func_800AB1EC(void);
 extern void   D_8008D924(const PersonaDef *d, short stat);
@@ -99,10 +99,10 @@ extern void   FusePairsOpen(void);
 /* PersonaFindFree, PersonaFill and PersonaFind are called without
    prototypes here. */
 extern short  func_800A26A0(short persona);
-extern short  func_800A080C(short kind);
-extern short  func_800A0744(void);
+extern short  FuseRollAccident(short kind);
+extern short  FuseRollKind(void);
 extern short  func_800A26DC(u_char a, u_char b);
-extern void   func_800A0450(short p, short kind, short level);
+extern void   FuseApplyBonus(short p, short kind, short level);
 extern void   func_800AB23C(short persona, u_char src, short *spell,
                             short *rank);
 extern void   ItemsRemovePending(short item, short count);
@@ -158,7 +158,7 @@ short PersonaSlotsFree(void);
 /* Back to picking the pair, whichever screen that was. */
 #define BACK_TO_PAIRS()                                                       \
     if (D_800BB820 == 0) {                                                    \
-        func_800A11EC();                                                      \
+        FusionOpen();                                                      \
         SlotInitTagged(D_800B148C, 1, 0x42, g_menu->top.cur * 8 + 0xC8, 0x30);\
         SlotInitTagged(D_800B1528, 2, 0x42, 0x20,                             \
                        g_menu->status_page.cur * 12 + 0x30);                  \
@@ -208,7 +208,7 @@ void FusionPairPick(void)
     res = &g_fuse.persona;
     func_800A1990(g_persona_stock[g_menu->status_page.cur],
                   g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
-    func_800A1690(*res);
+    FuseResultLineDraw(*res);
     if (InputCheckAcceptA(1)) {
         D_800BC050 = 0;
         if (g_fuse.arcana != 0) {
@@ -313,7 +313,7 @@ void FuseItemsOpen(void)
     *AT(g_tilemap2, 1, 13) = 0xCD;
     *AT(g_tilemap2, 3, 8) = 0xCD;
     *AT(g_tilemap2, 3, 21) = 0xCF;
-    func_800A08E4();
+    FuseItemsDraw();
     SlotClearAll();
     SlotInitTagged(D_800B1D08, 0x3C, 8, 0x18, 0x18);
     SlotInitTagged(D_800B2330, 0x2D, 7, 0, 0x10);
@@ -385,7 +385,7 @@ void FuseItemPick(void)
             TextItemStatRow(0, 0x40, 0x10);
         }
         func_800AB0D0(prev);
-        func_800A08E4();
+        FuseItemsDraw();
     }
     MsgStep();
     if ((short)(g_map_scroll_y % 12) == 0) {
@@ -633,7 +633,7 @@ void FuseExecute(void)
         if (rand() % n) {
             goto plain;
         }
-        switch (n = func_800A080C(g_fuse.unk2)) {
+        switch (n = FuseRollAccident(g_fuse.unk2)) {
         case 0: {
             u_short *r = &g_fuse.persona;
 
@@ -705,7 +705,7 @@ void FuseExecute(void)
             }
             func_800A1990(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], p, &g_fuse,
-                          func_800A0744());
+                          FuseRollKind());
         check:
             res = &g_fuse.persona;
             if (PersonaFind(*res) != -1) {
@@ -737,7 +737,7 @@ void FuseExecute(void)
         n = PersonaSlotsFree();
         g_persona_slots[n] = p;
     done:
-        func_800A0450(p, g_fuse.unk2, g_fuse.unk4);
+        FuseApplyBonus(p, g_fuse.unk2, g_fuse.unk4);
         if (g_fuse.flag) {
             n = *(u_short *)0x801F1BAC;
             personas[p].stat[0] += *(u_char *)0x801F1BAE;
@@ -797,7 +797,7 @@ void FuseExecute(void)
             FuseItemsOpen();
             g_persona_data_step -= 2;
         } else if (D_800BB820 == 0) {
-            func_800A11EC();
+            FusionOpen();
             SlotInitTagged(D_800B148C, 1, 0x42, g_menu->top.cur * 8 + 0xC8, 0x30);
             SlotInitTagged(D_800B1528, 2, 0x42, 0x20,
                            g_menu->status_page.cur * 12 + 0x30);
