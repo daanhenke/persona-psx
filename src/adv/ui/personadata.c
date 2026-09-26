@@ -62,7 +62,6 @@ extern void DrawPersonaList(void);
 
 extern void VramClearRect(int x, int y, int w, int h);
 extern void func_80033A50(int a, int b, int c, int d);
-extern void func_80034850(u_long *base);
 extern void BgReset(void);
 extern void SoundOpenSeq(u_short slot, u_short seq, short vab);
 extern void CellsInit(void);
@@ -154,7 +153,7 @@ void PersonaDataOpen(void)
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
-    func_80034850((u_long *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[g_ot_index]);
 
     SoundOpenSeq(0x18, 0, 0);

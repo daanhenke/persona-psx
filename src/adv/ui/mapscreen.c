@@ -65,7 +65,7 @@ extern u_char  g_BC204;
 extern int     g_BB94C;
 extern int     g_BB998;
 extern short   g_header_scroll_y;
-extern short   g_cam_x, g_map_scroll_x, D_800BBC04;
+extern short   g_cam_x, g_map_scroll_x, g_header_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern u_char  D_800B1D08[];
 extern u_char  g_map_title_def[];
@@ -74,7 +74,6 @@ extern u_char  D_800B2330[];
 
 extern void VramClearRect(int x, int y, int w, int h);
 extern void func_80033A50(int a, int b, int c, int d);
-extern void func_80034850(u_long *base);
 extern void BgReset(void);
 extern void FlushImageUploads(void);
 extern void SoundOpenSeq(u_short slot, u_short seq, short vab);
@@ -137,7 +136,7 @@ void MapScreenOpen(void)
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
-    func_80034850((u_long *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[g_ot_index]);
 
     SoundOpenSeq(0x18, 0, 0);
@@ -338,5 +337,5 @@ void MapScreenLayout(void)
     sy = g_menu->list[0].cur << 4;
     sx = g_menu->list[1].cur << 4;
     g_map_scroll_y = g_header_scroll_y = sy;
-    g_map_scroll_x = D_800BBC04 = sx;
+    g_map_scroll_x = g_header_scroll_x = sx;
 }

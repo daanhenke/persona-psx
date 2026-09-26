@@ -47,7 +47,7 @@ extern short   D_800BB7F4, g_item_top, g_swap_top, D_800BC224, D_800B8458,
                g_item_scroll_step;
 extern short   g_arcana_top;
 extern short   g_header_scroll_y;
-extern short   g_cam_x, g_map_scroll_x, D_800BBC04;
+extern short   g_cam_x, g_map_scroll_x, g_header_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern MenuList D_800BC584;
 extern MenuList D_800BC594;
@@ -65,7 +65,6 @@ extern u_char  g_pad_config;
 
 extern void VramClearRect(int x, int y, int w, int h);
 extern void func_80033A50(int a, int b, int c, int d);
-extern void func_80034850(u_long *base);
 extern void TimQueueAt(u_long *tim, short x, short y, short cx, short cy);
 extern void BgReset(void);
 extern void SoundOpenSeq(u_short slot, u_short seq, short vab);
@@ -125,7 +124,7 @@ void MainMenuOpen(void)
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
-    func_80034850((u_long *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[g_ot_index]);
     MainMenu();
 }
@@ -199,7 +198,7 @@ void MainMenu(void)
     g_map_scroll_y = 0;
     g_map_scroll_x = 0;
     g_header_scroll_y = 0;
-    D_800BBC04 = 0;
+    g_header_scroll_x = 0;
     g_view_dy = 0;
     g_view_dx = 0;
     g_view2_dy = 0;

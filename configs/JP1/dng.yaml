@@ -217,7 +217,7 @@ segments:
       - [0x2AE44, c, game/itemusableany]
       - [0x2AEFC, c, common/game/partystatus]
       - [0x2B040, c, game/charbelowmax]
-      - [0x2B124, asm, dng_2_s14b]
+      - [0x2B124, c, common/gfx/render]
       - [0x2B544, c, common/ui/pad]
       - [0x2B5A4, c, common/gfx/fadeblock]
       - [0x2B6B4, c, common/gfx/fadesprites]

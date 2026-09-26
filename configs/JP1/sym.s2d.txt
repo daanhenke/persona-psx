@@ -112,7 +112,7 @@ GsSetAmbient             = 0x800343D0; // type:func
 GsDrawOt                 = 0x80034418; // type:func
 GsClearOt                = 0x8003443C; // type:func
 GsGetTimInfo             = 0x8003476C; // type:func
-func_80034850            = 0x80034850; // type:func
+GsSetWorkBase            = 0x80034850; // type:func
 func_80034860            = 0x80034860; // type:func
 GsSetRefView2            = 0x80034870; // type:func
 GsGetLw                  = 0x80034F2C; // type:func
@@ -152,7 +152,7 @@ D_800643A4               = 0x800643A4; // type:u32 size:0xE7C
 //--------------------------------------------------------
 //--- PA: 0x000E80   VA: 0x80065220   subsegment: asm, s2d
 //--------------------------------------------------------
-func_80065220            = 0x80065220; // type:func size:0x594
+SlotsRenderAll           = 0x80065220; // type:func size:0x594
 
 //------------------------------------------------------------------
 //--- PA: 0x001414   VA: 0x800657B4   subsegment: c, common/gfx/slot
@@ -710,10 +710,10 @@ PartyAnyBelowMax         = 0x8007F86C; // type:func size:0x84
 //--- PA: 0x01B550   VA: 0x8007F8F0   subsegment: asm, s2d_2_s17b
 //---------------------------------------------------------------
 CharBelowMax             = 0x8007F8F0; // type:func size:0xE4
-func_8007F9D4            = 0x8007F9D4; // type:func size:0x8
+FrameHook                = 0x8007F9D4; // type:func size:0x8
 VramClearRect            = 0x8007F9DC; // type:func size:0x64
 RenderFrame              = 0x8007FA40; // type:func size:0x36C
-D_8007FDAC               = 0x8007FDAC; // type:func size:0x48
+RenderFrames             = 0x8007FDAC; // type:func size:0x48
 
 //----------------------------------------------------------------
 //--- PA: 0x01BA54   VA: 0x8007FDF4   subsegment: c, common/ui/pad
@@ -1321,18 +1321,27 @@ D_800B5DE4               = 0x800B5DE4; // type:u32 size:0x1C
 D_800B5E00               = 0x800B5E00; // type:u32 size:0x28
 D_800B5E28               = 0x800B5E28; // type:u32 size:0x4
 D_800B5E2C               = 0x800B5E2C; // type:u32 size:0x4
-D_800B5E30               = 0x800B5E30; // type:u32 size:0x128
+D_800B5E30               = 0x800B5E30; // type:u32 size:0x118
+g_effect_tick            = 0x800B5F48; // size:0x4
 g_page_fwd_repeat        = 0x800B5F4C;
 D_800B5F58               = 0x800B5F58; // type:u32 size:0x25E8
 g_menu_allow_hold        = 0x800B853C;
-D_800B8540               = 0x800B8540; // type:u32 size:0x4
-D_800B8544               = 0x800B8544; // type:u32 size:0x4
-D_800B8548               = 0x800B8548; // type:u32 size:0x63C
+g_bg_layer_otz           = 0x800B8540; // size:0xC
+g_view_dx                = 0x800B85B0; // size:0x2
+g_view2_dx               = 0x800B85B4; // size:0x2
 g_map_view_x             = 0x800B85A0;
 g_map_view_y             = 0x800B85A4;
 g_slot_cur               = 0x800B85A8;
 g_menu_blink             = 0x800B85AC;
 g_menu                   = 0x800B85B8;
+g_view_dy                = 0x800B85C0; // size:0x2
+g_view2_dy               = 0x800B85C4; // size:0x2
+g_cam_x                  = 0x800B8A68; // size:0x2
+g_map_scroll_x           = 0x800B8A6C; // size:0x2
+g_header_scroll_x        = 0x800B8A70; // size:0x2
+g_cam_y                  = 0x800B8B74; // size:0x2
+g_map_scroll_y           = 0x800B8B78; // size:0x2
+g_header_scroll_y        = 0x800B8B7C; // size:0x2
 g_party_last             = 0x800B85EC;
 D_800B8B84               = 0x800B8B84; // type:u32 size:0x4
 D_800B8B88               = 0x800B8B88; // type:u32 size:0x34

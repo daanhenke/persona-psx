@@ -115,7 +115,6 @@ extern u_char g_BC5B8, g_BC5BC, g_BC5C4, g_BC204, g_BC5C8;
 extern int    g_BB94C, g_BB998;
 
 extern void func_80033A50(int a, int b, int c, int d);
-extern void func_80034850(u_long *base);
 extern void CharJoin(u_char chr, u_char key, u_char level);
 extern void CharSetLevelExp(u_char level, u_char slot);
 extern void VramClearRect(int x, int y, int w, int h);
@@ -231,7 +230,7 @@ void ovl_adv_entry(void)
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
-    func_80034850((u_long *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[0]);
     GsClearOt(0, 0, &g_ot[1]);
     VramClearRect(0, 0, 0x140, 0x1DF);

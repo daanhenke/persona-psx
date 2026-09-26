@@ -286,7 +286,7 @@ FieldMsgPrint            = 0x80074FA4; // type:func size:0xB0
 FieldFindMember          = 0x80075054; // type:func size:0x64
 FieldMsgPrintCodes       = 0x800750B8; // type:func size:0xD4
 FieldMsgSetStyle         = 0x8007518C; // type:func size:0x30
-func_800751BC            = 0x800751BC; // type:func size:0x594
+SlotsRenderAll           = 0x800751BC; // type:func size:0x594
 
 //------------------------------------------------------------------
 //--- PA: 0x0113B0   VA: 0x80075750   subsegment: c, common/gfx/slot
@@ -784,10 +784,10 @@ PartyAnyBelowMax         = 0x8008F35C; // type:func size:0x84
 //--- PA: 0x02B040   VA: 0x8008F3E0   subsegment: asm, dng_2_s14b
 //---------------------------------------------------------------
 CharBelowMax             = 0x8008F3E0; // type:func size:0xE4
-func_8008F4C4            = 0x8008F4C4; // type:func size:0x8
+FrameHook                = 0x8008F4C4; // type:func size:0x8
 VramClearRect            = 0x8008F4CC; // type:func size:0x64
 RenderFrame              = 0x8008F530; // type:func size:0x36C
-D_8008F89C               = 0x8008F89C; // type:func size:0x48
+RenderFrames             = 0x8008F89C; // type:func size:0x48
 
 //----------------------------------------------------------------
 //--- PA: 0x02B544   VA: 0x8008F8E4   subsegment: c, common/ui/pad
@@ -1213,6 +1213,7 @@ D_8009CD50               = 0x8009CD50;
 D_8009DC70               = 0x8009DC70;
 D_8009EB90               = 0x8009EB90;
 g_field_lit              = 0x8009FAB0;
+g_effect_tick            = 0x8009FAB4; // size:0x4
 g_page_fwd_repeat        = 0x8009FAB8; // size:0x10
 
 
@@ -1275,6 +1276,7 @@ g_step_kind              = 0x8009FE5C; // size:0x1
 g_bob_tmd_b              = 0x8009FE60; // size:0x4
 g_cam_x                  = 0x8009FE70; // size:0x2
 g_map_scroll_x           = 0x8009FE74; // size:0x2
+g_header_scroll_x        = 0x8009FE78; // size:0x2
 g_cam_y                  = 0x8009FE7C; // size:0x2
 g_map_scroll_y           = 0x8009FE80; // size:0x2
 g_header_scroll_y        = 0x8009FE84; // size:0x2

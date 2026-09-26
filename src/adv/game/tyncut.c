@@ -100,7 +100,6 @@ extern void ActorsSetDepth();
 extern void ActorsPlaceSprites(void);
 extern void SlotsApplyXScale(void);
 extern int  MsgStep(void);
-extern void func_80034850(u_long *base);
 extern void TynInitCoords(void);
 extern void TynSetView(void);
 extern void TynInitPolys(void);
@@ -197,7 +196,7 @@ void AdvTynCutscene(void)
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
-    func_80034850((u_long *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[g_ot_index]);
     g_bg_shown = 0;
     SlotClearAll();

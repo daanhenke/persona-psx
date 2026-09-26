@@ -71,6 +71,7 @@ GsInit3D                 = 0x80033AF0; // type:func
 GsDrawOt                 = 0x80034418; // type:func
 GsClearOt                = 0x8003443C; // type:func
 GsGetTimInfo             = 0x8003476C; // type:func
+GsSetWorkBase            = 0x80034850; // type:func
 GsSetRefView2            = 0x80034870; // type:func
 GsGetLs                  = 0x800351F0; // type:func
 bcopy                    = 0x80041328; // type:func
@@ -723,7 +724,7 @@ SceneFindEntry           = 0x80080598; // type:func size:0x74
 //--- PA: 0x01C26C   VA: 0x8008060C   subsegment: asm, adv_29
 //-----------------------------------------------------------
 AdvExitPlaceLeader       = 0x8008060C; // type:func size:0x114
-func_80080720            = 0x80080720; // type:func size:0x5C0
+ActorWalkStep            = 0x80080720; // type:func size:0x5C0
 func_80080CE0            = 0x80080CE0; // type:func size:0x89C
 
 //-------------------------------------------------------------------
@@ -934,10 +935,10 @@ CoordSetRot              = 0x8008AFA8; // type:func size:0x100
 //--- PA: 0x026D08   VA: 0x8008B0A8   subsegment: asm, adv_38
 //-----------------------------------------------------------
 AdvRenderCharFrame       = 0x8008B0A8; // type:func size:0x1FC
-func_8008B2A4            = 0x8008B2A4; // type:func size:0x8
+FrameHook                = 0x8008B2A4; // type:func size:0x8
 VramClearRect            = 0x8008B2AC; // type:func size:0x64
 RenderFrame              = 0x8008B310; // type:func size:0x364
-D_8008B674               = 0x8008B674; // type:func size:0x48
+RenderFrames             = 0x8008B674; // type:func size:0x48
 
 //-------------------------------------------------------------------
 //--- PA: 0x02731C   VA: 0x8008B6BC   subsegment: c, ../common/ui/pad
@@ -1774,6 +1775,7 @@ g_tyn_uv2                = 0x800BBBEC; // size:0x8
 g_tyn_uv3                = 0x800BBBF4; // size:0x8
 g_cam_x                  = 0x800BBBFC;
 g_map_scroll_x           = 0x800BBC00;
+g_header_scroll_x        = 0x800BBC04; // size:0x2
 g_cam_y                  = 0x800BBC08;
 g_map_scroll_y           = 0x800BBC0C;
 g_header_scroll_y        = 0x800BBC10;

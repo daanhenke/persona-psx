@@ -150,6 +150,7 @@ segments:
       - [0x1B354, asm, s2d_2_s17a]
       - [0x1B40C, c, common/game/partystatus]
       - [0x1B550, asm, s2d_2_s17b]
+      - [0x1B634, c, common/gfx/render]
       - [0x1BA54, c, common/ui/pad]
       - [0x1BAB4, c, common/gfx/fadeblock]
       - [0x1BBC4, c, common/gfx/fadesprites]

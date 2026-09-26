@@ -52,7 +52,7 @@ extern short   g_use_top, g_item_top, g_swap_top, D_800A04D4, g_use_scroll_step,
                g_item_scroll_step;
 extern short   g_arcana_top;
 extern short   g_header_scroll_y;
-extern short   g_cam_x, g_map_scroll_x, D_8009FE78;
+extern short   g_cam_x, g_map_scroll_x, g_header_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern MenuList D_800A0500;
 extern MenuList D_800A0510;
@@ -203,7 +203,7 @@ void MainMenu(void)
     g_map_scroll_y = 0;
     g_map_scroll_x = 0;
     g_header_scroll_y = 0;
-    D_8009FE78 = 0;
+    g_header_scroll_x = 0;
     g_view_dy = 0;
     g_view_dx = 0;
     g_view2_dy = 0;

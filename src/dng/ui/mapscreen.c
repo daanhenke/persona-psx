@@ -72,7 +72,7 @@ extern u_char  D_800A04B8;
 extern int     D_8009FB3C;
 extern int     g_select_toggle;
 extern short   g_header_scroll_y;
-extern short   g_cam_x, g_map_scroll_x, D_8009FE78;
+extern short   g_cam_x, g_map_scroll_x, g_header_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern u_char  D_8009AA4C[];
 extern u_char  g_map_title_def[];
@@ -346,5 +346,5 @@ void MapScreenLayout(void)
     sy = g_menu->list[0].cur << 4;
     sx = g_menu->list[1].cur << 4;
     g_map_scroll_y = g_header_scroll_y = sy;
-    g_map_scroll_x = D_8009FE78 = sx;
+    g_map_scroll_x = g_header_scroll_x = sx;
 }

@@ -72,7 +72,7 @@ extern short   g_swap_top;
 extern short   g_cam_x;
 extern short   g_map_scroll_x;
 extern short   g_header_scroll_y;
-extern short   D_800BBC04;
+extern short   g_header_scroll_x;
 extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern GsMAP   D_800B8370;
 extern GsCELL  g_panel_cells[];
@@ -208,7 +208,7 @@ u_char FacilityScreen(u_char id)
     g_map_scroll_y = 0;
     g_map_scroll_x = 0;
     g_header_scroll_y = 0;
-    D_800BBC04 = 0;
+    g_header_scroll_x = 0;
     g_view_dy = 0;
     g_view_dx = 0;
     g_view2_dy = 0;
