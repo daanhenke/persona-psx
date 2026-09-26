@@ -73,7 +73,7 @@ extern void   StatusPersonaLayout(void);
 extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
 extern void   FuseResultRowDraw(short row);
-extern short  func_800A2904(void);
+extern short  ItemsListSellable(void);
 extern void   FuseResultsOpen(void);
 extern void   func_800AB1EC(void);
 extern void   FuseItemsOpen(void);
@@ -270,7 +270,7 @@ void FusePairPick(void)
                           g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
             D_800BC050 = 0;
             if (g_fuse.arcana != 0) {
-                D_800BBB34 = cost = func_800A2904();
+                D_800BBB34 = cost = ItemsListSellable();
                 if (cost != 0) {
                     if (cost < 10) {
                         D_800BBB34 = 10;

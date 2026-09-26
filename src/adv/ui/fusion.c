@@ -87,7 +87,7 @@ extern void   DrawItemRow(short n, short *dst);
 extern void   TextItemStatRow(short item, short x, short y);
 extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
-extern short  func_800A2904(void);
+extern short  ItemsListSellable(void);
 extern void   FuseResultLineDraw(short persona);
 extern void   FuseItemsDraw(void);
 extern void   FusionOpen(void);
@@ -212,7 +212,7 @@ void FusionPairPick(void)
     if (InputCheckAcceptA(1)) {
         D_800BC050 = 0;
         if (g_fuse.arcana != 0) {
-            D_800BBB34 = cost = func_800A2904();
+            D_800BBB34 = cost = ItemsListSellable();
             if (cost != 0) {
                 if (cost < 10) {
                     D_800BBB34 = 10;

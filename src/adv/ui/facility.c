@@ -112,7 +112,7 @@ extern void  ShopLoadItems2(u_char shop);
 extern void  ShopLoadPrices2(u_char shop);
 extern void  ShopCountInit(u_char n);
 extern void  ShopCountInit2(u_char n);
-extern void  func_800A81C8(void);
+extern void  ShopScreenOpen(void);
 extern void  func_800A6728(void);
 extern void  func_800A5560(void);
 extern int   CoinsAffordable(void);
@@ -124,8 +124,8 @@ extern void  FuseResultsOpen(void);
 extern void  SaveScreenOpen(void);
 extern void  func_800A8104(void);
 extern void  func_800A6674(void);
-extern void  func_800A5B7C(void);
-extern void  func_800A4E2C(void);
+extern void  CoinExchangeStep(void);
+extern void  ShopStep2(void);
 extern void  func_800A2994(void);
 extern void  FusionStep(void);
 extern void  FuseSearchStep(void);
@@ -252,7 +252,7 @@ u_char FacilityScreen(u_char id)
         ShopLoadItems(fac[0]);
         ShopLoadPrices(fac[0]);
         ShopCountInit(D_800BB848.cur);
-        func_800A81C8();
+        ShopScreenOpen();
         SlotSetFlicker(0, 1);
         goto next;
     case 3:
@@ -408,10 +408,10 @@ u_char FacilityScreen(u_char id)
             func_800A6674();
             break;
         case 4:
-            func_800A5B7C();
+            CoinExchangeStep();
             break;
         case 5:
-            func_800A4E2C();
+            ShopStep2();
             break;
         case 6:
             func_800A2994();

@@ -1375,10 +1375,16 @@ FusionStockDraw          = 0x800A1824; // type:func
 
 PersonaDefHasSpell       = 0x800A1E20; // type:func
 FuseSpecialHas           = 0x800A26A0; // type:func
+ItemsListSellable        = 0x800A2904; // type:func
 PersonaSlotsCount        = 0x800A470C; // type:func
 PersonaSpellsFull        = 0x800A4754; // type:func
+FacilityCursorPlace      = 0x800A4778; // type:func
+CharCanUsePersona        = 0x800A4DA0; // type:func
+ShopStep2                = 0x800A4E2C; // type:func
 MsgWaitPress             = 0x800A5AEC; // type:func
 CoinsAffordable          = 0x800A5B34; // type:func
+CoinExchangeStep         = 0x800A5B7C; // type:func
+ShopScreenOpen           = 0x800A81C8; // type:func
 ShopBuyOpen              = 0x800A9978; // type:func
 ShopSellOpen             = 0x800A9EF0; // type:func
 ShopMoneyDraw            = 0x800AA468; // type:func
