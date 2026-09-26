@@ -1,9 +1,11 @@
 /* Persona 1 (JP) - the event clock, counting up.
  *
- * Compiled into ADV and S2D rather than called across the boundary:
+ * Compiled into every overlay rather than called across the boundary:
  *   ADV @ 0x800664E8
+ *   DNG @ 0x80075F6C
  *   S2D @ 0x80065F80
- * DNG runs the same four bytes as a countdown instead, in FieldClockTick.
+ * DNG also runs the same four bytes as a countdown, in FieldClockTick. It
+ * names the bytes, so its reloc file keeps these reads by address.
  */
 #include <decomp/types.h>
 

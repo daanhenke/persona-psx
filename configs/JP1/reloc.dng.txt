@@ -34,3 +34,14 @@ rom:0x1C6E4 reloc:MIPS_HI16 symbol:g_pad_config
 rom:0x1C6E8 reloc:MIPS_LO16 symbol:g_pad_config
 rom:0x1C6F4 reloc:MIPS_HI16 symbol:g_pad_config
 rom:0x1C6F8 reloc:MIPS_LO16 symbol:g_pad_config
+
+// ClockTick (shared with ADV) reaches the clock bytes by address; the field
+// names them, so these reads are kept free of the names.
+rom:0x11BD0 reloc:MIPS_NONE symbol:g_clock_on
+rom:0x11BD4 reloc:MIPS_NONE symbol:g_clock_on
+rom:0x11BE4 reloc:MIPS_NONE symbol:g_clock_frame
+rom:0x11BE8 reloc:MIPS_NONE symbol:g_clock_frame
+rom:0x11BF8 reloc:MIPS_NONE symbol:g_clock_sec
+rom:0x11BFC reloc:MIPS_NONE symbol:g_clock_sec
+rom:0x11C0C reloc:MIPS_NONE symbol:g_clock_min
+rom:0x11C10 reloc:MIPS_NONE symbol:g_clock_min

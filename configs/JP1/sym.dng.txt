@@ -305,9 +305,11 @@ FadeStepUp               = 0x80075AD0; // type:func size:0x38
 FadeStepDown             = 0x80075B08; // type:func size:0x38
 
 //-----------------------------------------------------------
-//--- PA: 0x0117A0   VA: 0x80075B40   subsegment: asm, dng_s2
+//--- PA: 0x0117A0   VA: 0x80075B40   subsegment: c, common/gfx/slotfade
 //-----------------------------------------------------------
-D_80075B40               = 0x80075B40; // type:func size:0xC8
+SlotFadeIn               = 0x80075B40; // type:func size:0x50
+SlotFadeOut              = 0x80075B90; // type:func size:0x50
+SlotSetBrightness        = 0x80075BE0; // type:func size:0x28
 
 //-------------------------------------------------------------------------
 //--- PA: 0x011868   VA: 0x80075C08   subsegment: c, common/gfx/slotflicker
@@ -315,9 +317,9 @@ D_80075B40               = 0x80075B40; // type:func size:0xC8
 SlotSetFlicker           = 0x80075C08; // type:func size:0x54
 
 //--------------------------------------------------------------
-//--- PA: 0x0118BC   VA: 0x80075C5C   subsegment: asm, dng_s2_x1
+//--- PA: 0x0118BC   VA: 0x80075C5C   subsegment: c, common/gfx/slotsemitrans
 //--------------------------------------------------------------
-D_80075C5C               = 0x80075C5C; // type:func size:0x5C
+SlotSetSemiTrans         = 0x80075C5C; // type:func size:0x5C
 
 //----------------------------------------------------------------------
 //--- PA: 0x011918   VA: 0x80075CB8   subsegment: c, common/gfx/slotanim
@@ -337,9 +339,9 @@ SoundOpenSeq             = 0x80075E38; // type:func size:0x6C
 PlayTimeTick             = 0x80075EA4; // type:func size:0xC8
 
 //-----------------------------------------------------------
-//--- PA: 0x011BCC   VA: 0x80075F6C   subsegment: asm, dng_s3
+//--- PA: 0x011BCC   VA: 0x80075F6C   subsegment: c, common/game/clocktick
 //-----------------------------------------------------------
-D_80075F6C               = 0x80075F6C; // type:func size:0xDC
+ClockTick                = 0x80075F6C; // type:func size:0xDC
 
 //--------------------------------------------------------------------
 //--- PA: 0x011CA8   VA: 0x80076048   subsegment: c, common/ui/decimal
@@ -405,7 +407,7 @@ MenuStepCursor           = 0x80077538; // type:func size:0x1DC
 MenuScrollCursor         = 0x80077714; // type:func size:0x12C
 
 //-------------------------------------------------------------
-//--- PA: 0x0134A0   VA: 0x80077840   subsegment: asm, dng_1_s1
+//--- PA: 0x0134A0   VA: 0x80077840   subsegment: c, common/ui/menurepeat
 //-------------------------------------------------------------
 MenuResetRepeat          = 0x80077840; // type:func size:0x6C
 
@@ -415,7 +417,7 @@ MenuResetRepeat          = 0x80077840; // type:func size:0x6C
 ImageAnimStop            = 0x800778AC; // type:func size:0x24
 
 //--------------------------------------------------------------
-//--- PA: 0x013530   VA: 0x800778D0   subsegment: asm, dng_1_s1b
+//--- PA: 0x013530   VA: 0x800778D0   subsegment: c, gfx/imageanimall
 //--------------------------------------------------------------
 ImageAnimStopAll         = 0x800778D0; // type:func size:0x38
 
@@ -452,7 +454,7 @@ MainMenu                 = 0x80077FB4; // type:func size:0xDD4
 MenuTick                 = 0x80078D88; // type:func size:0x70
 
 //-------------------------------------------------------------
-//--- PA: 0x014A58   VA: 0x80078DF8   subsegment: asm, dng_1_s3
+//--- PA: 0x014A58   VA: 0x80078DF8   subsegment: c, ui/menubuild
 //-------------------------------------------------------------
 MenuBuild                = 0x80078DF8; // type:func size:0xF0
 
@@ -1161,6 +1163,7 @@ g_arcana_labels          = 0x8009A61C; // size:0x9C
 g_kind_labels            = 0x8009A700;
 g_char_face_files        = 0x8009A8B7;
 g_fm_hint_def            = 0x8009AC1C;
+g_menu_top_def           = 0x8009AECC;
 g_fm_hint2_def           = 0x8009B09C;
 g_persona_list_rule      = 0x8009B1D0;
 g_fm_grid_cur_def        = 0x8009B40C;
