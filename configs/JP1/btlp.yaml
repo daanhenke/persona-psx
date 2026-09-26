@@ -60,7 +60,10 @@ segments:
     vram: 0x800643A0
     subsegments:
       - [0x0, rodata, btlp_id]
-      - [0x4, rodata, btlp_rodata]
+      # BtlMoodsFromMoon's switch table, emitted by the C; fifteen words, so
+      # the zero word behind it is padding.
+      - [0x4, .rodata, moonmoods]
+      - [0x40, pad, btlp_pad_40]
       # BtlTalkSceneStep's switch table, which the C emits itself.
       - [0x44, .rodata, talkstep]
       - [0x8C, rodata, btlp_rodata0]

@@ -42,25 +42,23 @@
 extern int BtlOfferLevelTest(int test, u_short slot);
 extern int BtlStockHolds(const BtlOffer *offer);
 
-/* 97.71%. Four things got it there from 85.11%:
+/* Taken from the image:
    - the offer is a walking pointer and the counter an int (loop.c makes one
      pointer at the moods for every field);
    - the first gap step is a division by -10, which gcc expands as the negated
      quotient the image has;
    - each clamp has a temporary of its own, so each store can drop into the
      next clamp's delay slot;
-   - the crescent jumps into the full moon's store of mood 2 through a short.
-   What is left is scheduling. The full moon computes mood 2 before mood 3
-   where the image does it after, and the second gap step does mood 0 before
-   mood 2. Writing the store as `+= -step`, as `a = a - step`, or through
-   `step * -5` does not move either. */
-#ifdef NON_MATCHING
+   - each gap step is a local of its own block, so the one pseudo local-alloc
+     sees dies once and the times-five is built in its own register;
+   - the moon's cases add to the moods in place: sched1 breaks its ties on
+     statement order, and in the full moon mood 2 before mood 3 leaves the
+     store of mood 2 last, which cross-jumping shares with the crescent's;
+     likewise the second gap step does mood 1, mood 0, mood 2. */
 void BtlMoodsFromMoon(void)
 {
     BtlOffer *offer;
     int slot;
-    int step;
-    short m;
 
     offer = g_btl_offer;
     for (slot = 0; slot < BTL_OFFERS; offer++, slot++) {
@@ -72,30 +70,30 @@ void BtlMoodsFromMoon(void)
                 break;
             case MOON_CRESCENT:
             case MOON_WANING:
-                m = offer->mood[2] + 5;
-                goto set;
+                offer->mood[2] += 5;
+                break;
             case MOON_HALF:
             case MOON_GIBBOUS:
                 offer->mood[1] += 5;
                 break;
             case MOON_FULL:
                 offer->mood[1] += 10;
+                offer->mood[2] += 10;
                 offer->mood[3] += 10;
-                m = offer->mood[2] + 10;
-            set:
-                offer->mood[2] = m;
                 break;
             }
             if (BtlOfferLevelTest(3, slot) != 0) {
-                step = g_btl_level_gap / -10 * MOOD_PER_LEVEL;
+                int step = g_btl_level_gap / -10 * MOOD_PER_LEVEL;
+
                 offer->mood[2] += step;
                 offer->mood[1] -= step;
             }
             if (BtlOfferLevelTest(4, slot) != 0) {
-                step = g_btl_level_gap / 10 * MOOD_PER_LEVEL;
+                int step = g_btl_level_gap / 10 * MOOD_PER_LEVEL;
+
                 offer->mood[1] += step;
-                offer->mood[2] -= step;
                 offer->mood[0] += step;
+                offer->mood[2] -= step;
             }
             if (BtlStockHolds(offer) != 0) {
                 offer->mood[0] += MOOD_HELD;
@@ -148,7 +146,4 @@ void BtlMoodsFromMoon(void)
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/moonmoods", BtlMoodsFromMoon);
-#endif
 
