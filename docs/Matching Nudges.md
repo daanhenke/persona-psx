@@ -3841,3 +3841,29 @@ after the shift and cse has nothing to borrow.
 
 - [personaact.c](/src/btlp/personaact.c) - `BtlPersonaSpellMove`: `picked = 1`
   after `a->targets |= 1 << a->order`.
+## memset, three stores and two copies is an initialiser that leaves pad out
+
+`SVECTOR v[4] = { {x0, y0, 0}, ... }` does not set `pad`, so gcc 2.6 clears
+before it fills. store_constructor builds each element in a temporary of its
+own: a `memset` libcall, then the named fields, then a block copy into a
+temporary array. That array is block-copied into the variable. Written out
+by hand (memset, the fields, two copies), the code is the same, but the
+libcall's arguments are set up differently from a source `memset`'s, so sched2
+places the prologue saves elsewhere. Four memsets of 8 bytes into consecutive
+stack slots, each followed by the fields and an `lwl`/`lwr` copy, is this
+initialiser.
+
+- [effectframe.c](/src/btlp/effectframe.c) - `BtlEffectCursorBox` 99.35% and
+  `BtlDrawEffectFrame` 97.02%, both to exact (with the next entry for the
+  frame).
+
+## A short copy taken before the loop is the half-word loop.c lifts
+
+When the image lifts only a register copy of an int out of a loop
+(`addu s2, a0, zero`) and widens it again inside (`sll`/`sra` each round),
+the loop reads a `short` variable assigned from the int before the loop.
+`(short)n` written in the loop gets the whole narrowing and add lifted, and a
+`short n` does the arithmetic before the loop in halfwords.
+
+- [effectframe.c](/src/btlp/effectframe.c) - `BtlDrawEffectFrame`'s `tall`,
+  99.45% to exact.

@@ -24,21 +24,6 @@
 #include <libgpu.h>
 #include <persona/btlp/effect.h>
 
-/* The corners are staged in halfword fields, the way the piece drawer stages
-   its own. */
-typedef struct {
-    u_short vx;
-    short   vy;
-    short   vz;
-    short   pad;
-} BtlFrameVec;
-
-/* The four corners copied as one block, the way the transform's vectors are
-   filled. */
-typedef struct {
-    SVECTOR v[4];
-} BtlFrameQuad;
-
 /* A cell is eight pixels square, and the frame is drawn two scanlines above
    where it is asked for. */
 #define FRAME_CELL 8
@@ -68,55 +53,31 @@ typedef struct {
 #define CURSOR_MID    0x20
 #define CURSOR_BRIGHT 0x40
 
-/* 97.02%. The levers:
-   - the corners set as vx, vy, vz in every box;
-   - the four copied into the transform's vectors as one 32-byte block;
-   - each piece's run read once into a short, with its corner bits tested as
-     (r >> 14) & 1 and multiplied by the stretch plus one;
-   - the stretch worked out as an int from the signed width, and narrowed to a
-     short where the loop uses it.
-   What is left:
-   - the prologue saves ra, s2 and s0 before memset's arguments, where gcc
-     puts them after;
-   - the width and height swap registers with the copy the image makes of the
-     height for the loop;
-   - the run table's .rodata is D_8006489C in the image and anonymous here. */
-#ifdef NON_MATCHING
+/* The box's corners are an initialiser that leaves each SVECTOR's pad out,
+   so gcc builds every corner in a temporary of its own - cleared by a memset
+   call, then filled - copies it into a temporary array, and copies that into
+   `corner`: the image's four memsets and two block copies, with its prologue.
+   Each piece's run is read once into a short, its corner bits tested as
+   (r >> 14) & 1 and multiplied by the stretch plus one. The width's stretch
+   is narrowed where the loop uses it; the height's is a short taken before the
+   loop, which is the half-word copy loop.c lifts while the widening stays in
+   the loop. */
 int BtlDrawEffectFrame(BtlEffect *e)
 {
     u_char   rgb[3];
-    SVECTOR  corner[4];
+    SVECTOR  corner[4] = {
+        { g_btl_effect_ox, g_btl_effect_oy - FRAME_RISE, 0 },
+        { g_btl_effect_ox + e->dx * FRAME_CELL,
+          g_btl_effect_oy - FRAME_RISE, 0 },
+        { g_btl_effect_ox,
+          g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE, 0 },
+        { g_btl_effect_ox + e->dx * FRAME_CELL,
+          g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE, 0 },
+    };
     POLY_F4 *prim;
     int      across;
     int      down;
     long     i;
-
-    {
-        SVECTOR     vec[4];
-        BtlFrameVec box[4];
-
-        memset(&box[0], 0, sizeof(box[0]));
-        box[0].vx = g_btl_effect_ox;
-        box[0].vy = g_btl_effect_oy - FRAME_RISE;
-        box[0].vz = 0;
-        vec[0] = *(SVECTOR *)&box[0];
-        memset(&box[1], 0, sizeof(box[1]));
-        box[1].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[1].vy = g_btl_effect_oy - FRAME_RISE;
-        box[1].vz = 0;
-        vec[1] = *(SVECTOR *)&box[1];
-        memset(&box[2], 0, sizeof(box[2]));
-        box[2].vx = g_btl_effect_ox;
-        box[2].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
-        box[2].vz = 0;
-        vec[2] = *(SVECTOR *)&box[2];
-        memset(&box[3], 0, sizeof(box[3]));
-        box[3].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[3].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
-        box[3].vz = 0;
-        vec[3] = *(SVECTOR *)&box[3];
-        *(BtlFrameQuad *)corner = *(BtlFrameQuad *)vec;
-    }
     {
         /* Kept in .rodata and copied onto the stack, the way the piece drawer
            keeps its cells. */
@@ -126,6 +87,7 @@ int BtlDrawEffectFrame(BtlEffect *e)
         int     x;
         int     y;
         short   r;
+        short   tall;
 
         across = (short)e->dx - 2;
         if (across < 0) {
@@ -140,10 +102,11 @@ int BtlDrawEffectFrame(BtlEffect *e)
         i = 0;
         run[6] = down + run[6];
         run[7] = down + run[7];
+        tall = down;
         do {
             r = run[i];
             x = (((r >> 14) & 1) * ((short)across + 1) + ((r >> 12) & 1)) * FRAME_CELL;
-            y = (((r >> 13) & 1) * ((short)down + 1) + ((r >> 11) & 1)) * FRAME_CELL;
+            y = (((r >> 13) & 1) * (tall + 1) + ((r >> 11) & 1)) * FRAME_CELL;
             if (e->scale_y >= FRAME_FULL) {
                 if (BtlDrawFramePiece(i, g_btl_effect_ox + x + e->curx,
                                       g_btl_effect_oy + y + e->cury, r, 1)
@@ -184,49 +147,24 @@ int BtlDrawEffectFrame(BtlEffect *e)
     addPrim(g_btl_effect_ot, prim);
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectframe", BtlDrawEffectFrame);
-#endif
 
-/* 99.35%. The quad is reached through e->prim[g_btl_effect_page] at every
-   use, as the image re-reads the page each time. The corners are set as vx,
-   vy, vz and copied as one block, as in the frame above. What is left is the
-   prologue: the image saves ra straight after s0, and gcc here schedules the
-   save after memset's first two arguments. */
+/* The quad is reached through e->prim[g_btl_effect_page] at every use, as
+   the image re-reads the page each time; the corners are built as the frame's
+   are. */
 #define CURSOR_QUAD (&e->prim[g_btl_effect_page].shaded)
 
-#ifdef NON_MATCHING
 int BtlEffectCursorBox(BtlEffect *e)
 {
-    SVECTOR  corner[4];
-    long     i;
-
-    {
-        SVECTOR     vec[4];
-        BtlFrameVec box[4];
-
-        memset(&box[0], 0, sizeof(box[0]));
-        box[0].vx = g_btl_effect_ox;
-        box[0].vy = g_btl_effect_oy - FRAME_RISE;
-        box[0].vz = 0;
-        vec[0] = *(SVECTOR *)&box[0];
-        memset(&box[1], 0, sizeof(box[1]));
-        box[1].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[1].vy = g_btl_effect_oy - FRAME_RISE;
-        box[1].vz = 0;
-        vec[1] = *(SVECTOR *)&box[1];
-        memset(&box[2], 0, sizeof(box[2]));
-        box[2].vx = g_btl_effect_ox;
-        box[2].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
-        box[2].vz = 0;
-        vec[2] = *(SVECTOR *)&box[2];
-        memset(&box[3], 0, sizeof(box[3]));
-        box[3].vx = g_btl_effect_ox + e->dx * FRAME_CELL;
-        box[3].vy = g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE;
-        box[3].vz = 0;
-        vec[3] = *(SVECTOR *)&box[3];
-        *(BtlFrameQuad *)corner = *(BtlFrameQuad *)vec;
-    }
+    SVECTOR corner[4] = {
+        { g_btl_effect_ox, g_btl_effect_oy - FRAME_RISE, 0 },
+        { g_btl_effect_ox + e->dx * FRAME_CELL,
+          g_btl_effect_oy - FRAME_RISE, 0 },
+        { g_btl_effect_ox,
+          g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE, 0 },
+        { g_btl_effect_ox + e->dx * FRAME_CELL,
+          g_btl_effect_oy + (u_short)e->dy * FRAME_CELL - FRAME_RISE, 0 },
+    };
+    long i;
 
     setPolyG4(CURSOR_QUAD);
     setSemiTrans(CURSOR_QUAD, 1);
@@ -249,6 +187,3 @@ int BtlEffectCursorBox(BtlEffect *e)
     addPrim(g_btl_effect_ot, CURSOR_QUAD);
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectframe", BtlEffectCursorBox);
-#endif

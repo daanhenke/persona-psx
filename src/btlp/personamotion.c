@@ -94,7 +94,14 @@ extern short g_btl_seq_handle[];
    image's register is right and gcc lifts the divide's sign fixup out of the
    two arms; loaded inside the arm, the fixup stays where the image has it and
    the load wants a move. Seven shapes tried and 29,000 permuter iterations
-   found nothing under the hand version. */
+   found nothing under the hand version.
+   2026-09-26: the "lift" is reorg, not a code motion. With the height live
+   into the arms (loaded before the test, or spelt drop - drop / (half ? A :
+   B), which also gets the register right), sched1 opens both arms with the
+   sign shift, and dbr puts that one insn in the branch's delay slot and
+   deletes it from both arms. The image opens each arm with its own lui of the
+   magic and has the shift after the mult, filling the multiply's latency.
+   What makes sched1 do that with the height live-in is the open question. */
 #ifdef NON_MATCHING
 void BtlPersonaMotion03(BtlObj *o)
 {
