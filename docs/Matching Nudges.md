@@ -3664,3 +3664,42 @@ global-alloc's, which orders them by priority and not by birth.
   owner's wrap in one, 99.65% to exact.
 - [menudraw.c](/src/btlp/menudraw.c) - `BtlMenuDraw`: the last AddPrim in
   one, 99.68% to exact.
+
+## A merged tail allocated case by case
+
+When several arms end in the same code and the image's registers for that
+shared tail look like a *global* allocation - a callee-saved register on a
+value that never crosses a call, or a temp tied to a pointer that is not
+local to any one block - each arm probably carried its own copy of the tail.
+jump2 cross-jumps identical tails after register allocation, so the image
+shows one tail with each arm's registers chosen as if it stood alone. Written
+with one shared tail after a `break`, the tail's values span blocks, become
+global pseudos, and take other registers.
+
+- [preload.c](/src/main/preload.c) `AdvResolveSceneLoc` - 95.34% to 100%: the
+  four scene packs each spell out `CdIntToPos(...)` and the size store, and
+  the three flat files each their own call with a block-scoped `base`. One
+  `base` shared by the three arms is one pseudo across three blocks, which is
+  what put it in `v1` instead of the call result's `v0`.
+
+## A volatile store keeps a call's delay slot empty
+
+reorg fills a call's delay slot by scanning back past insns it cannot move,
+and any volatile memory reference it steps over counts as a conflict. So an
+argument set up before a two-word global store normally slides into the
+`jal`'s slot; if the image leaves a `nop` there instead, the store in between
+is to a volatile.
+
+- [cddaready.c](/src/main/cddaready.c) - `g_cd_da_pos` is written from the CD
+  interrupt and declared `volatile` in `cdda.h`; that alone took the routine
+  from 98.05% to 100%.
+
+## `%` before `/` keeps the dividend alive
+
+`rem = v % 16; value = v / 16;` and `value = v / 16; rem = v - value * 16;`
+compute the same thing, but in the first `v` is still live when `rem` is born,
+so the two conflict and `rem` cannot reuse `v`'s register.
+
+- [preloaddng.c](/src/main/preloaddng.c) `FormatHexDigits` - with the digit
+  written as an if/else, the order of those two lines is the whole difference
+  between 98.97% and 100%.
