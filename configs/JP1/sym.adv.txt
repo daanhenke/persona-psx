@@ -106,7 +106,9 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, adv_rodata
 //------------------------------------------------------------------
-D_800643A4               = 0x800643A4; // type:u32 size:0x138C
+D_800643A4               = 0x800643A4; // type:u32 size:0x54
+jtbl_800643F8            = 0x800643F8; // size:0x18
+jtbl_80064410            = 0x80064410; // size:0x20
 
 //-------------------------------------------------------------------
 //--- PA: 0x000170   VA: 0x80064510   subsegment: rodata, adv_rodata1
@@ -313,8 +315,8 @@ func_800684A4            = 0x800684A4; // type:func size:0x8
 func_800684AC            = 0x800684AC; // type:func size:0x8
 TimQueue                 = 0x800684B4; // type:func size:0x150
 TimQueueAt               = 0x80068604; // type:func size:0x170
-func_80068774            = 0x80068774; // type:func size:0x264
-func_800689D8            = 0x800689D8; // type:func size:0xDDC
+MainMenuOpen             = 0x80068774; // type:func size:0x264
+MainMenu                 = 0x800689D8; // type:func size:0xDDC
 
 //------------------------------------------------------------------------
 //--- PA: 0x005414   VA: 0x800697B4   subsegment: c, ../common/ui/menutick

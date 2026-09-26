@@ -55,6 +55,8 @@ segments:
     subsegments:
       - [0x0, rodata, adv_id]
       - [0x4, rodata, adv_rodata]
+      - [0x58, .rodata, ui/mainmenu]
+      - [0x70, rodata, adv_rodata0a]
       - [0x90, .rodata, ui/statusmenu]
       - [0xF0, .rodata, game/formationmenu]
       - [0x13C, rodata, adv_rodata0b]
@@ -125,7 +127,7 @@ segments:
       - [0x3E08, c, common/gfx/imageanimstart]
       - [0x3FFC, c, common/gfx/imagequeue]
       - [0x40FC, c, gfx/timqueue]
-      - [0x43D4, asm, adv_5]
+      - [0x43D4, c, ui/mainmenu]
       - [0x5414, c, common/ui/menutick]
       - [0x5484, asm, adv_6]
       - [0x5574, c, common/ui/menupoll]

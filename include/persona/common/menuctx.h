@@ -32,23 +32,31 @@ typedef struct {
     /* 0x120 */ MenuList arcana_col;
     /* 0x130 */ MenuList unk130;
     /* 0x140 */ MenuList unk140;
-    /* 0x150 */ u_char   pad150[0x20];
+    /* 0x150 */ MenuList unk150;
+    /* 0x160 */ MenuList unk160;
     /* 0x170 */ MenuList unk170;
     /* 0x180 */ MenuList unk180;
     /* 0x190 */ MenuList unk190;
     /* 0x1A0 */ MenuList unk1A0;
-    /* 0x1B0 */ u_char   pad1B0[0x10];
+    /* 0x1B0 */ MenuList unk1B0;
     /* 0x1C0 */ MenuList cfg_list;      /* the config list page's row       */
     /* 0x1D0 */ MenuList cfg_row;       /* the config battle page's row     */
     /* 0x1E0 */ MenuList member_list; /* the config tactics page's member */
-    /* 0x1F0 */ u_char   pad1F0[0x30];
+    /* 0x1F0 */ MenuList unk1F0;
+    /* 0x200 */ MenuList unk200;
+    /* 0x210 */ MenuList unk210;
     /* 0x220 */ MenuList unk220;
     /* 0x230 */ MenuList unk230;
     /* 0x240 */ MenuList unk240;
     /* 0x250 */ MenuList unk250;
     /* 0x260 */ MenuList item_row;      /* the item bag's cursor            */
     /* 0x270 */ MenuList item_col;
-    /* 0x280 */ u_char   pad280[0x50];
+    /* 0x280 */ MenuList unk280;        /* the config rows, each opened on
+                                           the saved option it shows       */
+    /* 0x290 */ MenuList unk290;
+    /* 0x2A0 */ MenuList unk2A0;
+    /* 0x2B0 */ MenuList unk2B0;
+    /* 0x2C0 */ MenuList unk2C0;
     /* 0x2D0 */ MenuList unk2D0;
     /* 0x2E0 */ MenuList unk2E0;
     /* 0x2F0 */ MenuList unk2F0;
