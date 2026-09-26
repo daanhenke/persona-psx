@@ -4,4 +4,5 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
+#define CHAREQUIP_SHORT
 #include "../../../common/game/equipauto.c"

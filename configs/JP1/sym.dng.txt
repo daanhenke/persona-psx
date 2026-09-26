@@ -727,14 +727,14 @@ EventFlagGet2            = 0x8008BF50; // type:func size:0x38
 EquipScreen              = 0x8008BF88; // type:func size:0x63C
 func_8008C5C4            = 0x8008C5C4; // type:func size:0x7A4
 func_8008CD68            = 0x8008CD68; // type:func size:0x748
-func_8008D4B0            = 0x8008D4B0; // type:func size:0x314
-func_8008D7C4            = 0x8008D7C4; // type:func size:0x318
+EquipStepRemove          = 0x8008D4B0; // type:func size:0x314
+EquipStepOptimise        = 0x8008D7C4; // type:func size:0x318
 EquipShowCursor          = 0x8008DADC; // type:func size:0x1C8
 EquipShowListCursor      = 0x8008DCA4; // type:func size:0x148
 ItemsListUsable          = 0x8008DDEC; // type:func size:0xD4
 EquipDrawListRow         = 0x8008DEC0; // type:func size:0xCC
-func_8008DF8C            = 0x8008DF8C; // type:func size:0x450
-func_8008E3DC            = 0x8008E3DC; // type:func size:0x160
+EquipDrawMember          = 0x8008DF8C; // type:func size:0x450
+CharEquipBest            = 0x8008E3DC; // type:func size:0x160
 
 //------------------------------------------------------------------------
 //--- PA: 0x02A19C   VA: 0x8008E53C   subsegment: c, common/game/equipbest
@@ -1329,7 +1329,7 @@ g_bg_shown               = 0x800A0438;
 g_view_eye               = 0x800A043C; // size:0xC
 g_view_at                = 0x800A0448; // size:0xC
 D_800A04B8               = 0x800A04B8; // size:0x1
-D_800A04C4               = 0x800A04C4; // type:u32 size:0x4
+g_equip_last             = 0x800A04C4; // size:0x2
 g_hud_digits             = 0x800A04C8; // size:0xC
 D_800A04D4               = 0x800A04D4; // size:0x4
 g_skill_help_spell       = 0x800A04D8; // size:0x2

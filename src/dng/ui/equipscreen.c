@@ -9,6 +9,7 @@
 #define SLOT_TAGGED_INTXY
 #define TILEMAP_INT_COUNT
 #define PERSONAPAGE_DNG
+#define NAME_KR
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
@@ -18,6 +19,8 @@
 #include <persona/adv/personapage.h>
 #include <persona/common/item.h>
 #include <persona/common/itemname.h>
+#include <persona/common/char.h>
+#include <persona/common/status.h>
 
 #define g_seq_handle ((short *)0x801F537C)
 
@@ -50,13 +53,24 @@ extern void   FadeUpBlocking(short step, short limit);
 extern void   FadeDownBlocking(short step, short floor);
 extern void   SsSetNck(short handle);
 extern void   ItemsCompact(void);
+/* Declared without prototypes where the screen calls them: the slot goes
+   over as the int it was worked out in. */
+extern void   CharUnequip();
+extern void   CharApplyStats();
+extern void   CharRecalcStats();
+extern void   CharPreviewEquip();
+extern void   CharPreviewDraw(short member, Char *c);
+extern void   func_800929D8(void);
+extern u_short EquipPickStronger(short member, short group);
+extern void   CharEquipBest(short member, short group);
+extern void   bcopy(void *src, void *dst, int n);
 extern void   ItemsClearPending(void);
-extern void   func_8008DF8C(short member);
+extern void   EquipDrawMember(short slot);
 extern void   EquipShowCursor(void);
 extern void   func_8008C5C4(void);
 extern void   func_8008CD68(void);
-extern void   func_8008D4B0(void);
-extern void   func_8008D7C4(void);
+extern void   EquipStepRemove(void);
+extern void   EquipStepOptimise(void);
 
 void EquipScreen(short standalone)
 {
@@ -95,7 +109,7 @@ void EquipScreen(short standalone)
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 5, 29), 0x3C2, 3);
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 6, 28), 0x3C5, 3);
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 7, 28), 0x3C8, 3);
-    func_8008DF8C(g_menu->unk050.cur);
+    EquipDrawMember(g_menu->unk050.cur);
     SlotClearAll();
     SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0x18, 0x18);
     SlotInitTagged(D_8009B074, 0x2D, 0x2FF, 0, 0x10);
@@ -128,10 +142,10 @@ void EquipScreen(short standalone)
             func_8008CD68();
             break;
         case 2:
-            func_8008D4B0();
+            EquipStepRemove();
             break;
         case 3:
-            func_8008D7C4();
+            EquipStepOptimise();
             break;
         }
         if (g_pad_pressed[0] & PAD_TOGGLE) {
@@ -156,9 +170,122 @@ INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008C5C4);
 
 INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008CD68);
 
-INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008D4B0);
+/* A copy of the member in party slot `slot` with `what` taken off - one
+   slot, or with EQUIP_ALL everything - put up beside them. */
+#define PREVIEW_REMOVE(what)                                                       n = g_party[g_menu->unk050.cur];                                               bcopy(&g_chars[n], &c, sizeof(Char));                                          if ((what) == 0) {                                                                 c.equip[0] = 0;                                                                c.equip[1] = 0;                                                                c.equip[2] = 0;                                                                c.equip[3] = 0;                                                                c.equip[4] = 0;                                                                c.equip[5] = 0;                                                                c.equip[6] = 0;                                                                CharPreviewEquip(&c, 0, 0);                                                } else {                                                                           CharPreviewEquip(&c, (what) - 1, 0);                                       }                                                                              CharPreviewDraw(n, &c);                                                        EquipShowListCursor()
 
-INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008D7C4);
+/* Step 2, taking things off: row 0 of the list is everything, rows 1-7 one
+   slot each. The preview follows either cursor; accepting does it. */
+void EquipStepRemove(void)
+{
+    Char c;
+    int  n;
+
+    if (MenuStepCursor(&g_menu->list[1])) {
+    preview:
+        PREVIEW_REMOVE(g_menu->list[1].cur);
+    } else if (MenuStepCursor(&g_menu->unk050)) {
+        /* The same preview; the image has it once, behind the first test. */
+        goto preview;
+    }
+    if (InputCheckAcceptA(1)) {
+        n = g_party[g_menu->unk050.cur];
+        if (g_menu->list[1].cur != 0) {
+            CharUnequip(n, g_menu->list[1].cur - 1);
+            CharApplyStats(n);
+            CharRecalcStats(n);
+            EquipDrawMember(g_menu->unk050.cur);
+        } else {
+            CharUnequip(n, 0);
+            CharUnequip(n, 1);
+            CharUnequip(n, 2);
+            CharUnequip(n, 3);
+            CharUnequip(n, 4);
+            CharUnequip(n, 5);
+            CharUnequip(n, 6);
+            CharApplyStats(n);
+            CharRecalcStats(n);
+            PREVIEW_REMOVE(0);
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        func_800929D8();
+        TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+        TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
+        EquipScreenLayout();
+        DrawGauge(0);
+        EquipDrawMember(g_menu->unk050.cur);
+        SlotSetFlicker(1, 1);
+        SlotSetFlicker(2, 1);
+        SlotSetFlicker(3, 1);
+        g_equip_step -= 2;
+    }
+}
+
+/* Step 3, letting the game choose: row 0 of the list is every slot, rows
+   1-7 one slot each. The preview shows the strongest choice for it;
+   accepting puts it on. */
+void EquipStepOptimise(void)
+{
+    Char c;
+    int  n;
+    int  i;
+
+    if (MenuStepCursor(&g_menu->list[1])) {
+    preview:
+        n = g_party[g_menu->unk050.cur];
+        bcopy(&g_chars[n], &c, sizeof(Char));
+        if (g_menu->list[1].cur == 0) {
+            c.equip[0] = EquipPickStronger(n, 0);
+            c.equip[1] = EquipPickStronger(n, 1);
+            c.equip[2] = EquipPickStronger(n, 2);
+            c.equip[3] = EquipPickStronger(n, 3);
+            c.equip[4] = EquipPickStronger(n, 4);
+            c.equip[5] = EquipPickStronger(n, 5);
+            CharPreviewEquip(&c, 6, EquipPickStronger(n, 6));
+        } else {
+            CharPreviewEquip(&c, g_menu->list[1].cur - 1,
+                             EquipPickStronger(n, g_menu->list[1].cur - 1));
+        }
+        CharPreviewDraw(n, &c);
+        EquipShowListCursor();
+    } else if (MenuStepCursor(&g_menu->unk050)) {
+        goto preview;
+    }
+    if (InputCheckAcceptA(1)) {
+        n = g_party[g_menu->unk050.cur];
+        if (g_menu->list[1].cur != 0) {
+            CharEquipBest(n, g_menu->list[1].cur - 1);
+            CharApplyStats(n);
+            CharRecalcStats(n);
+            func_800929D8();
+        } else {
+            for (i = 0; i < CHAR_EQUIP; i++) {
+                CharEquipBest(n, i);
+                func_800929D8();
+            }
+            CharApplyStats(n);
+            CharRecalcStats(n);
+        }
+        EquipDrawMember(g_menu->unk050.cur);
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        func_800929D8();
+        TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+        TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
+        EquipScreenLayout();
+        EquipDrawMember(g_menu->unk050.cur);
+        DrawGauge(0);
+        SlotSetFlicker(1, 1);
+        SlotSetFlicker(2, 1);
+        SlotSetFlicker(3, 1);
+        g_equip_step -= 3;
+    }
+}
+
+/* A number right-aligned so its last digit lands in `last`. */
+#define MEMBER_NUMBER(value, width, row, last)                                     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, row, last), GLYPH_DIGIT0,                         FormatDecimal(value, g_hud_digits, width))
+
+/* The two cells of the "unchanged" arrow. */
+#define ARROW_SAME 0x360
 
 /* Hides the five cursors, then shows the one for where the list cursor is:
    the member, the slot row, or one of the seven equipment rows. */
@@ -280,6 +407,51 @@ void EquipDrawListRow(short row, short *dst)
     }
 }
 
-INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008DF8C);
+/* The member in party slot `slot` as the screen opens on them: name, what
+   they wear, their five stats and six battle numbers, each with the arrow
+   the preview later recolours. */
+void EquipDrawMember(short slot)
+{
+    Char *c;
+    int   n;
 
-INCLUDE_ASM("dng/nonmatchings/ui/equipscreen", func_8008E3DC);
+    n = g_party[slot];
+    c = &g_chars[n];
+    TileMapFillRect(AT(g_tilemap1, 0, 5), 0, 8, 1, MAP_W);
+    TileMapWriteRow(c->name, AT(g_tilemap1, 0, 5), 0, 8);
+
+    TileMapFillRect(AT(g_tilemap1, 2, 5), 0, 10, CHAR_EQUIP, MAP_W);
+    DrawItemName(g_chars[n].equip[0], AT(g_tilemap1, 2, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[1], AT(g_tilemap1, 3, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[2], AT(g_tilemap1, 4, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[3], AT(g_tilemap1, 5, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[4], AT(g_tilemap1, 6, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[5], AT(g_tilemap1, 7, 5), 0, 1);
+    DrawItemName(g_chars[n].equip[6], AT(g_tilemap1, 8, 5), 0, 1);
+
+    TileMapFillRect(AT(g_tilemap1, 3, 24), 0, 2, CHAR_STATS, MAP_W);
+    MEMBER_NUMBER(g_chars[n].stat[0], 2, 3, 25);
+    MEMBER_NUMBER(g_chars[n].stat[1], 2, 4, 25);
+    MEMBER_NUMBER(g_chars[n].stat[2], 2, 5, 25);
+    MEMBER_NUMBER(g_chars[n].stat[3], 2, 6, 25);
+    MEMBER_NUMBER(g_chars[n].stat[4], 2, 7, 25);
+
+    TileMapFillRect(AT(g_tilemap1, 2, 34), 0, 3, 6, MAP_W);
+    MEMBER_NUMBER(g_chars[n].melee_atk, 3, 2, 36);
+    MEMBER_NUMBER(g_chars[n].melee_hit, 3, 3, 36);
+    MEMBER_NUMBER(g_chars[n].gun_atk, 3, 4, 36);
+    MEMBER_NUMBER(g_chars[n].gun_hit, 3, 5, 36);
+    MEMBER_NUMBER(g_chars[n].defence, 3, 6, 36);
+    MEMBER_NUMBER(g_chars[n].evade, 3, 7, 36);
+
+    /* `n` again as the row counter: one variable for both, as the
+       registers show. */
+    for (n = 0; n < CHAR_STATS; n++) {
+        AT(g_tilemap1, 3, 22)[n * MAP_W] = ARROW_SAME;
+        AT(g_tilemap1, 3, 23)[n * MAP_W] = ARROW_SAME + 1;
+    }
+    for (n = 0; n < 6; n++) {
+        AT(g_tilemap1, 2, 32)[n * MAP_W] = ARROW_SAME;
+        AT(g_tilemap1, 2, 33)[n * MAP_W] = ARROW_SAME + 1;
+    }
+}

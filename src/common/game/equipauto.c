@@ -1,7 +1,7 @@
 /* Persona 1 (JP) - re-equipping one group with the best the character has.
  *
- * Compiled into two overlays rather than called across the boundary:
- *   ADV 0x80093B24   S2D 0x8007E908
+ * Compiled into three overlays rather than called across the boundary:
+ *   ADV 0x80093B24   S2D 0x8007E908   DNG 0x8008E3DC
  *
  * The optimise entry of the equipment screen calls this for one group, or for
  * all seven in turn. What is worn comes off first, so the item already in the
@@ -24,8 +24,15 @@
 extern short g_equip_last;
 
 extern int  ItemsListUsable(short kind, short group);
+#ifdef CHAREQUIP_SHORT
+/* DNG's copy was built against short declarations: the slot and group go
+   over sign-extended rather than masked. */
+extern void CharUnequip(short slot, short group);
+extern void CharEquip(short slot, short group, u_short id);
+#else
 extern void CharUnequip(u_char slot, u_char group);
 extern void CharEquip(u_char slot, u_char group, u_short id);
+#endif
 
 void CharEquipBest(short slot, short group)
 {
