@@ -226,7 +226,7 @@ BgMapClearRow            = 0x80066210; // type:func size:0x40
 //--- PA: 0x001EB0   VA: 0x80066250   subsegment: asm, s2d_s3_x1
 //--------------------------------------------------------------
 func_80066250            = 0x80066250; // type:func size:0x144
-func_80066394            = 0x80066394; // type:func size:0xCF8
+MsgStep                  = 0x80066394; // type:func size:0xCF8
 switchD                  = 0x8006682C;
 default                  = 0x8006704C;
 
@@ -500,7 +500,7 @@ PersonaTopSpell          = 0x80075E24; // type:func size:0x44
 //-------------------------------------------------------------
 //--- PA: 0x011AC8   VA: 0x80075E68   subsegment: asm, s2d_2_s7
 //-------------------------------------------------------------
-D_80075E68               = 0x80075E68; // type:func size:0x78
+MsgWaitPress             = 0x80075E68; // type:func size:0x78
 
 //-------------------------------------------------------------------------
 //--- PA: 0x011B40   VA: 0x80075EE0   subsegment: c, common/gfx/tilemapruns
@@ -822,7 +822,7 @@ FormationClearMarkers    = 0x8008192C; // type:func size:0x68
 //-----------------------------------------------------------------
 //--- PA: 0x01D5F4   VA: 0x80081994   subsegment: asm, s2d_2_s21_x4
 //-----------------------------------------------------------------
-D_80081994               = 0x80081994; // type:func size:0x70
+FormationClearSprites    = 0x80081994; // type:func size:0x70
 
 //----------------------------------------------------------------------
 //--- PA: 0x01D664   VA: 0x80081A04   subsegment: c, common/gfx/statbars
@@ -883,7 +883,7 @@ InputCheckAcceptB        = 0x80083110; // type:func size:0x7C
 //--------------------------------------------------------------
 //--- PA: 0x01EDEC   VA: 0x8008318C   subsegment: asm, s2d_2_s22
 //--------------------------------------------------------------
-D_8008318C               = 0x8008318C; // type:func size:0x8C
+DrawItemCellRows         = 0x8008318C; // type:func size:0x8C
 
 //---------------------------------------------------------------------
 //--- PA: 0x01EE78   VA: 0x80083218   subsegment: c, common/ui/itemcell
@@ -1378,6 +1378,7 @@ D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
 D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C;
+g_pad_pressed            = 0x800FC004; // size:0x4
 g_msg                    = 0x80101E4C; // ignore:True size:0x40
 g_map_entries            = 0x801DD008; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8

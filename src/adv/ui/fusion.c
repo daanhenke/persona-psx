@@ -51,8 +51,8 @@ typedef struct {
 
 extern short   g_persona_data_step;
 extern u_char  g_menu_allow_hold;
-extern short   D_800B8458;
-extern short   D_800BB7F4;       /* the item list's top row */
+extern short   g_use_scroll_step;
+extern short   g_use_top;       /* the item list's top row */
 extern short   D_800BB820;       /* 0 from the stock (kind 7), else from a search */
 extern short   D_800BC050;       /* an item is offered */
 extern short   D_800BBB34;       /* how many items the list holds */
@@ -94,7 +94,7 @@ extern void   FusionOpen(void);
 extern void   func_800AB0D0(short n);
 extern void   func_800AB1EC(void);
 extern void   D_8008D924(const PersonaDef *d, short stat);
-extern void   D_80076EB0(short n);
+extern void   MsgWaitPress(short step);
 extern void   FusePairsOpen(void);
 /* PersonaFindFree, PersonaFill and PersonaFind are called without
    prototypes here. */
@@ -288,7 +288,7 @@ void FuseItemsOpen(void)
     int   i;
     short n;
 
-    n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+    n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
     MenuSetLayers(0x1B);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -304,10 +304,10 @@ void FuseItemsOpen(void)
     TileMapFillRect(AT(g_tilemap0, 3, 15), 0x17, 2, 5, MAP_W);
     TileMapFillRect(AT(g_tilemap0, 9, 2), 0x17, 0x1C, 6, MAP_W);
     for (i = 0; i < 5; i++) {
-        DrawItemRow((D_800BB7F4 + i) * 2,
-                    AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 0));
-        DrawItemRow((D_800BB7F4 + i) * 2 + 1,
-                    AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 14));
+        DrawItemRow((g_use_top + i) * 2,
+                    AT(g_tilemap1, (g_use_top + i) & 0x1F, 0));
+        DrawItemRow((g_use_top + i) * 2 + 1,
+                    AT(g_tilemap1, (g_use_top + i) & 0x1F, 14));
     }
     TileMapWriteRow(str_cell_run, AT(g_tilemap2, 5, 12), 0x383, 2);
     *AT(g_tilemap2, 1, 13) = 0xCD;
@@ -325,11 +325,11 @@ void FuseItemsOpen(void)
     SlotSetFlicker(4, 1);
     SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0xB0, 0x30);
     SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0xB0, 0x60);
-    MARKS(D_800BB7F4, (D_800BBB34 + 1) / 2 - 5);
+    MARKS(g_use_top, (D_800BBB34 + 1) / 2 - 5);
     g_bg_map1.ncellh = 0x20;
     g_cam_y = 0;
     g_bg_layers[4].x = 0x40;
-    g_map_scroll_y = D_800BB7F4 * 12;
+    g_map_scroll_y = g_use_top * 12;
 }
 
 void FuseItemPick(void)
@@ -338,34 +338,34 @@ void FuseItemPick(void)
     int      i;
     short    prev;
 
-    prev = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+    prev = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
     if ((short)(g_map_scroll_y % 12) == 0) {
-        if (D_800B8458 != 0) {
+        if (g_use_scroll_step != 0) {
             if (g_menu->unk2D0.delay < 3) {
                 g_menu->unk2D0.delay = 0;
             }
-            D_800B8458 = 0;
+            g_use_scroll_step = 0;
         }
-        if (PageScrollValue(&D_800BB7F4, 0, (D_800BBB34 + 1) / 2 - 5, 5)) {
+        if (PageScrollValue(&g_use_top, 0, (D_800BBB34 + 1) / 2 - 5, 5)) {
             for (i = 0; i < 5; i++) {
-                DrawItemRow((D_800BB7F4 + i) * 2,
-                            AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 0));
-                DrawItemRow((D_800BB7F4 + i) * 2 + 1,
-                            AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 14));
+                DrawItemRow((g_use_top + i) * 2,
+                            AT(g_tilemap1, (g_use_top + i) & 0x1F, 0));
+                DrawItemRow((g_use_top + i) * 2 + 1,
+                            AT(g_tilemap1, (g_use_top + i) & 0x1F, 14));
             }
-            g_map_scroll_y = D_800BB7F4 * 12;
-        } else if (MenuScrollCursor(&g_menu->unk2D0, &D_800BB7F4, 0,
+            g_map_scroll_y = g_use_top * 12;
+        } else if (MenuScrollCursor(&g_menu->unk2D0, &g_use_top, 0,
                                     (D_800BBB34 + 1) / 2 - 5,
-                                    (u_short *)&D_800B8458)) {
-            if (D_800B8458 < 0) {
-                DrawItemRow(D_800BB7F4 * 2, AT(g_tilemap1, D_800BB7F4 & 0x1F, 0));
-                DrawItemRow(D_800BB7F4 * 2 + 1,
-                            AT(g_tilemap1, D_800BB7F4 & 0x1F, 14));
-            } else if (D_800B8458 > 0) {
-                DrawItemRow((D_800BB7F4 + 4) * 2,
-                            AT(g_tilemap1, (D_800BB7F4 + 4) & 0x1F, 0));
-                DrawItemRow((D_800BB7F4 + 4) * 2 + 1,
-                            AT(g_tilemap1, (D_800BB7F4 + 4) & 0x1F, 14));
+                                    (u_short *)&g_use_scroll_step)) {
+            if (g_use_scroll_step < 0) {
+                DrawItemRow(g_use_top * 2, AT(g_tilemap1, g_use_top & 0x1F, 0));
+                DrawItemRow(g_use_top * 2 + 1,
+                            AT(g_tilemap1, g_use_top & 0x1F, 14));
+            } else if (g_use_scroll_step > 0) {
+                DrawItemRow((g_use_top + 4) * 2,
+                            AT(g_tilemap1, (g_use_top + 4) & 0x1F, 0));
+                DrawItemRow((g_use_top + 4) * 2 + 1,
+                            AT(g_tilemap1, (g_use_top + 4) & 0x1F, 14));
             }
         } else {
             MenuStepCursor(&g_menu->unk2E0);
@@ -373,12 +373,12 @@ void FuseItemPick(void)
     } else {
         MenuResetRepeat(&g_menu->unk2D0);
     }
-    MARKS(D_800BB7F4, (D_800BBB34 + 1) / 2 - 5);
+    MARKS(g_use_top, (D_800BBB34 + 1) / 2 - 5);
     SlotSetPos(4, 0x42, g_menu->unk2E0.cur * 0x70 + 0x50,
                g_menu->unk2D0.cur * 12 + 0x30);
-    g_map_scroll_y += D_800B8458;
-    if (prev != D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2) {
-        prev = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+    g_map_scroll_y += g_use_scroll_step;
+    if (prev != g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2) {
+        prev = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
         if ((items[prev] & ITEM_ID) && (items[prev] >> 9)) {
             TextItemStatRow(ITEM_AT(prev) & ITEM_ID, 0x40, 0x10);
         } else {
@@ -482,7 +482,7 @@ void FuseResultView(void)
             g_bg_layers[4].w = 0xF0;
             g_bg_layers[4].h = 0x10;
             g_bg_shown |= 0x10;
-            D_80076EB0(1);
+            MsgWaitPress(1);
             goto back;
         }
         if (InputCheckAcceptB(1) || g_menu_allow_hold) {
@@ -691,7 +691,7 @@ void FuseExecute(void)
         case 3:
             p = 0;
             if (D_800BC050) {
-                n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+                n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
                 p = ITEM_AT(n) & ITEM_ID;
             }
             func_800A1990(g_persona_stock[g_menu->status_page.cur],
@@ -700,7 +700,7 @@ void FuseExecute(void)
         case 4:
             p = 0;
             if (D_800BC050) {
-                n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+                n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
                 p = ITEM_AT(n) & ITEM_ID;
             }
             func_800A1990(g_persona_stock[g_menu->status_page.cur],
@@ -722,7 +722,7 @@ void FuseExecute(void)
         }
     plain:
         if (D_800BC050) {
-            n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+            n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
             func_800A1990(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], ITEM_AT(n) & ITEM_ID,
                           &g_fuse, 0);
@@ -750,7 +750,7 @@ void FuseExecute(void)
             if (*(u_short *)0x801F1BBC) {
                 personas[p].raw[6] = *(u_char *)0x801F1BBC;
             }
-            n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+            n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
             ItemsRemovePending(ITEM_AT(n) & ITEM_ID, 1);
             ItemsCommitPending();
             ItemsCompact();

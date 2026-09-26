@@ -48,7 +48,7 @@ extern short   g_persona_data_step;
 extern u_char  g_menu_allow_hold;
 extern short   g_item_top;
 extern short   g_swap_top;
-extern short   D_800B8458;
+extern short   g_use_scroll_step;
 extern short   g_header_scroll_y;
 extern short   D_800BB950;       /* how many results */
 extern short   D_800BB95C;       /* how many pairs give the one picked */
@@ -172,7 +172,7 @@ void FuseResultPick(void)
     int   i;
     short n;
 
-    i = D_800B8458;
+    i = g_use_scroll_step;
     if (D_800BB950 != 0) {
         if (D_800BB950 < RESULT_ROWS) {
             MenuStepCursor(&g_menu->status_who);
@@ -182,7 +182,7 @@ void FuseResultPick(void)
                     if (g_menu->status_who.delay < 3) {
                         g_menu->status_who.delay = 0;
                     }
-                    D_800B8458 = 0;
+                    g_use_scroll_step = 0;
                 }
                 if (PageScrollValue(&g_swap_top, 0, D_800BB950 - RESULT_ROWS,
                                     RESULT_ROWS)) {
@@ -192,16 +192,16 @@ void FuseResultPick(void)
                     g_map_scroll_y = g_swap_top * ROW_H;
                 } else if (MenuScrollCursor(&g_menu->status_who, &g_swap_top, 0,
                                             D_800BB950 - RESULT_ROWS,
-                                            (u_short *)&D_800B8458)) {
-                    if (D_800B8458 < 0) {
+                                            (u_short *)&g_use_scroll_step)) {
+                    if (g_use_scroll_step < 0) {
                         FuseResultRowDraw(g_swap_top);
-                    } else if (D_800B8458 > 0) {
+                    } else if (g_use_scroll_step > 0) {
                         FuseResultRowDraw(g_swap_top + RESULT_ROWS - 1);
                     }
                 }
             }
             MARKS(g_swap_top, D_800BB950 - RESULT_ROWS);
-            g_map_scroll_y += D_800B8458;
+            g_map_scroll_y += g_use_scroll_step;
         }
     }
     SlotSetPos(1, 0x42, 0x48, g_menu->status_who.cur * ROW_H + 0x30);
@@ -235,11 +235,11 @@ void FusePairPick(void)
         MenuStepCursor(&g_menu->unk030);
     } else {
         if ((short)(g_map_scroll_y % ROW_H) == 0) {
-            if (D_800B8458 != 0) {
+            if (g_use_scroll_step != 0) {
                 if (g_menu->unk030.delay < 3) {
                     g_menu->unk030.delay = 0;
                 }
-                D_800B8458 = 0;
+                g_use_scroll_step = 0;
             }
             if (PageScrollValue(&g_item_top, 0, D_800BB95C - PAIR_ROWS,
                                 PAIR_ROWS)) {
@@ -249,16 +249,16 @@ void FusePairPick(void)
                 g_map_scroll_y = g_item_top * ROW_H;
             } else if (MenuScrollCursor(&g_menu->unk030, &g_item_top, 0,
                                         D_800BB95C - PAIR_ROWS,
-                                        (u_short *)&D_800B8458)) {
-                if (D_800B8458 < 0) {
+                                        (u_short *)&g_use_scroll_step)) {
+                if (g_use_scroll_step < 0) {
                     FusePairRowDraw(g_item_top);
-                } else if (D_800B8458 > 0) {
+                } else if (g_use_scroll_step > 0) {
                     FusePairRowDraw(g_item_top + PAIR_ROWS - 1);
                 }
             }
         }
         MARKS(g_item_top, D_800BB95C - PAIR_ROWS);
-        g_map_scroll_y += D_800B8458;
+        g_map_scroll_y += g_use_scroll_step;
     }
     SlotSetPos(1, 0x42, 0x48, g_menu->unk030.cur * ROW_H + 0x54);
     if ((short)(g_map_scroll_y % ROW_H) == 0) {
@@ -467,7 +467,7 @@ void FusePairsOpen(void)
     }
     SlotInitTagged(D_800B130C, 1, 0x42, 0x48, g_menu->unk030.cur * ROW_H + 0x54);
     SlotSetFlicker(1, 1);
-    D_800B8458 = 0;
+    g_use_scroll_step = 0;
     g_cam_y = 0;
     g_header_scroll_y = 0;
     g_bg_map1.ncellh = 0x20;

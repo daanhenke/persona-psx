@@ -40,7 +40,7 @@ typedef struct {
     short persona;
 } FuseBonus;
 
-extern short   D_800BB7F4;
+extern short   g_use_top;
 extern u_char  g_moon;
 extern u_char  g_kind_labels[];
 extern u_char  D_800BA0E4[];
@@ -226,7 +226,7 @@ void FuseItemsDraw(void)
     u_short *res;
     short    n;
 
-    n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
+    n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
     res = &g_fuse.persona;
     TileMapFillRect(AT(g_tilemap2, 1, 2), 0, 0xB, 1, MAP_W);
     TileMapFillRect(AT(g_tilemap2, 1, 16), 0, 0xB, 1, MAP_W);

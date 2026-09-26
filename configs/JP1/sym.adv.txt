@@ -199,7 +199,7 @@ SlotSetAnim              = 0x8006622C; // type:func size:0x80
 //-------------------------------------------------------------
 //--- PA: 0x001F0C   VA: 0x800662AC   subsegment: asm, adv_1_x2
 //-------------------------------------------------------------
-D_800662AC               = 0x800662AC; // type:func size:0x50
+SoundRestartSeq          = 0x800662AC; // type:func size:0x50
 
 //--------------------------------------------------------------
 //--- PA: 0x001F5C   VA: 0x800662FC   subsegment: c, audio/sound
@@ -342,11 +342,11 @@ MenuPollInput            = 0x80069914; // type:func size:0xB4
 //----------------------------------------------------------
 //--- PA: 0x005628   VA: 0x800699C8   subsegment: asm, adv_7
 //----------------------------------------------------------
-func_800699C8            = 0x800699C8; // type:func size:0xD4
-func_80069A9C            = 0x80069A9C; // type:func size:0x60
-func_80069AFC            = 0x80069AFC; // type:func size:0x724
-func_8006A220            = 0x8006A220; // type:func size:0x690
-func_8006A8B0            = 0x8006A8B0; // type:func size:0x33C
+ItemMenuStep             = 0x800699C8; // type:func size:0xD4
+ItemMenuOpen             = 0x80069A9C; // type:func size:0x60
+ItemTopStep              = 0x80069AFC; // type:func size:0x724
+ItemUseStep              = 0x8006A220; // type:func size:0x690
+ItemTargetStep           = 0x8006A8B0; // type:func size:0x33C
 
 //-------------------------------------------------------------------------
 //--- PA: 0x00684C   VA: 0x8006ABEC   subsegment: c, ../common/ui/itemstats
@@ -487,7 +487,7 @@ PadSetPageButtons        = 0x800768A4; // type:func size:0x4C
 //-----------------------------------------------------------
 //--- PA: 0x012550   VA: 0x800768F0   subsegment: asm, adv_14
 //-----------------------------------------------------------
-func_800768F0            = 0x800768F0; // type:func size:0xF8
+MenuTopRedraw            = 0x800768F0; // type:func size:0xF8
 PersonaStockDraw         = 0x800769E8; // type:func size:0x23C
 
 //------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ PersonaTopSpell          = 0x80076E6C; // type:func size:0x44
 //-----------------------------------------------------------
 //--- PA: 0x012B10   VA: 0x80076EB0   subsegment: asm, adv_16
 //-----------------------------------------------------------
-D_80076EB0               = 0x80076EB0; // type:func size:0x78
+MsgWaitPress             = 0x80076EB0; // type:func size:0x78
 
 //----------------------------------------------------------------------------
 //--- PA: 0x012B88   VA: 0x80076F28   subsegment: c, ../common/gfx/tilemapruns
@@ -583,7 +583,7 @@ DrawStatusFrames         = 0x8007B9BC; // type:func size:0x408
 //-----------------------------------------------------------
 //--- PA: 0x017A24   VA: 0x8007BDC4   subsegment: asm, adv_19
 //-----------------------------------------------------------
-func_8007BDC4            = 0x8007BDC4; // type:func size:0x2D0
+ItemUseLayout            = 0x8007BDC4; // type:func size:0x2D0
 
 //------------------------------------------------------------------------
 //--- PA: 0x017CF4   VA: 0x8007C094   subsegment: c, ../common/ui/partyhud
@@ -1049,7 +1049,7 @@ FormationClearMarkers    = 0x8008D348; // type:func size:0x68
 //------------------------------------------------------------
 //--- PA: 0x029010   VA: 0x8008D3B0   subsegment: asm, adv_42b
 //------------------------------------------------------------
-D_8008D3B0               = 0x8008D3B0; // type:func size:0x70
+FormationClearSprites    = 0x8008D3B0; // type:func size:0x70
 
 //-------------------------------------------------------------------------
 //--- PA: 0x029080   VA: 0x8008D420   subsegment: c, ../common/gfx/statbars
@@ -1110,7 +1110,7 @@ InputCheckAcceptB        = 0x8008EB5C; // type:func size:0x7C
 //-----------------------------------------------------------
 //--- PA: 0x02A838   VA: 0x8008EBD8   subsegment: asm, adv_43
 //-----------------------------------------------------------
-D_8008EBD8               = 0x8008EBD8; // type:func size:0x8C
+DrawItemCellRows         = 0x8008EBD8; // type:func size:0x8C
 
 //------------------------------------------------------------------------
 //--- PA: 0x02A8C4   VA: 0x8008EC64   subsegment: c, ../common/ui/itemcell
@@ -1168,7 +1168,7 @@ CharApplyStats           = 0x8008FFF4; // type:func size:0x650
 //-----------------------------------------------------------
 //--- PA: 0x02C2A4   VA: 0x80090644   subsegment: asm, adv_46
 //-----------------------------------------------------------
-func_80090644            = 0x80090644; // type:func size:0x6D0
+CharPreviewEquip         = 0x80090644; // type:func size:0x6D0
 EquipDrawCompare         = 0x80090D14; // type:func size:0x8F4
 EquipScreen              = 0x80091608; // type:func size:0x63C
 func_80091C44            = 0x80091C44; // type:func size:0x7C8
@@ -1383,7 +1383,7 @@ FacilityCursorPlace      = 0x800A4778; // type:func
 PersonaSlotsDraw         = 0x800A4BD0; // type:func
 CharCanUsePersona        = 0x800A4DA0; // type:func
 ShopStep2                = 0x800A4E2C; // type:func
-MsgWaitPress             = 0x800A5AEC; // type:func
+MsgStepUntilPress        = 0x800A5AEC; // type:func
 CoinsAffordable          = 0x800A5B34; // type:func
 CoinExchangeStep         = 0x800A5B7C; // type:func
 FacilityStep3            = 0x800A6674; // type:func
@@ -1692,6 +1692,7 @@ g_bg_map2                = 0x800B8340; // type:u32 size:0x20
 g_bg_map                 = 0x800B8360; // type:u32 size:0x10
 D_800B8370               = 0x800B8370; // type:u32 size:0x14
 g_bg_layers              = 0x800B8380; // size:0xD8
+g_use_scroll_step        = 0x800B8458; // size:0x2
 g_menu_layer_defs        = 0x800B845C;
 g_formation_marker_def   = 0x800B8978;
 g_pad_binding_table      = 0x800B898C; // type:u32 size:0x4
@@ -1766,6 +1767,7 @@ g_grow_slot_x            = 0x800BAD20;
 g_actor_defs             = 0x800BAD3C;
 g_tyn_heap               = 0x800BADEC; // size:0xA00
 g_adv_field_state        = 0x800BB7EC;
+g_use_top                = 0x800BB7F4; // size:0x2
 g_effect_tick            = 0x800BB7FC;
 g_page_fwd_repeat        = 0x800BB800; // size:0x10
 

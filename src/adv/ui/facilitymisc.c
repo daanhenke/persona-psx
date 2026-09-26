@@ -40,7 +40,7 @@ extern void func_800A4E7C(void);
 extern void func_800A52F0(void);
 extern void func_800A5BCC(void);
 extern void func_800A6308(void);
-extern void func_800768F0(void);
+extern void MenuTopRedraw(void);
 void FacilityOpen3(void);
 extern void D_80078948(int a, int b);
 extern void D_8007A738(int a, int b);
@@ -281,7 +281,7 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A52F0);
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A5560);
 
 /* Keeps the message running until any button is pressed. */
-void MsgWaitPress(void)
+void MsgStepUntilPress(void)
 {
     goto check;
 loop:
@@ -350,7 +350,7 @@ void FacilityStep3(void)
 
 void FacilityOpen3(void)
 {
-    func_800768F0();
+    MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0x30, 0, 0);
     D_80078948(0, 4);
     D_8007A738(0, 8);
@@ -421,7 +421,7 @@ void ShopStep(void)
 
 void ShopScreenOpen(void)
 {
-    func_800768F0();
+    MenuTopRedraw();
     func_80077F8C(3, 1);
     func_8007A62C(3, 8);
 }

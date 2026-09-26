@@ -43,7 +43,7 @@ extern int     D_800BB7F8;
 extern short   g_stock_last;
 extern GsMAP   D_800B8370;
 extern GsCELL  g_panel_cells[];
-extern short   D_800BB7F4, g_item_top, g_swap_top, D_800BC224, D_800B8458,
+extern short   g_use_top, g_item_top, g_swap_top, D_800BC224, g_use_scroll_step,
                g_item_scroll_step;
 extern short   g_arcana_top;
 extern short   g_header_scroll_y;
@@ -86,7 +86,7 @@ extern void RunFrame(void);
 extern u_char func_80076F78(void);
 extern u_char func_80077614(void);
 extern void MenuTick(void);
-extern void func_800699C8(void);
+extern void ItemMenuStep(void);
 extern void StatusMenuStep(void);
 extern void ConfigMenuStep(void);
 extern void FormationMenuStep(void);
@@ -154,12 +154,12 @@ void MainMenu(void)
     g_bg_layers[0].attribute = 0x9000000;
     g_menu_sel = 0;
     g_BB94C = 0;
-    D_800BB7F4 = 0;
+    g_use_top = 0;
     g_item_top = 0;
     g_swap_top = 0;
     D_800BC224 = 0;
     g_arcana_top = 0;
-    D_800B8458 = 0;
+    g_use_scroll_step = 0;
     g_item_scroll_step = 0;
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
@@ -295,7 +295,7 @@ opening:
             MenuTick();
             break;
         case 1:
-            func_800699C8();
+            ItemMenuStep();
             break;
         case 2:
             StatusMenuStep();

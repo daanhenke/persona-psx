@@ -66,3 +66,20 @@ void FormationClearMarkers(void)
     SlotClear(0x1E);
     SlotClear(0x1F);
 }
+
+/* The same, and slot 7 with them: the label FormationMenu puts at the top
+   left. Nothing in the image calls it. */
+void FormationClearSprites(void)
+{
+    SlotClear(2);
+    SlotClear(3);
+    SlotClear(4);
+    SlotClear(5);
+    SlotClear(6);
+    SlotClear(7);
+    SlotClear(0x1B);
+    SlotClear(0x1C);
+    SlotClear(0x1D);
+    SlotClear(0x1E);
+    SlotClear(0x1F);
+}

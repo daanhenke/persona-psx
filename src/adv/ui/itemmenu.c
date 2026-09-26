@@ -27,7 +27,7 @@ extern u_char  D_800B2330[];
 extern void   DrawStatusHud(void);
 extern u_char MenuStepMember(int *sel, u_char last);
 extern void   EquipScreen(short standalone);
-extern void   func_800768F0(void);
+extern void   MenuTopRedraw(void);
 extern void   func_80077F8C(int a, int b);
 extern void   func_8007A62C(int a, int b);
 extern void   ItemsMergePending(void);
@@ -90,7 +90,7 @@ void ItemMemberPick(void)
                (y = x + 1)[g_menu->unk050.cur * 2]);
     if (InputCheckAcceptA(1)) {
         EquipScreen(0);
-        func_800768F0();
+        MenuTopRedraw();
         SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
         func_80077F8C(0, 1);
         func_8007A62C(0, 3);
@@ -103,7 +103,7 @@ void ItemMemberPick(void)
                        y[g_menu->unk050.cur * 2]);
         SlotSetFlicker(1, 1);
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
+        MenuTopRedraw();
         SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
         func_80077F8C(0, 1);
         func_8007A62C(0, 3);
@@ -193,7 +193,7 @@ void ItemBagOpen(void)
         g_menu_subsel++;
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
+        MenuTopRedraw();
         SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
         func_80077F8C(0, 1);
         func_8007A62C(0, 3);
@@ -351,7 +351,7 @@ void ItemBagStep(void)
         g_menu_subsel++;
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         CopyShorts(g_item_list, g_items, BAG_SIZE);
-        func_800768F0();
+        MenuTopRedraw();
         SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
         func_80077F8C(0, 1);
         func_8007A62C(0, 3);

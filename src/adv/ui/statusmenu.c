@@ -53,7 +53,7 @@ extern void   BgPanelSet(short id, short x, short y);
 extern void   func_8007AF78(void);
 extern void   func_8007B288(short member);
 extern void   func_8007B554(short member, short persona);
-extern void   func_800768F0(void);
+extern void   MenuTopRedraw(void);
 extern u_char D_800B12B8[];
 extern u_char D_800B1EB8[];
 extern u_char D_800B17E8[];
@@ -137,7 +137,7 @@ void StatusMenuStep(void)
 
 void StatusMenuOpen(void)
 {
-    func_800768F0();
+    MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0xC, 0, 0);
     func_80077F8C(1, 2);
     func_8007A62C(1, 6);
@@ -370,7 +370,7 @@ void SkillPersonaPick(void)
             g_menu_subsel++;
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
+        MenuTopRedraw();
         SlotClear(2);
         SlotClear(0x2F);
         SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
@@ -752,7 +752,7 @@ void StatusPageStep(void)
             g_menu_subsel++;
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800768F0();
+        MenuTopRedraw();
         MenuSetLayers(7);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);

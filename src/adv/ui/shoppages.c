@@ -21,8 +21,8 @@
 #define g_item_list   ((u_short *)0x800EAE4C)
 
 extern short    g_item_top;
-extern short    D_800BB7F4;
-extern short    D_800B8458;
+extern short    g_use_top;
+extern short    g_use_scroll_step;
 extern short    D_800BBB24;
 extern u_char   g_facility_count;
 extern MenuList D_800BB838;
@@ -123,7 +123,7 @@ void ShopSellOpen(void)
     int   i;
     short n;
 
-    n = D_800BB7F4 * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+    n = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
     MenuSetLayers(0x14);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -165,13 +165,13 @@ void ShopSellOpen(void)
     SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0xA8, 0x30);
     SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0xA8, 0x84);
     g_slot_cur = &g_slots[PAGE_MARK_SLOT];
-    if (D_800BB7F4 == 0) {
+    if (g_use_top == 0) {
         g_slot_cur->attr |= SLOT_ATTR_HIDE;
     } else {
         g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
     }
     g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
-    if (D_800BB7F4 == g_facility_count - SHOP_ROWS) {
+    if (g_use_top == g_facility_count - SHOP_ROWS) {
         g_slot_cur->attr |= SLOT_ATTR_HIDE;
     } else {
         g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
@@ -183,10 +183,10 @@ void ShopSellOpen(void)
         D_800BBB24 = 0x10;
     }
     for (i = 0; i < SHOP_ROWS; i++) {
-        DrawItemRow((D_800BB7F4 + i) * 2, AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 0));
-        DrawItemRow((D_800BB7F4 + i) * 2 + 1,
-                    AT(g_tilemap1, (D_800BB7F4 + i) & 0x1F, 14));
+        DrawItemRow((g_use_top + i) * 2, AT(g_tilemap1, (g_use_top + i) & 0x1F, 0));
+        DrawItemRow((g_use_top + i) * 2 + 1,
+                    AT(g_tilemap1, (g_use_top + i) & 0x1F, 14));
     }
-    D_800B8458 = 0;
-    g_map_scroll_y = D_800BB7F4 * 12;
+    g_use_scroll_step = 0;
+    g_map_scroll_y = g_use_top * 12;
 }

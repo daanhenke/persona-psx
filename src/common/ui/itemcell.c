@@ -1,5 +1,6 @@
-/* Persona 1 (JP) - one cell of the pending-item grid.
- *   ADV 0x8008EC64   S2D 0x80083218
+/* Persona 1 (JP) - the pending-item grid, a cell at a time.
+ *   DrawItemCellRows  ADV 0x8008EBD8   S2D 0x8008318C
+ *   DrawItemCell      ADV 0x8008EC64   S2D 0x80083218
  *
  * The same row itemrow.c draws, taken out of the two-column grid rather than
  * the flat list, and out of whichever glyph bank the caller asks for. A unit
@@ -36,6 +37,20 @@ extern void  TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
 extern void  TileMapFillRect(short *dst, short value, u_short w, u_short h,
                              u_short stride);
 extern void  DrawItemName(int id, short *dst, u_short base, int b);
+
+void DrawItemCell(short *dst, short col, short row, u_char bank);
+
+/* `count` rows of the grid from `row` on, both columns. */
+void DrawItemCellRows(short *dst, u_char row, u_char count)
+{
+    while (count != 0) {
+        DrawItemCell(dst, 0, row, 0);
+        DrawItemCell(dst + 14, 1, row, 0);
+        dst += ROW_STRIDE;
+        count--;
+        row++;
+    }
+}
 
 /* The same cell drawn out of the two-column grid rather than the flat list,
    and out of whichever glyph bank the caller asks for. */

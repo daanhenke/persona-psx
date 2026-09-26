@@ -52,7 +52,7 @@ extern u_char  g_money_label[]; /* its four-cell heading           */
 extern int     D_800BBB1C;
 extern short   D_800BB950;
 extern short   D_800BB820;
-extern short   D_800BB7F4;
+extern short   g_use_top;
 extern MenuList D_800BB848;
 extern MenuList D_800BB838;
 extern MenuList D_800BC604;
@@ -231,7 +231,7 @@ u_char FacilityScreen(u_char id)
     MenuListInit(&g_menu->unk250, 0, 0, 1, 0x1A);
     g_item_top = 0;
     g_swap_top = 0;
-    D_800BB7F4 = 0;
+    g_use_top = 0;
     BgReset();
     SlotClearAll();
     FadeBlackout();
@@ -335,7 +335,7 @@ u_char FacilityScreen(u_char id)
     case 6:
         PersonaSlotsCompact();
         MenuListInit(&g_menu->unk2E0, 0, 0, 9, 0x14);
-        D_800BB7F4 = 0;
+        g_use_top = 0;
         func_800A2A48();
     next:
         g_persona_data_step++;
@@ -349,7 +349,7 @@ u_char FacilityScreen(u_char id)
         MenuListInit(&g_menu->status_page, 0, 0, i, 0x16);
         MenuListInit(&g_menu->unk2D0, 0, 0, 4, 0x14);
         MenuListInit(&g_menu->unk2E0, 0, 0, 1, 0x1A);
-        D_800BB7F4 = 0;
+        g_use_top = 0;
         D_800BB820 = 0;
         FusionOpen();
         if (i != 0) {
@@ -374,7 +374,7 @@ u_char FacilityScreen(u_char id)
         }
         MenuListInit(&g_menu->unk2D0, 0, 0, 4, 0x14);
         MenuListInit(&g_menu->unk2E0, 0, 0, 1, 0x1A);
-        D_800BB7F4 = 0;
+        g_use_top = 0;
         g_item_top = 0;
         g_swap_top = 0;
         D_800BB820 = 1;

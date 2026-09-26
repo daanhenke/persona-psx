@@ -42,7 +42,7 @@ extern void TacticsSetCels(u_char n);
 extern void ConfigStepTactics(void);
 extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
-extern void func_800768F0(void);
+extern void MenuTopRedraw(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern void func_800782A4(int a, int b);
@@ -111,7 +111,7 @@ void ConfigMenuStep(void)
 
 void ConfigMenuOpen(void)
 {
-    func_800768F0();
+    MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x18, 0, 0);
     g_bg_layer_otz[2] = 0x40;
     g_bg_map0.ncellh = 0x40;
