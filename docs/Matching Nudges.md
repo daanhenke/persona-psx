@@ -3703,3 +3703,41 @@ so the two conflict and `rem` cannot reuse `v`'s register.
 - [preloaddng.c](/src/main/preloaddng.c) `FormatHexDigits` - with the digit
   written as an if/else, the order of those two lines is the whole difference
   between 98.97% and 100%.
+
+## How sched1 orders a block (sched.c, gcc 2.6.0)
+
+sched1 runs after combine and before register allocation, and fills each
+basic block from its end backwards. An insn's priority is the longest latency
+path from the block's start to it; ties go to the insn that came later in the
+original stream. When an insn becomes ready it is raised to the current top
+priority if it is *birthing*: it sets a register that is live below it and is
+set exactly once in the whole function (`reg_n_sets == 1`). So:
+
+- a value in a register set once is pulled down next to its first use;
+- a value set twice - a variable assigned in two places, a constant built in
+  two insns (`lui`/`ori`), a hard argument register loaded for more than one
+  call - is not, and stays where the source put it, or floats early;
+- among plain priority-1 insns, the source order decides.
+
+Levers that follow, each proven: assign a call's result to a variable set only
+once so its copy sinks to its stores; write a statement earlier so its insns
+lose the ties; write a block out twice so its argument registers are set twice
+(cross-jumping, which only runs after sched2, folds the copies).
+
+- [fxstep44.c](/src/btlp/fxstep44.c) - `BtlFxStep44`: result in a once-set
+  variable, attribute first. 97.58% to exact.
+- [fxsheet3.c](/src/btlp/fxsheet3.c) - `BtlFxStartSheetLate`: attribute first
+  so its two-insn constant stays at the top. 95.74% to exact.
+- [fxspell42.c](/src/btlp/fxspell42.c) - `BtlFxStep42`: the miss written for
+  each move. 98.84% to exact.
+
+## loop.c lifts by threshold x uses x lifetime
+
+An invariant is lifted only when `threshold * savings * lifetime` reaches the
+loop's insn count (threshold is 1 + the number of allocatable registers,
+doubled when the loop has no call, less 3 for each insn already lifted). A
+position stepped by hand is a short loop; the same position worked out from
+the counter adds insns and keeps a constant the image leaves in the loop.
+
+- [fxsheet3.c](/src/btlp/fxsheet3.c) - `BtlFxStartSheetLate`: the column's x
+  as `(col * W + ORG) * FIXED`, replacing an identical-arms workaround.
