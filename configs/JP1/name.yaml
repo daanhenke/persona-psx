@@ -46,7 +46,7 @@ segments:
     start: 0x0
     vram: 0x800643A0
     subsegments:
-      - [0x0, rodata, name_id]
+      - [0x0, .rodata, overlayid]
       - [0x4, c, ui/screen]
       - [0x1D94, c, ui/entry]
       - [0x1E40, c, ui/confirm]
