@@ -121,7 +121,7 @@ extern void  func_800A2A48(void);
 extern void  func_800A11EC(void);
 extern short func_8009BCE4(void);
 extern void  func_800A0E60(void);
-extern void  func_80099E9C(void);
+extern void  SaveScreenOpen(void);
 extern void  func_800A8104(void);
 extern void  func_800A6674(void);
 extern void  func_800A5B7C(void);
@@ -129,7 +129,7 @@ extern void  func_800A4E2C(void);
 extern void  func_800A2994(void);
 extern void  func_8009D5A8(void);
 extern void  func_8009BE48(void);
-extern void  func_80099DE8(void);
+extern void  SaveScreenStep(void);
 
 u_char FacilityScreen(u_char id)
 {
@@ -387,7 +387,7 @@ u_char FacilityScreen(u_char id)
         break;
     case 10:
         MenuListInit(&g_menu->unk2E0, 0, 0, 1, 0x1E);
-        func_80099E9C();
+        SaveScreenOpen();
         break;
     }
     FadeUpBlocking(4, 0x80);
@@ -427,7 +427,7 @@ u_char FacilityScreen(u_char id)
             g_persona_data_step = STEP_DONE;
             break;
         case 10:
-            func_80099DE8();
+            SaveScreenStep();
             break;
         }
         if (g_pad_pressed[0] & PAD_TOGGLE) {
