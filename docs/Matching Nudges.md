@@ -3497,6 +3497,12 @@ Macro bodies are the natural place for that.
   and advance macros and the scene's own block raise `line` from 13 to 18
   refs against the walker's 17. Every read of the speaker then goes through
   the walker, as it does in the image: 99.94% to exact.
+- [formationplace.c](/src/adv/game/formationplace.c) - `FormationPlaceMember`
+  (ADV and DNG). The byte `cell` had 3 refs over 28 insns (0.107) and needed
+  to beat 0.343. Computing it in two steps, with the second one a level deeper
+  (`do { cell = a * 5; do { cell += b; } while (0); } while (0);`), gave it
+  s0 as in the image: 98.96% to exact in both overlays. Other splits and
+  depths fixed the saved registers but swapped the sum's scratch registers.
 
 ## A register the image gives a set-once local wants more refs, not a hoist
 
