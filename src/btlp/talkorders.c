@@ -180,22 +180,21 @@ void BtlTalkersJoin(void)
     g_btl_talk_outcome = 3;
 }
 
-/* 99.95%. The cases are written in the image's order: 0, then 3, then 1,
+/* The cases are written in the image's order: 0, then 3, then 1,
    then the refusal, so 0 and 3 share the item call. Case 3 writes the refusal
    out in full rather than jumping to it; cross-jumping folds the copies back
    into one, but at loop time they are what keep loop.c from lifting the 1
    (the marker's and the case-1 compare's, matched into one movable) into a
-   saved register. Left: the image loads the kept order, move and target mask
-   above the kind byte's store and the kept ailment line below it, which
-   gives them a0, a1, a2 and v1; here the four copies land in other
-   registers.
+   saved register. The kept copies are written move, ailment line, order,
+   targets: sched1 breaks its ties on that order, and it is what puts the
+   order's reload below the kind byte's store and the other three above it,
+   in a1, a0 and a2 as the image has them.
 
    The same again: the kept copies go back over the live ones and the action
    is aimed afresh, because the negotiation moved everybody about and a target
    mask taken before it is no longer worth anything. Char.unk5D carries the
    kind in its low nibble and the one before it in the high one, so shifting
    the high nibble down is what makes "again" mean the round before this. */
-#ifdef NON_MATCHING
 void BtlTalkersLeaveField(void)
 {
     BtlActor *a;
@@ -210,9 +209,9 @@ void BtlTalkersLeaveField(void)
             && g_btl_actors[g_btl_actor_turn].marker < 2) {
             a->c.unk5D = (a->c.unk5D & 0xF0) | (a->c.unk5D >> 4);
             a->marker = 1;
+            a->move = a->move_kept;
             a->ail_line = a->ail_line_kept;
             a->order = a->order_kept;
-            a->move = a->move_kept;
             a->targets = a->targets_kept;
             switch (a->c.unk5D & 0xF) {
             case 0:
@@ -241,9 +240,6 @@ void BtlTalkersLeaveField(void)
     } while (g_btl_actor_turn < BTL_PARTY);
     g_btl_talk_outcome = 2;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkorders", BtlTalkersLeaveField);
-#endif
 
 /* A weapon or a used item made ready. BtlMarkMoveArea says which cells it
    reaches and answers negative when it reaches none; a fighter carrying guilt

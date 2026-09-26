@@ -69,10 +69,21 @@ extern SVECTOR   g_btl_arena_quad[];
 #define g_btl_arena_g (*(short *)0x800CCA14)
 #define g_btl_arena_b (*(short *)0x800CCA16)
 
-/* 93.21%. Written as the edges are, every coordinate worked out from the row
-   and the column. The image also steps a copy of the row's top (s6) for the
-   second corner, which none of `ymid` before the columns, the corners read
-   through it, or the old stepped variables reproduces.
+/* 95.14%. Written as the edges are, every coordinate worked out from the row
+   and the column. The image steps a copy of the row's top (s6) for the
+   second corner. Traced through loop.c 2026-09-26: that is two computations
+   of row*40-200 that cse cannot prove equal, both lifted out of the column
+   loop and merged by combine_givs in the row loop, the second left as a copy
+   in the column loop's preheader. The second corner's value is set at the
+   top of the column body so it lives long enough to be lifted (loop.c lifts
+   an insn only when threshold * uses * lifetime reaches the loop's insn
+   count, 134); the first is spelled (row - 5) * 40. That lifts both, gets
+   every rgb read and the per-round 0xFF000000 right, but the two givs end in
+   one register here (t8) with no copy, so the frame is still 0x30 against
+   0x38 and the registers shift by one.
+   The tail reads the fade off the rgb pointer (lh -2(s0)); here cse folds
+   rgb[-1] into the symbol. A struct {fade; rgb[3]; to[3];} view keeps it
+   register-relative but bases on the fade.
    The face, in the plane z = 0. It is the only one of the five put through
    the GTE by hand rather than through RotAverageNclip4, and it is the one that
    walks the arena's colour toward the scene's. */
@@ -83,14 +94,16 @@ void BtlDrawArenaBack(void)
     short  *rgb;
     int     row;
     int     col;
+    int     y;
 
     for (row = 0; row < ARENA_BACK_ROWS; row++) {
         for (col = 0; col < ARENA_BACK_COLS; col++) {
+            y = row * ARENA_STEP - ARENA_Y;
             g_btl_arena_face[0].vx = col * ARENA_STEP - ARENA_X;
-            g_btl_arena_face[0].vy = row * ARENA_STEP - ARENA_Y;
+            g_btl_arena_face[0].vy = (row - ARENA_Y / ARENA_STEP) * ARENA_STEP;
             g_btl_arena_face[0].vz = 0;
             g_btl_arena_face[1].vx = col * ARENA_STEP - (ARENA_X - ARENA_STEP);
-            g_btl_arena_face[1].vy = row * ARENA_STEP - ARENA_Y;
+            g_btl_arena_face[1].vy = y;
             g_btl_arena_face[1].vz = 0;
             g_btl_arena_face[2].vx = col * ARENA_STEP - ARENA_X;
             g_btl_arena_face[2].vy = row * ARENA_STEP - (ARENA_Y - ARENA_STEP);

@@ -27,13 +27,24 @@
 /* How much later each record starts than the one before it. */
 #define FX_STEP 2
 
-/* 91.66%. The image stores r, g and b to their home slots as words and reads
-   them back with lhu. The following forms were tried and none of them gives
-   that pair:
-   - a K&R definition with u_short parameters stores halfwords (88.28%);
-   - a K&R definition with an int prototype in scope stores halfwords;
-   - a prototyped u_short definition stores halfwords;
-   - an int definition never reloads. */
+/* 93.64%. The image stores r, g and b as words into three slots 8 bytes
+   apart (0x10/0x18/0x20, a 0x50 frame) and reads each back with lhu. Traced
+   through the gcc 2.6.0 source (build/gcc-src):
+   - only alignment -1 spaces slots by 8: reload's spill slots (alter_reg) or
+     BLKmode objects (assign_stack_local);
+   - one pseudo can never give sw + lhu: with LOAD_EXTEND_OP defined, reload
+     reloads any size-changing subreg of a pseudo in the pseudo's own mode
+     (reload.c push_reload and find_reloads' force_reload), so an int
+     parameter reloads with lw and a narrow one is stored with sh;
+   - a BLKmode short[2] per colour, written as a word, reproduces the frame,
+     the slots, the stores and the loads. That is the form below.
+   Left: the image loads into t0 with the object pointer in v0, where local
+   alloc here gives the value v0 and the pointer v1. t0 is the register reload
+   picks, which means the image's load pseudo got no hard reg and was replaced
+   by its memory equivalent (update_equiv_regs route A) - what keeps local
+   alloc off it is still open. One variable reused for all three puts the
+   pointer in v0 but the value in v1 (88.74%). Also open: the timer copy
+   (addu s4,a3) sits after s1's setup in the image. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
 {
@@ -43,7 +54,11 @@ BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
     int      slot;
     int      bit;
     u_short  targets;
+    short    cr[2], cg[2], cb[2];
 
+    *(int *)cr = r;
+    *(int *)cg = g;
+    *(int *)cb = b;
     bit     = 1;
     slot    = 0;
     last    = 0;
@@ -56,9 +71,9 @@ BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
             && !(g_btl_actors[slot].flags & BTL_ACTOR_OUT)
             && (targets & bit) != 0)
         {
-            g_btl_actors[slot].obj->rgb_to[0] = r;
-            g_btl_actors[slot].obj->rgb_to[1] = g;
-            g_btl_actors[slot].obj->rgb_to[2] = b;
+            g_btl_actors[slot].obj->rgb_to[0] = cr[0];
+            g_btl_actors[slot].obj->rgb_to[1] = cg[0];
+            g_btl_actors[slot].obj->rgb_to[2] = cb[0];
             g_btl_actors[slot].obj->fade      = FX_FADE;
 
             o = BtlOpenFxObj(slot, timer);

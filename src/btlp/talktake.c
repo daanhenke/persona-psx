@@ -36,20 +36,18 @@
 
 extern int BtlMoodBand(short value);
 
-/* 96.85%. The mood answers store their constant and return in each case,
-   so cross-jumping leaves one shared store-and-return tail; each switch's
-   default body is written first, which is where the compare tree falls
-   into; and `plain` is only set on the slot-0 path, or CSE would reuse it
-   for the second switch's 3. Left: on the non-mood path the image has the
-   step in v1 and `return 1` hoisted into the first branch's delay slot.
-   Here g_btl_talk_result's loaded value takes v1 and the step gets a0 (the
-   weight and the result swap registers in global alloc). */
-#ifdef NON_MATCHING
+/* The mood answers store their constant and return in each case, so
+   cross-jumping leaves one shared store-and-return tail; each switch's
+   default body is written first, which is where the compare tree falls into;
+   and `plain` is only set on the slot-0 path, or CSE would reuse it for the
+   second switch's 3. The step is stored in each arm rather than chosen into
+   a local: jump.c turns `if (c) x = a; else x = b;` into `x = b; if (c)
+   x = a;`, which sets the step while the weight is still live and moves it
+   out of v1. The last switch breaks to a single `return 1`. */
 int BtlTalkTakeLine(short slot, short verb, short said, short weight,
                     short mood)
 {
     short plain;
-    short step;
 
     if (verb != TALK_VERB_MOOD) {
         g_btl_talk_result |= TALK_NEW;
@@ -63,11 +61,11 @@ int BtlTalkTakeLine(short slot, short verb, short said, short weight,
             return 0;
         }
         if (weight < TALK_STRONG) {
-            step = TALK_STEP_PLAIN;
-        } else {
-            step = TALK_STEP_STRONG;
+            g_btl_talk_step = TALK_STEP_PLAIN;
+            g_btl_talk_said = said;
+            return 1;
         }
-        g_btl_talk_step = step;
+        g_btl_talk_step = TALK_STEP_STRONG;
         g_btl_talk_said = said;
         return 1;
     }
@@ -94,14 +92,12 @@ int BtlTalkTakeLine(short slot, short verb, short said, short weight,
     case 0:
     default:
         g_btl_talk_result |= TALK_TOO_WEAK;
-        return 1;
+        break;
     case 1:
     case 2:
         g_btl_talk_step = TALK_STEP_PLAIN;
-        return 1;
+        break;
     }
+    return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talktake", BtlTalkTakeLine);
-#endif
 

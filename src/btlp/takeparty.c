@@ -57,17 +57,20 @@ extern u_char   g_btl_test_party;
 
 extern void PersonaCreate(Char *c, int persona);
 
-/* 91.36%. The party is walked as party[i] against &g_btl_actors[i], the
+/* 96.08%. The party is walked as party[i] against &g_btl_actors[i], the
    quarter is a plain / 4, and g_chars/g_party are ignore:True so splat prints
-   the literals the source uses. What is left is scheduling:
-   - the image loads the three save bytes and stores g_btl_confirm before the
-     live row's copy. sched1 gives that copy no dependences at all here (its
-     `movstrsi` has a symbol destination and conflicts with nothing), so it
-     is the last insn picked and lands first. In the image something tied it
-     to the settings. A copy through a varying address would do it, but gcc
-     folds every pointer form back into the symbol;
-   - in the test block the image sets PersonaCreate's first argument before
-     the table pick and steps the Char walker in the call's delay slot. */
+   the literals the source uses. g_btl_confirm is stored through its address
+   as a number: sched.c's memrefs_conflict_p calls a symbol and a literal (or
+   two symbols) disjoint, but a literal against the live row's copy (a block
+   move from a literal, size 0) always conflicts, and that dependence is what
+   keeps the copy behind the confirm store as in the image. When this
+   matches, reloc.btlp.txt needs MIPS_NONE on that lui/sb.
+   Left, all sched1 order: the image loads the three save bytes first, reads
+   g_btl_encounter before the copy, and stores fast_anim then msg_speed after
+   it. Here msg_speed's store floats above the copy (a symbol, so free);
+   writing it or fast_anim as a literal too pins it but swaps the pair
+   (95.19%). In the test block the image sets PersonaCreate's first argument
+   before the table pick and steps the Char walker in the call's delay slot. */
 #ifdef NON_MATCHING
 void BtlTakeParty(void)
 {
@@ -135,7 +138,7 @@ void BtlTakeParty(void)
 
     memcpy(g_btl_formation_preset, g_formation_preset,
            GRID_CELLS * FORM_PRESETS);
-    g_btl_confirm = g_save_confirm;
+    *(u_char *)0x800CCA21 = g_save_confirm;
     memcpy(g_btl_formation, &g_formation_preset[GRID_CELLS * FORM_LIVE],
            GRID_CELLS);
     g_btl_fast_anim = g_save_fast_anim;

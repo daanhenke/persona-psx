@@ -39,30 +39,31 @@ extern short         g_btl_effect_oy;
 extern void (*g_btl_effect_cursor_fn[])(void);
 
 
-/* 93.29%. The cursor is placed through an int-typed call: this unit was
-   built against a BtlCursorPlace that took ints, so the image passes the two
-   sums without narrowing them (input.h keeps the short one, which is the
-   definition's). The step and the walked row are one variable, as the
-   image's s0 is, and the kept selection is an int, so copying it needs no
-   mask. Left: the image keeps each step's temporary apart from the selection
-   (CSE merges them here, ternaries included), and its row walk is not
-   rotated - the test sits at the top with the byte and the -1 lifted out -
-   where gcc here duplicates the first test and jumps into the loop. */
-#ifdef NON_MATCHING
-void BtlEffectMoveCursor(int slot)
+/* The cursor is placed through an int-typed call: this unit was built
+   against a BtlCursorPlace that took ints, so the image passes the two sums
+   without narrowing them (input.h keeps the short one, which is the
+   definition's). The selection and each step's temporary are shorts, which
+   is what keeps the temporary apart from the selection and sign-extends it
+   only where the sum can leave a byte. The walk's body opens with a
+   declaration, and that block note is what stops gcc rolling its first test
+   to the bottom of the loop. The routine is implicitly int - the image leaves
+   the delay slot before its exit empty. */
+int BtlEffectMoveCursor(int slot)
 {
     BtlEffect    *e;
     BtlEffectRow *row;
+    BtlEffectRow *step;
     u_short       grid;
     int           cols;
     int           rows;
-    int           sel;
-    int           t;
-    int           keep;
+    short         sel;
+    short         t;
+    short         keep;
 
     e = g_btl_effect[slot];
     if (slot == g_btl_effect_cur
-        && (row = g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
+        && (step = g_btl_effect_step[slot]) != (BtlEffectRow *)-1) {
+        row = step;
         if ((e->kind & BTL_EFFECT_NOPAD) == 0) {
             grid = e->grid;
             keep = e->sel;
@@ -81,7 +82,7 @@ void BtlEffectMoveCursor(int slot)
                 BtlSePlay(BTL_EFFECT_CLICK_BANK, BTL_EFFECT_CLICK_SE);
                 t = sel + cols;
                 sel = t;
-                if (cols * rows <= (short)t) {
+                if (cols * rows <= t) {
                     sel = t - cols * rows;
                 }
             }
@@ -89,13 +90,13 @@ void BtlEffectMoveCursor(int slot)
                 BtlSePlay(BTL_EFFECT_CLICK_BANK, BTL_EFFECT_CLICK_SE);
                 t = sel + 1;
                 sel = t;
-                if ((short)t % cols == 0) {
+                if (t % cols == 0) {
                     sel = t - cols;
                 }
             }
             if ((BtlInputKeys() & g_btl_key_left) != 0) {
                 BtlSePlay(BTL_EFFECT_CLICK_BANK, BTL_EFFECT_CLICK_SE);
-                if ((short)sel % cols == 0) {
+                if (sel % cols == 0) {
                     sel = sel + cols - 1;
                 } else {
                     sel = sel - 1;
@@ -103,17 +104,21 @@ void BtlEffectMoveCursor(int slot)
             }
 
             row = e->next;
-            do {
+            for (;;) {
+                BtlEffectRow *next;
+
                 if (row->row == (u_char)sel) {
-                    keep = sel;
-                    g_btl_effect_step[g_btl_effect_cur] = row;
                     break;
                 }
-                if (row->next == (BtlEffectRow *)-1) {
-                    break;
+                next = row->next;
+                if (next == (BtlEffectRow *)-1) {
+                    goto done;
                 }
-                row = row->next;
-            } while (1);
+                row = next;
+            }
+            keep = sel;
+            g_btl_effect_step[g_btl_effect_cur] = row;
+        done:
             e->sel = keep;
             row = g_btl_effect_step[g_btl_effect_cur];
         }
@@ -125,7 +130,4 @@ void BtlEffectMoveCursor(int slot)
                 + BTL_EFFECT_DY);
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/effectcursor", BtlEffectMoveCursor);
-#endif
 

@@ -75,7 +75,7 @@ extern void    BtlPlaceMember(int member, int col, int row);
 extern void    BtlSpawnFixedEnemies(void);
 extern int     BtlResetTalk(int open);
 
-/* 94.49%. Taken from the image so far:
+/* 97.60%. Taken from the image so far:
    - one counter for the clearing walk;
    - the counter zeroed ahead of the CD wait (reorg puts it in both of the
      wait's branch slots);
@@ -83,11 +83,14 @@ extern int     BtlResetTalk(int open);
    - the fixed-enemy test on the encounter as unsigned;
    - the record re-reached through g_btl_combatants after each call rather
      than held in `a`;
-   - the species stored into the grid rather than head >> 8 worked out again.
+   - the species stored into the grid rather than head >> 8 worked out again;
+   - the stage entry at raw * 2 read first, into a local: its constant is
+     then built in a register of its own (lui v0 / addu) where the two words
+     before it keep the assembler's $at expansion.
    What is left:
-   - i and the set's doubled offset trade saved registers;
-   - the image reaches the stage table's entry at raw * 2 through a
-     %hi/%lo pair of its own (in v0, not $at);
+   - i and the set's doubled offset trade saved registers (s1-s4);
+   - the image still loads that entry last, after the two words before it;
+     taking its address first and reading it at the call is worse (94.49%);
    - the two words before that entry count as misses against the image's
      D_ names. */
 #ifdef NON_MATCHING
@@ -110,6 +113,7 @@ void BtlSpawnEnemies(int set)
     int       rec;
     int       which;
     int       fill;
+    int       end;
 
     i = 0;
     g_btl_gfx_next = g_btl_enemy_gfx_start;
@@ -144,6 +148,7 @@ void BtlSpawnEnemies(int set)
         which = (set * BTL_ENEMY_SLOTS + i) * BTL_ENEMY_ROW;
         raw = g_btl_encounters[which + 1];
         if (raw != 0) {
+            end = (int)BTL_STAGE[raw * 2];
             tim = BTL_STAGE[raw * 2 - 2];
             image = (u_char *)BTL_STAGE[raw * 2 - 1];
             head = *(u_short *)((char *)tim + 2);
@@ -152,7 +157,7 @@ void BtlSpawnEnemies(int set)
             col = g_btl_encounters[which] >> 4;
             row = g_btl_encounters[which] & 0xF;
             slot = BtlLoadEnemyGfx(species, live, tim, image,
-                                   (int)BTL_STAGE[raw * 2] - (int)image);
+                                   end - (int)image);
             obj = BtlSpawnEnemy(species, col, row, slot, live);
             g_btl_combatants[rec].obj = obj;
             obj->mark_num = live + BTL_ENEMY_MARK0;

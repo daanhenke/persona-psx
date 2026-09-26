@@ -3572,3 +3572,59 @@ the variable in steps (`gain = price * roll; gain = gain / 100; ...`).
   99.73%. Also: a `short row[]` table with 32 bytes of frame below it is an
   unused local; `&g_btl_actors[BTL_PARTY + t]` rather than `&g_btl_enemies[t]`
   lets CSE rebase one register onto the member.
+
+## A loop body that opens with a declaration is not rotated
+
+`stmt.c` `expand_end_loop` rolls a loop's first conditional exit down to the
+bottom and jumps into the loop - but it scans from the top only until a
+CODE_LABEL, a call or a `NOTE_INSN_BLOCK_BEG`. A body that starts with
+`{ T *next; ...` emits that note first, so the exit test stays at the top with
+its invariants lifted in front of it, and whatever follows the loop (the found
+arm, reached by `break`) sits after the back jump. The local is also the
+image's separate temporary for the next pointer.
+
+- [effectcursor.c](/src/btlp/effectcursor.c) - `BtlEffectMoveCursor`, with the
+  two below: 93.29% to exact.
+
+## A short temporary sign-extends only where the sum can leave a byte
+
+Selections worked as `short` keep each step's temporary apart from the
+selection (the copy survives in a delay slot) and put an sll/sra pair only on
+the sums combine cannot bound: `keep - cols` of two bytes needs none, `sel +
+cols` does. Int temporaries were merged by CSE.
+
+- [effectcursor.c](/src/btlp/effectcursor.c) - `BtlEffectMoveCursor`.
+
+## A void routine whose exit branch keeps an empty delay slot returns int
+
+When the image leaves `nop` in the slot of a branch to the epilogue and the
+rebuild fills it with the next `li v0,...`, the routine is implicitly int: v0
+is live at the exit, so reorg will not move a v0 set into that slot. Declare
+it `int` (definition and prototype) with no `return`.
+
+- [effectcursor.c](/src/btlp/effectcursor.c) - `BtlEffectMoveCursor`, the last
+  row before exact.
+
+## `if (c) x = a; else x = b;` becomes `x = b; if (c) x = a;`
+
+jump.c turns a two-armed register assignment into an unconditional one plus a
+conditional overwrite. The unconditional set then lives across the test, so it
+conflicts with whatever the test reads and loses that register. Storing the
+value in each arm (jump.c does not do this to memory) keeps both arms; cross-
+jumping then shares the tail as the image does. Likewise a switch whose arms
+`return 1` each left v0 busy in the default arm; `break` to one `return 1`
+freed it.
+
+- [talktake.c](/src/btlp/talktake.c) - `BtlTalkTakeLine`, 96.85% to exact.
+
+## Independent copies are tie-broken by statement order
+
+Four field copies through one pointer (`a->x = a->x_kept`) have no
+dependences between them, so sched1 places them by priority and, on ties, by
+source order - and local-alloc then numbers their registers by where they
+landed. Which copy's load falls below an unrelated store, and which of a0..a2
+each gets, follows the order they are written in. Six orders were tried by
+hand; one is exact.
+
+- [talkorders.c](/src/btlp/talkorders.c) - `BtlTalkersLeaveField`, 99.95% to
+  exact (move, ailment line, order, targets).

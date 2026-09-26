@@ -187,7 +187,7 @@ extern void (*g_btl_effect_frames[])(BtlEffect *e);
 extern void BtlDrawEffects(u_long *ot);
 extern void BtlDrawEffectText(u_char *effect);
 extern void BtlEffectOffset(const BtlEffect *e);
-extern void BtlEffectMoveCursor(int slot);
+extern int BtlEffectMoveCursor(int slot);
 
 /* The row each slot's cursor is on. */
 extern BtlEffectRow *g_btl_effect_step[];
