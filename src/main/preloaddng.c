@@ -6,7 +6,6 @@
  * flight by the time it starts.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libcd.h>
 #include <libsnd.h>
 #include <persona/main/cd.h>
@@ -70,16 +69,15 @@ extern const DngName17 str_dng_vbq_tmpl;
    the floor in hex and xx the floor group (floor >> 3). Each template is
    copied into a local first, so every call starts from a clean one. The third
    file is skipped when entering from ADV with the gate flags clear. */
-/* 99.68%. The first FormatHexDigits argument is a fresh `lh` in the image:
-   g_save_floor, a signed second name for the halfword (reloc.main.txt pins
-   it on the expected side), keeps CSE from folding that read into the
-   second test's lhu. The queue submit is two calls that jump2 merges, which
-   leaves 3 in the branch's delay slot. What is left is the second test's
-   registers: the image has the floor in a0, unk4 in v0 and the table byte in
-   v1 - a0 as though the floor were still headed for the call. */
-#ifdef NON_MATCHING
+/* g_save_floor keeps the formatter's signed read separate from the unsigned
+   bounds check. Reuse the three locals below: floor's later shift gives it
+   the a0 register preference, and reusing value/count for the digits keeps
+   their loads on either side of the floor-group load. */
 void PreloadDng(void)
 {
+    int value;
+    u_int count;
+    int floor;
     DngName15 name;
     DngName16 names;
     DngName16 namem;
@@ -89,27 +87,37 @@ void PreloadDng(void)
     namem = str_dngm_tmpl;
 
     /* Coming back from BTLP or a cutscene keeps the floor you were on. */
-    if (g_state_next != 1 && g_state_next != 6) {
+    value = g_state_next;
+    if (value != 1 && value != 6)
+    {
         g_save_map_id = g_map_id[0];
         g_save_unk4 = g_map_unk4;
         g_save_pos_x = g_map_pos_x;
         g_save_pos_y = g_map_pos_y;
         g_save_unk5_idx = g_dng_room_entry[g_map_room * 4];
     }
-    if (g_dng_floor_maps[g_save_map_id] == 0 || g_dng_floor_maps[g_save_map_id] > 0x24) {
+    count = g_dng_floor_maps[g_save_map_id];
+    if (count == 0 || count > 0x24)
+    {
         g_save_map_id = 0;
     }
-    if (g_save_unk4 >= g_dng_floor_maps[g_save_map_id]) {
+    floor = g_save_map_id;
+    if (g_save_unk4 >= g_dng_floor_maps[floor])
+    {
         g_save_unk4 = 0;
     }
 
-    FormatHexDigits(g_save_floor, &name.c[7], 2);
-    names.c[7] = name.c[7];
-    namem.c[7] = name.c[7];
-    names.c[6] = name.c[6];
-    namem.c[6] = name.c[6];
+    floor = g_save_floor;
+    FormatHexDigits(floor, &name.c[7], 2);
+    count = name.c[7];
+    names.c[7] = count;
+    namem.c[7] = count;
+    value = name.c[6];
+    names.c[6] = value;
+    namem.c[6] = value;
 
-    FormatHexDigits(g_save_map_id >> 3, &name.c[3], 2);
+    floor = g_save_map_id;
+    FormatHexDigits(floor >> 3, &name.c[3], 2);
     g_cd_queue[0].name = name.c;
     g_cd_queue[0].dest = DNG_DEST;
     g_cd_queue[0].mode = 0;
@@ -125,15 +133,16 @@ void PreloadDng(void)
     names.c[2] = name.c[2];
     namem.c[2] = name.c[2];
 
-    if (g_state_next == 3 && g_dng_third_gate == 0 && (g_dng_third_flags & 1) == 0) {
+    /* Separate calls let jump2 merge the tail with 3 in the branch slot. */
+    if (g_state_next == 3 && g_dng_third_gate == 0 && (g_dng_third_flags & 1) == 0)
+    {
         CdQueueSubmit(2);
-    } else {
+    }
+    else
+    {
         CdQueueSubmit(3);
     }
 }
-#else
-INCLUDE_ASM("main/nonmatchings/preloaddng", PreloadDng);
-#endif
 
 /* Writes `digits` hex digits of `value` backwards from `end`, so the caller
    passes a pointer to the *last* digit position. Immediately follows
