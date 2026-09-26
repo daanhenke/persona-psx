@@ -1,12 +1,17 @@
-/* Persona 1 (JP) - the "other" and config menus.  ADV only.
- *   0x80074870 ConfigMenuStep   0x80074954 ConfigMenuOpen
- *   0x80074A30 MenuOtherStep    0x80074B84 ConfigListStep
- *   0x800754B4 ConfigOptionStep 0x800755BC ConfigPadStep
+/* Persona 1 (JP) - the "other" and config menus.  DNG only.
+ * DNG's copy of src/adv/ui/configmenu.c.
+ *   0x800834B0 ConfigMenuStep   0x80083594 ConfigMenuOpen
+ *   0x80083670 MenuOtherStep    0x800837BC ConfigListStep
+ *   0x800840C0 ConfigOptionStep 0x800841B0 ConfigPadStep
  *
  * The top menu's last command opens a short list: the field map (when there
  * is one), the persona data screen, and the config pages. The config pages
  * run as steps of their own.
  */
+#define SLOT_SETPOS_INT
+#define SLOT_TAGGED_INTXY
+#define TILEMAP_INT_COUNT
+#define PERSONAPAGE_DNG
 #include <decomp/types.h>
 #include <decomp/include_asm.h>
 #include <libgte.h>
@@ -34,18 +39,19 @@ extern u_short D_80100066;
 extern void DrawStatusHud(void);
 extern void PersonaDataScreen(void);
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
-extern void PadDrawLayout(u_char layout);
+/* Both take the layout unmasked in DNG. */
+extern void PadDrawLayout(int layout);
 extern void PadLoadBindings(u_char config);
 extern void PadSetPageButtons(u_char config);
 extern void DrawPlaceLabel(short in_battle);
-extern void func_8008FC78(u_char n);
+extern void func_80093D18(int n);
 extern void ConfigStepTactics(void);
 extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
-extern void func_800768F0(void);
-extern void func_80077F8C(int a, int b);
-extern void func_8007A62C(int a, int b);
-extern void func_800782A4(int a, int b);
+extern void func_8008546C(void);
+extern void func_80086B08(int a, int b);
+extern void func_800891A8(int a, int b);
+extern void func_80086E20(int a, int b);
 extern void MapScreen(void);
 extern void ConfigPageOpen(void);
 extern void ConfigStepRows(void);
@@ -62,16 +68,15 @@ void ConfigListStep(void);
 extern u_char D_801F2AC6;
 extern u_char g_pad_title[];
 extern u_char g_tactics_title[];
-extern u_char D_800B178C[];
-extern u_char D_800B1D08[];
-extern u_char D_800B2330[];
-extern u_char D_800B2A3C[];
+extern u_char D_8009A4D0[];
+extern u_char D_8009AA4C[];
+extern u_char D_8009B074[];
+extern u_char D_8009B7DC[];
+extern u_char g_fm_prompt_cur_def[];
 extern void   ConfigListBeginEdit(void);
 extern void   ConfigListApplyOption(void);
 extern void   ConfigListPlaceMarkers(void);
 extern void   ConfigRedrawBattlePage(void);
-extern u_char g_fm_prompt_cur_def[];
-extern u_char g_pad_config;
 void ConfigOptionStep(void);
 void ConfigPadStep(void);
 
@@ -111,7 +116,7 @@ void ConfigMenuStep(void)
 
 void ConfigMenuOpen(void)
 {
-    func_800768F0();
+    func_8008546C();
     SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x18, 0, 0);
     g_bg_layer_otz[2] = 0x40;
     g_bg_map0.ncellh = 0x40;
@@ -125,15 +130,15 @@ void ConfigMenuOpen(void)
     g_bg_map2.cellh = 12;
     g_bg_map2.ncellw = MAP_W;
     g_bg_map2.ncellh = 0x20;
-    func_80077F8C(2, 3);
-    func_8007A62C(2, 0x10);
+    func_80086B08(2, 3);
+    func_800891A8(2, 0x10);
 }
 
 void MenuOtherStep(void)
 {
     DrawStatusHud();
     if (MenuStepCursor(&g_menu->unk100)) {
-        func_800782A4(2, 0x10);
+        func_80086E20(2, 0x10);
     }
     if (InputCheckAcceptA(2)) {
         switch (g_menu->unk100.cur) {
@@ -180,7 +185,7 @@ void ConfigListStep(void)
     if (InputCheckAcceptA(1)) {
         switch (g_menu->cfg_list.cur) {
         case 2:
-            func_8008EDBC(0x10);
+            func_80092E5C(0x10);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 9), 0x12, 4, MAP_W);
@@ -188,8 +193,8 @@ void ConfigListStep(void)
             TileMapDrawWindow(AT(g_tilemap0, 4, 0), 0x24, 0xF, MAP_W);
             TileMapDrawBox(AT(g_tilemap0, 5, 1), 0x22, 0xD, MAP_W);
             TileMapWriteRow(g_pad_title, AT(g_tilemap1, 0, 11), 0, 10);
-            TileMapWriteRow(D_800B178C, AT(g_tilemap1, 1, 9), 0, 4);
-            TileMapWriteRow(D_800B178C, AT(g_tilemap1, 1, 17), 0, 4);
+            TileMapWriteRow(D_8009A4D0, AT(g_tilemap1, 1, 9), 0, 4);
+            TileMapWriteRow(D_8009A4D0, AT(g_tilemap1, 1, 17), 0, 4);
             for (i = 0; i < 4; i++) {
                 *AT(g_tilemap1, 6 + i, 0) = 0x434 + i * 2;
                 *AT(g_tilemap1, 6 + i, 1) = 0x435 + i * 2;
@@ -216,7 +221,7 @@ void ConfigListStep(void)
             }
             *AT(g_tilemap1, 1, 14) = 0xC1;
             *AT(g_tilemap1, 1, 22) = 0xC2;
-            MenuListInit(&g_menu->list[1], g_pad_config, 0, 1, 0x1A);
+            MenuListInit(&g_menu->list[1], *g_pad_layout, 0, 1, 0x1A);
             MenuListInit(&g_menu->list[0], 0, 0, 1, 0x14);
             DrawPlaceLabel(g_menu->list[0].cur);
             PadDrawLayout(g_menu->list[0].cur * 2 + g_menu->list[1].cur);
@@ -246,7 +251,7 @@ void ConfigListStep(void)
             g_menu_subsel += 2;
             break;
         case 3:
-            func_8008EDBC(0xF);
+            func_80092E5C(0xF);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 5), 0x1B, 9, MAP_W);
@@ -260,7 +265,7 @@ void ConfigListStep(void)
             TileMapWriteRow(g_tactics_title, AT(g_tilemap1, 0, 1), 0, 10);
             for (i = 0; i < 8; i++) {
                 y = i / 2 + 2;
-                TileMapWriteRow(D_800B178C,
+                TileMapWriteRow(D_8009A4D0,
                                 &MAP2D(g_tilemap1)[y][i % 2 * 11 + 4], 0, 4);
                 FormatDecimal(i + 1, g_hud_digits, 1);
                 TileMapWriteRowRev(g_hud_digits,
@@ -271,19 +276,19 @@ void ConfigListStep(void)
             MenuListInit(&g_menu->list[0], *tactics >> 1, 0, 3, 0x16);
             MenuListInit(&g_menu->list[1], *tactics & 1, 0, 1, 0x1A);
             SlotClearAll();
-            SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
-            SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+            SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0x18, 0x18);
+            SlotInitTagged(D_8009B074, 0x2D, 0x2FF, 0, 0x10);
             SlotSetAnim(0x2D, 0, 0, 0, 0, 0x24, 0, 0);
             SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0, 0);
             SlotSetPos(1, 0x42, g_menu->list[1].cur * 88 + 0x50,
                        g_menu->list[0].cur * 12 + 0x3C);
             SlotSetFlicker(1, 1);
-            SlotInitTagged(D_800B2A3C, 2, 8, 0x14, 0x96);
+            SlotInitTagged(D_8009B7DC, 2, 8, 0x14, 0x96);
             for (i = 0; i < 8; i++) {
                 g_cinema_cels0.h = 0x38;
             }
             g_cinema_cels6.h = 0x38;
-            func_8008FC78(D_801F2AC6);
+            func_80093D18(D_801F2AC6);
             g_menu_subsel++;
             break;
         case 4:
@@ -302,7 +307,7 @@ void ConfigOptionStep(void)
     if (MenuStepCursor(&g_menu->list[0]) || MenuStepCursor(&g_menu->list[1])) {
         SlotSetPos(1, 0x42, g_menu->list[1].cur * 88 + 0x50,
                    g_menu->list[0].cur * 12 + 0x3C);
-        func_8008FC78(g_menu->list[1].cur + g_menu->list[0].cur * 2);
+        func_80093D18(g_menu->list[1].cur + g_menu->list[0].cur * 2);
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         ConfigPageOpen();

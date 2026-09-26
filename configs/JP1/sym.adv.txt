@@ -433,7 +433,7 @@ FormationLoadPrompt      = 0x800746C0; // type:func size:0x1B0
 ConfigMenuStep           = 0x80074870; // type:func size:0xE4
 ConfigMenuOpen           = 0x80074954; // type:func size:0xDC
 MenuOtherStep            = 0x80074A30; // type:func size:0x154
-func_80074B84            = 0x80074B84; // type:func size:0x930
+ConfigListStep           = 0x80074B84; // type:func size:0x930
 ConfigOptionStep         = 0x800754B4; // type:func size:0x108
 ConfigPadStep            = 0x800755BC; // type:func size:0x1F8
 
@@ -1635,6 +1635,8 @@ D_800B89A4               = 0x800B89A4; // type:u32 size:0x8FC
 g_status_names           = 0x800B89C8; // size:0xB8
 g_status_labels          = 0x800B8A84;
 str_cfg_message_speed    = 0x800B8AF0;
+g_tactics_title          = 0x800B8AFC;
+g_pad_title              = 0x800B8B18;
 str_cfg_battle           = 0x800B8B30;
 str_cfg_auto_battle      = 0x800B8B38;
 str_cfg_speeds           = 0x800B8B94;

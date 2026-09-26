@@ -533,11 +533,11 @@ FormationSavePrompt      = 0x80082DDC; // type:func size:0x1A8
 FormationLoadPick        = 0x80082F84; // type:func size:0x38C
 FormationLoadPrompt      = 0x80083310; // type:func size:0x1A0
 ConfigMenuStep           = 0x800834B0; // type:func size:0xE4
-func_80083594            = 0x80083594; // type:func size:0xDC
-func_80083670            = 0x80083670; // type:func size:0x14C
-func_800837BC            = 0x800837BC; // type:func size:0x904
-func_800840C0            = 0x800840C0; // type:func size:0xF0
-func_800841B0            = 0x800841B0; // type:func size:0x1E8
+ConfigMenuOpen           = 0x80083594; // type:func size:0xDC
+MenuOtherStep            = 0x80083670; // type:func size:0x14C
+ConfigListStep           = 0x800837BC; // type:func size:0x904
+ConfigOptionStep         = 0x800840C0; // type:func size:0xF0
+ConfigPadStep            = 0x800841B0; // type:func size:0x1E8
 
 //-----------------------------------------------------------------------
 //--- PA: 0x01FFF8   VA: 0x80084398   subsegment: c, common/ui/placelabel
@@ -547,11 +547,11 @@ DrawPlaceLabel           = 0x80084398; // type:func size:0x98
 //-------------------------------------------------------------
 //--- PA: 0x020090   VA: 0x80084430   subsegment: asm, dng_2_s3
 //-------------------------------------------------------------
-func_80084430            = 0x80084430; // type:func size:0x36C
-func_8008479C            = 0x8008479C; // type:func size:0x1BC
-func_80084958            = 0x80084958; // type:func size:0xD4
-func_80084A2C            = 0x80084A2C; // type:func size:0x7C
-func_80084AA8            = 0x80084AA8; // type:func size:0x1A4
+ConfigStepRows           = 0x80084430; // type:func size:0x36C
+ConfigStepTactics        = 0x8008479C; // type:func size:0x1BC
+ConfigStepChoice         = 0x80084958; // type:func size:0xD4
+ConfigCloseChoice        = 0x80084A2C; // type:func size:0x7C
+ConfigPageOpen           = 0x80084AA8; // type:func size:0x1A4
 
 //-----------------------------------------------------------------------
 //--- PA: 0x0208AC   VA: 0x80084C4C   subsegment: c, common/ui/configlist
@@ -816,7 +816,7 @@ ConfigDrawLabels         = 0x8008FE44; // type:func size:0x104
 //--------------------------------------------------------------
 //--- PA: 0x02BBA8   VA: 0x8008FF48   subsegment: asm, dng_2_s16
 //--------------------------------------------------------------
-func_8008FF48            = 0x8008FF48; // type:func size:0x130
+PadDrawLayout            = 0x8008FF48; // type:func size:0x130
 D_80090078               = 0x80090078; // type:func size:0x1A8
 
 //------------------------------------------------------------------------
@@ -1162,6 +1162,8 @@ g_fm_hint2_def           = 0x8009B09C;
 g_persona_list_rule      = 0x8009B1D0;
 g_fm_grid_cur_def        = 0x8009B40C;
 g_grow_slot_def          = 0x8009B704;
+g_cinema_cels0           = 0x8009B714; // size:0x48
+g_cinema_cels6           = 0x8009B75C; // size:0x10
 g_bg_map0                = 0x8009B850; // size:0x10
 g_bg_map1                = 0x8009B860; // size:0x10
 g_bg_map2                = 0x8009B870; // size:0x10
@@ -1170,6 +1172,8 @@ g_panel_map              = 0x8009B8A0; // size:0x10
 g_bg_layers              = 0x8009B8B0; // size:0xD8
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
+g_tactics_title          = 0x8009C02C;
+g_pad_title              = 0x8009C048;
 g_config_labels_left     = 0x8009C124;
 g_config_labels_right    = 0x8009C154;
 g_pdata_bottom_def       = 0x8009C6E4;

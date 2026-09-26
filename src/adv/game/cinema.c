@@ -16,6 +16,7 @@
 #include <libgs.h>
 #include <persona/common/bg.h>
 #include <persona/common/slot.h>
+#include <persona/common/cel.h>
 
 #define CINEMA_SLOT  0x2F
 #define CINEMA_LAYER 0x10   /* the g_bg_shown bit the message layer takes */
@@ -27,13 +28,6 @@ typedef struct {
     /* 0x08 */ int    flag;
 } SlotPart;                     /* 0xC bytes, closed by -1 */
 
-/* The head of a cel list; the cels follow it, eight bytes each. */
-typedef struct {
-    /* 0x00 */ u_char  count;
-    /* 0x01 */ u_char  unk1;
-    /* 0x02 */ u_short attr;
-    /* 0x04 */ u_short w, h;
-} CelHead;
 
 typedef struct {
     /* 0x00 */ CelHead head;
@@ -42,8 +36,6 @@ typedef struct {
 } CelList1;
 
 extern SlotPart g_cinema_parts[];
-extern CelHead  g_cinema_cels0, g_cinema_cels1, g_cinema_cels3,
-                g_cinema_cels4, g_cinema_cels5, g_cinema_cels6;
 extern CelList1 g_cinema_cels2, g_cinema_cels_spare;
 extern int      g_actor_dim;
 
