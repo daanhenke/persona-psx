@@ -24,6 +24,8 @@
 #include <persona/common/persona.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
+#include <persona/btlp/sound.h>
+#include <persona/btlp/message.h>
 
 /* The stages, which are also the gifts in the order they are tried. */
 #define GIFT_ROLL  1  /* pick which one this demon leaves      */
@@ -93,7 +95,6 @@
 #define CD_IDLE (-1)
 
 extern volatile int  g_cd_busy;
-extern u_char        g_btl_banks[];
 extern const short   g_btl_gift_odds[][GIFT_KINDS];
 extern const u_char g_btl_talk_item_gift_script[];
 extern const u_char *g_btl_talk_money_script;
@@ -106,7 +107,6 @@ extern int   BtlRollDrop(void);
 extern int   BtlRollUncommon(void);
 extern int   BtlRollCommon(void);
 extern int   BtlRoundMoney(int amount);
-extern void  BtlSetInsert(int slot, u_long value);
 extern void  BtlLoadPackEntry(int entry);
 extern void  BtlBgmOpen(void);
 extern void  SsVabTransCompleted(long immediate);
@@ -114,7 +114,6 @@ extern void  BtlSePlay(int slot, int seq);
 /* This unit declares both of these itself: its BtlSoundOpen takes the
    banks as a u_char array and the key as a byte, which is not the
    prototype sound.h carries. */
-extern void  BtlSoundOpen(u_char *banks, int slot, u_char key);
 extern void  BtlSoundClose(int slot);
 
 /* 99.78%. What moved it from 89.31%: the rewards are built in steps on their
@@ -194,7 +193,7 @@ void BtlTalkSceneGift(void)
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
             BtlSetInsert(INSERT_ITEM,
-                         (u_long)g_item_defs[item & 0xFFFF].name);
+                         g_item_defs[item & 0xFFFF].name);
             BtlSeqPlay(g_btl_talk_gift_script);
             BtlSeqWaitDone();
             return;
@@ -228,7 +227,7 @@ void BtlTalkSceneGift(void)
             if (G_MONEY > MONEY_CAP) {
                 G_MONEY = MONEY_CAP;
             }
-            BtlSetInsert(INSERT_AMOUNT, gain);
+            BtlSetInsert(INSERT_AMOUNT, (const u_char *)gain);
             g_btl_talk_depth--;
             g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
             g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
@@ -253,7 +252,7 @@ void BtlTalkSceneGift(void)
             amount = amount / REWARD_UNIT;
             amount = amount + 1;
             g_btl_actors[g_btl_actor_slot].unk74 += amount;
-            BtlSetInsert(INSERT_AMOUNT, amount);
+            BtlSetInsert(INSERT_AMOUNT, (const u_char *)amount);
             BtlSeqPlay(g_btl_talk_exp_script);
             while (BtlSeqState() != 0) {
                 BtlDrawFrame();
@@ -264,7 +263,7 @@ void BtlTalkSceneGift(void)
     case GIFT_HEAL:
         g_btl_talk_stage[g_btl_talk_depth - 1] = GIFT_BLESS;
         BtlSetInsert(INSERT_ITEM,
-                     (u_long)g_item_defs[GIFT_CHARM_ITEM].name);
+                     g_item_defs[GIFT_CHARM_ITEM].name);
         gain = rand();
         slot = g_btl_actor_slot;
         i = g_btl_actors[slot].stat[4]
@@ -296,7 +295,7 @@ void BtlTalkSceneGift(void)
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_NONE;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_FREE;
         amount = rand() % BLESS_MAX;
-        BtlSetInsert(INSERT_AMOUNT, amount);
+        BtlSetInsert(INSERT_AMOUNT, (const u_char *)amount);
         g_btl_talk_scene[g_btl_talk_depth] = TALK_SCENE_SAY;
         g_btl_talk_stage[g_btl_talk_depth] = TALK_STAGE_RUN;
         g_btl_talk_depth++;
@@ -322,7 +321,7 @@ void BtlTalkSceneGift(void)
         amount = g_persona_data[
                      g_btl_offer[g_btl_offer_slot].persona].level + 1;
         amount += gain % HEAL_SPREAD;
-        BtlSetInsert(INSERT_AMOUNT, amount);
+        BtlSetInsert(INSERT_AMOUNT, (const u_char *)amount);
         slot = g_btl_actor_slot;
         hp = g_btl_actors[slot].c.hp - amount;
         g_btl_actors[slot].c.hp = hp;

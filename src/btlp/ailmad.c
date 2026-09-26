@@ -72,7 +72,13 @@
    register, where this works it out at the label and has to carry the slot
    into a saved register to get it there. Passing the sum in a local of its own
    does put the two in step, and costs the arm above it the exit it shares with
-   every other giving-up path. */
+   every other giving-up path.
+   2026-09-26: the image's side arm adds five to BtlSlowestOrder's result in
+   v0 itself (no n), and the other arm's own order store is cross-jumped into
+   the side arm's, which falls into the shared call. Written that way (order
+   stored in both arms, the label after the store) the merge is the image's,
+   but the other arm's leftover [addiu; j] keeps its own delay slot here where
+   reorg folds it into the branch in the image (96.82%). */
 #ifdef NON_MATCHING
 void BtlAilmentTurnMad(BtlActor *a, u_char *act)
 {

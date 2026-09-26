@@ -30,6 +30,11 @@
 #include <persona/btlp/battle.h>
 #include <persona/btlp/talk.h>
 #include <persona/btlp/demand.h>
+#include <persona/btlp/face.h>
+#include <persona/btlp/panel.h>
+#include <persona/btlp/sound.h>
+#include <persona/btlp/message.h>
+#include <persona/btlp/menu.h>
 
 /* The four things it can ask for. */
 #define DEMAND_MONEY 0
@@ -74,8 +79,6 @@ extern int g_btl_menu_aside;
 #define g_money (*(int*)0x801F2674)
 
 extern int  BtlRoundMoney(int sum);
-extern void BtlSetInsert(int which, const void* what);
-extern void BtlMenuOpen2(const u_char* menu);
 extern void BtlMenuAsideToggle(void);
 extern int  BtlMenuChoice(void);
 extern int  BtlMenuState(void);
@@ -83,16 +86,13 @@ extern void BtlMenuUpdate(void);
 extern void BtlMenuDismiss(void);
 extern void BtlTalkUpdate(void);
 extern void BtlFaceLoad(int face, int slot);
-extern void BtlFaceOpen(int x, int y, int scale);
 extern void BtlIndicatorIcon(void);
 extern void BtlTalkTakeLine(short i, short kind, short gauge, short weight,
                             short item);
 extern void BtlHighlightBegin(int gauge);
-extern void BtlQueueVoice(int gauge, int which);
 extern void BtlTalkPerform(void);
 extern void BtlRefreshMoodGauges(void);
 extern int  BtlOfferRank(int slot);
-extern void BtlPanelSetImage(int on, u_char image);
 extern void BtlPushRecent(int gauge);
 
 /* The scene's own tables live at a per-scene offset the scratch header holds. */
@@ -194,7 +194,7 @@ void BtlTalkSceneDemand(void)
                 case DEMAND_BLOOD:
                     break;
                 case DEMAND_MONEY:
-                    BtlSetInsert(0, (const void*)g_btl_demand_money);
+                    BtlSetInsert(0, (const u_char *)g_btl_demand_money);
                     break;
                 case DEMAND_ITEM:
                     n                 = rand();
@@ -218,7 +218,7 @@ void BtlTalkSceneDemand(void)
             }
             /* Two menus per party member: the plain one, and the one that
                asks for blood eight bytes on. */
-            BtlMenuOpen2((const u_char*)&g_btl_demand_menus[i]);
+            BtlMenuOpen2(&g_btl_demand_menus[i]);
             BtlFaceLoad(g_btl_actors[g_btl_actor_slot].c.key, 0);
             BtlFaceOpen(0x3C, 0x70, 0x1000);
             BtlIndicatorIcon();

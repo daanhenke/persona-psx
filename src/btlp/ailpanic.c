@@ -41,21 +41,20 @@
    under way. */
 #define PANIC_FRAMES 20
 
-/* 96.90%. Three things took it there from 94.54%, each read off the image's
-   registers:
+/* 98.16%. Read off the image's registers:
      - one variable, n, is the roll, the slot a pick answers and the order
        worked out from the slowest enemy, as the image keeps all three in a2;
      - the enemy side's 1 << slot shifts a variable set to 1 before its roll,
        which the image keeps in s0 across rand;
-     - the 0xFF the free cell is compared against and the old cell is cleared
-       with is a variable assigned inside the loop, after the cell's address:
-       the image hoists it into fp after the loop's divisor constant.
-   What is left is placement: the image loads g_btl_formation's address in
-   the middle of the second roll's division, and the division by twenty after
-   the loop reuses the divisor constant the loop hoisted, where gcc here loads
-   the address after the index and the constant again. Writing the address as
-   a sum in any order, and the loop as while (1) with a continue or a break,
-   all compile the same. */
+     - the move's success path is inside its loop and leaves by `return`, so
+       loop.c lifts and merges its constants with the loop's own: the divide
+       by twenty after the pick reuses the divide by five's magic (s3), and one
+       0xFF (fp) serves the free-cell test and the old cell's clearing.
+   What is left: the image loads g_btl_formation's address in the middle of
+   the second roll's division, where gcc here loads it after the index; and
+   the enemy switch's `n == 1` compares against that s0 in the image, where
+   gcc here puts 1 in v0 (cse cannot see s0's 1 past the join of the two
+   rolls). */
 #ifdef NON_MATCHING
 void BtlAilmentTurnPanic(BtlActor *a, u_char *act)
 {
@@ -129,23 +128,24 @@ void BtlAilmentTurnPanic(BtlActor *a, u_char *act)
                     break;
                 }
             }
-            do {
+            for (;;) {
                 col = rand() % GRID_W;
                 row = rand() % GRID_H;
                 cell = &g_btl_formation[row * GRID_W + col];
-                empty = CELL_EMPTY;
-            } while (*cell != empty || BtlFormationCellFree(col, row) == 0);
-            a->obj->steps = PANIC_FRAMES;
-            a->obj->step_x = ((col * PLACE_COL_W + PLACE_COL_ORG) * PLACE_FIXED
-                              - a->obj->x) / PANIC_FRAMES;
-            a->obj->step_y = ((row * PLACE_ROW_H + PLACE_ROW_ORG) * PLACE_FIXED
-                              - a->obj->y) / PANIC_FRAMES;
-            a->obj->col2 = col * 2;
-            a->obj->row = row;
-            g_btl_formation[from] = empty;
-            *cell = a->obj->mark_num;
-            *act = AIL_ACT_MOVED;
-            return;
+                if (*cell == CELL_EMPTY && BtlFormationCellFree(col, row) != 0) {
+                    a->obj->steps = PANIC_FRAMES;
+                    a->obj->step_x = ((col * PLACE_COL_W + PLACE_COL_ORG) * PLACE_FIXED
+                                      - a->obj->x) / PANIC_FRAMES;
+                    a->obj->step_y = ((row * PLACE_ROW_H + PLACE_ROW_ORG) * PLACE_FIXED
+                                      - a->obj->y) / PANIC_FRAMES;
+                    a->obj->col2 = col * 2;
+                    a->obj->row = row;
+                    g_btl_formation[from] = CELL_EMPTY;
+                    *cell = a->obj->mark_num;
+                    *act = AIL_ACT_MOVED;
+                    return;
+                }
+            }
         case 4:
             *act = AIL_ACT_NONE;
             return;

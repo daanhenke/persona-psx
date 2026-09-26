@@ -25,6 +25,7 @@
 #include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/battle.h>
+#include <persona/btlp/formation.h>
 
 /* Nine enemy slots to an encounter, two bytes a slot. */
 #define BTL_ENEMY_SLOTS 9
@@ -64,14 +65,12 @@ extern u_char    g_btl_encounters[];
 extern u_short   g_btl_enemy_gfx_offsets[];
 extern int       g_btl_enemy_gfx_base;
 extern u_char   *g_btl_enemy_gfx_start;
-extern volatile int g_cd_busy;
 
 extern short   BtlLoadEnemyGfx(int species, int slot, u_long *tim,
                                u_char *image, int bytes);
 extern BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx,
                              int depth);
 extern BtlObj *BtlSpawnActorObj(int model, const long *pos);
-extern void    BtlPlaceMember(int member, int col, int row);
 extern void    BtlSpawnFixedEnemies(void);
 extern int     BtlResetTalk(int open);
 
