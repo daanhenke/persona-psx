@@ -133,14 +133,14 @@ BtlObj *BtlFxStart42(void)
     return n;
 }
 
-/* 98.84%. Two instructions in the miss are the other way round: the image
-   loads the record's attribute and then the hidden bit, this loads the bit
-   first, a word ahead of the message's second argument. The or written out
-   in full either way round, and the two tests folded into one if, leave it
-   where it is. 0x42's hp written ahead of its status is what lets 0x6B share
-   the tail from the ailment's level on, the way the image has it; the other
-   two cases want theirs the other way. */
-#ifdef NON_MATCHING
+/* The miss is written out for each of the two moves that can miss.
+   Cross-jumping folds the second copy into the first after scheduling, so
+   the image shows one; before it, the copies mean the message's argument
+   registers are set twice in the routine, and sched1 only pulls a register
+   set once down to its use - which is why the image sets them ahead of the
+   attribute's read. 0x42's hp written ahead of its status is what lets 0x6B
+   share the tail from the ailment's level on, the way the image has it; the
+   other two cases want theirs the other way. */
 void BtlFxStep42(BtlObj *o)
 {
     BtlObj   *t;
@@ -153,8 +153,17 @@ void BtlFxStep42(BtlObj *o)
         if (o->timer != 0) {
             break;
         }
-        if (g_btl_fx_move == FX_42_SOME
-            || (g_btl_fx_move == FX_42_ALL && g_btl_act_kind == 0)) {
+        if (g_btl_fx_move == FX_42_SOME) {
+            if ((rand() & FX_42_MISS_ROLL) == 0) {
+                o->attr |= BTL_OBJ_HIDDEN;
+                BtlOpenMessage(FX_42_MSG_FLAGS, FX_42_MSG_STYLE,
+                               g_btl_msg_revive_failed, FX_42_MSG_X,
+                               FX_42_MSG_Y);
+                o->timer = FX_42_MSG_TIME;
+                g_btl_msg_timer = FX_42_MSG_TIME;
+                o->phase = FX_42_MISSED;
+            }
+        } else if (g_btl_fx_move == FX_42_ALL && g_btl_act_kind == 0) {
             if ((rand() & FX_42_MISS_ROLL) == 0) {
                 o->attr |= BTL_OBJ_HIDDEN;
                 BtlOpenMessage(FX_42_MSG_FLAGS, FX_42_MSG_STYLE,
@@ -257,6 +266,3 @@ void BtlFxStep42(BtlObj *o)
         break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell42", BtlFxStep42);
-#endif
