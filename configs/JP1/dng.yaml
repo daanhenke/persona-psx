@@ -263,7 +263,7 @@ segments:
       - [0x2EC6C, c, common/gfx/cells]
       - [0x2EC9C, asm, dng_2_s20_x1]
       - [0x2EDE8, c, common/gfx/cellsrow]
-      - [0x2EEA8, asm, dng_2_s20_x2]
+      - [0x2EEA8, c, common/ui/statuspages]
       - [0x2F818, c, common/ui/itemname]
       - [0x2FA48, c, common/game/charrecalc]
       - [0x2FCF4, c, common/game/charstats]

@@ -1,6 +1,13 @@
-/* Persona 1 (JP) - the status screen's pages.  ADV only.
- *   ADV 0x8008F1A8 StatusDrawMember  0x8008F848 StatusDrawName
- *       0x8008F8C0 StatusDrawPersona
+/* Persona 1 (JP) - the status screen's pages.
+ *
+ * Compiled into two overlays rather than called across the boundary:
+ *                        ADV         DNG
+ *   StatusDrawMember     0x8008F1A8  0x80093248
+ *   StatusDrawName       0x8008F848  0x800938E8
+ *   StatusDrawPersona    0x8008F8C0  0x80093960
+ *
+ * DNG's copy was built against TILEMAP_INT_COUNT: FormatDecimal's count goes
+ * to TileMapWriteRowRev unnarrowed.
  *
  * The member page: name, level and ailment on the top rows, then hp and sp
  * each over its maximum, three experience figures, the seven things equipped,

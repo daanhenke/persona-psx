@@ -989,7 +989,9 @@ CellsWriteRow            = 0x80093188; // type:func size:0xC0
 //-----------------------------------------------------------------
 //--- PA: 0x02EEA8   VA: 0x80093248   subsegment: asm, dng_2_s20_x2
 //-----------------------------------------------------------------
-D_80093248               = 0x80093248; // type:func size:0x970
+StatusDrawMember         = 0x80093248; // type:func size:0x6A0
+StatusDrawName           = 0x800938E8; // type:func size:0x78
+StatusDrawPersona        = 0x80093960; // type:func size:0x258
 DrawItemName             = 0x80093BB8; // type:func size:0x64
 DrawBagItemRow           = 0x80093C1C; // type:func size:0xFC
 TacticsSetCels           = 0x80093D18; // type:func size:0xD0
@@ -1195,6 +1197,7 @@ g_menu_layers            = 0x8009B98C;
 g_formation_marker_def   = 0x8009BEA8;
 g_pad_binding_table      = 0x8009BEBC;
 g_status_names           = 0x8009BEF8; // size:0x88
+g_status_labels          = 0x8009BFB4;
 str_cfg_message_speed    = 0x8009C020;
 g_tactics_title          = 0x8009C02C;
 g_pad_title              = 0x8009C048;
