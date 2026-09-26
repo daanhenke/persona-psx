@@ -327,7 +327,7 @@ SlotSetAnim              = 0x80075CB8; // type:func size:0x80
 //--------------------------------------------------------------
 //--- PA: 0x011998   VA: 0x80075D38   subsegment: asm, dng_s2_x2
 //--------------------------------------------------------------
-D_80075D38               = 0x80075D38; // type:func size:0x50
+SoundRestartSeq          = 0x80075D38; // type:func size:0x50
 SoundPlaySeq             = 0x80075D88; // type:func size:0xB0
 SoundOpenSeq             = 0x80075E38; // type:func size:0x6C
 
@@ -1345,6 +1345,7 @@ D_80180010               = 0x80180010; // ignore:True
 D_80180014               = 0x80180014; // ignore:True
 D_80180018               = 0x80180018; // ignore:True
 D_8018001C               = 0x8018001C; // ignore:True
+D_80180020               = 0x80180020; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
 D_801F15A0               = 0x801F15A0; // ignore:True
 D_801F15A4               = 0x801F15A4; // ignore:True

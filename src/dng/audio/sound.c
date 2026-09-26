@@ -1,14 +1,12 @@
-/* Persona 1 (JP) - sequence playback wrappers.
- *   ADV 0x800662FC SoundPlaySeq, 0x800663B0 SoundOpenSeq
+/* Persona 1 (JP) - sequence playback wrappers.  DNG only.
+ *   0x80075D38 SoundRestartSeq  0x80075D88 SoundPlaySeq
+ *   0x80075E38 SoundOpenSeq
  *
- * DNG (src/dng/audio/sound.c) and S2D (0x80065DEC) carry their own copies
- * against their own work areas.
- *
- * The sound data is one blob loaded at 0x80118000 whose first words are an
- * offset table, so a sequence's data is at 0x80118000 + g_seq_offset[seq].
+ * The field's copy of ADV's wrappers (src/adv/audio/sound.c). The sound data
+ * is one blob the preload leaves at 0x80180000 whose first words are an
+ * offset table, so a sequence's data is at 0x80180000 + g_seq_offset[seq].
  * Handles come back from SsSeqOpen and are parked in g_seq_handle, indexed by
- * a caller-chosen slot so several sequences can be in flight at once. The
- * fade-out that shares this source is a unit of its own, in soundfade.c.
+ * a caller-chosen slot so several sequences can be in flight at once.
  */
 #include <decomp/types.h>
 
@@ -16,14 +14,22 @@ extern void  SsSetNck(short seq);
 extern short SsSeqOpen(u_long *addr, short vabid);
 extern void  SsSeqSetVol(short seq, short voll, short volr);
 extern void  SsSeqPlay(short seq, short mode, short loop);
-extern void  SsSeqSetDecrescendo(short seq, short vol, short time);
-extern void  AdvRunFrame(void);
+extern void  SsSeqStop(short seq);
 
 /* All reached by hardcoded address rather than through a linker symbol. */
 #define g_seq_handle ((short *)0x801F537C)   /* one open handle per slot */
 #define g_vab_id     ((short *)0x801F535C)   /* VAB ids, by bank         */
-#define g_seq_offset ((u_long *)0x80118020)  /* offsets into the blob    */
-#define SEQ_DATA     0x80118000
+#define g_seq_offset ((u_long *)0x80180020)  /* offsets into the blob    */
+#define SEQ_DATA     0x80180000
+
+/* Stops the sequence in `slot` and starts it again from the top, looping. */
+void SoundRestartSeq(u_short slot)
+{
+    short *handle = &g_seq_handle[slot];
+
+    SsSeqStop(*handle);
+    SsSeqPlay(*handle, 1, 1);
+}
 
 /* Replaces whatever is in `slot` and starts the new sequence looping at full
    volume (0x7F on both channels). SsSetNck on the outgoing handle stops the
