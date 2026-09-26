@@ -725,8 +725,8 @@ EventFlagGet2            = 0x8008BF50; // type:func size:0x38
 //--- PA: 0x027BE8   VA: 0x8008BF88   subsegment: asm, dng_2_s11_x1
 //-----------------------------------------------------------------
 EquipScreen              = 0x8008BF88; // type:func size:0x63C
-func_8008C5C4            = 0x8008C5C4; // type:func size:0x7A4
-func_8008CD68            = 0x8008CD68; // type:func size:0x748
+EquipStepMain            = 0x8008C5C4; // type:func size:0x7A4
+EquipStepList            = 0x8008CD68; // type:func size:0x748
 EquipStepRemove          = 0x8008D4B0; // type:func size:0x314
 EquipStepOptimise        = 0x8008D7C4; // type:func size:0x318
 EquipShowCursor          = 0x8008DADC; // type:func size:0x1C8
