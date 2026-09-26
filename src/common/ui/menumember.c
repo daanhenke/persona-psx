@@ -9,7 +9,6 @@
  * to tell which way the step went.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/common/menuctx.h>
 
 /* S2D reads its own held-buttons word, at its own name. */
@@ -24,10 +23,9 @@ extern void SoundPlaySeq(int seq, int a, int b);
 #define PAD_LEFT   0x8000
 #define MOVE_SEQ   0x18
 
-/* Not matching in any overlay yet: gcc puts the narrowing of `last` in the
-   branch's delay slot *and* keeps a copy after it, where the original only has
-   the one. Every overlay takes it from asm meanwhile. */
-#ifdef NON_MATCHING
+/* The third portrait's horizontal step tests Left first and leaves early
+   when it is up: written that way the narrowing of `last` sits ahead of the
+   branch and serves both the store and the compare, as in the original. */
 short MenuStepMember(int *sel, u_char last)
 {
     short  moved;
@@ -80,14 +78,14 @@ short MenuStepMember(int *sel, u_char last)
             *sel = 0;
             break;
         case 2:
-            if (g_pad_held[0] & PAD_LEFT) {
-                *sel = last;
+            if (!(g_pad_held[0] & PAD_LEFT)) {
+                if (last < 3) {
+                    return moved;
+                }
+                *sel = 3;
                 break;
             }
-            if (last < 3) {
-                return moved;
-            }
-            *sel = 3;
+            *sel = last;
             break;
         case 3:
             if (g_pad_held[0] & PAD_LEFT) {
@@ -112,4 +110,3 @@ short MenuStepMember(int *sel, u_char last)
     }
     return moved;
 }
-#endif

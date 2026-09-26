@@ -65,6 +65,8 @@ segments:
       # so the asm rodata after it begins at 0x170, not in the padding.
       - [0x164, .rodata, common/ui/partyhud]
       - [0x170, rodata, adv_rodata1]
+      - [0x174, .rodata, common/ui/menumember]
+      - [0x188, rodata, adv_rodata1a]
       - [0x1E0, .rodata, audio/silencebgm]
       - [0x1FC, rodata, adv_rodata2]
       - [0x200, .rodata, game/scenefind]
