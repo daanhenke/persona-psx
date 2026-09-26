@@ -133,7 +133,7 @@ void FormationMenuOpen(void)
     u_char *grid = g_formation;
     u_char  i;
 
-    func_8008EDBC(0);
+    MenuSetLayers(0);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);

@@ -145,7 +145,7 @@ void StatusPersonaLayout(void)
 {
     int i;   /* the row, then the page's scroll stop */
 
-    func_8008EDBC(9);
+    MenuSetLayers(9);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 1, 0), 0x1E, 0x24, MAP_W);
@@ -516,7 +516,7 @@ void StatusStockView(void)
 
     if ((g_cam_y == 0 || g_cam_y == PAGE_LOW) &&
         (InputCheckAcceptB(1) || g_menu_allow_hold)) {
-        func_8008EDBC(0xA);
+        MenuSetLayers(0xA);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);

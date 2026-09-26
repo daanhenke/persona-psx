@@ -60,7 +60,7 @@ void FormationCmdStep(void)
             SlotSetFlicker(MARK_SLOT, 1);
             g_menu_subsel++;
         } else {
-            func_8008EDBC(0x12);
+            MenuSetLayers(0x12);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(g_tilemap0, 0xE, 0xC, MAP_W);

@@ -289,7 +289,7 @@ void FuseItemsOpen(void)
     short n;
 
     n = D_800BB7F4 * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
-    func_8008EDBC(0x1B);
+    MenuSetLayers(0x1B);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

@@ -428,7 +428,7 @@ void FusePairsOpen(void)
     int i;
     int id;
 
-    func_8008EDBC(0x1F);
+    MenuSetLayers(0x1F);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

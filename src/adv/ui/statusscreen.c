@@ -73,7 +73,7 @@ extern void  BgMapInit(void *script, short speed);
 
 void MenuStatusOpen(void)
 {
-    func_8008EDBC(0);
+    MenuSetLayers(0);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -121,7 +121,7 @@ void MenuStatusSelect(void)
         g_face_clut_fix = FACE_CLUT_FIX;
         TimQueueAt(PORTRAIT_TIM, 0x140, 0x168, 0, 0x1E6);
 
-        func_8008EDBC(1);
+        MenuSetLayers(1);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);

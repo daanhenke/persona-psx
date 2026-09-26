@@ -167,7 +167,7 @@ void StatusTopStep(void)
             g_menu_subsel++;
             break;
         case STATUS_PERSONAS:
-            func_8008EDBC(7);
+            MenuSetLayers(7);
             SlotClearAll();
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);
@@ -241,7 +241,7 @@ short StatusStockOpen(first)
 {
     int i;
 
-    func_8008EDBC(0xA);
+    MenuSetLayers(0xA);
     SlotClearAll();
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
@@ -290,7 +290,7 @@ void SkillMemberPick(void)
                    (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
     }
     if (InputCheckAcceptA(1)) {
-        func_8008EDBC(6);
+        MenuSetLayers(6);
         func_8007AF78();
         func_8007B288(g_menu->skill_member.cur);
         MenuListInit(&g_menu->skill_persona, 0, 0,
@@ -694,7 +694,7 @@ void StatusPageLayout(void)
     int     i;
     u_char *arc;
 
-    func_8008EDBC(8);
+    MenuSetLayers(8);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1E, 0x13, MAP_W);
@@ -753,7 +753,7 @@ void StatusPageStep(void)
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         func_800768F0();
-        func_8008EDBC(7);
+        MenuSetLayers(7);
         SlotClearAll();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapDrawWindow(AT(g_tilemap0, 0, 7), 0x1A, 7, MAP_W);

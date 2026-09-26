@@ -51,7 +51,7 @@ void ShopBuyOpen(void)
     int      k;
 
     row = g_item_top + g_menu->unk100.cur;
-    func_8008EDBC(0x14);
+    MenuSetLayers(0x14);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
@@ -124,7 +124,7 @@ void ShopSellOpen(void)
     short n;
 
     n = D_800BB7F4 * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
-    func_8008EDBC(0x14);
+    MenuSetLayers(0x14);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

@@ -263,7 +263,7 @@ u_char FacilityScreen(u_char id)
         FacilityOpen3();
         goto next;
     case 4:
-        func_8008EDBC(0x16);
+        MenuSetLayers(0x16);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

@@ -53,7 +53,7 @@ void FuseResultsOpen(void)
 {
     int i;
 
-    func_8008EDBC(0x1E);
+    MenuSetLayers(0x1E);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
@@ -102,7 +102,7 @@ void FusionOpen(void)
 {
     int i;
 
-    func_8008EDBC(0x19);
+    MenuSetLayers(0x19);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

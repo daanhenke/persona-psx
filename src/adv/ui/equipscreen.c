@@ -58,7 +58,7 @@ void EquipScreen(short standalone)
         MenuListInit(&g_menu->unk240, 0, 0, 1, 0x1A);
         MenuListInit(&g_menu->unk250, 0, 0, 1, 0x1A);
     }
-    func_8008EDBC(3);
+    MenuSetLayers(3);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);

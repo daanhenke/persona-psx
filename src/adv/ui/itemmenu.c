@@ -125,7 +125,7 @@ void ItemBagOpen(void)
     }
     MsgStep();
     if (InputCheckAcceptA(1)) {
-        func_8008EDBC(5);
+        MenuSetLayers(5);
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
         TileMapDrawWindow(AT(g_tilemap0, 0, 6), 0x1E, 0x11, MAP_W);

@@ -180,7 +180,7 @@ void ConfigListStep(void)
     if (InputCheckAcceptA(1)) {
         switch (g_menu->cfg_list.cur) {
         case 2:
-            func_8008EDBC(0x10);
+            MenuSetLayers(0x10);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 9), 0x12, 4, MAP_W);
@@ -246,7 +246,7 @@ void ConfigListStep(void)
             g_menu_subsel += 2;
             break;
         case 3:
-            func_8008EDBC(0xF);
+            MenuSetLayers(0xF);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(AT(g_tilemap0, 0, 5), 0x1B, 9, MAP_W);

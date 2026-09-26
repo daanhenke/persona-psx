@@ -276,7 +276,7 @@ void ArcanaGridOpen(void)
 {
     int i;   /* the row, then the arcana under the cursor */
 
-    func_8008EDBC(0xB);
+    MenuSetLayers(0xB);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
@@ -475,7 +475,7 @@ void PersonaDataLayout(void)
 {
     int i;   /* the row, then the page's scroll stop */
 
-    func_8008EDBC(9);
+    MenuSetLayers(9);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(AT(g_tilemap0, 1, 0), 0x1E, 0x24, MAP_W);

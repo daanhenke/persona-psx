@@ -303,7 +303,7 @@ void MapScreenLayout(void)
     g_view2_dy = 0;
     g_view2_dx = 0;
     g_menu_allow_hold = 0;
-    func_8008EDBC(0x13);
+    MenuSetLayers(0x13);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0x3DC, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap2, 0x3DC, MAP_W, 0x20, MAP_W);

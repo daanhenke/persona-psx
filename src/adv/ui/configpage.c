@@ -22,7 +22,7 @@ extern void ConfigListPlaceMarkers(void);
 
 void ConfigPageOpen(void)
 {
-    func_8008EDBC(0xE);
+    MenuSetLayers(0xE);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(g_tilemap0, 0x1D, 0xF, MAP_W);

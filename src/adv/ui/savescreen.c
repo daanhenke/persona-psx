@@ -158,7 +158,7 @@ void SaveTopStep(void)
     SlotSetPos(3, 0x23, 0x30, g_menu->unk2E0.cur * 16 + 0x32);
     if (InputCheckAcceptA(1)) {
         if (g_menu->unk2E0.cur != 0) {
-            func_8008EDBC(0x20);
+            MenuSetLayers(0x20);
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapDrawWindow(g_tilemap0, 0x1C, 6, MAP_W);
             TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x1A, 4, MAP_W);
@@ -574,7 +574,7 @@ void SaveScanSlots(short chan)
 
 void SaveSlotsOpen(void)
 {
-    func_8008EDBC(0x21);
+    MenuSetLayers(0x21);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(g_tilemap0, 0x16, 0x10, MAP_W);
@@ -655,7 +655,7 @@ void SaveMessage(short n, short keep)
 
 void SavePortOpen(void)
 {
-    func_8008EDBC(0x20);
+    MenuSetLayers(0x20);
     TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
     TileMapDrawWindow(g_tilemap0, 0x1C, 6, MAP_W);
     TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x1A, 4, MAP_W);
