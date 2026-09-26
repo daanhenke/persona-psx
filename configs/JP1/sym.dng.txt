@@ -104,6 +104,7 @@ bcopy                    = 0x80041328; // type:func
 bzero                    = 0x80041338; // type:func
 rand                     = 0x80041368; // type:func
 g_persona_data           = 0x80041760; // size:0x38
+g_insert8_names          = 0x80044266;
 g_char_templates         = 0x80044278; // size:0x168
 g_item_defs              = 0x800443E0; // size:0x20C
 g_spell_data             = 0x80047D20; // size:0x14
@@ -113,6 +114,7 @@ g_persona_defs           = 0x8004B0A8; // size:0x2C
 g_exp_curve              = 0x8004C204;
 g_exp_curve_alt          = 0x8004C38C;
 g_resist_labels          = 0x8004C824;
+g_msg_scripts            = 0x8004D3EC;
 g_map_base               = 0x8004D83C;
 g_cd_busy                = 0x80055C10;
 g_state_prev             = 0x80055C30;
@@ -363,7 +365,7 @@ BgMapClearRow            = 0x800761FC; // type:func size:0x40
 //--- PA: 0x011E9C   VA: 0x8007623C   subsegment: asm, dng_s4_x1
 //--------------------------------------------------------------
 BgReset                  = 0x8007623C; // type:func size:0x144
-func_80076380            = 0x80076380; // type:func size:0xCE4
+MsgStep                  = 0x80076380; // type:func size:0xCE4
 
 //-----------------------------------------------------------------------
 //--- PA: 0x012CC4   VA: 0x80077064   subsegment: c, common/gfx/bgmapcell
@@ -1136,6 +1138,11 @@ g_msg_cluts              = 0x80099A18;
 g_msg_styles             = 0x80099A28;
 g_flicker_ramp           = 0x80099A44;
 g_pow10                  = 0x80099A64;
+g_bg_clut                = 0x80099A8C; // size:0x80
+g_msg_clut               = 0x80099C74;
+g_msg_blink              = 0x80099C8C;
+g_msg_marks              = 0x80099D18; // size:0x78
+g_msg_choice_cur_def     = 0x80099D90;
 g_pdata_mark_up_def      = 0x80099DB0;
 g_pdata_mark_down_def    = 0x80099DD8;
 g_pdata_arrow_l_def      = 0x80099E00;
@@ -1271,6 +1278,7 @@ g_arcana_scroll_step     = 0x8009FE10; // size:0x2
 g_fog_near               = 0x8009FE14;
 g_model_defs             = 0x8009FE1C;
 g_floor_objs             = 0x8009FE24;
+g_msg_answer             = 0x8009FE28;
 g_floor_info             = 0x8009FE2C;
 g_bgm_off                = 0x8009FE30;
 g_floor_events           = 0x8009FE34;
@@ -1383,6 +1391,8 @@ g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
 g_personas               = 0x801F1DAC; // ignore:True size:0x7C0
 g_party                  = 0x801F256C; // ignore:True size:0x5
 g_money                  = 0x801F2674; // ignore:True size:0x4
+g_money2                 = 0x801F2678; // ignore:True size:0x4
+g_items                  = 0x801F267C; // ignore:True size:0x2A0
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF
 D_801F29A8               = 0x801F29A8; // ignore:True
 g_effect_steps           = 0x801F29A9; // ignore:True size:0x1
