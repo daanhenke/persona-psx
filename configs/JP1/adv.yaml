@@ -54,7 +54,7 @@ segments:
     vram: 0x800643A0
     subsegments:
       - [0x0, rodata, adv_id]
-      - [0x4, rodata, adv_rodata]
+      - [0x4, .rodata, gfx/bgreset]
       - [0x58, .rodata, ui/mainmenu]
       - [0x70, rodata, adv_rodata0a]
       - [0x90, .rodata, ui/statusmenu]

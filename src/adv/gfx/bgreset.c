@@ -190,9 +190,6 @@ static inline short FormatDigits(u_int value, u_char *dst, u_short width)
     return last;
 }
 
-/* 99.62%: case 1 keeps the script pointer in v1 where the original has s2,
-   so its surname hand-off is not cross-jumped with the glyph tail's. */
-#ifdef NON_MATCHING
 int MsgStep(void)
 {
     MsgState *st = g_msg;
@@ -297,7 +294,8 @@ next:
             if (st->flags & MSG_BACKWARD) {
                 st->flags ^= MSG_BACKWARD;
             }
-            s = st->script + 1;
+            s = st->script;
+            s++;
             st->flags = (st->flags & 0xFFFE) ^ MSG_COUNTED;
             goto done;
         }
@@ -475,9 +473,11 @@ next:
         break;
     case 19:
         st->script = s;
-        s = &g_kind_labels[(g_persona_defs[*s].kind - 1) * 10];
-        st->left = 10;
+        /* Read through a non-const view: the const header lets sched hoist
+           the store to left into the load's delay slot. */
+        s = &g_kind_labels[(((PersonaDef *)g_persona_defs)[*s].kind - 1) * 10];
         st->flags |= MSG_SUB | MSG_COUNTED;
+        st->left = 10;
         goto insert;
     }
     goto done;
@@ -530,6 +530,3 @@ done:
 ret:
     return 0;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/gfx/bgreset", MsgStep);
-#endif
