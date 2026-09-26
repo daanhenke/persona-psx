@@ -38,7 +38,7 @@
    apart. */
 #define FX_MARK_OWN 0x20
 
-/* 99.15%: every instruction is the image's; what is left is which saved
+/* 99.32%: every instruction is the image's; what is left is which saved
    register the column counter and the two y positions get. Two things in the
    image are not what gcc makes of a plain pair of for loops: the delay table
    is read through a counter of its own, k, reset from the cell at each row and
@@ -48,7 +48,12 @@
    are real, though: its allocation needs the loop depth that only real loops
    give, and it matched once nothing in them was worth lifting. Here the 9 is
    still lifted out of any real loop - the two tests against it match, which
-   doubles its savings - and that is the part not yet found. */
+   doubles its savings - and that is the part not yet found.
+   Register priorities (lreg): the image wants x, k, col, y_party, cell,
+   y_enemy, after, row. The column test in a do/while (0) doubles col's
+   weight and puts it third; left, y_enemy (5 uses over 76 insns, .132) still
+   outranks cell (5 over 78, .128). Setting y_enemy first fixes that but
+   reorders the prologue; its decrement placed last does not stretch it. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxGrid(int table)
 {
@@ -111,9 +116,11 @@ next_col:
     o->timer = g_btl_fx_grid_order[k] >> 1;
     k--;
     cell--;
-    if (col < FX_GRID_W) {
-        goto next_col;
-    }
+    do {
+        if (col < FX_GRID_W) {
+            goto next_col;
+        }
+    } while (0);
     y_enemy -= FX_GRID_DY;
     row--;
     y_party -= FX_GRID_DY;

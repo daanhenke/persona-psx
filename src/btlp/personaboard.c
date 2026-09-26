@@ -15,25 +15,13 @@
  * The row's first cell is set to the end marker before the name is copied over
  * it, so it is written and then lost every time round. The image does it.
  *
- * BtlOpenPersonaBoard is 97.09% and behind INCLUDE_ASM. The first cell store
- * is written as (cells + 8)[i], so it becomes a walker of its own and the
- * counter for the seven survives, as in the image. The rest of the old note
- * still applies to the two line accesses and the first store's addressing;
- * a sweep of 143 spellings of the four accesses found nothing better.
- * Two things about the loop are:
- *
- *   the image carries four induction variables where this carries two - one per
- *   occurrence of each array rather than one per array - and a counter of its
- *   own for the seven, where gcc folds the bound into the surviving pointer and
- *   tests it against 0x4D. Walking either array with a pointer instead makes it
- *   worse, not better: the base of g_spell_data then lifts into a register and
- *   every access to it costs the fold, taking the routine to 75.99%.
- *
- *   the grey is lifted out of the loop into a saved register, where the image
- *   writes it out afresh in the arm that uses it. That is the hoisting lever in
- *   Matching Nudges, which has already been fought once and not won at source
- *   level - both routines here have one use of the constant, and only ours
- *   lifts it.
+ * BtlOpenPersonaBoard is 98.71% and behind INCLUDE_ASM. The image's four
+ * induction variables - one per occurrence of each array - are two counters
+ * stepped together: loop.c merges givs of one counter with the same step,
+ * never givs of two. j indexes the live clut and the line's end marker and
+ * is the one tested; i indexes the grey clut and the name copy. What is left
+ * is where the grey clut's step lands against the name's reload of
+ * p->spell[i] at the bottom of the loop.
  *
  * Only the SP gauge is coloured, not an HP one: the call is handed a null for
  * the first bar, and the board has no second gauge to put one in.
@@ -100,6 +88,7 @@ void BtlOpenPersonaBoard(void)
     long      pos[3];
     int       spell;
     int       i;
+    int       j;
 
     p = &g_btl_personas[BtlActorPersona(g_btl_actor_turn)];
     memcpy(g_btl_persona_name, p->name, PERSONA_NAME_CELLS);
@@ -110,9 +99,10 @@ void BtlOpenPersonaBoard(void)
     BtlDrawNumberAlt(g_btl_persona_sp_max_cells,
                      g_btl_actors[g_btl_actor_turn].c.sp_max, PERSONA_SP_W);
     i = 0;
+    j = 0;
     do {
-        (g_btl_persona_cells + PERSONA_SPELL_CELL)[i].clut = PERSONA_CLUT_LIVE;
-        g_btl_persona_spell_lines[i][0] = BTL_TEXT_END;
+        g_btl_persona_cells[PERSONA_SPELL_CELL + j].clut = PERSONA_CLUT_LIVE;
+        g_btl_persona_spell_lines[j][0] = BTL_TEXT_END;
         spell = p->spell[i];
         if (spell != 0 && (g_spell_data[spell].kind & SPELL_KIND_LISTED) == 0) {
             g_btl_persona_cells[PERSONA_SPELL_CELL + i].clut = PERSONA_CLUT_NONE;
@@ -120,7 +110,8 @@ void BtlOpenPersonaBoard(void)
         memcpy(g_btl_persona_spell_lines[i], g_spell_data[p->spell[i]].name,
                SPELL_NAME_CELLS);
         i++;
-    } while (i < BTL_STATS_SPELLS);
+        j++;
+    } while (j < BTL_STATS_SPELLS);
     BtlSetGaugeColour(&g_btl_actors[g_btl_actor_turn].c, 0,
                       (u_char *)&g_btl_persona_cells[PERSONA_SP_CELL]);
     pos[0] = BOARD_X;
