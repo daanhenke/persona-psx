@@ -138,9 +138,6 @@ INCLUDE_ASM("main/nonmatchings/preloaddng", PreloadDng);
 /* Writes `digits` hex digits of `value` backwards from `end`, so the caller
    passes a pointer to the *last* digit position. Immediately follows
    PreloadDng in the binary, so it belongs to this translation unit. */
-/* 99.48%. Only the digit's register: the image builds it in v0, here in v1.
-   Writing it as an if/else gets v0 but moves rem and i down a register. */
-#ifdef NON_MATCHING
 void FormatHexDigits(int value, char *end, short digits)
 {
     short i;
@@ -152,12 +149,12 @@ void FormatHexDigits(int value, char *end, short digits)
     if (digits > 0) {
         do {
             v = (short)value;
+            rem = v % 16;
             value = v / 16;
-            rem = v - value * 16;
-            c = (char)rem;
-            c = c + 0x30;
             if (rem > 9) {
-                c = (char)rem + 0x37;
+                c = rem + 0x37;
+            } else {
+                c = rem + 0x30;
             }
             *end = c;
             i++;
@@ -165,9 +162,6 @@ void FormatHexDigits(int value, char *end, short digits)
         } while (i < digits);
     }
 }
-#else
-INCLUDE_ASM("main/nonmatchings/preloaddng", FormatHexDigits);
-#endif
 
 /* Loads floor `floor`'s bank `letter` and transfers its body into VAB *vab. */
 void DngLoadVab(short floor, u_char letter, short *vab)

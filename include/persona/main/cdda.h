@@ -11,7 +11,7 @@
 
 extern CdlLOC       g_cd_da_start;     /* where the track starts           */
 extern volatile int g_cd_da_repeat;
-extern CdlLOC       g_cd_da_pos;       /* where the head last reported     */
+extern volatile CdlLOC g_cd_da_pos;   /* where the head last reported     */
 extern CdlLOC       g_cd_da_end_loc;   /* one sector past the track        */
 extern int          g_cd_da_end;       /* the same as a sector number      */
 

@@ -6,12 +6,9 @@
  * confirmed twice over: by the state main then sets, and by the file queued.
  *
  * The dungeon preload is a unit of its own earlier in the image, in
- * preloaddng.c. Three routines between PreloadAdv and PreloadName here do not
- * come out of the C yet and are taken from asm in place, which is what keeps
- * this one unit rather than three.
+ * preloaddng.c.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libcd.h>
 #include <persona/common/eventflag.h>
 #include <persona/common/char.h>
@@ -166,96 +163,79 @@ void PreloadAdv(void)
  * ADV_DVL.BIN, 8 for ADV_PER.BIN, 5 for ADV_BST.BIN.
  *
  * The size slot is left holding a *sector count*, not bytes; PreloadAdv is
- * what shifts it left by 11. */
-/* 95.34%. The shape is the image's: case order 0,3,4,5, packs 0-3 in order,
-   the flat files storing the size before CdPosToInt, and the next entry
-   reached through a pointer taken as a value (&tbl[slot + 1]), which is what
-   keeps CSE from folding it into &tbl[slot]. What is left is allocation: the
-   image gives tbl and e the index's register (s1) and &tbl[slot] s3, which
-   pins the andi above the table load; here tbl takes s3 and the andi moves
-   into the jump's delay slot. The flat cases also build off in v0 rather
-   than a0, so base is copied out of v0. */
-#ifdef NON_MATCHING
+ * what shifts it left by 11.
+ *
+ * Every case spells out its own CdIntToPos; jump2 cross-jumps the identical
+ * tails into one after allocation, so the image shows a shared tail with each
+ * case's registers chosen as if it stood alone (a per-case `base`, too). */
 void AdvResolveSceneLoc(short kind, int index, void *unused)
 {
-    CdlFILE *fp;
-    CdlFILE *pk;
-    int      base;
-    int      pos;
-    int      off;
-    short    slot;
-    u_short *tbl;
-    u_short *e;
+    int   pos;
+    short slot;
 
     switch (kind) {
     case 0:
         switch ((short)index / 256) {
         case 0:
-            pk = &g_adv_scene_file;
-            CdSearchFileLoc(pk, str_adv_e0_bin);
-            pos = CdPosToInt(&pk->pos);
+            CdSearchFileLoc(&g_adv_scene_file, str_adv_e0_bin);
+            pos = CdPosToInt(&g_adv_scene_file.pos);
             slot = index & 0xFF;
-            tbl = g_adv_e0_offsets;
+            CdIntToPos(pos + g_adv_e0_offsets[slot], &g_adv_scene_file.pos);
+            g_adv_scene_file.size = g_adv_e0_offsets[slot + 1] - g_adv_e0_offsets[slot];
             break;
         case 1:
-            pk = &g_adv_scene_file;
-            CdSearchFileLoc(pk, str_adv_e1_bin);
-            pos = CdPosToInt(&pk->pos);
+            CdSearchFileLoc(&g_adv_scene_file, str_adv_e1_bin);
+            pos = CdPosToInt(&g_adv_scene_file.pos);
             slot = index & 0xFF;
-            tbl = g_adv_e1_offsets;
+            CdIntToPos(pos + g_adv_e1_offsets[slot], &g_adv_scene_file.pos);
+            g_adv_scene_file.size = g_adv_e1_offsets[slot + 1] - g_adv_e1_offsets[slot];
             break;
         case 2:
-            pk = &g_adv_scene_file;
-            CdSearchFileLoc(pk, str_adv_e2_bin);
-            pos = CdPosToInt(&pk->pos);
+            CdSearchFileLoc(&g_adv_scene_file, str_adv_e2_bin);
+            pos = CdPosToInt(&g_adv_scene_file.pos);
             slot = index & 0xFF;
-            tbl = g_adv_e2_offsets;
+            CdIntToPos(pos + g_adv_e2_offsets[slot], &g_adv_scene_file.pos);
+            g_adv_scene_file.size = g_adv_e2_offsets[slot + 1] - g_adv_e2_offsets[slot];
             break;
         case 3:
-            pk = &g_adv_scene_file;
-            CdSearchFileLoc(pk, str_adv_e3_bin);
-            pos = CdPosToInt(&pk->pos);
+            CdSearchFileLoc(&g_adv_scene_file, str_adv_e3_bin);
+            pos = CdPosToInt(&g_adv_scene_file.pos);
             slot = index & 0xFF;
-            tbl = g_adv_e3_offsets;
+            CdIntToPos(pos + g_adv_e3_offsets[slot], &g_adv_scene_file.pos);
+            g_adv_scene_file.size = g_adv_e3_offsets[slot + 1] - g_adv_e3_offsets[slot];
             break;
-        default:
-            goto out;
         }
-        CdIntToPos(pos + tbl[slot], &pk->pos);
-        e = &tbl[slot + 1];
-        g_adv_scene_file.size = *e - tbl[slot];
-out:
         g_cd_queue[0].dest = ADV_SCENE_DEST;
         return;
-    case 3:
-        fp = &g_adv_scene_file;
-        CdSearchFileLoc(fp, str_adv_bst_bin);
+    case 3: {
+        int base;
+
+        CdSearchFileLoc(&g_adv_scene_file, str_adv_bst_bin);
         g_adv_scene_file.size = 5;
-        base = CdPosToInt(&fp->pos) + 1;
-        off = (short)index * 5;
+        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
+        CdIntToPos(base + (short)index * 5, &g_adv_scene_file.pos);
         break;
-    case 4:
-        fp = &g_adv_scene_file;
-        CdSearchFileLoc(fp, str_adv_dvl_bin);
-        g_adv_scene_file.size = 9;
-        base = CdPosToInt(&fp->pos) + 1;
-        off = (short)index * 9;
-        break;
-    case 5:
-        fp = &g_adv_scene_file;
-        CdSearchFileLoc(fp, str_adv_per_bin);
-        g_adv_scene_file.size = 8;
-        base = CdPosToInt(&fp->pos) + 1;
-        off = (short)index * 8;
-        break;
-    default:
-        return;
     }
-    CdIntToPos(base + off, &fp->pos);
+    case 4: {
+        int base;
+
+        CdSearchFileLoc(&g_adv_scene_file, str_adv_dvl_bin);
+        g_adv_scene_file.size = 9;
+        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
+        CdIntToPos(base + (short)index * 9, &g_adv_scene_file.pos);
+        break;
+    }
+    case 5: {
+        int base;
+
+        CdSearchFileLoc(&g_adv_scene_file, str_adv_per_bin);
+        g_adv_scene_file.size = 8;
+        base = CdPosToInt(&g_adv_scene_file.pos) + 1;
+        CdIntToPos(base + (short)index * 8, &g_adv_scene_file.pos);
+        break;
+    }
+    }
 }
-#else
-INCLUDE_ASM("main/nonmatchings/preload", AdvResolveSceneLoc);
-#endif
 
 /* Before a battle: reads the encounter map's slice of BF.BIN, and clears the
    five party actors the first time a battle is entered.
