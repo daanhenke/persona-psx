@@ -84,12 +84,15 @@ void NameEntryInit(void)
         NameSpriteFromDef(i);
     }
     g_sprites[SPR_SIDE_CARET].attribute |= 0x40000000;
+#ifndef VER_US
+    /* The first page's tabs start enlarged; US has the one page. */
     g_sprites[SPR_PAGE_TAB].scalex = 0x1400;
     g_sprites[SPR_PAGE_TAB].scaley = 0x1200;
     g_sprites[SPR_PAGE_TAB2].scalex = 0x1200;
     g_sprites[SPR_PAGE_TAB2].scaley = 0x1200;
     g_sprites[11].scalex = 0x1400;
     g_sprites[11].scaley = 0x1200;
+#endif
     g_sprites[SPR_KEY_CARET].scalex = 0x1600;
     g_sprites[SPR_KEY_CARET].scaley = 0x1600;
     DrawSync(0);

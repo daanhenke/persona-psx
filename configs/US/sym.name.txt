@@ -1,0 +1,142 @@
+// Revelations: Persona (US) - NAME, loaded at 0x80065A84.
+//
+// The same routines and variables as JP1's NAME, at their US addresses. The
+// data sits 0x3B0 later and the workspace 0x26C later than JP1's; the US
+// keyboard is one page, so the kanji table follows it 0x144 bytes sooner.
+
+g_overlay_base       = 0x80065A84;
+
+ovl_name_entry       = 0x80065A88; // type:func size:0x31C
+NameEntryInput       = 0x80065DA4; // type:func size:0x7D8
+NamePlaySe           = 0x8006657C; // type:func size:0x34
+
+NameEntryComplete    = 0x800665B0; // type:func size:0x38
+
+NameConfirm          = 0x800665E8; // type:func size:0x344
+NameCaretPlace       = 0x8006692C; // type:func size:0xF8
+NameListPreview      = 0x80066A24; // type:func size:0xB4
+NameListClose        = 0x80066AD8; // type:func size:0x78
+NameListScroll       = 0x80066B50; // type:func size:0x24C
+NameListFill         = 0x80066D9C; // type:func size:0x1D4
+NameAddDakuten       = 0x80066F70; // type:func size:0x27C
+NameAddHandakuten    = 0x800671EC; // type:func size:0x154
+NameSetPage          = 0x80067340; // type:func size:0xE0
+NameDrawCursor       = 0x80067420; // type:func size:0xAC
+NameEntryInit        = 0x800674CC; // type:func size:0x424
+NameDrawFrame        = 0x800678F0; // type:func size:0x264
+NamePadRead          = 0x80067B54; // type:func size:0x120
+
+UploadImage          = 0x80067C74; // type:func size:0x3C
+
+TimLoad              = 0x80067CB0; // type:func size:0xA4
+
+UploadImageOne       = 0x80067D54; // type:func size:0x64
+
+UploadImageRows      = 0x80067DB8; // type:func size:0xA4
+
+BgFromPack           = 0x80067E5C; // type:func size:0x108
+
+NameSpriteSet        = 0x80067F64; // type:func size:0x148
+NameSpriteFromDef    = 0x800680AC; // type:func size:0xFC
+ExpandGlyph          = 0x800681A8; // type:func size:0x104
+
+NameDrawKeyboardPage = 0x800682AC; // type:func size:0x100
+
+g_name_repeat        = 0x800683AC; // size:0x1
+g_name_first         = 0x800683AD; // size:0x1
+g_name_mode          = 0x800683AE; // size:0x1
+g_name_field         = 0x800683AF; // size:0x1
+g_name_page          = 0x800683B0; // size:0x1
+g_name_text          = 0x800683B4; // size:0x30
+g_name_cursor        = 0x800683E4; // size:0x3
+g_name_col           = 0x800683E8; // size:0x2
+g_name_row           = 0x800683EA; // size:0x2
+g_name_blink         = 0x800683EC; // size:0x1
+g_name_blink_step    = 0x800683ED; // size:0x1
+g_name_x             = 0x800683F0; // size:0x3
+g_name_y             = 0x800683F4; // size:0x3
+g_name_len           = 0x800683F8; // size:0x3
+g_name_code_base     = 0x800683FC; // size:0x4
+g_name_sprite_defs   = 0x80068400; // size:0x3E8
+g_keyboard           = 0x800687E8; // size:0x9C
+g_kanji              = 0x80068884; // size:0x1694
+g_kanji_row_counts   = 0x80069F18; // size:0x2C
+g_kanji_rows         = 0x80069F44; // size:0xB0
+g_name_labels        = 0x80069FF4; // size:0x18
+
+g_pad_prev           = 0x8006A00C; // size:0x4
+g_pad_trig           = 0x8006A010; // size:0x4
+g_name_list_pos      = 0x8006A014; // size:0x4
+g_ot_tags            = 0x8006A018; // size:0x80
+g_bg_frame           = 0x8006A098; // size:0x24
+g_bg_fields          = 0x8006A0BC; // size:0x24
+g_packets            = 0x8006A0E0; // size:0x10000
+g_ot                 = 0x8007A0E0; // size:0x28
+g_sprite_attr        = 0x8007A108; // size:0xC8
+g_bg_keys            = 0x8007A1D0; // size:0x24
+g_map_frame          = 0x8007A1F4; // size:0x10
+g_map_fields         = 0x8007A204; // size:0x10
+g_list_rows          = 0x8007A214; // size:0x10
+g_bg_list            = 0x8007A224; // size:0x24
+g_blink_tick         = 0x8007A248; // size:0x4
+g_glyph_cell         = 0x8007A24C; // size:0x580
+g_map_keys           = 0x8007A7CC; // size:0x10
+g_sprites            = 0x8007A7DC; // size:0x708
+g_list_top           = 0x8007AEE4; // size:0x4
+g_map_list           = 0x8007AEE8; // size:0x10
+g_pad_held           = 0x8007AEF8; // size:0x4
+g_pad_raw            = 0x8007AEFC; // size:0x4
+g_list_code          = 0x8007AF00; // size:0x4
+g_caret_x            = 0x8007AF04; // size:0x4
+g_caret_y            = 0x8007AF08; // size:0x4
+
+SsSetMVol            = 0x80018C38; // type:func
+SsSeqOpen            = 0x80019AC4; // type:func
+SsInit               = 0x8001BF88; // type:func
+SsQuit               = 0x8001BFD8; // type:func
+SsStart              = 0x8001C2DC; // type:func
+SsSetTickMode        = 0x8001CCDC; // type:func
+SsEnd                = 0x8001CE48; // type:func
+SsSetTableSize       = 0x8001CEF8; // type:func
+SsSeqPlay            = 0x8001D304; // type:func
+SsSeqSetDecrescendo  = 0x8001DF4C; // type:func
+SsPlayBack           = 0x8001D374; // type:func
+SsSeqSetVol          = 0x8001D75C; // type:func
+SsSetStereo          = 0x8001DFC8; // type:func
+SsVabOpenHead        = 0x8001E430; // type:func
+SsVabTransBody       = 0x8001EBD8; // type:func
+SsVabTransCompleted  = 0x8001EF18; // type:func
+SsUtSetReverbType    = 0x8001F418; // type:func
+SsUtReverbOn         = 0x80020200; // type:func
+SsUtSetReverbDepth   = 0x80020280; // type:func
+PadRead              = 0x80025600; // type:func
+VSync                = 0x80025650; // type:func
+ResetCallback        = 0x80025834; // type:func
+ResetGraph           = 0x8002CC20; // type:func
+SetDispMask          = 0x8002D020; // type:func
+DrawSync             = 0x8002D0BC; // type:func
+ClearImage           = 0x8002D250; // type:func
+LoadImage            = 0x8002D2E4; // type:func
+GsSortFastBg         = 0x8003191C; // type:func
+GsSortSprite         = 0x80032B10; // type:func
+GsSortFastSprite     = 0x8003301C; // type:func
+GsInitGraph          = 0x80033198; // type:func
+GsSortClear          = 0x8003365C; // type:func
+GsGetActiveBuff      = 0x80033798; // type:func
+GsSwapDispBuff       = 0x8003394C; // type:func
+GsDefDispBuff        = 0x80033F34; // type:func
+GsDrawOt             = 0x800348FC; // type:func
+GsClearOt            = 0x80034920; // type:func
+GsGetTimInfo         = 0x80034C50; // type:func
+GsSetWorkBase        = 0x80034D34; // type:func
+bcopy                = 0x8004180C; // type:func
+g_text_hero_name     = 0x80044772; // size:0x8
+
+// The load buffer's file table and the save's name fields are reached by
+// literal address; keep them numbers.
+D_80140000           = 0x80140000; // ignore:True size:0x40
+g_persona_stock      = 0x801F297C; // ignore:True size:0xF
+D_801F298C           = 0x801F298C; // ignore:True size:0x1C
+D_801F1C0B           = 0x801F1C0B; // ignore:True
+g_vab_id             = 0x801F535C; // ignore:True size:0x10
+g_seq_handles        = 0x801F537C; // ignore:True size:0x40

@@ -14,11 +14,27 @@
 #define NAME_CELLS  8
 #define NAME_SHORT  5   /* how far the first two fields are used */
 
-/* The keyboard: four pages of six rows, each row ten keys with a button at
-   either end (columns 0 and 11). */
+/* The keyboard: four pages of six rows. JP1 has ten keys a row with a button
+   at either end (columns 0 and 11); US has thirteen keys and one page, with
+   the buttons after them in column 13. The code still allows four pages. */
 #define KEY_PAGES 4
 #define KEY_ROWS  6
+#ifdef VER_US
+#define KEY_COLS  13
+#else
 #define KEY_COLS  10
+#endif
+#define KANJI_COLS 10   /* kanji to a list row */
+
+/* The columns that hold buttons rather than keys, and how far left of the
+   caret position the box round them sits. */
+#ifdef VER_US
+#define KEY_IS_BUTTON(col) ((col) == KEY_COLS)
+#define BUTTON_CARET_DX    (-4)
+#else
+#define KEY_IS_BUTTON(col) ((col) == 0 || (col) == KEY_COLS + 1)
+#define BUTTON_CARET_DX    0
+#endif
 
 /* Pad bits. */
 #define PAD_SELECT 0x0100
@@ -35,6 +51,16 @@
 #define PAD_CIRCLE 0x0020
 #define PAD_CROSS  0x0040
 #define PAD_SQUARE 0x0080
+
+/* The accept and back buttons: the US release swaps them to the Western
+   layout, cross to accept and triangle to go back. */
+#ifdef VER_US
+#define PAD_OK     PAD_CROSS
+#define PAD_BACK   PAD_TRI
+#else
+#define PAD_OK     PAD_CIRCLE
+#define PAD_BACK   PAD_CROSS
+#endif
 
 
 /* One sprite as the screen sets it up. */
@@ -76,10 +102,10 @@ extern u_char      g_name_y[NAME_FIELDS];
 extern u_char      g_name_len[NAME_FIELDS]; /* cells each field takes */
 extern u_short     g_name_code_base[2];    /* first code of each kana page */
 extern NameSpriteDef g_name_sprite_defs[NAME_SPRITES];
-extern u_short       g_keyboard[KEY_PAGES][KEY_ROWS][KEY_COLS];
+extern u_short       g_keyboard[][KEY_ROWS][KEY_COLS];
 extern u_char        g_kanji_row_counts[]; /* rows in each group */
-extern u_short       g_kanji[][KEY_COLS];
-extern u_short     (*g_kanji_rows[])[KEY_COLS]; /* each group's rows of ten */
+extern u_short       g_kanji[][KANJI_COLS];
+extern u_short     (*g_kanji_rows[])[KANJI_COLS]; /* each group's rows of ten */
 extern int           g_name_labels[];
 
 extern u_long   g_pad_prev;

@@ -1,0 +1,73 @@
+name: "Revelations: Persona (US) - name"
+sha1: 0acfb9d25af6460e887c1cc2cac6f82bc8fe82f4
+
+options:
+  platform: psx
+  basename: name
+  base_path: ../..
+  target_path: rom/US/NAME.BIN
+  asm_path: asm/US/name
+  src_path: src/name
+  build_path: build/US
+  o_path: lib
+  ld_script_path: linkers/US/name.ld
+  symbol_addrs_path: configs/US/sym.name.txt
+  undefined_syms_auto_path: linkers/US/undefined_syms_auto.name.txt
+  undefined_funcs_auto_path: linkers/US/undefined_funcs_auto.name.txt
+  compiler: GCC
+  find_file_boundaries: True
+  create_asm_dependencies: True
+  disassemble_all: False
+  hasm_in_src_path: True
+  o_as_suffix: False
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  section_order: [".rodata", ".text", ".data", ".bss"]
+  subalign: 4
+  ld_align_section_vram_end: False
+  ld_align_segment_vram_end: False
+  ld_bss_is_noload: False
+  symbol_name_format: $VRAM
+  string_encoding: SHIFT-JIS
+  data_string_encoding: SHIFT-JIS
+  rodata_string_guesser_level: 2
+  # Off for data: the overlay's workspace image is not text, and a guessed
+  # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
+  # than the Shift-JIS ones the ROM holds.
+  data_string_guesser_level: 0
+
+segments:
+  # overlay id 9
+  - name: name
+    type: code
+    start: 0x0
+    vram: 0x80065A84
+    subsegments:
+      - [0x0, .rodata, overlayid]
+      - [0x4, c, ui/screen]
+      - [0xB2C, c, ui/entry]
+      - [0xB64, c, ui/confirm]
+      - [0xEA8, c, ui/caret]
+      - [0x10CC, c, ui/kanjilist]
+      - [0x14EC, c, ui/dakuten]
+      - [0x18BC, c, ui/page]
+      - [0x1A48, c, ui/init]
+      - [0x1E6C, c, ui/frame]
+      - [0x21F0, c, gfx/upload]
+      - [0x222C, c, common/gfx/tim]
+      - [0x22D0, c, common/gfx/imageone]
+      - [0x2334, c, common/gfx/image]
+      - [0x23D8, c, common/gfx/bgpack]
+      - [0x24E0, c, gfx/sprite]
+      - [0x2724, c, gfx/glyph]
+      - [0x2828, c, ui/keyboard]
+      # The tables and initialised state, then the workspace (see the JP1
+      # config: the file carries the zeroes, so the split is at the first
+      # variable with no initial value).
+      - [0x2928, .data, ui/namedata]
+      - [0x4588, bss, name_bss]
+
+  - [0x15488]

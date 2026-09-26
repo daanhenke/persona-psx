@@ -6,11 +6,13 @@
 #include <decomp/types.h>
 #include <persona/name/entry.h>
 
-/* Every field has to hold something before the screen will accept the name. */
+/* Every field has to hold something before the screen will accept the name.
+   US asks for the hero's name alone, so only the third field is checked. */
 u_char NameEntryComplete(void)
 {
     int i;
 
+#ifndef VER_US
     for (i = 0; i < NAME_SHORT; i++) {
         if (g_name_text[0][i] != 0) {
             break;
@@ -27,6 +29,7 @@ u_char NameEntryComplete(void)
     if (i == NAME_SHORT) {
         return 0;
     }
+#endif
     for (i = 0; i < NAME_CELLS; i++) {
         if (g_name_text[2][i] != 0) {
             break;

@@ -66,6 +66,14 @@ void ovl_name_entry(void)
     }
     SetDispMask(0);
 
+#ifdef VER_US
+    /* One name, in the save's own letter codes: 0x30 above the font's. */
+    for (i = 0; i < NAME_CELLS; i++) {
+        if (g_name_text[2][i] != 0) {
+            SAVE_HERO[i] = g_name_text[2][i] + 0x30;
+        }
+    }
+#else
     for (i = NAME_SHORT - 1; i >= 0; i--) {
         if (g_name_text[0][i] != 0) {
             len = i + 1;
@@ -108,6 +116,7 @@ void ovl_name_entry(void)
             SAVE_HERO[i] = 0xCC;
         }
     }
+#endif
     if (SAVE_HERO[NAME_CELLS - 1] == 0) {
         for (i = NAME_CELLS - 2; i >= 0; i--) {
             if (SAVE_HERO[i] != 0) {
@@ -116,7 +125,9 @@ void ovl_name_entry(void)
             }
         }
     }
+#ifndef VER_US
     bcopy(SAVE_NAME0, g_member_names, 0x14);
+#endif
     bcopy(SAVE_HERO, SAVE_HERO2, 8);
     bcopy(SAVE_HERO, g_text_hero_name, 8);
     VSync(0x78);
@@ -134,6 +145,145 @@ void NameListPreview(void);
 void NameListClose(void);
 void NameSetPage();
 
+#ifdef VER_US
+/* One frame of input. Answers 0 once the name is accepted.
+
+   US keeps only the keyboard: one page of letters, the buttons in the column
+   after them, and no kanji list. */
+int NameEntryInput(void)
+{
+    int i;
+
+    if (g_name_repeat != 0) {
+        return 1;
+    }
+    if (g_pad_held & PAD_UP) {
+        NamePlaySe(0);
+        if (--g_name_row < 0) {
+            g_name_row = 5;
+        } else if (g_name_row == 4 && g_name_col == KEY_COLS) {
+            g_name_row = 3;
+        }
+    } else if (g_pad_held & PAD_DOWN) {
+        NamePlaySe(0);
+        if (++g_name_row >= 6) {
+            g_name_row = 0;
+        } else if (g_name_row == 4 && g_name_col == KEY_COLS) {
+            g_name_row = 5;
+        }
+    } else if (g_pad_held & PAD_LEFT) {
+        NamePlaySe(0);
+        if (--g_name_col < 0) {
+            g_name_col = KEY_COLS;
+            if (g_name_row == 4) {
+                g_name_row = 3;
+            }
+        }
+    } else if (g_pad_held & PAD_RIGHT) {
+        NamePlaySe(0);
+        if (++g_name_col >= KEY_COLS + 1) {
+            g_name_col = 0;
+        }
+        if (g_name_col == KEY_COLS && g_name_row == 4) {
+            g_name_row = 3;
+        }
+    } else if (g_pad_held & PAD_L1) {
+        if (CUR > 0) {
+            NamePlaySe(0);
+            CUR--;
+        } else if (g_pad_trig & PAD_L1) {
+            NamePlaySe(0);
+        }
+    } else if (g_pad_held & PAD_R1) {
+        if (CUR < g_name_len[g_name_field] - 1) {
+            NamePlaySe(0);
+            CUR++;
+        } else if (g_pad_trig & PAD_R1) {
+            NamePlaySe(0);
+        }
+    } else if (g_pad_held & PAD_OK) {
+        if (g_name_col != KEY_COLS) {
+            CARET_CHAR = g_keyboard[g_name_page][g_name_row][g_name_col];
+            NameDrawCursor();
+            if (CUR != g_name_len[g_name_field] - 1) {
+                NamePlaySe(1);
+                CUR++;
+            } else if (g_pad_trig & PAD_OK) {
+                NamePlaySe(1);
+            }
+        } else if (g_name_row < 2) {
+            if (g_name_row == 0) {
+                if (CUR > 0) {
+                    NamePlaySe(1);
+                    CUR--;
+                } else if (g_pad_trig & PAD_OK) {
+                    NamePlaySe(1);
+                }
+            } else if (CUR < g_name_len[g_name_field] - 1) {
+                NamePlaySe(1);
+                CUR++;
+            } else if (g_pad_trig & PAD_OK) {
+                NamePlaySe(1);
+            }
+        } else if (g_name_row == 2) {
+            if (CUR != 0) {
+                NamePlaySe(3);
+                if (CARET_CHAR == 0) {
+                    CUR--;
+                }
+            } else if (g_name_text[g_name_field][0] != 0 || (g_pad_trig & PAD_OK)) {
+                NamePlaySe(3);
+            }
+            CARET_CHAR = 0;
+            NameDrawCursor();
+        } else if (g_name_row == 3) {
+            if (g_pad_trig & PAD_OK) {
+                NamePlaySe(3);
+                for (i = NAME_CELLS - 1; i >= 0; i--) {
+                    g_name_text[g_name_field][i] = 0;
+                }
+                for (i = 0; i < g_name_len[g_name_field]; i++) {
+                    ExpandGlyph(g_name_text[g_name_field][i], &g_glyph_cell[i * 2],
+                                g_name_len[g_name_field] * 2);
+                }
+                UploadImage(g_name_x[g_name_field] + 0x200, g_name_y[g_name_field],
+                            g_name_len[g_name_field] * 4, 0x10, g_glyph_cell);
+                CUR = 0;
+            }
+        } else if (g_pad_trig & PAD_OK) {
+            if (NameEntryComplete()) {
+                NamePlaySe(1);
+                if (NameConfirm() == 0) {
+                    NamePlaySe(1);
+                    SsSeqSetDecrescendo(g_seq_handles[0], 0x7F, 0x78);
+                    return 0;
+                }
+            }
+            NamePlaySe(2);
+        }
+    } else if (g_pad_held & PAD_BACK) {
+        if (CUR != 0) {
+            NamePlaySe(2);
+            if (CARET_CHAR == 0) {
+                CUR--;
+            }
+        } else if (g_name_text[g_name_field][0] != 0 || (g_pad_trig & PAD_BACK)) {
+            NamePlaySe(2);
+        }
+        CARET_CHAR = 0;
+        NameDrawCursor();
+    }
+
+    if (g_name_col == KEY_COLS) {
+        g_caret_x = 0x100;
+    } else {
+        g_caret_x = g_name_col * 16 + 0x18;
+    }
+    g_caret_y = g_name_row * 16 + 0x78;
+    NameCaretPlace();
+    return 1;
+}
+#else
 /* One frame of input. Answers 0 once the name is accepted. */
 int NameEntryInput(void)
 {
@@ -587,6 +737,7 @@ int NameEntryInput(void)
     NameCaretPlace();
     return 1;
 }
+#endif
 
 /* Plays sound effect `se`; the handles after the first are the effects. */
 void NamePlaySe(int se)

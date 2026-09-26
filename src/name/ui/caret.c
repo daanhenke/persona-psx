@@ -7,8 +7,8 @@
    box of their own - and the text caret under the cell being typed into. */
 void NameCaretPlace(void)
 {
-    if (g_name_col == 0 || g_name_col == KEY_COLS + 1) {
-        g_sprites[SPR_SIDE_CARET].x = g_caret_x;
+    if (KEY_IS_BUTTON(g_name_col)) {
+        g_sprites[SPR_SIDE_CARET].x = g_caret_x + BUTTON_CARET_DX;
         g_sprites[SPR_SIDE_CARET].y = g_caret_y;
         g_sprite_attr[SPR_SIDE_CARET] &= ~ATTR_HIDE;
         g_sprite_attr[SPR_KEY_CARET] |= ATTR_HIDE;

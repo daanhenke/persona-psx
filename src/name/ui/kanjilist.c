@@ -47,7 +47,7 @@ void NameListScroll(u_char back)
     } else {
         ExpandGlyph(0, g_glyph_cell, 0x16);
     }
-    for (k = 0; k < KEY_COLS; k++) {
+    for (k = 0; k < KANJI_COLS; k++) {
         ExpandGlyph(g_kanji_rows[group][row][k], &g_glyph_cell[(k + 1) * 2], 0x16);
     }
     UploadImage(0x200, slot * 16 + 0x30, 0x2C, 0x10, g_glyph_cell);
@@ -70,15 +70,14 @@ void NameListFill(u_char group, u_char row)
     } else {
         ExpandGlyph(0, g_glyph_cell, 0x16);
     }
-            for (k = 0; k < KEY_COLS; k++) {
+            for (k = 0; k < KANJI_COLS; k++) {
                 ExpandGlyph(g_kanji_rows[group][row][k], &g_glyph_cell[(k + 1) * 2], 0x16);
             }
             UploadImage(0x200, i * 16 + 0x30, 0x2C, 0x10, g_glyph_cell);
         }
         g_list_rows[i][1] = row;
-        row++;
         g_list_rows[i][0] = group;
-        if (row >= g_kanji_row_counts[group]) {
+        if (++row >= g_kanji_row_counts[group]) {
             row = 0;
             if (++group >= KANJI_GROUPS) {
                 group = 0;

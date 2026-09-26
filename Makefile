@@ -64,7 +64,13 @@ LD      := $(CROSS)-ld
 OBJCOPY := $(CROSS)-objcopy
 OBJDUMP := $(CROSS)-objdump
 CPP     := $(CROSS)-cpp
+# JP1 was built with gcc 2.6.0; the US release, three months later, with 2.7.2
+# (decompals/old-gcc's -psx builds of both). Shared sources match under either.
+ifeq ($(GAME_VERSION), US)
+CC      := $(TOOLS_DIR)/bin/gcc-2.7.2-psx/cc1
+else
 CC      := $(TOOLS_DIR)/bin/gcc-2.6.0/cc1
+endif
 OBJDIFF := $(OBJDIFF_DIR)/objdiff
 
 # Overridable so a container can point at its own interpreter; unset, this is
@@ -215,6 +221,8 @@ TARGET_IN := main atlus open movie end dng btlp s2d adv casino name
 ifeq ($(GAME_VERSION), US)
 TARGET_IN := $(TARGET_IN) nld
 endif
+# Only the targets this version has a config for yet (US has NAME alone).
+TARGET_IN := $(foreach t,$(TARGET_IN),$(if $(wildcard $(CONFIG_DIR)/$(t).yaml),$(t)))
 
 # Source Definitions
 

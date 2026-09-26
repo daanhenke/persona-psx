@@ -5,19 +5,11 @@
  * column loop, so the row goes up again after every glyph.
  */
 #include <decomp/types.h>
+#include <persona/name/entry.h>
 
-#define KEY_PAGES 4
-#define KEY_ROWS  6
-#define KEY_COLS  10
 #define CELL_H    0x10
 #define KEY_X     0x200
 #define KEY_Y     0x30
-
-extern u_short g_keyboard[KEY_PAGES][KEY_ROWS][KEY_COLS];
-extern u_long  g_glyph_cell[];
-
-extern void ExpandGlyph(u_short code, u_long *dst, int stride);
-extern void UploadImage(int x, int y, int w, int h, u_long *data);
 
 void NameDrawKeyboardPage(int page)
 {

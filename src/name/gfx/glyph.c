@@ -7,6 +7,14 @@
 #include <decomp/types.h>
 #include <persona/common/font.h>
 
+/* The low word's top five bits, carried into the high word. The US source
+   masks them before shifting, which gcc keeps as an extra and. */
+#ifdef VER_US
+#define CARRY(c) (((c) & 0xF8000000) >> 27)
+#else
+#define CARRY(c) ((c) >> 27)
+#endif
+
 /* Expands glyph `code` bottom row first, two words a row, and drops a shadow
    one pixel right and down by or'ing each row, shifted five bits, into the
    row below it. */
@@ -33,8 +41,8 @@ void ExpandGlyph(u_short code, u_long *dst, int stride)
         if (row < 15) {
             u_long c = dst[row * stride];
 
-            dst[(row + 1) * stride] = (c << 5) | dst[(row + 1) * stride];
-            dst[(row + 1) * stride + 1] = (dst[row * stride + 1] << 5) | (c >> 27) | dst[(row + 1) * stride + 1];
+            dst[(row + 1) * stride] |= c << 5;
+            dst[(row + 1) * stride + 1] |= (dst[row * stride + 1] << 5) | CARRY(c);
         }
     }
 }

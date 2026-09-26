@@ -35,8 +35,8 @@ void BgFromPack(u_long *pack, u_char *hdr, GsMAP *map, GsBG *bg,
     bg->scaley = 0x1000;
     bg->scalex = 0x1000;
     bg->rotate = 0;
-    bg->w = map->cellw * map->ncellw;
-    bg->h = map->cellh * map->ncellh;
+    bg->w = map->ncellw * map->cellw;
+    bg->h = map->ncellh * map->cellh;
     bg->mx = bg->w / 2;
     bg->my = bg->h / 2;
     bg->x = x + bg->mx;

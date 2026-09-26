@@ -40,9 +40,9 @@ int NameConfirm(void)
             if ((g_pad_held & PAD_UP) || (g_pad_held & PAD_DOWN)) {
                 NamePlaySe(0);
                 g_sprites[SPR_SIDE_CARET].y ^= 0x10;
-            } else if (g_pad_trig & PAD_CIRCLE) {
+            } else if (g_pad_trig & PAD_OK) {
                 break;
-            } else if (g_pad_trig & PAD_CROSS) {
+            } else if (g_pad_trig & PAD_BACK) {
                 NamePlaySe(2);
                 g_sprites[SPR_SIDE_CARET].y = CONFIRM_NO_Y;
                 break;

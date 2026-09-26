@@ -56,7 +56,7 @@ void NamePadRead(void)
     g_pad_prev = g_pad_raw;
     g_pad_raw = PadRead(1);
     if (g_pad_raw != 0) {
-        if ((g_pad_trig = (g_pad_raw & g_pad_prev) ^ g_pad_raw) == 0) {
+        if ((g_pad_trig = g_pad_raw ^ (g_pad_raw & g_pad_prev)) == 0) {
             if (g_name_first) {
                 if (g_name_repeat >= 25) {
                     g_pad_held = g_pad_raw;
