@@ -998,10 +998,10 @@ CharApplyStats           = 0x80094094; // type:func size:0x650
 //--------------------------------------------------------------
 func_800946E4            = 0x800946E4; // type:func size:0x6D0
 func_80094DB4            = 0x80094DB4; // type:func size:0x7C4
-func_80095578            = 0x80095578; // type:func size:0x60C
-func_80095B84            = 0x80095B84; // type:func size:0xEC
-func_80095C70            = 0x80095C70; // type:func size:0x10C
-func_80095D7C            = 0x80095D7C; // type:func size:0x454
+MapScreenOpen            = 0x80095578; // type:func size:0x60C
+MapScreen                = 0x80095B84; // type:func size:0xEC
+MapFindPlayer            = 0x80095C70; // type:func size:0x10C
+MapScreenLayout          = 0x80095D7C; // type:func size:0x454
 
 //-------------------------------------------------------------------------
 //--- PA: 0x031E30   VA: 0x800961D0   subsegment: c, common/game/roomrotate
@@ -1022,7 +1022,7 @@ MapPlaceMarker           = 0x8009645C; // type:func size:0xA8
 //--- PA: 0x032164   VA: 0x80096504   subsegment: asm, dng_2_s22
 //--------------------------------------------------------------
 MapDrawName              = 0x80096504; // type:func size:0xFC
-func_80096600            = 0x80096600; // type:func size:0x218
+MapDrawMarkers           = 0x80096600; // type:func size:0x218
 func_80096818            = 0x80096818; // type:func size:0x334
 func_80096B4C            = 0x80096B4C; // type:func size:0x68
 func_80096BB4            = 0x80096BB4; // type:func size:0x5A0
@@ -1174,6 +1174,8 @@ g_config_labels_right    = 0x8009C154;
 g_pdata_bottom_def       = 0x8009C6E4;
 g_stat_bar_cells         = 0x8009C72C;
 str_config_title         = 0x8009C740;
+g_map_title_def          = 0x8009C7E0; // size:0x10
+g_map_arrow_defs         = 0x8009C830; // size:0x40
 g_compass_cels           = 0x8009C8B0;
 g_map_marker_defs        = 0x8009C930;
 g_tile_walls             = 0x8009C9CC;

@@ -228,6 +228,7 @@ segments:
       - [0x2EEA8, asm, dng_2_s20_x2]
       - [0x2FCF4, c, common/game/charstats]
       - [0x30344, asm, dng_2_s21]
+      - [0x311D8, c, ui/mapscreen]
       - [0x31E30, c, common/game/roomrotate]
       - [0x31FD4, c, common/gfx/compass]
       - [0x320BC, c, common/gfx/mapmarker]

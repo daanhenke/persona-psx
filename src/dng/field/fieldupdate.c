@@ -11,7 +11,7 @@
 
 extern u_char D_8001555C[];
 extern void MainMenuOpen(void);
-extern void func_80095578(void);
+extern void MapScreenOpen(void);
 extern void PersonaDataOpen(void);
 
 #define HERE (g_floor_grid[g_dng->pos[POS_Y]][g_dng->pos[POS_X]])
@@ -174,7 +174,7 @@ int FieldUpdate(int noclip)
         } else if (pressed & BIND(menu)) {
             OPEN_SCREEN(MainMenuOpen);
         } else if (pressed & BIND(unk14)) {
-            OPEN_SCREEN(func_80095578);
+            OPEN_SCREEN(MapScreenOpen);
         } else if (pressed & BIND(persona)) {
             OPEN_SCREEN(PersonaDataOpen);
         } else {
