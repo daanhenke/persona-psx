@@ -273,6 +273,8 @@ segments:
       - [0x31FD4, c, common/gfx/compass]
       - [0x320BC, c, common/gfx/mapmarker]
       - [0x32164, asm, dng_2_s22]
+      - [0x327AC, c, common/ui/mapview]
+      - [0x32814, asm, dng_2_s22b]
       - [0x32DB4, c, common/game/tilewalls]
       - [0x32EF0, c, common/game/automap]
       - [0x32F68, c, common/game/automapmark]

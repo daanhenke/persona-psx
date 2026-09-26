@@ -1029,8 +1029,8 @@ MapPlaceMarker           = 0x8009645C; // type:func size:0xA8
 MapDrawName              = 0x80096504; // type:func size:0xFC
 MapDrawMarkers           = 0x80096600; // type:func size:0x218
 func_80096818            = 0x80096818; // type:func size:0x334
-func_80096B4C            = 0x80096B4C; // type:func size:0x68
-func_80096BB4            = 0x80096BB4; // type:func size:0x5A0
+MapDrawTurned            = 0x80096B4C; // type:func size:0x68
+MapDrawGrid              = 0x80096BB4; // type:func size:0x5A0
 
 //------------------------------------------------------------------------
 //--- PA: 0x032DB4   VA: 0x80097154   subsegment: c, common/game/tilewalls
@@ -1376,6 +1376,7 @@ D_80180018               = 0x80180018; // ignore:True
 D_8018001C               = 0x8018001C; // ignore:True
 D_80180020               = 0x80180020; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
+g_map_entries            = 0x801DD008; // ignore:True
 D_801F15A0               = 0x801F15A0; // ignore:True
 D_801F15A4               = 0x801F15A4; // ignore:True
 g_chars                  = 0x801F1BCC; // ignore:True size:0x1E0
