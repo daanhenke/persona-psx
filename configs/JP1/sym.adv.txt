@@ -743,7 +743,8 @@ EventFlagClear           = 0x800820E4; // type:func size:0x44
 //-----------------------------------------------------------
 //--- PA: 0x01DD88   VA: 0x80082128   subsegment: asm, adv_30
 //-----------------------------------------------------------
-D_80082128               = 0x80082128; // type:func size:0x1A4
+AdvWaitFrame             = 0x80082128; // type:func size:0x20
+AdvImageMorph            = 0x80082148; // type:func size:0x184
 ActorSetStandSprite      = 0x800822CC; // type:func size:0x1C0
 ActorSetShadowSprite     = 0x8008248C; // type:func size:0x1E8
 
@@ -1530,6 +1531,8 @@ g_adv_chest_empty_def    = 0x800B4FEC;
 g_adv_shrink_away_def    = 0x800B500C;
 g_adv_squash_away_def    = 0x800B502C;
 g_room_anim              = 0x800B51D4;
+g_reflect_def            = 0x800B5D9C; // size:0x20
+g_reflect_lit_def        = 0x800B5DBC; // size:0x10
 g_ebg_offsets            = 0x800B5DCC;
 g_mes_offsets            = 0x800B5F30;
 str_adv_ev01_bgd         = 0x800B6134;
