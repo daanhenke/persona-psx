@@ -35,15 +35,9 @@ void TileMapCapRow(short *dst, u_char w)
     *dst = 0x3A0;
 }
 
-/* 98.6%: in the image loop.c leaves the atlas base inside the bank loop
-   (it is rebuilt every pass) and keeps only i * 8 outside; this build
-   hoists the base with it. Every other loop matches. The RTL shows why:
-   &TEXT_ATLAS[j][i] expands as (i * 8 + base) + j * 1720, and loop.c moves
-   the i * 8 + base sum; the image adds i * 8 to (base + j * 1720). A row
-   pointer (TEXT_ATLAS[j] + i) gets that association, but then loop.c moves
-   the base and leaves i * 8 inside. Short col/row locals, an inline cell
-   setter and byte offsets all score lower. */
-#ifdef NON_MATCHING
+/* The atlas cell's address is the bank's row plus the column's byte offset,
+   the offset taken first: loop.c then moves only the offset out of the bank
+   loop, as the image has it. */
 void CellsInit(void)
 {
     short   i;
@@ -52,10 +46,13 @@ void CellsInit(void)
 
     for (i = 0; i < TEXT_CELLS; i++) {
         for (j = 0; j < TEXT_BANKS; j++) {
-            c = &TEXT_ATLAS[j][i];
+            int     k = i * sizeof(GsCELL);
+            GsCELL *row = TEXT_ATLAS[j];
+
+            c = (GsCELL *)(k + (int)row);
             c->u = (i % TEXT_COLS) * 8;
             c->v = (i / TEXT_COLS) * 12;
-            c->cba = ((j + 0x1A0) << 6) + 0x3C;
+            c->cba = (j + 0x1A0) * 64 + 0x3C;
             c->flag = 0;
             c->tpage = TEXT_TPAGE;
         }
@@ -197,4 +194,3 @@ void CellsInit(void)
         c->tpage = TEXT_TPAGE;
     }
 }
-#endif

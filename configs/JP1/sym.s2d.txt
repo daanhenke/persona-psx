@@ -1242,6 +1242,7 @@ g_config_labels_left     = 0x8009EE30;
 g_config_labels_right    = 0x8009EE60;
 g_stat_bar_cells         = 0x8009F438;
 str_config_title         = 0x8009F44C;
+g_icon_cell_clut         = 0x8009F4B4; // size:0x28
 g_compass_cels           = 0x8009F5BC;
 g_map_marker_defs        = 0x8009F63C;
 g_tile_walls             = 0x8009F6D8;
