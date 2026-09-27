@@ -56,6 +56,9 @@ segments:
     subsegments:
       - [0x800, .rodata, main]
       - [0x94C, rodata, main_rodata]
+      # The save file's name, the card unit's only string.
+      - [0x950, .rodata, card/card]
+      - [0x964, rodata, main_rodata_964]
       - [0x1A8C, c, main]
       - [0x2064, c, boot]
       # The C runtime's entry, and below it every Psy-Q library object

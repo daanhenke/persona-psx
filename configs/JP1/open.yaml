@@ -54,7 +54,7 @@ segments:
     vram: 0x80080000
     subsegments:
       # The memory card's file name, then the opening movie's path.
-      - [0x800, rodata, open_rodata]
+      - [0x800, .rodata, card]
       - [0x814, .rodata, movie]
       # The Psy-Q libraries' rodata, in link order after ours.
       - [0x828, rodata, psyq/rodata]
@@ -72,5 +72,8 @@ segments:
       - [0x21604, data, psyq/data]
       # gp small data, then the bss that the image's zero padding covers.
       - [0x34890, sdata, open_sdata]
+      # The card unit's device names.
+      - [0x348AC, .sdata, card]
+      - [0x348C4, sdata, open_sdata_c4]
 
   - [0x35000]

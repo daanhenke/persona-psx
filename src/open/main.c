@@ -15,8 +15,8 @@
 int main(void)
 {
     ResetCallback();
-    func_80086D14();
-    func_80086F34();
+    CardOpenEvents();
+    CardEnableEvents();
     SetDispMask(0);
     while (CdInit() == 0) {
     }
@@ -32,7 +32,7 @@ int main(void)
     }
     SetDispMask(0);
     DrawSync(0);
-    func_80086E7C();
+    CardCloseEvents();
     PadStop();
     ResetGraph(0);
     StopCallback();

@@ -8,9 +8,9 @@
 #include <libgs.h>
 
 extern int  func_80081018(int movie);
-extern void func_80086D14(void);
-extern void func_80086E7C(void);
-extern void func_80086F34(void);
+extern void CardOpenEvents(void);
+extern void CardCloseEvents(void);
+extern void CardEnableEvents(void);
 extern int  OpenPlayMovie(void);
 
 /* The title's sprites: every image and every font cell it draws. */
@@ -23,7 +23,7 @@ extern u_char   D_800B410C;
 extern int      D_800B4094;
 extern int      D_800B409C;
 extern int      D_8011F390[];
-extern u_char   D_800A0A90[];
+extern u_char   D_800A0C10[];
 
 extern void OpenPlaySeq(int i);
 extern void OpenLoadTim(u_long *addr, int no_clut);
