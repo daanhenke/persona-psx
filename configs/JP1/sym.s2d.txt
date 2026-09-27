@@ -140,7 +140,8 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, s2d_rodata
 //------------------------------------------------------------------
-D_800643A4               = 0x800643A4; // type:u32 size:0x138
+D_800643A4               = 0x800643A4; // type:u32 size:0x6C
+D_80064430               = 0x80064430; // size:0x88
 
 
 
@@ -352,10 +353,10 @@ DrawItemRowUsable        = 0x8006A1DC; // type:func size:0x14C
 //--- PA: 0x005F88   VA: 0x8006A328   subsegment: asm, s2d_1_s5
 //-------------------------------------------------------------
 PageScrollValue          = 0x8006A328; // type:func size:0x1A4
-func_8006A4CC            = 0x8006A4CC; // type:func size:0x1E0
-func_8006A6AC            = 0x8006A6AC; // type:func size:0x558
-func_8006AC04            = 0x8006AC04; // type:func size:0x6D4
-func_8006B2D8            = 0x8006B2D8; // type:func size:0x8E0
+ItemMemberPick           = 0x8006A4CC; // type:func size:0x1E0
+ItemBagOpen              = 0x8006A6AC; // type:func size:0x558
+ItemBagStep              = 0x8006AC04; // type:func size:0x6D4
+ItemSwapStep             = 0x8006B2D8; // type:func size:0x8E0
 StatusMenuStep           = 0x8006BBB8; // type:func size:0xF4
 StatusMenuOpen           = 0x8006BCAC; // type:func size:0x60
 StatusTopStep            = 0x8006BD0C; // type:func size:0x3D0
@@ -679,7 +680,7 @@ DrawGauge                = 0x8007ECEC; // type:func size:0x16C
 //--------------------------------------------------------------
 //--- PA: 0x01AAB8   VA: 0x8007EE58   subsegment: asm, s2d_2_s16
 //--------------------------------------------------------------
-func_8007EE58            = 0x8007EE58; // type:func size:0x3DC
+ItemUseOn                = 0x8007EE58; // type:func size:0x3DC
 
 //--------------------------------------------------------------------------
 //--- PA: 0x01AE94   VA: 0x8007F234   subsegment: c, common/game/spellusable
@@ -1559,3 +1560,10 @@ g_face_clut_fix          = 0x8011401C; // ignore:True size:0x2
 g_menu_top_def           = 0x8009DBD8;
 g_stock_empty_msg        = 0x8009D244;
 g_menu_bg_rle            = 0x8009D5D0;
+g_bg_map0                = 0x8009E55C; // size:0x10
+g_bg_map1                = 0x8009E56C; // size:0x10
+g_bg_map2                = 0x8009E57C; // size:0x20
+g_use_scroll_step        = 0x8009E694; // size:0x2
+g_tactics_title          = 0x8009ED38;
+g_pad_title              = 0x8009ED54;
+g_use_top                = 0x800B5F40; // size:0x2

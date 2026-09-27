@@ -23,7 +23,7 @@
 #include <persona/adv/personapage.h>
 
 /* The work list the pages are drawn from, and the bag in the save game. */
-#define g_item_list ((u_short *)0x800EAE4C)
+#define g_item_list ((u_short *)(0x800EAE4C + WORK_BIAS))
 #define g_items     ((u_short *)0x801F267C)
 #define BAG_SIZE    0x17F
 #define ITEM_ID     0x1FF

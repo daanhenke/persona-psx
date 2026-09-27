@@ -15,6 +15,15 @@
 #define D_8005E714 g_adv_scene_arg
 #define g_pad_held g_pad_held_s2d
 
+#define D_800B12A8 D_8009CCF8
+#define D_800B178C D_8009D1DC
+#define D_800B1878 D_8009D2C8
+#define D_800B1EB8 D_8009D908
+#define D_800B2A3C D_8009E4E8
+#define func_80077F8C func_80076F44
+#define func_800782A4 func_8007725C
+#define func_8007A62C func_800795E4
+
 /* DNG's. */
 #define D_8009ABFC    D_8009D908
 #define func_80085AF4 func_80075F30

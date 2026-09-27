@@ -147,3 +147,7 @@ rom:0x60E4 reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xC
 rom:0x60E8 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xC
 rom:0x60FC reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
 rom:0x6100 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE
+
+// ConfigMenuOpen reads the pad layout option by name (defined in externs.s2d.ld).
+rom:0xFB0C reloc:MIPS_HI16 symbol:g_pad_config addend:0x0
+rom:0xFB10 reloc:MIPS_LO16 symbol:g_pad_config addend:0x0
