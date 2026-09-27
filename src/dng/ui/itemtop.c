@@ -79,7 +79,7 @@ extern void   DrawStatusHud(void);
 extern void   func_80086E20(int a, int b);
 extern void   MenuTopRedraw(void);
 extern void   func_80086B08(int a, int b);
-extern void   func_800891A8(int a, int b);
+extern void   MenuIconsSet3(int a, int b);
 extern void   ItemUseLayout(void);
 extern void   MenuSetLayers(int);
 extern void   ItemsCommitPending(void);
@@ -146,7 +146,7 @@ void ItemMenuOpen(void)
     MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
     func_80086B08(0, 1);
-    func_800891A8(0, 3);
+    MenuIconsSet3(0, 3);
 }
 
 /* The item menu's command list, a frame. */

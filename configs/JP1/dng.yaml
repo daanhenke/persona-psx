@@ -197,7 +197,7 @@ segments:
       - [0x21648, c, common/game/persona]
       - [0x2168C, c, common/ui/msgwait]
       - [0x21704, c, common/gfx/tilemapruns]
-      - [0x21754, asm, dng_2_s7]
+      - [0x21754, c, ui/menuicons]
       - [0x2515C, c, common/gfx/box]
       - [0x256AC, c, gfx/barcap]
       - [0x25754, c, ui/skilldraw]

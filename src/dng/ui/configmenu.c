@@ -50,7 +50,7 @@ extern void ConfigStepChoice(void);
 extern void ConfigCloseChoice(void);
 extern void MenuTopRedraw(void);
 extern void func_80086B08(int a, int b);
-extern void func_800891A8(int a, int b);
+extern void MenuIconsSet3(int a, int b);
 extern void func_80086E20(int a, int b);
 extern void MapScreen(void);
 extern void ConfigPageOpen(void);
@@ -131,7 +131,7 @@ void ConfigMenuOpen(void)
     g_bg_map2.ncellw = MAP_W;
     g_bg_map2.ncellh = 0x20;
     func_80086B08(2, 3);
-    func_800891A8(2, 0x10);
+    MenuIconsSet3(2, 0x10);
 }
 
 void MenuOtherStep(void)

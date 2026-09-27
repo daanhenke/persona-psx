@@ -636,11 +636,11 @@ func_80086E20            = 0x80086E20; // type:func size:0x6A4
 D_800874C4               = 0x800874C4; // type:func size:0x728
 UpdateMenuSprites        = 0x80087BEC; // type:func size:0xA30
 D_8008861C               = 0x8008861C; // type:func size:0xA68
-func_80089084            = 0x80089084; // type:func size:0x124
-func_800891A8            = 0x800891A8; // type:func size:0x10C
-D_800892B4               = 0x800892B4; // type:func size:0x104
-func_800893B8            = 0x800893B8; // type:func size:0x9C
-D_80089454               = 0x80089454; // type:func size:0xA8
+MenuIconsSet5            = 0x80089084; // type:func size:0x124
+MenuIconsSet3            = 0x800891A8; // type:func size:0x10C
+MenuIconsSet2            = 0x800892B4; // type:func size:0x104
+MenuIconsShade           = 0x800893B8; // type:func size:0x9C
+MenuIconsShadeFrom       = 0x80089454; // type:func size:0xA8
 
 //-----------------------------------------------------------------
 //--- PA: 0x02515C   VA: 0x800894FC   subsegment: c, common/gfx/box

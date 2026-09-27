@@ -89,7 +89,7 @@ extern u_short g_skill_help_spell;
 
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
 extern void func_80086B08(int a, int b);
-extern void func_800891A8(int a, int b);
+extern void MenuIconsSet3(int a, int b);
 extern void StatusPersonaPick(void);
 extern void StatusPersonaView(void);
 extern void StatusStockPick(void);
@@ -151,7 +151,7 @@ void StatusMenuOpen(void)
     MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0xC, 0, 0);
     func_80086B08(1, 2);
-    func_800891A8(1, 6);
+    MenuIconsSet3(1, 6);
 }
 
 /* The status menu's command list, a frame: skills, the member pages, and
