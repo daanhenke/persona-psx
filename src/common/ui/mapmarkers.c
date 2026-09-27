@@ -1,5 +1,8 @@
-/* Persona 1 (JP) - the map screen's scroll arrows and cursor.  ADV only.
- *   ADV 0x80095C84
+/* Persona 1 (JP) - the map screen's scroll arrows and cursor.
+ *
+ * Compiled into two overlays rather than called across the boundary:
+ *   ADV 0x80095C84   DNG 0x80096600
+ * DNG's was built against SLOT_SETPOS_INT: x and y go over unnarrowed.
  *
  * Four arrow sprites, a pair for each of the screen's two lists: each is
  * hidden and then shown again only while its list can still move that way -

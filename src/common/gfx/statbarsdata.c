@@ -2,9 +2,9 @@
  *
  *   ADV 0x8008DA44 ..
  *
- * The tail of the stat-bar unit. The routine between these and the ones in
- * statbars.c has not been worked out yet, so the overlays take it from asm
- * and these two are an object of their own.
+ * The tail of the stat-bar unit, kept as an object of its own: the routine
+ * between these and the ones in statbars.c (DrawPersonaDefStatBar) was
+ * matched after the split and now closes statbars.c.
  */
 #include <decomp/types.h>
 #include <libgte.h>
