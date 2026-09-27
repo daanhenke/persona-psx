@@ -46,10 +46,10 @@ extern void SoundInit(void);
 extern void S2dLoadMapSound(void);
 extern void SoundOpenMapSeqs(void);
 extern void func_80033A50(int x0, int y0, int x1, int y1);
-extern void func_8008D8EC(u_char *p, int n);
-extern void func_80098868(u_char *p, int x, int y, int w, int h);
-extern void func_80093124(void);
-extern void func_80096174(void);
+extern void ModelMap(u_long *tmd, int slot);
+extern void VramQueueLoad(u_long *data, short x, short y, short w, short h);
+extern void FadeTilesInit(void);
+extern void S2dResetState(void);
 
 void S2dApplyPadLayout(void)
 {
@@ -139,7 +139,7 @@ void S2dSceneInit(void)
     rect.h = 0xF0;
     ClearImage(&rect, 0, 0, 0);
     DrawSync(0);
-    func_8008D8EC(D_8009FCC0, 0);
+    ModelMap((u_long *)D_8009FCC0, 0);
 
     SetPolyF4(&g_fade_poly);
     SetSemiTrans(&g_fade_poly, 1);
@@ -147,11 +147,11 @@ void S2dSceneInit(void)
     g_fade_poly.r0 = 0;
     g_fade_poly.g0 = 0;
     g_fade_poly.b0 = 0;
-    func_80098868(D_800A4CFC + 0x48, 0x200, 0xF8, 0x10, 4);
+    VramQueueLoad((u_long *)(D_800A4CFC + 0x48), 0x200, 0xF8, 0x10, 4);
     DrawSync(0);
     g_fade.rgb[0] = 0x60;
     g_fade.rgb[1] = 0x60;
     g_fade.rgb[2] = 0x60;
-    func_80093124();
-    func_80096174();
+    FadeTilesInit();
+    S2dResetState();
 }
