@@ -9,6 +9,7 @@
 #include <decomp/include_asm.h>
 #include <kernel.h>
 #include <sys/file.h>
+#include <persona/common/card.h>
 #include <persona/common/char.h>
 #include <persona/common/status.h>
 
@@ -30,19 +31,6 @@ extern volatile int g_card_result[3];
    ERROR, TIMEOUT, NEW. */
 extern long g_card_hw_ev[4];
 extern long g_card_sw_ev[4];
-
-/* The save file's header as the BIOS reads it: "SC", the icon's frame count,
-   the file's size in blocks, then the Shift-JIS title the card manager shows
-   - "Persona S-data N  LV N  N:NN:NN" - with its numbers patched in place. */
-typedef struct {
-    /* 0x00 */ char   magic[2];
-    /* 0x02 */ u_char type;
-    /* 0x03 */ u_char blocks;
-    /* 0x04 */ u_char title[64];
-    /* 0x44 */ u_char pad44[0x13C];
-} CardHeader;                            /* 0x180 bytes */
-
-extern CardHeader g_card_header;
 
 /* The save file's name: port digit at [2], save slot digit at [18]. */
 #define CARD_NAME_PORT 2

@@ -68,10 +68,12 @@ segments:
       - [0xA030, asm, psyq/crt0]
       - [0xA048, asm, psyq/libs]
       # The save file's header and icon, then the title's text.
-      - [0x21290, data, open_data]
+      - [0x21290, .data, main]
+      - [0x21410, .data, title]
       - [0x21604, data, psyq/data]
       # gp small data, then the bss that the image's zero padding covers.
-      - [0x34890, sdata, open_sdata]
+      - [0x34890, .sdata, main]
+      - [0x34894, .sdata, title]
       # The card unit's device names.
       - [0x348AC, .sdata, card]
       - [0x348C4, sdata, open_sdata_c4]
