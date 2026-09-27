@@ -88,7 +88,7 @@ extern void   DrawCharStatBars(Char *rec);
 extern u_short g_skill_help_spell;
 
 extern void SoundPlaySeq(u_short slot, u_short seq, short vab);
-extern void func_80086B08(int a, int b);
+extern void MenuWheelOpen(int a, int b);
 extern void MenuIconsSet3(int a, int b);
 extern void StatusPersonaPick(void);
 extern void StatusPersonaView(void);
@@ -150,7 +150,7 @@ void StatusMenuOpen(void)
 {
     MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0xC, 0, 0);
-    func_80086B08(1, 2);
+    MenuWheelOpen(1, 2);
     MenuIconsSet3(1, 6);
 }
 
