@@ -13,6 +13,7 @@
 #include <libgs.h>
 #include <libsnd.h>
 #include <persona/main/state.h>
+#include <persona/s2d/s2d.h>
 
 #define g_pad_layout (*(u_char *)0x801F2AC7)
 #define g_seq_handle ((short *)0x801F537C)
@@ -32,17 +33,13 @@ extern GsOT      g_ot_map[2];
 extern GsOT      g_ot_obj[2];
 extern GsOT      g_ot_layer[3][2];
 extern GsOT      g_ot_front[2];
-extern GsOT_TAG *g_ot_tags[7];
 
 extern DR_MODE  g_scene_drmode[2];
 extern DR_MODE  g_menu_drmode[2];
-extern u_char   g_fade_rgb[];
-extern POLY_F4  g_fade_poly;
 extern u_char   D_8009FCC0[];
 extern u_char   D_800A4CFC[];
 
 extern short  g_bgm_ready;
-extern u_char g_btl_map_id;
 
 extern void DngSeqMarkCallback(short access, short seq, short data);
 extern void SoundInit(void);
@@ -104,17 +101,17 @@ void S2dSceneInit(void)
     GsInit3D();
     S2dApplyPadLayout();
 
-    tag = g_ot_tags[0];
+    tag = g_ot_tag_back;
     for (i = 0; i < 2; i++) {
         g_ot_back[i].length = 4;
         g_ot_back[i].org = tag + i * 16;
     }
-    tag = g_ot_tags[1];
+    tag = g_ot_tag_map;
     for (i = 0; i < 2; i++) {
         g_ot_map[i].length = 11;
         g_ot_map[i].org = tag + i * 2048;
     }
-    tag = g_ot_tags[2];
+    tag = g_ot_tag_obj;
     for (i = 0; i < 2; i++) {
         g_ot_obj[i].length = 6;
         g_ot_obj[i].org = tag + i * 64;
@@ -122,10 +119,10 @@ void S2dSceneInit(void)
     for (j = 0; j < 3; j++) {
         for (i = 0; i < 2; i++) {
             g_ot_layer[j][i].length = 7;
-            g_ot_layer[j][i].org = g_ot_tags[3 + j] + i * 128;
+            g_ot_layer[j][i].org = g_ot_tag_layer[j] + i * 128;
         }
     }
-    tag = g_ot_tags[6];
+    tag = g_ot_tag_front;
     for (i = 0; i < 2; i++) {
         g_ot_front[i].length = 3;
         g_ot_front[i].org = tag + i * 8;
@@ -152,9 +149,9 @@ void S2dSceneInit(void)
     g_fade_poly.b0 = 0;
     func_80098868(D_800A4CFC + 0x48, 0x200, 0xF8, 0x10, 4);
     DrawSync(0);
-    g_fade_rgb[0] = 0x60;
-    g_fade_rgb[1] = 0x60;
-    g_fade_rgb[2] = 0x60;
+    g_fade.rgb[0] = 0x60;
+    g_fade.rgb[1] = 0x60;
+    g_fade.rgb[2] = 0x60;
     func_80093124();
     func_80096174();
 }
