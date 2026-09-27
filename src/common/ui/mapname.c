@@ -41,6 +41,10 @@ extern u_char g_map_name_cells[];
 extern void bzero(void *dst, int len);
 extern void BgMapInit(u_char *map, int arg);
 
+/* Not built yet. Setting `cell` before `src` gives the image's registers
+   (cell s1, src s0); what is left, in ADV and DNG alike, is the head of the
+   routine: the image loads the base 0x801DD000 into v1 and the index into v0
+   ahead of the s1 save and reads the table entry straight into s0. */
 void MapDrawName(short map)
 {
     u_char *src;
@@ -48,11 +52,11 @@ void MapDrawName(short map)
     u_char *second;
     int     i;
 
+    cell   = g_map_name_cells;
     src  = (u_char *)(*(int *)(MAP_NAMES_AT + MAP_NAMES_TABLE + map * 4) +
                       MAP_NAMES_AT);
     bzero(g_map_name_cells, 0x22);
     i      = 0;
-    cell   = g_map_name_cells;
     second = g_map_name_cells + 1;
     do {
         i++;

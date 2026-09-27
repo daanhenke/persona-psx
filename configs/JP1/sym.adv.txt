@@ -1137,11 +1137,12 @@ CellsClear               = 0x8008EF6C; // type:func size:0x30
 //--------------------------------------------------------------
 //--- PA: 0x02ABFC   VA: 0x8008EF9C   subsegment: asm, adv_44_x1
 //--------------------------------------------------------------
-D_8008EF9C               = 0x8008EF9C; // type:func size:0xE8
+CellsWriteNumberRev      = 0x8008EF9C; // type:func size:0x64
 
 //------------------------------------------------------------------
 //--- PA: 0x02ACE4   VA: 0x8008F084   subsegment: c, gfx/cellsdigits
 //------------------------------------------------------------------
+CellsWriteGlyphsRev      = 0x8008F000; // type:func size:0x84
 CellsWriteDigitsRev      = 0x8008F084; // type:func size:0x64
 
 //-------------------------------------------------------------------------

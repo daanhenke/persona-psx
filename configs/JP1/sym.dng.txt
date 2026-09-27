@@ -983,11 +983,13 @@ CellsClear               = 0x8009300C; // type:func size:0x30
 //-----------------------------------------------------------------
 //--- PA: 0x02EC9C   VA: 0x8009303C   subsegment: asm, dng_2_s20_x1
 //-----------------------------------------------------------------
-D_8009303C               = 0x8009303C; // type:func size:0x14C
+CellsWriteNumberRev      = 0x8009303C; // type:func size:0x64
 
 //----------------------------------------------------------------------
 //--- PA: 0x02EDE8   VA: 0x80093188   subsegment: c, common/gfx/cellsrow
 //----------------------------------------------------------------------
+CellsWriteGlyphsRev      = 0x800930A0; // type:func size:0x84
+CellsWriteDigitsRev      = 0x80093124; // type:func size:0x64
 CellsWriteRow            = 0x80093188; // type:func size:0xC0
 
 //-----------------------------------------------------------------
