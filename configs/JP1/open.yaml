@@ -49,9 +49,12 @@ segments:
     vram: 0x80080000
     subsegments:
       - [0x800, asm, open]
-      - [0x9C30, c, str]
-      - [0x9CE4, asm, open_1]
-      # Psy-Q from the library entry down; not ours to decompile.
-      - [0xA038, asm, psyq/libs]
+      - [0x16F4, c, main]
+      - [0x1818, asm, open_1]
+      - [0x9B44, c, str]
+      # __main and start, then every Psy-Q library object. Not ours to
+      # decompile, which is what the psyq/ prefix says.
+      - [0xA030, asm, psyq/crt0]
+      - [0xA048, asm, psyq/libs]
 
   - [0x35000]

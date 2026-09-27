@@ -123,7 +123,7 @@ MKPSXISO_FLAGS      := -y -q "$(ROM_DIR)/$(GAME_VERSION)/rebuild.xml"
 #
 # - main's memory card code (src/main/card) was built at -O0, like atlus and open.
 #
-# - main's, atlus's, movie's and end's sources keep a tentative definition as a real
+# - main's, atlus's, open's, movie's and end's sources keep a tentative definition as a real
 #   common (maspsx's --use-comm-section). That is how the image reaches their
 #   own small data gp-relative from C, and the common merges into the label
 #   splat emits.
@@ -140,7 +140,7 @@ define FlagsSwitch
 	$(eval CC_FLAGS = $(OPT) $(DL_FLAGS) -mips1 -mcpu=3000 -w -funsigned-char -fpeephole -ffunction-cse -fpcc-struct-return -fcommon -fverbose-asm -msoft-float -mgas -fgnu-linker -fdollars-in-identifiers -quiet)
 	$(eval ASPSX_VERSION := 2.34)
 	$(eval MASPSX_FLAGS = --gnu-as-path $(AS) --aspsx-version=$(ASPSX_VERSION) $(COMMON_FLAG) --run-assembler --expand-div $(AS_FLAGS))
-	$(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /movie/,$(1)),$(findstring /end/,$(1))),$(eval MASPSX_FLAGS += --use-comm-section))
+	$(if $(or $(findstring /main/,$(1)),$(findstring /atlus/,$(1)),$(findstring /open/,$(1)),$(findstring /movie/,$(1)),$(findstring /end/,$(1))),$(eval MASPSX_FLAGS += --use-comm-section))
 	$(if $(findstring /s2d/,$(1)),$(eval OVL_FLAGS := -DWORK_BIAS=0x20000),$(eval OVL_FLAGS := -DWORK_BIAS=0))
 endef
 
