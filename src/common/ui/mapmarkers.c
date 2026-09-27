@@ -15,7 +15,7 @@
 #include <persona/common/menuctx.h>
 #include <persona/common/slot.h>
 
-#define g_slots ((Slot *)0x800DC10C)
+#define g_slots ((Slot *)(0x800DC10C + WORK_BIAS))
 
 #define ARROW_SLOT  32   /* four: lo/hi of list 0, then of list 1 */
 #define CURSOR_SLOT 40

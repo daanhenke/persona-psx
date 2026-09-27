@@ -126,3 +126,24 @@ rom:0x1F94 reloc:MIPS_HI16 symbol:g_image_queue addend:0x8
 rom:0x1F9C reloc:MIPS_LO16 symbol:g_image_queue addend:0x8
 rom:0x1FA8 reloc:MIPS_HI16 symbol:g_image_queue addend:0xA
 rom:0x1FB0 reloc:MIPS_LO16 symbol:g_image_queue addend:0xA
+
+// DrawStatusHud reads the play clock's minutes and frames by name, where
+// PlayTimeTick reaches the whole clock by number (banned in sym.s2d.txt).
+rom:0x17580 reloc:MIPS_HI16 symbol:g_playtime_min addend:0x0
+rom:0x17584 reloc:MIPS_LO16 symbol:g_playtime_min addend:0x0
+rom:0x175DC reloc:MIPS_HI16 symbol:g_playtime_frame addend:0x0
+rom:0x175E0 reloc:MIPS_LO16 symbol:g_playtime_frame addend:0x0
+
+// PageScrollValue: the back-page repeat timer, split at its halfword by spimdisasm.
+rom:0x600C reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
+rom:0x6010 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE
+rom:0x601C reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xC
+rom:0x6020 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xC
+rom:0x6028 reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
+rom:0x602C reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE
+rom:0x60D0 reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
+rom:0x60D4 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE
+rom:0x60E4 reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xC
+rom:0x60E8 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xC
+rom:0x60FC reloc:MIPS_HI16 symbol:g_page_back_repeat addend:0xE
+rom:0x6100 reloc:MIPS_LO16 symbol:g_page_back_repeat addend:0xE

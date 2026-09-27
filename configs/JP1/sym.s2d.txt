@@ -183,7 +183,7 @@ SlotSetFlicker           = 0x80065C6C; // type:func size:0x54
 //--------------------------------------------------------------
 //--- PA: 0x001920   VA: 0x80065CC0   subsegment: asm, s2d_s1_x1
 //--------------------------------------------------------------
-D_80065CC0               = 0x80065CC0; // type:func size:0x5C
+SlotSetSemiTrans         = 0x80065CC0; // type:func size:0x5C
 
 //----------------------------------------------------------------------
 //--- PA: 0x00197C   VA: 0x80065D1C   subsegment: c, common/gfx/slotanim
@@ -275,7 +275,7 @@ MenuScrollCursor         = 0x8006773C; // type:func size:0x12C
 //-------------------------------------------------------------
 //--- PA: 0x0034C8   VA: 0x80067868   subsegment: asm, s2d_1_s1
 //-------------------------------------------------------------
-func_80067868            = 0x80067868; // type:func size:0x6C
+MenuResetRepeat          = 0x80067868; // type:func size:0x6C
 
 //-----------------------------------------------------------------------
 //--- PA: 0x003534   VA: 0x800678D4   subsegment: c, common/gfx/imageanim
@@ -285,7 +285,7 @@ ImageAnimStop            = 0x800678D4; // type:func size:0x24
 //--------------------------------------------------------------
 //--- PA: 0x003558   VA: 0x800678F8   subsegment: asm, s2d_1_s1b
 //--------------------------------------------------------------
-func_800678F8            = 0x800678F8; // type:func size:0x38
+ImageAnimStopAll         = 0x800678F8; // type:func size:0x38
 
 //----------------------------------------------------------------------------
 //--- PA: 0x003590   VA: 0x80067930   subsegment: c, common/gfx/imageanimstart
@@ -586,7 +586,7 @@ FontCellsInit            = 0x8007B7D4; // type:func size:0x100
 //--- PA: 0x017534   VA: 0x8007B8D4   subsegment: asm, s2d_2_s12
 //--------------------------------------------------------------
 DrawStatusHud            = 0x8007B8D4; // type:func size:0xF4
-func_8007B9C8            = 0x8007B9C8; // type:func size:0x108
+BgBoxShow                = 0x8007B9C8; // type:func size:0x108
 RunFrame                 = 0x8007BAD0; // type:func size:0x28
 
 //----------------------------------------------------------------------
@@ -603,7 +603,7 @@ PartyLastSlot            = 0x8007BCDC; // type:func size:0x2C
 //--- PA: 0x017968   VA: 0x8007BD08   subsegment: asm, s2d_2_s12a
 //---------------------------------------------------------------
 MenuStepMember           = 0x8007BD08; // type:func size:0x204
-func_8007BF0C            = 0x8007BF0C; // type:func size:0xD0
+BgPanelSet               = 0x8007BF0C; // type:func size:0xD0
 TextItemStatRow          = 0x8007BFDC; // type:func size:0x244
 
 //-----------------------------------------------------------------
@@ -748,7 +748,7 @@ ConfigDrawLabels         = 0x80080354; // type:func size:0x104
 //--------------------------------------------------------------
 //--- PA: 0x01C0B8   VA: 0x80080458   subsegment: asm, s2d_2_s19
 //--------------------------------------------------------------
-func_80080458            = 0x80080458; // type:func size:0x130
+PadDrawLayout            = 0x80080458; // type:func size:0x130
 D_80080588               = 0x80080588; // type:func size:0x1A8
 
 //------------------------------------------------------------------------
@@ -762,8 +762,8 @@ PadLoadBindings          = 0x80080730; // type:func size:0x154
 D_80080884               = 0x80080884; // type:func size:0xF0
 func_80080974            = 0x80080974; // type:func size:0x228
 D_80080B9C               = 0x80080B9C; // type:func size:0xE4
-func_80080C80            = 0x80080C80; // type:func size:0xE8
-func_80080D68            = 0x80080D68; // type:func size:0x38
+FormationRepairGrid      = 0x80080C80; // type:func size:0xE8
+FormationRepair          = 0x80080D68; // type:func size:0x38
 
 //------------------------------------------------------------------------
 //--- PA: 0x01CA00   VA: 0x80080DA0   subsegment: c, common/game/formation
@@ -925,8 +925,8 @@ CellsWriteRow            = 0x8008369C; // type:func size:0xC0
 //-----------------------------------------------------------------
 D_8008375C               = 0x8008375C; // type:func size:0x970
 DrawItemName             = 0x800840CC; // type:func size:0x64
-D_80084130               = 0x80084130; // type:func size:0xFC
-func_8008422C            = 0x8008422C; // type:func size:0xD0
+DrawBagItemRow           = 0x80084130; // type:func size:0xFC
+TacticsSetCels           = 0x8008422C; // type:func size:0xD0
 func_800842FC            = 0x800842FC; // type:func size:0x294
 
 //------------------------------------------------------------------------
@@ -963,7 +963,7 @@ MapPlaceMarker           = 0x800868F0; // type:func size:0xA8
 //--- PA: 0x0225F8   VA: 0x80086998   subsegment: asm, s2d_2_s25
 //--------------------------------------------------------------
 MapDrawName              = 0x80086998; // type:func size:0xFC
-func_80086A94            = 0x80086A94; // type:func size:0x220
+MapDrawMarkers           = 0x80086A94; // type:func size:0x220
 func_80086CB4            = 0x80086CB4; // type:func size:0x338
 MapDrawTurned            = 0x80086FEC; // type:func size:0x68
 MapDrawGrid              = 0x80087054; // type:func size:0x5A0
@@ -981,7 +981,7 @@ MapTileSeen              = 0x80087730; // type:func size:0x78
 //-----------------------------------------------------------------
 //--- PA: 0x023408   VA: 0x800877A8   subsegment: asm, s2d_2_s26_x1
 //-----------------------------------------------------------------
-D_800877A8               = 0x800877A8; // type:func size:0x80
+MapMarkTile              = 0x800877A8; // type:func size:0x80
 func_80087828            = 0x80087828; // type:func size:0x5AC
 func_80087DD4            = 0x80087DD4; // type:func size:0x150
 func_80087F24            = 0x80087F24; // type:func size:0x480
@@ -1338,8 +1338,8 @@ D_800B5E28               = 0x800B5E28; // type:u32 size:0x4
 D_800B5E2C               = 0x800B5E2C; // type:u32 size:0x4
 D_800B5E30               = 0x800B5E30; // type:u32 size:0x118
 g_effect_tick            = 0x800B5F48; // size:0x4
-g_page_fwd_repeat        = 0x800B5F4C;
-D_800B5F58               = 0x800B5F58; // type:u32 size:0x25E8
+g_page_fwd_repeat        = 0x800B5F4C; // size:0x10
+D_800B5F5C               = 0x800B5F5C; // size:0x25E4
 g_menu_allow_hold        = 0x800B853C;
 g_bg_layer_otz           = 0x800B8540; // size:0xC
 g_view_dx                = 0x800B85B0; // size:0x2
@@ -1363,8 +1363,7 @@ D_800B8B88               = 0x800B8B88; // type:u32 size:0x34
 g_image_queue_count      = 0x800B8BA4;
 g_map_name_cells         = 0x800B8BA8;
 D_800B8BBC               = 0x800B8BBC; // type:u32 size:0x18
-g_page_back_repeat       = 0x800B8BC8;
-D_800B8BD4               = 0x800B8BD4; // type:u32 size:0x8
+g_page_back_repeat       = 0x800B8BC8; // size:0x10
 g_image_queue            = 0x800B8BD8; // size:0x300
 D_800B8BDC               = 0x800B8BDC; // type:u32 size:0x4
 D_800B8BE0               = 0x800B8BE0; // type:u32 size:0x400
@@ -1522,3 +1521,12 @@ D_800B1D38               = 0x800B1D38; // size:0x4
 D_800B93A0               = 0x800B93A0; // size:0x4
 D_800B93A4               = 0x800B93A4; // size:0x4
 D_800B93A8               = 0x800B93A8; // size:0x4
+// Names the shared units' C uses.
+g_panel_cells            = 0x800B8F6C; // size:0x60
+g_cinema_cels0           = 0x8009E420; // size:0x48
+g_cinema_cels6           = 0x8009E468; // size:0x10
+g_stat_labels            = 0x8009DF20; // size:0x10
+g_item_descs             = 0x8004AE1C;
+g_pad_action_names       = 0x8009EF44; // size:0x4C
+g_pad_layout_actions     = 0x8009EF90; // size:0x50
+str_nothing              = 0x8009F458;

@@ -74,3 +74,5 @@ g_map_base = 0x8004D83C;
 /* resolved from the s2d link */
 g_formation_marker_def = 0x8009EBB4;
 g_slot_cur = 0x800B85A8;
+g_playtime_min = 0x801F29BD;
+g_playtime_frame = 0x801F29BF;
