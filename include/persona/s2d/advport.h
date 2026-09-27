@@ -31,6 +31,5 @@
 
 /* DNG's. */
 #define D_8009ABFC    D_8009D908
-#define func_80086614 func_80076A50
 
 #endif

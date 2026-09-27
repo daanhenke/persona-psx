@@ -2,9 +2,6 @@
    routines still in asm, under DNG's names. */
 #include <decomp/include_asm.h>
 
-#define MENUICONS_ASM_2           INCLUDE_ASM("dng/nonmatchings/ui/menuicons", func_80086190)
-#define MENUICONS_ASM_3           INCLUDE_ASM("dng/nonmatchings/ui/menuicons", func_80086614)
-#define MENUICONS_ASM_WHEELOPEN   INCLUDE_ASM("dng/nonmatchings/ui/menuicons", MenuWheelOpen)
 #define MENUICONS_ASM_5           INCLUDE_ASM("dng/nonmatchings/ui/menuicons", func_80086E20)
 #define MENUICONS_ASM_6           INCLUDE_ASM("dng/nonmatchings/ui/menuicons", D_800874C4)
 #define MENUICONS_ASM_UPDATE      INCLUDE_ASM("dng/nonmatchings/ui/menuicons", UpdateMenuSprites)

@@ -23,7 +23,7 @@ extern u_char g_menu_blink;
 extern void MenuSetLayers(int);
 extern void MenuScreenDraw(void);
 extern int  MenuWheelAnimIn(void);
-extern void func_80086614(void);
+extern void MenuWheelShow(void);
 
 void MenuBuild(void)
 {
@@ -39,6 +39,6 @@ void MenuBuild(void)
     MenuScreenDraw();
     MenuWheelAnimIn();
     if (g_menu_blink == 0xFF) {
-        func_80086614();
+        MenuWheelShow();
     }
 }

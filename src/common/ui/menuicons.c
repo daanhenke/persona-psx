@@ -102,20 +102,143 @@ int MenuWheelAnimIn(void)
     return 1;
 }
 
-MENUICONS_ASM_2;
+/* The wheel closing: the same circle run the other way, from the frame
+   after the icons are cleared (0xFF) until the count reaches 0x20. */
+int MenuWheelAnimOut(void)
+{
+    if (g_menu_blink != 0x20) {
+        if (g_menu_blink == 0xFF) {
+            g_menu_blink = 0;
+            SlotClear(0x28);
+            SlotClear(0x29);
+            SlotClear(0x2A);
+            SlotClear(0x2B);
+            SlotClear(0x2C);
+            SlotClear(0x2E);
+            SlotClear(0x30);
+            SlotClear(0x31);
+            SlotClear(0x32);
+            SlotClear(0x33);
+            SlotClear(0x34);
+            SlotClear(0x36);
+        }
+        g_slots[SHADE_SLOT + 0].x = 0x80 - rsin(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 0].y = 0x18 - rcos(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].y = 0x30 - rcos(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].y = 0x48 - rcos(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].y = 0x60 - rcos(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 4].x = 0xD0 - rsin(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 4].y = 0x68 - rcos(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_menu_blink++;
+        return 0;
+    }
+    return 1;
+}
 
-MENUICONS_ASM_3;
+/* The wheel at rest, as MenuBuild puts it back when the page is redrawn
+   with the wheel open (g_menu_blink 0xFF). */
+void MenuWheelShow(void)
+{
+    int a;
+
+    SlotInitTagged(D_8009AA4C, 0x3D, 0x300, 0xA0, 0x48);
+    SlotInitTagged(D_8009AB58, 0x35, 0x300, 0x78, 0x40);
+    SlotInitTagged(D_8009B074, 0x2D, 0x2FF, 0x88, 0x41);
+    SlotInitTagged(D_8009AA2C, 0x38, 0x300, 0, 0);
+    SlotInitTagged(D_8009AA2C, 0x39, 0x300, 0, 0);
+    SlotInitTagged(D_8009AA2C, 0x3A, 0x300, 0, 0);
+    SlotInitTagged(D_8009AA2C, 0x3B, 0x300, 0, 0);
+    SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0, 0);
+    {
+        int d = rsin(0) / 24;
+
+        g_slots[SHADE_SLOT + 0].x = 0x78 - d / 32;
+    }
+    {
+        int d = rcos(0) / 24;
+
+        g_slots[SHADE_SLOT + 0].y = 0x24 - d / 32;
+    }
+    g_slots[SHADE_SLOT + 0].u_add = 0x10;
+    a = 0x10;
+    {
+        int d = rsin(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 1].x = 0x68 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 1].y = 0x38 - d / 32;
+    }
+    g_slots[SHADE_SLOT + 1].u_add = 0x20;
+    a = 0x20;
+    {
+        int d = rsin(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 2].x = 0x58 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 2].y = 0x4C - d / 32;
+    }
+    g_slots[SHADE_SLOT + 2].u_add = 0x30;
+    a = 0x30;
+    {
+        int d = rsin(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 3].x = 0x48 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 3].y = 0x64 - d / 32;
+    }
+    g_slots[SHADE_SLOT + 3].v_add = 0x10;
+    a = 0x80;
+    {
+        int d = rsin(a * 16) / 22;
+
+        g_slots[SHADE_SLOT + 4].x = 0xD2 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 22;
+
+        g_slots[SHADE_SLOT + 4].y = 0x64 - d / 32;
+    }
+    g_slots[SHADE_SLOT + 4].u_add = 0x20;
+    SlotInitTagged(D_8009AA8C, 0x30, 0x300, 0x38, 0x1C);
+    SlotInitTagged(D_8009AA8C, 0x31, 0x300, 0x28, 0x30);
+    SlotInitTagged(D_8009AA8C, 0x32, 0x300, 0x18, 0x48);
+    SlotInitTagged(D_8009AA8C, 0x33, 0x300, 8, 0x60);
+    SlotInitTagged(D_8009ABA8, 0x2E, 0x2FF, 0xB2, 0x60);
+    SlotInitTagged(D_8009B074, 0x28, 0x300, 0x38, 0x22);
+    SlotInitTagged(D_8009B074, 0x29, 0x300, 0x28, 0x36);
+    SlotInitTagged(D_8009B074, 0x2A, 0x300, 0x18, 0x4E);
+    SlotInitTagged(D_8009B074, 0x2B, 0x300, 8, 0x66);
+    SlotInitTagged(D_8009B074, 0x2C, 0x300, 0xBA, 0x67);
+    g_slots[ICON_SLOT + 0].my = 6;
+    g_slots[ICON_SLOT + 1].my = 6;
+    g_slots[ICON_SLOT + 2].my = 6;
+    g_slots[ICON_SLOT + 3].my = 6;
+    g_slots[ICON_SLOT + 4].my = 6;
+    MenuIconsSet5(0);
+}
 
 /* Opens the icon wheel on entry `cur`: the frames, the row and its three
    shade sprites, each of the three set on its circle by angle. `kind` is
    not read. */
-/* 95.71%: the image divides by 24 (or 22) and then by 32 on the same
-   register, the second in place; written as one expression fold makes one
-   division of them, and through `d` the second works on a copy. */
-#ifdef NON_MATCHING
+/* Each coordinate's quotient is its own block-scoped temporary, so the
+   rounding of the second division ties to it (a shared `d` is global and
+   works on a copy); the angle is a variable, and cse keeps its register for
+   the later constants of the same value, as the image does. */
 void MenuWheelOpen(int kind, short cur)
 {
-    int d;
+    int a;
 
     SlotInitTagged(D_8009AA8C, 0x30, 0x300, 0x28, 0x30);
     SlotInitTagged(D_8009AA8C, 0x31, 0x300, 0x18, 0x48);
@@ -132,26 +255,44 @@ void MenuWheelOpen(int kind, short cur)
     SlotInitTagged(D_8009AA2C, 0x39, 0x300, 0, 0);
     SlotInitTagged(D_8009AA4C, 0x3A, 0x300, 0, 0);
     g_slots[WHEEL_SLOT].u_add = cur * 32;
-    d = rsin(0x100) / 24;
-    g_slots[SHADE_SLOT + 0].x = 0x68 - d / 32;
-    d = rcos(0x100) / 24;
-    g_slots[SHADE_SLOT + 0].y = 0x38 - d / 32;
+    a = 0x10;
+    {
+        int d = rsin(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 0].x = 0x68 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 0].y = 0x38 - d / 32;
+    }
     g_slots[SHADE_SLOT + 0].u_add = 0x10;
     g_slots[SHADE_SLOT + 0].v_add = 0x10;
-    d = rsin(0x200) / 24;
-    g_slots[SHADE_SLOT + 1].x = 0x58 - d / 32;
-    d = rcos(0x200) / 24;
-    g_slots[SHADE_SLOT + 1].y = 0x4C - d / 32;
+    a = 0x20;
+    {
+        int d = rsin(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 1].x = 0x58 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 24;
+
+        g_slots[SHADE_SLOT + 1].y = 0x4C - d / 32;
+    }
     g_slots[SHADE_SLOT + 1].u_add = 0x10;
     g_slots[SHADE_SLOT + 1].v_add = 0x10;
-    d = rsin(0x800) / 22;
-    g_slots[SHADE_SLOT + 2].x = 0xD2 - d / 32;
-    d = rcos(0x800) / 22;
-    g_slots[SHADE_SLOT + 2].y = 0x64 - d / 32;
+    a = 0x80;
+    {
+        int d = rsin(a * 16) / 22;
+
+        g_slots[SHADE_SLOT + 2].x = 0xD2 - d / 32;
+    }
+    {
+        int d = rcos(a * 16) / 22;
+
+        g_slots[SHADE_SLOT + 2].y = 0x64 - d / 32;
+    }
 }
-#else
-MENUICONS_ASM_WHEELOPEN;
-#endif
 
 MENUICONS_ASM_5;
 

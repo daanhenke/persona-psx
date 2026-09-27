@@ -86,7 +86,7 @@ extern u_char PartyLastSlot(void);
 extern short PersonaStockCompact(void);
 extern void RunFrame(void);
 extern int  MenuWheelAnimIn(void);
-extern int  func_80086190(void);
+extern int  MenuWheelAnimOut(void);
 extern void MenuTick(void);
 extern void ItemMenuStep(void);
 extern void StatusMenuStep(void);
@@ -325,7 +325,7 @@ opening:
         if (D_8009FB3C) {
             g_menu_blink = MENU_CLOSED;
         closing:
-            if (!func_80086190()) {
+            if (!MenuWheelAnimOut()) {
                 RunFrame();
                 goto closing;
             }

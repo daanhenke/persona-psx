@@ -17,9 +17,6 @@
 #ifndef D_8009B074
 #define D_8009B074    D_800B2330
 #endif
-#ifndef func_80086614
-#define func_80086614 func_80077A98
-#endif
 
 /* The equipment screen's (src/common/ui/equipsteps.c). */
 #ifndef D_8009FE20

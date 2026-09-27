@@ -4,9 +4,6 @@
 #include <persona/adv/dngport.h>
 #include <decomp/include_asm.h>
 
-#define MENUICONS_ASM_2           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_80077614)
-#define MENUICONS_ASM_3           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_80077A98)
-#define MENUICONS_ASM_WHEELOPEN   INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_80077F8C)
 #define MENUICONS_ASM_5           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_800782A4)
 #define MENUICONS_ASM_6           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", D_80078948)
 #define MENUICONS_ASM_UPDATE      INCLUDE_ASM("adv/nonmatchings/ui/menuicons", UpdateMenuSprites)
