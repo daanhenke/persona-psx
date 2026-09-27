@@ -42,6 +42,10 @@ extern void  TileMapWriteCol(const u_char *src, short *dst, int base,
 #ifdef TILEMAP_INT_COUNT
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,
                                 int count);
+#elif defined(TILEMAP_SHORT_BASE)
+/* adv's skill screen narrows the glyph base as well as the count. */
+extern void  TileMapWriteRowRev(const u_char *src, short *dst, u_short base,
+                                u_short count);
 #elif defined(TILEMAP_BYTE_COUNT)
 /* adv's item counters narrow the count to a byte. */
 extern void  TileMapWriteRowRev(const u_char *src, short *dst, int base,

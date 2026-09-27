@@ -554,10 +554,11 @@ BoxRowBottom             = 0x8007AE60; // type:func size:0x70
 //-----------------------------------------------------------
 //--- PA: 0x016B30   VA: 0x8007AED0   subsegment: asm, adv_18
 //-----------------------------------------------------------
-D_8007AED0               = 0x8007AED0; // type:func size:0xA8
-func_8007AF78            = 0x8007AF78; // type:func size:0x310
-func_8007B288            = 0x8007B288; // type:func size:0x2CC
-func_8007B554            = 0x8007B554; // type:func size:0x16C
+TileMapWriteBarCapped    = 0x8007AED0; // type:func size:0x54
+TileMapWriteBarCapped2   = 0x8007AF24; // type:func size:0x54
+SkillScreenLayout        = 0x8007AF78; // type:func size:0x310
+SkillPersonasDraw        = 0x8007B288; // type:func size:0x2CC
+SkillSpellsDraw          = 0x8007B554; // type:func size:0x16C
 DrawPersonaKeyName       = 0x8007B6C0; // type:func size:0x94
 
 //---------------------------------------------------------------------------

@@ -194,7 +194,8 @@ segments:
       # box.c is one unit: TileMapWriteBar sits between the window rows and the
       # box rows, so the bar is part of the same object.
       - [0x165E0, c, common/gfx/box]
-      - [0x16B30, asm, adv_18]
+      - [0x16B30, c, gfx/barcap]
+      - [0x16BD8, c, ui/skilldraw]
       - [0x17320, c, common/ui/personaname]
       - [0x17440, c, common/ui/spellname]
       - [0x174FC, c, gfx/menuscreen]

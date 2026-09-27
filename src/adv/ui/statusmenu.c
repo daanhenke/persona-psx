@@ -50,9 +50,9 @@ extern u_char MenuStepMember(int *sel, u_char last);
 extern u_char CharTopEntry(short slot);
 extern u_char PersonaTopSpell(short id);
 extern void   BgPanelSet(short id, short x, short y);
-extern void   func_8007AF78(void);
-extern void   func_8007B288(short member);
-extern void   func_8007B554(short member, short persona);
+extern void   SkillScreenLayout(void);
+extern void   SkillPersonasDraw(short member);
+extern void   SkillSpellsDraw(short member, short persona);
 extern void   MenuTopRedraw(void);
 extern u_char D_800B12B8[];
 extern u_char D_800B1EB8[];
@@ -291,11 +291,11 @@ void SkillMemberPick(void)
     }
     if (InputCheckAcceptA(1)) {
         MenuSetLayers(6);
-        func_8007AF78();
-        func_8007B288(g_menu->skill_member.cur);
+        SkillScreenLayout();
+        SkillPersonasDraw(g_menu->skill_member.cur);
         MenuListInit(&g_menu->skill_persona, 0, 0,
                      CharTopEntry(g_menu->skill_member.cur), 0x16);
-        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
         SlotInitTagged(D_800B12B8, 2, 0x42, 0x58,
                        g_menu->skill_persona.cur * 12 + 0x54);
         SlotSetFlicker(2, 1);
@@ -326,8 +326,8 @@ void SkillPersonaPick(void)
             g_menu->skill_spell.cur = 0;
             MenuListInit(&g_menu->skill_persona, 0, 0,
                          CharTopEntry(g_menu->skill_member.cur), 0x16);
-            func_8007B288(g_menu->skill_member.cur);
-            func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+            SkillPersonasDraw(g_menu->skill_member.cur);
+            SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
             SlotSetPos(1, 0x42,
                        (g_fm_mark_pos + 1)[g_menu->skill_member.cur][0],
                        (g_fm_mark_pos + 1)[g_menu->skill_member.cur][1]);
@@ -341,7 +341,7 @@ void SkillPersonaPick(void)
     } else if (g_menu->skill_persona.hi != 0xFF &&
                MenuStepCursor(&g_menu->skill_persona)) {
         g_menu->skill_spell.cur = 0;
-        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
     }
     SlotSetPos(2, 0x42, 0x58, g_menu->skill_persona.cur * 12 + 0x54);
     DrawStatusHud();
@@ -493,9 +493,9 @@ void SkillTargetPick(void)
         pp = (Persona *)(p * sizeof(Persona) + personas);
         c->sp -= pp->sp_cost;
         MenuScreenDraw();
-        func_8007AF78();
-        func_8007B288(g_menu->skill_member.cur);
-        func_8007B554(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        SkillScreenLayout();
+        SkillPersonasDraw(g_menu->skill_member.cur);
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
         if (!ItemUsableAny(g_skill_help_spell) || c->sp < pp->sp_cost) {
             goto back;
         }

@@ -1,4 +1,4 @@
-/* Persona 1 (JP) - the skills screen's layers.  DNG only.
+/* Persona 1 (JP) - the skills screen's layers.
  *   0x80089AF4 SkillScreenLayout   0x80089CCC SkillPersonasDraw
  *   0x80089F8C SkillSpellsDraw
  *
@@ -9,8 +9,11 @@
  */
 #define NAME_KR
 #define PERSONAPAGE_DNG
+/* ADV builds this too (SKILLDRAW_ADV), against the narrow declarations. */
+#ifndef SKILLDRAW_ADV
 #define ITEM_USABLE_INT
 #define TILEMAP_INT_COUNT
+#endif
 #include <decomp/types.h>
 #include <libgte.h>
 #include <libgpu.h>
@@ -37,6 +40,105 @@ extern void BgBoxShow(void);
 extern void DrawStatusHud(void);
 extern void DrawPersonaKeyName();
 
+#ifdef SKILLDRAW_ADV
+extern void WindowRowTop(short *dst, u_char w);
+extern void WindowRowMiddle(short *dst, u_char w);
+extern void WindowRowBottom(short *dst, u_char w);
+extern void BoxRowTop(short *dst, u_char w);
+extern void BoxRowMiddle(short *dst, u_char w);
+extern void BoxRowBottom(short *dst, u_char w);
+
+#define CELL_DIV  0x19   /* the left edge of a ruled span */
+#define CELL_FILL 0x1A
+
+/* ADV's layout has the window, box and bar routines written out, as its
+   status frames (gfx/statusframes.c) do. */
+void SkillScreenLayout(void)
+{
+    short *dst;
+    short *p;
+    u_char row;
+    u_char col;
+    u_char n;
+    short  i;
+
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    dst = AT(g_tilemap0, 0, 8);
+    for (row = 0; row < 0xB; row++) {
+        for (col = 0; col < 0x1D; col++) {
+            if (row == 0) {
+                WindowRowTop(dst, 0x1D);
+            } else if (row == 0xA) {
+                WindowRowBottom(dst, 0x1D);
+            } else {
+                WindowRowMiddle(dst, 0x1D);
+            }
+        }
+        dst += MAP_W;
+    }
+    dst = AT(g_tilemap0, 1, 9);
+    for (row = 0; (short)row < 9; row++) {
+        for (col = 0; (short)col < 0x1B; col++) {
+            do {
+                if (row == 0) {
+                    BoxRowTop(dst, 0x1B);
+                } else if (row == 8) {
+                    BoxRowBottom(dst, 0x1B);
+                } else {
+                    BoxRowMiddle(dst, 0x1B);
+                }
+            } while (0);
+        }
+        dst += MAP_W;
+    }
+    TileMapBlitRle(g_menu_bg_rle, AT(g_tilemap0, 11, 0), MAP_W);
+    TileMapWriteRun12(AT(g_tilemap0, 2, 11));
+    for (i = 0; i < 3; i++) {
+        g_tilemap2[5 * MAP_W + 0 + i * MAP_W] = 0x418 + i;
+        /* The one-cell bar is written out like the others; its empty
+           loop only goes after loop.c, so it still weighs on the hoisting. */
+        p = &g_tilemap0[6 * MAP_W + 10 + i * MAP_W];
+        *p = CELL_DIV;
+        n = 0;
+        while (n != 0) {
+            p++;
+            n--;
+            *p = CELL_FILL;
+        }
+        p = &g_tilemap0[6 * MAP_W + 11 + i * MAP_W];
+        *p = CELL_DIV;
+        n = 9;
+        while (n != 0) {
+            p++;
+            n--;
+            *p = CELL_FILL;
+        }
+        p = &g_tilemap0[6 * MAP_W + 21 + i * MAP_W];
+        *p = CELL_DIV;
+        n = 2;
+        while (n != 0) {
+            p++;
+            n--;
+            *p = CELL_FILL;
+        }
+    }
+    for (i = 0; i < 7; i++) {
+        p = &g_tilemap0[2 * MAP_W + 25 + i * MAP_W];
+        *p = CELL_DIV;
+        n = 9;
+        while (n != 0) {
+            p++;
+            n--;
+            *p = CELL_FILL;
+        }
+    }
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 2, 3), 0x37A, 2);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 4, 3), 0x457, 6);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 0, 17), 0x45D, 4);
+    BgBoxShow();
+    DrawStatusHud();
+}
+#else
 void SkillScreenLayout(void)
 {
     short i;
@@ -61,6 +163,7 @@ void SkillScreenLayout(void)
     BgBoxShow();
     DrawStatusHud();
 }
+#endif
 
 /* The member's name and SP, then their three Personas with each one's cost;
    an empty entry, or all three while the list is blocked, shows the rule. */
