@@ -1556,3 +1556,6 @@ g_tilemap0               = 0x8010E180; // ignore:True size:0x1400
 g_tilemap1               = 0x8010F580; // ignore:True size:0x1400
 g_tilemap2               = 0x80110980; // ignore:True size:0xA00
 g_face_clut_fix          = 0x8011401C; // ignore:True size:0x2
+g_menu_top_def           = 0x8009DBD8;
+g_stock_empty_msg        = 0x8009D244;
+g_menu_bg_rle            = 0x8009D5D0;

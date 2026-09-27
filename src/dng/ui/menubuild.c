@@ -13,7 +13,7 @@
 #include <persona/common/tilemap.h>
 
 #ifndef g_tilemap0
-#define g_tilemap0 ((short *)0x800EE180)
+#define g_tilemap0 ((short *)(0x800EE180 + WORK_BIAS))
 #endif
 
 /* The top page's own sprite in slot 0x2F; every sub-page clears it. */

@@ -15,8 +15,8 @@
 #define LAYER_STRIDE 0x28
 
 /* The frame starts one cell in; the backdrop goes over the whole layer. */
-#define g_frame_at ((short *)0x800EE182)
-#define g_layer_at ((short *)0x800EE180)
+#define g_frame_at ((short *)(0x800EE182 + WORK_BIAS))
+#define g_layer_at ((short *)(0x800EE180 + WORK_BIAS))
 
 extern const u_short g_menu_bg_rle[];
 
