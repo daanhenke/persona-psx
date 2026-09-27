@@ -246,7 +246,7 @@ segments:
       - [0x2C720, asm, dng_2_s17_x1]
       - [0x2C874, c, common/game/formationplace]
       - [0x2C97C, c, common/game/formationfits]
-      - [0x2CA20, asm, dng_2_s17_x2]
+      - [0x2CA20, c, ui/formationpresets]
       - [0x2CB84, c, common/game/equip]
       - [0x2CD9C, c, common/game/formationmembers]
       - [0x2CE2C, asm, dng_2_s18_x3]

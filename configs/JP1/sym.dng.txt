@@ -1166,6 +1166,7 @@ g_pdata_top_def          = 0x8009A414;
 g_menu_sel               = 0x8009A4CC;
 g_menu_subsel            = 0x8009A4CE;
 str_cell_run             = 0x8009A4FC;
+str_preset_saved         = 0x8009A510;
 str_empty                = 0x8009A518;
 g_stock_empty_msg        = 0x8009A538;
 g_persona_msg_key        = 0x8009A566;
