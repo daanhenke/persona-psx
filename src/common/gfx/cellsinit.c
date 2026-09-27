@@ -25,7 +25,7 @@
 #define TEXT_TPAGE  0x1E
 
 /* The icon strip's CLUT row, one per cell. */
-extern u_char D_800B9278[];
+extern u_char g_icon_cell_clut[];
 
 /* Puts the frame's end piece at both ends of a row `w` cells wide. */
 void TileMapCapRow(short *dst, u_char w)
@@ -112,7 +112,7 @@ void CellsInit(void)
         c = &CELLS(0x800E5D2C)[i];
         c->u = (i & 0xF) * 16;
         c->v = (i / 16) * 16;
-        c->cba = ((D_800B9278[i] + 0x1B0) << 6) + 0x3C;
+        c->cba = ((g_icon_cell_clut[i] + 0x1B0) << 6) + 0x3C;
         c->flag = 0;
         c->tpage = 0x1C;
     }

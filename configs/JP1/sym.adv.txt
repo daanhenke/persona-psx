@@ -1748,6 +1748,7 @@ str_config_title         = 0x800B9210;
 str_nothing              = 0x800B921C;
 g_moon_frames            = 0x800B9224; // size:0x10
 g_moon_names             = 0x800B9234; // size:0x44
+g_icon_cell_clut         = 0x800B9278; // size:0x28
 D_800B92A0               = 0x800B92A0; // type:u32 size:0x6C
 g_map_title_def          = 0x800B930C; // size:0x10
 g_map_arrow_defs         = 0x800B935C; // size:0x40

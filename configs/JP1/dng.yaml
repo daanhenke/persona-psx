@@ -252,7 +252,7 @@ segments:
       - [0x2CF2C, c, common/game/formationcompact]
       - [0x2D150, c, common/gfx/statbars]
       - [0x2D774, c, common/gfx/statbarsdata]
-      - [0x2D914, asm, dng_2_s18_x2]
+      - [0x2D914, c, common/gfx/cellsinit]
       - [0x2E2B4, c, common/game/items]
       # the commit routine, then a copy helper belonging to party.c
       - [0x2E638, c, game/itemscommit]

@@ -927,7 +927,7 @@ DrawPersonaDataStatBar   = 0x80091B78; // type:func size:0x13C
 //-----------------------------------------------------------------
 //--- PA: 0x02D914   VA: 0x80091CB4   subsegment: asm, dng_2_s18_x2
 //-----------------------------------------------------------------
-D_80091CB4               = 0x80091CB4; // type:func size:0x20
+TileMapCapRow            = 0x80091CB4; // type:func size:0x20
 CellsInit                = 0x80091CD4; // type:func size:0x980
 
 //--------------------------------------------------------------------
@@ -1220,6 +1220,7 @@ g_pdata_bottom_def       = 0x8009C6E4;
 g_stat_bar_cells         = 0x8009C72C;
 str_config_title         = 0x8009C740;
 str_nothing              = 0x8009C74C;
+g_icon_cell_clut         = 0x8009C7A8; // size:0x28
 g_map_title_def          = 0x8009C7E0; // size:0x10
 g_map_arrow_defs         = 0x8009C830; // size:0x40
 g_compass_cels           = 0x8009C8B0;
@@ -1385,6 +1386,7 @@ g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 D_800DC994               = 0x800DC994; // ignore:True
 D_800DC9D8               = 0x800DC9D8; // ignore:True
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
+g_menu_cells             = 0x800E3E4C; // ignore:True size:0x2400
 g_persona_list           = 0x800EAE4C; // ignore:True
 D_800EB347               = 0x800EB347; // ignore:True
 D_800EB34C               = 0x800EB34C; // ignore:True
