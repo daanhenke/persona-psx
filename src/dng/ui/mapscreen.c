@@ -54,12 +54,12 @@ extern u_short D_80100068;
 extern u_char  D_8010006A;
 extern u_char  D_8010006B;
 
-extern short   D_8009FDF8;
+extern short   g_map_view_area;
 extern short   D_8009FDFC;
 extern short   D_8009FE00;
 extern short   D_8009FE08;
 extern short   D_8009FE0C;
-extern short   D_8009FE88;
+extern short   g_map_view_room;
 
 extern u_char  g_map_north_up;
 extern short   g_persona_data_step;
@@ -255,17 +255,17 @@ void MapFindPlayer(void)
 {
     switch (g_state_next) {
     case 0:
-        D_8009FDF8 = D_801F15BE;
+        g_map_view_area = D_801F15BE;
         D_8009FE00 = D_801F15BE;
-        D_8009FE88 = D_801F15C0;
+        g_map_view_room = D_801F15C0;
         D_8009FE08 = D_801F15A4;
         D_8009FE0C = D_801F15A6;
         D_8009FDFC = D_801F15A7;
         break;
     case 3:
-        D_8009FDF8 = D_80100066;
+        g_map_view_area = D_80100066;
         D_8009FE00 = D_80100068 >> 8;
-        D_8009FE88 = D_80100068 & 0xFF;
+        g_map_view_room = D_80100068 & 0xFF;
         D_8009FE08 = D_8010006A;
         D_8009FE0C = D_8010006B;
         if (g_state_prev == 0) {
@@ -336,13 +336,13 @@ void MapScreenLayout(void)
     RoomRotatePoint(0, D_8009FE08, D_8009FE0C, turn, &x, &y);
     MenuListInit(&g_menu->list[1], x, 0, 0x17, 0x18);
     MenuListInit(&g_menu->list[0], y, 0, 0x17, 0x14);
-    MapDrawTurned(D_8009FE88, g_menu->MAP_TURN.cur);
+    MapDrawTurned(g_map_view_room, g_menu->MAP_TURN.cur);
     MapDrawMarkers();
     DrawCompass(g_menu->MAP_TURN.cur);
     MapPlaceMarker(g_menu->MAP_TURN.cur, D_8009FDFC, D_8009FE08, D_8009FE0C,
                    0);
-    MapDrawTurned(D_8009FE88, g_menu->MAP_TURN.cur);
-    MapDrawName(D_8009FE88);
+    MapDrawTurned(g_map_view_room, g_menu->MAP_TURN.cur);
+    MapDrawName(g_map_view_room);
     sy = g_menu->list[0].cur << 4;
     sx = g_menu->list[1].cur << 4;
     g_map_scroll_y = g_header_scroll_y = sy;

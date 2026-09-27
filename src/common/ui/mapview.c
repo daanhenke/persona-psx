@@ -10,13 +10,12 @@
  * the drawer with the turn the player has the map at.
  */
 #include <decomp/types.h>
+#include <persona/common/automap.h>
 
 #define MAP_PACK     0x801DD000
 #define MAP_BASES    ((u_char *)0x801DD004)
 #define MAP_TILES    (*(u_long *)0x801DD004)
 #define MAP_ENTRIES  ((u_long *)0x801DD008)
-
-extern void MapDrawGrid(u_char *map, u_char *tiles, short turn);
 
 void MapDrawTurned(short map, short turn)
 {
@@ -24,5 +23,5 @@ void MapDrawTurned(short map, short turn)
 
     pack = (u_long *)MAP_PACK;
     MapDrawGrid((u_char *)pack + MAP_ENTRIES[map + MAP_BASES[pack[0]]],
-                (u_char *)pack + MAP_TILES, turn);
+                (MapTile *)((u_char *)pack + MAP_TILES), turn);
 }

@@ -20,7 +20,7 @@
 extern short   D_8009FDFC;
 extern short   D_8009FE08;
 extern short   D_8009FE0C;
-extern short   D_8009FE88;
+extern short   g_map_view_room;
 extern short   g_persona_data_step;
 extern u_char  g_menu_allow_hold;
 extern u_short g_key_page_back;
@@ -41,7 +41,7 @@ extern void RoomRotatePoint(short from, short x, short y, short to,
 extern void MapDrawTurned(short map, short turn);
 
 /* A quarter turn by `d`: the two copies share their tail in the image. */
-#define MAP_TURN(d)                                                                g_menu->grid[1].cur = (g_menu->grid[1].cur + (d)) & (TURNS - 1);               DrawCompass(g_menu->grid[1].cur);                                              MapDrawTurned(D_8009FE88, g_menu->grid[1].cur);                                RoomRotatePoint(n, g_menu->list[1].cur, g_menu->list[0].cur,                                   g_menu->grid[1].cur, &pt[0], &pt[1]);                          MapPlaceMarker(g_menu->grid[1].cur, D_8009FDFC, D_8009FE08, D_8009FE0C,                       0);                                                             MenuListInit(&g_menu->list[1], pt[0], 0, 0x17, 0x18);                          MenuListInit(&g_menu->list[0], pt[1], 0, 0x17, 0x14);                          g_map_scroll_y = g_header_scroll_y = g_menu->list[0].cur * 16;                 g_map_scroll_x = g_header_scroll_x = g_menu->list[1].cur * 16
+#define MAP_TURN(d)                                                                g_menu->grid[1].cur = (g_menu->grid[1].cur + (d)) & (TURNS - 1);               DrawCompass(g_menu->grid[1].cur);                                              MapDrawTurned(g_map_view_room, g_menu->grid[1].cur);                                RoomRotatePoint(n, g_menu->list[1].cur, g_menu->list[0].cur,                                   g_menu->grid[1].cur, &pt[0], &pt[1]);                          MapPlaceMarker(g_menu->grid[1].cur, D_8009FDFC, D_8009FE08, D_8009FE0C,                       0);                                                             MenuListInit(&g_menu->list[1], pt[0], 0, 0x17, 0x18);                          MenuListInit(&g_menu->list[0], pt[1], 0, 0x17, 0x14);                          g_map_scroll_y = g_header_scroll_y = g_menu->list[0].cur * 16;                 g_map_scroll_x = g_header_scroll_x = g_menu->list[1].cur * 16
 
 void MapScreenStep(void)
 {

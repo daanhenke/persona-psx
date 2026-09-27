@@ -17,4 +17,15 @@
 
 extern const u_char g_map_base[];
 
+/* A tile type's entry in the map pack's tile table. */
+typedef struct {
+    u_char  pad[8];
+    u_short flags; /* low byte the wall shape, high byte the floor kind */
+    u_short pad2;
+} MapTile;
+
+extern u_char  MapTileSeen(short map, short room, short x, short y);
+extern u_short TileWallsFacing(short tile, short facing);
+extern void    MapDrawGrid(u_char *map, MapTile *tiles, short turn);
+
 #endif

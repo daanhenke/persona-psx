@@ -14,6 +14,7 @@
  * carries 0x80. A 0xFF 0x01 pair closes the map off.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -41,10 +42,17 @@ extern u_char g_map_name_cells[];
 extern void bzero(void *dst, int len);
 extern void BgMapInit(u_char *map, int arg);
 
-/* Not built yet. Setting `cell` before `src` gives the image's registers
-   (cell s1, src s0); what is left, in ADV and DNG alike, is the head of the
-   routine: the image loads the base 0x801DD000 into v1 and the index into v0
-   ahead of the s1 save and reads the table entry straight into s0. */
+/* Not matched (DNG 89.68%). Setting `cell` before `src` gives the image's
+   registers (cell s1, src s0); what is left, in ADV and DNG alike, is the
+   head. The image loads the base 0x801DD000 into v1 first and the index into
+   v0, and sets a0 = cell before the table load. For the index to miss a0,
+   sched1 must place `a0 = cell` (the call's argument copy, emitted with the
+   call) before the load. Every source order here has the load's LUID below
+   the copy's, the priorities are equal, and a read cannot follow the call
+   (sched.c: every MEM read depends on the last memory flush, const or not).
+   Splitting the sum (`src = entry; src += base`) loads straight into s0 as
+   the image does, but it scores lower. */
+#ifdef NON_MATCHING
 void MapDrawName(short map)
 {
     u_char *src;
@@ -77,3 +85,4 @@ void MapDrawName(short map)
     g_bg_layers[NAME_LAYER].h = NAME_H;
     g_bg_shown |= NAME_BIT;
 }
+#endif
