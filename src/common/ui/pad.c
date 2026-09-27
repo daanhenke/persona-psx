@@ -12,12 +12,13 @@
  * MenuStepCursor tests the held word because it times its own auto-repeat;
  * InputCheckAcceptA/B test the edge so a press fires once.
  *
- * All three are reached by hardcoded address rather than through their linker
- * symbols.
+ * held and previous are reached by hardcoded address; the edge is stored
+ * through its symbol.
  */
 #include <decomp/types.h>
 
 extern u_long PadRead(int n);
+extern int    g_pad_pressed[];
 
 /* Reads controller 1 once a frame: last frame's held word is rolled into the
    previous slot, the new one takes its place, and `(old & now) ^ now` -
@@ -34,6 +35,6 @@ void PadPoll(void)
     *prev = *held;
     now = PadRead(1);
     old = *prev;
-    *(int *)(0x800DC004 + WORK_BIAS) = (old & now) ^ now;
+    g_pad_pressed[0] = (old & now) ^ now;
     *held = now;
 }

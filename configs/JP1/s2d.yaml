@@ -39,6 +39,12 @@ options:
   # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
   # than the Shift-JIS ones the ROM holds.
   data_string_guesser_level: 0
+  # Everything the overlay reaches outside its own image: the resident
+  # executable's code and data, as btlp.yaml has it. Without the range a
+  # reference into the middle of a main symbol - g_persona_data + 0x26 - comes
+  # out as a fresh D_ label rather than the offset the C writes.
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   # overlay id 6
@@ -64,6 +70,8 @@ segments:
       - [0x708, rodata, s2d_rodata3b]
       - [0x730, .rodata, common/ui/persontype]
       - [0x7B8, rodata, s2d_rodata3c]
+      - [0xD0C, .rodata, game/sceneload]
+      - [0xD20, rodata, s2d_rodata3d]
       - [0xE80, asm, s2d]
       - [0x1414, c, common/gfx/slot]
       - [0x175C, c, common/gfx/fade]
@@ -201,6 +209,9 @@ segments:
       - [0x25318, c, common/ui/personalist]
       - [0x253E4, c, common/ui/persontype]
       - [0x25464, asm, s2d_2_s27]
+      # The disc loads: the map's sound, scene data and models, the prefetches.
+      - [0x359C0, c, game/sceneload]
+      - [0x35F08, asm, s2d_2_s27b]
       - [0x37884, c, common/game/eventflag]
       - [0x378AC, asm, s2d_2_s28]
       # The overlay's own workspace: what the disc carries a value for,
