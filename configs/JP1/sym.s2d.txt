@@ -1399,6 +1399,7 @@ D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C; // size:0x28
 g_pad_pressed            = 0x800FC004; // size:0x4
 g_msg                    = 0x80101E4C; // ignore:True size:0x40
+D_8010B380               = 0x8010B380; // ignore:True
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
 g_map_entries            = 0x801DD008; // ignore:True
 g_persona_stock          = 0x801F297C; // ignore:True size:0xF

@@ -1191,6 +1191,7 @@ g_persona_list_rule      = 0x8009B1D0;
 g_stat_labels            = 0x8009B214; // size:0x10
 g_equip_id_range         = 0x8009B2E4; // size:0x1C
 g_fm_grid_cur_def        = 0x8009B40C;
+g_formation_member_def   = 0x8009B4F4;
 g_grow_slot_def          = 0x8009B704;
 g_cinema_cels0           = 0x8009B714; // size:0x48
 g_cinema_cels6           = 0x8009B75C; // size:0x10

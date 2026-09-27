@@ -1889,6 +1889,7 @@ g_persona_list           = 0x800EAE4C; // ignore:True
 g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
 D_800EB347               = 0x800EB347; // ignore:True
 D_800EB34C               = 0x800EB34C; // ignore:True
+D_800EB380               = 0x800EB380; // ignore:True
 g_facility_kind          = 0x800EB581;
 g_facility_count         = 0x800EB582;
 g_shop_items             = 0x800EB590; // ignore:True

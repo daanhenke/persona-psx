@@ -4,4 +4,9 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
+
+/* dng hands the member's slot over unmasked. */
+#define SLOT_TAGGED_INT
+#define SLOT_CLEAR_INT
+
 #include "../../../common/game/formationmembers.c"

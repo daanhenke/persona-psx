@@ -248,7 +248,6 @@ segments:
       - [0x2CA20, c, ui/formationpresets]
       - [0x2CB84, c, common/game/equip]
       - [0x2CD9C, c, common/game/formationmembers]
-      - [0x2CE2C, asm, dng_2_s18_x3]
       - [0x2CF2C, c, common/game/formationcompact]
       - [0x2D150, c, common/gfx/statbars]
       - [0x2D774, c, common/gfx/statbarsdata]

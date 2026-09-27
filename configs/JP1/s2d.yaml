@@ -203,7 +203,6 @@ segments:
       - [0x1CF2C, asm, s2d_2_s20_x3]
       - [0x1D090, c, common/game/equip]
       - [0x1D2A8, c, common/game/formationmembers]
-      - [0x1D338, asm, s2d_2_s21_x3]
       - [0x1D440, c, common/game/formationcompact]
       - [0x1D664, c, common/gfx/statbars]
       - [0x1DC88, c, common/gfx/statbarsdata]

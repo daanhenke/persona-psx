@@ -281,8 +281,6 @@ segments:
       - [0x288BC, c, ui/formationpresets]
       - [0x28AAC, c, common/game/equip]
       - [0x28CC4, c, common/game/formationmembers]
-      # FormationSetMemberSprite is still asm.
-      - [0x28D54, asm, adv_42a]
       - [0x28E5C, c, common/game/formationcompact]
       - [0x29080, c, common/gfx/statbars]
       - [0x296A4, c, common/gfx/statbarsdata]

@@ -5,3 +5,4 @@
  * here would collapse back to one shared object.
  */
 #include "../../../common/game/formationmembers.c"
+
