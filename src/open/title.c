@@ -24,9 +24,12 @@ int g_msg_len;
 /* The font's sprites run 34 to a text row. */
 #define FONT_CELL(row, col) ((row) * 34 + (col))
 
+/* The save list's rows are 24 pixels apart from y 0x24. */
+#define SAVE_ROW_Y(row) ((short)((row) * 24 + 0x24))
+
 INCLUDE_ASM("open/nonmatchings/title", func_80081018);
 
-void OpenDrawFrame(void)
+void OpenDrawTitle(void)
 {
     int i;
 
@@ -39,7 +42,7 @@ void OpenDrawFrame(void)
         }
         GsSortBoxFill(&g_msg_box, &g_ot[g_active_buff], 0);
     }
-    if (D_800B40F8) {
+    if (g_msg_box_shown) {
         GsSortBoxFill(&g_msg_box, &g_ot[g_active_buff], 0);
     }
     for (i = 0; i < 10; i++) {
@@ -106,33 +109,393 @@ void OpenSpriteInit(u_short no, u_short w, u_short h, u_short tpage, u_short u, 
     g_sprites[no].scaley = 0x1000;
 }
 
-INCLUDE_ASM("open/nonmatchings/title", func_80082E00);
-
-void func_80084288(void)
+int OpenLoadMenu(int kind)
 {
-    D_800B410C = 2;
-    func_80085798();
+    int  i;
+    int  port;
+    int  bit;
+    int  slot;
+    int  yesno;
+    RECT rect;
+    int  want[2];
+
+    SetPolyG4(&g_grad_poly);
+    setXY4(&g_grad_poly, 0, 0, 0x13F, 0, 0, 0x77, 0x13F, 0x77);
+    setRGB0(&g_grad_poly, 0, 0, 0xFF);
+    setRGB1(&g_grad_poly, 0, 0, 0xFF);
+    setRGB2(&g_grad_poly, 0, 0, 0);
+    setRGB3(&g_grad_poly, 0, 0, 0);
+    for (i = 0; i < 20; i++) {
+        g_lines[i].attribute = 0;
+        g_lines[i].x0 = g_lines[i].x1 = i * 16 + 8;
+        g_lines[i].y0 = 0;
+        g_lines[i].y1 = 0xF0;
+        g_lines[i].r = 0x40;
+        g_lines[i].g = 0x40;
+        g_lines[i].b = 0x40;
+    }
+    for (i = 0; i < 15; i++) {
+        g_lines[i + 20].attribute = 0;
+        g_lines[i + 20].x0 = 0;
+        g_lines[i + 20].x1 = 0x140;
+        g_lines[i + 20].y0 = g_lines[i + 20].y1 = i * 16 + 8;
+        g_lines[i + 20].r = 0x40;
+        g_lines[i + 20].g = 0x40;
+        g_lines[i + 20].b = 0x40;
+    }
     g_pad_now = -1;
     g_pad_trig = 0;
-}
-
-void func_800842D0(int arg0)
-{
-    int i;
-
-    D_800B410C = 0;
     for (i = 0; i < 0x103; i++) {
         g_sprite_flags[i + 10] = 0;
     }
-    func_80084B40(arg0);
-    OpenFontLoadText(12, 2, 0x40, 0x54, D_800A0C10);
+    OpenLoadMenuSprites(kind);
+    OpenFontLoadText(12, 2, 0x40, 0x54, g_txt_load_header);
+    g_menu_state = 0;
+    port = 0;
+    while (1) {
+        switch (g_menu_state) {
+        case 0:
+            if (g_pad_trig & 0x5000) {
+                OpenPlaySeq(0);
+                port ^= 1;
+            } else if (g_pad_trig & 0x40) {
+                OpenPlaySeq(2);
+                return 1;
+            } else if (g_pad_trig & 0x80) {
+                OpenPlaySeq(2);
+                return 1;
+            } else if (g_pad_trig & 0x820) {
+                OpenPlaySeq(1);
+                VSync(30);
+                g_card_scan = CardLoad(port);
+                if (g_card_scan) {
+                    OpenCardPrompt(g_card_scan, port, kind);
+                } else {
+                    VSync(0);
+                    g_card_scan = CardScanSaves(port, kind, g_save_list);
+                    if (g_card_scan == -1) {
+                        OpenMessageOpen(12, 1, 0x40, 0x5C, g_txt_card_error);
+                        VSync(0);
+                        for (;;) {
+                            if (CardPollPorts(port == 0 ? 0x81 : 0, port ? 0x81 : 0)) {
+                                OpenLoadMenuReset(kind);
+                                break;
+                            }
+                            OpenDrawMenu();
+                            if (g_pad_trig) {
+                                break;
+                            }
+                        }
+                        g_msg_len = 0;
+                    } else {
+                        bit = 0x100;
+                        for (i = 0; i < 7; i++) {
+                            if (g_card_scan & bit) {
+                                OpenMessageOpen(12, 2, 0x40, 0x54, g_txt_save_broken);
+                                OpenFontRenderGlyph(i + 0xC1);
+                                rect.x = 0x354;
+                                rect.y = 0x100;
+                                rect.w = 4;
+                                rect.h = 16;
+                                LoadImage(&rect, (u_long *)g_font_glyph);
+                                DrawSync(0);
+                                VSync(0);
+                                for (;;) {
+                                    if (CardPollPorts(port == 0 ? 0x81 : 0, port ? 0x81 : 0)) {
+                                        OpenLoadMenuReset(kind);
+                                        break;
+                                    }
+                                    OpenDrawMenu();
+                                    if (g_pad_trig) {
+                                        break;
+                                    }
+                                }
+                            }
+                            bit <<= 1;
+                        }
+                        if ((want[port] = (g_card_scan & 0x7F) ^ ((g_card_scan & 0x7F00) >> 8))) {
+                            want[port ^ 1] = 0;
+                            g_msg_len = 0;
+                            g_menu_state = 1;
+                            g_text_len = 0;
+                            g_pad_now = -1;
+                            g_pad_trig = 0;
+                            bit = 1;
+                            for (i = 0; i < 7; i++) {
+                                if ((g_card_scan & bit) != ((bit << 8) & g_card_scan) >> 8) {
+                                    break;
+                                }
+                                bit <<= 1;
+                            }
+                            OpenSaveListInit(port, g_card_scan, slot = i);
+                            break;
+                        } else {
+                            OpenMessageOpen(12, 1, 0x40, 0x5C, g_txt_no_saves);
+                            OpenPlaySeq(3);
+                            VSync(0);
+                            for (;;) {
+                                if (CardPollPorts(want[0], want[1])) {
+                                    OpenLoadMenuReset(kind);
+                                    break;
+                                }
+                                OpenDrawMenu();
+                                if (g_pad_trig) {
+                                    break;
+                                }
+                            }
+                            g_msg_len = 0;
+                        }
+                    }
+                }
+            }
+            g_sprites[15].y = port * 16 + 0x92;
+            break;
+        case 1:
+            if (g_pad_trig & 0x1000) {
+                OpenPlaySeq(0);
+                slot--;
+            } else if (g_pad_trig & 0x4000) {
+                OpenPlaySeq(0);
+                slot++;
+            } else if (g_pad_trig & 0x40) {
+                OpenPlaySeq(2);
+                OpenLoadMenuReset(kind);
+                g_sprites[15].y = port * 16 + 0x92;
+                break;
+            } else if (g_pad_trig & 0x80) {
+                OpenPlaySeq(2);
+                return 1;
+            } else if (g_pad_trig & 0x820) {
+                OpenPlaySeq(1);
+                VSync(30);
+                g_card_status = CardCheckSave(port, kind, slot);
+                if (g_card_status == 0) {
+                    OpenMessageOpen(12, 1, 0x40, 0x5C, g_txt_no_saves);
+                    VSync(0);
+                    for (;;) {
+                        if (CardPollPorts(want[0], want[1])) {
+                            OpenLoadMenuReset(kind);
+                            break;
+                        }
+                        OpenDrawMenu();
+                        if (g_pad_trig) {
+                            break;
+                        }
+                    }
+                    g_msg_len = 0;
+                    break;
+                } else if (g_card_status == -2 || g_card_status == -1) {
+                    OpenMessageOpen(12, 2, 0x40, 0x54, g_txt_save_broken);
+                    OpenFontRenderGlyph(slot + 0xC1);
+                    rect.x = 0x354;
+                    rect.y = 0x100;
+                    rect.w = 4;
+                    rect.h = 16;
+                    LoadImage(&rect, (u_long *)g_font_glyph);
+                    DrawSync(0);
+                    VSync(0);
+                    for (;;) {
+                        if (CardPollPorts(want[0], want[1])) {
+                            break;
+                        }
+                        OpenDrawMenu();
+                        if (g_pad_trig) {
+                            break;
+                        }
+                    }
+                    g_msg_len = 0;
+                    OpenLoadMenuReset(kind);
+                    break;
+                }
+                if (kind == 1) {
+                    OpenMessageOpen(13, 3, 0x38, 0x54, g_txt_suspend_erase);
+                    VSync(0);
+                    for (;;) {
+                        if (CardPollPorts(want[0], want[1])) {
+                            OpenLoadMenuReset(kind);
+                            for (i = 0xFC; i < 0x103; i++) {
+                                g_sprite_flags[i + 10] = 0;
+                            }
+                            g_msg_len = 0;
+                            goto next;
+                        }
+                        OpenDrawMenu();
+                        if (g_pad_trig) {
+                            break;
+                        }
+                    }
+                    g_msg_len = 0;
+                }
+                OpenConfirmOpen();
+                yesno = 0;
+            next:
+                break;
+            }
+            slot = slot < 0 ? 6 : slot;
+            slot = slot < 7 ? slot : 0;
+            g_sprites[0x17].y = SAVE_ROW_Y(slot);
+            break;
+        case 2:
+            if (g_pad_trig & 0x5000) {
+                OpenPlaySeq(0);
+                yesno ^= 1;
+            } else if (g_pad_trig & 0x40) {
+                OpenPlaySeq(2);
+                g_menu_state = 1;
+                for (i = 0xFC; i < 0x103; i++) {
+                    g_sprite_flags[i + 10] = 0;
+                }
+                g_pad_now = -1;
+                g_pad_trig = 0;
+                break;
+            } else if (g_pad_trig & 0x80) {
+                OpenPlaySeq(2);
+                return 1;
+            } else if (g_pad_trig & 0x820) {
+                if (yesno == 1) {
+                    OpenPlaySeq(2);
+                    g_menu_state = 1;
+                    for (i = 0xFC; i < 0x103; i++) {
+                        g_sprite_flags[i + 10] = 0;
+                    }
+                    g_pad_now = -1;
+                    g_pad_trig = 0;
+                    break;
+                }
+                OpenMessageOpen(12, 3, 0x40, 0x58, g_txt_loading);
+                OpenDrawMenu();
+                OpenDrawMenu();
+                g_load_status = CardLoadSave(port, slot, kind);
+                if (g_load_status) {
+                    goto failed;
+                }
+                if (kind == 1) {
+                    VSync(0);
+                    g_load_status = CardDeleteFile(port, slot, kind);
+                    if (g_load_status == 0) {
+                        goto loaded;
+                    }
+                }
+            failed:
+                g_msg_len = 0;
+                VSync(0);
+                g_card_status = CardLoad(port);
+                if (g_card_status) {
+                    OpenCardPrompt(g_card_status, port, kind);
+                    OpenLoadMenuReset(kind);
+                    break;
+                }
+                if (g_load_status == -2 || g_load_status == -1) {
+                    OpenMessageOpen(12, 2, 0x40, 0x54, g_txt_save_broken);
+                    OpenFontRenderGlyph(slot + 0xC1);
+                    rect.x = 0x354;
+                    rect.y = 0x100;
+                    rect.w = 4;
+                    rect.h = 16;
+                    LoadImage(&rect, (u_long *)g_font_glyph);
+                    DrawSync(0);
+                    for (;;) {
+                        if (CardPollPorts(want[0], want[1])) {
+                            break;
+                        }
+                        OpenDrawMenu();
+                        if (g_pad_trig) {
+                            break;
+                        }
+                    }
+                    g_msg_len = 0;
+                    g_menu_state = 1;
+                    for (i = 0xFC; i < 0x103; i++) {
+                        g_sprite_flags[i + 10] = 0;
+                    }
+                    g_pad_now = -1;
+                    g_pad_trig = 0;
+                    break;
+                }
+            loaded:
+                g_save_slot = slot;
+                g_save_chan = port;
+                g_msg_len = 0;
+                return 0;
+            }
+            g_sprites[0x106].y = yesno * 16 + 0xBA;
+            break;
+        }
+        if (g_menu_state != 0 && CardPollPorts(want[0], want[1])) {
+            OpenLoadMenuReset(kind);
+            g_sprites[15].y = port * 16 + 0x92;
+        }
+        OpenDrawMenu();
+    }
+}
+
+void OpenConfirmOpen(void)
+{
+    g_menu_state = 2;
+    OpenConfirmSprites();
     g_pad_now = -1;
     g_pad_trig = 0;
 }
 
-INCLUDE_ASM("open/nonmatchings/title", func_800843A0);
+void OpenLoadMenuReset(int arg0)
+{
+    int i;
 
-void func_80084B40(int alt)
+    g_menu_state = 0;
+    for (i = 0; i < 0x103; i++) {
+        g_sprite_flags[i + 10] = 0;
+    }
+    OpenLoadMenuSprites(arg0);
+    OpenFontLoadText(12, 2, 0x40, 0x54, g_txt_load_header);
+    g_pad_now = -1;
+    g_pad_trig = 0;
+}
+
+void OpenDrawMenu(void)
+{
+    int i;
+
+    g_active_buff = GsGetActiveBuff();
+    GsSetWorkBase((PACKET *)g_packet[g_active_buff]);
+    GsClearOt(0, 0, &g_ot[g_active_buff]);
+    if (g_msg_len) {
+        for (i = 0; i < g_msg_len; i++) {
+            GsSortFastSprite(&g_sprites[i + 0x125], &g_ot[g_active_buff], g_sprite_flags[i + 0x125] & 0x7F);
+        }
+        GsSortBoxFill(&g_msg_box, &g_ot[g_active_buff], 0);
+    }
+    for (i = 0; i < g_text_len; i++) {
+        if (g_msg_len) {
+            g_sprites[i + 0x10D].r = g_sprites[i + 0x10D].g = g_sprites[i + 0x10D].b = 0x20;
+        } else {
+            g_sprites[i + 0x10D].r = g_sprites[i + 0x10D].g = g_sprites[i + 0x10D].b = 0x80;
+        }
+        GsSortFastSprite(&g_sprites[i + 0x10D], &g_ot[g_active_buff], g_sprite_flags[i + 0x10D] & 0x7F);
+    }
+    for (i = 0; i < 0x103; i++) {
+        if (g_msg_len) {
+            g_sprites[i + 10].r = g_sprites[i + 10].g = g_sprites[i + 10].b = 0x20;
+        } else {
+            g_sprites[i + 10].r = g_sprites[i + 10].g = g_sprites[i + 10].b = 0x80;
+        }
+        if (g_sprite_flags[i + 10] & 0x80) {
+            GsSortFastSprite(&g_sprites[i + 10], &g_ot[g_active_buff], g_sprite_flags[i + 10] & 0x7F);
+        }
+    }
+    for (i = 0; i < 35; i++) {
+        GsSortLine(&g_lines[i], &g_ot[g_active_buff], 15);
+    }
+    GsSortPoly(&g_grad_poly, &g_ot[g_active_buff], 15);
+    VSync(2);
+    g_pad_old = g_pad_now;
+    g_pad_now = ~((g_pad_buf0[2] << 8) | g_pad_buf0[3]);
+    g_pad_trig = g_pad_now ^ (g_pad_now & g_pad_old);
+    GsSwapDispBuff();
+    GsSortClear(0, 0, 0, &g_ot[g_active_buff]);
+    GsDrawOt(&g_ot[g_active_buff]);
+}
+
+void OpenLoadMenuSprites(int alt)
 {
     OpenSpriteInit(10, 0x30, 0x10, 0x1B, 0x90, 0, 0x100, 0x1E1);
     if (alt) {
@@ -175,9 +538,73 @@ void func_80084B40(int alt)
     g_sprite_flags[17] = 0x80;
 }
 
-INCLUDE_ASM("open/nonmatchings/title", func_80084E64);
+void OpenSaveListInit(int kind, int mask, int cursor)
+{
+    int i;
+    int j;
+    int bit;
 
-void func_80085798(void)
+    OpenSpriteInit(12, 0x30, 0x10, 0x1B, kind * 48, 0x10, 0x100, 0x1E1);
+    g_sprites[12].attribute = 0;
+    g_sprites[12].x = 0x48;
+    g_sprites[12].y = 0x10;
+    g_sprite_flags[12] = 0x82;
+    OpenSpriteInit(13, 0x30, 0x10, 0x19, 0x20, 0xC, 0, 0x1E1);
+    g_sprites[13].x = 0x48;
+    g_sprites[13].y = 0x10;
+    g_sprite_flags[13] = 0x82;
+    OpenSpriteInit(14, 0xB0, 0xC, 0x19, 0, 0x68, 0, 0x1E1);
+    g_sprites[14].x = 0x48;
+    g_sprites[14].y = 0x18;
+    g_sprite_flags[14] = 0x82;
+    for (i = 0; i < 7; i++) {
+        OpenSpriteInit(i + 15, 0xB0, 0x18, 0x19, 0, 0x74, 0, 0x1E1);
+        g_sprites[i + 15].x = 0x48;
+        g_sprites[i + 15].y = SAVE_ROW_Y(i);
+        g_sprite_flags[i + 15] = 0x82;
+    }
+    OpenSpriteInit(0x16, 0xB0, 0xC, 0x19, 0, 0x8C, 0, 0x1E1);
+    g_sprites[0x16].x = 0x48;
+    g_sprites[0x16].y = 0xCC;
+    g_sprite_flags[0x16] = 0x82;
+    OpenSpriteInit(0x17, 0xA0, 0x18, 0x18, 0, 0xD8, 0x100, 0x1E0);
+    g_sprites[0x17].attribute = 0x40000000;
+    g_sprites[0x17].x = 0x50;
+    g_sprites[0x17].y = SAVE_ROW_Y(cursor);
+    g_sprite_flags[0x17] = 0x81;
+    for (i = 0; i < 7; i++) {
+        for (j = 0; j < 34; j++) {
+            OpenSpriteInit(j + 24 + i * 34, 8, 12, 0x18, 0, 0, 0x100, 0x1E0);
+            g_sprites[FONT_CELL(i, j + 24)].attribute = 0;
+            g_sprites[FONT_CELL(i, j + 24)].x = j % 17 * 8 + 0x50;
+            g_sprites[FONT_CELL(i, j + 24)].y = j / 17 * 12 + SAVE_ROW_Y(i);
+        }
+        OpenSpriteSetUV(FONT_CELL(i, 24), 0xD8, 0x48);
+        OpenSpriteSetUV(FONT_CELL(i, 33), 0xE0, 0x48);
+        OpenSpriteSetUV(FONT_CELL(i, 41), 8, 0x78);
+        OpenSpriteSetUV(FONT_CELL(i, 42), 0x10, 0x78);
+        OpenSpriteSetUV(FONT_CELL(i, 48), 0x10, 0x6C);
+        OpenSpriteSetUV(FONT_CELL(i, 49), 0x18, 0x6C);
+        OpenSpriteSetUV(FONT_CELL(i, 50), 0x20, 0x6C);
+        OpenSpriteSetUV(FONT_CELL(i, 51), 0x28, 0x6C);
+        OpenSpriteSetUV(FONT_CELL(i, 55), 0x88, 0x48);
+    }
+    bit = 1;
+    for (i = 0; i < 7; i++) {
+        if ((mask & bit) && !((bit << 8) & mask)) {
+            for (j = 0; j < 34; j++) {
+                g_sprite_flags[i * 34 + j + 24] = 0x80;
+            }
+            OpenFontPutText(i, g_save_list[i].name);
+            OpenFontPutNumber(i, g_save_list[i].level, 20);
+            OpenFontPutNumber(i, g_save_list[i].hours, 29);
+            OpenFontPutNumber(i, g_save_list[i].minutes, 32);
+        }
+        bit <<= 1;
+    }
+}
+
+void OpenConfirmSprites(void)
 {
     OpenSpriteInit(0x106, 0x30, 0xC, 0x18, 0, 0xC8, 0x100, 0x1E0);
     g_sprites[0x106].attribute = 0x40000000;
@@ -271,28 +698,28 @@ void OpenFontLoadText(short w, short h, short x, short y, u_short *text)
     }
 }
 
-void func_8008615C(int kind, int port, int arg2)
+void OpenCardPrompt(int kind, int port, int arg2)
 {
     OpenPlaySeq(3);
     switch (kind) {
     case 1:
-        OpenMessageOpen(12, 1, 0x40, 0x5C, D_800A0C5C);
+        OpenMessageOpen(12, 1, 0x40, 0x5C, g_txt_card_error);
         break;
     case 2:
-        OpenMessageOpen(13, 1, 0x38, 0x58, D_800A0C40);
+        OpenMessageOpen(13, 1, 0x38, 0x58, g_txt_no_card);
         break;
     case 4:
-        OpenMessageOpen(13, 2, 0x38, 0x54, D_800A0C74);
+        OpenMessageOpen(13, 2, 0x38, 0x54, g_txt_unformatted);
         break;
     }
-    func_800843A0();
+    OpenDrawMenu();
     CardPollPorts(0, 0);
     for (;;) {
         if (CardPollPorts(port == 0 ? 0x81 : 0, port ? 0x81 : 0)) {
-            func_800842D0(arg2);
+            OpenLoadMenuReset(arg2);
             break;
         }
-        func_800843A0();
+        OpenDrawMenu();
         if (g_pad_trig) {
             break;
         }
@@ -339,7 +766,8 @@ void OpenMessageOpen(short w, short h, short x, short y, u_short *text)
     g_msg_box.b = 0;
 }
 
-void OpenFontRenderGlyph(u_short code)
+void OpenFontRenderGlyph(code)
+u_short code;
 {
     u_char *p;
     u_char  bits;
