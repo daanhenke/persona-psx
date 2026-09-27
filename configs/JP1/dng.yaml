@@ -235,7 +235,7 @@ segments:
       - [0x2B544, c, common/ui/pad]
       - [0x2B5A4, c, common/gfx/fadeblock]
       - [0x2B6B4, c, common/gfx/fadesprites]
-      - [0x2B79C, asm, dng_2_s15]
+      - [0x2B79C, c, common/ui/configcursors]
       - [0x2BAA4, c, common/ui/configlabels]
       - [0x2BBA8, c, common/ui/padlayout]
       - [0x2BCD8, c, ui/tacticlists]

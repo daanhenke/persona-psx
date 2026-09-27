@@ -262,7 +262,7 @@ segments:
       - [0x2731C, c, common/ui/pad]
       - [0x2737C, c, common/gfx/fadeblock]
       - [0x2748C, c, common/gfx/fadesprites]
-      - [0x27574, asm, adv_39]
+      - [0x27574, c, common/ui/configcursors]
       - [0x2787C, c, common/ui/configlabels]
       - [0x27980, c, common/ui/padlayout]
       - [0x27AB0, asm, adv_40]

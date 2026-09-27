@@ -959,7 +959,7 @@ FadeSpritesStepDown      = 0x8008B8A0; // type:func size:0x74
 //-----------------------------------------------------------
 //--- PA: 0x027574   VA: 0x8008B914   subsegment: asm, adv_39
 //-----------------------------------------------------------
-D_8008B914               = 0x8008B914; // type:func size:0x308
+ConfigPlaceCursors       = 0x8008B914; // type:func size:0x308
 
 //----------------------------------------------------------------------------
 //--- PA: 0x02787C   VA: 0x8008BC1C   subsegment: c, ../common/ui/configlabels
