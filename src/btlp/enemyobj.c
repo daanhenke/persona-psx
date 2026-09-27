@@ -13,7 +13,6 @@
  * takes the first table of its own.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/model.h>
 #include <persona/btlp/object.h>
 
@@ -50,19 +49,11 @@
 extern BtlObjDef         g_btl_enemy_def;
 extern u_char           *g_btl_species_gfx[];
 
-/* 97.85%. The species pick is a switch whose every arm stores the scripts
-   itself. The arms' stores are merged after scheduling, so each is
-   scheduled in its own case, which the image shows. The shadow takes its
-   scripts and attribute before the rest. What is left is one load: the
-   image reads the body's scripts before storing its kind, column and row,
-   and stores the scripts after them. Written first, the store and the
-   attribute come up with the load (93.55%). Written last, as here, the load
-   waits behind the three stores. */
-#ifdef NON_MATCHING
 BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx, int depth)
 {
     BtlObj *obj;
     BtlObj *shadow;
+    const u_long **scripts;
     long    pos[3];
     int     slot;
 
@@ -92,11 +83,14 @@ BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx, int depth)
 
     obj = BtlObjAlloc(&g_btl_enemy_def, BTL_ENEMY_GROUP, 0, 5, 0, pos,
                       gfx, slot);
+    scripts = (const u_long **)g_btl_species_gfx[species];
     obj->kind = species;
     obj->col2 = col;
     obj->row = row;
-    obj->scripts = (const u_long **)g_btl_species_gfx[species];
-    obj->attr |= BTL_BODY_ATTR | g_btl_species[species].attr;
+    obj->scripts = scripts;
+    /* This view shares the mutable model work area. Keeping the read mutable
+       stops sched2 moving it ahead of the body's kind and grid stores. */
+    obj->attr |= BTL_BODY_ATTR | ((BtlSpecies *)g_btl_species)[species].attr;
 
     pos[2] = 0;
     shadow = BtlObjAlloc(&g_btl_enemy_def, BTL_ENEMY_GROUP, obj, 5, 0, pos,
@@ -123,7 +117,4 @@ BtlObj *BtlSpawnEnemy(int species, int col, int row, short gfx, int depth)
     }
     return obj;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/enemyobj", BtlSpawnEnemy);
-#endif
 
