@@ -7,7 +7,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
-extern int  func_80081018(int movie);
+extern int  OpenTitle(int movie);
 extern void CardOpenEvents(void);
 extern void CardCloseEvents(void);
 extern void CardEnableEvents(void);
@@ -30,6 +30,7 @@ extern u_char   g_msg_box_shown;
 extern int      g_active_buff;
 extern u_char   g_packet[2][0x4000];
 extern GsOT     g_ot[2];
+extern GsOT_TAG g_ot_tags[2][16];
 extern GsLINE   g_lines[35];
 
 /* One save as the list shows it: the head of the block CardScanSaves reads. */
@@ -42,6 +43,27 @@ typedef struct {
 } OpenSaveEntry;                      /* 0x1A bytes */
 
 extern OpenSaveEntry g_save_list[7];
+
+/* The title's pack, loaded at 0x80180000 by the resident: offsets from its
+   start to five TIMs, the VAB head and body and four SEQs. */
+#define OPEN_PACK ((u_long *)0x80180000)
+
+extern u_char   g_title_choice;
+extern short    g_open_vab;
+extern u_char   g_seq_table[];
+extern int      g_title_idle;
+extern int      g_title_cursor;
+extern long     g_card0_suspends;
+extern long     g_card1_suspends;
+extern long     g_card0_saves;
+extern long     g_card1_saves;
+extern u_short  g_txt_no_cards[];
+extern u_short  g_txt_card0_full[];
+extern u_short  g_txt_card1_full[];
+extern int      CardCheckFree(u_char chan);
+extern void     SsUtReverbOn(void);
+extern void     SsQuit(void);
+extern void     SsSetStereo(void);
 extern int      g_card_scan;
 extern int      g_card_status;
 extern int      g_load_status;

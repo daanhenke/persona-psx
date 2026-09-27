@@ -6,7 +6,6 @@
  * executable.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libetc.h>
 #include <libgte.h>
 #include <libgpu.h>
@@ -20,6 +19,7 @@ int g_pad_old;
 int g_pad_trig;
 int g_text_len;
 int g_msg_len;
+int g_title_cursor;
 
 /* The font's sprites run 34 to a text row. */
 #define FONT_CELL(row, col) ((row) * 34 + (col))
@@ -27,7 +27,332 @@ int g_msg_len;
 /* The save list's rows are 24 pixels apart from y 0x24. */
 #define SAVE_ROW_Y(row) ((short)((row) * 24 + 0x24))
 
-INCLUDE_ASM("open/nonmatchings/title", func_80081018);
+int OpenTitle(int movie)
+{
+    RECT rect;
+    int  i;
+    int  j;
+    int  state = 0;
+    int  n_opts;
+    int  avail[3];
+    int  res[2];
+
+    ResetCallback();
+    SsEnd();
+    SsQuit();
+    SsInit();
+    InitPAD(g_pad_buf0, 4, g_pad_buf1, 4);
+    StartPAD();
+    if (movie == 1) {
+        setRECT(&rect, 0, 0, 0x200, 0x200);
+        ClearImage(&rect, 0, 0, 0);
+    }
+    DrawSync(0);
+    ResetGraph(3);
+    if (movie == 2) {
+        GsInitGraph(320, 240, 4, 0, 0);
+    } else {
+        GsInitGraph2(320, 240, 4, 0, 0);
+    }
+    GsDefDispBuff(0, 0, 0, 240);
+    OpenLoadTim((u_long *)(OPEN_PACK[0] + 0x80180000), 1);
+    DrawSync(0);
+    OpenLoadTim((u_long *)(OPEN_PACK[1] + 0x80180000), 0);
+    DrawSync(0);
+    OpenLoadTim((u_long *)(OPEN_PACK[2] + 0x80180000), 0);
+    DrawSync(0);
+    OpenLoadTim((u_long *)(OPEN_PACK[3] + 0x80180000), 0);
+    DrawSync(0);
+    OpenLoadTim((u_long *)(OPEN_PACK[4] + 0x80180000), 0);
+    DrawSync(0);
+    for (i = 0; i < 10; i++) {
+        g_sprite_flags[i] = 0;
+    }
+    g_ot[1].length = 4;
+    g_ot[0].length = 4;
+    g_ot[0].org = g_ot_tags[0];
+    g_ot[1].org = g_ot_tags[1];
+    OpenSpriteInit(9, 0x100, 0xF0, 8, 0, 0, 0, 0);
+    g_sprites[9].attribute = 0x2000000;
+    g_sprites[9].x = 0;
+    g_sprites[9].y = 0;
+    g_sprites[9].r = g_sprites[9].g = g_sprites[9].b = 0x80;
+    g_sprite_flags[9] = 0x82;
+    OpenSpriteInit(8, 0x40, 0xF0, 0xC, 0, 0, 0, 0);
+    g_sprites[8].attribute = 0x2000000;
+    g_sprites[8].x = 0x100;
+    g_sprites[8].y = 0;
+    g_sprites[8].r = g_sprites[8].g = g_sprites[8].b = 0xFF;
+    g_sprite_flags[8] = 0x82;
+    OpenSpriteInit(7, 0x88, 0x10, 0xD, 0, 0, 0, 0x1E0);
+    g_sprites[7].x = 0x5F;
+    g_sprites[7].y = 0xA4;
+    OpenSpriteInit(6, 0x68, 0x10, 0xD, 0, 0x10, 0, 0x1E0);
+    g_sprites[6].x = 0x6B;
+    g_sprites[6].y = 0x90;
+    OpenSpriteInit(5, 0x68, 0x10, 0xD, 0, 0x20, 0, 0x1E0);
+    g_sprites[5].x = 0x6B;
+    g_sprites[5].y = 0xA0;
+    OpenSpriteInit(4, 0x68, 0x10, 0xD, 0, 0x30, 0, 0x1E0);
+    g_sprites[4].x = 0x6B;
+    g_sprites[4].y = 0xB0;
+    OpenSpriteInit(3, 0xB0, 0x28, 0xD, 0, 0x40, 0, 0x1E0);
+    g_sprites[3].x = 0x46;
+    g_sprites[3].y = 0x92;
+    OpenSpriteInit(2, 0x88, 0x10, 0xD, 0, 0x68, 0, 0x1E0);
+    g_sprites[2].attribute |= 0x50000000;
+    g_sprites[2].x = 0x5B;
+    g_sprites[2].y = 0x90;
+    g_sprites[0].r = 0x80;
+    g_title_idle = 900;
+    g_title_cursor = 0;
+    if (movie == 0) {
+        g_msg_box.attribute = 0x50000000;
+        g_msg_box.x = 0;
+        g_msg_box.y = 0;
+        g_msg_box.w = 0x140;
+        g_msg_box.h = 0xF0;
+        g_msg_box.r = 0;
+        g_msg_box.g = 0;
+        g_msg_box.b = 0;
+        g_msg_box_shown = 1;
+        for (i = 0; i < 0x100; i += 4) {
+            g_msg_box.r = g_msg_box.g = g_msg_box.b = 0xFF - i;
+            OpenDrawTitle();
+            OpenDrawTitle();
+        }
+    } else {
+        g_sprites[9].r = g_sprites[9].g = g_sprites[9].b = 0x80;
+        g_sprites[8].r = g_sprites[8].g = g_sprites[8].b = 0x80;
+    }
+    g_msg_box_shown = 0;
+    OpenDrawTitle();
+    SsSetStereo();
+    SsUtSetReverbType(4);
+    SsUtReverbOn();
+    SsSetTickMode(1);
+    SsSetTableSize(g_seq_table, 4, 1);
+    g_open_vab = SsVabOpenHead((u_char *)(OPEN_PACK[5] + 0x80180000), -1);
+    SsVabTransBody((u_char *)(OPEN_PACK[6] + 0x80180000), g_open_vab);
+    SsVabTransCompleted(1);
+    for (i = 0; i < 4; i++) {
+        g_open_seq[i] = SsSeqOpen((u_long *)(OPEN_PACK[7 + i] + 0x80180000), g_open_vab);
+        SsSeqSetVol(g_open_seq[i], 0x7F, 0x7F);
+    }
+    SsStart();
+    SsSetMVol(0x7F, 0x7F);
+    VSync(60);
+    SsUtSetReverbDepth(0x40, 0x40);
+    g_sprite_flags[7] = 0x80;
+    g_pad_now = -1;
+    g_pad_trig = 0;
+    SetDispMask(1);
+    while (--g_title_idle) {
+        switch (state) {
+        case 0:
+            if (g_pad_trig) {
+                if (g_pad_trig != 1) {
+                    OpenPlaySeq(1);
+                } else {
+                    OpenPlaySeq(2);
+                }
+                g_title_idle = 900;
+                state = 1;
+                g_sprite_flags[7] = 0;
+            } else if (g_title_idle % 16 == 0) {
+                g_sprite_flags[7] ^= 0x80;
+            }
+            break;
+        case 1:
+            g_title_idle = 900;
+            g_sprite_flags[7] = 0;
+            g_sprite_flags[2] = 0;
+            g_sprite_flags[3] = 0x80;
+            g_sprite_flags[4] = 0;
+            g_sprite_flags[6] = 0;
+            OpenDrawTitle();
+            OpenDrawTitle();
+            avail[0] = 0;
+            avail[1] = 1;
+            avail[2] = 0;
+            n_opts = 1;
+            g_title_cursor = 1;
+            g_card0_suspends = g_card1_suspends = 0;
+            g_card0_saves = g_card1_saves = 0;
+            VSync(0);
+            res[0] = CardLoad(0);
+            VSync(0);
+            res[1] = CardLoad(1);
+            if (res[0] == 0 || res[1] == 0) {
+                VSync(0);
+                g_card_status = CardScanSaves(0, 0, g_save_list);
+                VSync(0);
+                g_load_status = CardScanSaves(1, 0, g_save_list);
+                g_card_status = g_card_status == -1 ? 0 : g_card_status;
+                g_load_status = g_load_status == -1 ? 0 : g_load_status;
+                g_card0_saves = (g_card_status & 0x7F) ^ ((g_card_status & 0x7F00) >> 8);
+                g_card1_saves = (g_load_status & 0x7F) ^ ((g_load_status & 0x7F00) >> 8);
+                if (g_card0_saves | g_card1_saves) {
+                    avail[0] = 1;
+                    n_opts++;
+                    g_title_cursor = 0;
+                }
+                VSync(0);
+                g_card_status = CardScanSaves(0, 1, g_save_list);
+                VSync(0);
+                g_load_status = CardScanSaves(1, 1, g_save_list);
+                g_card_status = g_card_status == -1 ? 0 : g_card_status;
+                g_load_status = g_load_status == -1 ? 0 : g_load_status;
+                g_card0_suspends = (g_card_status & 0x7F) ^ ((g_card_status & 0x7F00) >> 8);
+                g_card1_suspends = (g_load_status & 0x7F) ^ ((g_load_status & 0x7F00) >> 8);
+                if (g_card0_suspends | g_card1_suspends) {
+                    avail[2] = 1;
+                    n_opts++;
+                    g_title_cursor = 2;
+                }
+            }
+            if (avail[0]) {
+                g_sprite_flags[6] = 0x80;
+            } else {
+                g_sprite_flags[6] = 0;
+            }
+            if (avail[2]) {
+                g_sprite_flags[4] = 0x80;
+            } else {
+                g_sprite_flags[4] = 0;
+            }
+            g_sprite_flags[5] = 0x80;
+            g_sprite_flags[3] = 0;
+            g_sprite_flags[2] = 0x81;
+            g_sprites[2].y = g_title_cursor * 16 + 0x90;
+            state = 2;
+            break;
+        case 2:
+            if (g_pad_trig) {
+                g_title_idle = 900;
+                if (n_opts != 1) {
+                    if (g_pad_trig & 0x1000) {
+                        OpenPlaySeq(0);
+                        g_title_cursor--;
+                        while (1) {
+                            g_title_cursor = g_title_cursor < 0 ? 2 : g_title_cursor;
+                            if (avail[g_title_cursor] == 0) {
+                                g_title_cursor--;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    if ((g_pad_trig & 0x4000) || (g_pad_trig & 0x100)) {
+                        OpenPlaySeq(0);
+                        g_title_cursor++;
+                        while (1) {
+                            g_title_cursor = g_title_cursor < 3 ? g_title_cursor : 0;
+                            if (avail[g_title_cursor] == 0) {
+                                g_title_cursor++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    g_sprites[2].y = g_title_cursor * 16 + 0x90;
+                }
+                if (g_pad_trig & 0x820) {
+                    g_card_status = 0;
+                    switch (g_title_cursor) {
+                    case 0:
+                        OpenPlaySeq(1);
+                        if (OpenLoadMenu(g_title_choice / 2) == 0) {
+                            g_card_scan = -1;
+                            goto out;
+                        }
+                        state = 1;
+                        break;
+                    case 1:
+                        if (res[0] == 2 && res[1] == 2) {
+                            OpenMessageOpen(11, 2, 0x48, 0x5C, g_txt_no_cards);
+                            for (;;) {
+                                OpenDrawTitle();
+                                if (g_pad_trig) {
+                                    break;
+                                }
+                            }
+                            g_msg_len = 0;
+                        } else if ((res[0] == 0 || res[1] == 0) && g_card0_saves == 0 && g_card1_saves == 0) {
+                            g_card0_saves = g_card1_saves = 0;
+                            if (res[0] == 0) {
+                                VSync(0);
+                                if ((g_card0_saves = CardCheckFree(0)) == -1) {
+                                    OpenMessageOpen(10, 2, 0x50, 0x5C, g_txt_card0_full);
+                                    for (;;) {
+                                        OpenDrawTitle();
+                                        if (g_pad_trig) {
+                                            break;
+                                        }
+                                    }
+                                    g_msg_len = 0;
+                                }
+                            }
+                            if (res[1] == 0) {
+                                VSync(0);
+                                if ((g_card1_saves = CardCheckFree(1)) == -1) {
+                                    OpenMessageOpen(10, 2, 0x50, 0x5C, g_txt_card1_full);
+                                    for (;;) {
+                                        OpenDrawTitle();
+                                        if (g_pad_trig) {
+                                            break;
+                                        }
+                                    }
+                                    g_msg_len = 0;
+                                }
+                            }
+                            if (g_card0_saves != -1 && g_card1_saves != -1) {
+                                OpenPlaySeq(1);
+                            }
+                        } else {
+                            OpenPlaySeq(1);
+                        }
+                        bzero((u_char *)0x801F1BCC, 0x3780);
+                        for (i = 0x80; i >= 0; i -= 4) {
+                            g_sprites[0].r = g_sprites[0].g = g_sprites[0].b = i;
+                            OpenDrawTitle();
+                        }
+                        goto chosen;
+                    case 2:
+                        OpenPlaySeq(1);
+                        if (OpenLoadMenu(1) == 0) {
+                            goto chosen;
+                        }
+                        state = 1;
+                        break;
+                    }
+                } else if (g_pad_trig & 0x40) {
+                    OpenPlaySeq(2);
+                    state = 1;
+                }
+            }
+            break;
+        }
+        if (state >= 2) {
+            g_card_scan = CardPollPorts(0x81, 0x81);
+            if (g_card_scan) {
+                state = 1;
+            }
+        }
+        OpenDrawTitle();
+    }
+    for (i = 0x80; i >= 0; i -= 4) {
+        g_sprites[0].r = g_sprites[0].g = g_sprites[0].b = i;
+        OpenDrawTitle();
+    }
+    g_card_scan = 0;
+    goto out;
+chosen:
+    g_title_choice = g_title_cursor;
+    g_card_scan = -1;
+out:
+    return g_card_scan;
+}
 
 void OpenDrawTitle(void)
 {
