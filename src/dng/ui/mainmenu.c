@@ -85,7 +85,7 @@ extern void SsSetNck(short handle);
 extern u_char PartyLastSlot(void);
 extern short PersonaStockCompact(void);
 extern void RunFrame(void);
-extern int  func_80085AF4(void);
+extern int  MenuWheelAnimIn(void);
 extern int  func_80086190(void);
 extern void MenuTick(void);
 extern void ItemMenuStep(void);
@@ -284,7 +284,7 @@ void MainMenu(void)
     FadeUpBlocking(8, 0x80);
     SoundPlaySeq(0x18, 5, 1);
 opening:
-    if (!func_80085AF4()) {
+    if (!MenuWheelAnimIn()) {
         RunFrame();
         goto opening;
     }

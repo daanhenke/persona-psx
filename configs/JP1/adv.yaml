@@ -192,7 +192,7 @@ segments:
       - [0x12ACC, c, common/game/persona]
       - [0x12B10, c, common/ui/msgwait]
       - [0x12B88, c, common/gfx/tilemapruns]
-      - [0x12BD8, asm, adv_17]
+      - [0x12BD8, c, ui/menuicons]
       # box.c is one unit: TileMapWriteBar sits between the window rows and the
       # box rows, so the bar is part of the same object.
       - [0x165E0, c, common/gfx/box]

@@ -17,9 +17,6 @@
 #ifndef D_8009B074
 #define D_8009B074    D_800B2330
 #endif
-#ifndef func_80085AF4
-#define func_80085AF4 func_80076F78
-#endif
 #ifndef func_80086614
 #define func_80086614 func_80077A98
 #endif
@@ -53,6 +50,48 @@
 #endif
 #ifndef D_8009FE0C
 #define D_8009FE0C D_800BB9A0
+#endif
+
+/* The menu icons (src/common/ui/menuicons.c): its cell tables and the
+   routines ADV has not named yet. */
+#ifndef D_8009AA2C
+#define D_8009AA2C         D_800B1CE8
+#endif
+#ifndef D_8009AA8C
+#define D_8009AA8C         D_800B1D48
+#endif
+#ifndef D_8009AB58
+#define D_8009AB58         D_800B1E14
+#endif
+#ifndef D_8009ABA8
+#define D_8009ABA8         D_800B1E64
+#endif
+#ifndef D_8009B0B4
+#define D_8009B0B4         D_800B2370
+#endif
+#ifndef D_8009B0CC
+#define D_8009B0CC         D_800B2388
+#endif
+#ifndef D_8009B10C
+#define D_8009B10C         D_800B23C8
+#endif
+#ifndef MenuWheelOpen
+#define MenuWheelOpen      func_80077F8C
+#endif
+#ifndef MenuIconsSet5
+#define MenuIconsSet5      func_8007A508
+#endif
+#ifndef MenuIconsSet3
+#define MenuIconsSet3      func_8007A62C
+#endif
+#ifndef MenuIconsSet2
+#define MenuIconsSet2      D_8007A738
+#endif
+#ifndef MenuIconsShade
+#define MenuIconsShade     func_8007A83C
+#endif
+#ifndef MenuIconsShadeFrom
+#define MenuIconsShadeFrom D_8007A8D8
 #endif
 
 #endif

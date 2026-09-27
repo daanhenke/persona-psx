@@ -83,7 +83,7 @@ extern void SsSetNck(short handle);
 extern u_char PartyLastSlot(void);
 extern short PersonaStockCompact(void);
 extern void RunFrame(void);
-extern u_char func_80076F78(void);
+extern u_char MenuWheelAnimIn(void);
 extern u_char func_80077614(void);
 extern void MenuTick(void);
 extern void ItemMenuStep(void);
@@ -282,7 +282,7 @@ void MainMenu(void)
     FadeUpBlocking(8, 0x80);
     SoundPlaySeq(0x18, 5, 1);
 opening:
-    if (!func_80076F78()) {
+    if (!MenuWheelAnimIn()) {
         RunFrame();
         goto opening;
     }

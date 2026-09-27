@@ -22,7 +22,7 @@ extern u_char g_menu_blink;
 
 extern void MenuSetLayers(int);
 extern void MenuScreenDraw(void);
-extern int  func_80085AF4(void);
+extern int  MenuWheelAnimIn(void);
 extern void func_80086614(void);
 
 void MenuBuild(void)
@@ -37,7 +37,7 @@ void MenuBuild(void)
                      MENU_WRAP);
     SlotInitTagged(g_menu_top_def, 0x2F, 0x380, 0, 0);
     MenuScreenDraw();
-    func_80085AF4();
+    MenuWheelAnimIn();
     if (g_menu_blink == 0xFF) {
         func_80086614();
     }

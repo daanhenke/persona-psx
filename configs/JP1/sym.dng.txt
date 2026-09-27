@@ -628,7 +628,7 @@ TileMapWriteRun10        = 0x80085ACC; // type:func size:0x28
 //-------------------------------------------------------------
 //--- PA: 0x021754   VA: 0x80085AF4   subsegment: asm, dng_2_s7
 //-------------------------------------------------------------
-func_80085AF4            = 0x80085AF4; // type:func size:0x69C
+MenuWheelAnimIn          = 0x80085AF4; // type:func size:0x69C
 func_80086190            = 0x80086190; // type:func size:0x484
 func_80086614            = 0x80086614; // type:func size:0x4F4
 MenuWheelOpen            = 0x80086B08; // type:func size:0x318
