@@ -1028,7 +1028,7 @@ CharUnequip              = 0x8008CEF0; // type:func size:0xC0
 //-----------------------------------------------------------
 //--- PA: 0x028C10   VA: 0x8008CFB0   subsegment: asm, adv_42
 //-----------------------------------------------------------
-D_8008CFB0               = 0x8008CFB0; // type:func size:0xB4
+CharEquipDiffers         = 0x8008CFB0; // type:func size:0xB4
 
 //----------------------------------------------------------------------------------
 //--- PA: 0x028CC4   VA: 0x8008D064   subsegment: c, ../common/game/formationmembers

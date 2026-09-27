@@ -91,7 +91,7 @@ segments:
       - [0x49C, .rodata, audio/soundcmd]
       - [0x68C, rodata, adv_rodata5a]
       - [0x6F0, .rodata, common/game/equip]
-      - [0x72C, rodata, adv_rodata6]
+      - [0x74C, pad, adv_pad_74c]
       # the two stat-bar units emit their own switch tables.
       - [0x750, .rodata, common/gfx/statbars]
       - [0x794, rodata, adv_rodata6a]
@@ -276,7 +276,6 @@ segments:
       - [0x28818, c, common/game/formationfits]
       - [0x288BC, c, ui/formationpresets]
       - [0x28AAC, c, common/game/equip]
-      - [0x28C10, asm, adv_42]
       - [0x28CC4, c, common/game/formationmembers]
       # FormationSetMemberSprite is still asm.
       - [0x28D54, asm, adv_42a]

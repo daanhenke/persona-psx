@@ -4,9 +4,10 @@
  * something on takes it out of the inventory and taking it off gives it back.
  * Both directions go through the pending list rather than g_items directly.
  *
- *                DNG         ADV         S2D
- *   CharEquip    0x80090F24  0x8008CE4C  0x80081430
- *   CharUnequip  0x80090FC8  0x8008CEF0  0x800814D4
+ *                     DNG         ADV         S2D
+ *   CharEquip         0x80090F24  0x8008CE4C  0x80081430
+ *   CharUnequip       0x80090FC8  0x8008CEF0  0x800814D4
+ *   CharEquipDiffers  0x80091088  0x8008CFB0  0x80081594
  */
 #include <decomp/types.h>
 #include <persona/common/char.h>
@@ -88,4 +89,44 @@ void CharUnequip(u_char chr, u_char slot)
     if (item & ITEM_ID) {
         ItemsAddPending(item & ITEM_ID, 1);
     }
+}
+
+/* 0 when `slot` already holds `item`, 1 otherwise; only the ids are
+   compared, not the counts. A slot past the last compares whatever was left
+   in the register. */
+int CharEquipDiffers(u_char chr, u_char slot, u_short item)
+{
+    Char    *c;
+    u_short  cur;
+    int      differs;
+
+    differs = 1;
+    c = &g_chars[chr];
+    switch (slot) {
+    case 0:
+        cur = c->equip[0];
+        break;
+    case 1:
+        cur = c->equip[1];
+        break;
+    case 2:
+        cur = c->equip[2];
+        break;
+    case 3:
+        cur = c->equip[3];
+        break;
+    case 4:
+        cur = c->equip[4];
+        break;
+    case 5:
+        cur = c->equip[5];
+        break;
+    case 6:
+        cur = c->equip[6];
+        break;
+    }
+    if ((cur & ITEM_ID) == (item & ITEM_ID)) {
+        differs = 0;
+    }
+    return differs;
 }

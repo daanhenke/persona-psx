@@ -56,7 +56,7 @@ segments:
       - [0x31C, .rodata, common/game/spellusable]
       - [0x544, rodata, s2d_rodata2]
       - [0x634, .rodata, common/game/equip]
-      - [0x670, rodata, s2d_rodata3]
+      - [0x690, pad, s2d_pad_690]
       # the two stat-bar units emit their own switch tables.
       - [0x694, .rodata, common/gfx/statbars]
       - [0x6D8, rodata, s2d_rodata3a]
@@ -167,7 +167,6 @@ segments:
       - [0x1CE88, c, common/game/formationfits]
       - [0x1CF2C, asm, s2d_2_s20_x3]
       - [0x1D090, c, common/game/equip]
-      - [0x1D1F4, asm, s2d_2_s21]
       - [0x1D2A8, c, common/game/formationmembers]
       - [0x1D338, asm, s2d_2_s21_x3]
       - [0x1D440, c, common/game/formationcompact]

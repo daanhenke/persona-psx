@@ -84,7 +84,7 @@ segments:
       - [0x7C8, .rodata, game/charbelowmax]
       - [0x7F0, rodata, dng_rodata1b]
       - [0x808, .rodata, common/game/equip]
-      - [0x844, rodata, dng_rodata2]
+      - [0x864, pad, dng_pad_864]
       # the two stat-bar units emit their own switch tables.
       - [0x868, .rodata, common/gfx/statbars]
       - [0x8AC, rodata, dng_rodata2a]
@@ -246,7 +246,6 @@ segments:
       - [0x2C97C, c, common/game/formationfits]
       - [0x2CA20, asm, dng_2_s17_x2]
       - [0x2CB84, c, common/game/equip]
-      - [0x2CCE8, asm, dng_2_s18]
       - [0x2CD9C, c, common/game/formationmembers]
       - [0x2CE2C, asm, dng_2_s18_x3]
       - [0x2CF2C, c, common/game/formationcompact]
@@ -256,7 +255,7 @@ segments:
       - [0x2D914, asm, dng_2_s18_x2]
       - [0x2E2B4, c, common/game/items]
       # the commit routine, then a copy helper belonging to party.c
-      - [0x2E638, asm, dng_2_s18a]
+      - [0x2E638, c, game/itemscommit]
       - [0x2E734, c, common/game/copyshorts]
       - [0x2E76C, c, common/game/itemslist]
       - [0x2E7E0, c, common/ui/input]

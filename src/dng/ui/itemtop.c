@@ -82,7 +82,7 @@ extern void   func_80086B08(int a, int b);
 extern void   func_800891A8(int a, int b);
 extern void   ItemUseLayout(void);
 extern void   MenuSetLayers(int);
-extern void   func_800929D8(void);
+extern void   ItemsCommitPending(void);
 extern void   ItemUseOn(int member, int item);
 extern void   CopyShorts(u_short *src, u_short *dst, u_short count);
 extern void   DrawItemRowUsable(short slot, short *dst);
@@ -350,7 +350,7 @@ void ItemUseStep(void)
             g_menu_subsel += 5;
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800929D8();
+        ItemsCommitPending();
         ItemsCompact();
         g_menu_subsel = 0;
     }

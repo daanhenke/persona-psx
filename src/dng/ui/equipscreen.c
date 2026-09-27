@@ -75,7 +75,7 @@ extern void   CharApplyStats();
 extern void   CharRecalcStats();
 extern void   CharPreviewEquip();
 extern void   CharPreviewDraw(short member, Char *c);
-extern void   func_800929D8(void);
+extern void   ItemsCommitPending(void);
 extern void   CopyShorts(u_short *src, u_short *dst, u_short count);
 extern void   TextItemStatRow(short item, short x, short y);
 extern u_short EquipPickStronger(short member, short group);
@@ -422,7 +422,7 @@ void EquipStepList(void)
             goto close;
         } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         close:
-            func_800929D8();
+            ItemsCommitPending();
             ItemsCompact();
             TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
             TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
@@ -484,7 +484,7 @@ void EquipStepRemove(void)
             PREVIEW_REMOVE(0);
         }
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800929D8();
+        ItemsCommitPending();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
         EquipScreenLayout();
@@ -533,18 +533,18 @@ void EquipStepOptimise(void)
             CharEquipBest(n, g_menu->list[1].cur - 1);
             CharApplyStats(n);
             CharRecalcStats(n);
-            func_800929D8();
+            ItemsCommitPending();
         } else {
             for (i = 0; i < CHAR_EQUIP; i++) {
                 CharEquipBest(n, i);
-                func_800929D8();
+                ItemsCommitPending();
             }
             CharApplyStats(n);
             CharRecalcStats(n);
         }
         EquipDrawMember(g_menu->unk050.cur);
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800929D8();
+        ItemsCommitPending();
         TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
         TileMapFillRect(g_tilemap2, 0, MAP_W, 0x20, MAP_W);
         EquipScreenLayout();

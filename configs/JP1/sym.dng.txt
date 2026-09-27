@@ -879,7 +879,7 @@ CharUnequip              = 0x80090FC8; // type:func size:0xC0
 //--------------------------------------------------------------
 //--- PA: 0x02CCE8   VA: 0x80091088   subsegment: asm, dng_2_s18
 //--------------------------------------------------------------
-D_80091088               = 0x80091088; // type:func size:0xB4
+CharEquipDiffers         = 0x80091088; // type:func size:0xB4
 
 //-------------------------------------------------------------------------------
 //--- PA: 0x02CD9C   VA: 0x8009113C   subsegment: c, common/game/formationmembers
@@ -939,7 +939,7 @@ ItemsFindPending         = 0x80092978; // type:func size:0x60
 //---------------------------------------------------------------
 //--- PA: 0x02E638   VA: 0x800929D8   subsegment: asm, dng_2_s18a
 //---------------------------------------------------------------
-func_800929D8            = 0x800929D8; // type:func size:0xFC
+ItemsCommitPending       = 0x800929D8; // type:func size:0xFC
 
 //-------------------------------------------------------------------------
 //--- PA: 0x02E734   VA: 0x80092AD4   subsegment: c, common/game/copyshorts
