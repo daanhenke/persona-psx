@@ -42,30 +42,32 @@ extern u_char g_map_name_cells[];
 extern void bzero(void *dst, int len);
 extern void BgMapInit(u_char *map, int arg);
 
-/* Not matched (DNG 89.68%). Setting `cell` before `src` gives the image's
-   registers (cell s1, src s0); what is left, in ADV and DNG alike, is the
-   head. The image loads the base 0x801DD000 into v1 first and the index into
-   v0, and sets a0 = cell before the table load. For the index to miss a0,
-   sched1 must place `a0 = cell` (the call's argument copy, emitted with the
-   call) before the load. Every source order here has the load's LUID below
-   the copy's, the priorities are equal, and a read cannot follow the call
-   (sched.c: every MEM read depends on the last memory flush, const or not).
-   Splitting the sum (`src = entry; src += base`) loads straight into s0 as
-   the image does, but it scores lower. */
+/* Not matched: 98.62% in ADV and DNG, src and cell trade s0/s1.
+   The head now schedules as the image's: sched1 fills backwards and only
+   boosts an insn that sets a register set once, so the table address has to
+   go through `cells`, set once, with the loop stepping its own `cell`; and
+   `cells` is set after `src` so it wins the boosted tie by position. What is
+   left is global-alloc priority (refs * log2 refs / live): cell 8 refs over
+   13 insns outranks src's 9 over 16 and takes s0. Moving cell's set before
+   bzero fixes the registers but lets cse fold cells away, and the head goes
+   back to the old order; splitting src's sum loads it straight into s0 but
+   moves the base; do-while weighting changes nothing. */
 #ifdef NON_MATCHING
 void MapDrawName(short map)
 {
     u_char *src;
     u_char *cell;
     u_char *second;
+    u_char *cells;
     int     i;
 
-    cell   = g_map_name_cells;
     src  = (u_char *)(*(int *)(MAP_NAMES_AT + MAP_NAMES_TABLE + map * 4) +
                       MAP_NAMES_AT);
-    bzero(g_map_name_cells, 0x22);
+    cells = g_map_name_cells;
+    bzero(cells, 0x22);
     i      = 0;
-    second = g_map_name_cells + 1;
+    cell   = cells;
+    second = cells + 1;
     do {
         i++;
         *second = src[0];

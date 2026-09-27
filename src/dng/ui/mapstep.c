@@ -1,4 +1,4 @@
-/* Persona 1 (JP) - the map screen's frame.  DNG only.
+/* Persona 1 (JP) - the map screen's frame.
  *   0x80096818 MapScreenStep
  *
  * Once the map has finished scrolling to a tile, the page buttons turn it a
@@ -7,7 +7,10 @@
  * moves. The view then eases eight pixels a frame towards the cursor, and
  * backing out ends the screen.
  */
+/* ADV builds this too (MAPSTEP_ADV), with the input tests' u_char results. */
+#ifndef MAPSTEP_ADV
 #define PERSONAPAGE_DNG
+#endif
 #include <decomp/types.h>
 #include <libgte.h>
 #include <libgpu.h>

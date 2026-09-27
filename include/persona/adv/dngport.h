@@ -44,4 +44,15 @@
 #define EquipScreenLayout   DrawStatusFrames
 #endif
 
+/* The map screen's player marker (src/dng/ui/mapstep.c). */
+#ifndef D_8009FDFC
+#define D_8009FDFC D_800BB990
+#endif
+#ifndef D_8009FE08
+#define D_8009FE08 D_800BB99C
+#endif
+#ifndef D_8009FE0C
+#define D_8009FE0C D_800BB9A0
+#endif
+
 #endif

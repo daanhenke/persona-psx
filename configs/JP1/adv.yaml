@@ -328,12 +328,9 @@ segments:
       - [0x314B4, c, common/game/roomrotate]
       - [0x31658, c, common/gfx/compass]
       - [0x31740, c, common/gfx/mapmarker]
-      # MapDrawName comes out with s0/s1 swapped against the original; the
-      # schedule is already identical, so it is a register-allocation tie-break
-      # still to be worked out. Kept as asm until then.
-      - [0x317E8, asm, adv_50b]
+      - [0x317E8, c, common/ui/mapname]
       - [0x318E4, c, common/ui/mapmarkers]
-      - [0x31B04, asm, adv_51]
+      - [0x31B04, c, ui/mapstep]
       - [0x31F54, c, common/ui/mapview]
       - [0x31FBC, c, common/ui/mapgrid]
       - [0x3255C, c, common/game/tilewalls]

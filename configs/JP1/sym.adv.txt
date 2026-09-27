@@ -1289,7 +1289,7 @@ MapDrawName              = 0x80095B88; // type:func size:0xFC
 //--- PA: 0x0318E4   VA: 0x80095C84   subsegment: asm, adv_51
 //-----------------------------------------------------------
 MapDrawMarkers           = 0x80095C84; // type:func size:0x220
-func_80095EA4            = 0x80095EA4; // type:func size:0x450
+MapScreenStep            = 0x80095EA4; // type:func size:0x450
 MapDrawTurned            = 0x800962F4; // type:func size:0x68
 MapDrawGrid              = 0x8009635C; // type:func size:0x5A0
 
@@ -1846,8 +1846,7 @@ g_map_scroll_y           = 0x800BBC0C;
 g_header_scroll_y        = 0x800BBC10;
 g_map_view_room          = 0x800BBC14;
 g_image_queue_count      = 0x800BBC18;
-g_map_name_cells         = 0x800BBC1C;
-D_800BBC30               = 0x800BBC30; // type:u32 size:0x18
+g_map_name_cells         = 0x800BBC1C; // size:0x20
 g_page_back_repeat       = 0x800BBC3C; // size:0x10
 g_image_queue            = 0x800BBC4C; // size:0x300
 g_ot_index               = 0x800BBF54;
