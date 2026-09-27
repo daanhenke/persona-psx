@@ -77,3 +77,4 @@ g_slot_cur = 0x800B85A8;
 g_playtime_min = 0x801F29BD;
 g_playtime_frame = 0x801F29BF;
 g_pad_config = 0x801F2AC7;
+g_key_menu_close = 0x801F2A94;

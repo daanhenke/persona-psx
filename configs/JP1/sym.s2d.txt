@@ -1567,3 +1567,5 @@ g_use_scroll_step        = 0x8009E694; // size:0x2
 g_tactics_title          = 0x8009ED38;
 g_pad_title              = 0x8009ED54;
 g_use_top                = 0x800B5F40; // size:0x2
+g_equip_step             = 0x800B9568; // size:0x1
+D_800B9538               = 0x800B9538; // size:0x1
