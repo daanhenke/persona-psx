@@ -631,11 +631,11 @@ EventFlagGet2            = 0x8007C3B4; // type:func size:0x38
 //--- PA: 0x01804C   VA: 0x8007C3EC   subsegment: asm, s2d_2_s13_x1
 //-----------------------------------------------------------------
 EquipScreen              = 0x8007C3EC; // type:func size:0x63C
-func_8007CA28            = 0x8007CA28; // type:func size:0x7C8
-func_8007D1F0            = 0x8007D1F0; // type:func size:0x790
-func_8007D980            = 0x8007D980; // type:func size:0x338
-func_8007DCB8            = 0x8007DCB8; // type:func size:0x338
-func_8007DFF0            = 0x8007DFF0; // type:func size:0x1D8
+EquipStepMain            = 0x8007CA28; // type:func size:0x7C8
+EquipStepList            = 0x8007D1F0; // type:func size:0x790
+EquipStepRemove          = 0x8007D980; // type:func size:0x338
+EquipStepOptimise        = 0x8007DCB8; // type:func size:0x338
+EquipShowCursor          = 0x8007DFF0; // type:func size:0x1D8
 
 //------------------------------------------------------------------------
 //--- PA: 0x019E28   VA: 0x8007E1C8   subsegment: c, common/ui/equipcursor
@@ -655,7 +655,7 @@ DrawItemRow              = 0x8007E3EC; // type:func size:0xCC
 //-----------------------------------------------------------------
 //--- PA: 0x01A118   VA: 0x8007E4B8   subsegment: asm, s2d_2_s14_x1
 //-----------------------------------------------------------------
-func_8007E4B8            = 0x8007E4B8; // type:func size:0x450
+EquipDrawMember          = 0x8007E4B8; // type:func size:0x450
 
 //------------------------------------------------------------------------
 //--- PA: 0x01A568   VA: 0x8007E908   subsegment: c, common/game/equipauto
@@ -670,7 +670,7 @@ ItemsStrongestUsable     = 0x8007EA4C; // type:func size:0xF4
 //--------------------------------------------------------------
 //--- PA: 0x01A7A0   VA: 0x8007EB40   subsegment: asm, s2d_2_s15
 //--------------------------------------------------------------
-func_8007EB40            = 0x8007EB40; // type:func size:0x1AC
+EquipPickStronger        = 0x8007EB40; // type:func size:0x1AC
 
 //-------------------------------------------------------------------
 //--- PA: 0x01A94C   VA: 0x8007ECEC   subsegment: c, common/gfx/gauge
@@ -928,7 +928,7 @@ D_8008375C               = 0x8008375C; // type:func size:0x970
 DrawItemName             = 0x800840CC; // type:func size:0x64
 DrawBagItemRow           = 0x80084130; // type:func size:0xFC
 TacticsSetCels           = 0x8008422C; // type:func size:0xD0
-func_800842FC            = 0x800842FC; // type:func size:0x294
+CharRecalcStats          = 0x800842FC; // type:func size:0x294
 
 //------------------------------------------------------------------------
 //--- PA: 0x0201F0   VA: 0x80084590   subsegment: c, common/game/charstats
@@ -938,8 +938,8 @@ CharApplyStats           = 0x80084590; // type:func size:0x650
 //--------------------------------------------------------------
 //--- PA: 0x020840   VA: 0x80084BE0   subsegment: asm, s2d_2_s24
 //--------------------------------------------------------------
-func_80084BE0            = 0x80084BE0; // type:func size:0x6C0
-func_800852A0            = 0x800852A0; // type:func size:0x7F0
+CharPreviewEquip         = 0x80084BE0; // type:func size:0x6C0
+EquipDrawCompare         = 0x800852A0; // type:func size:0x7F0
 D_80085A90               = 0x80085A90; // type:func size:0x588
 MapScreen                = 0x80086018; // type:func size:0xEC
 MapFindPlayer            = 0x80086104; // type:func size:0x10C

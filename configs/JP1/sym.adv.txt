@@ -1177,11 +1177,11 @@ CharApplyStats           = 0x8008FFF4; // type:func size:0x650
 CharPreviewEquip         = 0x80090644; // type:func size:0x6D0
 EquipDrawCompare         = 0x80090D14; // type:func size:0x8F4
 EquipScreen              = 0x80091608; // type:func size:0x63C
-func_80091C44            = 0x80091C44; // type:func size:0x7C8
-func_8009240C            = 0x8009240C; // type:func size:0x790
-func_80092B9C            = 0x80092B9C; // type:func size:0x338
-func_80092ED4            = 0x80092ED4; // type:func size:0x338
-func_8009320C            = 0x8009320C; // type:func size:0x1D8
+EquipStepMain            = 0x80091C44; // type:func size:0x7C8
+EquipStepList            = 0x8009240C; // type:func size:0x790
+EquipStepRemove          = 0x80092B9C; // type:func size:0x338
+EquipStepOptimise        = 0x80092ED4; // type:func size:0x338
+EquipShowCursor          = 0x8009320C; // type:func size:0x1D8
 
 //---------------------------------------------------------------------------
 //--- PA: 0x02F044   VA: 0x800933E4   subsegment: c, ../common/ui/equipcursor
@@ -1201,7 +1201,7 @@ DrawItemRow              = 0x80093608; // type:func size:0xCC
 //--------------------------------------------------------------
 //--- PA: 0x02F334   VA: 0x800936D4   subsegment: asm, adv_47_x1
 //--------------------------------------------------------------
-func_800936D4            = 0x800936D4; // type:func size:0x450
+EquipDrawMember          = 0x800936D4; // type:func size:0x450
 
 //---------------------------------------------------------------------------
 //--- PA: 0x02F784   VA: 0x80093B24   subsegment: c, ../common/game/equipauto

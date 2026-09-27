@@ -26,12 +26,8 @@
 #define g_BB998 D_800B8630
 #define g_BC5C8 D_800B9538
 #define DrawStatusFrames EquipScreenLayout
-#define func_80091C44 func_8007CA28
-#define func_8009240C func_8007D1F0
-#define func_80092B9C func_8007D980
-#define func_80092ED4 func_8007DCB8
-#define func_8009320C func_8007DFF0
-#define func_800936D4 func_8007E4B8
+#define D_800BB9A8    D_800B8654
+#define D_800BC224    D_800B91DC
 
 /* DNG's. */
 #define D_8009ABFC    D_8009D908

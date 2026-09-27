@@ -2,7 +2,7 @@
  *   0x80091608 EquipScreen
  *
  * The screen and its loop; the four steps it runs, by g_equip_step, follow
- * it in the image (still asm). Opened from the status menu it shares that
+ * it in the image. Opened from the status menu it shares that
  * menu's lists and fades; `standalone` is script command 4C's way in, after
  * FormationMenu has set the menu context up, and makes it set up its own
  * lists, open its sounds and fade itself in and out.
@@ -39,12 +39,12 @@ extern void   SoundPlaySeq(u_short slot, u_short seq, short vab);
 extern void   FadeUpBlocking(short step, short limit);
 extern void   FadeDownBlocking(short step, short floor);
 extern void   SsSetNck(short handle);
-extern void   func_800936D4(short member);
-extern void   func_8009320C(void);
-extern void   func_80091C44(void);
-extern void   func_8009240C(void);
-extern void   func_80092B9C(void);
-extern void   func_80092ED4(void);
+extern void   EquipDrawMember(short member);
+extern void   EquipShowCursor(void);
+extern void   EquipStepMain(void);
+extern void   EquipStepList(void);
+extern void   EquipStepRemove(void);
+extern void   EquipStepOptimise(void);
 
 void EquipScreen(short standalone)
 {
@@ -83,7 +83,7 @@ void EquipScreen(short standalone)
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 5, 29), 0x3C2, 3);
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 6, 28), 0x3C5, 3);
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 7, 28), 0x3C8, 3);
-    func_800936D4(g_menu->unk050.cur);
+    EquipDrawMember(g_menu->unk050.cur);
     SlotClearAll();
     SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
     SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
@@ -96,7 +96,7 @@ void EquipScreen(short standalone)
     SlotSetFlicker(2, 1);
     SlotSetFlicker(3, 1);
     SlotSetFlicker(5, 1);
-    func_8009320C();
+    EquipShowCursor();
     g_equip_step = 0;
     if (standalone) {
         SoundOpenSeq(0x18, 0, 0);
@@ -110,16 +110,16 @@ void EquipScreen(short standalone)
         RunFrame();
         switch (g_equip_step) {
         case 0:
-            func_80091C44();
+            EquipStepMain();
             break;
         case 1:
-            func_8009240C();
+            EquipStepList();
             break;
         case 2:
-            func_80092B9C();
+            EquipStepRemove();
             break;
         case 3:
-            func_80092ED4();
+            EquipStepOptimise();
             break;
         }
         if (g_pad_pressed[0] & PAD_TOGGLE) {
@@ -139,3 +139,9 @@ void EquipScreen(short standalone)
         SsSetNck(g_seq_handle[0x1B]);
     }
 }
+
+/* The four steps and the cursor: the source DNG builds too
+   (src/common/ui/equipsteps.c), under ADV's names. */
+#include <persona/adv/dngport.h>
+#define EQUIPSTEPS_ADV
+#include "../../common/ui/equipsteps.c"
