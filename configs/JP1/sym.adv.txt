@@ -477,7 +477,7 @@ ConfigApplyOption        = 0x8007664C; // type:func size:0x84
 //-----------------------------------------------------------
 //--- PA: 0x012330   VA: 0x800766D0   subsegment: asm, adv_13
 //-----------------------------------------------------------
-D_800766D0               = 0x800766D0; // type:func size:0x1D4
+MenuChoicePageOpen       = 0x800766D0; // type:func size:0x1D4
 
 //-------------------------------------------------------------------------
 //--- PA: 0x012504   VA: 0x800768A4   subsegment: c, ../common/ui/padconfig
@@ -498,7 +498,7 @@ PersonaStockCompact      = 0x80076C24; // type:func size:0xBC
 //-----------------------------------------------------------
 //--- PA: 0x012940   VA: 0x80076CE0   subsegment: asm, adv_15
 //-----------------------------------------------------------
-func_80076CE0            = 0x80076CE0; // type:func size:0x108
+StockEmptyNotice         = 0x80076CE0; // type:func size:0x108
 
 //---------------------------------------------------------------------------
 //--- PA: 0x012A48   VA: 0x80076DE8   subsegment: c, ../common/game/charentry
@@ -970,11 +970,13 @@ ConfigDrawLabels         = 0x8008BC1C; // type:func size:0x104
 //--- PA: 0x027980   VA: 0x8008BD20   subsegment: asm, adv_40
 //-----------------------------------------------------------
 PadDrawLayout            = 0x8008BD20; // type:func size:0x130
-D_8008BE50               = 0x8008BE50; // type:func size:0x1A8
+TacticListStep           = 0x8008BE50; // type:func size:0xE8
 
 //---------------------------------------------------------------------------
 //--- PA: 0x027C58   VA: 0x8008BFF8   subsegment: c, ../common/ui/padbindings
 //---------------------------------------------------------------------------
+SlotsHighlight           = 0x8008BF38; // type:func size:0xB8
+MenuStepNone             = 0x8008BFF0; // type:func size:0x8
 PadLoadBindings          = 0x8008BFF8; // type:func size:0x154
 
 //-----------------------------------------------------------
@@ -1587,6 +1589,7 @@ g_menu_subsel            = 0x800B178A;
 str_cell_run             = 0x800B17B8;
 str_preset_saved         = 0x800B17CC;
 str_empty                = 0x800B17D4;
+g_stock_empty_msg        = 0x800B17F4;
 g_persona_msg_key        = 0x800B1822;
 str_cfg_command_confirm  = 0x800B1828;
 str_cfg_window_anim      = 0x800B1834;
@@ -1603,6 +1606,7 @@ g_kind_labels            = 0x800B19BC;
 g_char_face_files        = 0x800B1B73;
 g_menu_bg_rle            = 0x800B1B80;
 g_fm_hint_def            = 0x800B1ED8;
+g_menu_top_def           = 0x800B2188;
 g_fm_hint2_def           = 0x800B2358;
 g_persona_list_rule      = 0x800B248C;
 g_fm_grid_cur_def        = 0x800B266C;
@@ -1837,6 +1841,12 @@ g_adv_chest_money        = 0x800BC04C;
 g_image_anim             = 0x800BC058; // size:0x140
 g_arcana_top             = 0x800BC198;
 g_bg_shown               = 0x800BC19C;
+g_tactic_member          = 0x800BC1A4;
+g_tactic_list0           = 0x800BC1B4;
+g_tactic_list1           = 0x800BC1C4;
+g_tactic_list2           = 0x800BC1D4;
+g_tactic_list3           = 0x800BC1E4;
+g_tactic_list4           = 0x800BC1F4;
 g_equip_last             = 0x800BC20C;
 g_hud_digits             = 0x800BC218;
 g_skill_help_spell       = 0x800BC228;

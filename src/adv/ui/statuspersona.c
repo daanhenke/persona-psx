@@ -66,7 +66,7 @@ extern u_char g_fm_hint_def[];
 extern u_char g_fm_hint2_def[];
 extern short  PersonaStockCompact(void);
 extern void   PersonaStockDraw(void);
-extern void   func_80076CE0(void);
+extern void   StockEmptyNotice(void);
 extern u_char D_800B17E0[];
 extern u_char D_800B1D08[];
 extern u_char D_800B2330[];
@@ -449,7 +449,7 @@ void StatusStockReleaseConfirm(void)
                          0x1E);
             MenuListInit(&g_menu->stock_release, 0, 0, g_stock_last, 0x1E);
             if (g_stock_last == -1) {
-                func_80076CE0();
+                StockEmptyNotice();
                 g_menu_subsel = 0;
                 return;
             }

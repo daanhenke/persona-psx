@@ -45,7 +45,7 @@ extern void  func_800782A4(int a, int b);
 extern void  func_8008C23C(short member);
 extern short PersonaStockCompact(void);
 extern void  PersonaStockDraw(void);
-extern void  func_80076CE0(void);
+extern void  StockEmptyNotice(void);
 extern u_char MenuStepMember(int *sel, u_char last);
 extern u_char CharTopEntry(short slot);
 extern u_char PersonaTopSpell(short id);
@@ -261,7 +261,7 @@ short StatusStockOpen(first)
     SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0xC, 0, 0);
     if (g_stock_last == -1) {
         if (first) {
-            func_80076CE0();
+            StockEmptyNotice();
             g_menu_subsel = 0;
             return 1;
         }

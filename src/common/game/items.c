@@ -6,9 +6,10 @@
  *   FindPend   0x80092978  0x8008E8A8  0x80082E8C
  *   AddPend    0x800927C8  0x8008E6F8  0x80082CDC
  *
- * The commit routine below is not worked out yet, so the overlays take it from
- * asm and the rest of the original source is in itemslist.c, with ADV's own
- * two persistent-list edits in itemsedit.c.
+ * The commit routine that follows in the image is its own unit
+ * (src/dng/game/itemscommit.c, ADV's with the search inline), and the rest
+ * of the original source is in itemslist.c, with ADV's own two
+ * persistent-list edits in itemsedit.c.
  *
  * The lists themselves and the packing are in persona/common/item.h.
  */
@@ -150,55 +151,3 @@ short ItemsFindPending(u_short id)
     }
     return -1;
 }
-
-/* Merges the staging list into g_items: same id if it is already there, first
-   slot with an empty half otherwise. Both searches are written out rather than
-   calling ItemsFind, which is how the original has it.
-
-   This does not come out of the C yet, so the overlays take it from asm; it is
-   kept here for the progress build only. At 93.07% on ADV: the original
-   sign-extends j once and uses it both for the index and for k = j, where
-   this copies j as it stands and folds the extension into the index. The
-   search for a free slot is a goto loop - as a do-while its g_items moves
-   to the wrong loop's preheader. */
-#ifdef NON_MATCHING
-void ItemsCommitPending(void)
-{
-    u_short *src;
-    u_short *dst;
-    short    i;
-    short    j;
-    short    k;
-
-    i = 0;
-    do {
-        if (g_items_pending[i] != 0) {
-            k = g_items_pending[i] & ITEM_ID;
-            dst = g_items;
-            j = 0;
-            do {
-                if ((dst[j] & ITEM_ID) == k) {
-                    k = j;
-                    goto found;
-                }
-                j++;
-            } while (j < ITEM_SLOTS);
-            k = -1;
-        found:
-            if (k >= 0) {
-                g_items[k] = g_items_pending[i];
-            } else {
-                src = &g_items_pending[i];
-            next:
-                k++;
-                dst = &g_items[k];
-                if ((*dst & ITEM_ID) != 0 && (*dst >> 9) != 0) {
-                    goto next;
-                }
-                *dst = *src;
-            }
-        }
-        i++;
-    } while (i < ITEM_SLOTS);
-}
-#endif

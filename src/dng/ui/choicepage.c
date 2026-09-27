@@ -1,4 +1,4 @@
-/* Persona 1 (JP) - a page of three choices over two columns.  DNG only.
+/* Persona 1 (JP) - a page of three choices over two columns.
  *   0x80085254 MenuChoicePageOpen
  *
  * A window with three six-cell headings, seven rows of two ten-cell fields
@@ -8,7 +8,11 @@
  * filled at run time.
  */
 #define SLOT_TAGGED_INTXY
+/* ADV builds this too (0x800766D0, also uncalled); its SlotSetPos takes the
+   y narrowed. */
+#ifndef CHOICEPAGE_SHORT_POS
 #define SLOT_SETPOS_INT
+#endif
 #include <decomp/types.h>
 #include <persona/common/menuctx.h>
 #include <persona/common/slot.h>

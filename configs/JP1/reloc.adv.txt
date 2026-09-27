@@ -160,3 +160,11 @@ rom:0x304B0 reloc:MIPS_NONE symbol:D_801F29A9
 rom:0x304B4 reloc:MIPS_NONE symbol:D_801F29A9
 rom:0x304BC reloc:MIPS_NONE symbol:D_801F29A8
 rom:0x304C0 reloc:MIPS_NONE symbol:D_801F29A8
+
+// ItemUsableAny (DNG's source) reads the moon and both flags by address too.
+rom:0x305D8 reloc:MIPS_NONE symbol:g_moon
+rom:0x305DC reloc:MIPS_NONE symbol:g_moon
+rom:0x305EC reloc:MIPS_NONE symbol:D_801F29A8
+rom:0x305F0 reloc:MIPS_NONE symbol:D_801F29A8
+rom:0x305FC reloc:MIPS_NONE symbol:D_801F29A9
+rom:0x30600 reloc:MIPS_NONE symbol:D_801F29A9

@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - writing the staged item list back to the inventory.
- * DNG only.
+ * DNG's source; ADV builds it too.
  *   0x800929D8 ItemsCommitPending
  *
  * Every entry left in g_items_pending goes back into g_items: over the
@@ -9,24 +9,26 @@
 #include <decomp/types.h>
 #include <persona/common/item.h>
 
+/* The staging entry, indexed afresh at each use: ADV's build, with the
+   search inline, reads it again after the search rather than holding it. */
+#define PENDING(i) ((u_short *)((i) * 2 + pend))
+
 void ItemsCommitPending(void)
 {
     u_long   pend;   /* added index-first: an integer, not a pointer */
     u_short *items;
-    u_short *p;
     short    i;
     short    j;
 
     pend = (u_long)g_items_pending;
     items = g_items;
     for (i = 0; i < ITEM_SLOTS; i++) {
-        p = (u_short *)(i * 2 + pend);
-        if (*p != 0) {
-            j = ItemsFind(*p & ITEM_ID);
+        if (*PENDING(i) != 0) {
+            j = ItemsFind(*PENDING(i) & ITEM_ID);
             if (j >= 0) {
-                items[j] = *p;
+                items[j] = *PENDING(i);
             } else {
-                u_short *src = p;
+                u_short *src = PENDING(i);
 
                 do {
                     j++;
