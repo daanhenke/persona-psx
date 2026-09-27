@@ -36,6 +36,11 @@ options:
   rodata_string_guesser_level: 2
   data_string_guesser_level: 2
   gp_value: 0x800B4090
+  # The bss runs on past the image (the sprites, the decode buffers and the
+  # title's pack at 0x80180000), so sized symbols there name their fields as
+  # offsets.
+  global_vram_start: 0x80080000
+  global_vram_end: 0x80190000
 
 segments:
   - name: header
@@ -50,7 +55,8 @@ segments:
     subsegments:
       - [0x800, asm, open]
       - [0x16F4, c, main]
-      - [0x1818, asm, open_1]
+      - [0x1818, c, title]
+      - [0x7298, asm, open_1]
       - [0x9B44, c, str]
       # __main and start, then every Psy-Q library object. Not ours to
       # decompile, which is what the psyq/ prefix says.
