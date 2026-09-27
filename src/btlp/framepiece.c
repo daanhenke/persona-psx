@@ -14,7 +14,6 @@
  * into the ordering table BtlDrawEffects left in g_btl_effect_ot.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <decomp/libc.h>
 #include <libgte.h>
 #include <libgpu.h>
@@ -57,14 +56,6 @@ typedef struct {
 extern char    *g_btl_prim_next;
 extern u_long  *g_btl_effect_ot;
 
-/* 98.29%. x and y are plain short parameters that lose their registers
-   (the image reloads them with lhu from their spill slots through t5), the
-   sums are short, the grid step is i * across rather than a counter of its
-   own, and one addressable long serves as the corner counter and both
-   transform out-parameters. Left: the image gives across and piece s3/s4 and
-   lets col take s4 once piece is dead; here the loop's reduced col, row and
-   end pointer outrank them (about 7 weighted refs each) and take s3-s5. */
-#ifdef NON_MATCHING
 int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
 {
     /* Kept in .rodata and copied onto the stack: u at +0 of each entry and v
@@ -84,16 +75,19 @@ int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
     int          across;
     int          down;
     int          i;
-    u_int        dir;
     short        px;
     short        py;
 
     /* The descriptor's sign bit picks the direction, so one of the two step
-       counts is one and the other zero. */
-    dir = run;
-    across = (dir >> 15 ^ 1) & 1;
-    down = 1 - across;
+       counts is one and the other zero. Keep the steps in one variable:
+       its repeated assignments give it the original saved register. */
+    across = run;
+    across = (u_int)across >> 15;
+    across ^= 1;
+    across &= 1;
+    /* The scratchpad base is initialized before the vertical step. */
     pad = FRAME_PAD;
+    down = 1 - across;
 
     if (flat != 0) {
         setlen(&pad->sprite, FRAME_SPRITE_LEN);
@@ -145,7 +139,4 @@ int BtlDrawFramePiece(int piece, short x, short y, short run, short flat)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/framepiece", BtlDrawFramePiece);
-#endif
 

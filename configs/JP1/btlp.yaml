@@ -100,6 +100,8 @@ segments:
       # with the word of padding between them inside the unit.
       - [0x488, .rodata, talkboard]
       - [0x4CC, rodata, btlp_rodata3a]
+      # BtlDrawFramePiece's eight texture-cell coordinates, emitted by C.
+      - [0x4DC, .rodata, framepiece]
       # BtlDrawEffectFrame's run table, which effectframe.c emits itself.
       - [0x4FC, .rodata, effectframe]
       - [0x50C, rodata, btlp_rodata3a1]
