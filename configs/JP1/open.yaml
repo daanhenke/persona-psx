@@ -25,16 +25,16 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".text", ".data", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".sdata", ".bss"]
   subalign: 4
-  ld_align_section_vram_end: True
+  ld_align_section_vram_end: False
   ld_align_segment_vram_end: True
   ld_bss_is_noload: False
   symbol_name_format: $VRAM
   string_encoding: SHIFT-JIS
   data_string_encoding: SHIFT-JIS
   rodata_string_guesser_level: 2
-  data_string_guesser_level: 2
+  data_string_guesser_level: 0
   gp_value: 0x800B4090
   # The bss runs on past the image (the sprites, the decode buffers and the
   # title's pack at 0x80180000), so sized symbols there name their fields as
@@ -53,14 +53,24 @@ segments:
     start: 0x800
     vram: 0x80080000
     subsegments:
-      - [0x800, asm, open]
+      # The memory card's file name, then the opening movie's path.
+      - [0x800, rodata, open_rodata]
+      - [0x814, .rodata, movie]
+      # The Psy-Q libraries' rodata, in link order after ours.
+      - [0x828, rodata, psyq/rodata]
       - [0x16F4, c, main]
       - [0x1818, c, title]
-      - [0x7298, asm, open_1]
+      - [0x7298, c, card]
+      - [0x953C, c, movie]
       - [0x9B44, c, str]
       # __main and start, then every Psy-Q library object. Not ours to
       # decompile, which is what the psyq/ prefix says.
       - [0xA030, asm, psyq/crt0]
       - [0xA048, asm, psyq/libs]
+      # The save file's header and icon, then the title's text.
+      - [0x21290, data, open_data]
+      - [0x21604, data, psyq/data]
+      # gp small data, then the bss that the image's zero padding covers.
+      - [0x34890, sdata, open_sdata]
 
   - [0x35000]

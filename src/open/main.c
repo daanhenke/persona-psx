@@ -26,7 +26,7 @@ int main(void)
     StartCARD();
     _bu_init();
     while (1) {
-        if (func_80081018(func_80088D3C()) == -1) {
+        if (func_80081018(OpenPlayMovie()) == -1) {
             break;
         }
     }

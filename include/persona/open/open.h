@@ -11,12 +11,14 @@ extern int  func_80081018(int movie);
 extern void func_80086D14(void);
 extern void func_80086E7C(void);
 extern void func_80086F34(void);
-extern int  func_80088D3C(void);
+extern int  OpenPlayMovie(void);
 
 /* The title's sprites: every image and every font cell it draws. */
 extern GsSPRITE g_sprites[];
 
 extern short    g_open_seq[];
+/* Frames of the opening movie shown so far; it ends at 0x825. */
+extern int      g_movie_frame;
 extern u_char   D_800B410C;
 extern int      D_800B4094;
 extern int      D_800B409C;
