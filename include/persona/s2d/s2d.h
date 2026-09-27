@@ -35,6 +35,45 @@ extern GsOT_TAG *g_ot_tag_obj;
 extern GsOT_TAG *g_ot_tag_layer[3];
 extern GsOT_TAG *g_ot_tag_front;
 
+/* A placed object: its transform, the model and the coordinate system it
+   is drawn in. */
+typedef struct {
+    /* 0x00 */ SVECTOR       rot;
+    /* 0x08 */ VECTOR        trans;
+    /* 0x18 */ VECTOR        scale;
+    /* 0x28 */ GsDOBJ2       obj;
+    /* 0x38 */ int           unk38;
+    /* 0x3C */ GsCOORDINATE2 coord;
+} S2dObj;
+
+/* The map's own objects, 160 of them in the second work buffer: the same
+   parts in another order. */
+typedef struct {
+    /* 0x00 */ GsDOBJ2       obj;
+    /* 0x10 */ int           unk10;
+    /* 0x14 */ GsCOORDINATE2 coord;
+    /* 0x64 */ SVECTOR       rot;
+    /* 0x6C */ VECTOR        trans;
+    /* 0x7C */ VECTOR        scale;
+} S2dMapObj;
+
+typedef struct {
+    SVECTOR rot;
+    VECTOR  trans;
+    VECTOR  scale;
+} S2dXform;
+
+extern GsCOORDINATE2 g_root_coord;
+extern VECTOR        g_s2d_cam_scale;
+extern GsCOORDINATE2 g_s2d_cam_coord;
+extern S2dXform      g_map_xform;
+extern GsCOORDINATE2 g_map_coord;
+extern GsRVIEW2      g_s2d_view;
+extern GsRVIEW2      g_s2d_view2;
+extern GsF_LIGHT     g_s2d_light;
+extern S2dObj        g_s2d_obj;
+extern S2dObj        g_s2d_objs[7];
+
 /* Saved across a battle: where the party stood. */
 extern u_char g_btl_map_id;
 extern u_char g_btl_facing;

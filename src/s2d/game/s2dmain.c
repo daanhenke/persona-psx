@@ -47,7 +47,6 @@ extern short     D_800B0C68;
 extern short     D_800B0CF4[];
 extern short     D_800B0D2C;
 extern short     D_800B0D3C;
-extern SVECTOR   D_800B0E0C;
 extern u_long    D_800B1D30[];
 extern int       D_800B85BC;
 extern int       D_800B863C;
@@ -60,9 +59,9 @@ extern u_char    D_800AA66C[];
 extern void S2dSceneInit(void);
 extern void S2dLoadScene(void);
 extern void func_80093680(void);
-extern void func_8008E288(void);
-extern void func_8008E634(void);
-extern void func_8008E588(void);
+extern void S2dInitCoords(void);
+extern void S2dInitLight(void);
+extern void S2dInitView(void);
 extern void func_8008E6A8(void);
 extern void func_8009BF9C(void);
 extern void func_80094B08(void);
@@ -219,9 +218,9 @@ void ovl_s2d_entry(void)
             SsSeqSetCrescendo(g_seq_handle[0], 0x7E, 0x78);
         }
         S2dLoadScene();
-        func_8008E288();
-        func_8008E634();
-        func_8008E588();
+        S2dInitCoords();
+        S2dInitLight();
+        S2dInitView();
         D_800B863C = 0;
         D_800B0D2C = -1;
         D_800B0D3C = -1;
@@ -236,7 +235,7 @@ void ovl_s2d_entry(void)
         g_s2d_cam_ry = 0;
         g_s2d_cam_rz = 0;
         g_s2d_cam_x = 0;
-        D_800B0E0C.vy = 0x1000 - g_s2d_facing * 1024;
+        g_map_xform.rot.vy = 0x1000 - g_s2d_facing * 1024;
         func_8008B048();
     } while (D_800A4CF4[0] == -1);
 }

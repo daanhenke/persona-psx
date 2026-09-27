@@ -218,6 +218,8 @@ segments:
       - [0x25BBC, asm, s2d_2_s27_a]
       - [0x27234, c, game/sceneinit]
       - [0x276FC, asm, s2d_2_s27_b]
+      - [0x29EE8, c, game/scenecoords]
+      - [0x2A308, asm, s2d_2_s27_c]
       # The disc loads: the map's sound, scene data and models, the prefetches.
       - [0x32FD0, c, gfx/vram]
       - [0x33168, asm, s2d_2_s27a]
