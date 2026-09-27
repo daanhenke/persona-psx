@@ -53,7 +53,7 @@ extern void DrawPersonaStatBars(Persona *p);
 extern short PersonaTypeLabel(short kind);
 extern u_char D_800B198B[];
 extern void   StatusPageLayout(void);
-extern void   func_8008C23C(short member);
+extern void   StatusDrawPersonaRows(short member);
 extern void   BgMapInit(void *script, short speed);
 extern void   PersonaDataLayout(void);
 extern void   PersonaDataDraw(short id);
@@ -320,7 +320,7 @@ void StatusPersonaView(void)
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         StatusPageLayout();
         StatusPageDraw(g_menu->status_member.cur);
-        func_8008C23C(g_menu->status_member.cur);
+        StatusDrawPersonaRows(g_menu->status_member.cur);
         StatusPersonaPreview();
         SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0x58,
                        g_menu->persona_cmd.cur * 12 + 0x24);

@@ -42,7 +42,7 @@ extern u_char  D_800B2330[];
 extern void  DrawStatusHud(void);
 extern void  BgBoxShow(void);
 extern void  func_800782A4(int a, int b);
-extern void  func_8008C23C(short member);
+extern void  StatusDrawPersonaRows(short member);
 extern short PersonaStockCompact(void);
 extern void  PersonaStockDraw(void);
 extern void  StockEmptyNotice(void);
@@ -179,7 +179,7 @@ void StatusTopStep(void)
                 TileMapWriteBar(AT(g_tilemap0, 2 + i, 21), 10);
                 *AT(g_tilemap2, 1 + i, 0) = 0x418 + i;
             }
-            func_8008C23C(g_menu->status_member.cur);
+            StatusDrawPersonaRows(g_menu->status_member.cur);
             BgBoxShow();
             DrawStatusHud();
             SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
@@ -519,7 +519,7 @@ void StatusMemberPick(void)
 {
     DrawStatusHud();
     if (MenuStepMember(&g_menu->status_member.cur, g_party_last)) {
-        func_8008C23C(g_menu->status_member.cur);
+        StatusDrawPersonaRows(g_menu->status_member.cur);
         SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->status_member.cur][0],
                    (g_fm_mark_pos + 1)[g_menu->status_member.cur][1]);
     }
@@ -765,7 +765,7 @@ void StatusPageStep(void)
             TileMapWriteBar(AT(g_tilemap0, 2 + i, 21), 10);
             *AT(g_tilemap2, 1 + i, 0) = 0x418 + i;
         }
-        func_8008C23C(g_menu->status_member.cur);
+        StatusDrawPersonaRows(g_menu->status_member.cur);
         BgBoxShow();
         DrawStatusHud();
         SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);

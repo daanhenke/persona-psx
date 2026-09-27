@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - putting the formation grid back in order.
- *   ADV 0x8008C630 FormationRepair
+ *   ADV 0x8008C548 FormationRepairGrid  0x8008C630 FormationRepair
  *   DNG 0x8009076C FormationRepairGrid  0x80090854 FormationRepair
  *
  * Drops anyone past the end of the party off the grid, then gives every member
@@ -11,14 +11,13 @@
 #include <persona/common/char.h>
 
 /* Drops anyone past the end of the party off the grid, then gives every member
-   left without a cell the first one the placement rule allows. DNG builds the
-   grid half as a routine of its own (FORMATION_REPAIR_SPLIT) that
-   FormationRepair then calls. */
-#ifdef FORMATION_REPAIR_SPLIT
-void FormationRepairGrid(void)
-#else
-void FormationRepair(void)
+   left without a cell the first one the placement rule allows. ADV declares
+   it inline (FORMATION_REPAIR_INLINE): the routine is still emitted, and
+   FormationRepair gets a copy of the body where DNG and S2D call it. */
+#ifdef FORMATION_REPAIR_INLINE
+inline
 #endif
+void FormationRepairGrid(void)
 {
     u_char *grid;
     u_char  i;
@@ -39,13 +38,11 @@ void FormationRepair(void)
             grid[free] = i;
         }
     }
-#ifdef FORMATION_REPAIR_SPLIT
 }
 
 void FormationRepair(void)
 {
     FormationRepairGrid();
-#endif
     FormationSyncCells();
     FormationPlaceMarkers();
     FormationDrawMembers();

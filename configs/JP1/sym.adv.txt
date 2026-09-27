@@ -982,13 +982,15 @@ PadLoadBindings          = 0x8008BFF8; // type:func size:0x154
 //-----------------------------------------------------------
 //--- PA: 0x027DAC   VA: 0x8008C14C   subsegment: asm, adv_41
 //-----------------------------------------------------------
-D_8008C14C               = 0x8008C14C; // type:func size:0xF0
-func_8008C23C            = 0x8008C23C; // type:func size:0x228
-D_8008C464               = 0x8008C464; // type:func size:0x1CC
+SaveRowsDraw             = 0x8008C14C; // type:func size:0x40
+SaveRowDraw              = 0x8008C18C; // type:func size:0xB0
+StatusDrawPersonaRows    = 0x8008C23C; // type:func size:0x228
+StatusDrawPersonaNames   = 0x8008C464; // type:func size:0xE4
 
 //---------------------------------------------------------------------------------
 //--- PA: 0x028290   VA: 0x8008C630   subsegment: c, ../common/game/formationrepair
 //---------------------------------------------------------------------------------
+FormationRepairGrid      = 0x8008C548; // type:func size:0xE8
 FormationRepair          = 0x8008C630; // type:func size:0x100
 
 //---------------------------------------------------------------------------

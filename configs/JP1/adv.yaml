@@ -270,8 +270,8 @@ segments:
       - [0x27980, c, common/ui/padlayout]
       - [0x27AB0, c, ui/tacticlists]
       - [0x27C58, c, common/ui/padbindings]
-      - [0x27DAC, asm, adv_41]
-      - [0x28290, c, common/game/formationrepair]
+      - [0x27DAC, c, ui/statusrows]
+      - [0x281A8, c, common/game/formationrepair]
       - [0x28390, c, common/game/formation]
       # FormationCellFree, the placement rule, is still asm.
       - [0x285C4, asm, adv_41a]

@@ -1,4 +1,4 @@
-/* Persona 1 (JP) - rows the status and formation screens redraw.  DNG only.
+/* Persona 1 (JP) - rows the status and formation screens redraw.
  *   0x80090374 SaveRowsDraw  0x800903B4 SaveRowDraw
  *   0x80090464 StatusDrawPersonaRows  0x80090688 StatusDrawPersonaNames
  *
@@ -7,7 +7,10 @@
  * two-column list of sixteen records from the save area, each blank or
  * marked empty.
  */
+/* ADV builds this too (0x8008C14C on), with the counts narrowed. */
+#ifndef STATUSROWS_SHORT_COUNT
 #define TILEMAP_INT_COUNT
+#endif
 #include <decomp/types.h>
 #include <persona/common/char.h>
 #include <persona/common/persona.h>
@@ -58,7 +61,12 @@ void StatusDrawPersonaRows(short slot)
     int      i;
     int      k;
     int      hl;
+    /* ADV holds the digit bank narrowed, like its counts. */
+#ifdef STATUSROWS_SHORT_COUNT
+    u_short  bank;
+#else
     int      bank;
+#endif
 
     /* `i` holds the party index first, then counts the rows. */
     i = g_party[slot];
@@ -71,8 +79,8 @@ void StatusDrawPersonaRows(short slot)
             p = (Persona *)(k * sizeof(Persona) + personas);
             hl = c->entry == i ? BANK_EQUIPPED : 0;
             DrawPersonaKeyName(p->key, AT(g_tilemap2, 1 + i, 1), hl);
-            bank = hl + GLYPH_DIGIT0;
-            TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 1 + i, 19), bank,
+            TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 1 + i, 19),
+                               bank = hl + GLYPH_DIGIT0,
                                FormatDecimal(p->level, g_hud_digits, 2));
             FormatDecimal(p->slots, g_hud_digits, 1);
             TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 1 + i, 21), bank,
