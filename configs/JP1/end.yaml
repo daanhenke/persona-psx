@@ -64,7 +64,7 @@ segments:
       # decompile, which is what the psyq/ prefix says.
       - [0x3914, asm, psyq/crt0]
       - [0x392C, asm, psyq/libs]
-      - [0x1A98C, data, end_data]
+      - [0x1A98C, .data, end]
       - [0x1B3A0, data, psyq/data]
       # gp small data, then the bss that the image's zero padding covers.
       - [0x2E62C, sdata, end_sdata]

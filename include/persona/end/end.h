@@ -75,7 +75,7 @@ extern u_char  g_options[];
 
 extern void EndInit(void);
 extern void EndLoadImage(void);
-extern void EndLoadTim(u_long *tim, int noclut, int x, int y);
+extern int  EndLoadTim(u_long *tim, int noclut, int x, int y);
 /* Defined old-style: callers pass the width unnarrowed and it is masked
    where it is used. */
 extern void EndSetSprite();
