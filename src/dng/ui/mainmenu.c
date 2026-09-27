@@ -57,12 +57,9 @@ extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern MenuList D_800A0500;
 extern MenuList D_800A0510;
 extern MenuList D_800A0520;
-extern MenuList D_800A0458;
-extern MenuList D_800A0468;
-extern MenuList D_800A0478;
-extern MenuList D_800A0488;
-extern MenuList D_800A0498;
-extern MenuList D_800A04A8;
+extern MenuList g_tactic_member;
+extern MenuList g_tactic_list0, g_tactic_list1, g_tactic_list2, g_tactic_list3,
+                g_tactic_list4;
 extern u_char  D_801F2AC4, D_801F2AC5, D_801F2AC9, D_801F2ACA, D_801F2ACD;
 extern u_char  g_text_speed, g_map_north_up, g_cfg_stereo;
 /* The pad layout option, read here by name where the field reaches it by
@@ -269,12 +266,12 @@ void MainMenu(void)
     MenuListInit(&D_800A0500, D_801F2ACD, 0, 1, 0x1E);
     MenuListInit(&D_800A0510, 0, 0, 0xB, 0x16);
     MenuListInit(&D_800A0520, 0, 0, 1, 0x1A);
-    MenuListInit(&D_800A0458, 0, 0, 5, 0x16);
-    MenuListInit(&D_800A0468, g_party_tactic[0], 0, 2, 0x1A);
-    MenuListInit(&D_800A0478, g_party_tactic[1], 0, 2, 0x1A);
-    MenuListInit(&D_800A0488, g_party_tactic[2], 0, 2, 0x1A);
-    MenuListInit(&D_800A0498, g_party_tactic[3], 0, 2, 0x1A);
-    MenuListInit(&D_800A04A8, g_party_tactic[4], 0, 2, 0x1A);
+    MenuListInit(&g_tactic_member, 0, 0, 5, 0x16);
+    MenuListInit(&g_tactic_list0, g_party_tactic[0], 0, 2, 0x1A);
+    MenuListInit(&g_tactic_list1, g_party_tactic[1], 0, 2, 0x1A);
+    MenuListInit(&g_tactic_list2, g_party_tactic[2], 0, 2, 0x1A);
+    MenuListInit(&g_tactic_list3, g_party_tactic[3], 0, 2, 0x1A);
+    MenuListInit(&g_tactic_list4, g_party_tactic[4], 0, 2, 0x1A);
     PadLoadBindings(g_pad_config);
     PadSetPageButtons(g_pad_config);
     SlotClearAll();

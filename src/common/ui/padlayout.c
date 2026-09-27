@@ -8,7 +8,8 @@
  * bank so the unused buttons read as greyed out.
  *
  * S2D builds this same source against a layer 0x20000 higher, which is what
- * WORK_BIAS says.
+ * WORK_BIAS says. DNG's copy of the names and tables stays in its data
+ * segment (PADLAYOUT_EXTERN_DATA): the overlay's data is one asm blob.
  */
 #include <decomp/types.h>
 #include <persona/common/pad.h>
@@ -23,6 +24,7 @@
 
 #define GLYPH_BANK_DIM 0xD7
 
+#ifndef PADLAYOUT_EXTERN_DATA
 /* The action names, glyph bytes ending in 0xFF. Each overlay carries its own
    copy of these and of the two tables below. */
 u_char str_pad_action_00[] = {
@@ -120,6 +122,7 @@ u_char g_pad_layout_actions[] = {
     0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x02, 0x00, 0x04, 0x00, 0x00, 0x00,
     0x09, 0x0C, 0x01, 0x0A, 0x02, 0x0B, 0x04, 0x08,
 };
+#endif
 
 void PadDrawLayout(u_char layout)
 {

@@ -49,7 +49,7 @@ extern short   g_view_dx, g_view_dy, g_view2_dx, g_view2_dy;
 extern MenuList D_800A0500;
 extern MenuList D_800A0510;
 extern MenuList D_800A0520;
-extern MenuList D_800A0458;
+extern MenuList g_tactic_member;
 extern u_char  D_801F2ACD;
 /* The pad layout option, read by name here (see mainmenu.c). */
 extern u_char  g_pad_config;
@@ -274,7 +274,7 @@ void FormationMenu(void)
     MenuListInit(&D_800A0500, D_801F2ACD, 0, 1, 0x1E);
     MenuListInit(&D_800A0510, 0, 0, 0xB, 0x16);
     MenuListInit(&D_800A0520, 0, 0, 1, 0x1A);
-    MenuListInit(&D_800A0458, 0, 0, 5, 0x16);
+    MenuListInit(&g_tactic_member, 0, 0, 5, 0x16);
     PadLoadBindings(g_pad_config);
     PadSetPageButtons(g_pad_config);
     BgReset();

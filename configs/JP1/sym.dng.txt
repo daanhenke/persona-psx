@@ -824,11 +824,13 @@ ConfigDrawLabels         = 0x8008FE44; // type:func size:0x104
 //--- PA: 0x02BBA8   VA: 0x8008FF48   subsegment: asm, dng_2_s16
 //--------------------------------------------------------------
 PadDrawLayout            = 0x8008FF48; // type:func size:0x130
-D_80090078               = 0x80090078; // type:func size:0x1A8
+TacticListStep           = 0x80090078; // type:func size:0xE8
 
 //------------------------------------------------------------------------
 //--- PA: 0x02BE80   VA: 0x80090220   subsegment: c, common/ui/padbindings
 //------------------------------------------------------------------------
+SlotsHighlight           = 0x80090160; // type:func size:0xB8
+MenuStepNone             = 0x80090218; // type:func size:0x8
 PadLoadBindings          = 0x80090220; // type:func size:0x154
 
 //--------------------------------------------------------------
@@ -1208,6 +1210,8 @@ str_cfg_auto_battle      = 0x8009C068;
 str_cfg_speeds           = 0x8009C0C4;
 g_config_labels_left     = 0x8009C124;
 g_config_labels_right    = 0x8009C154;
+g_pad_action_names       = 0x8009C238; // size:0x4C
+g_pad_layout_actions     = 0x8009C284; // size:0x50
 g_pdata_bottom_def       = 0x8009C6E4;
 g_stat_bar_cells         = 0x8009C72C;
 str_config_title         = 0x8009C740;
@@ -1328,6 +1332,12 @@ g_arcana_top             = 0x800A0434; // size:0x2
 g_bg_shown               = 0x800A0438;
 g_view_eye               = 0x800A043C; // size:0xC
 g_view_at                = 0x800A0448; // size:0xC
+g_tactic_member          = 0x800A0458; // size:0x10
+g_tactic_list0           = 0x800A0468; // size:0x10
+g_tactic_list1           = 0x800A0478; // size:0x10
+g_tactic_list2           = 0x800A0488; // size:0x10
+g_tactic_list3           = 0x800A0498; // size:0x10
+g_tactic_list4           = 0x800A04A8; // size:0x10
 D_800A04B8               = 0x800A04B8; // size:0x1
 g_equip_last             = 0x800A04C4; // size:0x2
 g_hud_digits             = 0x800A04C8; // size:0xC
