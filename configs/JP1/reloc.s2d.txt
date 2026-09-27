@@ -116,3 +116,13 @@ rom:0x1CF0 reloc:MIPS_HI16 symbol:g_pow10 addend:-0x4
 rom:0x1CF4 reloc:MIPS_LO16 symbol:g_pow10 addend:-0x4
 rom:0x17F30 reloc:MIPS_HI16 symbol:g_hud_digits addend:-0x1
 rom:0x17F38 reloc:MIPS_LO16 symbol:g_hud_digits addend:-0x1
+
+// BgReset: the clut upload's RECT fields.
+rom:0x1F74 reloc:MIPS_HI16 symbol:g_image_queue addend:0x4
+rom:0x1F7C reloc:MIPS_LO16 symbol:g_image_queue addend:0x4
+rom:0x1F84 reloc:MIPS_HI16 symbol:g_image_queue addend:0x6
+rom:0x1F8C reloc:MIPS_LO16 symbol:g_image_queue addend:0x6
+rom:0x1F94 reloc:MIPS_HI16 symbol:g_image_queue addend:0x8
+rom:0x1F9C reloc:MIPS_LO16 symbol:g_image_queue addend:0x8
+rom:0x1FA8 reloc:MIPS_HI16 symbol:g_image_queue addend:0xA
+rom:0x1FB0 reloc:MIPS_LO16 symbol:g_image_queue addend:0xA

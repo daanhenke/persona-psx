@@ -25,7 +25,6 @@ extern GsCOORDINATE2 D_800B0F30;
 extern S2dXform      D_800B0F80;
 extern short         D_800B0F1C;
 
-extern void func_80033BE0(int h);
 extern void func_80033A40(int z);
 extern short D_800A4CF4[2];
 extern short g_compass_x;
@@ -132,7 +131,7 @@ INCLUDE_ASM("s2d/nonmatchings/game/scenecoords", S2dInitCoords);
 void S2dInitView(void)
 {
     u_char unused[0x18];
-    func_80033BE0(0x280);
+    GsSetProjection(0x280);
     g_s2d_view.vpx = 0;
     g_s2d_view.vpy = 0;
     g_s2d_view.vpz = -0x500;

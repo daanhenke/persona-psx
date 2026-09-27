@@ -102,10 +102,10 @@ GsInitCoordinate2        = 0x80033518; // type:func
 GsSetLsMatrix            = 0x800335C0; // type:func
 GsSetLightMatrix         = 0x800335F0; // type:func
 func_80033A40            = 0x80033A40; // type:func
-func_80033A50            = 0x80033A50; // type:func
+GsDefDispBuff            = 0x80033A50; // type:func
 GsInit3D                 = 0x80033AF0; // type:func
 GsMapModelingData        = 0x80033B68; // type:func
-func_80033BE0            = 0x80033BE0; // type:func
+GsSetProjection          = 0x80033BE0; // type:func
 GsSetFlatLight           = 0x80033C00; // type:func
 GsSetLightMode           = 0x800341C4; // type:func
 GsSetAmbient             = 0x800343D0; // type:func
@@ -225,7 +225,7 @@ BgMapClearRow            = 0x80066210; // type:func size:0x40
 //--------------------------------------------------------------
 //--- PA: 0x001EB0   VA: 0x80066250   subsegment: asm, s2d_s3_x1
 //--------------------------------------------------------------
-func_80066250            = 0x80066250; // type:func size:0x144
+BgReset                  = 0x80066250; // type:func size:0x144
 MsgStep                  = 0x80066394; // type:func size:0xCF8
 switchD                  = 0x8006682C;
 default                  = 0x8006704C;
@@ -311,8 +311,8 @@ func_80067C2C            = 0x80067C2C; // type:func size:0x8
 func_80067C34            = 0x80067C34; // type:func size:0x8
 TimQueue                 = 0x80067C3C; // type:func size:0x90
 TimQueueAt               = 0x80067CCC; // type:func size:0xB0
-func_80067D7C            = 0x80067D7C; // type:func size:0x26C
-func_80067FE8            = 0x80067FE8; // type:func size:0xD58
+MainMenuOpen             = 0x80067D7C; // type:func size:0x26C
+MainMenu                 = 0x80067FE8; // type:func size:0xD58
 
 //---------------------------------------------------------------------
 //--- PA: 0x0049A0   VA: 0x80068D40   subsegment: c, common/ui/menutick
@@ -1389,7 +1389,7 @@ D_800B94D4               = 0x800B94D4; // type:u32 size:0x8
 D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
 D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
-g_ot                     = 0x800B953C;
+g_ot                     = 0x800B953C; // size:0x28
 g_pad_pressed            = 0x800FC004; // size:0x4
 g_msg                    = 0x80101E4C; // ignore:True size:0x40
 g_pack_index             = 0x801DD000; // ignore:True size:0x8
@@ -1513,3 +1513,5 @@ g_vram_load_count        = 0x800A8314; // size:0x4
 g_vram_clear_count       = 0x800A8318; // size:0x4
 g_models                 = 0x800B04F8; // size:0x2A8
 g_map_obj                = 0x800B07A8; // size:0x60
+g_bg_clut                = 0x8009C798; // size:0x80
+g_menu_pack              = 0x800E0000; // ignore:True size:0x20

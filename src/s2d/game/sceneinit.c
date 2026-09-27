@@ -40,7 +40,6 @@ extern void DngSeqMarkCallback(short access, short seq, short data);
 extern void SoundInit(void);
 extern void S2dLoadMapSound(void);
 extern void SoundOpenMapSeqs(void);
-extern void func_80033A50(int x0, int y0, int x1, int y1);
 extern void ModelMap(u_long *tmd, int slot);
 extern void VramQueueLoad(u_long *data, short x, short y, short w, short h);
 extern void FadeTilesInit(void);
@@ -92,7 +91,7 @@ void S2dSceneInit(void)
     VSync(0);
     SetDispMask(0);
     GsInitGraph(0x200, 0xF0, 4, 0, 0);
-    func_80033A50(0, 0, 0x200, 0);
+    GsDefDispBuff(0, 0, 0x200, 0);
     GsInit3D();
     S2dApplyPadLayout();
 
