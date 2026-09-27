@@ -17,16 +17,16 @@
 #include <persona/common/slot.h>
 #include <persona/common/tilemap.h>
 
-#define g_slots    ((Slot *)0x800DC10C)
-#define g_tilemap0 ((short *)0x800EE180)
+#define g_slots    ((Slot *)(0x800DC10C + WORK_BIAS))
+#define g_tilemap0 ((short *)(0x800EE180 + WORK_BIAS))
 
 /* A cell of a character-map layer, by row and column. */
 #define AT(map, row, col) (&(map)[(row) * MAP_W + (col)])
 
 /* Where a portrait is read to: the archive entry's eight-byte header and
    then the TIM. */
-#define PORTRAIT_READ ((u_long *)0x800F4000)
-#define PORTRAIT_TIM  ((u_long *)0x800F4008)
+#define PORTRAIT_READ ((u_long *)(0x800F4000 + WORK_BIAS))
+#define PORTRAIT_TIM  ((u_long *)(0x800F4008 + WORK_BIAS))
 
 /* The sprites. */
 #define PICK_CURSOR_SLOT 2

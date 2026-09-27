@@ -41,6 +41,10 @@
 
 /* The six-cell label of each arcana, flat, by the 1-based PersonaData.arcana.
    The field's own copy; the status pages read it too. */
+#ifdef STOCKLIST_EXTERN_DATA
+/* S2D keeps the table in its data block. */
+extern u_char g_arcana_labels[];
+#else
 u_char g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W] = {
     0x75, 0x70, 0x00, 0x00, 0x00, 0x00,
     0x77, 0x54, 0x70, 0x00, 0x00, 0x00,
@@ -69,6 +73,7 @@ u_char g_arcana_labels[ARCANA_LABELS * ARCANA_LABEL_W] = {
     0x70, 0x87, 0x7F, 0x6A, 0x54, 0x00,
     0x70, 0x87, 0x7F, 0x00, 0x00, 0x00,
 };
+#endif
 
 void PersonaStockDraw(void)
 {

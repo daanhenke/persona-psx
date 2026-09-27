@@ -24,7 +24,7 @@
 #define FACE_SECTORS 5
 
 /* The face TIM's palette entry the page overrides, reached by address. */
-#define g_face_clut_fix (*(u_short *)0x800F401C)
+#define g_face_clut_fix (*(u_short *)(0x800F401C + WORK_BIAS))
 #define FACE_CLUT_FIX   0x8C63
 
 /* The page's three stops. */
