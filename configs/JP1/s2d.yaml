@@ -59,7 +59,7 @@ segments:
       - [0x690, pad, s2d_pad_690]
       # the two stat-bar units emit their own switch tables.
       - [0x694, .rodata, common/gfx/statbars]
-      - [0x6D8, rodata, s2d_rodata3a]
+      - [0x6F0, pad, s2d_pad_6f0]
       - [0x6F4, .rodata, common/gfx/statbarsdata]
       - [0x708, rodata, s2d_rodata3b]
       - [0x730, .rodata, common/ui/persontype]
@@ -171,7 +171,6 @@ segments:
       - [0x1D338, asm, s2d_2_s21_x3]
       - [0x1D440, c, common/game/formationcompact]
       - [0x1D664, c, common/gfx/statbars]
-      - [0x1DB68, asm, s2d_2_s21_x1]
       - [0x1DC88, c, common/gfx/statbarsdata]
       - [0x1DE28, asm, s2d_2_s21_x2]
       - [0x1E7C8, c, common/game/items]

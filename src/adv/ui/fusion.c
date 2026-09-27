@@ -93,7 +93,7 @@ extern void   FuseItemsDraw(void);
 extern void   FusionOpen(void);
 extern void   func_800AB0D0(short n);
 extern void   func_800AB1EC(void);
-extern void   D_8008D924(const PersonaDef *d, short stat);
+extern void   DrawPersonaDefStatBar(const PersonaDef *d, u_char stat);
 extern void   MsgWaitPress(short step);
 extern void   FusePairsOpen(void);
 /* PersonaFindFree, PersonaFill and PersonaFind are called without
@@ -535,11 +535,11 @@ void FusePersonaDraw(short id, short unused, short built)
         CellsWriteRow(g_spage_name_cells, d->name, 0, 10);
         CellsWriteRow(g_spage_kind_cells, &g_kind_labels[(d->kind - 1) * 10], 0,
                       10);
-        D_8008D924(d, 0);
-        D_8008D924(d, 1);
-        D_8008D924(d, 2);
-        D_8008D924(d, 3);
-        D_8008D924(d, 4);
+        DrawPersonaDefStatBar(d, 0);
+        DrawPersonaDefStatBar(d, 1);
+        DrawPersonaDefStatBar(d, 2);
+        DrawPersonaDefStatBar(d, 3);
+        DrawPersonaDefStatBar(d, 4);
         i = D_800B198B[d->kind];
         TileMapWriteRow(&D_800B1A98[i * 10], AT(g_tilemap1, 30, 18), 0, 10);
         i = PersonaTypeLabel(d->pad27[0]);

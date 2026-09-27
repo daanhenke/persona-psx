@@ -94,7 +94,7 @@ segments:
       - [0x74C, pad, adv_pad_74c]
       # the two stat-bar units emit their own switch tables.
       - [0x750, .rodata, common/gfx/statbars]
-      - [0x794, rodata, adv_rodata6a]
+      - [0x7AC, pad, adv_pad_7ac]
       - [0x7B0, .rodata, common/gfx/statbarsdata]
       - [0x7C4, pad, adv_pad_7c4]  # the pad word before CharPreviewEquip's table
       - [0x7C8, .rodata, game/charpreview]
@@ -281,7 +281,6 @@ segments:
       - [0x28D54, asm, adv_42a]
       - [0x28E5C, c, common/game/formationcompact]
       - [0x29080, c, common/gfx/statbars]
-      - [0x29584, asm, adv_42b_x1]
       - [0x296A4, c, common/gfx/statbarsdata]
       - [0x29844, asm, adv_42b_x2]
       - [0x2A1E4, c, common/game/items]

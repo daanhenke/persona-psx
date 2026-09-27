@@ -835,7 +835,7 @@ DrawPersonaStatBar       = 0x80081DE8; // type:func size:0x120
 //-----------------------------------------------------------------
 //--- PA: 0x01DB68   VA: 0x80081F08   subsegment: asm, s2d_2_s21_x1
 //-----------------------------------------------------------------
-D_80081F08               = 0x80081F08; // type:func size:0x120
+DrawPersonaDefStatBar    = 0x80081F08; // type:func size:0x120
 
 //--------------------------------------------------------------------------
 //--- PA: 0x01DC88   VA: 0x80082028   subsegment: c, common/gfx/statbarsdata

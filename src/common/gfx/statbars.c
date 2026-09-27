@@ -5,6 +5,7 @@
  *   DrawCharStatBars        0x800914F0  0x8008D420  0x80081A04
  *   DrawPersonaStatBar      0x800918D4  0x8008D804  0x80081DE8
  *   DrawPersonaStatBars     0x80091878  0x8008D7A8  0x80081D8C
+ *   DrawPersonaDefStatBar   0x800919F4  0x8008D924  0x80081F08
  *   DrawPersonaDataStatBar  0x80091B78  0x8008DAA8  0x8008208C
  *   DrawPersonaDataStatBars 0x80091B14  0x8008DA44  0x80082028
  *
@@ -241,6 +242,47 @@ void DrawPersonaStatBar(Persona *p, u_char stat)
         break;
     case 4:
         value = p->stat[4];
+        break;
+    }
+    if (value > STAT_MAX) {
+        value = STAT_MAX;
+    }
+    for (i = 0; i < value / BAR_UNITS; i++) {
+        cell->u = 0;
+        cell->v = BAR_V;
+        cell++;
+    }
+    if (value % BAR_UNITS != 0) {
+        cell->u = (value % BAR_UNITS) * BAR_W;
+        cell->v = BAR_V;
+    }
+}
+
+/* The same bar for a Persona's definition, before any record is built from
+   it. */
+void DrawPersonaDefStatBar(const PersonaDef *def, u_char stat)
+{
+    GsCELL *cell;
+    int     value;
+    int     i;
+
+    cell = g_stat_bar_cells[stat];
+    CellsClear(cell, BAR_CELLS);
+    switch (stat) {
+    case 0:
+        value = def->stat[0];
+        break;
+    case 1:
+        value = def->stat[1];
+        break;
+    case 2:
+        value = def->stat[2];
+        break;
+    case 3:
+        value = def->stat[3];
+        break;
+    case 4:
+        value = def->stat[4];
         break;
     }
     if (value > STAT_MAX) {
