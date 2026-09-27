@@ -44,7 +44,7 @@ extern void func_800A5BCC(void);
 extern void func_800A6308(void);
 extern void MenuTopRedraw(void);
 void FacilityOpen3(void);
-extern void D_80078948(int a, int b);
+extern void MenuWheelOpen2(int a, int b);
 extern void D_8007A738(int a, int b);
 extern short func_800A6FFC(short i);
 extern void DrawPersonaKeyName(u_char persona, short *dst, int base);
@@ -364,7 +364,7 @@ void FacilityOpen3(void)
 {
     MenuTopRedraw();
     SlotSetAnim(0x2D, 0, 0, 0, 0, 0x30, 0, 0);
-    D_80078948(0, 4);
+    MenuWheelOpen2(0, 4);
     D_8007A738(0, 8);
 }
 

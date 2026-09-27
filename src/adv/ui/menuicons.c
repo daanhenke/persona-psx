@@ -5,7 +5,7 @@
 #include <decomp/include_asm.h>
 
 #define MENUICONS_ASM_5           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_800782A4)
-#define MENUICONS_ASM_6           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", D_80078948)
+#define MENUICONS_ASM_6B          INCLUDE_ASM("adv/nonmatchings/ui/menuicons", func_80078B98)
 #define MENUICONS_ASM_UPDATE      INCLUDE_ASM("adv/nonmatchings/ui/menuicons", UpdateMenuSprites)
 #define MENUICONS_ASM_8           INCLUDE_ASM("adv/nonmatchings/ui/menuicons", D_80079AA0)
 #define MENUICONS_ASM_SHADEFROM   INCLUDE_ASM("adv/nonmatchings/ui/menuicons", D_8007A8D8)
