@@ -28,11 +28,6 @@ extern S2dKey g_s2d_keys[10];
 
 /* Double-buffered ordering tables, one pair per layer, and the tag buffers
    they point into. */
-extern GsOT      g_ot_back[2];
-extern GsOT      g_ot_map[2];
-extern GsOT      g_ot_obj[2];
-extern GsOT      g_ot_layer[3][2];
-extern GsOT      g_ot_front[2];
 
 extern DR_MODE  g_scene_drmode[2];
 extern DR_MODE  g_menu_drmode[2];

@@ -9,19 +9,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-
-typedef struct {
-    u_short n_vert;
-    u_short n_normal;
-    u_short n_prim;
-    u_short pad;
-} ModelCounts;
-
-typedef struct {
-    /* 0x00 */ u_long     *objs;
-    /* 0x04 */ u_long      n_obj;
-    /* 0x08 */ ModelCounts counts[16];
-} Model;                                /* 0x88 */
+#include <persona/s2d/model.h>
 
 /* One entry of a TMD's object table. */
 typedef struct {
@@ -34,7 +22,6 @@ typedef struct {
     long    scale;
 } TmdObject;                            /* 0x1C */
 
-extern Model g_models[];
 
 void ModelMap(u_long *tmd, int slot)
 {

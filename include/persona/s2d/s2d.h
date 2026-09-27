@@ -41,8 +41,8 @@ typedef struct {
     /* 0x00 */ SVECTOR       rot;
     /* 0x08 */ VECTOR        trans;
     /* 0x18 */ VECTOR        scale;
-    /* 0x28 */ GsDOBJ2       obj;
-    /* 0x38 */ int           unk38;
+    /* 0x28 */ int           unk28;
+    /* 0x2C */ GsDOBJ2       obj;
     /* 0x3C */ GsCOORDINATE2 coord;
 } S2dObj;
 
@@ -63,16 +63,31 @@ typedef struct {
     VECTOR  scale;
 } S2dXform;
 
+/* A model and the coordinate system it is drawn in. */
+typedef struct {
+    GsDOBJ2       obj;
+    GsCOORDINATE2 coord;
+} S2dModelObj;
+
 extern GsCOORDINATE2 g_root_coord;
 extern VECTOR        g_s2d_cam_scale;
 extern GsCOORDINATE2 g_s2d_cam_coord;
 extern S2dXform      g_map_xform;
-extern GsCOORDINATE2 g_map_coord;
+extern S2dModelObj   g_map_obj;
 extern GsRVIEW2      g_s2d_view;
 extern GsRVIEW2      g_s2d_view2;
 extern GsF_LIGHT     g_s2d_light;
 extern S2dObj        g_s2d_obj;
 extern S2dObj        g_s2d_objs[7];
+
+/* The ordering tables, one pair per layer, and which of each pair is being
+   built this frame. */
+extern GsOT g_ot_back[2];
+extern GsOT g_ot_map[2];
+extern GsOT g_ot_obj[2];
+extern GsOT g_ot_layer[3][2];
+extern GsOT g_ot_front[2];
+extern int  g_draw_side;
 
 /* Saved across a battle: where the party stood. */
 extern u_char g_btl_map_id;

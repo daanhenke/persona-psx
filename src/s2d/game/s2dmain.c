@@ -1,4 +1,5 @@
 /* Persona 1 (JP) - S2D's entry point and the state it keeps in the save.
+ *   0x80089840 S2dBeginFrame
  *   0x800899A8 .. 0x80089BEC  the save-block load/store pairs (S2dLoad*,
  *                             S2dStore*), S2dMarkScript, S2dResumeScript
  *   0x80089C04 ovl_s2d_entry
@@ -14,6 +15,7 @@
  * when ADV did not leave it playing, loads the map and runs it.
  */
 #include <decomp/types.h>
+#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -62,10 +64,43 @@ extern void func_80093680(void);
 extern void S2dInitCoords(void);
 extern void S2dInitLight(void);
 extern void S2dInitView(void);
-extern void func_8008E6A8(void);
+extern void S2dPlaceCompass(void);
 extern void func_8009BF9C(void);
 extern void func_80094B08(void);
 extern void func_8008B048(void);
+
+extern u_long g_s2d_workbase;
+
+#ifdef NON_MATCHING
+/* Starts a frame's drawing: the packet area for the buffer now being built
+   (the map's, or the larger one `alt` asks for) and every ordering table
+   of that side cleared. */
+void S2dBeginFrame(int alt)
+{
+    int    j;
+    u_long base;
+
+    g_draw_side = GsGetActiveBuff();
+    if (alt == 0) {
+        base = g_draw_side * 0x21000 + 0x800E0000;
+    } else {
+        base = g_draw_side * 0x10000 + 0x80100000;
+    }
+    g_s2d_workbase = base;
+    GsSetWorkBase((PACKET *)base);
+    GsClearOt(0, 0, &g_ot_back[g_draw_side]);
+    GsClearOt(0, 0, &g_ot_map[g_draw_side]);
+    GsClearOt(0, 0, &g_ot_obj[g_draw_side]);
+    for (j = 0; j < 3; j++) {
+        GsClearOt(0, 0, &g_ot_layer[j][g_draw_side]);
+    }
+    GsClearOt(0, 0, &g_ot_front[g_draw_side]);
+}
+#else
+/* 97%: the image keeps the active buffer in v0 and fills the branch slot
+   with the shift; this build copies it out first. */
+INCLUDE_ASM("s2d/nonmatchings/game/s2dmain", S2dBeginFrame);
+#endif
 
 void S2dLoad266B(void)
 {
@@ -224,7 +259,7 @@ void ovl_s2d_entry(void)
         D_800B863C = 0;
         D_800B0D2C = -1;
         D_800B0D3C = -1;
-        func_8008E6A8();
+        S2dPlaceCompass();
         func_8009BF9C();
         func_80094B08();
         g_s2d_cam_rx = 0x22A;

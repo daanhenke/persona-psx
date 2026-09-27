@@ -1,5 +1,6 @@
 /* Persona 1 (JP) - the map's coordinate systems, view and light.
  *   0x8008E288 S2dInitCoords  0x8008E588 S2dInitView  0x8008E634 S2dInitLight
+ *   0x8008E6A8 S2dPlaceCompass  0x8008E738 S2dBindModels
  *
  * Everything S2D draws in 3D hangs off one root coordinate system: the
  * camera, the map, the party's marker and the other placed objects, and the
@@ -13,6 +14,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <persona/s2d/s2d.h>
+#include <persona/s2d/model.h>
 #include <decomp/include_asm.h>
 
 #define MAP_OBJS 160
@@ -25,6 +27,11 @@ extern short         D_800B0F1C;
 
 extern void func_80033BE0(int h);
 extern void func_80033A40(int z);
+extern short D_800A4CF4[2];
+extern short g_compass_x;
+extern short g_compass_y;
+extern void  func_8008ED0C(int x, int y, int scale);
+extern void  func_8009994C(int x, int y, int w, int h, int a, int b, int c);
 
 #ifdef NON_MATCHING
 void S2dInitCoords(void)
@@ -57,7 +64,7 @@ void S2dInitCoords(void)
     g_map_xform.scale.vx = ONE;
     g_map_xform.scale.vy = ONE;
     g_map_xform.scale.vz = ONE;
-    GsInitCoordinate2(&g_root_coord, &g_map_coord);
+    GsInitCoordinate2(&g_root_coord, &g_map_obj.coord);
 
     c = &g_s2d_obj.coord;
     g_s2d_obj.trans.vx = 0;
@@ -157,3 +164,49 @@ void S2dInitLight(void)
     GsSetAmbient(0x555, 0x555, 0x555);
     GsSetLightMode(0);
 }
+
+/* Where the compass sits depends on which way the map is turned. */
+void S2dPlaceCompass(void)
+{
+    short *p;
+
+    if (D_800A4CF4[1] != 0) {
+        g_compass_x = 0x4C;
+        g_compass_y = -0x68;
+    } else {
+        g_compass_x = -0xE8;
+        g_compass_y = -0x68;
+    }
+    p = &g_compass_x;
+    func_8008ED0C(*p + 0x58, -0x18, 0x1000);
+    func_8009994C(*p + 0x10F, 0x18, 0x98, 0x68, 0, 0, 0x1000);
+}
+
+#ifdef NON_MATCHING
+/* The map's model and the party's marker take their first objects from
+   model slot 0, with the marker placed where the map is. */
+void S2dBindModels(void)
+{
+    g_map_obj.obj.tmd = g_models[0].objs;
+    *(u_long *)g_map_obj.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_map_obj.obj.tmd[4] |= g_map_obj.obj.tmd[5];
+    g_map_obj.obj.attribute = 0;
+    g_map_obj.obj.coord2 = &g_map_obj.coord;
+
+    g_s2d_obj.rot.vx = g_map_xform.rot.vx;
+    g_s2d_obj.obj.tmd = g_models[0].objs + 0x2A;
+    g_s2d_obj.trans = g_map_xform.trans;
+    *(u_long *)g_s2d_obj.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_s2d_obj.obj.tmd[4] |= g_s2d_obj.obj.tmd[5];
+    g_s2d_obj.obj.attribute = 0;
+    g_s2d_obj.obj.coord2 = &g_s2d_obj.coord;
+
+    g_s2d_objs[0].rot.vx = g_map_xform.rot.vx;
+    g_s2d_objs[0].trans = g_map_xform.trans;
+    g_s2d_objs[0].trans.vy -= 0x6A;
+}
+#else
+/* 62%: the image holds &obj.tmd in a register and derives coord2 from it;
+   the statement order around it is not settled. */
+INCLUDE_ASM("s2d/nonmatchings/game/scenecoords", S2dBindModels);
+#endif
