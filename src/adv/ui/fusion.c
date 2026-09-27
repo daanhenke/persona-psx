@@ -91,8 +91,8 @@ extern short  ItemsListSellable(void);
 extern void   FuseResultLineDraw(short persona);
 extern void   FuseItemsDraw(void);
 extern void   FusionOpen(void);
-extern void   func_800AB0D0(short n);
-extern void   func_800AB1EC(void);
+extern void   ItemDrawPrice(short n);
+extern void   FacilitySlotsClear(void);
 extern void   DrawPersonaDefStatBar(const PersonaDef *d, u_char stat);
 extern void   MsgWaitPress(short step);
 extern void   FusePairsOpen(void);
@@ -103,7 +103,7 @@ extern short  FuseRollAccident(short kind);
 extern short  FuseRollKind(void);
 extern short  FuseMoonLookup(short a, short b);
 extern void   FuseApplyBonus(short p, short kind, short level);
-extern void   func_800AB23C(short persona, u_char src, short *spell,
+extern void   FuseInheritSpell(short persona, u_char src, short *spell,
                             short *rank);
 extern void   ItemsRemovePending(short item, short count);
 extern void   ItemsCommitPending(void);
@@ -269,7 +269,7 @@ void FusionConfirm(void)
         SlotInitTagged(D_800B148C, 1, 0x42, g_menu->top.cur * 8 + 0xC8, 0x30);
         SlotInitTagged(D_800B1528, 2, 0x42, 0x20,
                        g_menu->status_page.cur * 12 + 0x30);
-        func_800AB1EC();
+        FacilitySlotsClear();
         SlotClear(0x2E);
         SlotSetFlicker(1, 1);
         SlotSetFlicker(2, 1);
@@ -384,7 +384,7 @@ void FuseItemPick(void)
         } else {
             TextItemStatRow(0, 0x40, 0x10);
         }
-        func_800AB0D0(prev);
+        ItemDrawPrice(prev);
         FuseItemsDraw();
     }
     MsgStep();
@@ -642,9 +642,9 @@ void FuseExecute(void)
             q = p;
             g_persona_slots[PersonaSlotsFree()] = p;
             m = g_persona_stock[g_menu->top.cur];
-            func_800AB23C(*r, g_persona_stock[g_menu->status_page.cur],
+            FuseInheritSpell(*r, g_persona_stock[g_menu->status_page.cur],
                           &spell_a, &rank_a);
-            func_800AB23C(*r, m, &spell_b, &rank_b);
+            FuseInheritSpell(*r, m, &spell_b, &rank_b);
             if (spell_a == 0xFF) {
                 if (spell_b == spell_a) {
                     goto done;

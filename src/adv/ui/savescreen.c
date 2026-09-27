@@ -83,7 +83,7 @@ extern int  CardSave(u_char chan, u_char slot, u_char kind);
 extern int  CardDeleteFile(u_char chan, u_char slot, u_char kind);
 extern void CinemaOpen(short plain);
 extern void CinemaClose(short plain);
-extern void func_800AB1EC(void);
+extern void FacilitySlotsClear(void);
 
 void SaveScreenOpen(void);
 void SaveTopStep(void);
@@ -189,7 +189,7 @@ void SaveTopStep(void)
             SaveMessage(0, 0);
             return;
         }
-        func_800AB1EC();
+        FacilitySlotsClear();
         MenuListInit(&g_menu->unk2C0, 0, 0, 6, 0x1E);
         /* Only one port has a card: the cursor is held on it. */
         if (g_card_state_a != CARD_NONE) {
@@ -247,7 +247,7 @@ void SaveQuitStep(void)
         if (g_menu->unk2F0.cur == 0) {
             TileMapDrawWindow(g_tilemap0, 0x1C, 8, MAP_W);
             TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x1A, 6, MAP_W);
-            func_800AB1EC();
+            FacilitySlotsClear();
             BgMapInit(g_save_quit_msg, 0);
             g_bg_layers[4].x = 0x48;
             g_bg_layers[4].y = 0x2C;
@@ -435,7 +435,7 @@ void SaveConfirmStep(void)
             kind = 1;
             break;
         }
-        func_800AB1EC();
+        FacilitySlotsClear();
         BgMapInit(g_save_busy_msg, 0);
         MSG_WINDOW(0x30);
         CinemaOpen(1);
@@ -501,7 +501,7 @@ void SaveConfirmStep(void)
     close:
         SaveSlotsDraw();
         SlotSetFlicker(4, 1);
-        func_800AB1EC();
+        FacilitySlotsClear();
         g_persona_data_step -= 1;
     }
 }
@@ -585,7 +585,7 @@ void SaveSlotsOpen(void)
     SlotInitTagged(g_fm_hint_def, 0x35, 0x24, 0x40, 0x10);
     SlotInitTagged(g_fm_hint2_def, 0x36, 0x22, 0x40, 0x10);
     SlotSetAnim(0x36, 0, 0, 0, g_menu->unk2D0.cur * 0x30 + 0x60, 0x30, 0, 0);
-    func_800AB1EC();
+    FacilitySlotsClear();
 }
 
 /* Two rows a slot: the frame and labels, then the save's name, level and

@@ -75,7 +75,7 @@ extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
 extern void   FuseResultRowDraw(short row);
 extern short  ItemsListSellable(void);
 extern void   FuseResultsOpen(void);
-extern void   func_800AB1EC(void);
+extern void   FacilitySlotsClear(void);
 extern void   FuseItemsOpen(void);
 extern void   FusePersonaDraw(short persona, short a, short b);
 extern void   FuseItemPick(void);
@@ -349,7 +349,7 @@ void FuseConfirmStep(void)
         return;
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800AB1EC();
+        FacilitySlotsClear();
         SlotClear(0x2E);
         SlotSetFlicker(1, 1);
         g_bg_shown ^= 0x10;

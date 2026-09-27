@@ -1431,7 +1431,15 @@ MoneyAdd                 = 0x800AAFD4; // type:func size:0x34
 //-----------------------------------------------------------
 //--- PA: 0x046C68   VA: 0x800AB008   subsegment: asm, adv_54
 //-----------------------------------------------------------
-D_800AB008               = 0x800AB008; // type:func size:0x7E0
+MoneySpend               = 0x800AB008; // type:func size:0x1C
+CoinsSpend               = 0x800AB024; // type:func size:0x1C
+ItemsListShopSell        = 0x800AB040; // type:func size:0x90
+ItemDrawPrice            = 0x800AB0D0; // type:func size:0x11C
+FacilitySlotsClear       = 0x800AB1EC; // type:func size:0x50
+FuseInheritSpell         = 0x800AB23C; // type:func size:0x1E8
+PersonaDataSpellIndex    = 0x800AB424; // type:func size:0x64
+PersonaDefSpellIndex     = 0x800AB488; // type:func size:0x68
+FuseSpellAllowed         = 0x800AB4F0; // type:func size:0x2F8
 AdvRunScript             = 0x800AB7E8; // type:func size:0x1B60
 AdvScriptSpecial         = 0x800AD348; // type:func size:0x338
 AdvSpecialProps          = 0x800AD680; // type:func size:0x540
@@ -1605,6 +1613,7 @@ str_place_2d             = 0x800B18B4;
 str_place_battle_top     = 0x800B18C0;
 str_place_in_battle      = 0x800B18CC;
 g_arcana_labels          = 0x800B18D8; // size:0x9C
+g_arcana_fuse_group      = 0x800B1974;
 g_kind_labels            = 0x800B19BC;
 g_char_face_files        = 0x800B1B73;
 g_menu_bg_rle            = 0x800B1B80;
@@ -1774,6 +1783,9 @@ g_save_format_ask        = 0x800BA7F0;
 g_save_format_msg        = 0x800BA828;
 g_save_busy_msg          = 0x800BA89C;
 g_save_msgs              = 0x800BAA1C;
+g_fuse_spell_list        = 0x800BAAC8; // size:0x6C
+g_fuse_spell_runs        = 0x800BAB34; // size:0x18
+g_fuse_group_classes     = 0x800BAB4C; // size:0x28
 g_cinema_parts           = 0x800BAB74; // size:0x64
 g_grow_slot_x            = 0x800BAD20;
 g_actor_defs             = 0x800BAD3C;

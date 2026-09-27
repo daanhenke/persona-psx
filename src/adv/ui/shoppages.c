@@ -38,7 +38,7 @@ extern void   ShopCountInit(u_char row);
 extern u_char ShopHave(short item);
 extern void   ShopBuyListDraw(void);
 extern void   DrawItemRow(short n, short *dst);
-extern short  func_800AB040(void);
+extern short  ItemsListShopSell(void);
 
 /* 99.8%: the row loop's counter and row pointer take s1/s2 the other way
    round in the image. */
@@ -178,7 +178,7 @@ void ShopSellOpen(void)
     }
     MenuListInit(&D_800BB838, 0, -1, 0xA, 0x90);
     ShopCountInit(n);
-    D_800BBB24 = func_800AB040() + 1;
+    D_800BBB24 = ItemsListShopSell() + 1;
     if (D_800BBB24 < 0x10) {
         D_800BBB24 = 0x10;
     }

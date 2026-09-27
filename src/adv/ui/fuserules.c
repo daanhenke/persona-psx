@@ -48,7 +48,7 @@ extern u_char  g_fuse_random_personas[];
 extern u_char  D_800B9CAB[][0x16];
 
 extern int   rand(void);
-extern short func_800AB23C(short persona, u_char src, void *spell, void *rank);
+extern short FuseInheritSpell(short persona, u_char src, void *spell, void *rank);
 extern void  DrawItemName(int id, short *dst, u_short base, int b);
 extern void  func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                            short special);
@@ -104,7 +104,7 @@ void FuseApplyBonus(short p, short kind, short mode)
     b = g_persona_stock[g_menu->status_page.cur];
     switch (mode) {
     case 1:
-        if (func_800AB23C(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         r->stat[0] += 1;
@@ -114,12 +114,12 @@ void FuseApplyBonus(short p, short kind, short mode)
         r->stat[4] += 1;
         break;
     case 2:
-        if (func_800AB23C(g_fuse.persona, b, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, b, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         break;
     case 3:
-        if (func_800AB23C(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         r->stat[0] -= 1;
