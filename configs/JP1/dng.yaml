@@ -243,7 +243,6 @@ segments:
       - [0x2BFD4, c, ui/statusrows]
       - [0x2C3CC, c, common/game/formationrepair]
       - [0x2C4EC, c, common/game/formation]
-      - [0x2C720, asm, dng_2_s17_x1]
       - [0x2C874, c, common/game/formationplace]
       - [0x2C97C, c, common/game/formationfits]
       - [0x2CA20, c, ui/formationpresets]

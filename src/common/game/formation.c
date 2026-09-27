@@ -91,13 +91,15 @@ u_char FormationFirstFree(void)
     }
 }
 
-/* The placement rule does not come out of the C yet; the overlays take it
-   from asm, so it is kept here for the progress build only. */
-#ifdef NON_MATCHING
+/* DNG builds the placement rule from here (FORMATION_CELL_FREE); ADV and S2D
+   still take theirs from asm. */
+#if defined(NON_MATCHING) || defined(FORMATION_CELL_FREE)
 /* A member may only stand on an empty cell whose four orthogonal neighbours are
    also empty. Each edge test carries both bounds even though one half of it is
    always true; `last` holds a constant, and the casts on the neighbour indices
-   decide which way round the address addition comes out. Leave all three. */
+   decide which way round the address addition comes out. Leave all three. The
+   tests sit inside the empty-cell branch: its `return 0` is the one the image
+   places last. */
 u_char FormationCellFree(u_char cell)
 {
     u_char *grid;
@@ -106,34 +108,34 @@ u_char FormationCellFree(u_char cell)
 
     ok = 1;
     grid = g_formation;
-    if (grid[cell] != CELL_EMPTY) {
-        return 0;
-    }
-    {
-        int row = (cell / GRID_W) & 0xFF;
-        if (row < GRID_H && row != 0 && grid[cell - GRID_W] != CELL_EMPTY) {
-            return 0;
+    if (grid[cell] == CELL_EMPTY) {
+        {
+            int row = (cell / GRID_W) & 0xFF;
+            if (row < GRID_H && row != 0 && grid[cell - GRID_W] != CELL_EMPTY) {
+                return 0;
+            }
         }
-    }
-    last = GRID_H - 1;
-    {
-        int row = (cell / GRID_W) & 0xFF;
-        if (row < last && row >= 0 && grid[(long)(cell + GRID_W)] != CELL_EMPTY) {
-            return 0;
+        last = GRID_H - 1;
+        {
+            int row = (cell / GRID_W) & 0xFF;
+            if (row < last && row >= 0 && grid[(long)(cell + GRID_W)] != CELL_EMPTY) {
+                return 0;
+            }
         }
-    }
-    {
-        int col = (cell % GRID_W) & 0xFF;
-        if (col < GRID_W && col != 0 && grid[(long)(cell - 1)] != CELL_EMPTY) {
-            return 0;
+        {
+            int col = (cell % GRID_W) & 0xFF;
+            if (col < GRID_W && col != 0 && grid[(long)(cell - 1)] != CELL_EMPTY) {
+                return 0;
+            }
         }
-    }
-    {
-        int col = (cell % GRID_W) & 0xFF;
-        if (col < last && col >= 0 && grid[(long)(cell + 1)] != CELL_EMPTY) {
-            return 0;
+        {
+            int col = (cell % GRID_W) & 0xFF;
+            if (col < last && col >= 0 && grid[(long)(cell + 1)] != CELL_EMPTY) {
+                return 0;
+            }
         }
+        return ok;
     }
-    return ok;
+    return 0;
 }
 #endif

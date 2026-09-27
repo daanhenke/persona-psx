@@ -4,4 +4,7 @@
  * splat resolves symlinks when it writes the linker script, so a link
  * here would collapse back to one shared object.
  */
+/* dng builds the placement rule from the shared source. */
+#define FORMATION_CELL_FREE
+
 #include "../../../common/game/formation.c"
