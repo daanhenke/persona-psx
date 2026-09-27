@@ -51,7 +51,7 @@ extern void   bcopy(void *src, void *dst, int len);
 extern void   CharPreviewEquip(Char *c, short slot, u_short item);
 extern void   MenuSetLayers(int);
 extern int    PersonaTypeLabel(short kind);
-extern void   func_80090464(int member);
+extern void   StatusDrawPersonaRows(int member);
 extern void   StockEmptyNotice(void);
 /* The field's message stepper. */
 extern int    MsgStep(void);
@@ -330,7 +330,7 @@ void StatusPersonaView(void)
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         StatusPageLayout();
         StatusPageDraw(g_menu->status_member.cur);
-        func_80090464(g_menu->status_member.cur);
+        StatusDrawPersonaRows(g_menu->status_member.cur);
         StatusPersonaPreview();
         SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0x58,
                        g_menu->persona_cmd.cur * 12 + 0x24);

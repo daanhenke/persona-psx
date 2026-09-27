@@ -836,9 +836,10 @@ PadLoadBindings          = 0x80090220; // type:func size:0x154
 //--------------------------------------------------------------
 //--- PA: 0x02BFD4   VA: 0x80090374   subsegment: asm, dng_2_s17
 //--------------------------------------------------------------
-D_80090374               = 0x80090374; // type:func size:0xF0
-func_80090464            = 0x80090464; // type:func size:0x224
-D_80090688               = 0x80090688; // type:func size:0xE4
+SaveRowsDraw             = 0x80090374; // type:func size:0x40
+SaveRowDraw              = 0x800903B4; // type:func size:0xB0
+StatusDrawPersonaRows    = 0x80090464; // type:func size:0x224
+StatusDrawPersonaNames   = 0x80090688; // type:func size:0xE4
 FormationRepairGrid      = 0x8009076C; // type:func size:0xE8
 FormationRepair          = 0x80090854; // type:func size:0x38
 

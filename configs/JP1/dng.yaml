@@ -240,7 +240,7 @@ segments:
       - [0x2BBA8, c, common/ui/padlayout]
       - [0x2BCD8, c, ui/tacticlists]
       - [0x2BE80, c, common/ui/padbindings]
-      - [0x2BFD4, asm, dng_2_s17]
+      - [0x2BFD4, c, ui/statusrows]
       - [0x2C3CC, c, common/game/formationrepair]
       - [0x2C4EC, c, common/game/formation]
       - [0x2C720, asm, dng_2_s17_x1]
