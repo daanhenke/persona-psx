@@ -3867,3 +3867,37 @@ the loop reads a `short` variable assigned from the int before the loop.
 
 - [effectframe.c](/src/btlp/effectframe.c) - `BtlDrawEffectFrame`'s `tall`,
   99.45% to exact.
+
+## Unoptimised code (-O0): OPEN.EXE, ATLUS.EXE, main's card code
+
+At -O0 nothing is scheduled or allocated across statements, so what is left
+to match is the tree gcc builds and the order it expands it in. Every one of
+these came from src/open (all of OPEN.EXE's code, exact).
+
+- **A lone `nop` between two branch targets is a user label.** The parser
+  calls `emit_nop()` before a `label:` when the last insn is itself a label
+  (only when not optimising). `if (res) goto failed; if (...) {...}
+  failed: ...` put it where the image has it
+  ([title.c](/src/open/title.c) `OpenLoadMenu`, 99.92% to exact).
+- **`if (x) goto L;` is `beqz x, skip; j L`.** The "branch into the body,
+  jump out" pair after a test is a goto or a break, not an inverted test.
+- **fold turns `X + (Y + C)` into `(X + C) + Y`.** The image's
+  `row*34 + 25`, then `+ i`, is written `row * 34 + (i + 25)` (the
+  `FONT_CELL` macro), and `j + 24 + i * 34` gives `(j + 24) + i*34`.
+- **A mode-changing cast stops that fold.** `A + (short)(i * 24 + 0x24)`
+  keeps the inner sum; `split_tree` will not look through the cast, and the
+  narrowing costs nothing when the result goes to a `short` field.
+- **`x > -1` is `slti x, 0; beqz`; `x >= 0` is `bgez`.** Both occur.
+- **A bare call assigned and used as a value comes back as the MEM** (store,
+  then reload): expand_assignment returns `to_rtx` for a CALL_EXPR right
+  side. Copy, copy, store means a conversion around the call - the variable
+  is `long` where the function returns `int`.
+- **Callers with no `andi 0xffff` on a u_short argument** call the routine
+  unprototyped; a K&R definition keeps the callee's narrowing
+  (`OpenSpriteSetUV`, `OpenFontRenderGlyph`).
+- **Locals take slots in declaration order, aggregates 8-aligned**, so a
+  gap before an array is its alignment, and a frame bigger than the named
+  locals is unused arrays (`OpenPlayMovie`'s 0x80 bytes).
+- **Spelling moves registers here too:** `% 16 == 0` for `!(x & 0xF)`,
+  `/ 2` for `>> 1` on a u_char, `0xFF - i` (no cast, so the constant
+  narrows to -1) - each fixed a register pair in `OpenTitle`.
