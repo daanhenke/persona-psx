@@ -25,6 +25,11 @@ extern long  g_s2d_cam_x;
 extern long  g_s2d_cam_y;
 extern long  g_s2d_cam_z;
 
+/* The exit the running map asks for (-1 while none), and which way the map
+   is turned. */
+extern short g_s2d_exit;
+extern short g_s2d_heading;
+
 /* Which way the party faces, 0-3. */
 extern short g_s2d_facing;
 

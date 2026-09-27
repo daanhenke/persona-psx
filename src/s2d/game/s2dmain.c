@@ -38,8 +38,6 @@ extern short  g_bgm_ready;
 
 extern int       D_800A4CE4;
 extern int       D_800A4CEC;
-/* [0] the exit a map asks for (-1 while none), [1] the party's facing. */
-extern short     D_800A4CF4[2];
 extern short     D_800A4CF8[2];
 extern u_char    D_800A4CFC[];
 /* The overlay's two work buffers: ordering-table tags, then the map's. */
@@ -67,7 +65,7 @@ extern void S2dInitView(void);
 extern void S2dPlaceCompass(void);
 extern void func_8009BF9C(void);
 extern void func_80094B08(void);
-extern void func_8008B048(void);
+extern void S2dRunMap(void);
 
 extern u_long g_s2d_workbase;
 
@@ -153,15 +151,15 @@ void S2dLoadHeading(void)
     u_char *p = (u_char *)0x801F2668;
 
     if (*p != 0) {
-        D_800A4CF4[1] = *p - 1;
+        g_s2d_heading = *p - 1;
     } else {
-        D_800A4CF4[1] = 1;
+        g_s2d_heading = 1;
     }
 }
 
 void S2dStoreHeading(void)
 {
-    D_801F2668 = D_800A4CF4[1] + 1;
+    D_801F2668 = g_s2d_heading + 1;
 }
 
 void S2dResumeScript(void)
@@ -227,7 +225,7 @@ void ovl_s2d_entry(void)
         ((u_char *)D_800B1D30)[1] = 1;
     }
     D_800B91EC[1] = 0;
-    D_800A4CF4[0] = -1;
+    g_s2d_exit = -1;
     S2dSceneInit();
     do {
         S2dLoad266B();
@@ -235,7 +233,7 @@ void ovl_s2d_entry(void)
         S2dLoadHeading();
         state = g_state_prev;
         g_s2d_facing = facing[g_adv_room & 3];
-        D_800A4CF8[1] = D_800A4CF4[1] * 1024;
+        D_800A4CF8[1] = g_s2d_heading * 1024;
         if (state == GAME_STATE_BTL) {
             g_map_id = g_btl_map_id;
             g_map_pos_x = g_btl_pos_x;
@@ -271,6 +269,6 @@ void ovl_s2d_entry(void)
         g_s2d_cam_rz = 0;
         g_s2d_cam_x = 0;
         g_map_xform.rot.vy = 0x1000 - g_s2d_facing * 1024;
-        func_8008B048();
-    } while (D_800A4CF4[0] == -1);
+        S2dRunMap();
+    } while (g_s2d_exit == -1);
 }

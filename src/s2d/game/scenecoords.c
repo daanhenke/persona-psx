@@ -26,7 +26,6 @@ extern S2dXform      D_800B0F80;
 extern short         D_800B0F1C;
 
 extern void func_80033A40(int z);
-extern short D_800A4CF4[2];
 extern short g_compass_x;
 extern short g_compass_y;
 extern void  func_8008ED0C(int x, int y, int scale);
@@ -169,7 +168,7 @@ void S2dPlaceCompass(void)
 {
     short *p;
 
-    if (D_800A4CF4[1] != 0) {
+    if (g_s2d_heading != 0) {
         g_compass_x = 0x4C;
         g_compass_y = -0x68;
     } else {
