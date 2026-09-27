@@ -276,7 +276,7 @@ segments:
       - [0x320BC, c, common/gfx/mapmarker]
       - [0x32164, asm, dng_2_s22]
       - [0x32260, c, common/ui/mapmarkers]
-      - [0x32478, asm, dng_2_s22a]
+      - [0x32478, c, ui/mapstep]
       - [0x327AC, c, common/ui/mapview]
       - [0x32814, asm, dng_2_s22b]
       - [0x32DB4, c, common/game/tilewalls]

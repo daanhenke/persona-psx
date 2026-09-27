@@ -103,7 +103,7 @@ extern void MapPlaceMarker(short map_dir, short player_dir, short x, short y,
 extern void RoomRotatePoint(short from, short x, short y, short to,
                             short *ox, short *oy);
 extern void MapDrawTurned(short map, short turn);
-extern void func_80096818(void);
+extern void MapScreenStep(void);
 extern void MenuSetLayers(int);
 /* The field's message stepper. */
 extern int  MsgStep(void);
@@ -242,7 +242,7 @@ void MapScreen(void)
     while (g_persona_data_step != MAP_CLOSED) {
         RunFrame();
         if (g_persona_data_step == 0) {
-            func_80096818();
+            MapScreenStep();
         }
         if (!g_menu_allow_hold && (g_key_menu_close & g_pad_pressed[0])) {
             g_menu_allow_hold = 1;

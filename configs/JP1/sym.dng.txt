@@ -1038,7 +1038,7 @@ MapPlaceMarker           = 0x8009645C; // type:func size:0xA8
 //--------------------------------------------------------------
 MapDrawName              = 0x80096504; // type:func size:0xFC
 MapDrawMarkers           = 0x80096600; // type:func size:0x218
-func_80096818            = 0x80096818; // type:func size:0x334
+MapScreenStep            = 0x80096818; // type:func size:0x334
 MapDrawTurned            = 0x80096B4C; // type:func size:0x68
 MapDrawGrid              = 0x80096BB4; // type:func size:0x5A0
 
