@@ -274,8 +274,6 @@ segments:
       - [0x27DAC, c, ui/statusrows]
       - [0x281A8, c, common/game/formationrepair]
       - [0x28390, c, common/game/formation]
-      # FormationCellFree, the placement rule, is still asm.
-      - [0x285C4, asm, adv_41a]
       - [0x28718, c, common/game/formationplace]
       - [0x28818, c, common/game/formationfits]
       - [0x288BC, c, ui/formationpresets]
@@ -286,7 +284,7 @@ segments:
       - [0x28E5C, c, common/game/formationcompact]
       - [0x29080, c, common/gfx/statbars]
       - [0x296A4, c, common/gfx/statbarsdata]
-      - [0x29844, asm, adv_42b_x2]
+      - [0x29844, c, common/gfx/cellsinit]
       - [0x2A1E4, c, common/game/items]
       # The copy helper after the commit routine is its own unit, out of the
       # same source as the party slot helpers.

@@ -1078,7 +1078,7 @@ DrawPersonaDataStatBar   = 0x8008DAA8; // type:func size:0x13C
 //---------------------------------------------------------------
 //--- PA: 0x029844   VA: 0x8008DBE4   subsegment: asm, adv_42b_x2
 //---------------------------------------------------------------
-D_8008DBE4               = 0x8008DBE4; // type:func size:0x20
+TileMapCapRow            = 0x8008DBE4; // type:func size:0x20
 CellsInit                = 0x8008DC04; // type:func size:0x980
 
 //-----------------------------------------------------------------------
@@ -1867,8 +1867,11 @@ g_pad_held               = 0x800DC000; // size:0x4
 g_pad_pressed            = 0x800DC004; // size:0x4
 g_slots                  = 0x800DC10C; // ignore:True size:0x1540
 g_msg                    = 0x800E1E4C; // ignore:True size:0x40
+g_menu_cells             = 0x800E3E4C; // ignore:True size:0x2400
 g_persona_list           = 0x800EAE4C; // ignore:True
 g_bg_slots               = 0x800EB14C; // ignore:True size:0x100
+D_800EB347               = 0x800EB347; // ignore:True
+D_800EB34C               = 0x800EB34C; // ignore:True
 g_facility_kind          = 0x800EB581;
 g_facility_count         = 0x800EB582;
 g_shop_items             = 0x800EB590; // ignore:True
