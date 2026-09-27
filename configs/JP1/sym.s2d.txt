@@ -193,9 +193,9 @@ SlotSetAnim              = 0x80065D1C; // type:func size:0x80
 //--------------------------------------------------------------
 //--- PA: 0x0019FC   VA: 0x80065D9C   subsegment: asm, s2d_s1_x2
 //--------------------------------------------------------------
-D_80065D9C               = 0x80065D9C; // type:func size:0x50
+SoundRestartSeq          = 0x80065D9C; // type:func size:0x50
 SoundPlaySeq             = 0x80065DEC; // type:func size:0x60
-func_80065E4C            = 0x80065E4C; // type:func size:0x6C
+SoundOpenSeq             = 0x80065E4C; // type:func size:0x6C
 
 //-----------------------------------------------------------------------
 //--- PA: 0x001B18   VA: 0x80065EB8   subsegment: c, common/game/playtime
@@ -306,8 +306,11 @@ FlushImageUploads        = 0x80067B9C; // type:func size:0x88
 //-------------------------------------------------------------
 //--- PA: 0x003884   VA: 0x80067C24   subsegment: asm, s2d_1_s2
 //-------------------------------------------------------------
-D_80067C24               = 0x80067C24; // type:func size:0xA8
-func_80067CCC            = 0x80067CCC; // type:func size:0xB0
+func_80067C24            = 0x80067C24; // type:func size:0x8
+func_80067C2C            = 0x80067C2C; // type:func size:0x8
+func_80067C34            = 0x80067C34; // type:func size:0x8
+TimQueue                 = 0x80067C3C; // type:func size:0x90
+TimQueueAt               = 0x80067CCC; // type:func size:0xB0
 func_80067D7C            = 0x80067D7C; // type:func size:0x26C
 func_80067FE8            = 0x80067FE8; // type:func size:0xD58
 
@@ -1110,12 +1113,12 @@ func_80096DE4            = 0x80096DE4; // type:func size:0x28
 func_80096E0C            = 0x80096E0C; // type:func size:0x3C8
 func_800971D4            = 0x800971D4; // type:func size:0xB4
 func_80097288            = 0x80097288; // type:func size:0xE8
-func_80097370            = 0x80097370; // type:func size:0x90
-func_80097400            = 0x80097400; // type:func size:0x38
-S2dLoadImage             = 0x80097438; // type:func size:0x38
-func_80097470            = 0x80097470; // type:func size:0x40
-func_800974B0            = 0x800974B0; // type:func size:0x30
-D_800974E0               = 0x800974E0; // type:u32 size:0x28
+TimLoad                  = 0x80097370; // type:func size:0x90
+VramStore                = 0x80097400; // type:func size:0x38
+VramLoad                 = 0x80097438; // type:func size:0x38
+VramMove                 = 0x80097470; // type:func size:0x40
+IntPow                   = 0x800974B0; // type:func size:0x30
+CopyWords                = 0x800974E0; // type:func size:0x28
 func_80097508            = 0x80097508; // type:func size:0x274
 func_8009777C            = 0x8009777C; // type:func size:0x1E8
 func_80097964            = 0x80097964; // type:func size:0x284
@@ -1459,3 +1462,4 @@ g_advcmd_file            = 0x800B5EE0; // size:0x18
 g_model_objs             = 0x800B8664; // size:0x400
 g_map_side               = 0x800B956C; // size:0x2
 g_map_pos_y              = 0x801F5353; // size:0x1
+g_seq_offset             = 0x800E0020; // ignore:True

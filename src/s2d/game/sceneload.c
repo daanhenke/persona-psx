@@ -53,7 +53,7 @@ extern short   g_map_side;
 extern short SsVabOpenHead(u_char *addr, short vabid);
 extern short SsVabTransBody(u_char *addr, short vabid);
 extern short SsVabTransCompleted(short immediateFlag);
-extern void  S2dLoadImage(int x, int y, int w, int h, u_long *p);
+extern void  VramLoad(int x, int y, int w, int h, u_long *p);
 
 void S2dLoadMapModels(void);
 
@@ -161,7 +161,7 @@ void S2dLoadMapModels(void)
     S2dMapModels(MODELS_AT, g_map_model_ids[*MAP_ID_AT][0], 0);
     S2dMapModels(EX_MAP_AT, g_map_model_ids[*MAP_ID_AT][2 - g_map_side],
                  2 - g_map_side);
-    S2dLoadImage(0x200, 0x100, 0x200, 0xE0, (u_long *)EX_MAP_AT);
+    VramLoad(0x200, 0x100, 0x200, 0xE0, (u_long *)EX_MAP_AT);
     DrawSync(0);
     str_2d_ex_map[NAME_DIGIT] = *(u_char *)MAP_ID_AT + '0';
     str_2d_ex_map[NAME_DIGIT + 1] = g_map_pos_y >= 0x91 ? 'A' : 'B';
