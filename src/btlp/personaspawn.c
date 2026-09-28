@@ -85,12 +85,6 @@ extern u_long       *g_btl_persona_tim;
 extern const u_long **g_btl_effect_gfx;
 
 
-/* 98.91%, and structurally closer than the 99.64% it replaces: the table is
-   indexed by gfx itself, not a copy of it, which is what puts the model in the
-   image's saved register. What is left is inside the inlined memcpy: the image
-   loads the source into a0 and copies it to a2 for the block move, where gcc
-   here loads it straight into a2. */
-#ifdef NON_MATCHING
 BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
 {
     BtlObj *obj;
@@ -101,7 +95,10 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
     int     y;
 
     g_btl_persona_image = PERSONA_IMAGE;
-    memcpy(PERSONA_IMAGE, g_load_stage_1, PERSONA_IMAGE_BYTES);
+    /* Reuse the object local for the source: its lifetime keeps the copy
+       into memcpy's working register, as in the original. */
+    obj = (BtlObj *)g_load_stage_1;
+    memcpy(PERSONA_IMAGE, (void *)obj, PERSONA_IMAGE_BYTES);
     BtlBindGfx(GFX_EFFECT, gfx, &g_btl_persona_image);
     g_btl_persona_tim = BtlUploadTim((u_long *)g_load_stage, PERSONA_PAGE,
                                      PERSONA_SLOT, PERSONA_ABR, 0, 1);
@@ -153,6 +150,3 @@ BtlObj *BtlSpawnPersona(int gfx, int col, int row, int motion)
 
     return first;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personaspawn", BtlSpawnPersona);
-#endif
