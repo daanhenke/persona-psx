@@ -17,7 +17,7 @@ extern short    g_menu_subsel;
 extern short    g_menu_sel;
 
 extern int  MenuStepCursor(u_short *m);   /* really a MenuList *, see menulist.c */
-extern void UpdateMenuSprites(int arg);
+extern void UpdateMenuSprites(short kind);
 extern void DrawStatusHud(void);
 
 /* InputCheckAcceptA and InputCheckAcceptB are deliberately absent. S2D and ADV

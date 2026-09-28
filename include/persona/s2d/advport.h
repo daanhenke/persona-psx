@@ -21,7 +21,6 @@
 #define D_800B1EB8 D_8009D908
 #define D_800B2A3C D_8009E4E8
 #define func_80077F8C func_80076F44
-#define func_800782A4 func_8007725C
 #define func_8007A62C func_800795E4
 #define g_BB998 D_800B8630
 #define g_BC5C8 D_800B9538

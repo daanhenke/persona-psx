@@ -51,7 +51,7 @@ extern u_char  D_8009B074[];
 
 extern void  DrawStatusHud(void);
 extern void  BgBoxShow(void);
-extern void  func_80086E20(int a, int b);
+extern void  MenuWheelTurn3(short kind, short list);
 extern void  StatusDrawPersonaRows(int member);
 extern short PersonaStockCompact(void);
 extern void  PersonaStockDraw(void);
@@ -162,7 +162,7 @@ void StatusTopStep(void)
 
     DrawStatusHud();
     if (MenuStepCursor(&g_menu->status_cmd)) {
-        func_80086E20(1, 6);
+        MenuWheelTurn3(1, 6);
     }
     if (InputCheckAcceptA(2)) {
         switch (g_menu->status_cmd.cur) {

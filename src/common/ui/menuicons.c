@@ -294,10 +294,13 @@ void MenuWheelOpen(int kind, short cur)
     }
 }
 
-/* Per frame of a turn, each shade sprite's offset from its place on the
-   circle: [sprite][frame][x, y], sprite 1 and 2 the two row sprites and 0
-   the one on the right. */
-extern short g_wheel_turn[3][8][2];
+/* Per frame of a turn, a shade sprite's offset from its place on the
+   circle: a row of eight (x, y) pairs per sprite. g_wheel_turn is the
+   three-icon wheel's (row 0 the sprite on the right, 1 and 2 the row);
+   the two-icon wheel adds its own row and the five-icon wheel two more. */
+extern short g_wheel_turn[3][16];
+extern short g_wheel_turn2[16];
+extern short g_wheel_turn5[2][16];
 extern int   g_pad_held;
 
 extern void RunFrame(void);
@@ -305,83 +308,72 @@ extern void RunFrame(void);
 void MenuIconsSet3(u_char kind, u_char list);
 
 /* Turns the three-icon wheel a step over eight frames, backwards while the
-   left shoulder buttons are held; the icons change half way.
+   left shoulder buttons are held; the icons change half way. The turns
+   below (two and five icons) are the same routine.
 
-   Not matched (67.65%). Found so far: MenuIconsSet3's prototype in scope
-   (the image passes the low byte of each spilled short parameter), the
-   angle set ahead of the i == 4 call so cse loses its constant, and a
-   multiplier variable of 1 that the image loads afresh per section. Open:
-   loop.c here folds every table read into one reduced pointer, where the
-   image reduces only slot 56's x and reads the rest from a base register
-   (table + 0x20, hoisted) plus i * 4, slot 58's y from the symbol; fold
-   also turns `t + 0x68 - d` into `t - (d - 0x68)`; and the image clears a
-   saved register at entry that nothing reads. */
-#ifdef NON_MATCHING
-void func_80086E20(short kind, short list)
+   Written as the wheel animations are, around a count `b` that is always
+   0: cse cannot see its value past the loops' labels, so the multiplier
+   and the angles fold to constants only in combine, after flow has kept
+   b's store (the saved register the image clears at entry and never
+   reads). `0x68 - d + t` keeps the table read ahead of the rounding
+   branch; `t + 0x68 - d` folds to `t - (d - 0x68)`. Rows of shorts
+   indexed i * 2 let cse base each read on one row address.
+   The image stores kind and list as halfwords and passes their low bytes
+   (sh, then lbu, from 8-aligned slots): byte buffers do that; a u_char
+   parameter spills with sb, a short one reloads with lhu and andi. */
+void MenuWheelTurn3(short kind, short list)
 {
     int i;
-    int a;
-    int m;
-    short (*t)[8][2];
+    int b;
+    u_char k[2], l[2];
 
-    m = 1;
-    t = g_wheel_turn;
+    b = 0;
+    *(short *)k = kind;
+    *(short *)l = list;
     g_slots[ICON_SLOT + 0].scale_y = 0x100;
     g_slots[ICON_SLOT + 1].scale_y = 0x100;
     g_slots[ICON_SLOT + 2].scale_y = 0x100;
     if (g_pad_held & 0x6000) {
         for (i = 7; i >= 0; i--) {
-            a = 0x100;
             if (i == 4) {
-                MenuIconsSet3(kind, list);
+                MenuIconsSet3(k[0], l[0]);
             }
-            g_slots[SHADE_SLOT + 0].x = t[1][i][0] + 0x68 - rsin(a) / 24 * m / 32;
-            g_slots[SHADE_SLOT + 0].y = t[1][i][1] + 0x38 - rcos(a) / 24 * m / 32;
-            a = 0x200;
-            g_slots[SHADE_SLOT + 1].x = t[2][i][0] + 0x58 - rsin(a) / 24 * m / 32;
-            g_slots[SHADE_SLOT + 1].y = t[2][i][1] + 0x4C - rcos(a) / 24 * m / 32;
-            a = 0x800;
-            g_slots[SHADE_SLOT + 2].x = t[0][i][0] + 0xD2 - rsin(a) / 22 * m / 32;
-            g_slots[SHADE_SLOT + 2].y = t[0][i][1] + 0x64 - rcos(a) / 22 * m / 32;
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[2][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[2][i * 2 + 1];
+            g_slots[SHADE_SLOT + 2].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 2].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
             RunFrame();
         }
     } else {
         for (i = 0; i < 8; i++) {
-            a = 0x100;
             if (i == 4) {
-                MenuIconsSet3(kind, list);
+                MenuIconsSet3(k[0], l[0]);
             }
-            g_slots[SHADE_SLOT + 0].x = t[1][i][0] + 0x68 - rsin(a) / 24 * m / 32;
-            g_slots[SHADE_SLOT + 0].y = t[1][i][1] + 0x38 - rcos(a) / 24 * m / 32;
-            a = 0x200;
-            g_slots[SHADE_SLOT + 1].x = t[2][i][0] + 0x58 - rsin(a) / 24 * m / 32;
-            g_slots[SHADE_SLOT + 1].y = t[2][i][1] + 0x4C - rcos(a) / 24 * m / 32;
-            a = 0x800;
-            g_slots[SHADE_SLOT + 2].x = t[0][i][0] + 0xD2 - rsin(a) / 22 * m / 32;
-            g_slots[SHADE_SLOT + 2].y = t[0][i][1] + 0x64 - rcos(a) / 22 * m / 32;
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[2][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[2][i * 2 + 1];
+            g_slots[SHADE_SLOT + 2].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 2].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
             RunFrame();
         }
     }
-    a = 0x100;
-    g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(a) / 24 * m / 32;
-    g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(a) / 24 * m / 32;
+    g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
     g_slots[SHADE_SLOT + 0].u_add = 0x10;
     g_slots[SHADE_SLOT + 0].v_add = 0x10;
-    a = 0x200;
-    g_slots[SHADE_SLOT + 1].x = 0x58 - rsin(a) / 24 * m / 32;
-    g_slots[SHADE_SLOT + 1].y = 0x4C - rcos(a) / 24 * m / 32;
+    g_slots[SHADE_SLOT + 1].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 1].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
     g_slots[SHADE_SLOT + 1].u_add = 0x10;
     g_slots[SHADE_SLOT + 1].v_add = 0x10;
-    a = 0x800;
-    g_slots[SHADE_SLOT + 2].x = 0xD2 - rsin(a) / 22 * m / 32;
-    g_slots[SHADE_SLOT + 2].y = 0x64 - rcos(a) / 22 * m / 32;
+    g_slots[SHADE_SLOT + 2].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 2].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
     g_slots[ICON_SLOT + 0].scale_y = 0x1000;
     g_slots[ICON_SLOT + 1].scale_y = 0x1000;
     g_slots[ICON_SLOT + 2].scale_y = 0x1000;
 }
-#else
-MENUICONS_ASM_5;
-#endif
 
 /* The two-icon wheel opened on entry `cur`, as MenuWheelOpen does the
    three. `kind` is not read. */
@@ -426,11 +418,193 @@ void MenuWheelOpen2(int kind, short cur)
     g_slots[WHEEL_SLOT].u_add = cur * 32;
 }
 
-MENUICONS_ASM_6B;
+void MenuIconsSet2(u_char kind, u_char list);
 
-MENUICONS_ASM_UPDATE;
+/* MenuWheelTurn3 for the two-icon wheel. */
+void MenuWheelTurn2(short kind, short list)
+{
+    int i;
+    int b;
+    u_char k[2], l[2];
 
-MENUICONS_ASM_8;
+    b = 0;
+    *(short *)k = kind;
+    *(short *)l = list;
+    g_slots[ICON_SLOT + 0].scale_y = 0x100;
+    g_slots[ICON_SLOT + 1].scale_y = 0x100;
+    if (g_pad_held & 0x6000) {
+        for (i = 7; i >= 0; i--) {
+            if (i == 4) {
+                MenuIconsSet2(k[0], l[0]);
+            }
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn2[i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn2[i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
+            RunFrame();
+        }
+    } else {
+        for (i = 0; i < 8; i++) {
+            if (i == 4) {
+                MenuIconsSet2(k[0], l[0]);
+            }
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn2[i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn2[i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
+            RunFrame();
+        }
+    }
+    g_slots[SHADE_SLOT + 0].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 0].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 1].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 1].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
+    g_slots[ICON_SLOT + 0].scale_y = 0x1000;
+    g_slots[ICON_SLOT + 1].scale_y = 0x1000;
+}
+
+/* MenuWheelTurn3 for the five-icon wheel, run when the cursor moves. Two
+   sprites take their neighbour's angle (0x10 and 0x20), as in the image. */
+void UpdateMenuSprites(short kind)
+{
+    int i;
+    int b;
+    u_char k[2];
+
+    b = 0;
+    *(short *)k = kind;
+    g_slots[ICON_SLOT + 0].scale_y = 0x100;
+    g_slots[ICON_SLOT + 1].scale_y = 0x100;
+    g_slots[ICON_SLOT + 2].scale_y = 0x100;
+    g_slots[ICON_SLOT + 3].scale_y = 0x100;
+    g_slots[ICON_SLOT + 4].scale_y = 0x100;
+    if (g_pad_held & 0x6000) {
+        for (i = 7; i >= 0; i--) {
+            if (i == 4) {
+                MenuIconsSet5(k[0]);
+            }
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2 + 1];
+            g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2];
+            g_slots[SHADE_SLOT + 2].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2 + 1];
+            g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[1][i * 2];
+            g_slots[SHADE_SLOT + 3].y = 0x64 - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 4].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 4].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
+            RunFrame();
+        }
+    } else {
+        for (i = 0; i < 8; i++) {
+            if (i == 4) {
+                MenuIconsSet5(k[0]);
+            }
+            g_slots[SHADE_SLOT + 0].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2];
+            g_slots[SHADE_SLOT + 0].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2];
+            g_slots[SHADE_SLOT + 1].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2 + 1];
+            g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2];
+            g_slots[SHADE_SLOT + 2].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[0][i * 2 + 1];
+            g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[1][i * 2];
+            g_slots[SHADE_SLOT + 3].y = 0x64 - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32 + g_wheel_turn5[1][i * 2 + 1];
+            g_slots[SHADE_SLOT + 4].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2];
+            g_slots[SHADE_SLOT + 4].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32 + g_wheel_turn[0][i * 2 + 1];
+            RunFrame();
+        }
+    }
+    g_slots[SHADE_SLOT + 0].x = 0x78 - rsin((b & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 0].y = 0x24 - rcos((b & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 1].y = 0x38 - rcos(((b + 0x10) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 2].y = 0x4C - rcos(((b + 0x20) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((b + 0x30) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 3].y = 0x64 - rcos(((b + 0x30) & 0xFF) * 16) / 24 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 4].x = 0xD2 - rsin(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
+    g_slots[SHADE_SLOT + 4].y = 0x64 - rcos(((b + 0x80) & 0xFF) * 16) / 22 * ((b & 0x1F) + 1) / 32;
+    g_slots[ICON_SLOT + 0].scale_y = 0x1000;
+    g_slots[ICON_SLOT + 1].scale_y = 0x1000;
+    g_slots[ICON_SLOT + 2].scale_y = 0x1000;
+    g_slots[ICON_SLOT + 3].scale_y = 0x1000;
+    g_slots[ICON_SLOT + 4].scale_y = 0x1000;
+}
+
+/* MenuWheelAnimOut for a wheel with a sixth shade sprite (slot 61, on a
+   circle round (0xA0, 0x48)); the fifth runs in a straight line. */
+int MenuWheelAnimOut6(void)
+{
+    if (g_menu_blink != 0x20) {
+        if (g_menu_blink == 0xFF) {
+            g_menu_blink = 0;
+            SlotInitTagged(D_8009AA2C, 0x3B, 0x300, 0, 0);
+            SlotInitTagged(D_8009AA4C, 0x3C, 0x300, 0, 0);
+            SlotClear(0x28);
+            SlotClear(0x29);
+            SlotClear(0x2A);
+            SlotClear(0x2B);
+            SlotClear(0x2C);
+            SlotClear(0x2E);
+            SlotClear(0x30);
+            SlotClear(0x31);
+            SlotClear(0x32);
+            SlotClear(0x33);
+            SlotClear(0x34);
+            SlotClear(0x36);
+        }
+        g_slots[SHADE_SLOT + 0].x = 0x80 - rsin(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 0].y = 0x18 - rcos(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].y = 0x30 - rcos(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].y = 0x48 - rcos(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].y = 0x60 - rcos(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 4].x = 0xD0 - g_menu_blink * 3 / 2;
+        g_slots[SHADE_SLOT + 4].y = 0x68 - g_menu_blink;
+        g_slots[SHADE_SLOT + 5].x = 0xA0 - rsin(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 5].y = 0x48 - rcos(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_menu_blink++;
+        return 0;
+    }
+    return 1;
+}
+
+/* MenuWheelAnimIn for the same wheel, opening from 0: the frames and icons
+   go up at the start and the icons keep their rest position. */
+int MenuWheelAnimIn6(void)
+{
+    if (g_menu_blink != 0xFF) {
+        if (g_menu_blink == 0) {
+            SlotInitTagged(D_8009AA8C, 0x30, 0x300, 0x38, 0x1C);
+            SlotInitTagged(D_8009AA8C, 0x31, 0x300, 0x28, 0x30);
+            SlotInitTagged(D_8009AA8C, 0x32, 0x300, 0x18, 0x48);
+            SlotInitTagged(D_8009AA8C, 0x33, 0x300, 8, 0x60);
+            SlotInitTagged(D_8009ABA8, 0x2E, 0x2FF, 0xB2, 0x60);
+            SlotInitTagged(D_8009B074, 0x28, 0x300, 0x38, 0x1C);
+            SlotInitTagged(D_8009B074, 0x29, 0x300, 0x28, 0x30);
+            SlotInitTagged(D_8009B074, 0x2A, 0x300, 0x18, 0x48);
+            SlotInitTagged(D_8009B074, 0x2B, 0x300, 8, 0x60);
+            SlotInitTagged(D_8009B074, 0x2C, 0x300, 0xBA, 0x61);
+            MenuIconsSet5(0);
+        }
+        g_slots[SHADE_SLOT + 0].x = 0x78 - rsin(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 0].y = 0x24 - rcos(g_menu_blink * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].x = 0x68 - rsin(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 1].y = 0x38 - rcos(((g_menu_blink + 0x10) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].x = 0x58 - rsin(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 2].y = 0x4C - rcos(((g_menu_blink + 0x20) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].x = 0x48 - rsin(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 3].y = 0x60 - rcos(((g_menu_blink + 0x30) & 0xFF) * 16) / 24 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 4].x = 0xD0 - g_menu_blink * 3 / 2;
+        g_slots[SHADE_SLOT + 4].y = 0x68 - g_menu_blink;
+        g_slots[SHADE_SLOT + 5].x = 0xA0 - rsin(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_slots[SHADE_SLOT + 5].y = 0x48 - rcos(((g_menu_blink + 0x80) & 0xFF) * 16) / 22 * ((g_menu_blink & 0x1F) + 1) / 32;
+        g_menu_blink--;
+        return 0;
+    }
+    return 1;
+}
 
 void MenuIconsShade(void);
 

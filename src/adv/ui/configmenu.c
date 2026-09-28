@@ -45,7 +45,7 @@ extern void ConfigCloseChoice(void);
 extern void MenuTopRedraw(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
-extern void func_800782A4(int a, int b);
+extern void MenuWheelTurn3(short kind, short list);
 extern void MapScreen(void);
 extern void ConfigPageOpen(void);
 extern void ConfigStepRows(void);
@@ -133,7 +133,7 @@ void MenuOtherStep(void)
 {
     DrawStatusHud();
     if (MenuStepCursor(&g_menu->unk100)) {
-        func_800782A4(2, 0x10);
+        MenuWheelTurn3(2, 0x10);
     }
     if (InputCheckAcceptA(2)) {
         switch (g_menu->unk100.cur) {

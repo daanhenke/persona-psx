@@ -3901,3 +3901,35 @@ these came from src/open (all of OPEN.EXE's code, exact).
 - **Spelling moves registers here too:** `% 16 == 0` for `!(x & 0xF)`,
   `/ 2` for `>> 1` on a u_char, `0xFF - i` (no cast, so the constant
   narrows to -1) - each fixed a register pair in `OpenTitle`.
+
+## A count that is always 0, and a parameter stored as a halfword
+
+The menu wheel's turns ([menuicons.c](/src/common/ui/menuicons.c)
+`MenuWheelTurn3`, `MenuWheelTurn2`, `UpdateMenuSprites`, 67.65% and asm to
+exact in DNG and ADV) needed five levers.
+
+- **A saved register cleared at entry and never read is a variable whose
+  reads combine removed.** Flow deletes a store nothing reads, so something
+  still read it at flow time. Combine knows the value of a pseudo set once
+  anywhere in the function (`get_last_value`). So with `b = 0`,
+  `(b & 0x1F) + 1` and `((b + 0x10) & 0xFF) * 16` fold to constants there,
+  after flow has kept the store. cse forgets at the loops' labels and cannot
+  fold them first. A lone `b * 16` is one insn with no LOG_LINKS, which
+  combine never tries; `(b & 0xFF) * 16` folds.
+- **`c - d + t`, not `t + c - d`.** fold rewrites the second as
+  `t - (d - c)`, which puts the table load after a division's rounding
+  branch, out of combine's reach. The first keeps `addiu a1, v0, c` ahead of
+  the branch, as the image has it.
+- **Rows of shorts indexed `i * 2`** (`g_wheel_turn[r][i * 2]`) give cse one
+  row address to relate the other rows' constants to (`s5 + i*4 + 0x20`).
+  `[r][i][0]` gave a separate symbol-plus-index read for each.
+- **Rows the image does not relate are separate arrays.** The two-icon turn
+  read its row with fresh `lui`s while the three-icon rows came off one base
+  register. Its own symbol (`g_wheel_turn2`) took it from 91.11% to 99.61%.
+- **`sh` of a parameter into an 8-aligned slot, then `lbu` back, is a byte
+  buffer.** A spilled `u_char` parameter stores with `sb`. A spilled `short`
+  one reloads with `lhu` and `andi`, because reload widens a narrowed pseudo
+  when LOAD_EXTEND_OP is defined. An addressable parameter's slot is packed,
+  two bytes apart. `u_char k[2]` is BLKmode, so its slot is 8-aligned;
+  written `*(short *)k = kind` and passed as `k[0]`, it gives the image's
+  store, reload and frame.

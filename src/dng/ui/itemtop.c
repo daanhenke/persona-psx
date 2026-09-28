@@ -76,7 +76,7 @@ extern u_char  D_8009ABFC[];
 extern u_char  D_8009B074[];
 
 extern void   DrawStatusHud(void);
-extern void   func_80086E20(int a, int b);
+extern void   MenuWheelTurn3(short kind, short list);
 extern void   MenuTopRedraw(void);
 extern void   MenuWheelOpen(int a, int b);
 extern void   MenuIconsSet3(int a, int b);
@@ -157,7 +157,7 @@ void ItemTopStep(void)
 
     prev = USE_SEL();
     if (MenuStepCursor(&g_menu->unk030)) {
-        func_80086E20(0, 3);
+        MenuWheelTurn3(0, 3);
     }
     DrawStatusHud();
     if (InputCheckAcceptA(2)) {
