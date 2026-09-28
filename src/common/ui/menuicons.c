@@ -1,9 +1,7 @@
 /* Persona 1 (JP) - the menus' icon rows and the icon wheel.
  *
- * Compiled into DNG and ADV rather than called across the boundary. Each
- * overlay's wrapper (src/dng/ui/menuicons.c, src/adv/ui/menuicons.c) defines
- * MENUICONS_ASM_<routine> as the asm include of every routine that is not C
- * yet, under that overlay's name for it.
+ * Compiled into DNG and ADV rather than called across the boundary, through
+ * each overlay's wrapper (src/dng/ui/menuicons.c, src/adv/ui/menuicons.c).
  *
  * A menu's commands stand as a row of sprite icons that turns with its
  * cursor: slot 40 onwards takes the cells of the entries from the cursor
@@ -667,20 +665,16 @@ void MenuIconsShade(void)
     }
 }
 
-/* 97.98%: k and the division's working copy trade a0/v1 against the
-   image. */
-#ifdef NON_MATCHING
+/* The same from shade `start`, for `n` sprites. The remainder is written
+   into each store rather than held in a local: a named `k` is a global
+   pseudo that a0 is already taken from, and it trades a0/v1 with the
+   division's working copy. */
 void MenuIconsShadeFrom(u_char start, u_char n)
 {
     u_char i;
-    int    k;
 
     for (i = 0; i < n; i++) {
-        k = (start + i + 1) % 5;
-        g_slots[SHADE_SLOT + i].u_add = (k % 4) * 16;
-        g_slots[SHADE_SLOT + i].v_add = (k / 4) * 16;
+        g_slots[SHADE_SLOT + i].u_add = ((start + i + 1) % 5 % 4) * 16;
+        g_slots[SHADE_SLOT + i].v_add = ((start + i + 1) % 5 / 4) * 16;
     }
 }
-#else
-MENUICONS_ASM_SHADEFROM;
-#endif
