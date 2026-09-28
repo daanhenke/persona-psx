@@ -15,13 +15,10 @@
  * The row's first cell is set to the end marker before the name is copied over
  * it, so it is written and then lost every time round. The image does it.
  *
- * BtlOpenPersonaBoard is 98.71% and behind INCLUDE_ASM. The image's four
- * induction variables - one per occurrence of each array - are two counters
- * stepped together: loop.c merges givs of one counter with the same step,
- * never givs of two. j indexes the live clut and the line's end marker and
- * is the one tested; i indexes the grey clut and the name copy. What is left
- * is where the grey clut's step lands against the name's reload of
- * p->spell[i] at the bottom of the loop.
+ * Three counters keep the spell lookup, the live row and the grey row/name
+ * copy independent. gcc's loop pass merges offsets with the same stride
+ * within one counter; keeping the spell lookup separate lets the grey row
+ * advance before the spell is reloaded for the name copy.
  *
  * Only the SP gauge is coloured, not an HP one: the call is handed a null for
  * the first bar, and the board has no second gauge to put one in.
@@ -81,7 +78,6 @@ extern const BtlBoardDef  g_btl_persona_board_defs[];
 /* Still assembly: what walks a gauge's cells to the colour the value deserves.
    The first bar is not drawn here, so it is handed nothing. */
 
-#ifdef NON_MATCHING
 void BtlOpenPersonaBoard(void)
 {
     BtlStats *p;
@@ -89,6 +85,7 @@ void BtlOpenPersonaBoard(void)
     int       spell;
     int       i;
     int       j;
+    int       k;
 
     p = &g_btl_personas[BtlActorPersona(g_btl_actor_turn)];
     memcpy(g_btl_persona_name, p->name, PERSONA_NAME_CELLS);
@@ -100,15 +97,17 @@ void BtlOpenPersonaBoard(void)
                      g_btl_actors[g_btl_actor_turn].c.sp_max, PERSONA_SP_W);
     i = 0;
     j = 0;
+    k = 0;
     do {
         g_btl_persona_cells[PERSONA_SPELL_CELL + j].clut = PERSONA_CLUT_LIVE;
         g_btl_persona_spell_lines[j][0] = BTL_TEXT_END;
         spell = p->spell[i];
         if (spell != 0 && (g_spell_data[spell].kind & SPELL_KIND_LISTED) == 0) {
-            g_btl_persona_cells[PERSONA_SPELL_CELL + i].clut = PERSONA_CLUT_NONE;
+            g_btl_persona_cells[PERSONA_SPELL_CELL + k].clut = PERSONA_CLUT_NONE;
         }
-        memcpy(g_btl_persona_spell_lines[i], g_spell_data[p->spell[i]].name,
+        memcpy(g_btl_persona_spell_lines[k], g_spell_data[p->spell[i]].name,
                SPELL_NAME_CELLS);
+        k++;
         i++;
         j++;
     } while (j < BTL_STATS_SPELLS);
@@ -119,9 +118,6 @@ void BtlOpenPersonaBoard(void)
     pos[2] = 0;
     g_btl_persona_board = BtlBoardOpen(g_btl_persona_board_defs, pos);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/personaboard", BtlOpenPersonaBoard);
-#endif
 
 void BtlClosePersonaBoard(void)
 {
