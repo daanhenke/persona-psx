@@ -43,15 +43,6 @@ extern u_char D_800B0AFD;
 extern u_int  D_800B0BB8;
 extern u_char D_800B3E98;
 
-/* The two draw buffers. */
-typedef struct {
-    DRAWENV *draw;
-    DISPENV *disp;
-    u_long  *ot;
-} CasinoDB;
-
-extern CasinoDB g_casino_db[2];
-
 /* Load buffers in the work area, per image table, and their counters. */
 extern u_char *D_800A837C[8];
 extern short   D_800A839C[2];
@@ -85,7 +76,7 @@ extern u_short CasinoItemSlot(short id);
 extern void CasinoReadPad(void);
 
 extern void CasinoDebugInit(void);
-extern void func_80066FB4(void);
+extern void CasinoInitDraw(void);
 extern void func_8006C890(void);
 extern void CasinoFrameWrap(int *frame);
 extern void CasinoDrawFrame(void);
@@ -109,7 +100,7 @@ void ovl_casino_entry(void)
     CasinoPickGame();
     CasinoInitState();
     CasinoDebugInit();
-    func_80066FB4();
+    CasinoInitDraw();
     func_8006C890();
     SetDispMask(1);
     for (;;) {

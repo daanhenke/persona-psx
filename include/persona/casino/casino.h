@@ -9,6 +9,8 @@
 #define PERSONA_CASINO_CASINO_H
 
 #include <decomp/types.h>
+#include <libgte.h>
+#include <libgpu.h>
 
 /* g_casino_game: the game being played, or the way out. */
 #define CASINO_GAME_LEAVE 31     /* fading out; leaves once the timer runs */
@@ -64,7 +66,15 @@ typedef struct {
 #define PAD_DOWN  0x4000
 #define PAD_LEFT  0x8000
 
+/* The two draw buffers. */
+typedef struct {
+    DRAWENV *draw;
+    DISPENV *disp;
+    u_long  *ot;
+} CasinoDB;
+
 /* The overlay's own. */
+extern CasinoDB g_casino_db[2];
 extern CasinoFlags D_800AFC98;
 extern u_short *g_casino_coin_item;
 extern u_char   g_casino_game;
