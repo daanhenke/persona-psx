@@ -107,10 +107,6 @@ typedef struct {
     short x0, y0, x1, y1, x2, y2, x3, y3;
 } CasinoQuad;
 
-typedef struct {
-    short x, y, w, h;
-} CasinoRec8;
-
 /* Where a sprite's image sits in its texture page. */
 typedef struct {
     short u, v, w, h;
@@ -133,14 +129,16 @@ typedef struct {
     short     n[2];
 } CasinoUVQueue;
 
-typedef struct {                /* 0x800B0974 */
-    CasinoRec8 *pos[2];
-    CasinoRec8 *uv[2];
-    short      *a[2];
-    short      *b[2];
-    short      *c[2];
-    short       n[2];
-} CasinoListE;
+/* Whole sprites: where, which part of which texture page, with which
+   palette, applied the same way. */
+typedef struct {
+    RECT    *pos[2];
+    RECT    *uv[2];
+    u_short *tpage[2];
+    u_short *clut[2];
+    short   *spr[2];
+    short    n[2];
+} CasinoRectQueue;
 
 /* Semi-transparency for runs of sprites, eight runs a frame, applied the
    same way. */
@@ -307,6 +305,26 @@ typedef struct {
     short           n;
 } CasinoPalCycles;
 
+/* A grid of equal cells, rows by cols, gap apart; built into a layout. */
+typedef struct {
+    short   cols;
+    short   rows;
+    short   x;
+    short   y;
+    short   w;
+    short   h;
+    short   dx;
+    short   dy;
+    u_short z;
+    u_char  on;
+} CasinoGridDef;
+
+/* A layout and how it is built, as the games list them. */
+typedef struct {
+    void         *def;
+    CasinoLayout *l;
+} CasinoLayoutDef;
+
 /* The overlay's own. */
 extern CasinoPalAnims   g_casino_palanims;
 extern CasinoPalCycles  g_casino_palcycles;
@@ -320,7 +338,7 @@ extern short           g_casino_sprite_count;
 extern CasinoLoadQueue g_casino_load_queue;
 extern CasinoQuadQueue g_casino_quads;
 extern CasinoUVQueue   g_casino_uvs;
-extern CasinoListE     D_800B0974;
+extern CasinoRectQueue g_casino_rects;
 extern CasinoClutQueue g_casino_cluts;
 extern CasinoSemiQueue g_casino_semis;
 extern int             g_casino_buf;

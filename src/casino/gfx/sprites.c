@@ -17,7 +17,7 @@
 
 extern short D_800A9120[2];
 
-extern void func_8006924C(void);
+extern void CasinoFlushRects(void);
 extern void CasinoFlushQuads(void);
 extern void CasinoFlushUVs(void);
 extern void CasinoFlushCluts(void);
@@ -40,8 +40,8 @@ void CasinoResetLists(void)
     g_casino_quads.n[0] = 0;
     g_casino_uvs.n[1] = 0;
     g_casino_uvs.n[0] = 0;
-    D_800B0974.n[1] = 0;
-    D_800B0974.n[0] = 0;
+    g_casino_rects.n[1] = 0;
+    g_casino_rects.n[0] = 0;
     g_casino_cluts.n[1] = 0;
     g_casino_cluts.n[0] = 0;
     g_casino_semis.n[1] = 0;
@@ -84,7 +84,7 @@ void CasinoDrawFrame(void)
     CasinoStepAnims();
     CasinoStepTweens();
     CasinoStepScrolls();
-    func_8006924C();
+    CasinoFlushRects();
     CasinoFlushQuads();
     CasinoFlushUVs();
     CasinoFlushSemis();
