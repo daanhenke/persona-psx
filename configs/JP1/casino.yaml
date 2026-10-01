@@ -70,7 +70,8 @@ segments:
       - [0x5C8C, c, gfx/semis]
       - [0x5F08, c, gfx/images]
       - [0x60E0, c, gfx/obj3d]
-      - [0x6708, asm, casino_a]
+      - [0x6708, c, gfx/tween]
+      - [0x7118, asm, casino_a]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,

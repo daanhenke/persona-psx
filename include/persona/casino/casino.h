@@ -155,7 +155,7 @@ typedef struct {
     short    n[2];
 } CasinoClutQueue;
 
-typedef struct {                /* 0x800AF5BC, 0x800AF688, 0x800B41A4 */
+typedef struct {                /* 0x800B41A4 */
     u_char *p[3];
     short   n;
 } CasinoList3;
@@ -213,7 +213,49 @@ typedef struct {
     VECTOR  scale;
 } CasinoXform;
 
+/* A sprite's place on screen, its depth and whether it is shown. */
+typedef struct {
+    short   x, y, w, h;
+    u_short z;
+    u_char  on;
+    u_char  pad;
+} CasinoCell;
+
+/* A picture made of a run of sprites: where each piece goes and which
+   texture it shows, both as indices into the layout's own tables. While a
+   tween is moving it, busy is set. */
+typedef struct {
+    short       busy;
+    short       first;
+    short       n;
+    short       unk6;
+    CasinoCell *cells;
+    CasinoTex  *tex;
+    short      *cell_idx;
+    short      *tex_idx;
+} CasinoLayout;
+
+/* A tween: a layout's pieces (or their textures) moved by delta every
+   frame for left + 1 frames. */
+typedef struct {
+    RECT          *delta;
+    CasinoLayout **layout;
+    short         *left;
+    short          n;
+} CasinoTweenQueue;
+
+/* What a tween is asked for, handed over by value. */
+typedef struct {
+    RECT          d;
+    CasinoLayout *l;
+    short         frames;
+} CasinoTweenArg;
+
 /* The overlay's own. */
+extern CasinoCell       *g_casino_cells;
+extern CasinoTex        *g_casino_texs;
+extern CasinoTweenQueue  g_casino_tweens;
+extern CasinoTweenQueue  g_casino_scrolls;
 extern CasinoSprites   g_casino_sprites;
 extern short           g_casino_sprite_count;
 extern CasinoLoadQueue g_casino_load_queue;
@@ -222,8 +264,6 @@ extern CasinoUVQueue   g_casino_uvs;
 extern CasinoListE     D_800B0974;
 extern CasinoClutQueue g_casino_cluts;
 extern CasinoSemiQueue g_casino_semis;
-extern CasinoList3     D_800AF5BC;
-extern CasinoList3     D_800AF688;
 extern CasinoList3     D_800B41A4;
 extern int             g_casino_buf;
 extern CasinoDB       *g_casino_cur_db;

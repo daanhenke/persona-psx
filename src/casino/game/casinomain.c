@@ -43,8 +43,6 @@ extern u_int  D_800B0BB8;
 extern u_char D_800B3E98;
 
 /* Load buffers in the work area that belong to no list. */
-extern u_char *D_800B0AE8;
-extern u_char *D_800B0AEC;
 
 extern void CasinoExit(void);
 extern void CasinoRunGame(void);
@@ -229,16 +227,16 @@ void CasinoMapWork(void)
     g_casino_cluts.spr[1] = (short *)0x800F0F78;
     g_casino_cluts.n[0] = 0;
     g_casino_cluts.n[1] = 0;
-    D_800B0AEC = (u_char *)0x800F1078;
-    D_800B0AE8 = (u_char *)0x800F3F58;
-    D_800AF5BC.p[0] = (u_char *)0x800F6E38;
-    D_800AF5BC.p[1] = (u_char *)0x800F7038;
-    D_800AF5BC.p[2] = (u_char *)0x800F7138;
-    D_800AF5BC.n = 0;
-    D_800AF688.p[0] = (u_char *)0x800F71B8;
-    D_800AF688.p[1] = (u_char *)0x800F73B8;
-    D_800AF688.p[2] = (u_char *)0x800F74B8;
-    D_800AF688.n = 0;
+    g_casino_cells = (CasinoCell *)0x800F1078;
+    g_casino_texs = (CasinoTex *)0x800F3F58;
+    g_casino_tweens.delta = (RECT *)0x800F6E38;
+    g_casino_tweens.layout = (CasinoLayout **)0x800F7038;
+    g_casino_tweens.left = (short *)0x800F7138;
+    g_casino_tweens.n = 0;
+    g_casino_scrolls.delta = (RECT *)0x800F71B8;
+    g_casino_scrolls.layout = (CasinoLayout **)0x800F73B8;
+    g_casino_scrolls.left = (short *)0x800F74B8;
+    g_casino_scrolls.n = 0;
     D_800B41A4.p[0] = (u_char *)0x800F7538;
     D_800B41A4.p[1] = (u_char *)0x800F7A38;
     D_800B41A4.p[2] = (u_char *)0x800F7AB8;
