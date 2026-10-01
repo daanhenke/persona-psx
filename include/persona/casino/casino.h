@@ -1,0 +1,57 @@
+/* Persona 1 (JP) - the CASINO overlay's shared state.
+ *
+ * The casino runs one of five games, picked from the spot on the map the
+ * player walked up to. Its own variables live in the overlay's bss; the
+ * save data it reads and writes back is reached by address, as the other
+ * overlays reach it.
+ */
+#ifndef PERSONA_CASINO_CASINO_H
+#define PERSONA_CASINO_CASINO_H
+
+#include <decomp/types.h>
+
+/* g_casino_game: the game being played, or the way out. */
+#define CASINO_GAME_LEAVE 31     /* fading out; leaves once the timer runs */
+#define CASINO_GAME_DONE  0xEC   /* the main loop's signal to return       */
+
+/* The save block's own words, by address. */
+#define g_money2         (*(int *)0x801F2678)
+#define g_items          ((u_short *)0x801F267C)
+#define g_exp_carry      (*(int *)0x801F29AC)
+#define g_29B0           (*(u_int *)0x801F29B0)
+#define g_29B4           (*(u_int *)0x801F29B4)
+#define g_playtime_hours ((u_char *)0x801F29BC)
+#define D_801F29ED       (*(u_char *)0x801F29ED)
+#define g_script_534C    (*(u_char *)0x801F534C)
+
+extern int    D_801F1BDC;
+extern u_char g_playtime_min;
+extern u_char g_playtime_sec;
+extern u_char g_playtime_frame;
+
+/* Six one-bit flags the visit starts with all clear. */
+typedef struct {
+    u_int b0 : 1;
+    u_int b1 : 1;
+    u_int b2 : 1;
+    u_int b3 : 1;
+    u_int b4 : 1;
+    u_int b5 : 1;
+} CasinoFlags;
+
+/* The overlay's own. */
+extern CasinoFlags D_800AFC98;
+extern u_short *g_casino_coin_item;
+extern u_char   g_casino_game;
+extern u_char   g_casino_step;
+extern int      g_casino_frame;
+extern int      g_casino_money;
+extern int      g_casino_timer;
+extern short    g_casino_vab;
+extern u_long   g_casino_pad;
+extern u_long   g_casino_pad_trig;
+extern u_char   g_casino_spot;
+extern int      g_casino_seed;
+extern u_char   g_casino_clock_on;
+
+#endif

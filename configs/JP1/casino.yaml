@@ -12,6 +12,7 @@ options:
   o_path: lib
   ld_script_path: linkers/JP1/casino.ld
   symbol_addrs_path: configs/JP1/sym.casino.txt
+  reloc_addrs_path: configs/JP1/reloc.casino.txt
   undefined_syms_auto_path: linkers/JP1/undefined_syms_auto.casino.txt
   undefined_funcs_auto_path: linkers/JP1/undefined_funcs_auto.casino.txt
   compiler: GCC
@@ -25,7 +26,7 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   generate_asm_macros_files: False
-  section_order: [".data", ".text", ".rodata", ".bss"]
+  section_order: [".rodata", ".text", ".data", ".bss"]
   subalign: 4
   ld_align_section_vram_end: False
   ld_align_segment_vram_end: False
@@ -38,6 +39,10 @@ options:
   # string round-trips through the UTF-8 .s file as its UTF-8 bytes rather
   # than the Shift-JIS ones the ROM holds.
   data_string_guesser_level: 0
+  # Everything the overlay reaches outside its own image: the resident
+  # executable's code and data, as the other overlays have it.
+  global_vram_start: 0x80010000
+  global_vram_end: 0x800643A0
 
 segments:
   # overlay id 8
@@ -46,13 +51,18 @@ segments:
     start: 0x0
     vram: 0x800643A0
     subsegments:
-      - [0x0, data, casino_id]
-      - [0x4, asm, casino]
+      - [0x0, rodata, casino_id]
+      # 0x4..0x1A0C is the leading rodata block (jump tables, strings and
+      # constants of every unit); the entry point is at 0x1A0C.
+      - [0x4, .rodata, game/casinomain]
+      - [0x144, rodata, casino_rodata]
+      - [0x1A0C, c, game/casinomain]
+      - [0x2564, asm, casino]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,
       # and behind it the run of zeroes the loader never has to write.
-      - [0x2F86C, rodata, casino_data]
+      - [0x2F86C, data, casino_data]
       - [0x43F9C, bss, casino_bss]
 
   - [0x50408]
