@@ -160,6 +160,59 @@ typedef struct {                /* 0x800AF5BC, 0x800AF688, 0x800B41A4 */
     short   n;
 } CasinoList3;
 
+/* A flat face of a 3D object: four corners, the depth it takes when the
+   object does not sort by distance, and whether it is shown. Face i is
+   drawn as sprite first + i. */
+typedef struct {
+    SVECTOR v[4];
+    u_short z;
+    u_char  on;
+    u_char  pad;
+} CasinoFace;
+
+typedef struct {
+    u_char      unk0;
+    u_char      flat;   /* the corners are already screen positions */
+    u_char      zsort;  /* 1: depth from the GTE, else each face's own */
+    u_char      unk3;
+    short       first;
+    short       n;
+    CasinoFace *face;
+} CasinoObj;
+
+/* How a face is built: a corner, a size, and which way round it faces. */
+typedef struct {
+    SVECTOR origin;
+    short   w;
+    short   h;
+    u_short z;
+    u_char  on;
+    u_char  pad;
+    short   axis;
+} CasinoFaceDef;
+
+/* A face's texture. */
+typedef struct {
+    short   u, v, w, h;
+    u_short tpage;
+    u_short clut;
+} CasinoTex;
+
+/* An object and the tables its faces are built and textured from. */
+typedef struct {
+    CasinoFaceDef *def;
+    CasinoTex     *tex;
+    short         *def_idx;
+    short         *tex_idx;
+    CasinoObj     *obj;
+} CasinoModel;
+
+typedef struct {
+    SVECTOR rot;
+    VECTOR  trans;
+    VECTOR  scale;
+} CasinoXform;
+
 /* The overlay's own. */
 extern CasinoSprites   g_casino_sprites;
 extern short           g_casino_sprite_count;
