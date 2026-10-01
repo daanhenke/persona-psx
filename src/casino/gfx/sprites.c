@@ -27,7 +27,7 @@ extern void CasinoFlushSemis(void);
 extern void CasinoFlushImages(void);
 extern void CasinoStepTweens(void);
 extern void CasinoStepScrolls(void);
-extern void func_8006B8B0(void);
+extern void CasinoStepAnims(void);
 extern void func_8006BFF0(void);
 extern void func_8006C330(void);
 extern void func_8006C5B0(void);
@@ -83,7 +83,7 @@ void CasinoDrawFrame(void)
     g_casino_timer++;
     g_casino_buf = g_casino_frame & 1;
     g_casino_cur_db = &g_casino_db[g_casino_buf];
-    func_8006B8B0();
+    CasinoStepAnims();
     CasinoStepTweens();
     CasinoStepScrolls();
     func_8006924C();

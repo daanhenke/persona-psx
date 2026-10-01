@@ -237,10 +237,10 @@ void CasinoMapWork(void)
     g_casino_scrolls.layout = (CasinoLayout **)0x800F73B8;
     g_casino_scrolls.left = (short *)0x800F74B8;
     g_casino_scrolls.n = 0;
-    D_800B41A4.p[0] = (u_char *)0x800F7538;
-    D_800B41A4.p[1] = (u_char *)0x800F7A38;
-    D_800B41A4.p[2] = (u_char *)0x800F7AB8;
-    D_800B41A4.n = 0;
+    g_casino_anims.delta = (CasinoXform *)0x800F7538;
+    g_casino_anims.obj = (CasinoObj **)0x800F7A38;
+    g_casino_anims.left = (short *)0x800F7AB8;
+    g_casino_anims.n = 0;
     g_casino_semis.n[0] = 0;
     g_casino_semis.n[1] = 0;
 }

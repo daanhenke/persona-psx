@@ -155,10 +155,13 @@ typedef struct {
     short    n[2];
 } CasinoClutQueue;
 
-typedef struct {                /* 0x800B41A4 */
-    u_char *p[3];
-    short   n;
-} CasinoList3;
+
+/* Where a 3D object is: rotation, position and scale. */
+typedef struct {
+    SVECTOR rot;
+    VECTOR  trans;
+    VECTOR  scale;
+} CasinoXform;
 
 /* A flat face of a 3D object: four corners, the depth it takes when the
    object does not sort by distance, and whether it is shown. Face i is
@@ -171,13 +174,14 @@ typedef struct {
 } CasinoFace;
 
 typedef struct {
-    u_char      unk0;
-    u_char      flat;   /* the corners are already screen positions */
-    u_char      zsort;  /* 1: depth from the GTE, else each face's own */
-    u_char      unk3;
-    short       first;
-    short       n;
-    CasinoFace *face;
+    u_char       busy;   /* an animation is moving it */
+    u_char       flat;   /* the corners are already screen positions */
+    u_char       zsort;  /* 1: depth from the GTE, else each face's own */
+    u_char       unk3;
+    short        first;
+    short        n;
+    CasinoFace  *face;
+    CasinoXform *xform;
 } CasinoObj;
 
 /* How a face is built: a corner, a size, and which way round it faces. */
@@ -206,12 +210,6 @@ typedef struct {
     short         *tex_idx;
     CasinoObj     *obj;
 } CasinoModel;
-
-typedef struct {
-    SVECTOR rot;
-    VECTOR  trans;
-    VECTOR  scale;
-} CasinoXform;
 
 /* A sprite's place on screen, its depth and whether it is shown. */
 typedef struct {
@@ -251,7 +249,24 @@ typedef struct {
     short         frames;
 } CasinoTweenArg;
 
+/* Animations: an object's transform moved by delta every frame for
+   left + 1 frames, the object drawn each time. */
+typedef struct {
+    CasinoXform *delta;
+    CasinoObj  **obj;
+    short       *left;
+    short        n;
+} CasinoAnimQueue;
+
+/* What an animation is asked for, handed over by value. */
+typedef struct {
+    CasinoXform d;
+    CasinoObj  *o;
+    short       frames;
+} CasinoAnimArg;
+
 /* The overlay's own. */
+extern CasinoAnimQueue  g_casino_anims;
 extern CasinoCell       *g_casino_cells;
 extern CasinoTex        *g_casino_texs;
 extern CasinoTweenQueue  g_casino_tweens;
@@ -264,7 +279,6 @@ extern CasinoUVQueue   g_casino_uvs;
 extern CasinoListE     D_800B0974;
 extern CasinoClutQueue g_casino_cluts;
 extern CasinoSemiQueue g_casino_semis;
-extern CasinoList3     D_800B41A4;
 extern int             g_casino_buf;
 extern CasinoDB       *g_casino_cur_db;
 extern CasinoDB g_casino_db[2];
