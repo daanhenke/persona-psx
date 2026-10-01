@@ -181,8 +181,8 @@ segments:
       # config.c is one unit: the battle-page redraw and the marker placement
       # sit between its list helpers, so all seven are the same object.
       - [0x11D20, c, common/ui/configlist]
-      - [0x11F00, c, common/ui/configbattle]
-      - [0x120A8, c, common/ui/config]
+      - [0x11EFC, c, common/ui/configbattle]
+      - [0x120AC, c, common/ui/config]
       - [0x12330, c, ui/choicepage]
       - [0x12504, c, common/ui/padconfig]
       - [0x12550, c, ui/menutop]
