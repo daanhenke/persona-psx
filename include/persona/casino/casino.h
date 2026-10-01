@@ -25,6 +25,9 @@
 #define g_playtime_hours ((u_char *)0x801F29BC)
 #define D_801F29ED       (*(u_char *)0x801F29ED)
 #define g_script_534C    (*(u_char *)0x801F534C)
+#define g_bgm_ready      (*(short *)0x801F5358)
+#define g_vab_id         ((short *)0x801F535C)
+#define g_seq_handle     ((short *)0x801F537C)
 
 extern int    D_801F1BDC;
 extern u_char g_playtime_min;
@@ -330,7 +333,9 @@ extern u_char   g_casino_step;
 extern int      g_casino_frame;
 extern int      g_casino_money;
 extern int      g_casino_timer;
-extern short    g_casino_vab;
+extern short    g_casino_vab;      /* the casino's own sound bank      */
+extern short    g_casino_main_vab; /* the bank the field left open     */
+extern short    g_casino_seqs[16]; /* open sequence handles, 0xFF free */
 extern u_long   g_casino_pad;
 extern u_long   g_casino_pad_trig;
 extern u_char   g_casino_spot;

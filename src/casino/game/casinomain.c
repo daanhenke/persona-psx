@@ -56,7 +56,7 @@ extern void CasinoReadPad(void);
 
 extern void CasinoDebugInit(void);
 extern void CasinoInitDraw(void);
-extern void func_8006C890(void);
+extern void CasinoInitSound(void);
 extern void CasinoFrameWrap(int *frame);
 extern void CasinoDrawFrame(void);
 extern void CasinoPlayTimeTick(u_char *clock);
@@ -80,7 +80,7 @@ void ovl_casino_entry(void)
     CasinoInitState();
     CasinoDebugInit();
     CasinoInitDraw();
-    func_8006C890();
+    CasinoInitSound();
     SetDispMask(1);
     for (;;) {
         CasinoReadPad();

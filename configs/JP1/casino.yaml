@@ -74,7 +74,8 @@ segments:
       - [0x7118, c, gfx/anim]
       - [0x7778, asm, casino_a]
       - [0x7F24, c, gfx/palanim]
-      - [0x84F0, asm, casino_b]
+      - [0x84F0, c, audio/sound]
+      - [0x8CCC, asm, casino_b]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,
