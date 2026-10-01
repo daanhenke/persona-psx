@@ -43,8 +43,8 @@ extern void ItemsClearPending(void);
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 extern void CoinShopListStep(void);
 extern void CoinShopCountStep(void);
-extern void func_800A5BCC(void);
-extern void func_800A6308(void);
+extern void CoinExchangePick(void);
+extern void CoinExchangeConfirm(void);
 extern void MenuTopRedraw(void);
 void FacilityOpen3(void);
 extern void MenuWheelOpen2(int a, int b);
@@ -110,6 +110,15 @@ void ShopSellTotalDraw(short row);
 extern void     ShopSellCountInit(short n);
 extern void     ItemsRemove(u_short id, int count);
 extern void     ItemsAdd(u_short id, int count);
+extern void     MenuWheelTurn2(short kind, short list);
+extern u_char   D_800BA650[];
+extern u_char   D_800BA65C[];
+extern u_char   D_800BA600[];   /* the message: not enough money */
+extern u_char   D_800BA60C[];   /* the message: the coin case is full */
+extern u_char   g_fm_hint_def[];
+extern u_char   g_fm_hint2_def[];
+extern u_char   g_fm_prompt_cur_def[];
+extern void     BgMapInit(void *script, short speed);
 extern short    g_sell_slots;   /* the sell list's entries, at least 16 */
 extern u_char   D_800BA640[];
 extern u_char   D_800B1EB8[];
@@ -146,8 +155,8 @@ extern void func_800A2FF8(void);
 extern void func_800A3388(void);
 extern void func_800A3984(void);
 extern void func_800A3D0C(void);
-extern void func_800A6788(void);
-extern void func_800A7118(void);
+extern void FacilityTradeTop(void);
+extern void FacilityTradePick(void);
 extern void FacilityTradeCountStep(void);
 extern void FacilityTradeMoonPick(void);
 extern void FacilityTradeMoonCountStep(void);
@@ -999,8 +1008,9 @@ void CoinShopOpen(void)
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", CoinShopOpen);
 #endif
 
-/* Keeps the message running until any button is pressed. */
-void MsgStepUntilPress(void)
+/* Keeps the message running until any button is pressed. The coin
+   exchange has it expanded. */
+inline void MsgStepUntilPress(void)
 {
     goto check;
 loop:
@@ -1012,8 +1022,8 @@ check:
 }
 
 /* How many coins the money buys, at a hundred a coin, up to what the coin
-   count can still hold. */
-u_int CoinsAffordable(void)
+   count can still hold. The exchange's confirm step has it expanded. */
+inline u_int CoinsAffordable(void)
 {
     u_int room;
     u_int n;
@@ -1030,17 +1040,169 @@ void CoinExchangeStep(void)
 {
     switch (g_persona_data_step) {
     case 0:
-        func_800A5BCC();
+        CoinExchangePick();
         break;
     case 1:
-        func_800A6308();
+        CoinExchangeConfirm();
         break;
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A5BCC);
+#ifdef NON_MATCHING
+/* p = 10 to the power (digits right of the cursor) + 1: the place value
+   of the digit the exchange's cursor is on. */
+#define EXCHANGE_PLACE()                                                          p = 10;                                                                       d = g_menu->arcana_row.hi - g_menu->arcana_row.cur - 1;                       for (i = 0; i < d; i++) {                                                         p *= 10;                                                                  }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6308);
+/* How many coins to buy, set a digit at a time: left and right pick the
+   digit, up and down change it. A asks to confirm. With the coin case
+   full, or less than a coin's price in hand, it only says so. */
+void CoinExchangePick(void)
+{
+    int p;
+    int i;
+    int d;
+    int w;
+    int n;
+
+    if (g_coins > COINS_MAX - 1) {
+        BgMapInit(D_800BA60C, 0);
+        MsgStepUntilPress();
+        g_persona_data_step = 0xFF;
+        return;
+    }
+    if (g_money < 100) {
+        BgMapInit(D_800BA600, 0);
+        MsgStepUntilPress();
+        g_persona_data_step = 0xFF;
+        return;
+    }
+    MsgStep();
+    if (g_facility_max != 0) {
+        if (MenuStepCursor(&g_menu->arcana_row)) {
+            if (g_menu->arcana_row.cur == 0) {
+                g_menu->unk100.hi = g_facility_max;
+                g_menu->unk100.cur = g_facility_max;
+                g_menu->arcana_row.cur++;
+                if (g_menu->arcana_row.hi == 1) {
+                    g_menu->unk300.hi = g_facility_max;
+                    g_menu->unk300.cur = g_facility_max;
+                    goto clamp;
+                }
+            } else if (g_menu->arcana_row.cur == g_menu->arcana_row.hi) {
+                g_menu->unk300.cur = g_menu->unk100.cur;
+                g_menu->unk300.hi = g_facility_max;
+                goto clamp;
+            }
+            EXCHANGE_PLACE();
+            g_menu->unk300.cur = g_menu->unk100.cur / p;
+            g_menu->unk300.hi = (u_int)g_facility_max / p + 1;
+        } else if (MenuStepCursor(&g_menu->unk300)) {
+            if (g_menu->arcana_row.cur != g_menu->arcana_row.hi) {
+                EXCHANGE_PLACE();
+                if (g_menu->unk300.cur == -1) {
+                    g_menu->unk300.cur = 0;
+                    n = 0;
+                } else {
+                    n = p * g_menu->unk300.cur + g_menu->unk100.cur % p;
+                }
+                g_menu->unk100.cur = n;
+            } else {
+                g_menu->unk100.cur = g_menu->unk300.cur;
+            }
+        }
+    clamp:
+        if (g_menu->unk100.cur > g_menu->unk100.hi) {
+            g_menu->unk100.cur = g_menu->unk100.hi;
+            EXCHANGE_PLACE();
+            g_menu->unk300.cur = g_menu->unk100.cur / p;
+        } else if (g_menu->unk100.cur < 0) {
+            g_menu->unk100.cur = 0;
+        }
+        if (g_menu->unk300.cur == -1) {
+            if (g_menu->unk300.hi == g_facility_max) {
+                g_menu->unk300.cur = 0;
+            } else {
+                g_menu->unk300.cur = g_menu->unk300.hi;
+            }
+        }
+        TileMapFillRect(AT(g_tilemap1, 3, 10), 0, 9, 1, MAP_W);
+        TileMapFillRect(AT(g_tilemap1, 5, 10), 0, 9, 1, MAP_W);
+        n = FormatDecimal(g_facility_max, g_hud_digits, 8);
+        TileMapFillRect(AT(g_tilemap1, 3, 19) - n, GLYPH_DIGIT0, n, 1, MAP_W);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 3, 18), GLYPH_DIGIT0,
+                           FormatDecimal(g_menu->unk100.cur, g_hud_digits, 8));
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 5, 18), GLYPH_DIGIT0,
+                           FormatDecimal(g_menu->unk100.cur * 100, g_hud_digits, 9));
+        SlotSetPos(1, 0x42, 0xE0 - (g_menu->arcana_row.hi - g_menu->arcana_row.cur) * 8, 0x54);
+    }
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->unk100.cur != 0) {
+            MenuListInit(&g_menu->list[0], 0, 0, 1, 0x1E);
+            SlotInitTagged(g_fm_hint_def, 0x24, 0x24, 0xF8, 0xA8);
+            SlotInitTagged(g_fm_hint_def, 0x25, 0x24, 0xF8, 0xB8);
+            SlotInitTagged(g_fm_hint_def, 0x26, 0x24, 0xF8, 0xC8);
+            SlotInitTagged(g_fm_hint2_def, 0x27, 0x22, 0xF8, 0xA8);
+            SlotInitTagged(g_fm_hint2_def, 0x28, 0x22, 0xF8, 0xB8);
+            SlotInitTagged(g_fm_hint2_def, 0x29, 0x22, 0xF8, 0xC8);
+            SlotSetAnim(0x28, 0, 0, 0, 0x30, 0, 0, 0);
+            SlotSetAnim(0x29, 0, 0, 0, 0x60, 0, 0, 0);
+            SlotInitTagged(g_fm_prompt_cur_def, 0x2A, 0x23, 0xF8, g_menu->list[0].cur * 16 + 0xBA);
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(0x2A, 1);
+            g_persona_data_step++;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        g_persona_data_step = 0xFF;
+    }
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", CoinExchangePick);
+#endif
+
+/* Yes or no to the exchange: yes turns the money into coins and redraws
+   both purses and what is left to buy; either way the question closes. */
+void CoinExchangeConfirm(void)
+{
+    int n;
+
+    if (MenuStepCursor(&g_menu->list[0])) {
+        SlotSetPos(0x2A, 0x23, 0xF8, g_menu->list[0].cur * 16 + 0xBA);
+    }
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->list[0].cur == 0) {
+            g_coins += g_menu->unk100.cur;
+            g_money -= g_menu->unk100.cur * 100;
+            g_facility_max = CoinsAffordable();
+            TileMapFillRect(AT(g_tilemap1, 3, 10), 0, 9, 1, MAP_W);
+            n = FormatDecimal(g_facility_max, g_hud_digits, 8);
+            TileMapFillRect(AT(g_tilemap1, 3, 19) - n, GLYPH_DIGIT0, n, 1, MAP_W);
+            *AT(g_tilemap1, 3, 18) = GLYPH_DIGIT0;
+            MenuListInit(&g_menu->arcana_row, n, 0, n, 0x18);
+            MenuListInit(&g_menu->unk100, 0, 0, g_facility_max, 0x50);
+            MenuListInit(&g_menu->unk300, 0, -1, g_facility_max, 0x50);
+            SlotSetPos(1, 0x42, 0xE0, 0x54);
+            TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 9, 18), GLYPH_DIGIT0,
+                               FormatDecimal(g_coins, g_hud_digits, 9));
+            TileMapFillRect(AT(g_tilemap1, 11, 10), 0, 9, 1, MAP_W);
+            TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 11, 18), GLYPH_DIGIT0,
+                               FormatDecimal(g_money, g_hud_digits, 9));
+            TileMapFillRect(AT(g_tilemap1, 5, 10), 0, 9, 1, MAP_W);
+            FormatDecimal(0, g_hud_digits, 1);
+            TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, 5, 18), GLYPH_DIGIT0, 1);
+        }
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+    SlotSetFlicker(1, 1);
+    SlotClear(0x24);
+    SlotClear(0x25);
+    SlotClear(0x26);
+    SlotClear(0x27);
+    SlotClear(0x28);
+    SlotClear(0x29);
+    SlotClear(0x2A);
+    g_persona_data_step--;
+}
 
 void FacilityStep3(void)
 {
@@ -1050,10 +1212,10 @@ void FacilityStep3(void)
         g_persona_data_step++;
         break;
     case 1:
-        func_800A6788();
+        FacilityTradeTop();
         break;
     case 2:
-        func_800A7118();
+        FacilityTradePick();
         break;
     case 3:
         FacilityTradeCountStep();
@@ -1075,7 +1237,97 @@ void FacilityOpen3(void)
     D_8007A738(0, 8);
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6788);
+/* The trade counter's top: the thirty-two items or the moon's seven. A
+   lays out the chosen list with the parts of the item under the cursor. */
+void FacilityTradeTop(void)
+{
+    int   i;
+    short n;
+
+    if (MenuStepCursor(&g_menu->skill_persona)) {
+        MenuWheelTurn2(0, 8);
+    }
+    DrawStatusHud();
+    if (InputCheckAcceptA(2)) {
+        SlotClearAll();
+        SlotInitTagged(D_800B1EB8, 0x2E, 0x24, 0x40, 0xE);
+        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        switch (g_menu->skill_persona.cur) {
+        case 0:
+            SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x30, 0, 0);
+            MenuSetLayers(0x18);
+            TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+            TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+            TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
+            TileMapDrawWindow(g_tilemap0, 0x1A, 0x12, MAP_W);
+            TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x18, 0x10, MAP_W);
+            TileMapFillRect(AT(g_tilemap0, 11, 7), 0x17, 0x11, 5, MAP_W);
+            for (i = 0; i < 6; i++) {
+                TileMapWriteBar(g_tilemap0 + 2 + (i + 3) * MAP_W, 10);
+                TileMapWriteBar(g_tilemap0 + 14 + (i + 3) * MAP_W, 10);
+            }
+            TileMapFillRect(AT(g_tilemap0, 3, 12), 0x17, 2, 6, MAP_W);
+            FacilityItemsDraw();
+            n = (g_item_top + g_menu->unk180.cur) * 2 + g_menu->unk190.cur;
+            TextItemStatRow(g_trade_items[n], 0x42, 0x10);
+            FacilityTradePartsDraw(n);
+            TileMapWriteRow(D_800BA650, AT(g_tilemap2, 3, 0), 0, 9);
+            TileMapWriteRow(D_800BA65C, AT(g_tilemap2, 5, 2), 0, 7);
+            TileMapWriteRow(D_800BA65C, AT(g_tilemap2, 7, 2), 0, 7);
+            SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0xA0, 0x30);
+            SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0xA0, 0x6C);
+            SlotInitTagged(g_pdata_cursor_def, 4, 0x42, g_menu->unk190.cur * 96 + 0x50,
+                           g_menu->unk180.cur * 12 + 0x30);
+            g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+            if (g_item_top == 0) {
+                g_slot_cur->attr |= SLOT_ATTR_HIDE;
+            } else {
+                g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+            }
+            g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+            if (g_item_top == 10) {
+                g_slot_cur->attr |= SLOT_ATTR_HIDE;
+            } else {
+                g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+            }
+            SlotSetFlicker(4, 1);
+            g_map_scroll_y += g_item_top * 12;
+            g_persona_data_step++;
+            break;
+        case 1:
+            SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0x30, 0, 0);
+            MenuSetLayers(0x1A);
+            TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+            TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+            TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
+            TileMapDrawWindow(g_tilemap0, 0x15, 0x13, MAP_W);
+            TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x13, 0x11, MAP_W);
+            TileMapFillRect(AT(g_tilemap0, 12, 2), 0x17, 0x11, 5, MAP_W);
+            for (i = 0; i < 7; i++) {
+                TileMapWriteBar(g_tilemap0 + 2 + (i + 3) * MAP_W, 10);
+            }
+            TileMapWriteBar(AT(g_tilemap0, 13, 3), 10);
+            TileMapWriteBar(AT(g_tilemap0, 15, 3), 10);
+            TileMapWriteBar(AT(g_tilemap0, 14, 13), 3);
+            TileMapWriteBar(AT(g_tilemap0, 16, 13), 3);
+            FacilityTradeExtrasDraw();
+            n = g_menu->unk1A0.cur;
+            TextItemStatRow(g_trade_items[n + TRADE_ITEMS], 0x42, 0x10);
+            FacilityTradeMoonPartsDraw(n);
+            TileMapWriteRow(D_800BA650, AT(g_tilemap2, 2, 0), 0, 9);
+            TileMapWriteRow(D_800BA65C, AT(g_tilemap2, 4, 2), 0, 7);
+            TileMapWriteRow(D_800BA65C, AT(g_tilemap2, 6, 2), 0, 7);
+            SlotInitTagged(g_pdata_cursor_def, 4, 0x42, 0x60, g_menu->unk1A0.cur * 12 + 0x3C);
+            SlotSetFlicker(4, 1);
+            g_map_scroll_y = 0;
+            g_persona_data_step += 3;
+            break;
+        }
+    } else if (InputCheckAcceptB(2) || g_menu_allow_hold) {
+        g_persona_data_step = 0xFF;
+    }
+}
 
 /* Thirty-two item names in two columns, dimmed where the item is out. */
 void FacilityItemsDraw(void)
@@ -1136,7 +1388,69 @@ short FacilityTradeCount(short n)
     return have;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7118);
+/* The thirty-two items' grid: scrolls a row or a page at a time, shows the
+   stats and parts of the item under the cursor, and A asks for a count when
+   any can be had. */
+void FacilityTradePick(void)
+{
+    short prev;
+
+    prev = g_menu->unk190.cur + (g_item_top + g_menu->unk180.cur) * 2;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->unk180.delay < 3) {
+                g_menu->unk180.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_item_top, 0, 10, 6)) {
+            g_map_scroll_y = g_item_top * 12;
+        } else if (!MenuScrollCursor(&g_menu->unk180, &g_item_top, 0, 10,
+                                     (u_short *)&g_use_scroll_step)) {
+            MenuStepCursor(&g_menu->unk190);
+        }
+    } else {
+        MenuResetRepeat(&g_menu->unk190);
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_item_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_item_top == 10) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(4, 0x42, g_menu->unk190.cur * 96 + 0x50, g_menu->unk180.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if (prev != (g_item_top + g_menu->unk180.cur) * 2 + g_menu->unk190.cur) {
+        prev = (g_item_top + g_menu->unk180.cur) * 2 + g_menu->unk190.cur;
+        TextItemStatRow(g_trade_items[prev], 0x42, 0x10);
+        FacilityTradePartsDraw(prev);
+    }
+    MsgStep();
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (InputCheckAcceptA(1)) {
+            g_facility_max = FacilityTradeCount(prev);
+            if (g_facility_max != 0) {
+                *AT(g_tilemap2, 2, 11) = 0xCE;
+                TileMapWriteRow(D_800BA648, AT(g_tilemap2, 2, 2), 0, 8);
+                FormatDecimal(g_facility_max, g_hud_digits, 2);
+                MenuListInit(&g_menu->arcana_row, 0, -1, 10, 0x90);
+                MenuListInit(&g_menu->unk100, 0, 0, g_facility_max, 0x50);
+                SlotInitTagged(D_800B1124, 1, 0x42, 0xE0, 0x84);
+                SlotSetFlicker(1, 1);
+                SlotSetFlicker(4, 0);
+                g_persona_data_step++;
+            }
+        } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            g_persona_data_step = 0;
+        }
+    }
+}
 
 /* The two parts item n costs, each with how many the bag holds. */
 void FacilityTradePartsDraw(short n)
