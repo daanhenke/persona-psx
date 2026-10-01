@@ -66,6 +66,10 @@ typedef struct {
 #define PAD_DOWN  0x4000
 #define PAD_LEFT  0x8000
 
+/* The buffer the other one of a pair belongs to: the one not being drawn
+   into this frame. */
+#define CASINO_OTHER(a) (a)[!g_casino_buf]
+
 /* The two draw buffers. */
 typedef struct {
     DRAWENV *draw;
@@ -93,29 +97,38 @@ typedef struct {
 } CasinoLoadQueue;
 
 /* The other draw lists. Each keeps its arrays and its count once per
-   buffer, so an entry added now is still there when the other buffer is
-   drawn. What each one draws is not worked out yet. */
+   buffer, and an entry is added to both, so it is still there when the
+   other buffer is drawn. What some of them draw is not worked out yet. */
+/* A sprite's four corners. */
 typedef struct {
-    short x, y, w, h, u, v, uw, vh;
-} CasinoRec16;
+    short x0, y0, x1, y1, x2, y2, x3, y3;
+} CasinoQuad;
 
 typedef struct {
     short x, y, w, h;
 } CasinoRec8;
 
-typedef struct {                /* 0x800B4764 */
-    CasinoRec16 *rec[2];
-    short       *z[2];
-    short        n[2];
-} CasinoListC;
+/* Where a sprite's image sits in its texture page. */
+typedef struct {
+    short u, v, w, h;
+} CasinoUV;
 
-typedef struct {                /* 0x800A837C */
-    CasinoRec8 *rec[2];
-    short      *a[2];
-    short      *b[2];
-    short      *c[2];
+/* New corners for sprites, applied to each buffer's polygons as that
+   buffer is next drawn. */
+typedef struct {
+    CasinoQuad *quad[2];
+    short      *spr[2];
     short       n[2];
-} CasinoListD;
+} CasinoQuadQueue;
+
+/* New textures for sprites, applied the same way. */
+typedef struct {
+    CasinoUV *uv[2];
+    u_short  *tpage[2];
+    u_short  *clut[2];
+    short    *spr[2];
+    short     n[2];
+} CasinoUVQueue;
 
 typedef struct {                /* 0x800B0974 */
     CasinoRec8 *pos[2];
@@ -140,8 +153,8 @@ typedef struct {                /* 0x800AF5BC, 0x800AF688, 0x800B41A4 */
 extern CasinoSprites   g_casino_sprites;
 extern short           g_casino_sprite_count;
 extern CasinoLoadQueue g_casino_load_queue;
-extern CasinoListC     D_800B4764;
-extern CasinoListD     D_800A837C;
+extern CasinoQuadQueue g_casino_quads;
+extern CasinoUVQueue   g_casino_uvs;
 extern CasinoListE     D_800B0974;
 extern CasinoListF     D_800A86A0;
 extern CasinoList3     D_800AF5BC;

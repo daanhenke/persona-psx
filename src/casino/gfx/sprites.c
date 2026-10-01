@@ -21,8 +21,8 @@ extern short D_800AAF5C;
 extern short D_800B0A48[2];
 
 extern void func_8006924C(void);
-extern void func_80069894(void);
-extern void func_80069BD4(void);
+extern void CasinoFlushQuads(void);
+extern void CasinoFlushUVs(void);
 extern void func_80069F60(void);
 extern void func_8006A150(void);
 extern void CasinoFlushImages(void);
@@ -39,10 +39,10 @@ void CasinoAddSprites(CasinoDB *db);
 void CasinoResetLists(void)
 {
     g_casino_load_queue.n = 0;
-    D_800B4764.n[1] = 0;
-    D_800B4764.n[0] = 0;
-    D_800A837C.n[1] = 0;
-    D_800A837C.n[0] = 0;
+    g_casino_quads.n[1] = 0;
+    g_casino_quads.n[0] = 0;
+    g_casino_uvs.n[1] = 0;
+    g_casino_uvs.n[0] = 0;
     D_800B0974.n[1] = 0;
     D_800B0974.n[0] = 0;
     D_800A86A0.n[1] = 0;
@@ -88,8 +88,8 @@ void CasinoDrawFrame(void)
     func_8006ACBC();
     func_8006B1B0();
     func_8006924C();
-    func_80069894();
-    func_80069BD4();
+    CasinoFlushQuads();
+    CasinoFlushUVs();
     func_8006A150();
     func_8006C330();
     func_8006C5B0();
