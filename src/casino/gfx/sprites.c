@@ -16,14 +16,9 @@
 #include <persona/casino/casino.h>
 
 extern short D_800A8668;
-extern short D_800A86B0[2];
-extern short D_800A839C[2];
 extern short D_800A9120[2];
 extern short D_800AAF5C;
-extern short D_800B099C[2];
 extern short D_800B0A48[2];
-extern short D_800B016C;
-extern short D_800B4774[2];
 
 extern void func_8006924C(void);
 extern void func_80069894(void);
@@ -43,15 +38,15 @@ void CasinoAddSprites(CasinoDB *db);
 
 void CasinoResetLists(void)
 {
-    g_casino_load_count = 0;
-    D_800B4774[1] = 0;
-    D_800B4774[0] = 0;
-    D_800A839C[1] = 0;
-    D_800A839C[0] = 0;
-    D_800B099C[1] = 0;
-    D_800B099C[0] = 0;
-    D_800A86B0[1] = 0;
-    D_800A86B0[0] = 0;
+    g_casino_load_queue.n = 0;
+    D_800B4764.n[1] = 0;
+    D_800B4764.n[0] = 0;
+    D_800A837C.n[1] = 0;
+    D_800A837C.n[0] = 0;
+    D_800B0974.n[1] = 0;
+    D_800B0974.n[0] = 0;
+    D_800A86A0.n[1] = 0;
+    D_800A86A0.n[0] = 0;
     D_800B0A48[1] = 0;
     D_800B0A48[0] = 0;
     D_800A9120[1] = 0;
@@ -80,7 +75,7 @@ void CasinoInitSprites(void)
         g_casino_sprites.z[i] = 0xFF;
         g_casino_sprites.on[i] = 0;
     }
-    D_800B016C = 0;
+    g_casino_sprites.n = 0;
 }
 
 void CasinoDrawFrame(void)
@@ -102,7 +97,7 @@ void CasinoDrawFrame(void)
     func_8006BFF0();
     rand();
     DrawSync(0);
-    if (g_casino_load_count) {
+    if (g_casino_load_queue.n) {
         CasinoFlushImages();
     }
     DrawSync(0);

@@ -82,19 +82,71 @@ typedef struct {
     POLY_FT4 *prim[2];
     short    *z;
     u_char   *on;
+    short     n;
 } CasinoSprites;
 
 /* Images waiting for the next DrawSync to go up to VRAM. */
 typedef struct {
     RECT    *rect;
     u_long **data;
+    short    n;
 } CasinoLoadQueue;
+
+/* The other draw lists. Each keeps its arrays and its count once per
+   buffer, so an entry added now is still there when the other buffer is
+   drawn. What each one draws is not worked out yet. */
+typedef struct {
+    short x, y, w, h, u, v, uw, vh;
+} CasinoRec16;
+
+typedef struct {
+    short x, y, w, h;
+} CasinoRec8;
+
+typedef struct {                /* 0x800B4764 */
+    CasinoRec16 *rec[2];
+    short       *z[2];
+    short        n[2];
+} CasinoListC;
+
+typedef struct {                /* 0x800A837C */
+    CasinoRec8 *rec[2];
+    short      *a[2];
+    short      *b[2];
+    short      *c[2];
+    short       n[2];
+} CasinoListD;
+
+typedef struct {                /* 0x800B0974 */
+    CasinoRec8 *pos[2];
+    CasinoRec8 *uv[2];
+    short      *a[2];
+    short      *b[2];
+    short      *c[2];
+    short       n[2];
+} CasinoListE;
+
+typedef struct {                /* 0x800A86A0 */
+    u_char *p[4];
+    short   n[2];
+} CasinoListF;
+
+typedef struct {                /* 0x800AF5BC, 0x800AF688, 0x800B41A4 */
+    u_char *p[3];
+    short   n;
+} CasinoList3;
 
 /* The overlay's own. */
 extern CasinoSprites   g_casino_sprites;
 extern short           g_casino_sprite_count;
 extern CasinoLoadQueue g_casino_load_queue;
-extern short           g_casino_load_count;
+extern CasinoListC     D_800B4764;
+extern CasinoListD     D_800A837C;
+extern CasinoListE     D_800B0974;
+extern CasinoListF     D_800A86A0;
+extern CasinoList3     D_800AF5BC;
+extern CasinoList3     D_800AF688;
+extern CasinoList3     D_800B41A4;
 extern int             g_casino_buf;
 extern CasinoDB       *g_casino_cur_db;
 extern CasinoDB g_casino_db[2];

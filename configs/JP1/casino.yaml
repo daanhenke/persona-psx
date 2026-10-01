@@ -63,6 +63,8 @@ segments:
       - [0x2D50, c, gfx/vramload]
       - [0x3D20, c, gfx/sprites]
       - [0x4138, asm, casino]
+      - [0x5224, c, gfx/spriteset]
+      - [0x52C0, asm, casino_a]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,
