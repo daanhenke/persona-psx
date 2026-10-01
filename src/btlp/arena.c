@@ -84,6 +84,15 @@ extern SVECTOR   g_btl_arena_quad[];
    The tail reads the fade off the rgb pointer (lh -2(s0)); here cse folds
    rgb[-1] into the symbol. A struct {fade; rgb[3]; to[3];} view keeps it
    register-relative but bases on the fade.
+   2026-10-01, traced in cse.c/loop.c: find_best_addr folds (plus rgb -2)
+   whenever cse knows rgb's constant. That holds for the array name, a pointer
+   set from it, or a do/while(0) or one-pass for around the calls. Only a base
+   cse cannot see keeps -2(s0), e.g. one set before a real loop label. A
+   (short *)0x800CCA12 base folds the arguments to li pairs; the image has
+   la. The s6 copy is the one strength_reduce emits for a giv that is not
+   replaceable (check_final_value). Here both row givs are "final_value
+   replaceable" and merge. Moving y, or a copy of it, into the row body did
+   not keep a copy either (91-93%).
    The face, in the plane z = 0. It is the only one of the five put through
    the GTE by hand rather than through RotAverageNclip4, and it is the one that
    walks the arena's colour toward the scene's. */

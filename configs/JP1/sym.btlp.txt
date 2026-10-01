@@ -153,6 +153,7 @@ g_btl_debug_act_kind1         = 0x8004E270; // type:u8 size:0x1
 g_btl_debug_act_kind2         = 0x8004E271; // type:u8 size:0x1
 g_btl_debug_guard             = 0x8004E272; // type:u8 size:0x1
 g_btl_debug_act_for           = 0x8004E273; // type:u8 size:0x1
+g_btl_debug_grid              = 0x8004E27F; // type:u8 size:0x1
 g_btl_debug_hud               = 0x80055BEC;
 g_btl_chain_battle            = 0x80055BED;
 g_cd_busy                     = 0x80055C10;

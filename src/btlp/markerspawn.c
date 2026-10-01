@@ -74,11 +74,20 @@ BtlMarkerDef g_btl_marker_defs[BTL_MARKER_PARTS] = {
 };
 extern BtlObj            *g_btl_marker_obj[];
 
-/* 96.95%. The marker loop takes each marker's position by index and walks
+/* 97.34%. The marker loop takes each marker's position by index and walks
    only the definitions. The lone position is three words, and the extra
-   record takes the old record before it is marked. What is left: the image
-   sets up BtlObjSetAttr's two arguments right after the allocation returns,
-   and gcc here sets them after the stores. */
+   record takes the old record before it is marked.
+   2026-10-01 (sched1 dump): storing the record into g_btl_marker_obj before
+   marking it gives marker++ priority 2 (it waits on a store that waits on a
+   store), so BtlObjSetAttr's argument moves (priority 1, highest LUID) lose
+   the backward pick and land right after the allocation, as in the image.
+   Left: the image does the shift, the mark and marker++ before the three
+   g_btl_marker_obj stores. That needs s0's +4 to win its tie with
+   marker++, but loop.c emits a reduced giv's step just before the biv's
+   step, so its LUID is always lower. A walked BtlObj ** (mp++ after
+   marker++) fixes the order exactly, but the shown address's symbol then
+   lives two insns, gets hoisted, and the shown store is strength-reduced
+   too (93-95%). */
 #ifdef NON_MATCHING
 void BtlSpawnMarkers(void)
 {
@@ -131,8 +140,8 @@ void BtlSpawnMarkers(void)
                           g_btl_marker_pos[marker], 0x19, 0x1E);
         prev = obj;
         obj->attached = g_btl_marker_obj[marker];
-        obj->mark_num = marker;
         g_btl_marker_obj[marker] = obj;
+        obj->mark_num = marker;
         g_btl_marker_shown[marker] = 0;
         marker++;
         obj->attr |= MARKER_EXTRA_BIT;

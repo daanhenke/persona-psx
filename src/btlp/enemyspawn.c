@@ -74,25 +74,18 @@ extern BtlObj *BtlSpawnActorObj(int model, const long *pos);
 extern void    BtlSpawnFixedEnemies(void);
 extern int     BtlResetTalk(int open);
 
-/* 97.60%. Taken from the image so far:
-   - one counter for the clearing walk;
-   - the counter zeroed ahead of the CD wait (reorg puts it in both of the
-     wait's branch slots);
+/* Shapes taken from the image:
+   - one counter for the clearing walk and the fill, zeroed again only after
+     the CD wait, which reorg copies into both of the wait's branch slots;
    - no reset of g_cd_busy after the wait;
    - the fixed-enemy test on the encounter as unsigned;
    - the record re-reached through g_btl_combatants after each call rather
      than held in `a`;
-   - the species stored into the grid rather than head >> 8 worked out again;
-   - the stage entry at raw * 2 read first, into a local: its constant is
-     then built in a register of its own (lui v0 / addu) where the two words
-     before it keep the assembler's $at expansion.
-   What is left:
-   - i and the set's doubled offset trade saved registers (s1-s4);
-   - the image still loads that entry last, after the two words before it;
-     taking its address first and reading it at the call is worse (94.49%);
-   - the two words before that entry count as misses against the image's
-     D_ names. */
-#ifdef NON_MATCHING
+   - the species stored into the grid rather than head >> 8 worked out
+     again;
+   - the stage's pointer table read by address, the two words before the
+     entry first, as the image loads them. reloc.btlp.txt keeps splat from
+     naming those reads. */
 void BtlSpawnEnemies(int set)
 {
     CdlLOC    loc;
@@ -136,20 +129,20 @@ void BtlSpawnEnemies(int set)
                           g_btl_enemy_gfx_offsets[set + 1]
                               - g_btl_enemy_gfx_offsets[set],
                           (u_long *)BTL_STAGE);
-    i = 0;
     while (g_cd_busy != CD_IDLE) {
         BtlDrawFrame();
     }
 
+    i = 0;
     live = 0;
     rec = 0;
     do {
         which = (set * BTL_ENEMY_SLOTS + i) * BTL_ENEMY_ROW;
         raw = g_btl_encounters[which + 1];
         if (raw != 0) {
-            end = (int)BTL_STAGE[raw * 2];
             tim = BTL_STAGE[raw * 2 - 2];
             image = (u_char *)BTL_STAGE[raw * 2 - 1];
+            end = (int)BTL_STAGE[raw * 2];
             head = *(u_short *)((char *)tim + 2);
             *(u_short *)((char *)tim + 2) = 0;
             species = head >> 8;
@@ -203,7 +196,4 @@ void BtlSpawnEnemies(int set)
     }
     BtlResetTalk(0);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/enemyspawn", BtlSpawnEnemies);
-#endif
 

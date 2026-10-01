@@ -94,7 +94,13 @@ BtlObj *BtlFxStart3A(void)
    load, and neither does the move taken into a local; dropping the group's
    cast, storing the attribute or the phase later, or a local for the bit each
    leave it further off. The copies' kind written ahead of their motion and
-   the target held in `slot` are what took it from 91.78%. */
+   the target held in `slot` are what took it from 91.78%.
+   2026-10-01 (sched1/sched2 dumps): sched1 gives the load the birthing boost
+   (slot is set once). It is picked the moment the hit-slot store and the
+   shift are placed, which puts it after the group. sched2 then only keeps
+   it behind the `or` that frees a0. Reusing slot for the mask (two sets)
+   drops the boost and the load moves up, but slot then lands in a1 and the
+   hit stores follow it (81.71%). */
 #ifdef NON_MATCHING
 void BtlFxStep3A(BtlObj *o)
 {

@@ -58,7 +58,17 @@
    simplify_set only makes that from an operation, which would leave an insn
    the image lacks. A 2-byte copy is never a movstr (MOVE_RATIO 2). The timer
    copy sorts last in sched2 only if its insn comes after loop.c's preheader;
-   a running local set just before the loop moves it part of the way. */
+   a running local set just before the loop moves it part of the way.
+   2026-10-01: plain `int r, g, b` used directly reproduces the image except
+   for lw where it has lhu (91.66%). reload1.c eliminate_regs keeps a
+   (subreg:HI (reg:SI)) of a spilled pseudo as a subreg under LOAD_EXTEND_OP,
+   and find_reloads then reloads it whole. The exception is a pseudo wider
+   than a word. A `union { long long ll; int i; }` per colour gives
+   sw a0 / lhu t0 on 8-aligned slots exactly, but allocno_compare doubles a
+   two-word pseudo's priority (0.29 against head's 0.056), so two colours
+   take saved pairs (69%). A pre-reload (subreg:HI (mem:SI)) would also
+   narrow, because register_operand accepts it. Only update_equiv_regs'
+   replacement makes one, and only for stack-passed parameters. */
 #ifdef NON_MATCHING
 BtlObj *BtlOpenFxOnTargets(int r, int g, int b, int timer)
 {

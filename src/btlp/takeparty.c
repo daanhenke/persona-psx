@@ -70,7 +70,14 @@ extern void PersonaCreate(Char *c, int persona);
    it. Here msg_speed's store floats above the copy (a symbol, so free);
    writing it or fast_anim as a literal too pins it but swaps the pair
    (95.19%). In the test block the image sets PersonaCreate's first argument
-   before the table pick and steps the Char walker in the call's delay slot. */
+   before the table pick and steps the Char walker in the call's delay slot.
+   2026-10-01 (sched1 dump): after sched1 our order already has both stores
+   after the copy. sched2 lifts msg_speed's store because local-alloc put
+   its value in v1, the register lh g_btl_encounter rewrites, and that
+   anti-dependence drags it up. The image's value sits in a0 (confirm v1,
+   fast v0, copy temps a1/a2/a3/t0) so nothing pins it. The copy's la pairs
+   are output_block_move's own scratches in both. Statement order and
+   hoisting the three loads into locals leave the schedule unchanged. */
 #ifdef NON_MATCHING
 void BtlTakeParty(void)
 {

@@ -61,15 +61,15 @@ void BtlCloseItemBoard(void)
     BtlBoardShut(g_btl_list_board);
 }
 
-/* 98.38%. The clear and the line loop's slot reads are plain indexing: a
+/* The clear and the line loop's slot reads are plain indexing: a
    hand-walked slot pointer shared by both put it in a saved register where the
    image has a loop.c pointer. The line loop's other walkers stay - written as
-   indexing that loop scores 71%. What is left is in the first loop: the image
-   loads the entry before the count's second read, and the count test's branch
-   takes its delay slot from the loop test rather than the fall-through. The
-   entry's type, the order of the three reads, and the shape of the tests
-   (one chain, nested, a continue) all score the same. */
-#ifdef NON_MATCHING
+   indexing that loop scores 71%. The pick loop steps `from` in the for's own
+   increment: the skips then jump to the loop's continue point, which reorg
+   predicts taken, so the count test borrows the loop test for its delay slot
+   as the image does. The line loop's count has a variable of its own:
+   sharing the pick loop's sets it twice, which costs the pick loop's shift
+   sched1's pull towards its use and loads the count before the entry. */
 void BtlBuildItemLines(u_short *from)
 {
     BtlGfxText  *rows;
@@ -83,13 +83,14 @@ void BtlBuildItemLines(u_short *from)
     int          id;
     int          count;
     int          n;
+    int          have;
 
     rows     = g_btl_item_rows;
     rows2    = rows + ITEM_LINES;
     name     = g_btl_item_names[0];
     count_at = g_btl_item_counts[0];
     n        = 0;
-    while (n < ITEM_LINES) {
+    for (; n < ITEM_LINES; from++) {
         if (from >= &g_items[ITEM_SLOTS]) {
             break;
         }
@@ -102,7 +103,6 @@ void BtlBuildItemLines(u_short *from)
                 n++;
             }
         }
-        from++;
     }
 
     for (; n < ITEM_LINES; n++) {
@@ -116,11 +116,11 @@ void BtlBuildItemLines(u_short *from)
     do {
         memcpy(name, g_item_defs[g_btl_item_slots[n] & ITEM_ID].name,
                sizeof(g_btl_item_names[0]));
-        count = g_btl_item_slots[n] >> ITEM_SHIFT;
-        if (count == 0) {
+        have = g_btl_item_slots[n] >> ITEM_SHIFT;
+        if (have == 0) {
             *count_at = BTL_TEXT_END;
         } else {
-            BtlDrawNumber(count_at, count, ITEM_COUNT_WIDTH);
+            BtlDrawNumber(count_at, have, ITEM_COUNT_WIDTH);
         }
         if (n < ITEM_ROWS) {
             *h = tall;
@@ -139,6 +139,3 @@ void BtlBuildItemLines(u_short *from)
         h2       += sizeof(BtlGfxText);
     } while (n < ITEM_LINES);
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/itemboard", BtlBuildItemLines);
-#endif

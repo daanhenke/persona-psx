@@ -89,7 +89,9 @@ segments:
       - [0x41C, .rodata, leveltest]
       # BtlPlacePanel's push table, which the C emits itself.
       - [0x434, .rodata, panelplace]
-      - [0x43C, rodata, btlp_rodata3]
+      # BtlDrawPanelBox's two local initialisers - the full-strength levels
+      # and the zero flashes - which the C emits itself.
+      - [0x43C, .rodata, panelbox]
       # BtlHighlightBegin's row order, which the C emits itself.
       - [0x44C, .rodata, highlight]
       # BtlFaceDraw's three local initialisers - the quad's rotation, where it

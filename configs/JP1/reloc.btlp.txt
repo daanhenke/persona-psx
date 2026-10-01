@@ -317,3 +317,13 @@ rom:0x22028 reloc:MIPS_HI16 symbol:g_btl_test_party_keys2 addend:-0x55
 rom:0x2202C reloc:MIPS_LO16 symbol:g_btl_test_party_keys2 addend:-0x55
 rom:0x22188 reloc:MIPS_HI16 symbol:g_btl_test_party_personas2 addend:-0x55
 rom:0x2218C reloc:MIPS_LO16 symbol:g_btl_test_party_personas2 addend:-0x55
+
+// BtlSpawnEnemies reads the stage's pointer table by address, at raw * 2
+// and the two words before it: the index is added first, as a literal
+// address compiles, and the image has no relocation there.
+rom:0x22E78 reloc:MIPS_NONE symbol:g_load_stage
+rom:0x22E80 reloc:MIPS_NONE symbol:g_load_stage
+rom:0x22E88 reloc:MIPS_NONE symbol:g_load_stage
+rom:0x22E8C reloc:MIPS_NONE symbol:g_load_stage
+rom:0x22E94 reloc:MIPS_NONE symbol:g_load_stage
+rom:0x22E98 reloc:MIPS_NONE symbol:g_load_stage

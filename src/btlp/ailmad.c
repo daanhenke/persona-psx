@@ -78,7 +78,12 @@
    the side arm's, which falls into the shared call. Written that way (order
    stored in both arms, the label after the store) the merge is the image's,
    but the other arm's leftover [addiu; j] keeps its own delay slot here where
-   reorg folds it into the branch in the image (96.82%). */
+   reorg folds it into the branch in the image (96.82%).
+   2026-10-01 (.greg): the image keeps the spell count in s1 and the slot in
+   s2, so they are two variables there. A separate `count` puts the count in
+   s1 (97.74%), but global-alloc then ranks a (0.16) below s (0.28) and spell
+   (0.21), and refused (1.36) just above the slot (1.30). The image has both
+   the other way round. */
 #ifdef NON_MATCHING
 void BtlAilmentTurnMad(BtlActor *a, u_char *act)
 {

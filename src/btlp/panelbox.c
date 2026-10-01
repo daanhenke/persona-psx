@@ -52,24 +52,21 @@
 
 extern int rsin(int a);
 
-/* 96.56%. The wedge loop reads the corners as the table they are
-   (g_btl_panel_corner[panel][i], through a pointer to the whole table set
-   before the loop): the image works out panel * 112 and steps i * 28 on its
-   own, where the flat [panel * 4 + i] folded both into one stepped offset.
-   Left:
-   - the image works panel * 112 out again every round. loop.c lifts that
-     chain here because threshold * savings * lifetime = 52 * 2 * 2 = 208
-     reaches the loop's 204 insns, so the image's loop is at least five insns
-     longer at loop time. Clamps written as ternaries lengthen it enough but
-     leave a copy of n and stop the table address being lifted; stores written
-     in both arms cost far more.
-   - the face and the glow each load their prim table's address ahead of the
-     panel * size product in the image, and after it here. Pointer arithmetic
-     in place of &table[panel] changes nothing. */
-#ifdef NON_MATCHING
+/* Each prim table's address is taken into a pointer of its own before the
+   panel's entry is indexed off it: the image loads the address ahead of the
+   panel * size product and adds the product to it. The wedge loop sets its
+   table pointer afresh each round and builds each wedge's address as one
+   offset, panel * 112 + i * 28, added to it. The colour stores reach the
+   same offset through the table's name. Setting the pointer inside the loop
+   keeps the loop long enough that loop.c leaves panel * 112 in it (lifting
+   needs threshold * savings * lifetime, 52 * 2 * 2 = 208, to reach the
+   loop's insn count). The parenthesised offset is what makes the wedge and
+   the colours share it. */
 void BtlDrawPanelBox(int panel)
 {
     POLY_FT4 *face;
+    POLY_FT4 *faces;
+    POLY_G4  *glows;
     POLY_G4  *glow;
     POLY_G3  *w;
     POLY_G3 (*corners)[BTL_PANEL_CORNERS];
@@ -85,7 +82,8 @@ void BtlDrawPanelBox(int panel)
     int       i;
     int       n;
 
-    face = &g_btl_panel_poly[panel];
+    faces = g_btl_panel_poly;
+    face  = &faces[panel];
     face->x0 = g_btl_panel_face_xy[0].vx;
     face->y0 = g_btl_panel_face_xy[0].vy;
     face->x1 = g_btl_panel_face_xy[1].vx;
@@ -95,7 +93,8 @@ void BtlDrawPanelBox(int panel)
     face->x3 = g_btl_panel_face_xy[3].vx;
     face->y3 = g_btl_panel_face_xy[3].vy;
 
-    glow = &g_btl_panel_glow[panel];
+    glows = g_btl_panel_glow;
+    glow  = &glows[panel];
     glow->x0 = g_btl_panel_face_xy[0].vx;
     glow->y0 = g_btl_panel_face_xy[0].vy;
     glow->x1 = g_btl_panel_face_xy[1].vx;
@@ -150,15 +149,16 @@ void BtlDrawPanelBox(int panel)
         break;
     }
 
-    /* The table's address is held in a pointer of its own for the whole walk,
-       which is the saved base the image adds each corner's offset to. */
-    corners = g_btl_panel_corner;
     for (i = 0; i < BTL_PANEL_CORNERS; i++) {
+        /* The table's address, which the image holds in a register of its
+           own and adds each wedge's offset to. */
+        corners = g_btl_panel_corner;
         /* The three vertices go through a pointer and the colours through
            the array: each clamp puts its store in a block of its own, where
            gcc 2.6 has no CSE to carry the pointer, so only the run of six
            coordinates shares a base. */
-        w = &corners[panel][i];
+        w = (POLY_G3 *)((u_char *)corners
+                        + (panel * sizeof(corners[0]) + i * sizeof(corners[0][0])));
         w->x0 = g_btl_panel_wedge_xy[i][0].vx;
         w->y0 = g_btl_panel_wedge_xy[i][0].vy;
         w->x1 = g_btl_panel_wedge_xy[i][1].vx;
@@ -225,7 +225,4 @@ void BtlDrawPanelBox(int panel)
         g_btl_panel_corner[panel][i].b2 = n;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/panelbox", BtlDrawPanelBox);
-#endif
 

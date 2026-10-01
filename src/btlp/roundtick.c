@@ -35,7 +35,16 @@ extern BtlActor g_btl_enemies[];
    builds the second and third counters' stores from it and the slot's
    offset, where gcc here reaches all three through the walked pointer. Every
    field through the global table, every field through the pointer, and a
-   local copy of the table's address all land further away. */
+   local copy of the table's address all land further away.
+   2026-10-01 (loop dump): the three counter stores' base,
+   &g_btl_actors[i], is one giv per block (mult 236, add the hoisted table
+   address). combine_movables gives all three the same add register, so
+   combine_givs merges them into one reduced pointer. In the image only
+   TIMED_A's is reduced (a3); TIMED_B's and the ward's stay a1 + t0, so their
+   givs were never merged with it. Separately, the image bases the post-ward
+   fields on a +0xD3 giv (a0) and the top flags on +0x64 (a2), where here
+   the +0x64 loop-test giv absorbs every field. Storing TIMED_A through `a`
+   puts it on that giv instead of a separate register. */
 #ifdef NON_MATCHING
 void BtlCountDownRound(void)
 {
