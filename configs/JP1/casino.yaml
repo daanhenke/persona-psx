@@ -72,7 +72,7 @@ segments:
       - [0x60E0, c, gfx/obj3d]
       - [0x6708, c, gfx/tween]
       - [0x7118, c, gfx/anim]
-      - [0x7778, asm, casino_a]
+      - [0x7778, c, gfx/fade]
       - [0x7F24, c, gfx/palanim]
       - [0x84F0, c, audio/sound]
       - [0x8CCC, asm, casino_b]

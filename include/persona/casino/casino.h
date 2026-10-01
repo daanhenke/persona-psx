@@ -325,7 +325,36 @@ typedef struct {
     CasinoLayout *l;
 } CasinoLayoutDef;
 
+/* Colour fades: a run of sprites' tint stepped towards a colour, per
+   buffer, up to 32 at a time. */
+typedef struct {
+    u_char r, g, b;
+} CasinoRGB;
+
+/* A fade's step per frame, per channel. */
+typedef struct {
+    s8 r, g, b;
+} CasinoDelta;
+
+typedef struct {
+    short       first[2][32];
+    short       count[2][32];
+    CasinoDelta d[2][32];
+    short       left[2][32];
+    short       n[2];
+} CasinoFadeQueue;
+
+/* What a fade is asked for, handed over by value. */
+typedef struct {
+    short     first;
+    short     count;
+    CasinoRGB c;
+    u_char    pad;
+    short     frames;
+} CasinoFadeArg;
+
 /* The overlay's own. */
+extern CasinoFadeQueue  g_casino_fades;
 extern CasinoPalAnims   g_casino_palanims;
 extern CasinoPalCycles  g_casino_palcycles;
 extern CasinoAnimQueue  g_casino_anims;

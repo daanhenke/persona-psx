@@ -15,7 +15,6 @@
 #include <libetc.h>
 #include <persona/casino/casino.h>
 
-extern short D_800A9120[2];
 
 extern void CasinoFlushRects(void);
 extern void CasinoFlushQuads(void);
@@ -26,7 +25,7 @@ extern void CasinoFlushImages(void);
 extern void CasinoStepTweens(void);
 extern void CasinoStepScrolls(void);
 extern void CasinoStepAnims(void);
-extern void func_8006BFF0(void);
+extern void CasinoStepFades(void);
 extern void CasinoStepPalAnims(void);
 extern void CasinoStepPalCycles(void);
 extern int  rand(void);
@@ -46,8 +45,8 @@ void CasinoResetLists(void)
     g_casino_cluts.n[0] = 0;
     g_casino_semis.n[1] = 0;
     g_casino_semis.n[0] = 0;
-    D_800A9120[1] = 0;
-    D_800A9120[0] = 0;
+    g_casino_fades.n[1] = 0;
+    g_casino_fades.n[0] = 0;
     g_casino_palanims.n = 0;
     g_casino_palcycles.n = 0;
 }
@@ -91,7 +90,7 @@ void CasinoDrawFrame(void)
     CasinoStepPalAnims();
     CasinoStepPalCycles();
     CasinoFlushCluts();
-    func_8006BFF0();
+    CasinoStepFades();
     rand();
     DrawSync(0);
     if (g_casino_load_queue.n) {
