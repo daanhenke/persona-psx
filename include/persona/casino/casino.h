@@ -39,6 +39,31 @@ typedef struct {
     u_int b5 : 1;
 } CasinoFlags;
 
+/* A cursor on a grid of w by h cells. The previous cell is kept for the
+   redraw, and each axis either wraps or stops at its edges. */
+typedef struct {
+    s8     x;
+    s8     y;
+    s8     prev_x;
+    s8     prev_y;
+    s8     w;
+    s8     h;
+    u_char wrap_x;
+    u_char wrap_y;
+    u_char unk8;
+    u_char unk9;
+    u_char unkA;
+    u_char unkB;
+    u_char unkC;
+    u_char unkD;
+} CasinoCursor;
+
+/* The pad's direction bits. */
+#define PAD_UP    0x1000
+#define PAD_RIGHT 0x2000
+#define PAD_DOWN  0x4000
+#define PAD_LEFT  0x8000
+
 /* The overlay's own. */
 extern CasinoFlags D_800AFC98;
 extern u_short *g_casino_coin_item;

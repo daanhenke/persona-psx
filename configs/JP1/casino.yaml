@@ -57,7 +57,9 @@ segments:
       - [0x4, .rodata, game/casinomain]
       - [0x144, rodata, casino_rodata]
       - [0x1A0C, c, game/casinomain]
-      - [0x2564, asm, casino]
+      - [0x2564, c, game/cursor]
+      - [0x2B04, c, game/tick]
+      - [0x2C14, asm, casino]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,

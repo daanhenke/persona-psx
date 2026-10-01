@@ -84,7 +84,7 @@ extern void CasinoFindCoinItem(void);
 extern u_short CasinoItemSlot(short id);
 extern void CasinoReadPad(void);
 
-extern void func_80066F88(void);
+extern void CasinoDebugInit(void);
 extern void func_80066FB4(void);
 extern void func_8006C890(void);
 extern void CasinoFrameWrap(int *frame);
@@ -108,7 +108,7 @@ void ovl_casino_entry(void)
     CasinoMapWork();
     CasinoPickGame();
     CasinoInitState();
-    func_80066F88();
+    CasinoDebugInit();
     func_80066FB4();
     func_8006C890();
     SetDispMask(1);
