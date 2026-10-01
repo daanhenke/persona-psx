@@ -114,7 +114,7 @@ extern void  ShopCountInit(u_char n);
 extern void  ShopCountInit2(u_char n);
 extern void  ShopScreenOpen(void);
 extern void  FacilityOpen3(void);
-extern void  func_800A5560(void);
+extern void  CoinShopOpen(void);
 extern int   CoinsAffordable(void);
 extern void  PersonaSlotsCompact(void);
 extern void  PersonaSwapOpen(void);
@@ -327,7 +327,7 @@ u_char FacilityScreen(u_char id)
         ShopLoadItems2(fac[0]);
         ShopLoadPrices2(fac[0]);
         ShopCountInit2(D_800BB848.cur);
-        func_800A5560();
+        CoinShopOpen();
         SlotSetFlicker(0, 1);
         i = g_item_top + g_menu->unk100.cur;
         TextItemStatRow(g_shop_items[i], 0x38, 0xE);

@@ -41,7 +41,7 @@ extern short g_persona_data_step;
 extern void ItemsCompact(void);
 extern void ItemsClearPending(void);
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
-extern void func_800A4E7C(void);
+extern void CoinShopListStep(void);
 extern void CoinShopCountStep(void);
 extern void func_800A5BCC(void);
 extern void func_800A6308(void);
@@ -94,6 +94,23 @@ extern void     TileMapWriteRun10(short *dst);
 extern void     BgBoxShow(void);
 extern void     DrawPartySlotStatus(int slot, int kind);
 extern u_short  g_menu_bg_rle[];
+extern short    g_use_scroll_step;
+extern u_char   g_facility_count;
+extern u_char   D_800BA63C[];
+extern u_char   PageScrollValue(short *value, short lo, short hi, short step);
+extern short    MenuScrollCursor(MenuList *m, short *row, short first, short last,
+                                 u_short *offset);
+extern void     MenuResetRepeat(MenuList *m);
+extern void     ShopCountInit(u_char row);
+extern void     ShopBuyListDraw2(void);
+extern void     MoneyAdd(u_int amount);
+extern void     ItemsRemovePending(u_short id, u_short count);
+extern void     DrawItemRow(short n, short *dst);
+void ShopSellTotalDraw(short row);
+extern u_char   D_800BA640[];
+extern u_char   D_800B1EB8[];
+extern void     ShopCountInit2(u_char row);
+#define g_facility ((u_char *)0x800EB580)
 
 /* What a paper fusion comes out as. */
 typedef struct {
@@ -131,10 +148,10 @@ extern void func_800A76F4(void);
 extern void FacilityTradeMoonPick(void);
 extern void func_800A7D7C(void);
 extern void ShopTopStep(void);
-extern void func_800A8448(void);
+extern void ShopListStep(void);
 extern void ShopBuyCountStep(void);
 extern void func_800A8B88(void);
-extern void func_800A91C8(void);
+extern void ShopSellCountStep(void);
 extern void ShopMemberPick(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
@@ -784,7 +801,7 @@ void ShopStep2(void)
 {
     switch (g_persona_data_step) {
     case 0:
-        func_800A4E7C();
+        CoinShopListStep();
         break;
     case 1:
         CoinShopCountStep();
@@ -792,7 +809,70 @@ void ShopStep2(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A4E7C);
+/* The coin counter's list: scrolls a row or a page at a time, shows the
+   stats, price and stock of the row under the cursor, and A asks how many. */
+void CoinShopListStep(void)
+{
+    short prev;
+    short n;
+
+    prev = g_item_top + g_menu->unk100.cur;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->unk100.delay < 3) {
+                g_menu->unk100.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_item_top, 0, g_facility[2] - 8, 8)) {
+            g_map_scroll_y = g_item_top * 12;
+        } else {
+            MenuScrollCursor(&g_menu->unk100, &g_item_top, 0, g_facility[2] - 8,
+                             (u_short *)&g_use_scroll_step);
+        }
+    } else {
+        MenuResetRepeat(&g_menu->unk100);
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_item_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_item_top == g_facility_count - 8) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(4, 0x42, 0x48, g_menu->unk100.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if (prev != g_item_top + g_menu->unk100.cur) {
+        prev = g_item_top + g_menu->unk100.cur;
+        TextItemStatRow(g_shop_items[prev] & ITEM_ID, 0x38, 0xE);
+        ShopCountInit2(prev);
+        TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 24), GLYPH_DIGIT0,
+                           FormatDecimal(g_shop_prices[prev], g_hud_digits, 9));
+        TileMapFillRect(AT(g_tilemap2, 13, 9), 0, 2, 1, MAP_W);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 10), GLYPH_DIGIT0,
+                           FormatDecimal(ShopHave(g_shop_items[prev]), g_hud_digits, 2));
+    }
+    MsgStep();
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (InputCheckAcceptA(1)) {
+            if (g_shop_count.hi != 0) {
+                ShopCountRowDraw();
+                ShopTotalRedraw(prev, g_shop_count.cur);
+                TileMapWriteRow(D_800BA63C, AT(g_tilemap2, 0, 23), 0, 3);
+                SlotSetFlicker(4, 0);
+                g_persona_data_step++;
+            }
+        } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            g_persona_data_step = 0xFF;
+        }
+    }
+}
 
 /* The coin counter's count: as at the money counters, but paid in coins. */
 void CoinShopCountStep(void)
@@ -825,17 +905,95 @@ void CoinShopCountStep(void)
         ItemsCommitPending();
         ItemsCompact();
         CoinsSpend(*price * g_shop_count.cur);
-        func_800A5560();
+        CoinShopOpen();
         SlotSetFlicker(0, 1);
         g_persona_data_step--;
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        func_800A5560();
+        CoinShopOpen();
         SlotSetFlicker(0, 1);
         g_persona_data_step--;
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A5560);
+#ifdef NON_MATCHING
+/* Lays out the coin counter: eight rows of stock with their prices in
+   coins, the count window, and the coins left. */
+void CoinShopOpen(void)
+{
+    int      i;
+    short    row;
+    u_short *item;
+    int      k;
+
+    row = g_item_top + g_menu->unk100.cur;
+    MenuSetLayers(0x14);
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
+    TileMapDrawWindow(g_tilemap0, 0x20, 0x11, MAP_W);
+    TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0x1E, 0xF, MAP_W);
+    for (i = 0; i < 8; i++) {
+        TileMapWriteBar(g_tilemap0 + 3 + (i + 2) * MAP_W, 0xA);
+        TileMapWriteBar(g_tilemap0 + 15 + (i + 2) * MAP_W, 0xA);
+        TileMapWriteBar(g_tilemap0 + 26 + (i + 2) * MAP_W, 3);
+    }
+    for (i = 15; i >= 0; i--) {
+        *AT(g_tilemap1, i, 12) = 0x37F;
+    }
+    TileMapFillRect(AT(g_tilemap0, 2, 13), 0x17, 2, 8, MAP_W);
+    TileMapFillRect(AT(g_tilemap0, 2, 25), 0x17, 1, 8, MAP_W);
+    TileMapFillRect(AT(g_tilemap0, 11, 2), 0x17, 0x1C, 4, MAP_W);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 0, 14), 0x46E, 4);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 10, 13), 0x38D, 5);
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 12, 13), 0x389, 4);
+    TileMapWriteBar(AT(g_tilemap0, 12, 18), 0xA);
+    TileMapWriteBar(AT(g_tilemap0, 14, 18), 0xA);
+    TileMapWriteBar(AT(g_tilemap0, 14, 11), 3);
+    k = row;
+    item = &g_shop_items[k];
+    TextItemStatRow(*item & ITEM_ID, 0x38, 0xE);
+    ShopCountInit2(row);
+    TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+    TileMapFillRect(AT(g_tilemap2, 13, 16), 0, 9, 1, MAP_W);
+    *AT(g_tilemap2, 11, 15) = 0x37F;
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 24), GLYPH_DIGIT0,
+                       FormatDecimal(g_shop_prices[k], g_hud_digits, 9));
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 10), GLYPH_DIGIT0,
+                       FormatDecimal(ShopHave(*item), g_hud_digits, 2));
+    *AT(g_tilemap2, 13, 8) = 0xCE;
+    *AT(g_tilemap2, 13, 15) = 0x37F;
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 24), GLYPH_DIGIT0,
+                       FormatDecimal(g_coins, g_hud_digits, 9));
+    TileMapWriteRow(D_800BA640, AT(g_tilemap2, 13, 0), 0, 7);
+    SlotClearAll();
+    SlotInitTagged(D_800B1EB8, 0x2E, 0x24, 0x36, 0xC);
+    SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+    SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+    SlotSetAnim(0x2D, 0, 0, 0, 0, 0x48, 0, 0);
+    SlotInitTagged(g_pdata_cursor_def, 4, 0x42, 0x48, g_menu->unk100.cur * 12 + 0x30);
+    SlotSetFlicker(4, 1);
+    SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0x98, 0x30);
+    SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0x98, 0x84);
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_item_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_item_top == g_facility_count - 8) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    MenuListInit(&g_shop_tens, 0, -1, 0xA, 0x90);
+    ShopCountInit2(row);
+    ShopBuyListDraw2();
+    g_map_scroll_y = g_item_top * 12;
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", CoinShopOpen);
+#endif
 
 /* Keeps the message running until any button is pressed. */
 void MsgStepUntilPress(void)
@@ -1071,7 +1229,7 @@ void ShopStep(void)
         ShopTopStep();
         break;
     case 2:
-        func_800A8448();
+        ShopListStep();
         break;
     case 3:
         ShopBuyCountStep();
@@ -1080,7 +1238,7 @@ void ShopStep(void)
         func_800A8B88();
         break;
     case 5:
-        func_800A91C8();
+        ShopSellCountStep();
         break;
     case 6:
         ShopMemberPick();
@@ -1135,7 +1293,75 @@ void ShopTopStep(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8448);
+/* The money counter's list: as the coin counter's, with the price marked
+   and the count's cursor put up beside the row. */
+void ShopListStep(void)
+{
+    short prev;
+    int   have;
+
+    prev = g_item_top + g_menu->unk100.cur;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->unk100.delay < 3) {
+                g_menu->unk100.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_item_top, 0, g_facility[2] - 8, 8)) {
+            g_map_scroll_y = g_item_top * 12;
+        } else {
+            MenuScrollCursor(&g_menu->unk100, &g_item_top, 0, g_facility[2] - 8,
+                             (u_short *)&g_use_scroll_step);
+        }
+    } else {
+        MenuResetRepeat(&g_menu->unk100);
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_item_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_item_top == g_facility_count - 8) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(4, 0x42, 0x48, g_menu->unk100.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if (prev != g_item_top + g_menu->unk100.cur) {
+        prev = g_item_top + g_menu->unk100.cur;
+        TextItemStatRow(g_shop_items[prev] & ITEM_ID, 0x38, 0xE);
+        ShopCountInit(prev);
+        TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 24), GLYPH_DIGIT0,
+                           FormatDecimal(g_shop_prices[prev], g_hud_digits, 9));
+        *AT(g_tilemap2, 11, 15) = 0xD0;
+        have = ShopHave(g_shop_items[prev]);
+        TileMapFillRect(AT(g_tilemap2, 13, 9), 0, 2, 1, MAP_W);
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 10), GLYPH_DIGIT0,
+                           FormatDecimal(have, g_hud_digits, 2));
+        *AT(g_tilemap2, 13, 8) = 0xCE;
+    }
+    MsgStep();
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (InputCheckAcceptA(1)) {
+            if (g_shop_count.hi != 0) {
+                ShopCountRowDraw();
+                ShopTotalDraw(prev, g_shop_count.cur);
+                TileMapWriteRow(D_800BA63C, AT(g_tilemap2, 0, 23), 0, 3);
+                SlotSetFlicker(4, 0);
+                SlotInitTagged(D_800B1124, 8, 0x42, 0x108, g_menu->unk100.cur * 12 + 0x30);
+                SlotSetFlicker(8, 1);
+                g_persona_data_step = 3;
+            }
+        } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            g_persona_data_step = 0;
+        }
+    }
+}
 
 /* How many to buy: up and down step by one, left and right by ten, and
    never more than the money and the bag allow nor fewer than one. A buys
@@ -1182,7 +1408,68 @@ void ShopBuyCountStep(void)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8B88);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A91C8);
+/* How many to sell. A sells them and redraws the bag's page, clearing the
+   stats if the entry is gone; either way the count window closes. */
+void ShopSellCountStep(void)
+{
+    u_short *list;
+    int      n;
+
+    list = g_item_list;
+    if (MenuStepCursor(&g_shop_tens)) {
+        g_shop_count.cur = g_shop_tens.cur * 10 + g_shop_count.cur % 10;
+    } else {
+        MenuStepCursor(&g_shop_count);
+    }
+    if (g_shop_count.cur > g_shop_count.hi) {
+        g_shop_count.cur = g_shop_count.hi;
+    } else if (g_shop_tens.cur < 0) {
+        g_shop_count.cur = 0;
+    }
+    if (g_shop_count.cur == 0) {
+        g_shop_count.cur = 1;
+    }
+    g_shop_tens.cur = g_shop_count.cur / 10;
+    n = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+    ShopSellTotalDraw(n);
+    if (InputCheckAcceptA(1)) {
+        if (g_shop_count.cur != 0) {
+            n = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+            MoneyAdd(g_item_defs[list[n] & ITEM_ID].price * g_shop_count.cur);
+            ItemsRemovePending(list[n] & ITEM_ID, g_shop_count.cur);
+            for (n = 0; n < 8; n++) {
+                DrawItemRow((g_use_top + n) * 2, AT(g_tilemap1, (g_use_top + n) & 0x1F, 0));
+                DrawItemRow((g_use_top + n) * 2 + 1, AT(g_tilemap1, (g_use_top + n) & 0x1F, 14));
+            }
+        }
+        n = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+        if (!(list[n] & ITEM_ID) || !(list[n] >> 9)) {
+            TextItemStatRow(0, 0x42, 0x12);
+        }
+        TileMapFillRect(AT(g_tilemap2, 1, 0), 0, MAP_W, 2, MAP_W);
+        TileMapFillRect(AT(g_tilemap2, 11, 9), 0, 2, 1, MAP_W);
+        TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+        *AT(g_tilemap2, 11, 10) = GLYPH_DIGIT0;
+        *AT(g_tilemap2, 11, 24) = GLYPH_DIGIT0;
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 24), GLYPH_DIGIT0,
+                           FormatDecimal(g_money, g_hud_digits, 9));
+        SlotSetFlicker(4, 1);
+        SlotClear(8);
+        g_persona_data_step = 4;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        TileMapFillRect(AT(g_tilemap2, 1, 0), 0, MAP_W, 2, MAP_W);
+        TileMapFillRect(AT(g_tilemap2, 11, 9), 0, 2, 1, MAP_W);
+        TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+        *AT(g_tilemap2, 11, 10) = GLYPH_DIGIT0;
+        *AT(g_tilemap2, 11, 24) = GLYPH_DIGIT0;
+        TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 24), GLYPH_DIGIT0,
+                           FormatDecimal(g_money, g_hud_digits, 9));
+        SlotSetFlicker(4, 1);
+        SlotClear(8);
+        g_persona_data_step = 4;
+    }
+    MsgStep();
+}
 
 /* Picks the member to equip from the counter; A opens the equipment
    screen on them, B goes back to the counter's top. */

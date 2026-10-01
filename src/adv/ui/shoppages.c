@@ -18,6 +18,7 @@
 
 #define g_money       (*(u_int *)0x801F2674)
 #define g_shop_items  ((u_short *)0x800EB590)
+#define g_shop_prices ((int *)0x800EB5D0)
 #define g_item_list   ((u_short *)0x800EAE4C)
 
 extern short    g_item_top;
@@ -26,7 +27,6 @@ extern short    g_use_scroll_step;
 extern short    D_800BBB24;
 extern u_char   g_facility_count;
 extern MenuList g_shop_tens;
-extern int      D_800EB5D0[];    /* the prices, as the buy page reaches them */
 extern u_char   D_800BA640[];
 extern u_char   D_800BA664[];
 extern u_char   D_800B1D08[];
@@ -79,7 +79,7 @@ void ShopBuyOpen(void)
     TileMapFillRect(AT(g_tilemap2, 13, 16), 0, 9, 1, MAP_W);
     *AT(g_tilemap2, 11, 15) = 0xD0;
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 24), GLYPH_DIGIT0,
-                       FormatDecimal(D_800EB5D0[k], g_hud_digits, 9));
+                       FormatDecimal(g_shop_prices[k], g_hud_digits, 9));
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 13, 10), GLYPH_DIGIT0,
                        FormatDecimal(ShopHave(*item), g_hud_digits, 2));
     *AT(g_tilemap2, 13, 8) = 0xCE;
