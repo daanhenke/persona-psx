@@ -43,7 +43,7 @@ extern u_char  D_800B130C[];
 extern short PersonaStockCompact(void);
 extern void  func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
                            short special);
-extern void  func_800A275C(void);
+extern void  FuseChartDraw(void);
 
 void FuseResultRowDraw(short row);
 void FuseResultLineDraw(short id);
@@ -123,7 +123,7 @@ void FusionOpen(void)
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 13, 2), 0x476, 6);
     TileMapWriteRow(str_cell_run, AT(g_tilemap1, 14, 13), 0x383, 2);
     FusionStockDraw();
-    func_800A275C();
+    FuseChartDraw();
     TileMapWriteBar(AT(g_tilemap0, 16, 3), 0x1C);
     PersonaStockCompact();
     func_800A1990(g_persona_stock[g_menu->status_page.cur],
