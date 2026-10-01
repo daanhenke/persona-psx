@@ -169,6 +169,12 @@ short FuseSpecialMatch(short persona, short item, short a, short b);
 extern void FuseItemBonus(short arcana, short item, int a, int b, void *out);
 extern u_char g_arcana_fuse_group[];
 extern u_char D_800B19A4[];
+/* The fusion tables after the arcana chart, each its own array. */
+extern u_char g_fuse_rank_bonus[];  /* [7][8], by the two arcanas' rank groups */
+extern u_char g_fuse_kind_bonus[];  /* [..][4], read three past its start */
+extern u_char g_arcana_personas[];  /* (first, count) by arcana */
+extern u_char g_fuse_specials[];    /* the forty special Personas */
+extern u_char g_fuse_moon_rows[];   /* the moon's rows, and what they pick */
 
 /* What the offered item adds to a fusion (FuseItemBonus fills it): magic,
    the five stats, a step through the arcana, and a spell. */
@@ -227,10 +233,10 @@ void FuseCompute(u_char a, u_char b, short mode, FuseResult *out, short arcana)
     } else {
         out->arcana = D_800BA0E4[ar_a * 19 + ar_b + 0x20];
     }
-    out->unk2 = D_800BA0E4[0x1C7 + g_arcana_fuse_group[ar_a] * 4 + g_arcana_fuse_group[ar_b]];
-    out->flag = 0;
-    out->unk4 = D_800BA0E4[D_800B19A4[ar_a] * 8 + D_800B19A4[ar_b] + 0x18C];
+    out->unk2 = g_fuse_kind_bonus[3 + g_arcana_fuse_group[ar_a] * 4 + g_arcana_fuse_group[ar_b]];
+    out->unk4 = g_fuse_rank_bonus[D_800B19A4[ar_a] * 8 + D_800B19A4[ar_b]];
     r = 0;
+    out->flag = 0;
     if (out->arcana) {
         r = FuseFindPersona(out->arcana, a, b, level, mode);
     }
@@ -284,7 +290,7 @@ short FuseArcanaStep(short arcana, short cur, short dir)
     case 0:
         return cur;
     case 1:
-        n = D_800BA0E4[0x1DA + arcana * 2];
+        n = g_arcana_personas[arcana * 2];
         if (cur == n) {
             return n;
         }
@@ -293,7 +299,7 @@ short FuseArcanaStep(short arcana, short cur, short dir)
         }
         return cur - 1;
     case 2:
-        n = D_800BA0E4[0x1DA + arcana * 2];
+        n = g_arcana_personas[arcana * 2];
         r = cur;
         if (cur == n) {
             return n;
@@ -309,7 +315,7 @@ short FuseArcanaStep(short arcana, short cur, short dir)
         }
         return r;
     case 3:
-        n = D_800BA0E4[0x1DA + arcana * 2] + D_800BA0E4[0x1DB + arcana * 2] - 1;
+        n = g_arcana_personas[arcana * 2] + g_arcana_personas[1 + arcana * 2] - 1;
         if (cur == n) {
             return n;
         }
@@ -318,7 +324,7 @@ short FuseArcanaStep(short arcana, short cur, short dir)
         }
         return cur + 1;
     case 4:
-        n = D_800BA0E4[0x1DA + arcana * 2] + D_800BA0E4[0x1DB + arcana * 2] - 1;
+        n = g_arcana_personas[arcana * 2] + g_arcana_personas[1 + arcana * 2] - 1;
         r = cur;
         if (cur == n) {
             return n;
@@ -368,28 +374,28 @@ short FuseFindPersona(short arcana, short a, short b, short level, short item)
     lo = 0;
     hi = 0;
     for (i = 0; i < FUSE_SPECIALS; i++) {
-        p = D_800BA0E4[0x208 + i];
+        p = g_fuse_specials[i];
         if (FuseSpecialMatch(p, item, a, b) == 3) {
             return p;
         }
     }
     FuseItemBonus(arcana, item, a, b, (void *)0x801F1BAC);
-    i = D_800BA0E4[0x1DB + arcana * 2] - 1;
+    i = g_arcana_personas[1 + arcana * 2] - 1;
     for (n = 0; n < i; n++) {
-        r = FuseSpecialMatch(D_800BA0E4[0x1DA + arcana * 2] + n, item, a, b);
+        r = FuseSpecialMatch(g_arcana_personas[arcana * 2] + n, item, a, b);
         if (r == 2) {
-            return D_800BA0E4[0x1DA + arcana * 2] + n;
+            return g_arcana_personas[arcana * 2] + n;
         }
     }
-    i = D_800BA0E4[0x1DB + arcana * 2] - 1;
+    i = g_arcana_personas[1 + arcana * 2] - 1;
     for (;;) {
-        r = FuseSpecialMatch(D_800BA0E4[0x1DA + arcana * 2] + i, item, a, b);
+        r = FuseSpecialMatch(g_arcana_personas[arcana * 2] + i, item, a, b);
         if (r != 0) {
             if (r == 2) {
-                return D_800BA0E4[0x1DA + arcana * 2] + i;
+                return g_arcana_personas[arcana * 2] + i;
             }
             lo = hi;
-            hi = D_800BA0E4[0x1DA + arcana * 2] + i;
+            hi = g_arcana_personas[arcana * 2] + i;
         }
         if (lo != hi && level >= g_persona_defs[lo].level && level < g_persona_defs[hi].level) {
             break;
@@ -627,7 +633,7 @@ short FuseSpecialHas(short persona)
     int i;
 
     for (i = 0; i < FUSE_SPECIALS; i++) {
-        if (D_800BA0E4[0x208 + i] == persona) {
+        if (g_fuse_specials[i] == persona) {
             return 1;
         }
     }
@@ -641,9 +647,9 @@ short FuseMoonLookup(short a, short b)
 {
     int row;
 
-    row = D_800BA0E4[0x230 + (g_moon & 0xF)];
-    return g_fuse_moon_picks[D_800BA0E4[0x240 + row] * 7 +
-                             D_800BA0E4[0x243 + g_persona_data[b].arcana * 9 + row]];
+    row = g_fuse_moon_rows[g_moon & 0xF];
+    return g_fuse_moon_picks[g_fuse_moon_rows[0x10 + row] * 7 +
+                             g_fuse_moon_rows[0x13 + g_persona_data[b].arcana * 9 + row]];
 }
 
 /* The fusion chart: what each pair of stock Personas fuses into, one cell

@@ -40,6 +40,7 @@ typedef struct {
     short persona;
 } FuseBonus;
 
+extern u_char g_fuse_moon_rows[];
 extern short   g_use_top;
 extern u_char  g_moon;
 extern u_char  g_kind_labels[];
@@ -283,7 +284,7 @@ void FuseItemBonus(short arcana, short item, int unused2, int unused3,
     case 0xE0:
         r = rand() & 0xFF;
         if (r >= 0xC9) {
-            r = D_800BA0E4[0x230 + (g_moon & 0xF)];
+            r = g_fuse_moon_rows[g_moon & 0xF];
             out->persona = g_fuse_random_personas[(rand() & 0xFF) / 16 * 9 + r];
         } else {
             switch (r / 8) {
