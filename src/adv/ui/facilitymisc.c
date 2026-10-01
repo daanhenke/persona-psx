@@ -18,6 +18,8 @@
 #include <persona/common/slot.h>
 #include <persona/common/status.h>
 #include <persona/adv/personapage.h>
+#include <persona/main/cd.h>
+#include <persona/common/bg.h>
 
 #define g_persona_slots ((u_char *)0x801F2574)
 #define g_item_list     ((u_short *)0x800EAE4C)
@@ -71,6 +73,11 @@ extern void     DrawStatusHud(void);
 extern u_char   MenuStepMember(int *sel, u_char last);
 extern void     EquipScreen(short standalone);
 void CharPersonasDraw(short slot, short *dst);
+void PersonaSlotsDrawFor(short slot);
+short PersonaSlotsCount(void);
+void PersonaSlotView(short n);
+void PersonaSwapSlotsOpen(void);
+void PersonaSlotsDraw(void);
 extern int      g_facility_max;   /* the most the facility can hand over */
 extern u_char   D_800BA648[];
 extern u_char   D_800B1124[];
@@ -119,6 +126,13 @@ extern u_char   g_fm_hint_def[];
 extern u_char   g_fm_hint2_def[];
 extern u_char   g_fm_prompt_cur_def[];
 extern void     BgMapInit(void *script, short speed);
+extern void     StatusPersonaLayout(void);
+extern void     StatusPersonaDraw();
+extern void     SoundPlaySeq(u_short slot, u_short seq, short vab);
+extern u_short  g_key_menu_close;
+extern u_char   D_800B17E0[];
+extern u_char   D_800B17EE[];
+extern u_char   D_800BA6D0[];
 extern short    g_sell_slots;   /* the sell list's entries, at least 16 */
 extern u_char   D_800BA640[];
 extern u_char   D_800B1EB8[];
@@ -151,7 +165,7 @@ extern short  g_trade_moon_recipes[];  /* [7][TRADE_PICKS][2] */
 extern u_char ShopHave(short item);
 extern void PersonaSwapOpen(void);
 extern void FacilityMemberPick(void);
-extern void func_800A2FF8(void);
+extern void PersonaSwapEntryPick(void);
 extern void func_800A3388(void);
 extern void func_800A3984(void);
 extern void func_800A3D0C(void);
@@ -580,7 +594,7 @@ void FacilityStep6(void)
         FacilityMemberPick();
         break;
     case 2:
-        func_800A2FF8();
+        PersonaSwapEntryPick();
         break;
     case 3:
         func_800A3388();
@@ -648,7 +662,7 @@ void FacilityMemberPick(void)
     DrawStatusHud();
     if (InputCheckAcceptA(1)) {
         MenuListInit(&g_menu->unk2D0, 0, 0, 3, 0x16);
-        func_800A47F8();
+        PersonaSwapSlotsOpen();
         CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
         FacilityCursorPlace();
         g_map_scroll_y = g_use_top * 12;
@@ -694,7 +708,71 @@ void CharPersonasDraw(short slot, short *dst)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2FF8);
+/* Picks one of the member's three entries, or the slot list below them.
+   Triangle opens the entry's Persona; A moves on to the slots to swap
+   with, B goes back to the member. */
+void PersonaSwapEntryPick(void)
+{
+    Char *chars;
+    int   k;
+    int   n;
+
+    chars = g_chars;
+    if (!MenuStepCursor(&g_menu->unk2D0)) {
+        MenuStepCursor(&g_menu->status_who);
+    }
+    PersonaSlotsDrawFor(g_menu->status_who.cur);
+    CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+    FacilityCursorPlace();
+    if (g_pad_pressed[0] & 0x10) {
+        if (g_menu->unk2D0.cur == 3) {
+            return;
+        }
+        k = g_party[g_menu->status_who.cur];
+        if (g_chars[k].blocked) {
+            return;
+        }
+        n = chars[k].list[g_menu->unk2D0.cur];
+        if (n == SLOT_EMPTY) {
+            return;
+        }
+        SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
+        PersonaSlotView(n);
+        PersonaSwapSlotsOpen();
+        CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+        FacilityCursorPlace();
+        g_map_scroll_y = g_use_top * 12;
+        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x24, 0, 0);
+    } else if (InputCheckAcceptA(1)) {
+        if (g_menu->unk2D0.cur == 3) {
+            if (!PersonaSlotsCount()) {
+                return;
+            }
+            PersonaSlotsDraw();
+            SlotInitTagged(g_pdata_cursor_def, 2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(2, 1);
+            g_persona_data_step++;
+        } else {
+            k = g_party[g_menu->status_who.cur];
+            if (g_chars[k].blocked) {
+                return;
+            }
+            n = g_chars[k].entry;
+            if (g_menu->unk2D0.cur == n && !PersonaSlotsCount()) {
+                return;
+            }
+            PersonaSlotsDrawFor(g_menu->status_who.cur);
+            SlotInitTagged(g_pdata_cursor_def, 2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(2, 1);
+            g_persona_data_step += 3;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        PersonaSwapOpen();
+        g_persona_data_step--;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3388);
 
@@ -702,10 +780,67 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3984);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3D0C);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A43BC);
+/* A Persona's data pages, opened over the facility: the portrait read
+   off the disc, then the two halves scrolled between until B. */
+void PersonaSlotView(short n)
+{
+    int stop;
+
+    g_bg_map1.ncellh = 0x40;
+    AdvResolveSceneLoc(5, g_personas[n].key, 0);
+    CdReadFileToAddrAsync(&g_adv_scene_file, 8, PORTRAIT_READ);
+    while (g_cd_busy != -1) {
+        RunFrame();
+    }
+    TimQueueAt(PORTRAIT_TIM, 0x140, 0x168, 0, 0x1E6);
+    SlotClear(PAGE_MARK_SLOT);
+    SlotClear(PAGE_MARK_SLOT + 1);
+    MenuListInit(&g_menu->page, 0, 0, 1, 0x14);
+    StatusPersonaLayout();
+    StatusPersonaDraw(n);
+    g_cam_y = 0;
+    g_map_scroll_y = 0;
+    for (;;) {
+        RunFrame();
+        MenuStepCursor(&g_menu->page);
+        switch (g_menu->page.cur) {
+        case 0:
+            stop = 0;
+            break;
+        case 1:
+            stop = PAGE_LOW;
+            break;
+        }
+        if (stop < g_cam_y) {
+            g_cam_y -= PAGE_STEP;
+        }
+        if (g_cam_y < stop) {
+            g_cam_y += PAGE_STEP;
+        }
+        if (stop < g_map_scroll_y) {
+            g_map_scroll_y -= PAGE_STEP;
+        }
+        if (g_map_scroll_y < stop) {
+            g_map_scroll_y += PAGE_STEP;
+        }
+        SlotSetPos(0, 0x52, 0x50, 0x34 - g_cam_y);
+        SlotSetPos(PAGE_BOTTOM_SLOT, 0x50, 0x48, 0x120 - g_cam_y);
+
+        PAGE_MARKS();
+
+        if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            break;
+        }
+        if (g_key_menu_close & g_pad_pressed[0]) {
+            g_menu_allow_hold = 1;
+            SoundPlaySeq(0x18, 0, 1);
+        }
+    }
+    g_bg_map1.ncellh = 0x20;
+}
 
 /* How many of the sixteen Persona slots are filled. */
-u_char PersonaSlotsCount(void)
+short PersonaSlotsCount(void)
 {
     u_char *slots;
     u_char  i;
@@ -747,7 +882,73 @@ void FacilityCursorPlace(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A47F8);
+/* Lays out the swap's second page: the sixteen Persona slots beside the
+   member's three, dimmed where the member cannot take them. */
+void PersonaSwapSlotsOpen(void)
+{
+    int i;
+
+    MenuSetLayers(0x1D);
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
+    SlotClearAll();
+    TileMapDrawWindow(g_tilemap0, 0x10, 0xB, MAP_W);
+    TileMapDrawBox(g_tilemap0 + MAP_W + 1, 0xE, 9, MAP_W);
+    TileMapDrawWindow(AT(g_tilemap0, 11, 0), 0x10, 4, MAP_W);
+    TileMapDrawWindow(AT(g_tilemap0, 0, 16), 0x10, 0xF, MAP_W);
+    TileMapDrawBox(AT(g_tilemap0, 1, 17), 0xE, 0xD, MAP_W);
+    TileMapWriteRun10(AT(g_tilemap0, 2, 3));
+    TileMapWriteBar(AT(g_tilemap0, 8, 3), 10);
+    for (i = 0; i < 3; i++) {
+        TileMapWriteBar(g_tilemap0 + 3 + (i + 4) * MAP_W, 10);
+        *AT(g_tilemap2, i + 3, 0) = i + 0x418;
+    }
+    {
+        short *dst;
+        int    cell;
+
+        i = 15;
+        dst = AT(g_tilemap1, 15, 0);
+        cell = 0x427;
+        for (; i >= 0; i--) {
+            *dst = cell;
+            dst -= MAP_W;
+            cell--;
+        }
+    }
+    for (i = 0; i < 10; i++) {
+        TileMapWriteBar(g_tilemap0 + 19 + (i + 3) * MAP_W, 10);
+    }
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 2, 3), 0x457, 6);
+    TileMapWriteRow(D_800B17E0, AT(g_tilemap2, 7, 3), 0x285, 6);
+    TileMapWriteRow(D_800BA6D0, AT(g_tilemap2, 11, 3), 0, 6);
+    *AT(g_tilemap2, 11, 0) = 0x438;
+    *AT(g_tilemap2, 11, 1) = 0x439;
+    *AT(g_tilemap2, 12, 1) = 0x44E;
+    TileMapWriteRow(D_800B17EE, AT(g_tilemap2, 12, 3), 0, 6);
+    PersonaSlotsDrawFor(g_menu->status_who.cur);
+    SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+    SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+    SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x24, 0, 0);
+    SlotInitTagged(g_pdata_cursor_def, 1, 0x42, 0, 0);
+    SlotSetFlicker(1, 1);
+    SlotInitTagged(g_pdata_mark_up_def, PAGE_MARK_SLOT, 0x42, 0xE8, 0x24);
+    SlotInitTagged(g_pdata_mark_down_def, PAGE_MARK_SLOT + 1, 0x42, 0xE8, 0xA8);
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_use_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_use_top != 6) {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    }
+    g_cam_y = 0;
+}
 
 /* The Persona slots page: each filled slot's name, and a rule for each
    empty one. */
