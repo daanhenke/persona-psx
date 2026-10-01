@@ -18,13 +18,12 @@
 extern short D_800A8668;
 extern short D_800A9120[2];
 extern short D_800AAF5C;
-extern short D_800B0A48[2];
 
 extern void func_8006924C(void);
 extern void CasinoFlushQuads(void);
 extern void CasinoFlushUVs(void);
-extern void func_80069F60(void);
-extern void func_8006A150(void);
+extern void CasinoFlushCluts(void);
+extern void CasinoFlushSemis(void);
 extern void CasinoFlushImages(void);
 extern void func_8006ACBC(void);
 extern void func_8006B1B0(void);
@@ -45,10 +44,10 @@ void CasinoResetLists(void)
     g_casino_uvs.n[0] = 0;
     D_800B0974.n[1] = 0;
     D_800B0974.n[0] = 0;
-    D_800A86A0.n[1] = 0;
-    D_800A86A0.n[0] = 0;
-    D_800B0A48[1] = 0;
-    D_800B0A48[0] = 0;
+    g_casino_cluts.n[1] = 0;
+    g_casino_cluts.n[0] = 0;
+    g_casino_semis.n[1] = 0;
+    g_casino_semis.n[0] = 0;
     D_800A9120[1] = 0;
     D_800A9120[0] = 0;
     D_800AAF5C = 0;
@@ -90,10 +89,10 @@ void CasinoDrawFrame(void)
     func_8006924C();
     CasinoFlushQuads();
     CasinoFlushUVs();
-    func_8006A150();
+    CasinoFlushSemis();
     func_8006C330();
     func_8006C5B0();
-    func_80069F60();
+    CasinoFlushCluts();
     func_8006BFF0();
     rand();
     DrawSync(0);

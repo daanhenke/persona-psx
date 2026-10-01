@@ -43,7 +43,6 @@ extern u_int  D_800B0BB8;
 extern u_char D_800B3E98;
 
 /* Load buffers in the work area that belong to no list. */
-extern short   D_800B0A48[2];
 extern u_char *D_800B0AE8;
 extern u_char *D_800B0AEC;
 
@@ -224,12 +223,12 @@ void CasinoMapWork(void)
     D_800B0974.c[1] = (short *)0x800F04A8;
     D_800B0974.n[0] = 0;
     D_800B0974.n[1] = 0;
-    D_800A86A0.p[0] = (u_char *)0x800F0C78;
-    D_800A86A0.p[1] = (u_char *)0x800F0D78;
-    D_800A86A0.p[2] = (u_char *)0x800F0E78;
-    D_800A86A0.p[3] = (u_char *)0x800F0F78;
-    D_800A86A0.n[0] = 0;
-    D_800A86A0.n[1] = 0;
+    g_casino_cluts.clut[0] = (u_short *)0x800F0C78;
+    g_casino_cluts.clut[1] = (u_short *)0x800F0D78;
+    g_casino_cluts.spr[0] = (short *)0x800F0E78;
+    g_casino_cluts.spr[1] = (short *)0x800F0F78;
+    g_casino_cluts.n[0] = 0;
+    g_casino_cluts.n[1] = 0;
     D_800B0AEC = (u_char *)0x800F1078;
     D_800B0AE8 = (u_char *)0x800F3F58;
     D_800AF5BC.p[0] = (u_char *)0x800F6E38;
@@ -244,8 +243,8 @@ void CasinoMapWork(void)
     D_800B41A4.p[1] = (u_char *)0x800F7A38;
     D_800B41A4.p[2] = (u_char *)0x800F7AB8;
     D_800B41A4.n = 0;
-    D_800B0A48[0] = 0;
-    D_800B0A48[1] = 0;
+    g_casino_semis.n[0] = 0;
+    g_casino_semis.n[1] = 0;
 }
 
 /* With the flag in the save set, whatever the running total gained since

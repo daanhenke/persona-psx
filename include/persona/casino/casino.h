@@ -139,10 +139,21 @@ typedef struct {                /* 0x800B0974 */
     short       n[2];
 } CasinoListE;
 
-typedef struct {                /* 0x800A86A0 */
-    u_char *p[4];
-    short   n[2];
-} CasinoListF;
+/* Semi-transparency for runs of sprites, eight runs a frame, applied the
+   same way. */
+typedef struct {
+    short  first[2][8];
+    short  count[2][8];
+    u_char mode[2][8];
+    short  n[2];
+} CasinoSemiQueue;
+
+/* New palettes for sprites, applied the same way. */
+typedef struct {
+    u_short *clut[2];
+    short   *spr[2];
+    short    n[2];
+} CasinoClutQueue;
 
 typedef struct {                /* 0x800AF5BC, 0x800AF688, 0x800B41A4 */
     u_char *p[3];
@@ -156,7 +167,8 @@ extern CasinoLoadQueue g_casino_load_queue;
 extern CasinoQuadQueue g_casino_quads;
 extern CasinoUVQueue   g_casino_uvs;
 extern CasinoListE     D_800B0974;
-extern CasinoListF     D_800A86A0;
+extern CasinoClutQueue g_casino_cluts;
+extern CasinoSemiQueue g_casino_semis;
 extern CasinoList3     D_800AF5BC;
 extern CasinoList3     D_800AF688;
 extern CasinoList3     D_800B41A4;
