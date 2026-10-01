@@ -49,7 +49,7 @@ extern u_char  D_800BA0C0[];
 extern u_char  D_800BA0E4[];
 extern u_char  g_money_msg[];   /* the money page's message script */
 extern u_char  g_money_label[]; /* its four-cell heading           */
-extern int     D_800BBB1C;
+extern int     g_facility_max;
 extern short   D_800BB950;
 extern short   D_800BB820;
 extern short   g_use_top;
@@ -291,8 +291,8 @@ u_char FacilityScreen(u_char id)
         n = FormatDecimal(100, g_hud_digits, 3);
         TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 0, 16), 0xC0,
                            (u_short)n);
-        D_800BBB1C = CoinsAffordable();
-        i = (short)FormatDecimal(D_800BBB1C, g_hud_digits, 8);
+        g_facility_max = CoinsAffordable();
+        i = (short)FormatDecimal(g_facility_max, g_hud_digits, 8);
         TileMapFillRect(AT(g_tilemap1, 3, 19) - i, 0xC0, i, 1, MAP_W);
         MenuListInit(&g_menu->arcana_row, i, 0, i, 0x18);
         n = FormatDecimal(g_money2, g_hud_digits, 8);
@@ -305,8 +305,8 @@ u_char FacilityScreen(u_char id)
         SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
         SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
         SlotSetAnim(0x2D, 0, 0, 0, 0, 0x48, 0, 0);
-        MenuListInit(&g_menu->unk300, 0, -1, D_800BBB1C, 0x50);
-        MenuListInit(&g_menu->unk100, 0, 0, D_800BBB1C, 0x50);
+        MenuListInit(&g_menu->unk300, 0, -1, g_facility_max, 0x50);
+        MenuListInit(&g_menu->unk100, 0, 0, g_facility_max, 0x50);
         SlotInitTagged(D_800B110C, 1, 0x42, 0xE0, 0x54);
         SlotInitTagged(D_800B1E98, 0x2E, 0x200, 0x46, 0xA);
         SlotSetFlicker(1, 1);

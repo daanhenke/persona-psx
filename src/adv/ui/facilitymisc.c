@@ -54,6 +54,31 @@ extern void DrawItemName(int id, short *dst, u_short base, int b);
 extern const u_char g_persona_list_rule[];
 extern short g_item_top;
 extern MenuList g_shop_count;   /* the count picker */
+extern short    g_fm_mark_pos[][2];
+extern u_char   g_fm_mark_def[];
+extern short    g_header_scroll_y;
+extern short    g_map_scroll_y;
+extern short    g_use_top;
+extern short    D_800BB9A8;
+extern short    D_800BC224;
+extern u_char   D_800B1D08[];
+extern u_char   D_800B2330[];
+extern u_char   g_menu_allow_hold;
+extern void     DrawStatusHud(void);
+extern u_char   MenuStepMember(int *sel, u_char last);
+extern void     EquipScreen(short standalone);
+void CharPersonasDraw(short slot, short *dst);
+extern int      g_facility_max;   /* the most the facility can hand over */
+extern u_char   D_800BA648[];
+extern u_char   D_800B1124[];
+extern void     TextItemStatRow(short item, short x, short y);
+extern void     MenuWheelTurn3(short kind, short list);
+extern int      ItemsListShopSell(void);
+extern void     ShopBuyOpen(void);
+extern void     ShopSellOpen(void);
+#define g_shop_items ((u_short *)0x800EB590)
+extern u_char   InputCheckAcceptA(int n);
+extern u_char   InputCheckAcceptB(int n);
 
 #define TRADE_ITEMS  32 /* then the seven the moon decides */
 #define TRADE_PICKS  3
@@ -65,7 +90,7 @@ extern short  g_trade_recipes[];       /* [TRADE_ITEMS][2] */
 extern short  g_trade_moon_recipes[];  /* [7][TRADE_PICKS][2] */
 extern u_char ShopHave(short item);
 extern void func_800A2A48(void);
-extern void func_800A2CD0(void);
+extern void FacilityMemberPick(void);
 extern void func_800A2FF8(void);
 extern void func_800A3388(void);
 extern void func_800A3984(void);
@@ -73,14 +98,14 @@ extern void func_800A3D0C(void);
 extern void func_800A6788(void);
 extern void func_800A7118(void);
 extern void func_800A76F4(void);
-extern void func_800A79CC(void);
+extern void FacilityTradeMoonPick(void);
 extern void func_800A7D7C(void);
-extern void func_800A8200(void);
+extern void ShopTopStep(void);
 extern void func_800A8448(void);
 extern void func_800A8928(void);
 extern void func_800A8B88(void);
 extern void func_800A91C8(void);
-extern void func_800A95B8(void);
+extern void ShopMemberPick(void);
 extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern int  MsgStep(void);
@@ -167,7 +192,7 @@ void FacilityStep6(void)
         g_persona_data_step++;
         break;
     case 1:
-        func_800A2CD0();
+        FacilityMemberPick();
         break;
     case 2:
         func_800A2FF8();
@@ -186,7 +211,42 @@ void FacilityStep6(void)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2A48);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2CD0);
+/* Picks a party member and shows the Personas it carries; A moves on to
+   them, B packs the Persona slots and leaves. */
+void FacilityMemberPick(void)
+{
+    u_char *slots;
+    u_char  i;
+    u_char  j;
+
+    MenuStepMember(&g_menu->status_who.cur, g_party_last);
+    SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->status_who.cur][0],
+               (g_fm_mark_pos + 1)[g_menu->status_who.cur][1]);
+    CharPersonasDraw(g_menu->status_who.cur, g_tilemap2);
+    DrawStatusHud();
+    if (InputCheckAcceptA(1)) {
+        MenuListInit(&g_menu->unk2D0, 0, 0, 3, 0x16);
+        func_800A47F8();
+        CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+        FacilityCursorPlace();
+        g_map_scroll_y = g_use_top * 12;
+        g_persona_data_step++;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        slots = g_persona_slots;
+        for (i = 0; i < 16; i++) {
+            if (slots[i] == SLOT_EMPTY) {
+                for (j = i + 1; j < 16; j++) {
+                    if (slots[j] != SLOT_EMPTY) {
+                        slots[i] = slots[j];
+                        slots[j] = SLOT_EMPTY;
+                        break;
+                    }
+                }
+            }
+        }
+        g_persona_data_step = 0xFF;
+    }
+}
 
 /* A party member's name and the three Personas it carries, the one in use
    picked out; empty entries, or all three while the list is blocked, as
@@ -406,7 +466,7 @@ void FacilityStep3(void)
         func_800A76F4();
         break;
     case 4:
-        func_800A79CC();
+        FacilityTradeMoonPick();
         break;
     case 5:
         func_800A7D7C();
@@ -484,13 +544,88 @@ short FacilityTradeCount(short n)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7118);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7578);
+/* The two parts item n costs, each with how many the bag holds. */
+void FacilityTradePartsDraw(short n)
+{
+    short a;
+    short b;
+
+    TileMapFillRect(AT(g_tilemap2, 4, 1), 0, 10, 1, MAP_W);
+    a = g_trade_recipes[n * 2];
+    DrawItemName(a, AT(g_tilemap2, 4, 1), 0, 0);
+    TileMapFillRect(AT(g_tilemap2, 5, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 5, 13), GLYPH_DIGIT0,
+                       FormatDecimal(ShopHave(a), g_hud_digits, 2));
+    *AT(g_tilemap2, 5, 11) = 0xCE;
+    TileMapFillRect(AT(g_tilemap2, 6, 1), 0, 10, 1, MAP_W);
+    b = g_trade_recipes[n * 2 + 1];
+    DrawItemName(b, AT(g_tilemap2, 6, 1), 0, 0);
+    TileMapFillRect(AT(g_tilemap2, 7, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 7, 13), GLYPH_DIGIT0,
+                       FormatDecimal(ShopHave(b), g_hud_digits, 2));
+    *AT(g_tilemap2, 7, 11) = 0xCE;
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A76F4);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A79CC);
+/* The moon items' list: moving shows each one's stats and parts; A asks
+   for a count when any can be had. */
+void FacilityTradeMoonPick(void)
+{
+    short prev;
+    short n;
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7BD0);
+    prev = g_menu->unk1A0.cur;
+    MenuStepCursor(&g_menu->unk1A0);
+    SlotSetPos(4, 0x42, 0x60, g_menu->unk1A0.cur * 12 + 0x30);
+    if (prev != g_menu->unk1A0.cur) {
+        n = g_menu->unk1A0.cur;
+        prev = g_menu->unk1A0.cur;
+        TextItemStatRow(g_trade_items[n + TRADE_ITEMS], 0x42, 0x10);
+        FacilityTradeMoonPartsDraw(n);
+    }
+    MsgStep();
+    if (InputCheckAcceptA(1)) {
+        g_facility_max = FacilityTradeCount(prev + TRADE_ITEMS);
+        if (g_facility_max != 0) {
+            *AT(g_tilemap2, 1, 11) = 0xCE;
+            TileMapWriteRow(D_800BA648, AT(g_tilemap2, 1, 2), 0, 8);
+            FormatDecimal(g_facility_max, g_hud_digits, 2);
+            MenuListInit(&g_menu->arcana_row, 0, -1, 10, 0x90);
+            MenuListInit(&g_menu->unk100, 0, 0, g_facility_max, 0x50);
+            SlotInitTagged(D_800B1124, 1, 0x42, 0xC0, 0x90);
+            SlotSetFlicker(1, 1);
+            SlotSetFlicker(4, 0);
+            g_persona_data_step++;
+        }
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        g_persona_data_step = 0;
+    }
+}
+
+/* The same for one of the seven moon items, under the moon's pick. */
+void FacilityTradeMoonPartsDraw(short n)
+{
+    int   pick;
+    short a;
+    short b;
+
+    pick = D_800BA0E4[0x10 + (g_moon & 0x1F)];
+    TileMapFillRect(AT(g_tilemap2, 3, 1), 0, 10, 1, MAP_W);
+    a = g_trade_moon_recipes[(n * TRADE_PICKS + pick) * 2];
+    DrawItemName(a, AT(g_tilemap2, 3, 1), 0, 0);
+    TileMapFillRect(AT(g_tilemap2, 4, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 4, 13), GLYPH_DIGIT0,
+                       FormatDecimal(ShopHave(a), g_hud_digits, 2));
+    *AT(g_tilemap2, 4, 11) = 0xCE;
+    TileMapFillRect(AT(g_tilemap2, 5, 1), 0, 10, 1, MAP_W);
+    b = g_trade_moon_recipes[(n * TRADE_PICKS + pick) * 2 + 1];
+    DrawItemName(b, AT(g_tilemap2, 5, 1), 0, 0);
+    TileMapFillRect(AT(g_tilemap2, 6, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 6, 13), GLYPH_DIGIT0,
+                       FormatDecimal(ShopHave(b), g_hud_digits, 2));
+    *AT(g_tilemap2, 6, 11) = 0xCE;
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7D7C);
 
@@ -502,7 +637,7 @@ void ShopStep(void)
         g_persona_data_step++;
         break;
     case 1:
-        func_800A8200();
+        ShopTopStep();
         break;
     case 2:
         func_800A8448();
@@ -517,7 +652,7 @@ void ShopStep(void)
         func_800A91C8();
         break;
     case 6:
-        func_800A95B8();
+        ShopMemberPick();
         break;
     }
 }
@@ -529,7 +664,45 @@ void ShopScreenOpen(void)
     func_8007A62C(3, 8);
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8200);
+/* The counter's top: buy, sell, or equip a member. */
+void ShopTopStep(void)
+{
+    DrawStatusHud();
+    if (MenuStepCursor(&g_menu->skill_persona)) {
+        MenuWheelTurn3(3, 8);
+    }
+    if (InputCheckAcceptA(2)) {
+        SlotSetFlicker(0, 0);
+        switch (g_menu->skill_persona.cur) {
+        case 0:
+            ShopBuyOpen();
+            TextItemStatRow(g_shop_items[g_item_top + g_menu->unk100.cur], 0x38, 0xE);
+            g_persona_data_step = 2;
+            break;
+        case 1:
+            if (ItemsListShopSell()) {
+                MenuListInit(&g_menu->page, 0, 0, 7, 0x14);
+                MenuListInit(&g_menu->stock, 0, 0, 1, 0x1A);
+                g_use_top = 0;
+                ShopSellOpen();
+                g_persona_data_step = 4;
+            }
+            break;
+        case 2:
+            SlotClearAll();
+            SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+            SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+            SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0, 0, 0);
+            SlotInitTagged(g_fm_mark_def, 1, 0x42, (g_fm_mark_pos + 1)[g_menu->unk050.cur][0],
+                           (g_fm_mark_pos + 1)[g_menu->unk050.cur][1]);
+            SlotSetFlicker(1, 1);
+            g_persona_data_step = 6;
+            break;
+        }
+    } else if (InputCheckAcceptB(2) || g_menu_allow_hold) {
+        g_persona_data_step = 0xFF;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8448);
 
@@ -539,7 +712,42 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8B88);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A91C8);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A95B8);
+/* Picks the member to equip from the counter; A opens the equipment
+   screen on them, B goes back to the counter's top. */
+void ShopMemberPick(void)
+{
+    short *x;
+    short *y;
+
+    DrawStatusHud();
+    if (MenuStepMember(&g_menu->unk050.cur, g_party_last)) {
+        g_header_scroll_y = 0;
+        D_800BB9A8 = 0;
+        D_800BC224 = 0;
+        g_menu->unk230.cur = 0;
+        g_menu->unk240.cur = 0;
+    }
+    x = &g_fm_mark_pos[1][0];
+    SlotSetPos(1, 0x42, (g_fm_mark_pos + 1)[g_menu->unk050.cur][0],
+               (y = x + 1)[g_menu->unk050.cur * 2]);
+    if (InputCheckAcceptA(1)) {
+        EquipScreen(0);
+        MenuTopRedraw();
+        func_80077F8C(3, 1);
+        func_8007A62C(3, 8);
+        SlotClearAll();
+        SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+        SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+        SlotSetAnim(0x2D, 0, 0, 0, 0x90, 0, 0, 0);
+        SlotInitTagged(g_fm_mark_def, 1, 0x42, x[g_menu->unk050.cur * 2],
+                       y[g_menu->unk050.cur * 2]);
+        SlotSetFlicker(1, 1);
+        DrawStatusHud();
+        g_persona_data_step = 6;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        g_persona_data_step = 0;
+    }
+}
 
 /* The count on the list row under the cursor, with its brackets. */
 void ShopCountRowDraw(void)
