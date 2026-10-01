@@ -135,3 +135,9 @@ rom:0x5EA0 reloc:MIPS_HI16 symbol:g_casino_semis addend:0x50
 rom:0x5EA8 reloc:MIPS_LO16 symbol:g_casino_semis addend:0x50
 rom:0x5ECC reloc:MIPS_HI16 symbol:g_casino_semis addend:0x50
 rom:0x5ED4 reloc:MIPS_LO16 symbol:g_casino_semis addend:0x50
+rom:0x7FDC reloc:MIPS_HI16 symbol:g_casino_palanims addend:0x20
+rom:0x7FE0 reloc:MIPS_LO16 symbol:g_casino_palanims addend:0x20
+rom:0x80B4 reloc:MIPS_HI16 symbol:g_casino_palanims addend:0x22
+rom:0x80B8 reloc:MIPS_LO16 symbol:g_casino_palanims addend:0x22
+rom:0x80C4 reloc:MIPS_HI16 symbol:g_casino_palanims addend:0x20
+rom:0x80C8 reloc:MIPS_LO16 symbol:g_casino_palanims addend:0x20

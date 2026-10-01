@@ -265,7 +265,48 @@ typedef struct {
     short       frames;
 } CasinoAnimArg;
 
+/* A palette animation: every wait + 1 ticks the next 16-colour palette
+   in seq goes up to r, frames palettes in all. */
+typedef struct {
+    u_long (*pal)[8];
+    short   *seq;
+    RECT     r;
+    u_char   on;
+    u_char   pad;
+    short    wait;
+    short    frames;
+} CasinoPalAnim;
+
+/* A palette rotation: the count colours of pal turned by one place every
+   wait + 1 ticks, a full turn in all. */
+typedef struct {
+    u_short *pal;
+    u_char   count;
+    u_char   pad;
+    RECT     r;
+    u_char   on;
+    u_char   pad2;
+    short    wait;
+} CasinoPalCycle;
+
+/* What is playing: the object, how many ticks it runs and how far it is. */
+typedef struct {
+    CasinoPalAnim *a[8];
+    short          len[8];
+    short          t[8];
+    short          n;
+} CasinoPalAnims;
+
+typedef struct {
+    CasinoPalCycle *a[8];
+    short           len[8];
+    short           t[8];
+    short           n;
+} CasinoPalCycles;
+
 /* The overlay's own. */
+extern CasinoPalAnims   g_casino_palanims;
+extern CasinoPalCycles  g_casino_palcycles;
 extern CasinoAnimQueue  g_casino_anims;
 extern CasinoCell       *g_casino_cells;
 extern CasinoTex        *g_casino_texs;
