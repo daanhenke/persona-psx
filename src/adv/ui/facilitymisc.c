@@ -107,6 +107,10 @@ extern void     MoneyAdd(u_int amount);
 extern void     ItemsRemovePending(u_short id, u_short count);
 extern void     DrawItemRow(short n, short *dst);
 void ShopSellTotalDraw(short row);
+extern void     ShopSellCountInit(short n);
+extern void     ItemsRemove(u_short id, int count);
+extern void     ItemsAdd(u_short id, int count);
+extern short    g_sell_slots;   /* the sell list's entries, at least 16 */
 extern u_char   D_800BA640[];
 extern u_char   D_800B1EB8[];
 extern void     ShopCountInit2(u_char row);
@@ -144,13 +148,13 @@ extern void func_800A3984(void);
 extern void func_800A3D0C(void);
 extern void func_800A6788(void);
 extern void func_800A7118(void);
-extern void func_800A76F4(void);
+extern void FacilityTradeCountStep(void);
 extern void FacilityTradeMoonPick(void);
-extern void func_800A7D7C(void);
+extern void FacilityTradeMoonCountStep(void);
 extern void ShopTopStep(void);
 extern void ShopListStep(void);
 extern void ShopBuyCountStep(void);
-extern void func_800A8B88(void);
+extern void ShopSellStep(void);
 extern void ShopSellCountStep(void);
 extern void ShopMemberPick(void);
 extern void func_80077F8C(int a, int b);
@@ -1052,13 +1056,13 @@ void FacilityStep3(void)
         func_800A7118();
         break;
     case 3:
-        func_800A76F4();
+        FacilityTradeCountStep();
         break;
     case 4:
         FacilityTradeMoonPick();
         break;
     case 5:
-        func_800A7D7C();
+        FacilityTradeMoonCountStep();
         break;
     }
 }
@@ -1090,8 +1094,9 @@ void FacilityItemsDraw(void)
     }
 }
 
-/* The seven names after the thirty-two, one to a row. */
-void FacilityTradeExtrasDraw(void)
+/* The seven names after the thirty-two, one to a row. Later steps have it
+   expanded in place. */
+inline void FacilityTradeExtrasDraw(void)
 {
     int i;
     int dim;
@@ -1155,7 +1160,49 @@ void FacilityTradePartsDraw(short n)
     *AT(g_tilemap2, 7, 11) = 0xCE;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A76F4);
+/* How many of the item under the cursor to trade for; A takes the parts
+   and hands the items over. */
+void FacilityTradeCountStep(void)
+{
+    short n;
+
+    n = g_menu->unk190.cur + (g_item_top + g_menu->unk180.cur) * 2;
+    MsgStep();
+    if (MenuStepCursor(&g_menu->arcana_row)) {
+        g_menu->unk100.cur = g_menu->arcana_row.cur * 10 + g_menu->unk100.cur % 10;
+    } else {
+        MenuStepCursor(&g_menu->unk100);
+    }
+    if (g_menu->unk100.cur > g_menu->unk100.hi) {
+        g_menu->unk100.cur = g_menu->unk100.hi;
+    } else if (g_menu->arcana_row.cur < 0) {
+        g_menu->unk100.cur = 0;
+    }
+    if (g_menu->unk100.cur == 0) {
+        g_menu->unk100.cur = 1;
+    }
+    g_menu->arcana_row.cur = g_menu->unk100.cur / 10;
+    TileMapFillRect(AT(g_tilemap2, 2, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 2, 13), GLYPH_DIGIT0,
+                       FormatDecimal(g_menu->unk100.cur, g_hud_digits, 2));
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->unk100.cur != 0) {
+            ItemsRemove(g_trade_recipes[n * 2], g_menu->unk100.cur);
+            ItemsRemove(g_trade_recipes[n * 2 + 1], g_menu->unk100.cur);
+            ItemsAdd(g_trade_items[n], g_menu->unk100.cur);
+            FacilityItemsDraw();
+        } else {
+            return;
+        }
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+    TileMapFillRect(AT(g_tilemap2, 2, 2), 0, 0xD, 1, MAP_W);
+    FacilityTradePartsDraw(n);
+    SlotSetFlicker(4, 1);
+    SlotClear(1);
+    g_persona_data_step--;
+}
 
 /* The moon items' list: moving shows each one's stats and parts; A asks
    for a count when any can be had. */
@@ -1216,7 +1263,50 @@ void FacilityTradeMoonPartsDraw(short n)
     *AT(g_tilemap2, 6, 11) = 0xCE;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7D7C);
+/* The same for the moon items, under the moon's pick. */
+void FacilityTradeMoonCountStep(void)
+{
+    short n;
+    int   pick;
+
+    n = g_menu->unk1A0.cur;
+    MsgStep();
+    if (MenuStepCursor(&g_menu->arcana_row)) {
+        g_menu->unk100.cur = g_menu->arcana_row.cur * 10 + g_menu->unk100.cur % 10;
+    } else {
+        MenuStepCursor(&g_menu->unk100);
+    }
+    if (g_menu->unk100.cur > g_menu->unk100.hi) {
+        g_menu->unk100.cur = g_menu->unk100.hi;
+    } else if (g_menu->arcana_row.cur < 0) {
+        g_menu->unk100.cur = 0;
+    }
+    if (g_menu->unk100.cur == 0) {
+        g_menu->unk100.cur = 1;
+    }
+    g_menu->arcana_row.cur = g_menu->unk100.cur / 10;
+    pick = D_800BA0E4[0x10 + (g_moon & 0x1F)];
+    TileMapFillRect(AT(g_tilemap2, 1, 12), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 1, 13), GLYPH_DIGIT0,
+                       FormatDecimal(g_menu->unk100.cur, g_hud_digits, 2));
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->unk100.cur != 0) {
+            ItemsRemove(g_trade_moon_recipes[(n * TRADE_PICKS + pick) * 2], g_menu->unk100.cur);
+            ItemsRemove(g_trade_moon_recipes[(n * TRADE_PICKS + pick) * 2 + 1], g_menu->unk100.cur);
+            ItemsAdd(g_trade_items[n + TRADE_ITEMS], g_menu->unk100.cur);
+            FacilityTradeExtrasDraw();
+        } else {
+            return;
+        }
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+    TileMapFillRect(AT(g_tilemap2, 1, 2), 0, 0xD, 1, MAP_W);
+    FacilityTradeMoonPartsDraw(n);
+    SlotSetFlicker(4, 1);
+    SlotClear(1);
+    g_persona_data_step--;
+}
 
 void ShopStep(void)
 {
@@ -1235,7 +1325,7 @@ void ShopStep(void)
         ShopBuyCountStep();
         break;
     case 4:
-        func_800A8B88();
+        ShopSellStep();
         break;
     case 5:
         ShopSellCountStep();
@@ -1406,7 +1496,85 @@ void ShopBuyCountStep(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8B88);
+/* The bag's page at the counter: scrolls a row or a page at a time with
+   both columns, shows the stats of the entry under the cursor, and A asks
+   how many of it to sell. B puts the bag back as it was. */
+void ShopSellStep(void)
+{
+    u_short *list;
+    short    prev;
+    int      i;
+
+    list = g_item_list;
+    prev = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->page.delay < 3) {
+                g_menu->page.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_use_top, 0, g_sell_slots / 2 - 8, 8)) {
+            for (i = 0; i < 8; i++) {
+                DrawItemRow((g_use_top + i) * 2, AT(g_tilemap1, (g_use_top + i) & 0x1F, 0));
+                DrawItemRow((g_use_top + i) * 2 + 1, AT(g_tilemap1, (g_use_top + i) & 0x1F, 14));
+            }
+            g_map_scroll_y = g_use_top * 12;
+        } else if (MenuScrollCursor(&g_menu->page, &g_use_top, 0, g_sell_slots / 2 - 8,
+                                    (u_short *)&g_use_scroll_step)) {
+            if (g_use_scroll_step < 0) {
+                DrawItemRow(g_use_top * 2, AT(g_tilemap1, g_use_top & 0x1F, 0));
+                DrawItemRow(g_use_top * 2 + 1, AT(g_tilemap1, g_use_top & 0x1F, 14));
+            } else if (g_use_scroll_step > 0) {
+                DrawItemRow((g_use_top + 7) * 2, AT(g_tilemap1, (g_use_top + 7) & 0x1F, 0));
+                DrawItemRow((g_use_top + 7) * 2 + 1, AT(g_tilemap1, (g_use_top + 7) & 0x1F, 14));
+            }
+        } else {
+            MenuStepCursor(&g_menu->stock);
+        }
+    } else {
+        MenuResetRepeat(&g_menu->page);
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_use_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_use_top != g_sell_slots / 2 - 8) {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(4, 0x42, g_menu->stock.cur * 112 + 0x48, g_menu->page.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if (prev != g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2) {
+        prev = g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2;
+        if ((list[prev] & ITEM_ID) && (list[prev] >> 9)) {
+            TextItemStatRow(g_item_list[prev] & ITEM_ID, 0x38, 0xE);
+        } else {
+            TextItemStatRow(0, 0x38, 0x12);
+        }
+    }
+    MsgStep();
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (InputCheckAcceptA(1)) {
+            if ((list[prev] & ITEM_ID) && (list[prev] >> 9)) {
+                SlotSetFlicker(4, 0);
+                ShopSellCountInit(g_use_top * 2 + g_menu->stock.cur + g_menu->page.cur * 2);
+                SlotInitTagged(D_800B1124, 8, 0x42, 0x90, 0xA8);
+                SlotSetFlicker(8, 1);
+                g_persona_data_step = 5;
+            }
+        } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            ItemsCommitPending();
+            ItemsCompact();
+            CopyShorts(g_items, g_item_list, 0x17F);
+            g_persona_data_step = 0;
+        }
+    }
+}
 
 /* How many to sell. A sells them and redraws the bag's page, clearing the
    stats if the entry is gone; either way the count window closes. */

@@ -24,7 +24,7 @@
 extern short    g_item_top;
 extern short    g_use_top;
 extern short    g_use_scroll_step;
-extern short    D_800BBB24;
+extern short    g_sell_slots;
 extern u_char   g_facility_count;
 extern MenuList g_shop_tens;
 extern u_char   D_800BA640[];
@@ -178,9 +178,9 @@ void ShopSellOpen(void)
     }
     MenuListInit(&g_shop_tens, 0, -1, 0xA, 0x90);
     ShopCountInit(n);
-    D_800BBB24 = ItemsListShopSell() + 1;
-    if (D_800BBB24 < 0x10) {
-        D_800BBB24 = 0x10;
+    g_sell_slots = ItemsListShopSell() + 1;
+    if (g_sell_slots < 0x10) {
+        g_sell_slots = 0x10;
     }
     for (i = 0; i < SHOP_ROWS; i++) {
         DrawItemRow((g_use_top + i) * 2, AT(g_tilemap1, (g_use_top + i) & 0x1F, 0));
