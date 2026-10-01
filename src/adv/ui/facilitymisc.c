@@ -16,6 +16,7 @@
 #include <persona/common/menuctx.h>
 #include <persona/common/tilemap.h>
 #include <persona/common/slot.h>
+#include <persona/common/status.h>
 
 #define g_persona_slots ((u_char *)0x801F2574)
 #define g_item_list     ((u_short *)0x800EAE4C)
@@ -46,13 +47,23 @@ extern void MenuTopRedraw(void);
 void FacilityOpen3(void);
 extern void MenuWheelOpen2(int a, int b);
 extern void D_8007A738(int a, int b);
-extern short func_800A6FFC(short i);
+extern short FacilityTradeCount(short i);
 extern void DrawPersonaKeyName(u_char persona, short *dst, int base);
+short CharCanUsePersona(short chr, short persona);
 extern void DrawItemName(int id, short *dst, u_short base, int b);
 extern const u_char g_persona_list_rule[];
 extern short g_item_top;
-extern int   D_800BB858;
-extern short D_800B9C7C[];
+extern MenuList g_shop_count;   /* the count picker */
+
+#define TRADE_ITEMS  32 /* then the seven the moon decides */
+#define TRADE_PICKS  3
+
+/* The items the facility trades for, and the two parts each costs. The
+   seven after the first thirty-two have three pairs each, one per pick. */
+extern short  g_trade_items[];         /* [TRADE_ITEMS + 7], then 0 */
+extern short  g_trade_recipes[];       /* [TRADE_ITEMS][2] */
+extern short  g_trade_moon_recipes[];  /* [7][TRADE_PICKS][2] */
+extern u_char ShopHave(short item);
 extern void func_800A2A48(void);
 extern void func_800A2CD0(void);
 extern void func_800A2FF8(void);
@@ -177,7 +188,29 @@ INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2A48);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2CD0);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2E9C);
+/* A party member's name and the three Personas it carries, the one in use
+   picked out; empty entries, or all three while the list is blocked, as
+   rules. */
+void CharPersonasDraw(short slot, short *dst)
+{
+    Persona *personas;
+    Char    *c;
+    int      i;
+
+    c = &g_chars[g_party[slot]];
+    personas = g_personas;
+    TileMapFillRect(dst + 2, 0, 8, 1, MAP_W);
+    TileMapFillRect(dst + 2 * MAP_W + 1, 0, 10, 3, MAP_W);
+    TileMapWriteRow(c->name, dst + 2, 0, 8);
+    for (i = 0; i < 3; i++) {
+        if (c->list[i] != SLOT_EMPTY && !c->blocked) {
+            DrawPersonaKeyName(personas[c->list[i]].key, dst + (i + 2) * MAP_W + 1,
+                               c->entry == i ? 0x285 : 0);
+        } else {
+            TileMapWriteRow(g_persona_list_rule, dst + (i + 2) * MAP_W + 2, 0xD7, 8);
+        }
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2FF8);
 
@@ -253,14 +286,35 @@ void PersonaSlotsDraw(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A4C98);
+/* The Persona slots page for one party member: each name dimmed unless the
+   member can take it. */
+void PersonaSlotsDrawFor(short slot)
+{
+    Persona *personas;
+    short    chr;
+    int      i;
+    int      n;
+
+    personas = g_personas;
+    chr = g_party[slot];
+    TileMapFillRect(AT(g_tilemap1, 0, 1), 0, 10, 16, MAP_W);
+    for (i = 0; i < 16; i++) {
+        n = g_persona_slots[i];
+        if (n != SLOT_EMPTY) {
+            DrawPersonaKeyName(personas[n].key, AT(g_tilemap1, i, 1),
+                               CharCanUsePersona(chr, personas[n].key) ? 0 : 0xD7);
+        } else {
+            TileMapWriteRow(g_persona_list_rule, AT(g_tilemap1, i, 2), 0xD7, 8);
+        }
+    }
+}
 
 #ifdef NON_MATCHING
 /* Whether a character may take a Persona: it must answer them at all, and
    they must be at its level. */
 /* 96.14%: the image keeps v0 free and puts the Persona offset in a1;
    this build uses v0 and a0 for the same values. */
-u_char CharCanUsePersona(short chr, short persona)
+short CharCanUsePersona(short chr, short persona)
 {
     Char *c;
 
@@ -379,17 +433,54 @@ void FacilityItemsDraw(void)
 
     TileMapFillRect(g_tilemap1, 0, 0x16, 0x20, MAP_W);
     i = 0;
-    ids = D_800B9C7C;
+    ids = g_trade_items;
     for (; i < 32; i++) {
-        dim = func_800A6FFC(i) == 0;
+        dim = FacilityTradeCount(i) == 0;
         DrawItemName(*ids, &g_tilemap1[i / 2 * MAP_W] + (i & 1) * 12, dim * 0xD7, 0);
         ids++;
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6F2C);
+/* The seven names after the thirty-two, one to a row. */
+void FacilityTradeExtrasDraw(void)
+{
+    int i;
+    int dim;
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A6FFC);
+    TileMapFillRect(g_tilemap1, 0, 10, 5, MAP_W);
+    for (i = 0; i < 7; i++) {
+        dim = FacilityTradeCount(i + TRADE_ITEMS) == 0;
+        DrawItemName(g_trade_items[i + TRADE_ITEMS], AT(g_tilemap1, i, 0), dim * 0xD7, 0);
+    }
+}
+
+/* How many of item n can be had: one of each of its two parts apiece, and
+   no more than the bag's 99 still takes. The seven items after the first
+   thirty-two (ids 0x13-0x19) have three recipes each, picked by the moon. */
+short FacilityTradeCount(short n)
+{
+    int    room;
+    int    have;
+    u_char have2;
+    int    k;
+
+    room = 99 - ShopHave(g_trade_items[n]);
+    if (g_trade_items[n] < 0x13 || g_trade_items[n] > 0x19) {
+        have = ShopHave(g_trade_recipes[n * 2]);
+        have2 = ShopHave(g_trade_recipes[n * 2 + 1]);
+    } else {
+        k = n * TRADE_PICKS + D_800BA0E4[0x10 + (g_moon & 0x1F)];
+        have = ShopHave(g_trade_moon_recipes[(k - TRADE_ITEMS * TRADE_PICKS) * 2]);
+        have2 = ShopHave(g_trade_moon_recipes[(k - TRADE_ITEMS * TRADE_PICKS) * 2 + 1]);
+    }
+    if (have2 < have) {
+        have = have2;
+    }
+    if (room < have) {
+        return room;
+    }
+    return have;
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A7118);
 
@@ -458,9 +549,19 @@ void ShopCountRowDraw(void)
     row = g_item_top + g_menu->unk100.cur;
     TileMapFillRect(AT(g_tilemap1, 0, 23), 0, 3, 16, MAP_W);
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap1, row, 25), GLYPH_DIGIT0,
-                       FormatDecimal(D_800BB858, g_hud_digits, 2));
+                       FormatDecimal(g_shop_count.cur, g_hud_digits, 2));
     *AT(g_tilemap1, row, 23) = 0xCE;
     *AT(g_tilemap2, 13, 8) = 0xCE;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A9868);
+/* The sell count beside the row, and what that many fetch. */
+void ShopSellTotalDraw(short row)
+{
+    TileMapFillRect(AT(g_tilemap2, 11, 9), 0, 2, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 10), GLYPH_DIGIT0,
+                       FormatDecimal(g_shop_count.cur, g_hud_digits, 2));
+    TileMapFillRect(AT(g_tilemap2, 11, 16), 0, 9, 1, MAP_W);
+    TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 11, 24), GLYPH_DIGIT0,
+                       FormatDecimal(g_item_defs[g_item_list[row] & ITEM_ID].price * g_shop_count.cur,
+                                     g_hud_digits, 9));
+}

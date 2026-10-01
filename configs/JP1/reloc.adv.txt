@@ -172,3 +172,8 @@ rom:0x30600 reloc:MIPS_NONE symbol:D_801F29A9
 // FuseInheritSpell reads the arcana group table one below its start (arcana is 1-based).
 rom:0x46F00 reloc:MIPS_HI16 symbol:g_arcana_fuse_group addend:-0x1
 rom:0x46F08 reloc:MIPS_LO16 symbol:g_arcana_fuse_group addend:-0x1
+// FacilityTradeCount reads the moon recipes as [(n * 3 + pick - 96) * 2]: item 32 is their first.
+rom:0x42D0C reloc:MIPS_HI16 symbol:g_trade_moon_recipes addend:-0x180
+rom:0x42D14 reloc:MIPS_LO16 symbol:g_trade_moon_recipes addend:-0x180
+rom:0x42D20 reloc:MIPS_HI16 symbol:g_trade_moon_recipes addend:-0x17E
+rom:0x42D28 reloc:MIPS_LO16 symbol:g_trade_moon_recipes addend:-0x17E

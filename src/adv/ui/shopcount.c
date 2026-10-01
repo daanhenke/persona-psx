@@ -47,7 +47,7 @@
 
 extern Slot    *g_slot_cur;
 extern u_char   g_facility_count;
-extern MenuList D_800BB858;
+extern MenuList g_shop_count;
 extern u_char   D_800BA0C0[];    /* (count, first) by shop */
 extern u_char   D_800BA0E4[];    /* and for the counters of kind 5 */
 extern u_short  D_800B9DA0[];
@@ -285,12 +285,12 @@ inline u_char ShopAffordable2(u_int price)
 
 void ShopCountInit(u_char row)
 {
-    MenuListInit(&D_800BB858, 1, 0, ShopCanBuy(row), 0x50);
+    MenuListInit(&g_shop_count, 1, 0, ShopCanBuy(row), 0x50);
 }
 
 void ShopCountInit2(u_char row)
 {
-    MenuListInit(&D_800BB858, 1, 0, ShopCanBuy2(row), 0x50);
+    MenuListInit(&g_shop_count, 1, 0, ShopCanBuy2(row), 0x50);
 }
 
 u_char ShopCanBuy(u_char row)
@@ -337,7 +337,7 @@ short ShopSellCount(short n);
 
 void ShopSellCountInit(short n)
 {
-    MenuListInit(&D_800BB858, 1, 0, ShopSellCount(n), 0x50);
+    MenuListInit(&g_shop_count, 1, 0, ShopSellCount(n), 0x50);
 }
 
 /* How many of a bag entry there are. */

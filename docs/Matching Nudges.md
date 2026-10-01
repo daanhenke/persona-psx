@@ -3933,3 +3933,35 @@ exact in DNG and ADV) needed five levers.
   two bytes apart. `u_char k[2]` is BLKmode, so its slot is 8-aligned;
   written `*(short *)k = kind` and passed as `k[0]`, it gives the image's
   store, reload and frame.
+
+## Frame bytes nothing touches can be an indexed call argument
+
+FacilityTradeCount (adv facilitymisc.c) has 16 bytes of locals that no
+instruction reads or writes. They are not an unused array. Each arm passes
+`ShopHave(tbl[n * 2])` and `ShopHave(tbl[n * 2 + 1])` out of a `short`
+table, and each arm written that way reserves 8 frame bytes. The same reads
+as fields of a two-short struct (`tbl[n].a`, `tbl[n].b`) compile to the same
+instructions with no frame. Before reaching for `int unused[N]`, write the
+table reads in the call arguments as computed indexes.
+
+## A table biased below its start needs the bias outside the multiply
+
+The image read `lh a0, D_800B9BCC(at)`, which lies 0x180 below the moon
+recipe table, in another table's data. gcc folds a constant into the symbol
+only when the address is expanded as a sum (`expand_expr` MULT_EXPR with
+EXPAND_SUM applies `(x + c) * k = x * k + c * k`). That path covers a plain
+element read, `tbl[(k - 96) * 2]`. A struct field read (`tbl[k - 96].a`)
+goes through `get_inner_reference`, whose offset is expanded without
+EXPAND_SUM, so the `- 96` stays an `addiu`. Folding the bias into `k` first
+(`k = (n - 32) * 3 + pick`) hides it from the address altogether. The
+expected side needs a reloc pin with the negative addend.
+
+## A copy from a byte-typed local keeps the return unextended
+
+`if (have2 < have) have = have2; if (room < have) return room; return have;`
+in a `short` function sign-extends `have` on return when both are `int`.
+combine's initial scan gives a register copied from another register one
+sign-bit copy, so the copy hides `have2`'s byte range. Declaring `u_char
+have2` (with `have` still `int`) turns the copy into a zero-extension that
+combine can see, and the image's bare `addu v0, s0, zero` comes back.
+`short` or `u_char` for both adds extensions at the compares instead.
