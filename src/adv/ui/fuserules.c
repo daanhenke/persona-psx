@@ -50,7 +50,7 @@ extern u_char  D_800B9CAB[][0x16];
 extern int   rand(void);
 extern short FuseInheritSpell(short persona, u_char src, void *spell, void *rank);
 extern void  DrawItemName(int id, short *dst, u_short base, int b);
-extern void  func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
+extern void  FuseCompute(u_char a, u_char b, short mode, FuseResult *out,
                            short special);
 
 /* 96.7%: the image loads both stock bytes before converting `mode` and
@@ -241,7 +241,7 @@ void FuseItemsDraw(void)
     *AT(g_tilemap2, 1, 15) = g_menu->top.cur + 0x418;
     DrawPersonaName(g_persona_stock[g_menu->top.cur], AT(g_tilemap2, 1, 16), 0);
     DrawItemName(g_item_list[n] & ITEM_ID, AT(g_tilemap2, 3, 10), 0, 0);
-    func_800A1990(g_persona_stock[g_menu->status_page.cur],
+    FuseCompute(g_persona_stock[g_menu->status_page.cur],
                   g_persona_stock[g_menu->top.cur], g_item_list[n] & ITEM_ID,
                   &g_fuse, 0);
     TileMapWriteRow(&g_kind_labels[(short)(g_persona_defs[*res].kind - 1) * 10],

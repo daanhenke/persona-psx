@@ -41,7 +41,7 @@ extern u_char  D_800B2330[];
 extern u_char  D_800B130C[];
 
 extern short PersonaStockCompact(void);
-extern void  func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
+extern void  FuseCompute(u_char a, u_char b, short mode, FuseResult *out,
                            short special);
 extern void  FuseChartDraw(void);
 
@@ -126,7 +126,7 @@ void FusionOpen(void)
     FuseChartDraw();
     TileMapWriteBar(AT(g_tilemap0, 16, 3), 0x1C);
     PersonaStockCompact();
-    func_800A1990(g_persona_stock[g_menu->status_page.cur],
+    FuseCompute(g_persona_stock[g_menu->status_page.cur],
                   g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
     FuseResultLineDraw(g_fuse.persona);
     SlotClearAll();

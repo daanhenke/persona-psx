@@ -85,7 +85,7 @@ extern short  PersonaTypeLabel(short kind);
 /* PersonaFind is called without a prototype here. */
 extern void   DrawItemRow(short n, short *dst);
 extern void   TextItemStatRow(short item, short x, short y);
-extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
+extern void   FuseCompute(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
 extern short  ItemsListSellable(void);
 extern void   FuseResultLineDraw(short persona);
@@ -206,7 +206,7 @@ void FusionPairPick(void)
     SlotSetPos(1, 0x42, g_menu->top.cur * 8 + 0xC8, 0x30);
     SlotSetPos(2, 0x42, 0x20, g_menu->status_page.cur * 12 + 0x30);
     res = &g_fuse.persona;
-    func_800A1990(g_persona_stock[g_menu->status_page.cur],
+    FuseCompute(g_persona_stock[g_menu->status_page.cur],
                   g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
     FuseResultLineDraw(*res);
     if (InputCheckAcceptA(1)) {
@@ -694,7 +694,7 @@ void FuseExecute(void)
                 n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
                 p = ITEM_AT(n) & ITEM_ID;
             }
-            func_800A1990(g_persona_stock[g_menu->status_page.cur],
+            FuseCompute(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], p, &g_fuse, 0x16);
             goto check;
         case 4:
@@ -703,7 +703,7 @@ void FuseExecute(void)
                 n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
                 p = ITEM_AT(n) & ITEM_ID;
             }
-            func_800A1990(g_persona_stock[g_menu->status_page.cur],
+            FuseCompute(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], p, &g_fuse,
                           FuseRollKind());
         check:
@@ -723,11 +723,11 @@ void FuseExecute(void)
     plain:
         if (D_800BC050) {
             n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
-            func_800A1990(g_persona_stock[g_menu->status_page.cur],
+            FuseCompute(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], ITEM_AT(n) & ITEM_ID,
                           &g_fuse, 0);
         } else {
-            func_800A1990(g_persona_stock[g_menu->status_page.cur],
+            FuseCompute(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
         }
     build:

@@ -70,7 +70,7 @@ extern u_char PageScrollValue(short *value, short lo, short hi, short step);
 extern short  MenuScrollCursor(MenuList *m, short *row, short first,
                                short last, u_short *offset);
 extern void   StatusPersonaLayout(void);
-extern void   func_800A1990(u_char a, u_char b, short mode, FuseResult *out,
+extern void   FuseCompute(u_char a, u_char b, short mode, FuseResult *out,
                             short special);
 extern void   FuseResultRowDraw(short row);
 extern short  ItemsListSellable(void);
@@ -122,7 +122,7 @@ short FuseListResults(void)
     for (i = 0; i < n; i++) {
         res = &g_fuse.persona;
         for (j = 0; j < n; j++) {
-            func_800A1990(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
+            FuseCompute(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
             if (*res && !FuseListHas(*res)) {
                 g_fuse_results[count++] = *res;
             }
@@ -266,7 +266,7 @@ void FusePairPick(void)
             i = g_item_top + g_menu->unk030.cur;
             g_menu->top.cur = g_fuse_pairs[i][1];
             g_menu->status_page.cur = g_fuse_pairs[i][0];
-            func_800A1990(g_persona_stock[g_menu->status_page.cur],
+            FuseCompute(g_persona_stock[g_menu->status_page.cur],
                           g_persona_stock[g_menu->top.cur], 0, &g_fuse, 0);
             D_800BC050 = 0;
             if (g_fuse.arcana != 0) {
@@ -373,7 +373,7 @@ short FuseListPairs(short id)
     last = PersonaStockCompact();
     for (i = 0; i <= last; i++) {
         for (j = 0; j <= last; j++) {
-            func_800A1990(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
+            FuseCompute(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
             if (g_fuse.persona == id) {
                 g_fuse_pairs[count][0] = i;
                 g_fuse_pairs[count][1] = j;

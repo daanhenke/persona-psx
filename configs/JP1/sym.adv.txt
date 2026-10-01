@@ -1381,8 +1381,10 @@ FuseResultRowDraw        = 0x800A14C4; // type:func
 FuseResultLineDraw       = 0x800A1690; // type:func
 FusionStockDraw          = 0x800A1824; // type:func
 
+FuseCompute              = 0x800A1990;
 FuseArcanaStep           = 0x800A1C24;
 PersonaDefHasSpell       = 0x800A1E20; // type:func
+FuseFindPersona          = 0x800A1E7C;
 FuseSpecialMatch         = 0x800A2140;
 FuseSpecialHas           = 0x800A26A0; // type:func
 FuseMoonLookup           = 0x800A26DC; // type:func size:0x80

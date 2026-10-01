@@ -150,18 +150,32 @@ extern void     ShopCountInit2(u_char row);
 
 /* What a paper fusion comes out as. */
 typedef struct {
-    u_short arcana;     /* 0 if the pair cannot be fused */
-    u_short unk2;
-    u_short unk4;
-    u_short persona;
-    u_short flag;
+    short arcana;     /* 0 if the pair cannot be fused */
+    short unk2;
+    short unk4;
+    short persona;
+    short flag;
 } FuseResult;
 
 #define g_fuse       (*(FuseResult *)0x801F1B8C)
 #define g_fuse_bytes ((u_char *)0x801F1B8C)  /* the chart reads it a byte at a time */
 
 extern int  PersonaStockCompact();
-extern void func_800A1990(u_char a, u_char b, short mode, FuseResult *out, short special);
+void FuseCompute(u_char a, u_char b, short mode, FuseResult *out, short arcana);
+extern short FuseSpellAllowed(short persona, short spell);
+short FuseArcanaStep(short arcana, short cur, short dir);
+short FuseFindPersona(short arcana, short a, short b, short level, short item);
+short FuseSpecialMatch(short persona, short item, short a, short b);
+extern void FuseItemBonus(short arcana, short item, int a, int b, void *out);
+extern u_char g_arcana_fuse_group[];
+extern u_char D_800B19A4[];
+
+/* What the offered item adds to a fusion (FuseItemBonus fills it): magic,
+   the five stats, a step through the arcana, and a spell. */
+#define g_fuse_bonus_mag   (*(u_short *)0x801F1BAC)
+#define g_fuse_bonus_stat  ((u_short *)0x801F1BAE)
+#define g_fuse_bonus_step  (*(short *)0x801F1BB8)
+#define g_fuse_bonus_spell (*(u_short *)0x801F1BBC)
 
 #define TRADE_ITEMS  32 /* then the seven the moon decides */
 #define TRADE_PICKS  3
@@ -193,7 +207,69 @@ extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern int  MsgStep(void);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A1990);
+#ifdef NON_MATCHING
+/* Works out what Personas a and b fuse into: the arcana from the chart
+   (or the one given), the Persona of that arcana for their average level,
+   and with an item offered (mode), whether the item changes it. */
+void FuseCompute(u_char a, u_char b, short mode, FuseResult *out, short arcana)
+{
+    int   ar_a;
+    int   ar_b;
+    int   level;
+    int   r;
+    int   t;
+
+    ar_a = g_persona_data[a].arcana - 1;
+    ar_b = g_persona_data[b].arcana - 1;
+    level = (g_persona_data[a].level + g_persona_data[b].level) / 2 + 3;
+    if (arcana) {
+        out->arcana = arcana;
+    } else {
+        out->arcana = D_800BA0E4[ar_a * 19 + ar_b + 0x20];
+    }
+    out->unk2 = D_800BA0E4[0x1C7 + g_arcana_fuse_group[ar_a] * 4 + g_arcana_fuse_group[ar_b]];
+    out->flag = 0;
+    out->unk4 = D_800BA0E4[D_800B19A4[ar_a] * 8 + D_800B19A4[ar_b] + 0x18C];
+    r = 0;
+    if (out->arcana) {
+        r = FuseFindPersona(out->arcana, a, b, level, mode);
+    }
+    out->persona = r;
+    if (mode) {
+        if (FuseSpecialHas(r)) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_mag) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_stat[0]) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_stat[1]) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_stat[2]) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_stat[3]) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_stat[4]) {
+            out->flag = 1;
+        }
+        if (g_fuse_bonus_spell && FuseSpellAllowed(out->persona, g_fuse_bonus_spell)) {
+            out->flag = 1;
+        }
+        t = FuseArcanaStep(out->arcana, out->persona, g_fuse_bonus_step);
+        if (t != r) {
+            out->flag = 1;
+            out->persona = t;
+        }
+    }
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", FuseCompute);
+#endif
 
 #ifdef NON_MATCHING
 /* Steps through an arcana's Personas in the fusion tables: dir 1 and 2
@@ -276,7 +352,58 @@ u_char PersonaDefHasSpell(short persona, short spell)
     return 0;
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A1E7C);
+/* The Persona a fusion of a and b gives in an arcana: a special one whose
+   recipe the item and both Personas fill, else one the item alone calls
+   up, else the first ordinary one, from the top of the arcana down, that
+   the average level reaches. */
+short FuseFindPersona(short arcana, short a, short b, short level, short item)
+{
+    int    i;
+    int    n;
+    int    r;
+    int    lo;
+    int    hi;
+    u_char p;
+
+    lo = 0;
+    hi = 0;
+    for (i = 0; i < FUSE_SPECIALS; i++) {
+        p = D_800BA0E4[0x208 + i];
+        if (FuseSpecialMatch(p, item, a, b) == 3) {
+            return p;
+        }
+    }
+    FuseItemBonus(arcana, item, a, b, (void *)0x801F1BAC);
+    i = D_800BA0E4[0x1DB + arcana * 2] - 1;
+    for (n = 0; n < i; n++) {
+        r = FuseSpecialMatch(D_800BA0E4[0x1DA + arcana * 2] + n, item, a, b);
+        if (r == 2) {
+            return D_800BA0E4[0x1DA + arcana * 2] + n;
+        }
+    }
+    i = D_800BA0E4[0x1DB + arcana * 2] - 1;
+    for (;;) {
+        r = FuseSpecialMatch(D_800BA0E4[0x1DA + arcana * 2] + i, item, a, b);
+        if (r != 0) {
+            if (r == 2) {
+                return D_800BA0E4[0x1DA + arcana * 2] + i;
+            }
+            lo = hi;
+            hi = D_800BA0E4[0x1DA + arcana * 2] + i;
+        }
+        if (lo != hi && level >= g_persona_defs[lo].level && level < g_persona_defs[hi].level) {
+            break;
+        }
+        if (i == 0) {
+            break;
+        }
+        i--;
+    }
+    if (lo == hi) {
+        return lo;
+    }
+    return hi;
+}
 
 /* Whether a fusion makes one of the special Personas: 3 when the item
    and both Personas fit its recipe, 2 when the item does, 0 when nothing
@@ -531,7 +658,7 @@ void FuseChartDraw(void)
 
     for (i = 0; i <= PersonaStockCompact(); i++) {
         for (j = 0; j <= PersonaStockCompact(); j++) {
-            func_800A1990(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
+            FuseCompute(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
             cell = 0x44B;
             if (g_fuse_bytes[0] != 0) {
                 switch (g_fuse_bytes[2]) {
