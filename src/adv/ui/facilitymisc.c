@@ -17,6 +17,7 @@
 #include <persona/common/tilemap.h>
 #include <persona/common/slot.h>
 #include <persona/common/status.h>
+#include <persona/adv/personapage.h>
 
 #define g_persona_slots ((u_char *)0x801F2574)
 #define g_item_list     ((u_short *)0x800EAE4C)
@@ -27,6 +28,7 @@
 #define FUSE_SPECIALS 40
 #define COINS_MAX     99999999
 #define AT(map, row, col) (&(map)[(row) * MAP_W + (col)])
+#define MAP2D(map)        ((short (*)[MAP_W])(map))
 #define ITEM_ID       0x1FF
 #define ITEM_NO_SALE  0x1000
 
@@ -40,7 +42,7 @@ extern void ItemsCompact(void);
 extern void ItemsClearPending(void);
 extern void SlotSetPos(u_char slot, int attr, short x, short y);
 extern void func_800A4E7C(void);
-extern void func_800A52F0(void);
+extern void CoinShopCountStep(void);
 extern void func_800A5BCC(void);
 extern void func_800A6308(void);
 extern void MenuTopRedraw(void);
@@ -49,6 +51,7 @@ extern void MenuWheelOpen2(int a, int b);
 extern void D_8007A738(int a, int b);
 extern short FacilityTradeCount(short i);
 extern void DrawPersonaKeyName(u_char persona, short *dst, int base);
+short FuseSpecialHas(short persona);
 short CharCanUsePersona(short chr, short persona);
 extern void DrawItemName(int id, short *dst, u_short base, int b);
 extern const u_char g_persona_list_rule[];
@@ -76,9 +79,36 @@ extern void     MenuWheelTurn3(short kind, short list);
 extern int      ItemsListShopSell(void);
 extern void     ShopBuyOpen(void);
 extern void     ShopSellOpen(void);
-#define g_shop_items ((u_short *)0x800EB590)
-extern u_char   InputCheckAcceptA(int n);
-extern u_char   InputCheckAcceptB(int n);
+#define g_shop_items  ((u_short *)0x800EB590)
+#define g_shop_prices ((int *)0x800EB5D0)
+extern MenuList g_shop_tens;   /* the count's tens, which left and right step */
+extern void     ShopTotalDraw(u_char row, u_char count);
+extern void     CopyShorts(u_short *src, u_short *dst, u_short count);
+extern void     ItemsAddPending(u_short id, u_short count);
+extern void     ItemsCommitPending(void);
+extern void     MoneySpend(u_int amount);
+extern void     CoinsSpend(u_int amount);
+extern void     ShopTotalRedraw(u_char row, u_char count);
+extern void     MenuSetLayers(int layers);
+extern void     TileMapWriteRun10(short *dst);
+extern void     BgBoxShow(void);
+extern void     DrawPartySlotStatus(int slot, int kind);
+extern u_short  g_menu_bg_rle[];
+
+/* What a paper fusion comes out as. */
+typedef struct {
+    u_short arcana;     /* 0 if the pair cannot be fused */
+    u_short unk2;
+    u_short unk4;
+    u_short persona;
+    u_short flag;
+} FuseResult;
+
+#define g_fuse       (*(FuseResult *)0x801F1B8C)
+#define g_fuse_bytes ((u_char *)0x801F1B8C)  /* the chart reads it a byte at a time */
+
+extern int  PersonaStockCompact();
+extern void func_800A1990(u_char a, u_char b, short mode, FuseResult *out, short special);
 
 #define TRADE_ITEMS  32 /* then the seven the moon decides */
 #define TRADE_PICKS  3
@@ -89,7 +119,7 @@ extern short  g_trade_items[];         /* [TRADE_ITEMS + 7], then 0 */
 extern short  g_trade_recipes[];       /* [TRADE_ITEMS][2] */
 extern short  g_trade_moon_recipes[];  /* [7][TRADE_PICKS][2] */
 extern u_char ShopHave(short item);
-extern void func_800A2A48(void);
+extern void PersonaSwapOpen(void);
 extern void FacilityMemberPick(void);
 extern void func_800A2FF8(void);
 extern void func_800A3388(void);
@@ -102,7 +132,7 @@ extern void FacilityTradeMoonPick(void);
 extern void func_800A7D7C(void);
 extern void ShopTopStep(void);
 extern void func_800A8448(void);
-extern void func_800A8928(void);
+extern void ShopBuyCountStep(void);
 extern void func_800A8B88(void);
 extern void func_800A91C8(void);
 extern void ShopMemberPick(void);
@@ -112,7 +142,73 @@ extern int  MsgStep(void);
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A1990);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A1C24);
+#ifdef NON_MATCHING
+/* Steps through an arcana's Personas in the fusion tables: dir 1 and 2
+   go down one or two, 3 and 4 up, never past either end, and a special
+   Persona is stepped over rather than landed on. */
+short FuseArcanaStep(short arcana, short cur, short dir)
+{
+    int n;
+    int r;
+
+    switch (dir) {
+    case 0:
+        return cur;
+    case 1:
+        n = D_800BA0E4[0x1DA + arcana * 2];
+        if (cur == n) {
+            return n;
+        }
+        if (FuseSpecialHas(cur - 1)) {
+            return cur;
+        }
+        return cur - 1;
+    case 2:
+        n = D_800BA0E4[0x1DA + arcana * 2];
+        r = cur;
+        if (cur == n) {
+            return n;
+        }
+        if (!FuseSpecialHas(cur - 1)) {
+            r--;
+        }
+        if (cur - 1 == n) {
+            return r;
+        }
+        if (!FuseSpecialHas(cur - 2)) {
+            r = cur - 2;
+        }
+        return r;
+    case 3:
+        n = D_800BA0E4[0x1DA + arcana * 2] + D_800BA0E4[0x1DB + arcana * 2] - 1;
+        if (cur == n) {
+            return n;
+        }
+        if (FuseSpecialHas(cur + 1)) {
+            return cur;
+        }
+        return cur + 1;
+    case 4:
+        n = D_800BA0E4[0x1DA + arcana * 2] + D_800BA0E4[0x1DB + arcana * 2] - 1;
+        r = cur;
+        if (cur == n) {
+            return n;
+        }
+        if (!FuseSpecialHas(cur + 1)) {
+            r++;
+        }
+        if (cur + 1 == n) {
+            return r;
+        }
+        if (!FuseSpecialHas(cur + 2)) {
+            r = cur + 2;
+        }
+        return r;
+    }
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", FuseArcanaStep);
+#endif
 
 /* Whether a Persona's definition lists `spell` among its first six. */
 u_char PersonaDefHasSpell(short persona, short spell)
@@ -129,10 +225,224 @@ u_char PersonaDefHasSpell(short persona, short spell)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A1E7C);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2140);
+/* Whether a fusion makes one of the special Personas: 3 when the item
+   and both Personas fit its recipe, 2 when the item does, 0 when nothing
+   does, and 1 when the Persona is not one of the specials at all. */
+short FuseSpecialMatch(short persona, short item, short a, short b)
+{
+    short r;
+
+    r = 0;
+    if (FuseSpecialHas(persona)) {
+        switch (persona) {
+        case 1:
+            if (item == 0x88 && (a == 0x34 || a == 0x51) && (b == 0x34 || b == 0x51)) {
+                r = 3;
+            }
+            break;
+        case 3:
+            if (item == 0x89) {
+                r = 2;
+            }
+            break;
+        case 4:
+            if (item == 0x8A) {
+                r = 2;
+            }
+            break;
+        case 8:
+            if (item == 0x87) {
+                r = 2;
+            }
+            break;
+        case 9:
+            if (item == 0x80 && (a == 0x2C || a == 0x33) && (b == 0x33 || b == 0x2C)) {
+                r = 3;
+            }
+            break;
+        case 11:
+            if (item == 0x81) {
+                r = 2;
+            }
+            break;
+        case 14:
+            if (item == 0x82) {
+                r = 2;
+            }
+            break;
+        case 19:
+            if (item == 0x8C && (a == 0x55 || a == 0x45) && (b == 0x45 || b == 0x55)) {
+                r = 3;
+            }
+            break;
+        case 21:
+            if (item == 0x8D) {
+                r = 2;
+            }
+            break;
+        case 22:
+            if (item == 0x8E) {
+                r = 2;
+            }
+            break;
+        case 27:
+            if (item == 0x7B && (a == 0x10 || a == 0x5D) && (b == 0x5D || b == 0x10)) {
+                r = 3;
+            }
+            break;
+        case 28:
+            if (item == 0x7C) {
+                r = 2;
+            }
+            break;
+        case 32:
+            if (item == 0x7D) {
+                r = 2;
+            }
+            break;
+        case 35:
+            if (item == 0x98 && (a == 0x60 || a == 0x69) && (b == 0x69 || b == 0x60)) {
+                r = 3;
+            }
+            break;
+        case 36:
+            if (item == 0x99) {
+                r = 2;
+            }
+            break;
+        case 42:
+            if (item == 0x9A) {
+                r = 2;
+            }
+            break;
+        case 46:
+            if (item == 0x93 && (a == 0x0A || a == 0x63) && (b == 0x63 || b == 0x0A)) {
+                r = 3;
+            }
+            break;
+        case 47:
+            if (item == 0x94) {
+                r = 2;
+            }
+            break;
+        case 53:
+            if (item == 0x83) {
+                r = 2;
+            }
+            break;
+        case 57:
+            if (item == 0x90 && (a == 0x4F || a == 0x57) && (b == 0x57 || b == 0x4F)) {
+                r = 3;
+            }
+            break;
+        case 58:
+            if (item == 0x91) {
+                r = 2;
+            }
+            break;
+        case 59:
+            if (item == 0x92) {
+                r = 2;
+            }
+            break;
+        case 64:
+            if (item == 0x8F) {
+                r = 2;
+            }
+            break;
+        case 66:
+            if (item == 0x9F) {
+                r = 2;
+            }
+            break;
+        case 68:
+            if (item == 0xA1) {
+                r = 2;
+            }
+            break;
+        case 69:
+            if (item == 0x9B) {
+                r = 2;
+            }
+            break;
+        case 71:
+            if (item == 0x9D && (a == 0x56 || a == 0x5E) && (b == 0x5E || b == 0x56)) {
+                r = 3;
+            }
+            break;
+        case 72:
+            if (item == 0x9E) {
+                r = 2;
+            }
+            break;
+        case 74:
+            if (item == 0xA2) {
+                r = 2;
+            }
+            break;
+        case 76:
+            if (item == 0xA0) {
+                r = 2;
+            }
+            break;
+        case 78:
+            if (item == 0x8B) {
+                r = 2;
+            }
+            break;
+        case 80:
+            if (item == 0x96 && (a == 0x5B || a == 0x6A) && (b == 0x6A || b == 0x5B)) {
+                r = 3;
+            }
+            break;
+        case 81:
+            if (item == 0x97) {
+                r = 2;
+            }
+            break;
+        case 85:
+            if (item == 0x84 && (a == 0x0E || a == 0x1B) && (b == 0x1B || b == 0x0E)) {
+                r = 3;
+            }
+            break;
+        case 86:
+            if (item == 0x85) {
+                r = 2;
+            }
+            break;
+        case 87:
+            if (item == 0x86) {
+                r = 2;
+            }
+            break;
+        case 88:
+            if (item == 0x9C) {
+                r = 2;
+            }
+            break;
+        case 92:
+            if (item == 0x95) {
+                r = 2;
+            }
+            break;
+        case 93:
+            if (item == 0x7E && (a == 0x3E || a == 0x30) && (b == 0x30 || b == 0x3E)) {
+                r = 3;
+            }
+            break;
+        case 95:
+            if (item == 0x7F) {
+                r = 2;
+            }
+            break;
+        }
+        return r;
+    }
+    return 1;
+}
 
 /* Whether a Persona is one of the forty the fusion tables treat specially. */
-u_char FuseSpecialHas(short persona)
+short FuseSpecialHas(short persona)
 {
     int i;
 
@@ -156,7 +466,52 @@ short FuseMoonLookup(short a, short b)
                              D_800BA0E4[0x243 + g_persona_data[b].arcana * 9 + row]];
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A275C);
+/* The fusion chart: what each pair of stock Personas fuses into, one cell
+   a pair, or the blank cell where the pair gives nothing. */
+void FuseChartDraw(void)
+{
+    int i;
+    int j;
+    int k;
+    int base;
+    int cell;
+
+    for (i = 0; i <= PersonaStockCompact(); i++) {
+        for (j = 0; j <= PersonaStockCompact(); j++) {
+            func_800A1990(g_persona_stock[i], g_persona_stock[j], 0, &g_fuse, 0);
+            cell = 0x44B;
+            if (g_fuse_bytes[0] != 0) {
+                switch (g_fuse_bytes[2]) {
+                case 0:
+                    k = 0;
+                    break;
+                case 1:
+                    k = 2;
+                    break;
+                case 2:
+                    k = 1;
+                    break;
+                }
+                switch (g_fuse_bytes[4]) {
+                case 0:
+                    base = 0x448;
+                    break;
+                case 1:
+                    base = 0x451;
+                    break;
+                case 2:
+                    base = 0x44E;
+                    break;
+                case 3:
+                    base = 0x454;
+                    break;
+                }
+                cell = base + k;
+            }
+            MAP2D(g_tilemap1)[i + 1][j + 22] = cell;
+        }
+    }
+}
 
 /* Fills g_item_list with the bag's items a shop will buy, and says how
    many there are. */
@@ -188,7 +543,7 @@ void FacilityStep6(void)
 {
     switch (g_persona_data_step) {
     case 0:
-        func_800A2A48();
+        PersonaSwapOpen();
         g_persona_data_step++;
         break;
     case 1:
@@ -209,7 +564,44 @@ void FacilityStep6(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A2A48);
+/* Lays out the Persona swap screen on the member under the cursor. */
+void PersonaSwapOpen(void)
+{
+    int i;
+
+    SlotClearAll();
+    MenuSetLayers(0x1C);
+    TileMapFillRect(g_tilemap0, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap1, 0, MAP_W, 0x40, MAP_W);
+    TileMapFillRect(g_tilemap2, 0, MAP_W, 0x40, MAP_W);
+    TileMapDrawWindow(AT(g_tilemap0, 0, 6), 0x10, 9, MAP_W);
+    TileMapDrawBox(AT(g_tilemap0, 1, 7), 0xE, 7, MAP_W);
+    TileMapBlitRle(g_menu_bg_rle, AT(g_tilemap0, 11, 0), MAP_W);
+    TileMapWriteRun10(AT(g_tilemap0, 2, 9));
+    for (i = 0; i < 3; i++) {
+        TileMapWriteBar(g_tilemap0 + 9 + (i + 4) * MAP_W, 10);
+        *AT(g_tilemap2, i + 2, 0) = i + 0x418;
+    }
+    TileMapWriteRow(str_cell_run, AT(g_tilemap2, 1, 3), 0x457, 6);
+    BgBoxShow();
+    DrawStatusHud();
+    DrawPartySlotStatus(0, 0);
+    DrawPartySlotStatus(1, 0);
+    DrawPartySlotStatus(2, 0);
+    DrawPartySlotStatus(3, 0);
+    DrawPartySlotStatus(4, 0);
+    CharPersonasDraw(g_menu->status_who.cur, g_tilemap2);
+    g_cam_y = 0;
+    g_map_scroll_y = 0;
+    g_header_scroll_y = 0;
+    SlotClear(0x2F);
+    SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
+    SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
+    SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x24, 0, 0);
+    SlotInitTagged(g_fm_mark_def, 1, 0x42, (g_fm_mark_pos + 1)[g_menu->status_who.cur][0],
+                   (g_fm_mark_pos + 1)[g_menu->status_who.cur][1]);
+    SlotSetFlicker(1, 1);
+}
 
 /* Picks a party member and shows the Personas it carries; A moves on to
    them, B packs the Persona slots and leaves. */
@@ -395,14 +787,53 @@ void ShopStep2(void)
         func_800A4E7C();
         break;
     case 1:
-        func_800A52F0();
+        CoinShopCountStep();
         break;
     }
 }
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A4E7C);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A52F0);
+/* The coin counter's count: as at the money counters, but paid in coins. */
+void CoinShopCountStep(void)
+{
+    u_short *item;
+    int     *price;
+
+    if (MenuStepCursor(&g_shop_tens)) {
+        g_shop_count.cur = g_shop_tens.cur * 10 + g_shop_count.cur % 10;
+    } else {
+        MenuStepCursor(&g_shop_count);
+    }
+    if (g_shop_count.cur > g_shop_count.hi) {
+        g_shop_count.cur = g_shop_count.hi;
+    } else if (g_shop_tens.cur < 0) {
+        g_shop_count.cur = 0;
+    }
+    if (g_shop_count.cur == 0) {
+        g_shop_count.cur = 1;
+    }
+    g_shop_tens.cur = g_shop_count.cur / 10;
+    ShopCountRowDraw();
+    ShopTotalRedraw(g_item_top + g_menu->unk100.cur, g_shop_count.cur);
+    MsgStep();
+    if (InputCheckAcceptA(1)) {
+        item = g_shop_items + g_item_top + g_menu->unk100.cur;
+        price = g_shop_prices + g_item_top + g_menu->unk100.cur;
+        CopyShorts(g_items, g_item_list, 0x17F);
+        ItemsAddPending(*item, g_shop_count.cur);
+        ItemsCommitPending();
+        ItemsCompact();
+        CoinsSpend(*price * g_shop_count.cur);
+        func_800A5560();
+        SlotSetFlicker(0, 1);
+        g_persona_data_step--;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        func_800A5560();
+        SlotSetFlicker(0, 1);
+        g_persona_data_step--;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A5560);
 
@@ -643,7 +1074,7 @@ void ShopStep(void)
         func_800A8448();
         break;
     case 3:
-        func_800A8928();
+        ShopBuyCountStep();
         break;
     case 4:
         func_800A8B88();
@@ -706,7 +1137,48 @@ void ShopTopStep(void)
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8448);
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8928);
+/* How many to buy: up and down step by one, left and right by ten, and
+   never more than the money and the bag allow nor fewer than one. A buys
+   them. */
+void ShopBuyCountStep(void)
+{
+    u_short *item;
+    int     *price;
+
+    if (MenuStepCursor(&g_shop_tens)) {
+        g_shop_count.cur = g_shop_tens.cur * 10 + g_shop_count.cur % 10;
+    } else {
+        MenuStepCursor(&g_shop_count);
+    }
+    if (g_shop_count.cur > g_shop_count.hi) {
+        g_shop_count.cur = g_shop_count.hi;
+    } else if (g_shop_tens.cur < 0) {
+        g_shop_count.cur = 0;
+    }
+    if (g_shop_count.cur == 0) {
+        g_shop_count.cur = 1;
+    }
+    g_shop_tens.cur = g_shop_count.cur / 10;
+    ShopCountRowDraw();
+    ShopTotalDraw(g_item_top + g_menu->unk100.cur, g_shop_count.cur);
+    MsgStep();
+    if (InputCheckAcceptA(1)) {
+        item = g_shop_items + g_item_top + g_menu->unk100.cur;
+        price = g_shop_prices + g_item_top + g_menu->unk100.cur;
+        CopyShorts(g_items, g_item_list, 0x17F);
+        ItemsAddPending(*item, g_shop_count.cur);
+        ItemsCommitPending();
+        ItemsCompact();
+        MoneySpend(*price * g_shop_count.cur);
+        ShopBuyOpen();
+        SlotClear(8);
+        g_persona_data_step = 2;
+    } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+        ShopBuyOpen();
+        SlotClear(8);
+        g_persona_data_step = 2;
+    }
+}
 
 INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A8B88);
 

@@ -25,7 +25,7 @@ extern short    g_use_top;
 extern short    g_use_scroll_step;
 extern short    D_800BBB24;
 extern u_char   g_facility_count;
-extern MenuList D_800BB838;
+extern MenuList g_shop_tens;
 extern int      D_800EB5D0[];    /* the prices, as the buy page reaches them */
 extern u_char   D_800BA640[];
 extern u_char   D_800BA664[];
@@ -109,7 +109,7 @@ void ShopBuyOpen(void)
     } else {
         g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
     }
-    MenuListInit(&D_800BB838, 0, -1, 0xA, 0x90);
+    MenuListInit(&g_shop_tens, 0, -1, 0xA, 0x90);
     ShopCountInit(row);
     ShopBuyListDraw();
     g_map_scroll_y = g_item_top * 12;
@@ -176,7 +176,7 @@ void ShopSellOpen(void)
     } else {
         g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
     }
-    MenuListInit(&D_800BB838, 0, -1, 0xA, 0x90);
+    MenuListInit(&g_shop_tens, 0, -1, 0xA, 0x90);
     ShopCountInit(n);
     D_800BBB24 = ItemsListShopSell() + 1;
     if (D_800BBB24 < 0x10) {

@@ -118,7 +118,8 @@ segments:
       - [0xDC0, .rodata, ui/fusesearch]
       - [0xDD8, .rodata, ui/fusion]
       - [0xDEC, rodata, adv_rodata7c]
-      - [0x1070, .rodata, ui/facilitymisc]
+      # FuseSpecialMatch's table, and the step tables after it.
+      - [0xEF0, .rodata, ui/facilitymisc]
       - [0x10BC, pad, adv_pad_10bc]
       - [0x10C0, .rodata, game/money]
       - [0x113C, rodata, adv_rodata7c2]

@@ -54,7 +54,7 @@ extern short   D_800BB950;
 extern short   D_800BB820;
 extern short   g_use_top;
 extern MenuList D_800BB848;
-extern MenuList D_800BB838;
+extern MenuList g_shop_tens;
 extern MenuList D_800BC604;
 extern short   g_persona_data_step;
 extern short   g_cutscene_alt;
@@ -117,7 +117,7 @@ extern void  FacilityOpen3(void);
 extern void  func_800A5560(void);
 extern int   CoinsAffordable(void);
 extern void  PersonaSlotsCompact(void);
-extern void  func_800A2A48(void);
+extern void  PersonaSwapOpen(void);
 extern void  FusionOpen(void);
 extern short FuseListResults(void);
 extern void  FuseResultsOpen(void);
@@ -220,7 +220,7 @@ u_char FacilityScreen(u_char id)
     MenuListInit(&g_menu->page, 0, 0, 7, 0x14);
     MenuListInit(&g_menu->stock, 0, 0, 1, 0x1A);
     MenuListInit(&D_800BB848, 0, 0, g_facility_count - 1, 0x1E);
-    MenuListInit(&D_800BB838, 0, -1, 0xA, 0x90);
+    MenuListInit(&g_shop_tens, 0, -1, 0xA, 0x90);
     MenuListInit(&g_menu->unk100, 0, 0, 7, 0x14);
     MenuListInit(&g_menu->list[2], 0, 0, 0, 6);
     MenuListInit(&g_menu->list[3], 0, 0, 0, 0xA);
@@ -336,7 +336,7 @@ u_char FacilityScreen(u_char id)
         PersonaSlotsCompact();
         MenuListInit(&g_menu->unk2E0, 0, 0, 9, 0x14);
         g_use_top = 0;
-        func_800A2A48();
+        PersonaSwapOpen();
     next:
         g_persona_data_step++;
         break;
