@@ -73,7 +73,30 @@ typedef struct {
     u_long  *ot;
 } CasinoDB;
 
+/* The sprites: a POLY_FT4 per sprite in each buffer, its depth in the
+   ordering table, and whether it is drawn. Each game sets how many it
+   uses in g_casino_sprite_count. */
+#define CASINO_SPRITES 1000
+
+typedef struct {
+    POLY_FT4 *prim[2];
+    short    *z;
+    u_char   *on;
+} CasinoSprites;
+
+/* Images waiting for the next DrawSync to go up to VRAM. */
+typedef struct {
+    RECT    *rect;
+    u_long **data;
+} CasinoLoadQueue;
+
 /* The overlay's own. */
+extern CasinoSprites   g_casino_sprites;
+extern short           g_casino_sprite_count;
+extern CasinoLoadQueue g_casino_load_queue;
+extern short           g_casino_load_count;
+extern int             g_casino_buf;
+extern CasinoDB       *g_casino_cur_db;
 extern CasinoDB g_casino_db[2];
 extern CasinoFlags D_800AFC98;
 extern u_short *g_casino_coin_item;

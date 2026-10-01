@@ -34,7 +34,6 @@ extern int    D_800A8EA4;
 extern u_char D_800A9540;
 extern u_int  D_800AAF18;
 extern u_char D_800AAF68;
-extern short  D_800B0158;
 extern int    D_800B0A9C;
 extern u_char D_800B0AF0;
 extern u_char D_800B0AF8;
@@ -48,13 +47,10 @@ extern u_char *D_800A837C[8];
 extern short   D_800A839C[2];
 extern u_char *D_800A86A0[4];
 extern short   D_800A86B0[2];
-extern u_char *D_800A9798[2];
-extern short   D_800A97A0;
 extern u_char *D_800AF5BC[3];
 extern short   D_800AF5C8;
 extern u_char *D_800AF688[3];
 extern short   D_800AF694;
-extern u_char *D_800B015C[4];
 extern u_char *D_800B0974[10];
 extern short   D_800B099C[2];
 extern short   D_800B0A48[2];
@@ -207,13 +203,13 @@ void CasinoMapWork(void)
     g_casino_db[1].ot = (u_long *)0x800C10E0;
     ClearOTag(g_casino_db[0].ot, 0x400);
     ClearOTag(g_casino_db[1].ot, 0x400);
-    D_800B015C[0] = (u_char *)0x800C20E0;
-    D_800B015C[1] = (u_char *)0x800CBD20;
-    D_800B015C[2] = (u_char *)0x800D5960;
-    D_800B015C[3] = (u_char *)0x800D6130;
-    D_800A9798[0] = (u_char *)0x800D6518;
-    D_800A9798[1] = (u_char *)0x800D6618;
-    D_800A97A0 = 0;
+    g_casino_sprites.prim[0] = (POLY_FT4 *)0x800C20E0;
+    g_casino_sprites.prim[1] = (POLY_FT4 *)0x800CBD20;
+    g_casino_sprites.z = (short *)0x800D5960;
+    g_casino_sprites.on = (u_char *)0x800D6130;
+    g_casino_load_queue.rect = (RECT *)0x800D6518;
+    g_casino_load_queue.data = (u_long **)0x800D6618;
+    g_casino_load_count = 0;
     D_800B4764[0] = (u_char *)0x800D6698;
     D_800B4764[1] = (u_char *)0x800DA518;
     D_800B4764[2] = (u_char *)0x800DE398;
@@ -305,18 +301,18 @@ void CasinoPickGame(void)
     switch (g_casino_spot) {
     case 0xD0: case 0xD1: case 0xD2: case 0xD3:
         g_casino_game = 1;
-        D_800B0158 = 0x2F6;
+        g_casino_sprite_count = 0x2F6;
         break;
     case 0xD4: case 0xD5: case 0xD6: case 0xD7:
         g_casino_game = 2;
-        D_800B0158 = 0x3C1;
+        g_casino_sprite_count = 0x3C1;
         break;
     case 0xD8: case 0xD9: case 0xDA: case 0xDB:
     case 0xDC: case 0xDD: case 0xDE: case 0xDF:
     case 0xE0: case 0xE1: case 0xE2: case 0xE3:
     case 0xE4: case 0xE5: case 0xE6: case 0xE7:
         g_casino_game = 3;
-        D_800B0158 = 0x22E;
+        g_casino_sprite_count = 0x22E;
         break;
     case 0xE9: case 0xEA: case 0xEB: case 0xEC:
     case 0xED: case 0xEE: case 0xEF: case 0xF0:
@@ -325,11 +321,11 @@ void CasinoPickGame(void)
     case 0xF9: case 0xFA: case 0xFB: case 0xFC:
     case 0xFD: case 0xFE: case 0xFF:
         g_casino_game = 4;
-        D_800B0158 = 0x14D;
+        g_casino_sprite_count = 0x14D;
         break;
     case 0xE8:
         g_casino_game = 5;
-        D_800B0158 = 0x1A0;
+        g_casino_sprite_count = 0x1A0;
         break;
     }
 }
