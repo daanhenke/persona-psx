@@ -1572,8 +1572,13 @@ void CoinShopOpen(void)
         TileMapWriteBar(g_tilemap0 + 15 + (i + 2) * MAP_W, 0xA);
         TileMapWriteBar(g_tilemap0 + 26 + (i + 2) * MAP_W, 3);
     }
-    for (i = 15; i >= 0; i--) {
-        *AT(g_tilemap1, i, 12) = 0x37F;
+    {
+        int cell;
+
+        cell = 0x37F;
+        for (i = 15; i >= 0; i--) {
+            *AT(g_tilemap1, i, 12) = cell;
+        }
     }
     TileMapFillRect(AT(g_tilemap0, 2, 13), 0x17, 2, 8, MAP_W);
     TileMapFillRect(AT(g_tilemap0, 2, 25), 0x17, 1, 8, MAP_W);

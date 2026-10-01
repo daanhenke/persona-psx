@@ -3965,3 +3965,34 @@ sign-bit copy, so the copy hides `have2`'s byte range. Declaring `u_char
 have2` (with `have` still `int`) turns the copy into a zero-extension that
 combine can see, and the image's bare `addu v0, s0, zero` comes back.
 `short` or `u_char` for both adds extensions at the compares instead.
+
+## A row offset in its own register is `base + k + (i + n) * MAP_W`
+
+PersonaSwapOpen's bar loop keeps `(i + 4) * 0x50` in one register (starting
+at 0x140) and adds a hoisted `g_tilemap0 + 9` at each call. `AT(map, i + 4,
+9)` and `&MAP2D(map)[i + 4][9]` both fold everything into one pointer giv
+(starting at 0x800EE2D2): the C front end's pointer_int_sum distributes the
+`+ 4` of a PLUS index into the constant. Writing the pointer sum with the
+product last, `g_tilemap0 + 9 + (i + 4) * MAP_W`, keeps the product whole,
+so loop.c reduces only the offset. The same form matched the bars in
+PersonaSwapSlotsOpen and FacilityTradeTop.
+
+## A value that counts in its own register was a variable
+
+A loop storing `i + 0x418` down a column keeps `i + 0x418` unreduced: a
+non-address giv whose reduction saves nothing is left alone. When the image
+holds the value in a register that starts at 0x427 and decrements, and that
+register's init comes after the counter's but after the address giv's too,
+the source had its own variables: `i = 15; dst = AT(map, 15, 0); cell =
+0x427;` then `*dst = cell; dst -= MAP_W; cell--;` (PersonaSwapSlotsOpen).
+Strength-reduced inits always land after a user variable's.
+
+## A unit boundary four bytes late shows as a phantom function
+
+configbattle scored 0% in ADV and S2D while DNG was exact: the yamls split
+the units at the routine's second instruction, so the previous unit's
+expected object carried its `addiu sp`, the routine's own started mid-body
+as `func_800762A0`, and the next unit opened on its delay-slot `nop` as a
+four-byte `func_80076448`. The link never notices (objects are laid end to
+end). A `nonmatching func_X, 0x4` holding one `nop` at a unit's start, or a
+sym entry that sits 4 bytes before its segment, is this.
