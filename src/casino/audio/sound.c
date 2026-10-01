@@ -25,7 +25,7 @@ extern void  SsSeqStop(short seq);
 extern void  SsSetNck(short seq);
 
 extern u_char g_casino_wrapped;
-extern u_char D_800B06B4;
+extern u_char g_casino_soundtest;
 
 #define SEQ_FREE 0xFF
 
@@ -43,7 +43,7 @@ void CasinoInitSound(void)
         g_casino_seqs[i] = v;
     }
     g_casino_main_vab = g_vab_id[0];
-    D_800B06B4 = 1;
+    g_casino_soundtest = 1;
     g_casino_wrapped = 0;
     g_bgm_ready = 1;
     g_casino_seqs[15] = g_seq_handle[0];
