@@ -133,6 +133,15 @@ extern u_short  g_key_menu_close;
 extern u_char   D_800B17E0[];
 extern u_char   D_800B17EE[];
 extern u_char   D_800BA6D0[];
+extern u_short  g_release_items[];  /* by Persona key: what letting it go gives */
+extern u_char   g_release_msg[];    /* the message that says so, the item patched in */
+extern u_char   D_800BA6BC[];       /* the message: let it go? */
+extern short    PersonaSpellsFull(short n);
+extern void     FacilitySlotsClear(void);
+extern void     CinemaOpen(short plain);
+extern void     CinemaClose(short plain);
+extern void     CharApplyStats(u_char chr);
+extern void     CharRecalcStats(u_char chr);
 extern short    g_sell_slots;   /* the sell list's entries, at least 16 */
 extern u_char   D_800BA640[];
 extern u_char   D_800B1EB8[];
@@ -166,9 +175,9 @@ extern u_char ShopHave(short item);
 extern void PersonaSwapOpen(void);
 extern void FacilityMemberPick(void);
 extern void PersonaSwapEntryPick(void);
-extern void func_800A3388(void);
-extern void func_800A3984(void);
-extern void func_800A3D0C(void);
+extern void PersonaReleasePick(void);
+extern void PersonaReleaseConfirm(void);
+extern void PersonaSwapApply(void);
 extern void FacilityTradeTop(void);
 extern void FacilityTradePick(void);
 extern void FacilityTradeCountStep(void);
@@ -597,13 +606,13 @@ void FacilityStep6(void)
         PersonaSwapEntryPick();
         break;
     case 3:
-        func_800A3388();
+        PersonaReleasePick();
         break;
     case 4:
-        func_800A3984();
+        PersonaReleaseConfirm();
         break;
     case 5:
-        func_800A3D0C();
+        PersonaSwapApply();
         break;
     }
 }
@@ -774,11 +783,290 @@ void PersonaSwapEntryPick(void)
     }
 }
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3388);
+/* The Persona slots: scrolls them, triangle opens the one under the
+   cursor, A asks whether to let it go, B goes back to the member. */
+void PersonaReleasePick(void)
+{
+    int n;
+    int k;
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3984);
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->unk2E0.delay < 3) {
+                g_menu->unk2E0.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_use_top, 0, 6, 10)) {
+            g_map_scroll_y = g_use_top * 12;
+        } else {
+            MenuScrollCursor(&g_menu->unk2E0, &g_use_top, 0, 6, (u_short *)&g_use_scroll_step);
+        }
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_use_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_use_top != 6) {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_pad_pressed[0] & 0x10) {
+            k = g_use_top + g_menu->unk2E0.cur;
+            n = g_persona_slots[k];
+            if (n == SLOT_EMPTY) {
+                return;
+            }
+            SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
+            PersonaSlotView(n);
+            PersonaSwapSlotsOpen();
+            CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+            FacilityCursorPlace();
+            g_map_scroll_y = g_use_top * 12;
+            PersonaSlotsDraw();
+            SlotInitTagged(g_pdata_cursor_def, 2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+            SlotSetFlicker(1, 0);
+            SlotSetFlicker(2, 1);
+            SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x24, 0, 0);
+        } else if (InputCheckAcceptA(1)) {
+            k = g_use_top + g_menu->unk2E0.cur;
+            if (g_persona_slots[k] == SLOT_EMPTY) {
+                return;
+            }
+            MenuListInit(&g_menu->list[1], 1, 0, 1, 0x1E);
+            SlotInitTagged(g_fm_prompt_cur_def, 3, 0x23, 0xF0, g_menu->list[1].cur * 16 + 0x4A);
+            SlotInitTagged(g_fm_hint_def, 9, 0x24, 0xF0, 0x48);
+            SlotInitTagged(g_fm_hint_def, 10, 0x24, 0xF0, 0x58);
+            SlotInitTagged(g_fm_hint2_def, 12, 0x22, 0xF0, 0x48);
+            SlotInitTagged(g_fm_hint2_def, 13, 0x22, 0xF0, 0x58);
+            SlotSetAnim(12, 0, 0, 0, 0x30, 0, 0, 0);
+            SlotSetAnim(13, 0, 0, 0, 0x60, 0, 0, 0);
+            SlotSetFlicker(2, 0);
+            SlotSetFlicker(3, 1);
+            SlotInitTagged(D_800B1EB8, 0x2E, 0x24, 0x36, 0xE);
+            BgMapInit(D_800BA6BC, 0);
+            g_bg_layers[4].x = 0x38;
+            g_bg_layers[4].y = 0x10;
+            g_bg_layers[4].w = 0xF0;
+            g_bg_layers[4].h = 0x10;
+            g_bg_shown |= 0x10;
+            g_persona_data_step++;
+        } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
+            SlotSetFlicker(1, 1);
+            SlotClear(2);
+            g_persona_data_step--;
+        }
+    }
+}
 
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", func_800A3D0C);
+/* Yes or no to letting the Persona in the slot go. One that has learned
+   all its spells leaves an item behind, and a message says which. */
+void PersonaReleaseConfirm(void)
+{
+    Persona *personas;
+    int      slot;
+    u_char   n;
+
+    personas = g_personas;
+    MenuStepCursor(&g_menu->list[1]);
+    SlotSetPos(3, 0x23, 0xF0, g_menu->list[1].cur * 16 + 0x4A);
+    MsgStep();
+    if (InputCheckAcceptA(1)) {
+        if (g_menu->list[1].cur == 0) {
+            slot = g_use_top + g_menu->unk2E0.cur;
+            n = g_persona_slots[slot];
+            if (PersonaSpellsFull(n)) {
+                CopyShorts(g_items, g_item_list, 0x17F);
+                ItemsAddPending(g_release_items[g_personas[n].key], 1);
+                ItemsCommitPending();
+                ItemsCompact();
+                g_release_msg[0x15] = g_personas[n].key;
+                g_release_msg[0x47] = g_release_items[g_personas[n].key];
+                g_release_msg[0x48] = g_release_items[g_personas[n].key] >> 8;
+                g_release_msg[0x6D] = g_release_items[g_personas[n].key];
+                g_release_msg[0x6E] = g_release_items[g_personas[n].key] >> 8;
+                FacilitySlotsClear();
+                SlotClear(0x2E);
+                g_bg_layers[4].x = 0x28;
+                g_bg_layers[4].y = 0xA4;
+                g_bg_layers[4].w = 0xF0;
+                g_bg_layers[4].h = 0x30;
+                BgMapInit(g_release_msg, 0);
+                CinemaOpen(1);
+                while (!(g_msg->flags & MSG_DONE)) {
+                    MsgStep();
+                    RunFrame();
+                }
+                CinemaClose(1);
+                g_bg_shown ^= 0x10;
+            }
+            personas[n].key = 0;
+            g_persona_slots[slot] = SLOT_EMPTY;
+            PersonaSlotsDraw();
+        }
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+    SlotSetFlicker(2, 1);
+    FacilitySlotsClear();
+    SlotClear(0x2E);
+    g_bg_shown ^= 0x10;
+    if (!PersonaSlotsCount()) {
+        SlotSetFlicker(1, 1);
+        SlotClear(2);
+        g_persona_data_step--;
+    }
+    g_persona_data_step--;
+}
+
+#ifdef NON_MATCHING
+/* The slot to swap the member's entry with. A Persona in the slot changes
+   places with the entry, which moves up past empty entries; an empty slot
+   takes the entry, and the entries after it close up. */
+void PersonaSwapApply(void)
+{
+    Char    *chars;
+    Persona *personas;
+    int      slot;
+    int      chr;
+    int      i;
+    int      n;
+    u_char   old;
+    Char    *c;
+    u_char   t;
+
+    chars = g_chars;
+    personas = g_personas;
+    if ((short)(g_map_scroll_y % 12) == 0) {
+        if (g_use_scroll_step != 0) {
+            if (g_menu->unk2E0.delay < 3) {
+                g_menu->unk2E0.delay = 0;
+            }
+            g_use_scroll_step = 0;
+        }
+        if (PageScrollValue(&g_use_top, 0, 6, 10)) {
+            g_map_scroll_y = g_use_top * 12;
+        } else {
+            MenuScrollCursor(&g_menu->unk2E0, &g_use_top, 0, 6, (u_short *)&g_use_scroll_step);
+        }
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT];
+    if (g_use_top == 0) {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    }
+    g_slot_cur = &g_slots[PAGE_MARK_SLOT + 1];
+    if (g_use_top != 6) {
+        g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
+    } else {
+        g_slot_cur->attr |= SLOT_ATTR_HIDE;
+    }
+    SlotSetPos(2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+    g_map_scroll_y += g_use_scroll_step;
+    if ((short)(g_map_scroll_y % 12) != 0) {
+        return;
+    }
+    if (g_pad_pressed[0] & 0x10) {
+        chr = g_use_top + g_menu->unk2E0.cur;
+        n = g_persona_slots[chr];
+        if (n == SLOT_EMPTY) {
+            return;
+        }
+        SlotSetAnim(0x2D, 0, 0, 0, 0x60, 0xC, 0, 0);
+        PersonaSlotView(n);
+        PersonaSwapSlotsOpen();
+        CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+        FacilityCursorPlace();
+        g_map_scroll_y = g_use_top * 12;
+        PersonaSlotsDrawFor(g_menu->status_who.cur);
+        SlotInitTagged(g_pdata_cursor_def, 2, 0x42, 0xC8, g_menu->unk2E0.cur * 12 + 0x30);
+        SlotSetFlicker(1, 0);
+        SlotSetFlicker(2, 1);
+        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0x24, 0, 0);
+        return;
+    }
+    if (InputCheckAcceptA(1)) {
+        slot = g_use_top + g_menu->unk2E0.cur;
+        if (g_persona_slots[slot] != SLOT_EMPTY) {
+            if (!CharCanUsePersona(g_party[g_menu->status_who.cur],
+                                   personas[g_persona_slots[slot]].key)) {
+                return;
+            }
+            chr = g_party[g_menu->status_who.cur];
+            old = chars[chr].list[g_menu->unk2D0.cur];
+            personas[old].owner = SLOT_EMPTY;
+            i = g_menu->unk2D0.cur;
+            switch (i) {
+            case 2:
+                if (chars[chr].list[0] == SLOT_EMPTY) {
+                    i = 0;
+                } else if (chars[chr].list[1] == SLOT_EMPTY) {
+                    i = 1;
+                }
+                break;
+            case 1:
+                if (chars[chr].list[0] == SLOT_EMPTY) {
+                    i = 0;
+                }
+                break;
+            }
+            chars[chr].list[i] = g_persona_slots[slot];
+            personas[g_persona_slots[slot]].owner = chars[chr].key;
+        swapped:
+            g_persona_slots[slot] = old;
+            CharApplyStats(chr);
+            CharRecalcStats(chr);
+            CharPersonasDraw(g_menu->status_who.cur, AT(g_tilemap2, 1, 0));
+            PersonaSlotsDrawFor(g_menu->status_who.cur);
+        } else {
+            chr = g_party[g_menu->status_who.cur];
+            n = chars[chr].entry;
+            if (g_menu->unk2D0.cur == n) {
+                return;
+            }
+            c = &chars[chr];
+            old = c->list[g_menu->unk2D0.cur];
+            switch (g_menu->unk2D0.cur) {
+            case 0:
+                t = c->list[2];
+                c->list[2] = SLOT_EMPTY;
+                c->list[0] = c->list[1];
+                c->list[1] = t;
+                c->entry--;
+                break;
+            case 1:
+                t = c->list[2];
+                c->list[2] = SLOT_EMPTY;
+                c->list[1] = t;
+                if (c->entry == 2) {
+                    c->entry--;
+                }
+                break;
+            case 2:
+                chars[chr].list[2] = SLOT_EMPTY;
+                break;
+            }
+            personas[old].owner = SLOT_EMPTY;
+            goto swapped;
+        }
+    } else if (!InputCheckAcceptB(1) && !g_menu_allow_hold) {
+        return;
+    }
+    SlotSetFlicker(1, 1);
+    SlotClear(2);
+    g_persona_data_step -= 3;
+}
+#else
+INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", PersonaSwapApply);
+#endif
 
 /* A Persona's data pages, opened over the facility: the portrait read
    off the disc, then the two halves scrolled between until B. */
@@ -858,7 +1146,7 @@ short PersonaSlotsCount(void)
 }
 
 /* Whether a Persona has reached its eighth spell slot. */
-u_char PersonaSpellsFull(short n)
+short PersonaSpellsFull(short n)
 {
     return g_personas[n].slots >= 8;
 }
