@@ -2,7 +2,9 @@
  *   0x8009A2A8 S2dWinInit      0x8009A368 (the draw, asm)
  *   0x8009A658 S2dWinSetArea   0x8009A714 S2dWinCheckFull
  *   0x8009A774 S2dReadChar     0x8009A7B8 S2dCopyName
- *   0x8009A804 S2dCopyChars
+ *   0x8009A804 S2dCopyChars    0x8009A890 (asm)
+ *   0x8009AB20 S2dWinScroll    0x8009AC04 S2dWinState
+ *   0x8009AC18 (the script step, asm)  0x8009B428 S2dWinSetParam
  *
  * A window runs a script that lays text into it; characters are one byte
  * below 0x80 and two above, and a string ends in 0xFF.
@@ -13,7 +15,13 @@
 #include <libgpu.h>
 #include <persona/s2d/textwin.h>
 
-extern void func_8009B490(void);
+extern void S2dIndicatorBar(void);
+/* Declared without a prototype: the scroll hands its height over
+   unnarrowed. */
+extern void VramQueueClear();
+
+/* Seven settings the window scripts read. */
+extern int D_800B5EF8[7];
 
 void S2dWinInit(mode, w, script, a, b, c, d, cols, rows, x, y)
     short   mode;
@@ -81,7 +89,7 @@ void S2dWinSetArea(S2dWin *w, int side, int x, int y)
 void S2dWinCheckFull(S2dWin *w)
 {
     if (w->count == w->cols * w->rows) {
-        func_8009B490();
+        S2dIndicatorBar();
         w->flags = (w->flags & ~0x10) | 0x64;
     }
 }
@@ -137,4 +145,64 @@ void S2dCopyChars(u_char *s, u_short *out)
         *out++ = c;
     }
     *out = TEXT_END;
+}
+
+INCLUDE_ASM("s2d/nonmatchings/ui/textwin", func_8009A890);
+
+/* One step of the window's scroll: four lines up every frame, and after a
+   whole window the text starts again from the top with its glyphs
+   cleared. Returns how far it has scrolled. */
+u_short S2dWinScroll(S2dWin *w)
+{
+    if (--w->scroll_wait == 0) {
+        w->y -= 4;
+        if (++w->scroll >= w->rows * 4) {
+            w->y = w->y0;
+            if (!(w->mode & 1)) {
+                w->unk06 = 0;
+                w->count = 0;
+            }
+            w->scroll = 0;
+            VramQueueClear(w->unk1C4, w->unk1C6, 0x40,
+                           ((w->cols * w->rows) / 16 + 1) * 16, 0, 0, 0);
+        }
+        w->scroll_wait = 1;
+    }
+    return w->scroll;
+}
+
+u_long S2dWinState(S2dWin *w)
+{
+    return w->flags | (w->unk04 << 16);
+}
+
+INCLUDE_ASM("s2d/nonmatchings/ui/textwin", func_8009AC18);
+
+void S2dWinSetParam(int which, int v)
+{
+    int *p = D_800B5EF8;
+
+    switch (which) {
+    case 0:
+        p[0] = v;
+        break;
+    case 1:
+        p[1] = v;
+        break;
+    case 2:
+        p[3] = v;
+        break;
+    case 3:
+        p[4] = v;
+        break;
+    case 4:
+        p[6] = v;
+        break;
+    case 5:
+        p[5] = v;
+        break;
+    case 6:
+        p[2] = v;
+        break;
+    }
 }

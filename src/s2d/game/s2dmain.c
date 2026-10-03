@@ -47,7 +47,7 @@ extern u_long    D_800B1D30[];
 extern int       D_800B85BC;
 extern short     D_800B8FD4;
 extern short     D_800B8FD8;
-extern u_char    D_800AA66C[];
+extern u_char    D_800AA73C[];
 
 extern void S2dSceneInit(void);
 extern void S2dLoadScene(void);
@@ -127,13 +127,13 @@ void S2dMarkScript(int kind)
     case 3:
         if (!(*flags & 1)) {
             *flags |= 1;
-            *script = (int)(D_800AA66C + 0xD0);
+            *script = (int)D_800AA73C;
         }
         break;
     case 5:
         if (!(*flags & 2)) {
             *flags |= 2;
-            *script = (int)(D_800AA66C + 0x25C);
+            *script = (int)(D_800AA73C + 0x18C);
         }
         break;
     }

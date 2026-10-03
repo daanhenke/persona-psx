@@ -11,13 +11,17 @@
 typedef struct {
     /* 0x000 */ short   mode;
     /* 0x002 */ u_short flags;
-    /* 0x004 */ short   unk04;
+    /* 0x004 */ u_short unk04;
     /* 0x006 */ short   unk06;
     /* 0x008 */ int     unk08;
     /* 0x00C */ int     script;
     /* 0x010 */ short   unk10;
     /* 0x012 */ short   count;     /* characters placed */
-    /* 0x014 */ u_char  unk14[0x19C - 0x14];
+    /* 0x014 */ short   unk14;
+    /* 0x016 */ short   unk16;
+    /* 0x018 */ short   scroll;    /* rows scrolled */
+    /* 0x01A */ short   scroll_wait;
+    /* 0x01C */ u_char  unk1C[0x19C - 0x1C];
     /* 0x19C */ VECTOR  trans;
     /* 0x1AC */ SVECTOR rot;
     /* 0x1B4 */ VECTOR  scale;
