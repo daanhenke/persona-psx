@@ -18,14 +18,6 @@
 #define g_pad_layout (*(u_char *)0x801F2AC7)
 #define g_seq_handle ((short *)0x801F537C)
 
-typedef struct {
-    u_short mask;
-    u_short pad;
-} S2dKey;
-
-/* The actions S2D reads the pad for, in the order its code tests them. */
-extern S2dKey g_s2d_keys[10];
-
 /* Double-buffered ordering tables, one pair per layer, and the tag buffers
    they point into. */
 

@@ -3,7 +3,9 @@
  *   0x8008ED0C S2dCompassMoveTo  0x8008ED54 S2dCompassScaleTo
  *   0x8008EDB4 S2dCompassStep    0x8008EFB8 S2dCompassDepthSort
  *   0x8008F1BC S2dDrawCompass    0x8008F3C0 S2dUpdate
- *   0x8008F4A4 S2dDraw
+ *   0x8008F4A4 S2dDraw           0x8008F570 S2dInitPartyObjs
+ *   0x8008F7D8 S2dFilterInput    0x8008F878 S2dViewKeys
+ *   0x8008FC00 S2dPartyMoved
  *
  * The party is two placed objects, g_party_obj and [1]. Left standing
  * still long enough on a map that allows it, one of them starts an idle
@@ -32,7 +34,8 @@ extern int   D_800A4CF0;
 extern int   g_idle_frames;
 extern int   g_idle_kind;
 extern int   g_idle_phase;
-extern short D_800A4CDC;
+/* How far the party's model turns each frame. */
+extern int   g_party_spin;
 
 extern short g_compass_x;
 
@@ -75,6 +78,28 @@ extern void S2dDrawMapObjs(void);
 extern void func_800937FC(void);
 extern void func_800971D4(void);
 extern void func_80089F5C(int n);
+extern void S2dLoad2670(void);
+
+/* S2dFilterInput's two inputs, their last sixteen values, the outputs and
+   the sixteen weights. */
+extern u_char D_800B2D98[2];
+extern short  g_filter_hist[2][16];
+extern int    g_filter_sum[2];
+extern short  D_800A5028[16];
+
+#define g_seq_handle ((short *)0x801F537C)
+
+/* The view's zoom: whether it was last zoomed out, and a request to put it
+   back. */
+extern int D_800A5068;
+/* Which way the view was last zoomed: 2 back in, below that out. */
+extern int g_view_zoom;
+
+extern int  func_8008E158(int which);
+extern void func_800999D0(int a, int b);
+
+/* The party's last six places. */
+extern short D_800A5088[][2];
 
 /* The four outer pieces' places, projected for their depths. */
 extern SVECTOR g_compass_pts[4];
@@ -132,7 +157,7 @@ void S2dDrawParty(GsOT *ot, int shift)
     }
 
     o = &g_party_obj;
-    g_party_obj.rot.vy += D_800A4CDC;
+    g_party_obj.rot.vy += g_party_spin;
     func_8008D988(&o->trans, &o->rot, &o->scale, &o->coord);
     GsGetLws(g_party_obj.obj.coord2, &lw, &ls);
     GsSetLightMatrix(&lw);
@@ -348,4 +373,152 @@ void S2dDraw(void)
     func_800937FC();
     func_800971D4();
     func_80089F5C(4);
+}
+
+/* The party's model at the camera's place, and the three objects that hang
+   off D_800B0B78: two of model 4's objects at the camera's rotation. */
+void S2dInitPartyObjs(void)
+{
+    GsInitCoordinate2(NULL, &g_party_obj.coord);
+    g_party_obj.trans = *(VECTOR *)&g_s2d_cam_x;
+
+    GsInitCoordinate2(NULL, &D_800B0B78.coord);
+    D_800B0B78.scale.vx = ONE;
+    D_800B0B78.scale.vy = ONE;
+    D_800B0B78.scale.vz = ONE;
+
+    GsInitCoordinate2(&D_800B0B78.coord, &D_800B0C04.coord);
+    D_800B0C04.trans.vx = 0;
+    D_800B0C04.trans.vy = 0;
+    D_800B0C04.trans.vz = ONE;
+    D_800B0C04.rot = *(SVECTOR *)&g_s2d_cam_rx;
+    D_800B0C04.scale.vx = 0;
+    D_800B0C04.scale.vy = 4;
+    D_800B0C04.scale.vz = 0;
+
+    GsInitCoordinate2(&D_800B0B78.coord, &D_800B0C90.coord);
+    D_800B0C90.trans.vx = 0;
+    D_800B0C90.trans.vy = 0;
+    D_800B0C90.trans.vz = ONE;
+    D_800B0C90.rot = *(SVECTOR *)&g_s2d_cam_rx;
+    D_800B0C90.scale.vx = 0;
+    D_800B0C90.scale.vy = 0;
+    D_800B0C90.scale.vz = 0;
+
+    S2dLoad2670();
+
+    D_800B0C04.obj.tmd = g_models[4].objs;
+    *(u_long *)D_800B0C04.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)D_800B0C04.obj.tmd[4] |= D_800B0C04.obj.tmd[5];
+    D_800B0C04.obj.attribute = 0;
+    D_800B0C04.obj.coord2 = &D_800B0C04.coord;
+
+    D_800B0C90.obj.tmd = g_models[4].objs + 7;
+    *(u_long *)D_800B0C90.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)D_800B0C90.obj.tmd[4] |= D_800B0C90.obj.tmd[5];
+    D_800B0C04.obj.attribute = 0x40000000;
+    D_800B0C90.obj.attribute = 0;
+    D_800B0C90.obj.coord2 = &D_800B0C90.coord;
+
+    g_party_spin = 0x20;
+}
+
+/* Two sixteen-tap filters: input n goes into each one's ring, and the
+   weighted sum of the ring comes out. */
+void S2dFilterInput(int n)
+{
+    int i;
+    int k;
+
+    for (i = 0; i < 2; i++) {
+        g_filter_hist[i][n & 0xF] = D_800B2D98[i];
+        g_filter_sum[i] = 0;
+        for (k = 0; k < 16; k++) {
+            g_filter_sum[i] += g_filter_hist[i][(n - k) & 0xF] * D_800A5028[k];
+        }
+    }
+}
+
+/* The view's keys: one zooms the compass out over the map and brings in
+   its music, another (or a request) zooms it back; up and down tilt the
+   view, and two keys - through the filters - turn it. Always 1. */
+int S2dViewKeys(void)
+{
+    short *p;
+
+    if (func_8008E158(1) & g_s2d_keys[2].mask) {
+        S2dCompassMoveTo(g_s2d_heading ? -0x9C : 0x9C, -0x6C, 0x100);
+        S2dCompassScaleTo(0xE00, 0xE00, 0xE00, 0x100);
+        func_800999D0(0, 0x100);
+        func_8009994C(g_s2d_heading == 0 ? 0x1A0 : 0x60, 0x2C, 0x80, 0x38, 1,
+                      1, 0x100);
+        SsSeqSetVol(g_seq_handle[13], 0x7E, 0x7E);
+        SsSeqPlay(g_seq_handle[13], 1, 1);
+        SsSeqStop(g_seq_handle[15]);
+        if ((u_int)g_view_zoom < 2) {
+            D_800A5068 = 1;
+        } else {
+            g_view_zoom = 0;
+            D_800A5068 = 0;
+        }
+    }
+    if ((func_8008E158(1) & (g_s2d_keys[0].mask | 0xF0)) || D_800A5068 == 1) {
+        p = &g_compass_x;
+        S2dCompassMoveTo(*p + 0x58, -0x18, 0x100);
+        S2dCompassScaleTo(ONE, ONE, ONE, 0x100);
+        func_8009994C(*p + 0x10F, 0x18, 0x98, 0x68, 0, 0, 0x100);
+        func_800999D0(1, 0x100);
+        SsSeqSetVol(g_seq_handle[15], 0x7E, 0x7E);
+        SsSeqPlay(g_seq_handle[15], 1, 1);
+        SsSeqStop(g_seq_handle[13]);
+        SsSeqStop(g_seq_handle[14]);
+        g_view_zoom = 2;
+        D_800A5068 = 0;
+    }
+    if (func_8008E158(0) & 0x1000) {
+        int v;
+
+        v = D_800B0C04.rot.vx - 0xB;
+        if (v <= 0) {
+            v = 1;
+        }
+        D_800B0C04.rot.vx = v;
+    }
+    if (func_8008E158(0) & 0x4000) {
+        int v;
+
+        v = D_800B0C04.rot.vx + 0xB;
+        if (v > 0x400) {
+            v = 0x400;
+        }
+        D_800B0C04.rot.vx = v;
+    }
+    if ((func_8008E158(0) & g_s2d_keys[6].mask) || (func_8008E158(0) & 0x2000)) {
+        D_800B2D98[0] = 1;
+    } else {
+        D_800B2D98[0] = 0;
+    }
+    if ((func_8008E158(0) & g_s2d_keys[5].mask) || (func_8008E158(0) & 0x8000)) {
+        D_800B2D98[1] = 1;
+    } else {
+        D_800B2D98[1] = 0;
+    }
+    S2dFilterInput(D_800B863C);
+    D_800B0C04.rot.vy += (g_filter_sum[0] * 64) >> 12;
+    D_800B0C04.rot.vy -= (g_filter_sum[1] * 64) >> 12;
+    return 1;
+}
+
+/* Whether the party's last six places differ from the first. */
+int S2dPartyMoved(void)
+{
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        if (D_800A5088[0][0] != D_800A5088[i][0] ||
+            D_800A5088[0][1] != D_800A5088[i][1]) {
+            return 1;
+        }
+    }
+    return 0;
 }

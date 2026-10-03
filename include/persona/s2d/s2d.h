@@ -134,6 +134,14 @@ typedef struct {
 
 extern S2dMapInfo g_map_info[];
 
+typedef struct {
+    u_short mask;
+    u_short pad;
+} S2dKey;
+
+/* The actions S2D reads the pad for, in the order its code tests them. */
+extern S2dKey g_s2d_keys[10];
+
 extern u_char g_map_pos_x;
 extern u_char g_map_pos_y;
 extern short  g_map_side;
