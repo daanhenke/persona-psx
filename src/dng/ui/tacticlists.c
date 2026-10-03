@@ -13,7 +13,7 @@
 #include <persona/common/slot.h>
 
 #define g_cfg          ((u_char *)0x801F2AC4)
-#define g_slots        ((Slot *)0x800DC10C)
+#define g_slots        ((Slot *)(0x800DC10C + WORK_BIAS))
 
 extern MenuList g_tactic_member;
 extern MenuList g_tactic_list0, g_tactic_list1, g_tactic_list2, g_tactic_list3,

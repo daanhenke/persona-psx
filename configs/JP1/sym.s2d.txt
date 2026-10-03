@@ -174,7 +174,9 @@ FadeStepDown             = 0x80065B6C; // type:func size:0x38
 //-----------------------------------------------------------
 //--- PA: 0x001804   VA: 0x80065BA4   subsegment: asm, s2d_s1
 //-----------------------------------------------------------
-D_80065BA4               = 0x80065BA4; // type:func size:0xC8
+SlotFadeIn               = 0x80065BA4; // type:func size:0x50
+SlotFadeOut              = 0x80065BF4; // type:func size:0x50
+SlotSetBrightness        = 0x80065C44; // type:func size:0x28
 
 //-------------------------------------------------------------------------
 //--- PA: 0x0018CC   VA: 0x80065C6C   subsegment: c, common/gfx/slotflicker
@@ -468,7 +470,7 @@ ConfigApplyOption        = 0x80075604; // type:func size:0x84
 //-------------------------------------------------------------
 //--- PA: 0x0112E8   VA: 0x80075688   subsegment: asm, s2d_2_s4
 //-------------------------------------------------------------
-D_80075688               = 0x80075688; // type:func size:0x1D4
+MenuChoicePageOpen       = 0x80075688; // type:func size:0x1D4
 
 //----------------------------------------------------------------------
 //--- PA: 0x0114BC   VA: 0x8007585C   subsegment: c, common/ui/padconfig
@@ -753,7 +755,9 @@ ConfigDrawLabels         = 0x80080354; // type:func size:0x104
 //--- PA: 0x01C0B8   VA: 0x80080458   subsegment: asm, s2d_2_s19
 //--------------------------------------------------------------
 PadDrawLayout            = 0x80080458; // type:func size:0x130
-D_80080588               = 0x80080588; // type:func size:0x1A8
+TacticListStep           = 0x80080588; // type:func size:0xE8
+SlotsHighlight           = 0x80080670; // type:func size:0xB8
+MenuStepNone             = 0x80080728; // type:func size:0x8
 
 //------------------------------------------------------------------------
 //--- PA: 0x01C390   VA: 0x80080730   subsegment: c, common/ui/padbindings
@@ -918,7 +922,9 @@ CellsClear               = 0x80083520; // type:func size:0x30
 //-----------------------------------------------------------------
 //--- PA: 0x01F1B0   VA: 0x80083550   subsegment: asm, s2d_2_s23_x1
 //-----------------------------------------------------------------
-D_80083550               = 0x80083550; // type:func size:0x14C
+CellsWriteNumberRev      = 0x80083550; // type:func size:0x64
+CellsWriteGlyphsRev      = 0x800835B4; // type:func size:0x84
+CellsWriteDigitsRev      = 0x80083638; // type:func size:0x64
 
 //----------------------------------------------------------------------
 //--- PA: 0x01F2FC   VA: 0x8008369C   subsegment: c, common/gfx/cellsrow
@@ -928,7 +934,9 @@ CellsWriteRow            = 0x8008369C; // type:func size:0xC0
 //-----------------------------------------------------------------
 //--- PA: 0x01F3BC   VA: 0x8008375C   subsegment: asm, s2d_2_s23_x2
 //-----------------------------------------------------------------
-D_8008375C               = 0x8008375C; // type:func size:0x970
+StatusDrawMember         = 0x8008375C; // type:func size:0x6A0
+StatusDrawName           = 0x80083DFC; // type:func size:0x78
+StatusDrawPersona        = 0x80083E74; // type:func size:0x258
 DrawItemName             = 0x800840CC; // type:func size:0x64
 DrawBagItemRow           = 0x80084130; // type:func size:0xFC
 TacticsSetCels           = 0x8008422C; // type:func size:0xD0
@@ -1248,6 +1256,7 @@ g_bg_layers              = 0x8009E5BC; // size:0xD8
 g_menu_layer_defs        = 0x8009E698;
 g_formation_marker_def   = 0x8009EBB4;
 g_pad_binding_table      = 0x8009EBC8; // size:0x3C
+g_status_labels          = 0x8009ECC0;
 str_cfg_message_speed    = 0x8009ED2C;
 str_cfg_battle           = 0x8009ED6C;
 str_cfg_auto_battle      = 0x8009ED74;
@@ -1414,6 +1423,11 @@ g_image_anim             = 0x800B9008; // size:0x140
 g_arcana_top             = 0x800B9148; // size:0x2
 g_bg_shown               = 0x800B914C;
 g_tactic_member          = 0x800B9158; // size:0x10
+g_tactic_list0           = 0x800B9168; // size:0x10
+g_tactic_list1           = 0x800B9178; // size:0x10
+g_tactic_list2           = 0x800B918C; // size:0x10
+g_tactic_list3           = 0x800B919C; // size:0x10
+g_tactic_list4           = 0x800B91AC; // size:0x10
 g_equip_last             = 0x800B91CC; // type:u32 size:0x20
 g_hud_digits             = 0x800B91D0;
 g_skill_help_spell       = 0x800B91E8; // size:0x2
