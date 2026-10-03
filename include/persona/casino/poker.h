@@ -70,6 +70,14 @@ extern u_char g_poker_jackpot_add; /* ticks still to add to the jackpot */
 /* The ten cards a hand can use: the deal, then the draw's replacements. */
 extern u_char g_poker_deck[10];
 
+/* What the three double-up games share (double.c). */
+void CasinoPokerDoubleExit(void);
+void CasinoPokerDoubleMusic(void);
+void CasinoPokerDoubleMusicEnd(void);
+void CasinoPokerDoubleBlink(u_char n);
+void CasinoPokerHiLoKeys(void);
+void CasinoPokerColorKeys(void);
+
 /* The table. Layout lists are built in one go, frames are four-piece
    borders; each 3D object is its own one-element array with the model
    that builds it right behind it. */

@@ -44,13 +44,10 @@ extern void CasinoPayStep(int *win);
 
 extern void  CasinoPokerHiLoRun(void);
 extern void  CasinoPokerColorRun(void);
-extern void  func_800775CC(void);
 extern void  CasinoPokerDoubleMaxed(void);
 extern void  CasinoPokerDoubleNumbers(void);
 extern void  CasinoPokerDoubleIntro(void);
 extern void  CasinoPokerDoubleReadouts(void);
-extern void  func_80077F38(void);
-extern void  func_80078014(void);
 extern void  func_80082658(u_char *out, int n, int range, int unique);
 extern short func_80082454(u_char card);
 extern void  func_800824CC(int i, u_char card, int face, int spr);
@@ -89,7 +86,7 @@ void CasinoPokerDoublePlay(void)
         CasinoPokerColorRun();
         break;
     case 0x39:
-        func_800775CC();
+        CasinoPokerDoubleExit();
         break;
     }
 }
@@ -308,7 +305,7 @@ void CasinoPokerHighWin(void)
         CasinoStartAnim(D_800962E4, 0x10, 0, -0x800, 0, 0, -0x50, 0, 0, 0, 0);
     }
     if (g_casino_timer == 0x20) {
-        func_80077F38();
+        CasinoPokerDoubleMusic();
         SsSeqSetVol(g_casino_seqs[15], 0x40, 0x40);
     }
     if (!SsIsEos(g_casino_seqs[1], 0) && g_casino_timer >= 0x20) {
@@ -349,7 +346,7 @@ void CasinoPokerHighAgain(void)
         }
     }
     if (g_poker_double_step != 0x37) {
-        func_80078014();
+        CasinoPokerDoubleMusicEnd();
         g_casino_timer = -1;
     }
 }

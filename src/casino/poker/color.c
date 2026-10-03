@@ -42,10 +42,6 @@ extern void CasinoSplitDigits(u_int n);
 extern void CasinoPayStep(int *win);
 
 extern int   rand(void);
-extern void  func_80077F38(void);
-extern void  func_80078014(void);
-extern void  func_80078094(int n);
-extern void  func_800781FC(void);
 extern short func_80082454(u_char card);
 extern void  func_800824CC(int i, u_char card, int face, int spr);
 extern void  func_800825A4(u_char card, int spr);
@@ -185,7 +181,7 @@ void CasinoPokerColorShow(void)
 
 void CasinoPokerColorGuess(void)
 {
-    func_800781FC();
+    CasinoPokerColorKeys();
     if (g_poker_color_guess != 0xFF) {
         SsSeqStop(g_casino_seqs[4]);
         SsSeqPlay(g_casino_seqs[4], 1, 1);
@@ -223,7 +219,7 @@ void CasinoPokerColorWin(void)
             g_poker_payout = 1000000;
         }
         CasinoShowNumber(g_poker_payout, D_80095E94, 8);
-        func_80077F38();
+        CasinoPokerDoubleMusic();
         SsSeqSetVol(g_casino_seqs[15], 0x40, 0x40);
     }
     if (!SsIsEos(g_casino_seqs[1], 0) && g_casino_timer >= 0x10) {
@@ -247,7 +243,7 @@ void CasinoPokerColorWin(void)
 /* The stake reached a million: say so, and pay it out on a key. */
 void CasinoPokerDoubleMaxed(void)
 {
-    func_80078094(0x10);
+    CasinoPokerDoubleBlink(0x10);
     if (((g_casino_pad_trig & PAD_CIRCLE) || (g_casino_pad_trig & PAD_SQUARE) || (g_casino_pad_trig & PAD_TRIANGLE) ||
          (g_casino_pad_trig & PAD_CROSS)) &&
         g_casino_timer > 0x78) {
@@ -277,7 +273,7 @@ void CasinoPokerColorAgain(void)
         }
     }
     if (g_poker_double_step != 0x37) {
-        func_80078014();
+        CasinoPokerDoubleMusicEnd();
         SsSeqStop(g_casino_seqs[4]);
         SsSeqPlay(g_casino_seqs[4], 1, 1);
         g_casino_timer = -1;
