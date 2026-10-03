@@ -27,6 +27,9 @@
 #define STATUS_10    0x10
 #define LABEL_BASE   0x285
 extern u_char g_status_names[][8];
+#ifdef STATUSMAIN_KEY_NAME
+extern void DrawPersonaKeyName();
+#endif
 
 extern const u_char g_persona_list_rule[];
 
@@ -128,6 +131,12 @@ void StatusDrawMain(u_char slot)
     for (member = 0; member < CHAR_LIST_N; member++) {
         bank = c->list[member];
         if (bank != 0xFF && !c->blocked) {
+#ifdef STATUSMAIN_KEY_NAME
+            /* S2D's hands the row to DrawPersonaKeyName, as DNG's does. */
+            key = personas[bank].key;
+            base = c->entry == member ? LABEL_BASE : 0;
+            DrawPersonaKeyName(key, AT(26 + member, 3), base);
+#else
             base = c->entry == member ? LABEL_BASE : 0;
             key = personas[bank].key;
             TileMapFillRect(AT(26, 3) + member * MAP_W, 0, 10, 1, MAP_W);
@@ -135,6 +144,7 @@ void StatusDrawMain(u_char slot)
                 TileMapWriteRow(g_persona_defs[key].name,
                                 AT(26, 3) + member * MAP_W, base, 10);
             }
+#endif
         } else {
             TileMapWriteRow(g_persona_list_rule, AT(26 + member, 4), GLYPH_BANK, 8);
         }

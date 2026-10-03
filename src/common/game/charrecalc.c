@@ -31,8 +31,13 @@ void CharRecalcStats(u_char n)
     c = &g_chars[n];
     defs = g_item_defs;
     k = c->entry;
+#ifndef RECALC_ANY_PERSONA
     if (k != CHAR_NO_ENTRY && !c->blocked &&
         g_personas[v = c->list[k]].key != 0) {
+#else
+    /* S2D's takes the active entry's magic without looking at its key. */
+    if (k != CHAR_NO_ENTRY && !c->blocked && (v = c->list[k], 1)) {
+#endif
         c->mag_atk = g_personas[v].mag_atk;
         c->mag_def = g_personas[v].mag_def;
     } else {

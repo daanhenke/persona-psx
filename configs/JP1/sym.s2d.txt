@@ -1256,6 +1256,7 @@ g_bg_layers              = 0x8009E5BC; // size:0xD8
 g_menu_layer_defs        = 0x8009E698;
 g_formation_marker_def   = 0x8009EBB4;
 g_pad_binding_table      = 0x8009EBC8; // size:0x3C
+g_status_names           = 0x8009EC04; // size:0xB8
 g_status_labels          = 0x8009ECC0;
 str_cfg_message_speed    = 0x8009ED2C;
 str_cfg_battle           = 0x8009ED6C;
