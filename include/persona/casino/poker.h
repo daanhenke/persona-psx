@@ -42,9 +42,11 @@ extern u_char g_poker_rank;                 /* 0 nothing, 1 royal flush .. 9 one
 extern u_char g_poker_flip_idx;             /* the card the draw is turning */
 extern u_char g_poker_jackpot_hit;
 extern u_int  g_poker_jackpot;
-extern int    g_poker_payout;
+extern u_int  g_poker_payout;
 extern u_char g_poker_double_game; /* which double-up game was picked */
 extern u_char g_poker_double_step; /* its own step                    */
+extern u_char g_poker_double_shown; /* its intro has played once      */
+extern u_int  g_poker_double_pay;   /* what winning it would pay      */
 
 extern s8    g_poker_flip_sound;               /* the turn sound is owed     */
 extern int   g_poker_win_seq;                  /* the jingle playing, or -1  */
@@ -104,6 +106,12 @@ extern CasinoLayout    D_80095A90; /* the panels the post-win choice shows */
 extern CasinoLayout    D_80095B28;
 extern CasinoLayout    D_80095BF4;
 extern CasinoLayout    D_80095CC0;
+extern CasinoLayout    D_8009651C;    /* the double-up's two prompts */
+extern CasinoLayout    D_800965E8;
+extern CasinoLayout    D_80095E94[8]; /* its readouts: the stake, the money, the double */
+extern CasinoLayout    D_80095FBC[8];
+extern CasinoLayout    D_800960E4[8];
+extern CasinoObj       D_80095DD0[];
 extern CasinoObj       D_800953E0[];
 extern CasinoModel     D_800953F0;
 extern CasinoObj       D_80095470[];

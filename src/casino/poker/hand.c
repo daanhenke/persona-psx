@@ -8,6 +8,7 @@
  *   0x800729DC CasinoSortBytes
  *   0x80072A7C CasinoPokerPick
  *   0x80072AF0 CasinoPokerCallRank
+ *   0x80072C34 CasinoPokerWinMusic
  *
  * A card's rank is card % 13 (0 the ace) and its suit card / 13; suit 4 is
  * the joker, which stands in for whatever completes the best hand. Ranks:
@@ -312,5 +313,29 @@ void CasinoPokerCallRank(u_char rank)
     case 9:
         CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x139D28, g_casino_vab);
         break;
+    }
+}
+
+/* The win's music, by rank; returns the sequence it started. */
+int CasinoPokerWinMusic(u_char rank)
+{
+    switch (rank) {
+    case 1:
+        CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x139FB8, g_casino_main_vab);
+        return 0x139FB8;
+    case 2:
+    case 3:
+        CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x13A208, g_casino_main_vab);
+        return 0x13A208;
+    case 4:
+    case 5:
+    case 6:
+        CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x13A338, g_casino_main_vab);
+        return 0x13A338;
+    case 7:
+    case 8:
+    case 9:
+        CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x13A418, g_casino_main_vab);
+        return 0x13A418;
     }
 }

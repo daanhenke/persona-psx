@@ -69,8 +69,8 @@ extern void   CasinoPokerHoldKeys(void);
 extern void   CasinoPokerStartDraw(void);
 extern u_char CasinoPokerEvaluate(u_char *hand, u_char *marks);
 extern void   CasinoPokerCallRank(u_char rank);
-extern int    func_80072C34(u_char rank);
-extern void   func_80072D14(void);
+extern int    CasinoPokerWinMusic(u_char rank);
+extern void   CasinoPokerDoublePlay(void);
 
 extern s8 g_casino_key_fire[4];
 extern s8 g_casino_key_hold[4];
@@ -95,12 +95,6 @@ extern CasinoLayout D_80095CF8;
 extern CasinoLayout D_80095D30;
 extern CasinoLayout D_80095D68;
 extern CasinoLayout D_80095E14;
-extern CasinoLayout D_8009651C;
-extern CasinoLayout D_800965E8;
-extern CasinoLayout D_80095E94[8];
-extern CasinoLayout D_80095FBC[8];
-extern CasinoLayout D_800960E4[8];
-extern CasinoObj    D_80095DD0[];
 extern CasinoModel  D_80095DE0;
 
 void CasinoPokerOpen(void);
@@ -171,7 +165,7 @@ void CasinoPokerRun(void)
         CasinoPokerDoubleUp();
         break;
     case POKER_DOUBLE_PLAY:
-        func_80072D14();
+        CasinoPokerDoublePlay();
         break;
     }
     if (g_casino_step != POKER_OPEN) {
@@ -399,7 +393,7 @@ void CasinoPokerWin(void)
     }
     if (g_casino_timer == 0) {
         CasinoPokerLightMarks();
-        g_poker_win_seq = func_80072C34(g_poker_rank);
+        g_poker_win_seq = CasinoPokerWinMusic(g_poker_rank);
         SsSeqSetVol(g_casino_seqs[15], 0x20, 0x20);
     }
     if (g_poker_win_seq != -1 && !SsIsEos(g_casino_seqs[0], 0)) {
