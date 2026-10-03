@@ -6,7 +6,8 @@
  *   0x8008F4A4 S2dDraw           0x8008F570 S2dInitPartyObjs
  *   0x8008F7D8 S2dFilterInput    0x8008F878 S2dViewKeys
  *   0x8008FC00 S2dPartyMoved     0x8008FC5C (the map's markers, asm)
- *   0x80090248 S2dDrawPartyFront
+ *   0x80090248 S2dDrawPartyFront 0x80090380 S2dDrawShade
+ *   0x80090554 S2dEndFrame
  *
  * The party is two placed objects, g_party_obj and [1]. Left standing
  * still long enough on a map that allows it, one of them starts an idle
@@ -80,6 +81,11 @@ extern void func_800937FC(void);
 extern void func_800971D4(void);
 extern void func_80089F5C(int n);
 extern void S2dLoad2670(void);
+extern void VramFlushQueues(void);
+extern void func_800935C8(void);
+extern void func_8008E1C0(void);
+
+extern int D_800B0EF0;
 
 /* S2dFilterInput's two inputs, their last sixteen values, the outputs and
    the sixteen weights. */
@@ -108,8 +114,7 @@ typedef struct {
     short  w, h;
 } S2dMove;
 
-/* The party's place on the screen, and the copy that keeps it in VRAM. */
-extern short   D_800B049C[2];
+/* The copy that keeps the party's patch of the screen in VRAM. */
 extern S2dMove g_party_move[2];
 
 /* The party's last six places. */
@@ -544,8 +549,8 @@ INCLUDE_ASM("s2d/nonmatchings/game/field", func_8008FC5C);
 void S2dDrawPartyFront(void)
 {
     SetDrawMove(&g_party_move[g_draw_side]);
-    g_party_move[g_draw_side].sx = D_800B049C[0] + 0xF0;
-    g_party_move[g_draw_side].sy = D_800B049C[1] + 0xA0;
+    g_party_move[g_draw_side].sx = g_s2d_drawenv.clip.x + 0xF0;
+    g_party_move[g_draw_side].sy = g_s2d_drawenv.clip.y + 0xA0;
     g_party_move[g_draw_side].w = 0x20;
     g_party_move[g_draw_side].h = 0x26;
     g_party_move[g_draw_side].dx = 0x200;
@@ -554,4 +559,80 @@ void S2dDrawPartyFront(void)
     g_party_mark.obj.attribute |= 0x80000000;
     g_party_obj.rot.vx = D_800B0C04.rot.vx;
     S2dDrawParty(&g_ot_front[g_draw_side], 0xB);
+}
+
+/* Maps 3 to 6 have a shade over the map: half of it on 3, the other half
+   on 4, all of it (and darker) on 5 and 6. */
+/* The map id read as a member: the image reloads it every turn of the
+   corner loop, which gcc 2.6 only does for a struct member (a plain global
+   it lets the array stores pass, and lifts out of the loop). */
+typedef struct {
+    u_char v;
+} S2dByteView;
+
+void S2dDrawShade(void)
+{
+    POLY_F4 f;
+    SVECTOR v[4];
+    int     i;
+
+    if (g_btl_map_id >= 3) {
+        SetPolyF4(&f);
+        SetSemiTrans(&f, 1);
+        SetShadeTex(&f, 0);
+        f.r0 = 0x20;
+        f.g0 = 0x20;
+        f.b0 = 0x20;
+        for (i = 0; i < 4; i++) {
+            switch (((S2dByteView *)&g_btl_map_id)->v) {
+            case 5:
+            case 6:
+                f.r0 = 0;
+                f.g0 = 0;
+                f.b0 = 0;
+                /* fall through */
+            case 3:
+                v[i].vx = (i & 1) * 0x4B8;
+                break;
+            case 4:
+                v[i].vx = (i & 1) * 0x4B8 - 0x4B8;
+                break;
+            }
+            v[i].vy = 0;
+            v[i].vz = 0x4B8 - (i / 2) * 0x970;
+        }
+        RotTransPers4(&v[0], &v[1], &v[2], &v[3], (long *)&f.x0,
+                      (long *)&f.x1, (long *)&f.x2, (long *)&f.x3,
+                      (long *)&i, (long *)&i);
+        GsSortPoly(&f, &g_ot_map[g_draw_side], 0);
+    }
+}
+
+/* The frame's end: the draw modes added, the queued uploads flushed, the
+   buffers swapped and every ordering table drawn, front to back. */
+void S2dEndFrame(void)
+{
+    int i;
+
+    AddPrim(g_ot_back[g_draw_side].tag, &g_menu_drmode[g_draw_side]);
+    AddPrim(g_ot_obj[g_draw_side].tag, &g_scene_drmode[g_draw_side]);
+    GetDrawEnv(&g_s2d_drawenv);
+    DrawSync(0);
+    VramFlushQueues();
+    DrawSync(0);
+    D_800B0EF0 = VSync(2);
+    ResetGraph(1);
+    func_800935C8();
+    func_8008E1C0();
+    GsSwapDispBuff();
+    GsSortClear(0, 0, 0, &g_ot_front[g_draw_side]);
+    GsDrawOt(&g_ot_front[g_draw_side]);
+    GsSortClear(g_fade.rgb[0], g_fade.rgb[1], g_fade.rgb[2], &g_ot_obj[g_draw_side]);
+    GsDrawOt(&g_ot_obj[g_draw_side]);
+    GsDrawOt(&g_ot_map[g_draw_side]);
+    GsDrawOt(&g_ot_back[g_draw_side]);
+    for (i = 0; i < 3; i++) {
+        GsDrawOt(&g_ot_layer[i][g_draw_side]);
+    }
+    D_800B863C++;
 }

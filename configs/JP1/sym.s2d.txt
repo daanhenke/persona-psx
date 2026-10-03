@@ -1080,8 +1080,8 @@ S2dViewKeys              = 0x8008F878; // type:func size:0x388
 S2dPartyMoved            = 0x8008FC00; // type:func size:0x5C
 func_8008FC5C            = 0x8008FC5C; // type:func size:0x5EC
 S2dDrawPartyFront        = 0x80090248; // type:func size:0x138
-func_80090380            = 0x80090380; // type:func size:0x1D4
-func_80090554            = 0x80090554; // type:func size:0x24C
+S2dDrawShade             = 0x80090380; // type:func size:0x1D4
+S2dEndFrame              = 0x80090554; // type:func size:0x24C
 func_800907A0            = 0x800907A0; // type:func size:0xAD0
 func_80091270            = 0x80091270; // type:func size:0xB0
 func_80091320            = 0x80091320; // type:func size:0x50C
@@ -1313,8 +1313,7 @@ D_800AA66C               = 0x800AA66C; // type:u32 size:0x5E30
 //------------------------------------------------------------
 //--- PA: 0x04C0FC   VA: 0x800B049C   subsegment: bss, s2d_bss
 //------------------------------------------------------------
-D_800B049C               = 0x800B049C; // type:u32 size:0x8
-D_800B04A4               = 0x800B04A4; // type:u32 size:0x54
+g_s2d_drawenv            = 0x800B049C; // size:0x5C
 g_map_obj_count          = 0x800B07A0; // size:0x4
 g_party_obj              = 0x800B07A4; // size:0x8C
 g_party_mark             = 0x800B0830; // size:0x8C

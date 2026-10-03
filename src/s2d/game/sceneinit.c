@@ -21,8 +21,6 @@
 /* Double-buffered ordering tables, one pair per layer, and the tag buffers
    they point into. */
 
-extern DR_MODE  g_scene_drmode[2];
-extern DR_MODE  g_menu_drmode[2];
 extern u_char   D_8009FCC0[];
 
 extern short  g_bgm_ready;

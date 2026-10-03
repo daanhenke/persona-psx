@@ -92,6 +92,12 @@ extern GsOT g_ot_map[2];
 extern GsOT g_ot_obj[2];
 extern GsOT g_ot_layer[3][2];
 extern GsOT g_ot_front[2];
+
+/* The draw modes added ahead of the object and back layers, and the draw
+   environment read back each frame. */
+extern DR_MODE g_scene_drmode[2];
+extern DR_MODE g_menu_drmode[2];
+extern DRAWENV g_s2d_drawenv;
 extern int  g_draw_side;
 
 /* Saved across a battle: where the party stood. */
