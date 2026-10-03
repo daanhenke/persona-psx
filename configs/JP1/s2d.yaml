@@ -57,7 +57,8 @@ segments:
       # 0x4..0xE80 is the leading rodata block; the entry point is at 0xE80.
       - [0x4, rodata, s2d_rodata]
       - [0x70, .rodata, ui/itemtop]
-      - [0x90, rodata, s2d_rodata0b]
+      - [0x90, .rodata, ui/statusmenu]
+      - [0xF0, rodata, s2d_rodata0b]
       - [0x118, .rodata, ui/configmenu]
       # partyhud is ten bytes; the linker pads to the next word.
       - [0x13C, .rodata, common/ui/partyhud]
@@ -121,6 +122,9 @@ segments:
       - [0x5E3C, c, common/ui/itemrowuse]
       - [0x5F88, c, common/ui/pagescroll]
       - [0x612C, asm, s2d_1_s5_p1]
+      - [0x7818, c, ui/statusmenu]
+      - [0xA14C, c, ui/statuspersona]
+      - [0xBF14, asm, s2d_1_s5_p2]
       - [0xCAE8, c, common/ui/menustatus]
       - [0xCB80, c, ui/statusscreen]
       - [0xD994, c, game/formationcmd]

@@ -135,13 +135,14 @@ memmove                  = 0x80041398; // type:func
 //--------------------------------------------------------------
 //--- PA: 0x000000   VA: 0x800643A0   subsegment: rodata, s2d_id
 //--------------------------------------------------------------
+g_resist_labels          = 0x8004C824;
 g_overlay_base           = 0x800643A0;
 
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, s2d_rodata
 //------------------------------------------------------------------
 D_800643A4               = 0x800643A4; // type:u32 size:0x6C
-D_80064430               = 0x80064430; // size:0x88
+D_80064490               = 0x80064490; // size:0x28
 
 
 
@@ -362,7 +363,7 @@ StatusMenuOpen           = 0x8006BCAC; // type:func size:0x60
 StatusTopStep            = 0x8006BD0C; // type:func size:0x3D0
 StatusStockScreen        = 0x8006C0DC; // type:func size:0xF8
 StatusStockOpen          = 0x8006C1D4; // type:func size:0x278
-func_8006C44C            = 0x8006C44C; // type:func size:0x23C
+SkillMemberPick          = 0x8006C44C; // type:func size:0x23C
 SkillPersonaPick         = 0x8006C688; // type:func size:0x4D0
 SkillSpellPick           = 0x8006CB58; // type:func size:0x3B0
 SkillTargetPick          = 0x8006CF08; // type:func size:0x334
@@ -377,7 +378,7 @@ StatusPersonaLayout      = 0x8006E800; // type:func size:0x3D0
 StatusPersonaPreview     = 0x8006EBD0; // type:func size:0x90
 StatusPersonaDraw        = 0x8006EC60; // type:func size:0x3D0
 StatusPersonaNames       = 0x8006F030; // type:func size:0xC0
-func_8006F0F0            = 0x8006F0F0; // type:func size:0x480
+StatusPersonaView        = 0x8006F0F0; // type:func size:0x480
 StatusStockPick          = 0x8006F570; // type:func size:0x36C
 StatusStockReleasePick   = 0x8006F8DC; // type:func size:0x2B0
 StatusStockReleaseConfirm = 0x8006FB8C; // type:func size:0x1F0
@@ -549,8 +550,8 @@ BoxRowBottom             = 0x80079E18; // type:func size:0x70
 //-------------------------------------------------------------
 D_80079E88               = 0x80079E88; // type:func size:0xA8
 SkillScreenLayout        = 0x80079F30; // type:func size:0x1D8
-func_8007A108            = 0x8007A108; // type:func size:0x2CC
-func_8007A3D4            = 0x8007A3D4; // type:func size:0x16C
+SkillPersonasDraw        = 0x8007A108; // type:func size:0x2CC
+SkillSpellsDraw          = 0x8007A3D4; // type:func size:0x16C
 DrawPersonaKeyName       = 0x8007A540; // type:func size:0x94
 
 //------------------------------------------------------------------------
@@ -693,7 +694,7 @@ CharSpellUsable          = 0x8007F38C; // type:func size:0x11C
 //--------------------------------------------------------------
 //--- PA: 0x01B108   VA: 0x8007F4A8   subsegment: asm, s2d_2_s17
 //--------------------------------------------------------------
-func_8007F4A8            = 0x8007F4A8; // type:func size:0x1BC
+SpellApplyField          = 0x8007F4A8; // type:func size:0x1BC
 
 //---------------------------------------------------------------------
 //--- PA: 0x01B2C4   VA: 0x8007F664   subsegment: c, common/game/status
@@ -763,7 +764,7 @@ PadLoadBindings          = 0x80080730; // type:func size:0x154
 //--- PA: 0x01C4E4   VA: 0x80080884   subsegment: asm, s2d_2_s20
 //--------------------------------------------------------------
 D_80080884               = 0x80080884; // type:func size:0xF0
-func_80080974            = 0x80080974; // type:func size:0x228
+StatusDrawPersonaRows    = 0x80080974; // type:func size:0x228
 StatusDrawPersonaNames   = 0x80080B9C; // type:func size:0xE4
 FormationRepairGrid      = 0x80080C80; // type:func size:0xE8
 FormationRepair          = 0x80080D68; // type:func size:0x38
@@ -1218,17 +1219,22 @@ func_8009C67C            = 0x8009C67C; // type:func size:0xD4
 g_flicker_ramp           = 0x8009C750; // type:u32 size:0x85A4
 g_pow10                  = 0x8009C770;
 g_config_marker_def      = 0x8009CB98;
+g_spage_kind_cells       = 0x8009D024;
+g_spage_name_cells       = 0x8009D07C;
 g_menu_sel               = 0x8009D1D8;
 g_menu_subsel            = 0x8009D1DA;
 str_cell_run             = 0x8009D208;
 str_empty                = 0x8009D224;
+g_persona_msg_key        = 0x8009D272;
 str_cfg_command_confirm  = 0x8009D278;
 str_cfg_window_anim      = 0x8009D284;
 str_cfg_do_or_not        = 0x8009D2A0;
+g_stock_release_msg      = 0x8009D2AC;
 str_place_3d_adv         = 0x8009D2F8;
 str_place_2d             = 0x8009D304;
 str_place_battle_top     = 0x8009D310;
 str_place_in_battle      = 0x8009D31C;
+g_kind_labels            = 0x8009D40C;
 g_persona_list_rule      = 0x8009DEDC;
 g_formation_member_def   = 0x8009E200;
 g_bg_map                 = 0x8009E59C; // size:0x10
@@ -1391,6 +1397,7 @@ g_image_anim             = 0x800B9008; // size:0x140
 g_bg_shown               = 0x800B914C;
 g_equip_last             = 0x800B91CC; // type:u32 size:0x20
 g_hud_digits             = 0x800B91D0;
+g_skill_help_spell       = 0x800B91E8; // size:0x2
 D_800B91EC               = 0x800B91EC; // type:u32 size:0x23C
 D_800B9428               = 0x800B9428; // type:u32 size:0x4
 D_800B942C               = 0x800B942C; // type:u32 size:0xA8
@@ -1399,6 +1406,7 @@ D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
 D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
 g_ot                     = 0x800B953C; // size:0x28
+g_stock_last             = 0x800B9564; // size:0x2
 g_pad_pressed            = 0x800FC004; // size:0x4
 g_msg                    = 0x80101E4C; // ignore:True size:0x40
 D_8010B380               = 0x8010B380; // ignore:True

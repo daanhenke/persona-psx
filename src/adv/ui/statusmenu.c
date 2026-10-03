@@ -293,9 +293,17 @@ void SkillMemberPick(void)
         MenuSetLayers(6);
         SkillScreenLayout();
         SkillPersonasDraw(g_menu->skill_member.cur);
+#ifdef SKILL_SPELLS_FIRST
+        /* S2D draws the spells for the Persona the cursor was left on, then
+           puts the cursor back on the first. */
+        SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+        MenuListInit(&g_menu->skill_persona, 0, 0,
+                     CharTopEntry(g_menu->skill_member.cur), 0x16);
+#else
         MenuListInit(&g_menu->skill_persona, 0, 0,
                      CharTopEntry(g_menu->skill_member.cur), 0x16);
         SkillSpellsDraw(g_menu->skill_member.cur, g_menu->skill_persona.cur);
+#endif
         SlotInitTagged(D_800B12B8, 2, 0x42, 0x58,
                        g_menu->skill_persona.cur * 12 + 0x54);
         SlotSetFlicker(2, 1);

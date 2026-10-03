@@ -193,8 +193,12 @@ void StatusPersonaLayout(void)
 }
 
 /* The member's stats as they would be with the highlighted Persona active:
-   worked out on a copy of the member's record and drawn from it. */
-inline void StatusPersonaPreview(void)
+   worked out on a copy of the member's record and drawn from it. ADV's
+   view inlines it; S2D's calls it (PREVIEW_CALLED). */
+#ifndef PREVIEW_CALLED
+inline
+#endif
+void StatusPersonaPreview(void)
 {
     Char c;
 
