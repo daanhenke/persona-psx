@@ -206,13 +206,13 @@ void S2dLoad2670(void)
     int *p = (int *)0x801F2670;
 
     if (*p != 0) {
-        g_s2d_objs[9].rot.vx = g_s2d_objs[8].rot.vx = *p;
+        D_800B0C90.rot.vx = D_800B0C04.rot.vx = *p;
     }
 }
 
 void S2dStore2670(void)
 {
-    D_801F2670 = g_s2d_objs[8].rot.vx;
+    D_801F2670 = D_800B0C04.rot.vx;
 }
 
 void ovl_s2d_entry(void)

@@ -58,35 +58,35 @@ void S2dInitCoords(void)
     g_map_xform.scale.vx = ONE;
     g_map_xform.scale.vy = ONE;
     g_map_xform.scale.vz = ONE;
-    GsInitCoordinate2(&g_root_coord, &g_s2d_objs[0].coord);
+    GsInitCoordinate2(&g_root_coord, &g_party_obj.coord);
 
-    c = &g_s2d_objs[1].coord;
-    g_s2d_objs[0].trans.vx = 0;
-    g_s2d_objs[0].trans.vy = 0;
-    g_s2d_objs[0].trans.vz = 0;
-    g_s2d_objs[0].rot.vx = 0;
-    g_s2d_objs[0].rot.vy = 0;
-    g_s2d_objs[0].rot.vz = 0;
-    g_s2d_objs[0].scale.vx = 0x1800;
-    g_s2d_objs[0].scale.vy = 0x1800;
-    g_s2d_objs[0].scale.vz = 0x1800;
+    c = &g_party_mark.coord;
+    g_party_obj.trans.vx = 0;
+    g_party_obj.trans.vy = 0;
+    g_party_obj.trans.vz = 0;
+    g_party_obj.rot.vx = 0;
+    g_party_obj.rot.vy = 0;
+    g_party_obj.rot.vz = 0;
+    g_party_obj.scale.vx = 0x1800;
+    g_party_obj.scale.vy = 0x1800;
+    g_party_obj.scale.vz = 0x1800;
     GsInitCoordinate2(&g_root_coord, c);
 
-    c = &g_s2d_objs[2].coord;
-    g_s2d_objs[1].trans.vx = 0;
-    g_s2d_objs[1].trans.vy = 0;
-    g_s2d_objs[1].trans.vz = 0;
-    g_s2d_objs[1].rot.vx = 0;
-    g_s2d_objs[1].rot.vy = 0;
-    g_s2d_objs[1].rot.vz = 0;
-    g_s2d_objs[1].scale.vx = 0x1400;
-    g_s2d_objs[1].scale.vy = ONE;
-    g_s2d_objs[1].scale.vz = ONE;
+    c = &g_compass_objs[0].coord;
+    g_party_mark.trans.vx = 0;
+    g_party_mark.trans.vy = 0;
+    g_party_mark.trans.vz = 0;
+    g_party_mark.rot.vx = 0;
+    g_party_mark.rot.vy = 0;
+    g_party_mark.rot.vz = 0;
+    g_party_mark.scale.vx = 0x1400;
+    g_party_mark.scale.vy = ONE;
+    g_party_mark.scale.vz = ONE;
     GsInitCoordinate2(NULL, c);
     for (i = 1; i < 5; i++) {
-        GsInitCoordinate2(c, &g_s2d_objs[i + 2].coord);
+        GsInitCoordinate2(c, &g_compass_objs[i].coord);
     }
-    o = &g_s2d_objs[2];
+    o = &g_compass_objs[0];
     for (i = 0; i < 5; i++) {
         o[i].trans = D_800A4FA4[i];
         o[i].rot.vx = 0;
@@ -181,23 +181,23 @@ void S2dPlaceCompass(void)
    model slot 0, with the marker placed where the map is. */
 void S2dBindModels(void)
 {
-    g_s2d_objs[0].obj.tmd = g_models[0].objs;
-    *(u_long *)g_s2d_objs[0].obj.tmd[4] &= 0xFF000000;
-    *(u_long *)g_s2d_objs[0].obj.tmd[4] |= g_s2d_objs[0].obj.tmd[5];
-    g_s2d_objs[0].obj.attribute = 0;
-    g_s2d_objs[0].obj.coord2 = &g_s2d_objs[0].coord;
+    g_party_obj.obj.tmd = g_models[0].objs;
+    *(u_long *)g_party_obj.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_party_obj.obj.tmd[4] |= g_party_obj.obj.tmd[5];
+    g_party_obj.obj.attribute = 0;
+    g_party_obj.obj.coord2 = &g_party_obj.coord;
 
-    g_s2d_objs[0].rot.vx = g_map_xform.rot.vx;
-    g_s2d_objs[1].obj.tmd = g_models[0].objs + 0x2A;
-    g_s2d_objs[0].trans = g_map_xform.trans;
-    *(u_long *)g_s2d_objs[1].obj.tmd[4] &= 0xFF000000;
-    *(u_long *)g_s2d_objs[1].obj.tmd[4] |= g_s2d_objs[1].obj.tmd[5];
-    g_s2d_objs[1].obj.attribute = 0;
-    g_s2d_objs[1].obj.coord2 = &g_s2d_objs[1].coord;
+    g_party_obj.rot.vx = g_map_xform.rot.vx;
+    g_party_mark.obj.tmd = g_models[0].objs + 0x2A;
+    g_party_obj.trans = g_map_xform.trans;
+    *(u_long *)g_party_mark.obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_party_mark.obj.tmd[4] |= g_party_mark.obj.tmd[5];
+    g_party_mark.obj.attribute = 0;
+    g_party_mark.obj.coord2 = &g_party_mark.coord;
 
-    g_s2d_objs[1].rot.vx = g_map_xform.rot.vx;
-    g_s2d_objs[1].trans = g_map_xform.trans;
-    g_s2d_objs[1].trans.vy -= 0x6A;
+    g_party_mark.rot.vx = g_map_xform.rot.vx;
+    g_party_mark.trans = g_map_xform.trans;
+    g_party_mark.trans.vy -= 0x6A;
 }
 #else
 /* 62%: the image holds &obj.tmd in a register and derives coord2 from it;

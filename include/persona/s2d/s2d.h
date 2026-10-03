@@ -43,8 +43,7 @@ extern GsOT_TAG *g_ot_tag_front;
 /* A placed object: the ordering table it is sorted into (MAPOBJ_MAP,
    MAPOBJ_MAP2 or any other for the object layer), the model, the coordinate
    system it is drawn in and that system's transform. The map's own pieces
-   are 160 of these in the second work buffer; the overlay's other objects
-   are g_s2d_objs, the party's model first. */
+   are 160 of these in the second work buffer. */
 typedef struct {
     /* 0x00 */ short         kind;
     /* 0x02 */ short         unk02;
@@ -74,7 +73,14 @@ extern S2dXform      g_map_xform;
 extern GsRVIEW2      g_s2d_view;
 extern GsRVIEW2      g_s2d_view2;
 extern GsF_LIGHT     g_s2d_light;
-extern S2dMapObj     g_s2d_objs[10];
+/* The party's model and the mark drawn above it, the compass's five pieces
+   (hung off the first), and three more. */
+extern S2dMapObj     g_party_obj;
+extern S2dMapObj     g_party_mark;
+extern S2dMapObj     g_compass_objs[5];
+extern S2dMapObj     D_800B0B78;
+extern S2dMapObj     D_800B0C04;
+extern S2dMapObj     D_800B0C90;
 extern S2dMapObj     D_800B0F1C;
 
 /* The ordering tables, one pair per layer, and which of each pair is being
