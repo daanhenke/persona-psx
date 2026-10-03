@@ -61,4 +61,57 @@ extern CasinoPalAnim g_poker_palanim2[];
 extern CasinoPalAnim g_poker_palanim3[];
 extern CasinoPalAnim g_poker_palanim4[];
 
+/* What the HUD last drew, so it redraws only on a change. */
+extern int    g_poker_jackpot_shown;
+extern u_char g_poker_jackpot_add; /* ticks still to add to the jackpot */
+
+/* The ten cards a hand can use: the deal, then the draw's replacements. */
+extern u_char g_poker_deck[10];
+
+/* The table. Layout lists are built in one go, frames are four-piece
+   borders; each 3D object is its own one-element array with the model
+   that builds it right behind it. */
+extern CasinoLayoutDef D_8009479C[];
+extern CasinoLayoutDef D_8009485C[];
+extern CasinoLayoutDef D_80094958[];
+extern CasinoLayoutDef D_80094A20[];
+extern CasinoLayoutDef D_80094B78[];
+extern CasinoLayoutDef D_80094C98[];
+extern CasinoLayoutDef D_80094DB4[];
+extern CasinoLayoutDef D_80094EA0[];
+extern CasinoLayoutDef D_800954DC[];
+extern CasinoLayoutDef D_80095630[];
+extern CasinoLayoutDef D_80095688[];
+extern CasinoFrame     D_800948A4;
+extern CasinoFrame     D_80094A60;
+extern CasinoFrame     D_800951E4;
+extern CasinoFrame     D_80095254;
+extern CasinoFrame     D_800952C4;
+extern CasinoFrame     D_80095334;
+extern CasinoLayout    g_poker_jackpot_digits[9]; /* eight digits and the point */
+extern CasinoLayout    g_poker_money_digits[8];
+extern CasinoLayout    D_80095164;
+extern CasinoLayout    D_8009519C;
+extern CasinoLayout    D_8009520C;
+extern CasinoLayout    D_8009527C;
+extern CasinoLayout    D_800952EC;
+extern CasinoLayout    D_8009535C;
+extern CasinoLayout    D_800957E4[POKER_CARDS]; /* the cards' faces */
+extern CasinoObj       D_800953E0[];
+extern CasinoModel     D_800953F0;
+extern CasinoObj       D_80095470[];
+extern CasinoModel     D_80095480;
+extern CasinoObj       D_800955C4[];
+extern CasinoModel     D_800955D4;
+extern CasinoObj       D_80095770[];
+extern CasinoModel     D_80095780;
+extern CasinoObj       D_80096240[];
+extern CasinoModel     D_80096250;
+extern CasinoObj       D_800962E4[];
+extern CasinoModel     D_800962F4;
+extern CasinoObj       D_80096388[];
+extern CasinoModel     D_80096398;
+extern CasinoObj       D_80096484[];
+extern CasinoModel     D_80096494;
+
 #endif

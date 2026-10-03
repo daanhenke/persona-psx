@@ -150,7 +150,7 @@ void CasinoInitState(void)
         g_casino_clock_on = 1;
     }
     D_800A8EA4 = 0xFFFF;
-    g_casino_last_bet = 0xFF;
+    g_casino_bet_shown = 0xFF;
     g_casino_bet_done = 0;
     g_casino_quit = 0;
     g_casino_win = 0;

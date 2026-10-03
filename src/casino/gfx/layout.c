@@ -22,29 +22,6 @@
 extern void CasinoQueueQuad(short x0, short y0, short x1, short y1, short x2, short y2, short x3, short y3, int spr);
 extern void CasinoQueueUV(short u, short v, short w, short h, u_short tpage, u_short clut, int spr);
 
-/* A frame of four pieces: two of w0 by h0 and two of w1 by h1, taken from
-   one place in a texture page. */
-typedef struct {
-    short   x;
-    short   y;
-    short   u;
-    short   v;
-    short   w0;
-    short   h0;
-    short   w1;
-    short   h1;
-    u_short z;
-    u_char  on;
-    u_char  pad;
-    u_short tpage;
-    u_short clut;
-} CasinoFrameDef;
-
-typedef struct {
-    CasinoFrameDef *def;
-    CasinoLayout   *l;
-} CasinoFrame;
-
 void CasinoBuildGrid(CasinoGridDef *g, CasinoLayout *l);
 void CasinoShowLayout(CasinoLayout *l, u_char mode);
 void CasinoResetLayout(CasinoLayout *l, u_char mode);

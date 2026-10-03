@@ -335,6 +335,29 @@ typedef struct {
     CasinoLayout *l;
 } CasinoLayoutDef;
 
+/* A frame of four pieces: two of w0 by h0 and two of w1 by h1, taken from
+   one place in a texture page. */
+typedef struct {
+    short   x;
+    short   y;
+    short   u;
+    short   v;
+    short   w0;
+    short   h0;
+    short   w1;
+    short   h1;
+    u_short z;
+    u_char  on;
+    u_char  pad;
+    u_short tpage;
+    u_short clut;
+} CasinoFrameDef;
+
+typedef struct {
+    CasinoFrameDef *def;
+    CasinoLayout   *l;
+} CasinoFrame;
+
 /* Colour fades: a run of sprites' tint stepped towards a colour, per
    buffer, up to 32 at a time. */
 typedef struct {
@@ -401,7 +424,7 @@ extern u_char   g_casino_clock_on;
 
 /* The round every game plays: coins in, a win paid out. */
 extern u_char       g_casino_bet;      /* coins bet this round             */
-extern u_char       g_casino_last_bet; /* the bet the round before          */
+extern u_char       g_casino_bet_shown; /* the bet as last drawn, 0xFF none  */
 extern u_char       g_casino_max_bet;  /* coins going in until the limit    */
 extern u_char       g_casino_bet_done; /* the bet is placed                 */
 extern u_char       g_casino_quit;     /* leaving the table                 */
