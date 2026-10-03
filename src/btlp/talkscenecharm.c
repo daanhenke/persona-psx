@@ -94,13 +94,9 @@ extern void  BtlTakeOffer(u_short persona, const u_char *script);
 extern void  BtlBoxOpen(short cols, short x, short y, int style);
 extern void  BtlShowAilmentMarks(int show);
 
-/* Twelve bytes of dead .rodata sit ahead of the thresholds in the original
-   object - the stare scene's, whatever this file looked like before it was
-   split. Nothing reads them, and the compiler builds the stare's own copy out
-   of immediate stores rather than from here. They are not decoration: the jump
-   table below is aligned to eight from the start of the block, so without them
-   it lands four bytes early and drags the rest of the overlay's rodata with
-   it. */
+/* The stare scene copies these thresholds onto its stack. Keep them in this
+   rodata block: the charm scene's jump table is aligned to eight relative to
+   its start, and splitting off these twelve bytes moves that table. */
 const int g_btl_talk_stare_odds[3] = { 0x80, TALK_ODDS_ALL, 0 };
 
 void BtlTalkSceneCharm(void)

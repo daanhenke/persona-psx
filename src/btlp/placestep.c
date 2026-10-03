@@ -28,7 +28,12 @@
    steps take the stepped value into a second register before its sign test
    (addu v1, v0, zero), where gcc here works the stepped value out straight
    into the register it stores. Everything else, the pad stepping included,
-   is as the image has it. */
+   is as the image has it.
+   2026-10-01: a `short` decrement (`dec = row - 1; row = dec; if (dec < 0)`)
+   gets the image's tie of the sum to the load, but cse moves the sign test
+   onto the SImode sum, combine then folds dec's copy into the store, and
+   the store goes first (96.28%). See placegrid.c for the flow RTL the image
+   implies. */
 #ifdef NON_MATCHING
 int BtlPlaceMoveStep(BtlActor *a)
 {

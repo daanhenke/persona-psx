@@ -116,7 +116,7 @@ extern void  BtlSePlay(int slot, int seq);
    prototype sound.h carries. */
 extern void  BtlSoundClose(int slot);
 
-/* 99.78%. What moved it from 89.31%: the rewards are built in steps on their
+/* 99.82%. What moved it from 89.31%: the rewards are built in steps on their
    own variables (money's amount never crosses a call and lives in a1, the
    others in s0); the experience line inserts the amount, not nought; the bless
    and hit arms reach members through a pointer; the hit arm's enemy is
@@ -127,9 +127,11 @@ extern void  BtlSoundClose(int slot);
    which settles its registers. The 32 unused bytes of frame below the row
    table are an unused local. Left: the heal and hit arms give the roll's copy
    a2 where this gives it a1 (global-alloc order among the short-lived locals;
-   scoping the heal arm's locals the same way is worse), the roll case swaps
-   the row index and the odds base between v1 and a0, and the second item arm
-   jumps to the shared test rather than straight to the money fallback. */
+   scoping the heal arm's locals the same way is worse), and the second item
+   arm jumps to the shared test rather than straight to the money fallback.
+   2026-10-01: the roll case takes the odds table into a pointer of its own
+   before indexing it (99.78% -> 99.82%), which puts the row index in v1 and
+   the base in a0 as the image has them. */
 #ifdef NON_MATCHING
 void BtlTalkSceneGift(void)
 {
@@ -138,6 +140,7 @@ void BtlTalkSceneGift(void)
     u_char pad[0x20];
     short row[10] = { 0, 1, 2, 3, -1, 4, 5, 6, 7, 8 };
     const short *p;
+    const short (*odds)[GIFT_KINDS];
     BtlActor    *a;
     BtlActor    *e;
     short        roll;
@@ -153,7 +156,8 @@ void BtlTalkSceneGift(void)
     switch (g_btl_talk_stage[g_btl_talk_depth - 1]) {
     case GIFT_ROLL:
         i = 0;
-        p = g_btl_gift_odds[row[g_btl_talk_pair]];
+        odds = g_btl_gift_odds;
+        p = odds[row[g_btl_talk_pair]];
         /* A plain `while`: written as a do/while gcc peels the first test,
            which the original does not. */
         while (i < GIFT_KINDS) {

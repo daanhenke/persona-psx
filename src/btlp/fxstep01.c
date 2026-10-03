@@ -163,16 +163,16 @@ void BtlFxStep01(BtlObj *o)
                 o->actor->obj->motion = FX_01_GRAB_MOTION;
                 o->actor->obj->phase = 0;
             }
-            slot = g_btl_fx_target;
+            i = g_btl_fx_target;
             o->phase = FX_STEP_DONE;
             o->attr |= BTL_OBJ_HIDDEN;
             o->children = (u_char)g_btl_spell_fx[g_btl_fx_move].group;
             g_btl_hits_left = FX_01_HITS;
             g_btl_hit_walk = -1;
             g_btl_shake_on = 0;
-            g_btl_hit_slot = slot;
+            g_btl_hit_slot = i;
             g_btl_hit_mask = 1;
-            g_btl_actors[g_btl_actor_turn].targets &= ~(1 << slot);
+            g_btl_actors[g_btl_actor_turn].targets &= ~(1 << i);
             return;
         }
         if ((o->attr & BTL_OBJ_PICKED) != 0) {

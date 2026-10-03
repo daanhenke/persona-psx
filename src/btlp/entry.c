@@ -212,7 +212,15 @@ void BtlBoxDismiss(void)
    of the first register argument. Moving the g_btl_tim_buf store into any of
    the argument slots, dropping the enc temporary or nesting the assignment all
    compile to the same order. odiff also reports the raw addresses and the
-   unowned string section as aliases; those are names, not bytes. */
+   unowned string section as aliases; those are names, not bytes.
+   2026-10-01 (sched1 dump): enc is set three times in the function, so its
+   load never gets sched1's birthing boost and, at priority 1 with the
+   lowest LUID, is placed first. The image's order (lw after the fifth
+   argument's store, before the sixth's li) is what the boost gives if the
+   sixth argument's store and li are picked before it. A variable of its own
+   (or no temporary) does boost the load, but the first argument's move into
+   a0 (priority 2, it waits on g_load_stage_6's load) is picked first, and
+   the sixth argument's pair moves above both (99.27%). */
 void ovl_btlp_entry(void)
 {
     long     pos[4];

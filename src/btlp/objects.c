@@ -104,6 +104,15 @@ extern void BtlDrawArenaLeft(void);
 extern void BtlDrawArenaBottom(void);
 extern void BtlDrawArenaTop(void);
 
+/* 97.32%. Two residuals, both loop.c (2026-10-01, loop dumps):
+   - debug grid: the image keeps 0xFF000000 in the cell code and lifts only
+     0x00FFFFFF. Here the goto-built column loop is no loop to loop.c, so the
+     128-insn row loop moves both at full threshold (life 8 and 6, 52 each).
+     A real column loop (97.81%) still lifts both and folds the cell pointer
+     into the row offset.
+   - mesh: the image keeps `far` as a live biv with its seven offsets. Here
+     combine_givs folds all seven onto far[1] (benefit 14), reduces them,
+     and eliminates `far`, so the base is m + 0x216 rather than m + 0x214. */
 #ifdef NON_MATCHING
 void BtlDrawObjects(void)
 {

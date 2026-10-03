@@ -63,7 +63,16 @@ extern int     g_btl_place_walk;
    the image copies the decremented value before shifting it for the sign
    test and stores the copy, where gcc here stores first and shifts in place.
    At the confirm, the column and row are read into v0/v1 rather than v1/a0.
-   An int temporary, a pre-decrement and a ternary were all tried. */
+   An int temporary, a pre-decrement and a ternary were all tried.
+   2026-10-01 (flow/combine/sched dumps): the image is exactly this flow
+   RTL - r85 = row - 1, r86 = (subreg:HI r85), store r86, sign test on
+   r85 << 16 - with the narrowing copy kept and the store sunk past the
+   shift. Here combine folds the copy into the store, so the store reads r85
+   and goes first. A short temporary (new, or `at`/`cell` reused) folds the
+   same. At the confirm, sched1 ranks the two stores (priority 2, they wait
+   on loads) above `return 0`'s v0 set (priority 1). That lands between the
+   loads and the stores, so local-alloc keeps the loads out of v0. Store
+   order and the formation store's position do not change it. */
 #ifdef NON_MATCHING
 int BtlPlaceGridUpdate(int carrying)
 {

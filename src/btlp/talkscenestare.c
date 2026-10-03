@@ -16,7 +16,7 @@
  */
 #include <decomp/types.h>
 #include <rand.h>
-#include <decomp/include_asm.h>
+#include <decomp/libc.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/object.h>
 #include <persona/btlp/offer.h>
@@ -102,7 +102,8 @@ extern const u_char *g_btl_talk_menace_script;
 /* An array of one: read as a scalar, gcc lifts the load above the mark's
    attribute store in the lost arm, and the image does not. */
 extern const u_char *g_btl_talk_lost_script[];
-extern const u_char *g_btl_talk_glared_script;
+/* Keep this read after the text's x argument is set up. */
+extern const u_char *volatile g_btl_talk_glared_script;
 extern const u_char *g_btl_talk_offer_over_script;
 extern const u_char *g_btl_talk_surprised_script;
 
@@ -114,27 +115,15 @@ extern void BtlBoxOpen(short cols, short x, short y, int style);
 extern void BtlShowAilmentMarks(int show);
 extern void BtlSoundClose(int slot);
 
-/* 99.54%, from 73.86%. What changed:
-   - each arm writes out its own text, box and close-down; gcc cross-jumps
-     the shared tails the way the image shows;
-   - the held test is `== 1`, with its arm first;
-   - one counter serves the odds walk and the held flag;
-   - the motion row is taken as in the other member motions;
-   - the lost line's script pointer is an array of one, so its load stays
-     behind the mark's attribute store and the lost arm jumps into the
-     surprised tail with only the text's position left to set.
-   What is left:
-   - in the glared arm the image sets the text's x before loading the
-     script, and gcc here loads first; an array for that script does not
-     move it;
-   - the odds initialiser's .rodata is named in the image, which needs the
-     unit's rodata split once the routine matches. */
-#ifdef NON_MATCHING
+/* This table shares its rodata block with the charm scene's thresholds and
+   jump table. Copy it explicitly to preserve that block's alignment. */
+extern const int g_btl_talk_stare_odds[3];
+
 void BtlTalkSceneStare(void)
 {
     /* Kept in .rodata and copied onto the stack, so the level test can rewrite
        two of them. */
-    int  odds[3] = { 0x80, TALK_ODDS_ALL, 0 };
+    int odds[3];
     BtlActor *a;
     int  i;
     int  roll;
@@ -142,6 +131,7 @@ void BtlTalkSceneStare(void)
     const u_char *line;
     const u_char *row;
 
+    memcpy(odds, g_btl_talk_stare_odds, sizeof(odds));
     switch (g_btl_talk_stage[g_btl_talk_depth - 1]) {
     case TALK_STAGE_RUN:
         if (BtlOfferLevelTest(TALK_OFFER_LEVEL, g_btl_offer_slot) != 0
@@ -300,7 +290,4 @@ void BtlTalkSceneStare(void)
 
     return;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkscenestare", BtlTalkSceneStare);
-#endif
 
