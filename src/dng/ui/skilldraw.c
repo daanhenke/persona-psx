@@ -9,8 +9,9 @@
  */
 #define NAME_KR
 #define PERSONAPAGE_DNG
-/* ADV builds this too (SKILLDRAW_ADV), against the narrow declarations. */
-#ifndef SKILLDRAW_ADV
+/* ADV builds this too (SKILLDRAW_ADV), against the narrow declarations;
+   S2D takes those with DNG's layout (SKILLDRAW_NARROW). */
+#if !defined(SKILLDRAW_ADV) && !defined(SKILLDRAW_NARROW)
 #define ITEM_USABLE_INT
 #define TILEMAP_INT_COUNT
 #endif

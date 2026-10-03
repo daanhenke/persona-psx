@@ -547,7 +547,8 @@ BoxRowBottom             = 0x80079E18; // type:func size:0x70
 //-------------------------------------------------------------
 //--- PA: 0x015AE8   VA: 0x80079E88   subsegment: asm, s2d_2_s9
 //-------------------------------------------------------------
-D_80079E88               = 0x80079E88; // type:func size:0xA8
+TileMapWriteBarCapped    = 0x80079E88; // type:func size:0x54
+TileMapWriteBarCapped2   = 0x80079EDC; // type:func size:0x54
 SkillScreenLayout        = 0x80079F30; // type:func size:0x1D8
 SkillPersonasDraw        = 0x8007A108; // type:func size:0x2CC
 SkillSpellsDraw          = 0x8007A3D4; // type:func size:0x16C
@@ -762,7 +763,8 @@ PadLoadBindings          = 0x80080730; // type:func size:0x154
 //--------------------------------------------------------------
 //--- PA: 0x01C4E4   VA: 0x80080884   subsegment: asm, s2d_2_s20
 //--------------------------------------------------------------
-D_80080884               = 0x80080884; // type:func size:0xF0
+SaveRowsDraw             = 0x80080884; // type:func size:0x40
+SaveRowDraw              = 0x800808C4; // type:func size:0xB0
 StatusDrawPersonaRows    = 0x80080974; // type:func size:0x228
 StatusDrawPersonaNames   = 0x80080B9C; // type:func size:0xE4
 FormationRepairGrid      = 0x80080C80; // type:func size:0xE8

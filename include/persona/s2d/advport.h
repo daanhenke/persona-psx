@@ -68,6 +68,7 @@
 #define D_800B9628    D_8009F808
 
 /* DNG's. */
+#define CharPreviewDraw EquipDrawCompare
 #define D_8009ABFC    D_8009D908
 #define D_8009AA2C    D_8009D738
 #define D_8009AA4C    D_8009D758

@@ -9,7 +9,10 @@
  * each in the colour and with the arrow of whether it went down or up.
  */
 #include <decomp/types.h>
+/* S2D's copy narrows the base and the count (TILEMAP_SHORT_BASE). */
+#ifndef TILEMAP_SHORT_BASE
 #define TILEMAP_INT_COUNT
+#endif
 #include <persona/common/char.h>
 #include <persona/common/item.h>
 #include <persona/common/itemname.h>
@@ -118,7 +121,12 @@ void CharPreviewEquip(Char *c, short slot, u_short item)
     }
 
     k = c->entry;
+#ifndef PREVIEW_ANY_PERSONA
     if (k != CHAR_NO_ENTRY && !c->blocked && ps[v = c->list[k]].key != 0) {
+#else
+    /* S2D's takes the active entry's magic without looking at its key. */
+    if (k != CHAR_NO_ENTRY && !c->blocked && (v = c->list[k], 1)) {
+#endif
         c->mag_atk = ps[v].mag_atk;
         c->mag_def = ps[v].mag_def;
     } else {
@@ -219,5 +227,10 @@ void CharPreviewDraw(short member, Char *c)
 }
 
 /* Two bytes the object carries after the arrow table. Nothing reads them;
-   they are here so the rodata after this unit stays in place. */
+   they are here so the rodata after this unit stays in place. S2D's object
+   carries different ones (PREVIEW_S2D_TAIL). */
+#ifdef PREVIEW_S2D_TAIL
+const u_short D_80064ACE = 0x31;
+#else
 const u_short D_80064CA2 = 0x4630;
+#endif
