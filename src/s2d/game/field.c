@@ -5,7 +5,8 @@
  *   0x8008F1BC S2dDrawCompass    0x8008F3C0 S2dUpdate
  *   0x8008F4A4 S2dDraw           0x8008F570 S2dInitPartyObjs
  *   0x8008F7D8 S2dFilterInput    0x8008F878 S2dViewKeys
- *   0x8008FC00 S2dPartyMoved
+ *   0x8008FC00 S2dPartyMoved     0x8008FC5C (the map's markers, asm)
+ *   0x80090248 S2dDrawPartyFront
  *
  * The party is two placed objects, g_party_obj and [1]. Left standing
  * still long enough on a map that allows it, one of them starts an idle
@@ -97,6 +98,19 @@ extern int g_view_zoom;
 
 extern int  func_8008E158(int which);
 extern void func_800999D0(int a, int b);
+
+/* A DR_MOVE written field by field. */
+typedef struct {
+    u_long tag;
+    u_long code[2];
+    short  sx, sy;
+    short  dx, dy;
+    short  w, h;
+} S2dMove;
+
+/* The party's place on the screen, and the copy that keeps it in VRAM. */
+extern short   D_800B049C[2];
+extern S2dMove g_party_move[2];
 
 /* The party's last six places. */
 extern short D_800A5088[][2];
@@ -521,4 +535,23 @@ int S2dPartyMoved(void)
         }
     }
     return 0;
+}
+
+INCLUDE_ASM("s2d/nonmatchings/game/field", func_8008FC5C);
+
+/* The party drawn over everything: the screen under it copied to VRAM at
+   (0x200, 0x1DA), the mark hidden, and the party at the view's tilt. */
+void S2dDrawPartyFront(void)
+{
+    SetDrawMove(&g_party_move[g_draw_side]);
+    g_party_move[g_draw_side].sx = D_800B049C[0] + 0xF0;
+    g_party_move[g_draw_side].sy = D_800B049C[1] + 0xA0;
+    g_party_move[g_draw_side].w = 0x20;
+    g_party_move[g_draw_side].h = 0x26;
+    g_party_move[g_draw_side].dx = 0x200;
+    g_party_move[g_draw_side].dy = 0x1DA;
+    AddPrim(g_ot_front[g_draw_side].org, &g_party_move[g_draw_side]);
+    g_party_mark.obj.attribute |= 0x80000000;
+    g_party_obj.rot.vx = D_800B0C04.rot.vx;
+    S2dDrawParty(&g_ot_front[g_draw_side], 0xB);
 }
