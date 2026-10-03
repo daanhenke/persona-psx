@@ -40,27 +40,26 @@ extern GsOT_TAG *g_ot_tag_obj;
 extern GsOT_TAG *g_ot_tag_layer[3];
 extern GsOT_TAG *g_ot_tag_front;
 
-/* A placed object: its transform, the model and the coordinate system it
-   is drawn in. */
+/* A placed object: the ordering table it is sorted into (MAPOBJ_MAP,
+   MAPOBJ_MAP2 or any other for the object layer), the model, the coordinate
+   system it is drawn in and that system's transform. The map's own pieces
+   are 160 of these in the second work buffer; the overlay's other objects
+   are g_s2d_objs, the party's model first. */
 typedef struct {
-    /* 0x00 */ SVECTOR       rot;
-    /* 0x08 */ VECTOR        trans;
-    /* 0x18 */ VECTOR        scale;
-    /* 0x28 */ int           unk28;
-    /* 0x2C */ GsDOBJ2       obj;
-    /* 0x3C */ GsCOORDINATE2 coord;
-} S2dObj;
-
-/* The map's own objects, 160 of them in the second work buffer: the same
-   parts in another order. */
-typedef struct {
-    /* 0x00 */ GsDOBJ2       obj;
-    /* 0x10 */ int           unk10;
+    /* 0x00 */ short         kind;
+    /* 0x02 */ short         unk02;
+    /* 0x04 */ GsDOBJ2       obj;
     /* 0x14 */ GsCOORDINATE2 coord;
     /* 0x64 */ SVECTOR       rot;
     /* 0x6C */ VECTOR        trans;
     /* 0x7C */ VECTOR        scale;
 } S2dMapObj;
+
+#define MAPOBJ_MAP  0
+#define MAPOBJ_MAP2 0x80
+
+extern S2dMapObj *g_map_objs;
+extern int        g_map_obj_count;
 
 typedef struct {
     SVECTOR rot;
@@ -68,22 +67,15 @@ typedef struct {
     VECTOR  scale;
 } S2dXform;
 
-/* A model and the coordinate system it is drawn in. */
-typedef struct {
-    GsDOBJ2       obj;
-    GsCOORDINATE2 coord;
-} S2dModelObj;
-
 extern GsCOORDINATE2 g_root_coord;
 extern VECTOR        g_s2d_cam_scale;
 extern GsCOORDINATE2 g_s2d_cam_coord;
 extern S2dXform      g_map_xform;
-extern S2dModelObj   g_map_obj;
 extern GsRVIEW2      g_s2d_view;
 extern GsRVIEW2      g_s2d_view2;
 extern GsF_LIGHT     g_s2d_light;
-extern S2dObj        g_s2d_obj;
-extern S2dObj        g_s2d_objs[7];
+extern S2dMapObj     g_s2d_objs[10];
+extern S2dMapObj     D_800B0F1C;
 
 /* The ordering tables, one pair per layer, and which of each pair is being
    built this frame. */

@@ -1,5 +1,5 @@
 /* Persona 1 (JP) - S2D's entry point and the state it keeps in the save.
- *   0x80089840 S2dBeginFrame
+ *   0x80089804 S2dFrameUnlocked  0x80089840 S2dBeginFrame
  *   0x800899A8 .. 0x80089BEC  the save-block load/store pairs (S2dLoad*,
  *                             S2dStore*), S2dMarkScript, S2dResumeScript
  *   0x80089C04 ovl_s2d_entry
@@ -43,8 +43,6 @@ extern u_char    D_800A4CFC[];
 /* The overlay's two work buffers: ordering-table tags, then the map's. */
 extern GsOT_TAG *g_work_buf;
 extern int       g_work_buf2;
-extern short     D_800B0C68;
-extern short     D_800B0CF4[];
 extern short     D_800B0D2C;
 extern short     D_800B0D3C;
 extern u_long    D_800B1D30[];
@@ -52,7 +50,6 @@ extern int       D_800B85BC;
 extern int       D_800B863C;
 extern short     D_800B8FD4;
 extern short     D_800B8FD8;
-extern int       D_800B9150;
 extern short     D_800B91EC[];
 extern u_char    D_800AA66C[];
 
@@ -68,6 +65,21 @@ extern void func_80094B08(void);
 extern void S2dRunMap(void);
 
 extern u_long g_s2d_workbase;
+
+/* Set while the field is not taking the pad (the debug screen's KEY_LOCK). */
+extern int g_key_lock;
+
+extern void S2dUpdate(void);
+extern void S2dDraw(void);
+
+/* One frame with the pad taken, after which it is locked again. */
+void S2dFrameUnlocked(void)
+{
+    g_key_lock = 0;
+    S2dUpdate();
+    S2dDraw();
+    g_key_lock = 1;
+}
 
 #ifdef NON_MATCHING
 /* Starts a frame's drawing: the packet area for the buffer now being built
@@ -194,13 +206,13 @@ void S2dLoad2670(void)
     int *p = (int *)0x801F2670;
 
     if (*p != 0) {
-        D_800B0CF4[0] = D_800B0C68 = *p;
+        g_s2d_objs[9].rot.vx = g_s2d_objs[8].rot.vx = *p;
     }
 }
 
 void S2dStore2670(void)
 {
-    D_801F2670 = D_800B0C68;
+    D_801F2670 = g_s2d_objs[8].rot.vx;
 }
 
 void ovl_s2d_entry(void)
@@ -217,9 +229,9 @@ void ovl_s2d_entry(void)
     }
     g_ot_tag_front = g_work_buf + 0x13A0;
     D_800B85BC = (int)(g_work_buf + 0x13B0);
-    D_800B9150 = g_work_buf2;
-    D_800B1D30[1] = D_800B9150 + 0x5780;
-    bzero((u_char *)D_800B9150, 0x5780);
+    g_map_objs = (S2dMapObj *)g_work_buf2;
+    D_800B1D30[1] = (int)g_map_objs + 0x5780;
+    bzero((u_char *)g_map_objs, 0x5780);
     if (*(u_short *)&g_map_id != 0) {
         ((u_char *)D_800B1D30)[0] = 1;
         ((u_char *)D_800B1D30)[1] = 1;

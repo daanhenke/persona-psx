@@ -19,11 +19,7 @@
 
 #define MAP_OBJS 160
 
-extern int           D_800B9150;
 extern VECTOR        D_800A4FA4[5];
-extern GsCOORDINATE2 D_800B0F30;
-extern S2dXform      D_800B0F80;
-extern short         D_800B0F1C;
 
 extern void func_80033A40(int z);
 extern short g_compass_x;
@@ -35,11 +31,11 @@ extern void  func_8009994C(int x, int y, int w, int h, int a, int b, int c);
 void S2dInitCoords(void)
 {
     S2dMapObj     *m;
-    S2dObj        *o;
+    S2dMapObj     *o;
     GsCOORDINATE2 *c;
     int        i;
 
-    m = (S2dMapObj *)D_800B9150;
+    m = g_map_objs;
     GsInitCoordinate2(NULL, &g_root_coord);
 
     g_s2d_cam_x = 0;
@@ -62,35 +58,35 @@ void S2dInitCoords(void)
     g_map_xform.scale.vx = ONE;
     g_map_xform.scale.vy = ONE;
     g_map_xform.scale.vz = ONE;
-    GsInitCoordinate2(&g_root_coord, &g_map_obj.coord);
+    GsInitCoordinate2(&g_root_coord, &g_s2d_objs[0].coord);
 
-    c = &g_s2d_obj.coord;
-    g_s2d_obj.trans.vx = 0;
-    g_s2d_obj.trans.vy = 0;
-    g_s2d_obj.trans.vz = 0;
-    g_s2d_obj.rot.vx = 0;
-    g_s2d_obj.rot.vy = 0;
-    g_s2d_obj.rot.vz = 0;
-    g_s2d_obj.scale.vx = 0x1800;
-    g_s2d_obj.scale.vy = 0x1800;
-    g_s2d_obj.scale.vz = 0x1800;
-    GsInitCoordinate2(&g_root_coord, c);
-
-    c = &g_s2d_objs[0].coord;
+    c = &g_s2d_objs[1].coord;
     g_s2d_objs[0].trans.vx = 0;
     g_s2d_objs[0].trans.vy = 0;
     g_s2d_objs[0].trans.vz = 0;
     g_s2d_objs[0].rot.vx = 0;
     g_s2d_objs[0].rot.vy = 0;
     g_s2d_objs[0].rot.vz = 0;
-    g_s2d_objs[0].scale.vx = 0x1400;
-    g_s2d_objs[0].scale.vy = ONE;
-    g_s2d_objs[0].scale.vz = ONE;
+    g_s2d_objs[0].scale.vx = 0x1800;
+    g_s2d_objs[0].scale.vy = 0x1800;
+    g_s2d_objs[0].scale.vz = 0x1800;
+    GsInitCoordinate2(&g_root_coord, c);
+
+    c = &g_s2d_objs[2].coord;
+    g_s2d_objs[1].trans.vx = 0;
+    g_s2d_objs[1].trans.vy = 0;
+    g_s2d_objs[1].trans.vz = 0;
+    g_s2d_objs[1].rot.vx = 0;
+    g_s2d_objs[1].rot.vy = 0;
+    g_s2d_objs[1].rot.vz = 0;
+    g_s2d_objs[1].scale.vx = 0x1400;
+    g_s2d_objs[1].scale.vy = ONE;
+    g_s2d_objs[1].scale.vz = ONE;
     GsInitCoordinate2(NULL, c);
     for (i = 1; i < 5; i++) {
-        GsInitCoordinate2(c, &g_s2d_objs[i].coord);
+        GsInitCoordinate2(c, &g_s2d_objs[i + 2].coord);
     }
-    o = &g_s2d_objs[1];
+    o = &g_s2d_objs[2];
     for (i = 0; i < 5; i++) {
         o[i].trans = D_800A4FA4[i];
         o[i].rot.vx = 0;
@@ -108,17 +104,17 @@ void S2dInitCoords(void)
         m->scale.vz = ONE;
     }
 
-    GsInitCoordinate2(&g_root_coord, &D_800B0F30);
-    D_800B0F80.trans.vx = 0;
-    D_800B0F80.trans.vy = 0;
-    D_800B0F80.trans.vz = 0;
-    D_800B0F80.rot.vx = 0;
-    D_800B0F80.rot.vy = 0;
-    D_800B0F80.rot.vz = 0;
-    D_800B0F80.scale.vx = ONE;
-    D_800B0F80.scale.vy = ONE;
-    D_800B0F80.scale.vz = ONE;
-    D_800B0F1C = 0;
+    GsInitCoordinate2(&g_root_coord, &D_800B0F1C.coord);
+    D_800B0F1C.trans.vx = 0;
+    D_800B0F1C.trans.vy = 0;
+    D_800B0F1C.trans.vz = 0;
+    D_800B0F1C.rot.vx = 0;
+    D_800B0F1C.rot.vy = 0;
+    D_800B0F1C.rot.vz = 0;
+    D_800B0F1C.scale.vx = ONE;
+    D_800B0F1C.scale.vy = ONE;
+    D_800B0F1C.scale.vz = ONE;
+    D_800B0F1C.kind = 0;
 }
 #else
 /* 95%: the image steps the five transforms with three pointers taken off
@@ -185,23 +181,23 @@ void S2dPlaceCompass(void)
    model slot 0, with the marker placed where the map is. */
 void S2dBindModels(void)
 {
-    g_map_obj.obj.tmd = g_models[0].objs;
-    *(u_long *)g_map_obj.obj.tmd[4] &= 0xFF000000;
-    *(u_long *)g_map_obj.obj.tmd[4] |= g_map_obj.obj.tmd[5];
-    g_map_obj.obj.attribute = 0;
-    g_map_obj.obj.coord2 = &g_map_obj.coord;
-
-    g_s2d_obj.rot.vx = g_map_xform.rot.vx;
-    g_s2d_obj.obj.tmd = g_models[0].objs + 0x2A;
-    g_s2d_obj.trans = g_map_xform.trans;
-    *(u_long *)g_s2d_obj.obj.tmd[4] &= 0xFF000000;
-    *(u_long *)g_s2d_obj.obj.tmd[4] |= g_s2d_obj.obj.tmd[5];
-    g_s2d_obj.obj.attribute = 0;
-    g_s2d_obj.obj.coord2 = &g_s2d_obj.coord;
+    g_s2d_objs[0].obj.tmd = g_models[0].objs;
+    *(u_long *)g_s2d_objs[0].obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_s2d_objs[0].obj.tmd[4] |= g_s2d_objs[0].obj.tmd[5];
+    g_s2d_objs[0].obj.attribute = 0;
+    g_s2d_objs[0].obj.coord2 = &g_s2d_objs[0].coord;
 
     g_s2d_objs[0].rot.vx = g_map_xform.rot.vx;
+    g_s2d_objs[1].obj.tmd = g_models[0].objs + 0x2A;
     g_s2d_objs[0].trans = g_map_xform.trans;
-    g_s2d_objs[0].trans.vy -= 0x6A;
+    *(u_long *)g_s2d_objs[1].obj.tmd[4] &= 0xFF000000;
+    *(u_long *)g_s2d_objs[1].obj.tmd[4] |= g_s2d_objs[1].obj.tmd[5];
+    g_s2d_objs[1].obj.attribute = 0;
+    g_s2d_objs[1].obj.coord2 = &g_s2d_objs[1].coord;
+
+    g_s2d_objs[1].rot.vx = g_map_xform.rot.vx;
+    g_s2d_objs[1].trans = g_map_xform.trans;
+    g_s2d_objs[1].trans.vy -= 0x6A;
 }
 #else
 /* 62%: the image holds &obj.tmd in a register and derives coord2 from it;

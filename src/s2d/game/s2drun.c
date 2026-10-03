@@ -59,10 +59,10 @@ extern void func_80097964(u_char *p);
 extern void func_80097BE8(u_char *p);
 extern void func_80098BFC(void);
 extern void func_8008EC44(void);
-extern void func_8008F3C0(void);
+extern void S2dUpdate(void);
 extern void func_80091320(void);
-extern void func_80089804(void);
-extern void func_8008F4A4(void);
+extern void S2dFrameUnlocked(void);
+extern void S2dDraw(void);
 extern void func_80091D24(void);
 extern void func_8009224C(void);
 extern void func_80092A08(int n);
@@ -93,7 +93,7 @@ void S2dRunMap(void)
     S2dResumeScript();
     D_800B93A0 = 0x1999;
     D_800B93A4 = 0x1000;
-    func_8008F3C0();
+    S2dUpdate();
     func_80091320();
 
     while (g_cd_busy != -1) {
@@ -114,12 +114,12 @@ void S2dRunMap(void)
     S2dResumeScript();
     D_800B93A0 = 0x1999;
     D_800B93A4 = 0x1000;
-    func_80089804();
+    S2dFrameUnlocked();
 
     D_800B5F3C = 1;
     do {
-        func_8008F3C0();
-        func_8008F4A4();
+        S2dUpdate();
+        S2dDraw();
     } while (D_800B5F3C != 0);
 
     D_800B93A0 = 0x1999;
