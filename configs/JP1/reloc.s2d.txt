@@ -87,10 +87,6 @@ rom:0x4628 reloc:MIPS_HI16 symbol:g_options addend:0x5
 rom:0x462C reloc:MIPS_LO16 symbol:g_options addend:0x5
 rom:0x48E8 reloc:MIPS_HI16 symbol:g_pad_bindings addend:0xC
 rom:0x48EC reloc:MIPS_LO16 symbol:g_pad_bindings addend:0xC
-rom:0xC8FC reloc:MIPS_HI16 symbol:g_options addend:0x5
-rom:0xC900 reloc:MIPS_LO16 symbol:g_options addend:0x5
-rom:0xCA30 reloc:MIPS_HI16 symbol:g_pad_bindings addend:0xC
-rom:0xCA34 reloc:MIPS_LO16 symbol:g_pad_bindings addend:0xC
 rom:0x185CC reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
 rom:0x185D0 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
 rom:0x2211C reloc:MIPS_HI16 symbol:g_options addend:0x3
@@ -153,3 +149,13 @@ rom:0xFB10 reloc:MIPS_LO16 symbol:g_pad_config addend:0x0
 // StatusStockScreen reads the close key by name (defined in externs.s2d.ld).
 rom:0x7D7C reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
 rom:0x7D80 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
+
+// FormationMenu reads the battle option, the pad layout and the close key by name.
+rom:0xC8FC reloc:MIPS_HI16 symbol:D_801F2ACD addend:0x0
+rom:0xC900 reloc:MIPS_LO16 symbol:D_801F2ACD addend:0x0
+rom:0xC964 reloc:MIPS_HI16 symbol:g_pad_config addend:0x0
+rom:0xC968 reloc:MIPS_LO16 symbol:g_pad_config addend:0x0
+rom:0xC974 reloc:MIPS_HI16 symbol:g_pad_config addend:0x0
+rom:0xC978 reloc:MIPS_LO16 symbol:g_pad_config addend:0x0
+rom:0xCA30 reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
+rom:0xCA34 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0

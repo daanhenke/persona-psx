@@ -58,7 +58,8 @@ segments:
       - [0x4, rodata, s2d_rodata]
       - [0x70, .rodata, ui/itemtop]
       - [0x90, .rodata, ui/statusmenu]
-      - [0xF0, rodata, s2d_rodata0b]
+      - [0xF0, .rodata, game/formationmenu]
+      - [0x114, pad, s2d_pad_114]
       - [0x118, .rodata, ui/configmenu]
       # partyhud is ten bytes; the linker pads to the next word.
       - [0x13C, .rodata, common/ui/partyhud]
@@ -124,7 +125,7 @@ segments:
       - [0x612C, asm, s2d_1_s5_p1]
       - [0x7818, c, ui/statusmenu]
       - [0xA14C, c, ui/statuspersona]
-      - [0xBF14, asm, s2d_1_s5_p2]
+      - [0xBF14, c, game/formationmenu]
       - [0xCAE8, c, common/ui/menustatus]
       - [0xCB80, c, ui/statusscreen]
       - [0xD994, c, game/formationcmd]

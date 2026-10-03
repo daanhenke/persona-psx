@@ -142,7 +142,6 @@ g_overlay_base           = 0x800643A0;
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, s2d_rodata
 //------------------------------------------------------------------
 D_800643A4               = 0x800643A4; // type:u32 size:0x6C
-D_80064490               = 0x80064490; // size:0x28
 
 
 
@@ -385,7 +384,7 @@ StatusStockReleaseConfirm = 0x8006FB8C; // type:func size:0x1F0
 StatusStockView          = 0x8006FD7C; // type:func size:0x538
 FormationMenuStep        = 0x800702B4; // type:func size:0x130
 FormationMenuOpen        = 0x800703E4; // type:func size:0x2C8
-D_800706AC               = 0x800706AC; // type:func size:0x7DC
+FormationMenu            = 0x800706AC; // type:func size:0x7DC
 
 //-----------------------------------------------------------------------
 //--- PA: 0x00CAE8   VA: 0x80070E88   subsegment: c, common/ui/menustatus
@@ -1238,6 +1237,7 @@ g_kind_labels            = 0x8009D40C;
 g_persona_list_rule      = 0x8009DEDC;
 g_formation_member_def   = 0x8009E200;
 g_bg_map                 = 0x8009E59C; // size:0x10
+D_8009E5AC               = 0x8009E5AC; // size:0x10
 g_bg_layers              = 0x8009E5BC; // size:0xD8
 g_menu_layer_defs        = 0x8009E698;
 g_formation_marker_def   = 0x8009EBB4;
@@ -1364,6 +1364,8 @@ g_menu_blink             = 0x800B85AC;
 g_menu                   = 0x800B85B8;
 g_view_dy                = 0x800B85C0; // size:0x2
 g_view2_dy               = 0x800B85C4; // size:0x2
+g_item_top               = 0x800B85E4; // size:0x2
+g_swap_top               = 0x800B85E8; // size:0x2
 g_map_view_area          = 0x800B8624;
 g_cam_x                  = 0x800B8A68; // size:0x2
 g_map_scroll_x           = 0x800B8A6C; // size:0x2
@@ -1392,9 +1394,12 @@ D_800B8FEC               = 0x800B8FEC; // type:u32 size:0x4
 D_800B8FF0               = 0x800B8FF0; // type:u32 size:0x4
 D_800B8FF4               = 0x800B8FF4; // type:u32 size:0x4
 D_800B8FF8               = 0x800B8FF8; // type:u32 size:0x4
-D_800B8FFC               = 0x800B8FFC; // type:u32 size:0x18
+D_800B8FFC               = 0x800B8FFC; // type:u32 size:0x4
+g_item_scroll_step       = 0x800B9000; // size:0x2
 g_image_anim             = 0x800B9008; // size:0x140
+g_arcana_top             = 0x800B9148; // size:0x2
 g_bg_shown               = 0x800B914C;
+g_tactic_member          = 0x800B9158; // size:0x10
 g_equip_last             = 0x800B91CC; // type:u32 size:0x20
 g_hud_digits             = 0x800B91D0;
 g_skill_help_spell       = 0x800B91E8; // size:0x2
@@ -1404,7 +1409,11 @@ D_800B942C               = 0x800B942C; // type:u32 size:0xA8
 D_800B94D4               = 0x800B94D4; // type:u32 size:0x8
 D_800B94DC               = 0x800B94DC; // type:u32 size:0x8
 D_800B94E4               = 0x800B94E4; // type:u32 size:0x8
-D_800B94EC               = 0x800B94EC; // type:u32 size:0x94
+D_800B94EC               = 0x800B94EC; // type:u32 size:0xC
+D_800B94F8               = 0x800B94F8; // size:0x10
+D_800B9508               = 0x800B9508; // size:0x10
+D_800B9518               = 0x800B9518; // size:0x10
+D_800B9528               = 0x800B9528; // size:0x10
 g_ot                     = 0x800B953C; // size:0x28
 g_stock_last             = 0x800B9564; // size:0x2
 g_pad_pressed            = 0x800FC004; // size:0x4

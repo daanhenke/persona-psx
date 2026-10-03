@@ -35,6 +35,13 @@
 #define D_800B1898    D_8009D2E8
 #define D_800B198B    D_8009D3DB
 #define D_800B1A98    D_8009D4E8
+#define D_800B25E8    D_8009E094
+#define D_800B8370    D_8009E5AC
+#define D_800BB7F8    D_800B5F44
+#define g_BB94C       D_800B85C8
+#define D_800BC584    D_800B94F8
+#define D_800BC594    D_800B9508
+#define D_800BC5A4    D_800B9518
 
 /* DNG's. */
 #define D_8009ABFC    D_8009D908

@@ -20,7 +20,11 @@
 #define LIVE_ROW 8
 
 #define g_seq_handle ((short *)0x801F537C)
-#define PACK_AT      ((u_long *)0x80118000)
+/* S2D's preload leaves the archive at 0x800E0000 (FORMATION_PACK). */
+#ifndef FORMATION_PACK
+#define FORMATION_PACK 0x80118000
+#endif
+#define PACK_AT      ((u_long *)FORMATION_PACK)
 #define MEMBER(n)    ((u_long *)((u_char *)PACK_AT + PACK_AT[n]))
 
 extern short   g_menu_subsel;
@@ -83,8 +87,12 @@ extern void FormationLoadPrompt(void);
 
 void FormationMenuOpen(void);
 
-/* One step of the formation screen. */
-inline void FormationMenuStep(void)
+/* One step of the formation screen. ADV's menu loop inlines it; S2D's
+   calls it (FORMATION_STEP_CALLED). */
+#ifndef FORMATION_STEP_CALLED
+inline
+#endif
+void FormationMenuStep(void)
 {
     u_char *live = &g_formation_preset[LIVE_ROW * GRID_CELLS];
     u_char *grid = g_formation;
@@ -177,7 +185,7 @@ void FormationMenu(void)
     TimQueueAt(MEMBER(5), 0x300, 0x140, 0x3D0, 0x180);
     TimQueueAt(MEMBER(6), 0x300, 0x1A0, 0x3E0, 0x180);
     TimQueueAt(MEMBER(7), 0x300, 0x130, 0x3F0, 0x1B0);
-    g_menu = (MenuCtx *)0x800ECC80;
+    g_menu = (MenuCtx *)(0x800ECC80 + WORK_BIAS);
     g_BC5C8 = 1;
     g_menu_allow_hold = 0;
     D_800BB7F8 = 0x8CA0;
@@ -194,7 +202,7 @@ void FormationMenu(void)
     g_bg_layer_otz[3] = 0xA0;
     g_bg_layer_otz[4] = 0x20;
     g_menu_subsel = 1;
-    g_bg_map0.base = (GsCELL *)0x800E864C;
+    g_bg_map0.base = (GsCELL *)(0x800E864C + WORK_BIAS);
     g_bg_layers[0].attribute = 0x9000000;
     g_menu_sel = 0;
     g_BB94C = 0;
@@ -215,7 +223,7 @@ void FormationMenu(void)
     g_bg_layers[1].attribute = 0x8000000;
     g_bg_layers[1].x = 0;
     g_bg_layers[1].y = 0;
-    g_bg_map1.base = (GsCELL *)0x800E3E4C;
+    g_bg_map1.base = (GsCELL *)(0x800E3E4C + WORK_BIAS);
     g_bg_map1.cellw = 8;
     g_bg_map1.cellh = 12;
     g_bg_map1.ncellw = MAP_W;
@@ -227,13 +235,13 @@ void FormationMenu(void)
     D_800B8370.ncellh = 3;
     g_bg_layers[2].x = 0;
     g_bg_layers[2].y = 0;
-    g_bg_map2.base = (GsCELL *)0x800E3E4C;
+    g_bg_map2.base = (GsCELL *)(0x800E3E4C + WORK_BIAS);
     g_bg_map2.cellw = 8;
     g_bg_map2.cellh = 12;
     g_bg_map2.ncellw = MAP_W;
     g_bg_map2.ncellh = 0x20;
     g_bg_map2.index = (u_short *)g_tilemap2;
-    D_800B8370.base = (GsCELL *)0x800E3E4C;
+    D_800B8370.base = (GsCELL *)(0x800E3E4C + WORK_BIAS);
     D_800B8370.cellw = 8;
     D_800B8370.cellh = 12;
     D_800B8370.index = (u_short *)g_panel_cells;
