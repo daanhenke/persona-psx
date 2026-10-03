@@ -42,7 +42,7 @@ extern void CasinoShowNumber(u_int n, CasinoLayout *digits, u_char count);
 extern void CasinoSplitDigits(u_int n);
 extern void CasinoPayStep(int *win);
 
-extern void  func_800746C0(void);
+extern void  CasinoPokerHiLoRun(void);
 extern void  func_800760DC(void);
 extern void  func_800775CC(void);
 extern void  func_80076894(void);
@@ -83,7 +83,7 @@ void CasinoPokerDoublePlay(void)
         CasinoPokerHighRun();
         break;
     case 1:
-        func_800746C0();
+        CasinoPokerHiLoRun();
         break;
     case 2:
         func_800760DC();
