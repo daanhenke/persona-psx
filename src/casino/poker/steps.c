@@ -67,8 +67,8 @@ extern void   CasinoPokerQuit(void);
 extern void   CasinoPokerMoveCursor(void);
 extern void   CasinoPokerHoldKeys(void);
 extern void   CasinoPokerStartDraw(void);
-extern u_char func_800723A4(u_char *hand, u_char *marks);
-extern void   func_80072AF0(u_char rank);
+extern u_char CasinoPokerEvaluate(u_char *hand, u_char *marks);
+extern void   CasinoPokerCallRank(u_char rank);
 extern int    func_80072C34(u_char rank);
 extern void   func_80072D14(void);
 
@@ -277,7 +277,7 @@ void CasinoPokerDeal(void)
 {
     if (g_casino_timer == 0) {
         CasinoPokerDealCards();
-        g_poker_rank = func_800723A4(g_poker_hand, g_poker_marks);
+        g_poker_rank = CasinoPokerEvaluate(g_poker_hand, g_poker_marks);
     }
     if (g_casino_timer == 0x18) {
         CasinoSpritesSetOn(0x233, 0x31, 0);
@@ -297,7 +297,7 @@ void CasinoPokerHold(void)
 {
     CasinoCursorRepeat(&g_casino_cursor, 1, 10);
     if (g_casino_timer == 0) {
-        g_poker_rank = func_800723A4(g_poker_hand, g_poker_marks);
+        g_poker_rank = CasinoPokerEvaluate(g_poker_hand, g_poker_marks);
         if (g_poker_rank) {
             CasinoPokerLightMarks();
             CasinoQueueCluts(g_poker_hand_spr[g_poker_rank - 1], 1, GetClut(0x390, 0x1F1));
@@ -364,7 +364,7 @@ void CasinoPokerJudge(void)
     int   first;
 
     if (g_casino_timer == 0) {
-        g_poker_rank = func_800723A4(g_poker_hand, g_poker_marks);
+        g_poker_rank = CasinoPokerEvaluate(g_poker_hand, g_poker_marks);
         if (g_casino_bet < 5) {
             row = g_casino_bet - 1;
         } else {
@@ -403,7 +403,7 @@ void CasinoPokerWin(void)
         SsSeqSetVol(g_casino_seqs[15], 0x20, 0x20);
     }
     if (g_poker_win_seq != -1 && !SsIsEos(g_casino_seqs[0], 0)) {
-        func_80072AF0(g_poker_rank);
+        CasinoPokerCallRank(g_poker_rank);
         g_poker_win_seq = -1;
         g_casino_timer = -1;
         g_casino_step = POKER_CHOOSE;
