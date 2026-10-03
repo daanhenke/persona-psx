@@ -406,7 +406,10 @@ extern CasinoSemiQueue g_casino_semis;
 extern int             g_casino_buf;
 extern CasinoDB       *g_casino_cur_db;
 extern CasinoDB g_casino_db[2];
-extern CasinoFlags D_800AFC98;
+/* The lamps' flip states, a word the code reads either way: bit by bit
+   through CASINO_LAMPS, or (the poker HUD) masked as a whole. */
+extern u_int g_casino_lamps;
+#define CASINO_LAMPS (*(CasinoFlags *)&g_casino_lamps)
 extern u_short *g_casino_coin_item;
 extern u_char   g_casino_game;
 extern u_char   g_casino_step;

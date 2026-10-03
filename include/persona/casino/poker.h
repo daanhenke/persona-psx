@@ -97,6 +97,13 @@ extern CasinoLayout    D_8009527C;
 extern CasinoLayout    D_800952EC;
 extern CasinoLayout    D_8009535C;
 extern CasinoLayout    D_800957E4[POKER_CARDS]; /* the cards' faces */
+extern CasinoLayout    D_80094D9C;    /* the bet's digits     */
+extern CasinoLayout    D_80094E28[5]; /* the pay table's rows */
+extern CasinoLayout    D_800954C4;
+extern CasinoLayout    D_80095A90; /* the panels the post-win choice shows */
+extern CasinoLayout    D_80095B28;
+extern CasinoLayout    D_80095BF4;
+extern CasinoLayout    D_80095CC0;
 extern CasinoObj       D_800953E0[];
 extern CasinoModel     D_800953F0;
 extern CasinoObj       D_80095470[];

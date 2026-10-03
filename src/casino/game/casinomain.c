@@ -155,12 +155,12 @@ void CasinoInitState(void)
     g_casino_quit = 0;
     g_casino_win = 0;
     g_casino_bet = 0;
-    D_800AFC98.b1 = 0;
-    D_800AFC98.b0 = 0;
-    D_800AFC98.b3 = 0;
-    D_800AFC98.b2 = 0;
-    D_800AFC98.b5 = 0;
-    D_800AFC98.b4 = 0;
+    CASINO_LAMPS.b1 = 0;
+    CASINO_LAMPS.b0 = 0;
+    CASINO_LAMPS.b3 = 0;
+    CASINO_LAMPS.b2 = 0;
+    CASINO_LAMPS.b5 = 0;
+    CASINO_LAMPS.b4 = 0;
     g_casino_money = g_money2;
     CasinoFindCoinItem();
     CasinoSyncCounters();

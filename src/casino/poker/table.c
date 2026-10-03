@@ -38,10 +38,10 @@ extern void CasinoStartAnim(CasinoObj *o, short frames, short rx, short ry, shor
                             long sy, long sz);
 extern void CasinoPlaySeq(short *h, u_long *seq, short vab);
 
-extern void func_80071ECC(u_char bet, u_char shown);
-extern void func_80071F88(); /* (u_char bet, u_char mode); one caller passes only the bet */
-extern void func_80072314(); /* the same */
-extern void func_800713D8(u_char i);
+extern void CasinoPokerLightRow(); /* (short bet, short shown), defined old-style */
+extern void CasinoPokerPayTable(); /* (u_char bet, u_char mode); one caller passes only the bet */
+extern void CasinoPokerBetDigits(); /* the same */
+extern void CasinoPokerShowCard(u_char i);
 extern void func_80082658(u_char *out, int n, int range, int unique);
 extern int  func_80082454(u_char card);
 extern void func_800824CC(int i, u_char card, int face, int spr);
@@ -66,12 +66,12 @@ void CasinoPokerInit(void)
     g_poker_jackpot_add = 0;
     g_poker_jackpot_hit = 0;
     g_poker_jackpot_shown = g_poker_jackpot;
-    D_800AFC98.b5 = 0;
-    D_800AFC98.b4 = 0;
-    D_800AFC98.b3 = 0;
-    D_800AFC98.b2 = 0;
-    D_800AFC98.b1 = 0;
-    D_800AFC98.b0 = 0;
+    CASINO_LAMPS.b5 = 0;
+    CASINO_LAMPS.b4 = 0;
+    CASINO_LAMPS.b3 = 0;
+    CASINO_LAMPS.b2 = 0;
+    CASINO_LAMPS.b1 = 0;
+    CASINO_LAMPS.b0 = 0;
 }
 
 void CasinoPokerBuild(void)
@@ -85,9 +85,9 @@ void CasinoPokerBuild(void)
     CasinoBuildLayouts(D_80094B78, 0);
     CasinoBuildLayouts(D_80094C98, 0);
     CasinoBuildLayouts(D_80094DB4, 1);
-    func_80072314(0);
+    CasinoPokerBetDigits(0);
     CasinoBuildLayouts(D_80094EA0, 1);
-    func_80071F88(0);
+    CasinoPokerPayTable(0);
     CasinoShowLayout(&D_8009520C, 0);
     CasinoBuildFrame(&D_800951E4);
     CasinoShowLayout(&D_80095164, 0);
@@ -322,23 +322,23 @@ void CasinoPokerBetKeys(void)
 void CasinoPokerBetLamps(void)
 {
     if (!g_casino_bet_shown && g_casino_bet == 1) {
-        D_800AFC98.b2 = 1;
-        D_800AFC98.b4 = 1;
+        CASINO_LAMPS.b2 = 1;
+        CASINO_LAMPS.b4 = 1;
     }
     if (g_casino_bet_shown && !g_casino_bet) {
-        D_800AFC98.b4 = 0;
-        D_800AFC98.b2 = 0;
+        CASINO_LAMPS.b4 = 0;
+        CASINO_LAMPS.b2 = 0;
     }
 }
 
 void CasinoPokerShowBet(void)
 {
     if (g_casino_bet < 6) {
-        func_80071ECC(g_casino_bet, g_casino_bet_shown);
+        CasinoPokerLightRow(g_casino_bet, g_casino_bet_shown);
     }
     if (g_casino_bet == 0 || g_casino_bet >= 6) {
-        func_80072314(g_casino_bet, 2);
-        func_80071F88(g_casino_bet, 2);
+        CasinoPokerBetDigits(g_casino_bet, 2);
+        CasinoPokerPayTable(g_casino_bet, 2);
     }
 }
 
@@ -349,7 +349,7 @@ void CasinoPokerDealCards(void)
     func_80082658(g_poker_deck, 10, 0x35, 1);
     for (i = 0; i < POKER_CARDS; i++) {
         g_poker_hand[i] = g_poker_deck[i];
-        func_800713D8(i);
+        CasinoPokerShowCard(i);
         g_casino_xforms[i].rot.vx = 0;
         g_casino_xforms[i].rot.vy = -0x80;
         g_casino_xforms[i].rot.vz = 0;

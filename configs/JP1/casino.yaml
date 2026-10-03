@@ -80,7 +80,8 @@ segments:
       - [0x8CCC, c, debug/soundtest]
       - [0x8EBC, c, poker/steps]
       - [0xB878, c, poker/table]
-      - [0xCCD4, asm, casino_b]
+      - [0xCCD4, c, poker/play]
+      - [0xE004, asm, casino_b]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,
