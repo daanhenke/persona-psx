@@ -15,6 +15,10 @@
 #define D_8005E714 g_adv_scene_arg
 #define g_pad_held g_pad_held_s2d
 
+/* The menu archive the preload leaves unpacked. */
+#define MENU_PACK 0x800E0000
+#define func_80033A50 GsDefDispBuff
+
 #define D_800B12A8 D_8009CCF8
 #define D_800B12B8 D_8009CD08
 #define D_800B178C D_8009D1DC
@@ -55,6 +59,13 @@
 #define D_800BC584    D_800B94F8
 #define D_800BC594    D_800B9508
 #define D_800BC5A4    D_800B9518
+#define g_BC204       D_800B91BC
+#define D_800BB990    D_800B8628
+#define D_800BB994    D_800B862C
+#define D_800BB99C    D_800B8634
+#define D_800BB9A0    D_800B8638
+#define D_800B1EF8    D_8009D948
+#define D_800B9628    D_8009F808
 
 /* DNG's. */
 #define D_8009ABFC    D_8009D908

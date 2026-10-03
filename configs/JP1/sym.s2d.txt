@@ -741,7 +741,7 @@ FadeSpritesStepDown      = 0x8007FFD8; // type:func size:0x74
 //--------------------------------------------------------------
 //--- PA: 0x01BCAC   VA: 0x8008004C   subsegment: asm, s2d_2_s18
 //--------------------------------------------------------------
-D_8008004C               = 0x8008004C; // type:func size:0x308
+ConfigPlaceCursors       = 0x8008004C; // type:func size:0x308
 
 //-------------------------------------------------------------------------
 //--- PA: 0x01BFB4   VA: 0x80080354   subsegment: c, common/ui/configlabels
@@ -942,7 +942,7 @@ CharApplyStats           = 0x80084590; // type:func size:0x650
 //--------------------------------------------------------------
 CharPreviewEquip         = 0x80084BE0; // type:func size:0x6C0
 EquipDrawCompare         = 0x800852A0; // type:func size:0x7F0
-D_80085A90               = 0x80085A90; // type:func size:0x588
+MapScreenOpen            = 0x80085A90; // type:func size:0x588
 MapScreen                = 0x80086018; // type:func size:0xEC
 MapFindPlayer            = 0x80086104; // type:func size:0x10C
 MapScreenLayout          = 0x80086210; // type:func size:0x454
@@ -967,7 +967,7 @@ MapPlaceMarker           = 0x800868F0; // type:func size:0xA8
 //--------------------------------------------------------------
 MapDrawName              = 0x80086998; // type:func size:0xFC
 MapDrawMarkers           = 0x80086A94; // type:func size:0x220
-func_80086CB4            = 0x80086CB4; // type:func size:0x338
+MapScreenStep            = 0x80086CB4; // type:func size:0x338
 MapDrawTurned            = 0x80086FEC; // type:func size:0x68
 MapDrawGrid              = 0x80087054; // type:func size:0x5A0
 
@@ -985,7 +985,7 @@ MapTileSeen              = 0x80087730; // type:func size:0x78
 //--- PA: 0x023408   VA: 0x800877A8   subsegment: asm, s2d_2_s26_x1
 //-----------------------------------------------------------------
 MapMarkTile              = 0x800877A8; // type:func size:0x80
-func_80087828            = 0x80087828; // type:func size:0x5AC
+PersonaDataOpen          = 0x80087828; // type:func size:0x5AC
 PersonaDataScreen        = 0x80087DD4; // type:func size:0x150
 ArcanaGridOpen           = 0x80087F24; // type:func size:0x480
 ArcanaGridStep           = 0x800883A4; // type:func size:0x3B8
@@ -1220,6 +1220,7 @@ g_pow10                  = 0x8009C770;
 g_config_marker_def      = 0x8009CB98;
 g_spage_kind_cells       = 0x8009D024;
 g_spage_name_cells       = 0x8009D07C;
+g_pdata_top_def          = 0x8009D120;
 g_menu_sel               = 0x8009D1D8;
 g_menu_subsel            = 0x8009D1DA;
 str_cell_run             = 0x8009D208;
@@ -1254,12 +1255,18 @@ g_config_labels_right    = 0x8009EE60;
 g_stat_bar_cells         = 0x8009F438;
 str_config_title         = 0x8009F44C;
 g_icon_cell_clut         = 0x8009F4B4; // size:0x28
+g_map_title_def          = 0x8009F4EC;
+g_map_arrow_defs         = 0x8009F53C; // size:0x40
 g_compass_cels           = 0x8009F5BC;
 g_map_marker_defs        = 0x8009F63C;
 g_map_floor_cells        = 0x8009F67C; // size:0x1C
 g_map_turned_cells       = 0x8009F698; // size:0x40
 g_tile_walls             = 0x8009F6D8;
 g_map_wall_cells         = 0x8009F708; // size:0x70
+g_pdata_arcana_cells     = 0x8009F780;
+g_pdata_name_cells       = 0x8009F7B8;
+g_pdata_page_rle         = 0x8009F82C;
+g_arcana_help_msgs       = 0x8009F9A8;
 g_flag_groups            = 0x8009FA10;
 g_s2d_exit               = 0x800A4CF4; // size:0x2
 g_s2d_heading            = 0x800A4CF6; // size:0x2
@@ -1370,6 +1377,7 @@ g_view2_dy               = 0x800B85C4; // size:0x2
 g_item_top               = 0x800B85E4; // size:0x2
 g_swap_top               = 0x800B85E8; // size:0x2
 g_map_view_area          = 0x800B8624;
+g_arcana_scroll_step     = 0x800B864C; // size:0x2
 g_cam_x                  = 0x800B8A68; // size:0x2
 g_map_scroll_x           = 0x800B8A6C; // size:0x2
 g_header_scroll_x        = 0x800B8A70; // size:0x2
@@ -1390,6 +1398,7 @@ D_800B8BE0               = 0x800B8BE0; // type:u32 size:0x400
 g_ot_index               = 0x800B8ED8;
 g_bg_index               = 0x800B8EEC;
 g_persona_list_count     = 0x800B8FCC;
+g_persona_data_step      = 0x800B8FD0; // size:0x2
 D_800B8FE0               = 0x800B8FE0; // type:u32 size:0x4
 D_800B8FE4               = 0x800B8FE4; // type:u32 size:0x4
 D_800B8FE8               = 0x800B8FE8; // type:u32 size:0x4

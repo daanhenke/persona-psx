@@ -79,3 +79,5 @@ g_playtime_frame = 0x801F29BF;
 g_pad_config = 0x801F2AC7;
 g_key_menu_close = 0x801F2A94;
 D_801F2ACD = 0x801F2ACD;
+D_801F2ACB = 0x801F2ACB;
+D_801F15A4 = 0x801F15A4;

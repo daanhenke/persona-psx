@@ -25,7 +25,7 @@
 #include <persona/adv/personapage.h>
 
 /* The persona ids the list shows, reached by hardcoded address. */
-#define g_persona_list ((u_char *)0x800EAE4C)
+#define g_persona_list ((u_char *)(0x800EAE4C + WORK_BIAS))
 
 /* This screen's portraits: kind 4, nine sectors each. */
 #define PORTRAIT_KIND    4
@@ -58,10 +58,17 @@ extern void DrawPersonaList(void);
 /* The save-game option bytes; the fourth is the pad layout. */
 #define g_cfg        ((u_char *)0x801F2AC4)
 #define g_seq_handle ((short *)0x801F537C)
-#define PACK_AT      ((u_long *)0x80118000)
+/* The archive the preload leaves unpacked; S2D's is elsewhere (MENU_PACK). */
+#ifndef MENU_PACK
+#define MENU_PACK 0x80118000
+#endif
+#define PACK_AT      ((u_long *)MENU_PACK)
 
 extern void VramClearRect(int x, int y, int w, int h);
+extern void FlushImageUploads(void);
+#ifndef func_80033A50
 extern void func_80033A50(int a, int b, int c, int d);
+#endif
 extern void BgReset(void);
 extern void SoundOpenSeq(u_short slot, u_short seq, short vab);
 extern void CellsInit(void);
@@ -148,19 +155,27 @@ void PersonaDataOpen(void)
     TimQueueAt((u_long *)((u_char *)PACK_AT + pack[6]), 0x300, 0x1A0, 0x3E0, 0x180);
     TimQueueAt((u_long *)((u_char *)PACK_AT + pack[7]), 0x300, 0x130, 0x3F0, 0x1B0);
     BgReset();
+#ifdef DATA_FLUSH_UPLOADS
+    /* S2D's sends the images before it goes on (DATA_FLUSH_UPLOADS). */
+    FlushImageUploads();
+    DrawSync(0);
+#endif
 
     g_ot[0].length = g_ot[1].length = 11;
-    g_ot[0].org = (GsOT_TAG *)0x800D6000;
-    g_ot[1].org = (GsOT_TAG *)0x800D9000;
+    g_ot[0].org = (GsOT_TAG *)(0x800D6000 + WORK_BIAS);
+    g_ot[1].org = (GsOT_TAG *)(0x800D9000 + WORK_BIAS);
     g_ot_index = GsGetActiveBuff();
-    GsSetWorkBase((PACKET *)(0x800C0000 + g_ot_index * 0xB000));
+    GsSetWorkBase((PACKET *)(0x800C0000 + WORK_BIAS + g_ot_index * 0xB000));
     GsClearOt(0, 0, &g_ot[g_ot_index]);
 
+#ifndef DATA_NO_MENU_SEQS
+    /* S2D's keeps the field's sounds (DATA_NO_MENU_SEQS). */
     SoundOpenSeq(0x18, 0, 0);
     SoundOpenSeq(0x19, 0, 0);
     SoundOpenSeq(0x1A, 0, 0);
     SoundOpenSeq(0x1B, 0, 0);
-    g_menu = (MenuCtx *)0x800ECC80;
+#endif
+    g_menu = (MenuCtx *)(0x800ECC80 + WORK_BIAS);
     g_BB998 = 0;
     g_BC204 = 0;
     g_menu_allow_hold = 0;
@@ -184,7 +199,7 @@ void PersonaDataOpen(void)
     g_pad_held[0] = 0;
     g_pad_pressed[0] = 0;
     g_bg_layers[0].attribute = 0x9000000;
-    g_bg_map0.base = (GsCELL *)0x800E864C;
+    g_bg_map0.base = (GsCELL *)(0x800E864C + WORK_BIAS);
     g_bg_map0.cellw = 8;
     g_bg_map0.cellh = 12;
     g_bg_map0.ncellw = MAP_W;
@@ -193,7 +208,7 @@ void PersonaDataOpen(void)
     g_bg_layers[1].attribute = 0x8000000;
     g_bg_layers[1].x = 0;
     g_bg_layers[1].y = 0;
-    g_bg_map1.base = (GsCELL *)0x800E3E4C;
+    g_bg_map1.base = (GsCELL *)(0x800E3E4C + WORK_BIAS);
     g_bg_map1.cellw = 8;
     g_bg_map1.cellh = 12;
     g_bg_map1.ncellw = MAP_W;
@@ -202,7 +217,7 @@ void PersonaDataOpen(void)
     g_bg_layers[2].attribute = 0x8000000;
     g_bg_layers[2].x = 0;
     g_bg_layers[2].y = 0;
-    g_bg_map2.base = (GsCELL *)0x800E3E4C;
+    g_bg_map2.base = (GsCELL *)(0x800E3E4C + WORK_BIAS);
     g_bg_map2.cellw = 8;
     g_bg_map2.cellh = 12;
     g_bg_map2.ncellw = MAP_W;
@@ -232,10 +247,12 @@ void PersonaDataOpen(void)
     FadeUpBlocking(8, 0x80);
     PersonaDataScreen();
     FadeDownBlocking(8, 0);
+#ifndef DATA_NO_MENU_SEQS
     SsSetNck(g_seq_handle[0x18]);
     SsSetNck(g_seq_handle[0x19]);
     SsSetNck(g_seq_handle[0x1A]);
     SsSetNck(g_seq_handle[0x1B]);
+#endif
 }
 
 void PersonaDataScreen(void)

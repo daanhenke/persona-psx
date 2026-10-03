@@ -89,12 +89,8 @@ rom:0x48E8 reloc:MIPS_HI16 symbol:g_pad_bindings addend:0xC
 rom:0x48EC reloc:MIPS_LO16 symbol:g_pad_bindings addend:0xC
 rom:0x185CC reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
 rom:0x185D0 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
-rom:0x2211C reloc:MIPS_HI16 symbol:g_options addend:0x3
-rom:0x22120 reloc:MIPS_LO16 symbol:g_options addend:0x3
-rom:0x21D08 reloc:MIPS_HI16 symbol:g_pad_bindings addend:0xC
-rom:0x21D0C reloc:MIPS_LO16 symbol:g_pad_bindings addend:0xC
-rom:0x23B30 reloc:MIPS_HI16 symbol:g_pad_bindings addend:0xC
-rom:0x23B34 reloc:MIPS_LO16 symbol:g_pad_bindings addend:0xC
+rom:0x23B30 reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
+rom:0x23B34 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
 rom:0x11158 reloc:MIPS_HI16 symbol:g_options addend:0x23
 rom:0x1115C reloc:MIPS_LO16 symbol:g_options addend:0x23
 rom:0x11228 reloc:MIPS_HI16 symbol:g_options addend:0x23
@@ -159,3 +155,12 @@ rom:0xC974 reloc:MIPS_HI16 symbol:g_pad_config addend:0x0
 rom:0xC978 reloc:MIPS_LO16 symbol:g_pad_config addend:0x0
 rom:0xCA30 reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
 rom:0xCA34 reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
+
+// The map screen reads the close key, the player's map and the north-up
+// option by name.
+rom:0x21D08 reloc:MIPS_HI16 symbol:g_key_menu_close addend:0x0
+rom:0x21D0C reloc:MIPS_LO16 symbol:g_key_menu_close addend:0x0
+rom:0x21D98 reloc:MIPS_HI16 symbol:D_801F15A4 addend:0x0
+rom:0x21D9C reloc:MIPS_LO16 symbol:D_801F15A4 addend:0x0
+rom:0x2211C reloc:MIPS_HI16 symbol:D_801F2ACB addend:0x0
+rom:0x22120 reloc:MIPS_LO16 symbol:D_801F2ACB addend:0x0

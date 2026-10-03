@@ -20,11 +20,11 @@
 #define LIVE_ROW 8
 
 #define g_seq_handle ((short *)0x801F537C)
-/* S2D's preload leaves the archive at 0x800E0000 (FORMATION_PACK). */
-#ifndef FORMATION_PACK
-#define FORMATION_PACK 0x80118000
+/* The archive the preload leaves unpacked; S2D's is elsewhere (MENU_PACK). */
+#ifndef MENU_PACK
+#define MENU_PACK 0x80118000
 #endif
-#define PACK_AT      ((u_long *)FORMATION_PACK)
+#define PACK_AT      ((u_long *)MENU_PACK)
 #define MEMBER(n)    ((u_long *)((u_char *)PACK_AT + PACK_AT[n]))
 
 extern short   g_menu_subsel;
