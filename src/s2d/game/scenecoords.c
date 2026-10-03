@@ -24,7 +24,7 @@ extern VECTOR        D_800A4FA4[5];
 extern void func_80033A40(int z);
 extern short g_compass_x;
 extern short g_compass_y;
-extern void  func_8008ED0C(int x, int y, int scale);
+extern void  S2dCompassMoveTo(int x, int y, int step);
 extern void  func_8009994C(int x, int y, int w, int h, int a, int b, int c);
 
 #ifdef NON_MATCHING
@@ -172,7 +172,7 @@ void S2dPlaceCompass(void)
         g_compass_y = -0x68;
     }
     p = &g_compass_x;
-    func_8008ED0C(*p + 0x58, -0x18, 0x1000);
+    S2dCompassMoveTo(*p + 0x58, -0x18, 0x1000);
     func_8009994C(*p + 0x10F, 0x18, 0x98, 0x68, 0, 0, 0x1000);
 }
 

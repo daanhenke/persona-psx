@@ -261,7 +261,7 @@ segments:
       - [0x295E8, asm, s2d_2_s27_b1]
       - [0x29EE8, c, game/scenecoords]
       - [0x2A514, c, game/field]
-      - [0x2A8A4, asm, s2d_2_s27_c]
+      - [0x2AC18, asm, s2d_2_s27_c]
       - [0x2ED84, c, gfx/fadetiles]
       - [0x2EE90, asm, s2d_2_s27_c1]
       - [0x31DD4, c, game/statereset]
