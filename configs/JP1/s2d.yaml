@@ -284,7 +284,6 @@ segments:
       - [0x359C0, c, game/sceneload]
       - [0x35F08, c, ui/textwin]
       - [0x370F0, c, ui/indicator]
-      - [0x372A4, asm, s2d_2_s27b]
       - [0x37884, c, common/game/eventflag]
       - [0x378AC, asm, s2d_2_s28]
       # The overlay's own workspace: what the disc carries a value for,

@@ -1192,12 +1192,12 @@ S2dIndicatorBar          = 0x8009B490; // type:func size:0x14
 S2dIndicatorClear        = 0x8009B4A4; // type:func size:0x10
 S2dDrawIndicator         = 0x8009B4B4; // type:func size:0x11C
 S2dIndicatorState        = 0x8009B5D0; // type:func size:0x10
-S2dIndicatorHide         = 0x8009B5E0; // type:func size:0x34
-S2dIndicatorShow         = 0x8009B614; // type:func size:0x30
-func_8009B644            = 0x8009B644; // type:func size:0x114
+S2dIndicatorOpen         = 0x8009B5E0; // type:func size:0x34
+S2dIndicatorClose        = 0x8009B614; // type:func size:0x30
+S2dIndicatorStep         = 0x8009B644; // type:func size:0x114
 func_8009B758            = 0x8009B758; // type:func size:0x434
-func_8009BB8C            = 0x8009BB8C; // type:func size:0x68
-func_8009BBF4            = 0x8009BBF4; // type:func size:0x30
+S2dLoadWinColors         = 0x8009BB8C; // type:func size:0x68
+S2dEventFlagSet          = 0x8009BBF4; // type:func size:0x30
 
 //------------------------------------------------------------------------
 //--- PA: 0x037884   VA: 0x8009BC24   subsegment: c, common/game/eventflag
