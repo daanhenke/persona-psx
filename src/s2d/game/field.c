@@ -7,7 +7,8 @@
  *   0x8008F7D8 S2dFilterInput    0x8008F878 S2dViewKeys
  *   0x8008FC00 S2dPartyMoved     0x8008FC5C (the map's markers, asm)
  *   0x80090248 S2dDrawPartyFront 0x80090380 S2dDrawShade
- *   0x80090554 S2dEndFrame
+ *   0x80090554 S2dEndFrame       0x800907A0 (asm)
+ *   0x80091270 S2dTurnCamera
  *
  * The party is two placed objects, g_party_obj and [1]. Left standing
  * still long enough on a map that allows it, one of them starts an idle
@@ -66,8 +67,8 @@ extern int    D_800B863C;
 extern short  g_compass_y;
 
 extern void func_8009777C(u_char *p);
-extern void func_80091270(void);
 extern void func_8008CEB8(void);
+void        S2dTurnCamera(void);
 extern void func_8008BD78(void);
 extern void func_8008C038(void);
 extern void func_8008C34C(void);
@@ -86,6 +87,7 @@ extern void func_800935C8(void);
 extern void func_8008E1C0(void);
 
 extern int D_800B0EF0;
+
 
 /* S2dFilterInput's two inputs, their last sixteen values, the outputs and
    the sixteen weights. */
@@ -358,7 +360,7 @@ void S2dUpdate(void)
     if (g_map_info[g_btl_map_id].effect == 0) {
         func_8009777C(D_800B1D38);
     }
-    func_80091270();
+    S2dTurnCamera();
     switch (D_800A4CFC.mode) {
     case 0:
     case 1:
@@ -635,4 +637,28 @@ void S2dEndFrame(void)
         GsDrawOt(&g_ot_layer[i][g_draw_side]);
     }
     D_800B863C++;
+}
+
+INCLUDE_ASM("s2d/nonmatchings/game/field", func_800907A0);
+
+/* One step of the camera's turn: the angle goes on by the speed until it
+   reaches the heading's, where both stop. */
+void S2dTurnCamera(void)
+{
+    int   t;
+    short f;  /* a short: an int puts the two in each other's registers */
+
+    g_cam_turn_angle += g_cam_turn_speed;
+    if (g_cam_turn_speed > 0) {
+        t = g_s2d_heading * 1024;
+        f = g_cam_turn_angle < t;
+    } else {
+        t = g_s2d_heading * 1024;
+        f = t < g_cam_turn_angle;
+    }
+    if (!f) {
+        g_cam_turn_speed = 0;
+        g_cam_turn_angle = t;
+    }
+    g_s2d_cam_ry = (u_int)rcos(g_cam_turn_angle) >> 3;
 }

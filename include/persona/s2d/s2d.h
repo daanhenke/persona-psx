@@ -30,6 +30,10 @@ extern long  g_s2d_cam_z;
 extern short g_s2d_exit;
 extern short g_s2d_heading;
 
+/* The camera's turn towards the heading: its speed and its angle. */
+extern short g_cam_turn_speed;
+extern short g_cam_turn_angle;
+
 /* Which way the party faces, 0-3. */
 extern short g_s2d_facing;
 

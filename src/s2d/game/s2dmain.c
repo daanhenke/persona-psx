@@ -38,7 +38,6 @@ extern short  g_bgm_ready;
 
 extern int       D_800A4CE4;
 extern int       D_800A4CEC;
-extern short     D_800A4CF8[2];
 /* The overlay's two work buffers: ordering-table tags, then the map's. */
 extern GsOT_TAG *g_work_buf;
 extern int       g_work_buf2;
@@ -244,7 +243,7 @@ void ovl_s2d_entry(void)
         S2dLoadHeading();
         state = g_state_prev;
         g_s2d_facing = facing[g_adv_room & 3];
-        D_800A4CF8[1] = g_s2d_heading * 1024;
+        g_cam_turn_angle = g_s2d_heading * 1024;
         if (state == GAME_STATE_BTL) {
             g_map_id = g_btl_map_id;
             g_map_pos_x = g_btl_pos_x;
