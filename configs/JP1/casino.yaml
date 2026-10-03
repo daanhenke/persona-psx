@@ -57,7 +57,7 @@ segments:
       - [0x4, .rodata, game/casinomain]
       - [0x144, .rodata, debug/soundtest]
       - [0x158, .rodata, poker/steps]
-      - [0x2F8, rodata, casino_rodata]
+      - [0x3A8, rodata, casino_rodata]
       - [0x1A0C, c, game/casinomain]
       - [0x2564, c, game/cursor]
       - [0x2B04, c, game/tick]
@@ -79,7 +79,7 @@ segments:
       - [0x84F0, c, audio/sound]
       - [0x8CCC, c, debug/soundtest]
       - [0x8EBC, c, poker/steps]
-      - [0xAEF4, asm, casino_b]
+      - [0xB878, asm, casino_b]
       - [0x1AF10, c, dispatch]
       - [0x1AFC8, asm, casino_1]
       # The overlay's own workspace: what the disc carries a value for,

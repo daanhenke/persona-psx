@@ -19,6 +19,7 @@
  *   0x8006EE60 CasinoPow10
  *   0x8006EEDC CasinoPokerLose
  *   0x8006F018 CasinoPokerClear
+ *   0x8006F294 CasinoPokerDoubleUp
  *
  * Each step runs once a frame; g_casino_timer counts the frames since it
  * began, and a step hands over by setting the next one and the timer to
@@ -44,10 +45,13 @@ extern void CasinoCursorRepeat(CasinoCursor *c, u_char mode, short rate);
 extern void CasinoStartAnim(CasinoObj *o, short frames, short rx, short ry, short rz, long tx, long ty, long tz, long sx,
                             long sy, long sz);
 extern void CasinoPlaySeq(short *h, u_long *seq, short vab);
+extern void CasinoBuildObj(CasinoModel *m);
+extern void CasinoTexObj(CasinoModel *m);
+extern void CasinoSetXform(CasinoXform *x);
+extern void CasinoDrawObj(CasinoObj *o);
 
 extern u_char g_casino_wrapped;
 
-extern void   func_8006F294(void);
 extern void   func_8006FC18(void);
 extern void   func_8006FCBC(void);
 extern void   func_80070890(void);
@@ -56,6 +60,7 @@ extern void   func_80070A18(void);
 extern void   func_80070D64(void);
 extern void   func_80070E98(void);
 extern void   func_80070F58(void);
+extern void   func_80071074(void);
 extern void   func_800715C8(void);
 extern void   func_800718EC(void);
 extern void   func_80071948(void);
@@ -81,6 +86,65 @@ extern CasinoLayout    D_80095CC0;
 extern CasinoObj       D_80095770;
 extern CasinoLayout    D_800957E4[POKER_CARDS];
 
+/* The double-up table's pieces. */
+extern CasinoLayout D_8009488C;
+extern CasinoLayout D_80094940;
+extern CasinoLayout D_80094A08;
+extern CasinoLayout D_80094A48;
+extern CasinoLayout D_80094B48;
+extern CasinoLayout D_80094B60;
+extern CasinoLayout D_80094C20;
+extern CasinoLayout D_80094C38;
+extern CasinoLayout D_80094C50;
+extern CasinoLayout D_80094C68;
+extern CasinoLayout D_80094C80;
+extern CasinoLayout D_80094D9C;
+extern CasinoLayout D_80094E28;
+extern CasinoLayout D_80094E40;
+extern CasinoLayout D_80094E58;
+extern CasinoLayout D_80094E70;
+extern CasinoLayout D_80094E88;
+extern CasinoLayout D_80094F44;
+extern CasinoLayout D_80094F5C;
+extern CasinoLayout D_80094F74;
+extern CasinoLayout D_80094F8C;
+extern CasinoLayout D_80094FA4;
+extern CasinoLayout D_80094FBC;
+extern CasinoLayout D_80094FD4;
+extern CasinoLayout D_80094FEC;
+extern CasinoLayout D_80095004;
+extern CasinoLayout D_80095084;
+extern CasinoLayout D_8009509C;
+extern CasinoLayout D_800950B4;
+extern CasinoLayout D_800950CC;
+extern CasinoLayout D_800950E4;
+extern CasinoLayout D_800950FC;
+extern CasinoLayout D_80095114;
+extern CasinoLayout D_8009512C;
+extern CasinoLayout D_80095164;
+extern CasinoLayout D_8009519C;
+extern CasinoLayout D_800951CC;
+extern CasinoLayout D_8009520C;
+extern CasinoLayout D_8009523C;
+extern CasinoLayout D_8009527C;
+extern CasinoLayout D_800952AC;
+extern CasinoLayout D_800952EC;
+extern CasinoLayout D_8009531C;
+extern CasinoLayout D_8009535C;
+extern CasinoLayout D_80095CF8;
+extern CasinoLayout D_80095D30;
+extern CasinoLayout D_80095D68;
+extern CasinoLayout D_80095E14;
+extern CasinoLayout D_8009651C;
+extern CasinoLayout D_800965E8;
+extern CasinoLayout D_80095E94[8];
+extern CasinoLayout D_80095FBC[8];
+extern CasinoLayout D_800960E4[8];
+extern CasinoObj    D_800953E0;
+extern CasinoObj    D_80095470;
+extern CasinoObj    D_80095DD0[];
+extern CasinoModel  D_80095DE0;
+
 void CasinoPokerOpen(void);
 void CasinoPokerEnter(void);
 void CasinoPokerBet(void);
@@ -98,6 +162,7 @@ void CasinoPayStep(int *win);
 int  CasinoPow10(u_char unused, u_char n);
 void CasinoPokerLose(void);
 void CasinoPokerClear(void);
+void CasinoPokerDoubleUp(void);
 
 void CasinoPokerRun(void)
 {
@@ -145,7 +210,7 @@ void CasinoPokerRun(void)
         CasinoPokerCollect();
         break;
     case POKER_DOUBLE_UP:
-        func_8006F294();
+        CasinoPokerDoubleUp();
         break;
     case POKER_DOUBLE_PLAY:
         func_80072D14();
@@ -659,5 +724,149 @@ void CasinoPokerClear(void)
         }
         g_casino_timer = -1;
         g_casino_step = POKER_ENTER;
+    }
+}
+
+void CasinoPokerDoubleUp(void)
+{
+    CasinoLayout *a[11] = { &D_80094940, &D_8009488C, &D_80094A08, &D_80094A48, &D_80094B48, &D_80094B60,
+                            &D_80094C20, &D_80094C38, &D_80094C50, &D_80094C68, &D_80094C80 };
+    CasinoLayout *b[6]  = { &D_80094D9C, &D_80094E28, &D_80094E40, &D_80094E58, &D_80094E70, &D_80094E88 };
+    CasinoLayout *c[14] = { &D_80094F44, &D_80094F5C, &D_80094F74, &D_80094F8C, &D_80094FA4,
+                            &D_80094FBC, &D_80094FD4, &D_80094FEC, &D_80095004, &D_80095164,
+                            &D_800951CC, &D_8009520C, &D_800952AC, &D_800952EC };
+    CasinoLayout *d[13] = { &D_80095084, &D_8009509C, &D_800950B4, &D_800950CC, &D_800950E4,
+                            &D_800950FC, &D_80095114, &D_8009512C, &D_8009519C, &D_8009523C,
+                            &D_8009527C, &D_8009531C, &D_8009535C };
+    int i;
+
+    if (g_casino_timer == 1) {
+        CasinoTween(&D_80095A90, 8, 8, -0x10, -0x10, 8);
+    }
+    if (g_casino_timer == 8) {
+        CasinoSpritesSetOn(0x26C, 0xB, 0);
+    }
+    func_80071074();
+    if (g_casino_timer == 1) {
+        for (i = 0; i < 14; i++) {
+            CasinoTween(c[i], -0xA0, 0, 0, 0, 0x20);
+        }
+        for (i = 0; i < 13; i++) {
+            CasinoTween(d[i], 0xA0, 0, 0, 0, 0x20);
+        }
+        CasinoStartAnim(&D_800953E0, 0x20, 0, 0, 0, -0xA0, 0, 0, 0, 0, 0);
+        CasinoStartAnim(&D_80095470, 0x20, 0, 0, 0, 0xA0, 0, 0, 0, 0, 0);
+    }
+    if (g_casino_timer == 0x20) {
+        CasinoSpritesSetOn(0x208, 9, 0);
+        CasinoSpritesSetOn(0x211, 8, 0);
+        CasinoSpritesSetOn(0x219, 4, 0);
+        CasinoSpritesSetOn(0x21D, 4, 0);
+        CasinoSpritesSetOn(0x221, 4, 0);
+        CasinoSpritesSetOn(0x225, 4, 0);
+        CasinoSpritesSetOn(0x229, 4, 0);
+        CasinoSpritesSetOn(0x22B, 4, 0);
+        CasinoSpritesSetOn(0x22D, 1, 0);
+        CasinoSpritesSetOn(0x22E, 1, 0);
+        CasinoSpritesSetOn(0x22F, 1, 0);
+        CasinoSpritesSetOn(0x230, 1, 0);
+        CasinoSpritesSetOn(0x231, 1, 0);
+        CasinoSpritesSetOn(0x232, 1, 0);
+    }
+    if (g_casino_timer == 0x20) {
+        CasinoSpritesSetOn(0x14, 0x1E, 1);
+        for (i = 0; i < 6; i++) {
+            CasinoTween(b[i], 0, 4, 0, -8, 4);
+        }
+    }
+    if (g_casino_timer == 0x27) {
+        CasinoPlaySeq(&g_casino_seqs[2], (u_long *)0x139E18, g_casino_main_vab);
+        CasinoSpritesSetOn(0x14F, 5, 0);
+        CasinoSpritesSetOn(0x154, 0x24, 0);
+        CasinoSpritesSetOn(0x178, 0x24, 0);
+        CasinoSpritesSetOn(0x19C, 0x24, 0);
+        CasinoSpritesSetOn(0x1C0, 0x24, 0);
+        CasinoSpritesSetOn(0x1E4, 0x24, 0);
+        for (i = 0; i < 11; i++) {
+            CasinoTween(a[i], 0, -0x80, 0, 0, 0x20);
+        }
+    }
+    if (g_casino_timer == 0x3F) {
+        CasinoSpritesSetOn(0xF9, 9, 0);
+        CasinoSpritesSetOn(0xF5, 4, 0);
+        CasinoSpritesSetOn(0x102, 0xA, 0);
+        CasinoSpritesSetOn(0x10C, 4, 0);
+        CasinoSpritesSetOn(0x119, 9, 0);
+        CasinoSpritesSetOn(0x110, 4, 0);
+        CasinoSpritesSetOn(0x11D, 0xA, 0);
+        CasinoSpritesSetOn(0x127, 0xA, 0);
+        CasinoSpritesSetOn(0x131, 0xA, 0);
+        CasinoSpritesSetOn(0x13B, 0xA, 0);
+        CasinoSpritesSetOn(0x145, 0xA, 0);
+    }
+    if (g_casino_timer == 0x3F) {
+        for (i = 0; i < POKER_CARDS; i++) {
+            if (g_poker_held[i] == 1) {
+                CasinoTween(&D_800957E4[i], 0x10, 0, -0x20, -8, 8);
+            }
+        }
+    }
+    if (g_casino_timer == 0x47) {
+        CasinoSpritesSetOn(0x8C, 5, 0);
+        CasinoSpritesSetOn(0x3C, 0x1E, 1);
+        for (i = 0; i < POKER_CARDS; i++) {
+            CasinoStartAnim(&g_casino_objs[i], 0x20, 0, 0x800, 0, 0, 0, 0, 0, 0, 0);
+        }
+    }
+    if (g_casino_timer == 0x67) {
+        CasinoPlaySeq(&g_casino_seqs[1], (u_long *)0x139E94, g_casino_main_vab);
+        for (i = 0; i < POKER_CARDS; i++) {
+            CasinoStartAnim(&g_casino_objs[i], 0x20, 0, 0, 0, -((10 - i) * 32), 0, 0, 0, 0, 0);
+        }
+    }
+    if (g_casino_timer > 0x87) {
+        if (g_poker_double_game == 0) {
+            CasinoTween(&D_80095B28, 0, -0x20, 0, -0x10, 0x10);
+            CasinoBuildObj(&D_80095DE0);
+            CasinoTexObj(&D_80095DE0);
+            CasinoSetXform(D_80095DD0->xform);
+            CasinoDrawObj(D_80095DD0);
+        } else if (g_poker_double_game == 1) {
+            CasinoTween(&D_80095BF4, 0, -0x20, 0, -0x10, 0x10);
+        } else if (g_poker_double_game == 2) {
+            CasinoTween(&D_80095CC0, 0, -0x20, 0, -0x10, 0x10);
+        }
+        CasinoShowLayout(&D_80095CF8, 0);
+        CasinoShowLayout(&D_80095D30, 0);
+        CasinoShowLayout(&D_80095D68, 0);
+        CasinoShowLayout(&D_80095E14, 0);
+        CasinoShowLayout(&D_80095E94[0], 0);
+        CasinoShowLayout(&D_80095E94[1], 0);
+        CasinoShowLayout(&D_80095E94[2], 0);
+        CasinoShowLayout(&D_80095E94[3], 0);
+        CasinoShowLayout(&D_80095E94[4], 0);
+        CasinoShowLayout(&D_80095E94[5], 0);
+        CasinoShowLayout(&D_80095E94[6], 0);
+        CasinoShowLayout(&D_80095E94[7], 0);
+        CasinoShowLayout(&D_80095FBC[0], 0);
+        CasinoShowLayout(&D_80095FBC[1], 0);
+        CasinoShowLayout(&D_80095FBC[2], 0);
+        CasinoShowLayout(&D_80095FBC[3], 0);
+        CasinoShowLayout(&D_80095FBC[4], 0);
+        CasinoShowLayout(&D_80095FBC[5], 0);
+        CasinoShowLayout(&D_80095FBC[6], 0);
+        CasinoShowLayout(&D_80095FBC[7], 0);
+        CasinoShowLayout(&D_800960E4[0], 0);
+        CasinoShowLayout(&D_800960E4[1], 0);
+        CasinoShowLayout(&D_800960E4[2], 0);
+        CasinoShowLayout(&D_800960E4[3], 0);
+        CasinoShowLayout(&D_800960E4[4], 0);
+        CasinoShowLayout(&D_800960E4[5], 0);
+        CasinoShowLayout(&D_800960E4[6], 0);
+        CasinoShowLayout(&D_800960E4[7], 0);
+        CasinoShowLayout(&D_800965E8, 0);
+        CasinoShowLayout(&D_8009651C, 0);
+        g_casino_timer = -1;
+        g_casino_step = POKER_DOUBLE_PLAY;
     }
 }

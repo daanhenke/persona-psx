@@ -35,6 +35,7 @@
 extern CasinoObj g_casino_objs[25]; /* the 3D objects; poker's cards first */
 
 extern u_char g_poker_hand[POKER_CARDS];    /* the cards dealt            */
+extern u_char g_poker_held[POKER_CARDS];    /* kept through the draw      */
 extern u_char g_poker_marks[POKER_CARDS];   /* the cards that make the rank */
 extern u_char g_poker_flipped[POKER_CARDS]; /* turned over in the draw    */
 extern u_char g_poker_rank;                 /* 0 nothing, 1 royal flush .. 9 one pair */
