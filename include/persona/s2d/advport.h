@@ -21,8 +21,20 @@
 #define D_800B1878 D_8009D2C8
 #define D_800B1EB8 D_8009D908
 #define D_800B2A3C D_8009E4E8
-#define func_80077F8C func_80076F44
-#define func_8007A62C func_800795E4
+/* The menu icons (src/common/ui/menuicons.c), by ADV's unnamed names. The
+   real names are defined as themselves so dngport.h leaves them alone. */
+#define MenuWheelOpen      MenuWheelOpen
+#define MenuIconsSet5      MenuIconsSet5
+#define MenuIconsSet3      MenuIconsSet3
+#define MenuIconsSet2      MenuIconsSet2
+#define MenuIconsShade     MenuIconsShade
+#define MenuIconsShadeFrom MenuIconsShadeFrom
+#define func_80077F8C MenuWheelOpen
+#define func_8007A508 MenuIconsSet5
+#define func_8007A62C MenuIconsSet3
+#define D_8007A738    MenuIconsSet2
+#define func_8007A83C MenuIconsShade
+#define D_8007A8D8    MenuIconsShadeFrom
 #define g_BB998 D_800B8630
 #define g_BC5C8 D_800B9538
 #define DrawStatusFrames EquipScreenLayout
@@ -32,6 +44,7 @@
 #define D_800B17E8    D_8009D238
 #define D_800B167C    D_8009D0CC
 #define D_800B16B0    D_8009D100
+#define D_800B188C    D_8009D2DC
 #define D_800B1898    D_8009D2E8
 #define D_800B198B    D_8009D3DB
 #define D_800B1A98    D_8009D4E8
@@ -45,5 +58,14 @@
 
 /* DNG's. */
 #define D_8009ABFC    D_8009D908
+#define D_8009AA2C    D_8009D738
+#define D_8009AA4C    D_8009D758
+#define D_8009AA8C    D_8009D798
+#define D_8009AB58    D_8009D864
+#define D_8009ABA8    D_8009D8B4
+#define D_8009B074    D_8009DD80
+#define D_8009B0B4    D_8009DDC0
+#define D_8009B0CC    D_8009DDD8
+#define D_8009B10C    D_8009DE18
 
 #endif

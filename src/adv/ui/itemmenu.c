@@ -38,7 +38,7 @@ extern void   TextItemStatRow(short item, short x, short y);
 
 /* The work list the bag is drawn from, and the bag in the save game. An entry
    is an item id in the low nine bits and a count above them. */
-#define g_item_list ((u_short *)0x800EAE4C)
+#define g_item_list ((u_short *)(0x800EAE4C + WORK_BIAS))
 #define g_items     ((u_short *)0x801F267C)
 #define BAG_SIZE    0x17F
 #define ITEM_ID     0x1FF
@@ -59,6 +59,19 @@ extern void  SoundPlaySeq(u_short slot, u_short seq, short vab);
 extern short MenuScrollCursor(MenuList *m, short *row, short first, short last,
                               u_short *offset);
 extern void  MenuResetRepeat(MenuList *m);
+
+/* Back to the item menu's command list. ADV spells it out; S2D's copy
+   calls ItemMenuOpen (itemtop.c), which does the same (ITEM_MENU_CALLS). */
+#ifdef ITEM_MENU_CALLS
+extern void ItemMenuOpen(void);
+#define ITEM_MENU_BACK() ItemMenuOpen()
+#else
+#define ITEM_MENU_BACK()                                                       \
+    MenuTopRedraw();                                                           \
+    SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);                                 \
+    func_80077F8C(0, 1);                                                       \
+    func_8007A62C(0, 3)
+#endif
 
 extern short   g_item_top;
 /* The swap cursor's scroll row. */
@@ -90,10 +103,7 @@ void ItemMemberPick(void)
                (y = x + 1)[g_menu->unk050.cur * 2]);
     if (InputCheckAcceptA(1)) {
         EquipScreen(0);
-        MenuTopRedraw();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ITEM_MENU_BACK();
         SlotClearAll();
         SlotInitTagged(D_800B1D08, 0x3C, 0x300, 0x18, 0x18);
         SlotInitTagged(D_800B2330, 0x2D, 0x2FF, 0, 0x10);
@@ -103,10 +113,7 @@ void ItemMemberPick(void)
                        y[g_menu->unk050.cur * 2]);
         SlotSetFlicker(1, 1);
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        MenuTopRedraw();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ITEM_MENU_BACK();
         g_menu_subsel -= 2;
     }
 }
@@ -193,14 +200,16 @@ void ItemBagOpen(void)
         g_menu_subsel++;
     }
     if (InputCheckAcceptB(1) || g_menu_allow_hold) {
-        MenuTopRedraw();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ITEM_MENU_BACK();
         g_menu_subsel = 1;
     }
 }
 
+#ifdef ITEM_MENU_CALLS
+/* S2D's copy calls PageScrollValue (pagescroll.c). */
+extern u_char PageScrollValue(short *value, short lo, short hi, short step);
+#define ItemPageScroll PageScrollValue
+#else
 /* PageScrollValue (pagescroll.c), which the original expanded here. */
 static inline u_char ItemPageScroll(short *value, short lo, short hi,
                                     short step)
@@ -250,6 +259,7 @@ none:
     g_page_fwd_repeat.flags |= MENU_FIRST_REPEAT;
     return 0;
 }
+#endif
 
 /* The item bag, a frame: the cursor walks two columns and the list scrolls
    a row (12 lines) at a time, or a page with the page buttons, redrawing the
@@ -351,10 +361,7 @@ void ItemBagStep(void)
         g_menu_subsel++;
     } else if (InputCheckAcceptB(1) || g_menu_allow_hold) {
         CopyShorts(g_item_list, g_items, BAG_SIZE);
-        MenuTopRedraw();
-        SlotSetAnim(0x2D, 0, 0, 0, 0x30, 0, 0, 0);
-        func_80077F8C(0, 1);
-        func_8007A62C(0, 3);
+        ITEM_MENU_BACK();
         g_menu_subsel = 1;
     }
 }
@@ -421,6 +428,8 @@ void ItemSwapStep(void)
     g_header_scroll_y += g_item_scroll_step;
     SlotSetPos(1, 0x42, g_menu->list[1].cur * 112 + 0x40,
                g_menu->list[0].cur * 12 + 0x38);
+#ifndef SWAP_KEEPS_MARKS
+    /* S2D's leaves the page marks as the bag left them (SWAP_KEEPS_MARKS). */
     g_slot_cur = &g_slots[PAGE_MARK_SLOT];
     if (g_swap_top == 0) {
         g_slot_cur->attr |= SLOT_ATTR_HIDE;
@@ -433,6 +442,7 @@ void ItemSwapStep(void)
     } else {
         g_slot_cur->attr &= ~SLOT_ATTR_HIDE;
     }
+#endif
 
     if (prev != g_swap_top * 2 + g_menu->list[1].cur + g_menu->list[0].cur * 2) {
         u_short *p;

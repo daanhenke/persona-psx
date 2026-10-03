@@ -15,7 +15,7 @@
 #include <persona/common/menuctx.h>
 #include <persona/common/slot.h>
 
-#define g_slots ((Slot *)0x800DC10C)
+#define g_slots ((Slot *)(0x800DC10C + WORK_BIAS))
 
 #define ICON_SLOT  40
 #define FRAME_SLOT 45

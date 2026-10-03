@@ -518,18 +518,18 @@ TileMapWriteRun10        = 0x80075F08; // type:func size:0x28
 MenuWheelAnimIn          = 0x80075F30; // type:func size:0x69C
 MenuWheelAnimOut         = 0x800765CC; // type:func size:0x484
 MenuWheelShow            = 0x80076A50; // type:func size:0x4F4
-func_80076F44            = 0x80076F44; // type:func size:0x318
+MenuWheelOpen            = 0x80076F44; // type:func size:0x318
 MenuWheelTurn3           = 0x8007725C; // type:func size:0x6A4
 MenuWheelOpen2           = 0x80077900; // type:func size:0x250
 MenuWheelTurn2           = 0x80077B50; // type:func size:0x4D8
 UpdateMenuSprites        = 0x80078028; // type:func size:0xA30
 MenuWheelAnimOut6        = 0x80078A58; // type:func size:0x4EC
 MenuWheelAnimIn6         = 0x80078F44; // type:func size:0x57C
-func_800794C0            = 0x800794C0; // type:func size:0x124
-func_800795E4            = 0x800795E4; // type:func size:0x10C
-D_800796F0               = 0x800796F0; // type:func size:0x104
-func_800797F4            = 0x800797F4; // type:func size:0x9C
-D_80079890               = 0x80079890; // type:func size:0xA8
+MenuIconsSet5            = 0x800794C0; // type:func size:0x124
+MenuIconsSet3            = 0x800795E4; // type:func size:0x10C
+MenuIconsSet2            = 0x800796F0; // type:func size:0x104
+MenuIconsShade           = 0x800797F4; // type:func size:0x9C
+MenuIconsShadeFrom       = 0x80079890; // type:func size:0xA8
 
 //-----------------------------------------------------------------
 //--- PA: 0x015598   VA: 0x80079938   subsegment: c, common/gfx/box
@@ -1235,6 +1235,9 @@ str_place_battle_top     = 0x8009D310;
 str_place_in_battle      = 0x8009D31C;
 g_kind_labels            = 0x8009D40C;
 g_persona_list_rule      = 0x8009DEDC;
+g_wheel_turn             = 0x8009DF30; // size:0x60
+g_wheel_turn2            = 0x8009DF90; // size:0x20
+g_wheel_turn5            = 0x8009DFB0; // size:0x40
 g_formation_member_def   = 0x8009E200;
 g_bg_map                 = 0x8009E59C; // size:0x10
 D_8009E5AC               = 0x8009E5AC; // size:0x10
