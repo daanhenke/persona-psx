@@ -23,29 +23,28 @@ extern int D_800B93A8;
 /* Steps the script took before it stopped. */
 extern int D_800B0EE4;
 
-extern void func_8009A2A8(int a, u_short *win, int script, int b, int c,
-                          int d, int e, int f, int g, int h, int i);
-extern int  func_8009AC18(u_short *win);
+extern void S2dWinInit();
+extern int  func_8009AC18(S2dWin *w);
 
 void S2dMsgOpen(int script)
 {
     D_800A4CEC = script;
-    func_8009A2A8(5, D_800B91EC, script, 0x1C0, 0x100, 0x200, 0xF8, 0xF, 1,
-                  -0xD0, 0x54);
+    S2dWinInit(5, &D_800B91EC, script, 0x1C0, 0x100, 0x200, 0xF8, 0xF, 1,
+               -0xD0, 0x54);
     D_800B93A0 = 0x10;
     D_800B93A4 = 0x80;
     D_800B93A8 = 0x1000;
     D_800B0EE4 = 0;
-    while (func_8009AC18(D_800B91EC)) {
+    while (func_8009AC18(&D_800B91EC)) {
         D_800B0EE4++;
     }
-    D_800B91EC[1] = 0x8000;
+    D_800B91EC.flags = 0x8000;
     D_800A4CE8 = 1;
 }
 
 void S2dMsgClose(void)
 {
-    D_800B91EC[1] = 0;
+    D_800B91EC.flags = 0;
     D_800A4CE8 = 0;
 }
 

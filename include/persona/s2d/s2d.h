@@ -6,6 +6,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <persona/s2d/textwin.h>
 
 /* The screen fade: its colour, drawn as one semi-transparent quad. */
 typedef struct {
@@ -34,8 +35,8 @@ extern short g_s2d_heading;
 extern short g_cam_turn_speed;
 extern short g_cam_turn_angle;
 
-/* The field's message window's state block. */
-extern u_short D_800B91EC[];
+/* The field's message window. */
+extern S2dWin D_800B91EC;
 
 /* Frames since the map began. */
 extern u_int g_s2d_frame;

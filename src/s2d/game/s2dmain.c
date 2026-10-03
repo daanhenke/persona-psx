@@ -232,7 +232,7 @@ void ovl_s2d_entry(void)
         ((u_char *)D_800B1D30)[0] = 1;
         ((u_char *)D_800B1D30)[1] = 1;
     }
-    D_800B91EC[1] = 0;
+    D_800B91EC.flags = 0;
     g_s2d_exit = -1;
     S2dSceneInit();
     do {
