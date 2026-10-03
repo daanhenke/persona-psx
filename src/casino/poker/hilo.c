@@ -330,7 +330,7 @@ void CasinoPokerHiLoCollect(void)
     }
     if (!(g_casino_frame & 1)) {
         CasinoPayStep((int *)&g_poker_payout);
-        if ((u_int)g_casino_money > 99999998) {
+        if (g_casino_money > 99999998) {
             g_poker_payout = 0;
             g_casino_money = 99999999;
         }
@@ -422,26 +422,26 @@ void CasinoPokerHiLoDealFirst(void)
     short face;
 
     do {
-        func_80082658(g_poker_deck, 2, 0x34, 1);
-    } while (g_poker_deck[0] == 0x34 || g_poker_deck[1] == 0x34);
+        func_80082658(g_casino_deck, 2, 0x34, 1);
+    } while (g_casino_deck[0] == 0x34 || g_casino_deck[1] == 0x34);
     odds = CasinoPokerHiLoOdds(g_poker_double_pay);
     if (odds && rand() % 256 < odds) {
         for (;;) {
             u_char r0;
             u_char r1;
 
-            if (g_poker_deck[0] != g_poker_deck[1]) {
-                r0 = g_poker_deck[0] % 13;
-                r1 = g_poker_deck[1] % 13;
+            if (g_casino_deck[0] != g_casino_deck[1]) {
+                r0 = g_casino_deck[0] % 13;
+                r1 = g_casino_deck[1] % 13;
                 if (r0 == r1) {
                     break;
                 }
             }
-            func_80082658(g_poker_deck, 2, 0x34, 1);
+            func_80082658(g_casino_deck, 2, 0x34, 1);
         }
     }
     for (i = 0; i < 2; i++) {
-        g_poker_hand[i] = g_poker_deck[i];
+        g_poker_hand[i] = g_casino_deck[i];
         face = func_80082454(g_poker_hand[i]);
         func_800824CC(i, g_poker_hand[i], face, i * 0x15 + 0x8D);
         func_800825A4(g_poker_hand[i], i * 0x15 + 0x8D);
@@ -470,7 +470,7 @@ void CasinoPokerHiLoDealNext(void)
     s8    odds;
     short face;
 
-    deck = g_poker_deck;
+    deck = g_casino_deck;
     n = (g_poker_hilo_round + 1) % 2;
     do {
         do {

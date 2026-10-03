@@ -35,7 +35,7 @@ extern u_char D_800B0AF0;
 extern u_char D_800B0AF8;
 extern u_char D_800B0AFC;
 extern u_char D_800B0AFD;
-extern u_int  D_800B0BB8;
+extern u_int  g_bj_jackpot;
 
 /* Load buffers in the work area that belong to no list. */
 
@@ -57,7 +57,7 @@ extern void CasinoDrawFrame(void);
 extern void CasinoPlayTimeTick(u_char *clock);
 extern void CasinoStopSeqs(void);
 extern void CasinoPokerRun(void);
-extern void func_80078294(void);
+extern void CasinoBjRun(void);
 extern void func_800828DC(void);
 extern void func_800886F0(void);
 extern void func_8008D250(void);
@@ -104,7 +104,7 @@ void CasinoExit(void)
     g_state_next = 3;
     g_money2 = g_casino_money;
     g_29B0 = g_poker_jackpot;
-    g_29B4 = D_800B0BB8;
+    g_29B4 = g_bj_jackpot;
 }
 
 void CasinoRunGame(void)
@@ -114,7 +114,7 @@ void CasinoRunGame(void)
         CasinoPokerRun();
         break;
     case 2:
-        func_80078294();
+        CasinoBjRun();
         break;
     case 3:
         func_800828DC();
@@ -261,12 +261,12 @@ void CasinoSyncCounters(void)
         g_exp_carry = D_801F1BDC;
     }
     g_poker_jackpot = g_29B0;
-    D_800B0BB8 = g_29B4;
+    g_bj_jackpot = g_29B4;
     if (g_poker_jackpot > 99999998) {
         g_poker_jackpot = 99999999;
     }
-    if (D_800B0BB8 > 999998) {
-        D_800B0BB8 = 999999;
+    if (g_bj_jackpot > 999998) {
+        g_bj_jackpot = 999999;
     }
 }
 

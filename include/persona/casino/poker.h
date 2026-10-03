@@ -32,15 +32,12 @@
 #define POKER_CARDS 5
 #define POKER_RANKS 9
 
-extern CasinoObj g_casino_objs[25]; /* the 3D objects; poker's cards first */
-
 extern u_char g_poker_hand[POKER_CARDS];    /* the cards dealt            */
 extern u_char g_poker_held[POKER_CARDS];    /* kept through the draw      */
 extern u_char g_poker_marks[POKER_CARDS];   /* the cards that make the rank */
 extern u_char g_poker_flipped[POKER_CARDS]; /* turned over in the draw    */
 extern u_char g_poker_rank;                 /* 0 nothing, 1 royal flush .. 9 one pair */
 extern u_char g_poker_flip_idx;             /* the card the draw is turning */
-extern u_char g_poker_jackpot_hit;
 extern u_int  g_poker_jackpot;
 extern u_int  g_poker_payout;
 extern u_char g_poker_double_game; /* which double-up game was picked */
@@ -62,13 +59,6 @@ extern CasinoPalAnim g_poker_palanim1[];
 extern CasinoPalAnim g_poker_palanim2[];
 extern CasinoPalAnim g_poker_palanim3[];
 extern CasinoPalAnim g_poker_palanim4[];
-
-/* What the HUD last drew, so it redraws only on a change. */
-extern int    g_poker_jackpot_shown;
-extern u_char g_poker_jackpot_add; /* ticks still to add to the jackpot */
-
-/* The ten cards a hand can use: the deal, then the draw's replacements. */
-extern u_char g_poker_deck[10];
 
 /* What the three double-up games share (double.c). */
 void CasinoPokerDoubleExit(void);

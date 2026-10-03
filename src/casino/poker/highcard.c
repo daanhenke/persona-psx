@@ -367,7 +367,7 @@ void CasinoPokerHighCollect(void)
     }
     if (!(g_casino_frame & 1) && g_poker_payout) {
         CasinoPayStep((int *)&g_poker_payout);
-        if ((u_int)g_casino_money > 99999998) {
+        if (g_casino_money > 99999998) {
             g_poker_payout = 0;
             g_casino_money = 99999999;
         }
@@ -486,16 +486,16 @@ void CasinoPokerHighDealCards(void)
 
     for (;;) {
         n = 0;
-        func_80082658(g_poker_deck, 5, 0x35, 1);
-        if (g_poker_deck[0] == 0x34) {
+        func_80082658(g_casino_deck, 5, 0x35, 1);
+        if (g_casino_deck[0] == 0x34) {
             continue;
         }
-        r = g_poker_deck[0] % 13;
+        r = g_casino_deck[0] % 13;
         if (!r) {
             continue;
         }
         for (j = 1; j < POKER_CARDS; j++) {
-            if ((u_char)(g_poker_deck[j] % 13) >= r) {
+            if ((u_char)(g_casino_deck[j] % 13) >= r) {
                 n++;
             }
         }
@@ -504,7 +504,7 @@ void CasinoPokerHighDealCards(void)
         }
     }
     for (i = 0; i < POKER_CARDS; i++) {
-        g_poker_hand[i] = g_poker_deck[i];
+        g_poker_hand[i] = g_casino_deck[i];
         face = func_80082454(g_poker_hand[i]);
         func_800824CC(i, g_poker_hand[i], face, i * 0x15 + 0x8D);
         func_800825A4(g_poker_hand[i], i * 0x15 + 0x8D);

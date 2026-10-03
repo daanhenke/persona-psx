@@ -366,7 +366,7 @@ void CasinoPokerJudge(void)
             CasinoQueueCluts(first, 10, 0x7CA4);
             CasinoQueueCluts(g_poker_rank + first, 1, GetClut(0x390, 0x1F1));
             if (g_poker_rank == 1 && g_casino_bet == 10) {
-                g_poker_jackpot_hit = 1;
+                g_casino_jackpot_hit = 1;
                 g_poker_payout = g_casino_win = g_poker_jackpot / 100;
             } else {
                 g_poker_payout = g_casino_win = g_poker_pay[g_poker_rank - 1] * g_casino_bet;
@@ -469,9 +469,9 @@ void CasinoPokerChoose(void)
                 }
                 CasinoQueueCluts(g_poker_rank + (first = row * 10 + 0x11D), 1, 0x7CA4);
             }
-            if (g_poker_jackpot_hit == 1) {
+            if (g_casino_jackpot_hit == 1) {
                 g_poker_jackpot = 1000000;
-                g_poker_jackpot_hit = 0;
+                g_casino_jackpot_hit = 0;
             }
             g_casino_timer = -1;
         }
@@ -546,7 +546,7 @@ void CasinoPokerCollect(void)
         if (g_casino_win && !(g_casino_frame & 1)) {
             CasinoPayStep(&g_casino_win);
         }
-        if ((u_int)g_casino_money > 99999998) {
+        if (g_casino_money > 99999998) {
             g_casino_win = 0;
             g_casino_money = 99999999;
         }

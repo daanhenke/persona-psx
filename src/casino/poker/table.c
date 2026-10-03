@@ -63,9 +63,9 @@ void CasinoPokerInit(void)
     g_casino_bet_shown = 0;
     g_casino_bet = 0;
     g_casino_quit = 0;
-    g_poker_jackpot_add = 0;
-    g_poker_jackpot_hit = 0;
-    g_poker_jackpot_shown = g_poker_jackpot;
+    g_casino_jackpot_add = 0;
+    g_casino_jackpot_hit = 0;
+    g_casino_jackpot_shown = g_poker_jackpot;
     CASINO_LAMPS.b5 = 0;
     CASINO_LAMPS.b4 = 0;
     CASINO_LAMPS.b3 = 0;
@@ -229,20 +229,20 @@ void CasinoShowCents(u_int n, CasinoLayout *digits, u_char count)
 void CasinoPokerNewHand(void)
 {
     g_poker_hand[0] = 0;
-    g_poker_deck[0] = 0;
+    g_casino_deck[0] = 0;
     g_poker_hand[1] = 0;
-    g_poker_deck[1] = 0;
+    g_casino_deck[1] = 0;
     g_poker_hand[2] = 0;
-    g_poker_deck[2] = 0;
+    g_casino_deck[2] = 0;
     g_poker_hand[3] = 0;
-    g_poker_deck[3] = 0;
+    g_casino_deck[3] = 0;
     g_poker_hand[4] = 0;
-    g_poker_deck[4] = 0;
-    g_poker_deck[5] = 0;
-    g_poker_deck[6] = 0;
-    g_poker_deck[7] = 0;
-    g_poker_deck[8] = 0;
-    g_poker_deck[9] = 0;
+    g_casino_deck[4] = 0;
+    g_casino_deck[5] = 0;
+    g_casino_deck[6] = 0;
+    g_casino_deck[7] = 0;
+    g_casino_deck[8] = 0;
+    g_casino_deck[9] = 0;
     g_poker_held[0] = 0;
     g_poker_held[1] = 0;
     g_poker_held[2] = 0;
@@ -346,9 +346,9 @@ void CasinoPokerDealCards(void)
 {
     int i;
 
-    func_80082658(g_poker_deck, 10, 0x35, 1);
+    func_80082658(g_casino_deck, 10, 0x35, 1);
     for (i = 0; i < POKER_CARDS; i++) {
-        g_poker_hand[i] = g_poker_deck[i];
+        g_poker_hand[i] = g_casino_deck[i];
         CasinoPokerShowCard(i);
         g_casino_xforms[i].rot.vx = 0;
         g_casino_xforms[i].rot.vy = -0x80;
@@ -372,7 +372,7 @@ void CasinoPokerDrawCards(void)
     for (i = 0, k = 0; i < POKER_CARDS; i++) {
         g_poker_marks[i] = 0;
         if (!g_poker_held[i]) {
-            g_poker_hand[i] = g_poker_deck[POKER_CARDS + k];
+            g_poker_hand[i] = g_casino_deck[POKER_CARDS + k];
             k++;
             func_800824CC(i, g_poker_hand[i], func_80082454(g_poker_hand[i]), i * 0x15 + 0x8D);
             func_800825A4(g_poker_hand[i], i * 0x15 + 0x8D);

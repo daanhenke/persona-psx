@@ -414,7 +414,7 @@ extern u_short *g_casino_coin_item;
 extern u_char   g_casino_game;
 extern u_char   g_casino_step;
 extern int      g_casino_frame;
-extern int      g_casino_money;
+extern u_int    g_casino_money;
 extern int      g_casino_timer;
 extern short    g_casino_vab;      /* the casino's own sound bank      */
 extern short    g_casino_main_vab; /* the bank the field left open     */
@@ -438,5 +438,17 @@ extern CasinoCursor g_casino_cursor;
    its eight decimal digits, and the one being counted. */
 extern u_char g_casino_win_digits[8];
 extern u_char g_casino_pay_digit;
+
+/* The jackpot a card game feeds: what the HUD last drew, the ticks still to
+   add to it, and whether this round hit it. */
+extern int    g_casino_jackpot_shown;
+extern u_char g_casino_jackpot_add;
+extern u_char g_casino_jackpot_hit;
+
+/* The shuffled shoe the card games deal from: poker uses ten cards of one
+   deck, blackjack four decks. */
+extern u_char g_casino_deck[208];
+
+extern CasinoObj g_casino_objs[25]; /* the games' 3D objects: cards, chips */
 
 #endif

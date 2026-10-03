@@ -158,15 +158,15 @@ void CasinoPokerHud(void)
         CasinoShowNumber(g_casino_money, g_poker_money_digits, 8);
         g_casino_money_shown = g_casino_money;
     }
-    if (g_poker_jackpot != g_poker_jackpot_shown) {
+    if (g_poker_jackpot != g_casino_jackpot_shown) {
         CasinoShowCents(g_poker_jackpot, g_poker_jackpot_digits, 8);
-        g_poker_jackpot_shown = g_poker_jackpot;
+        g_casino_jackpot_shown = g_poker_jackpot;
     }
-    if (g_poker_jackpot_add && !(g_casino_frame & 1)) {
+    if (g_casino_jackpot_add && !(g_casino_frame & 1)) {
         if (g_poker_jackpot <= 99999998) {
             g_poker_jackpot++;
         }
-        g_poker_jackpot_add--;
+        g_casino_jackpot_add--;
     }
     if (CASINO_LAMPS.b0 != CASINO_LAMPS.b1) {
         CasinoStartAnim(D_800953E0, 0x10, 0x800, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -187,7 +187,7 @@ void CasinoPokerPlaceBet(void)
     CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x139AE4, g_casino_vab);
     g_casino_step = POKER_START_HAND;
     g_casino_timer = -1;
-    g_poker_jackpot_add = g_casino_bet;
+    g_casino_jackpot_add = g_casino_bet;
 }
 
 void CasinoPokerQuit(void)

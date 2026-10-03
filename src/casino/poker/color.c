@@ -296,7 +296,7 @@ void CasinoPokerColorCollect(void)
     }
     if (!(g_casino_frame & 1)) {
         CasinoPayStep((int *)&g_poker_payout);
-        if ((u_int)g_casino_money > 99999998) {
+        if (g_casino_money > 99999998) {
             g_poker_payout = 0;
             g_casino_money = 99999999;
         }
@@ -374,7 +374,7 @@ void CasinoPokerColorDealCard(void)
 {
     short face;
 
-    g_poker_hand[0] = g_poker_deck[0] = rand() % 52;
+    g_poker_hand[0] = g_casino_deck[0] = rand() % 52;
     if (g_poker_hand[0] == 0x34) {
         g_poker_hand[0] = rand() % 52;
     }

@@ -276,9 +276,9 @@ void CasinoPokerPick(int n, u_char *out, int count)
 {
     int i;
 
-    func_80082658(g_poker_deck, n, n);
+    func_80082658(g_casino_deck, n, n);
     for (i = 0; i < count; i++) {
-        out[i] = g_poker_deck[i];
+        out[i] = g_casino_deck[i];
     }
 }
 
