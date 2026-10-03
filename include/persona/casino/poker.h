@@ -11,17 +11,22 @@
 #include <persona/casino/casino.h>
 
 /* g_casino_step values the game runs through. */
-#define POKER_OPEN       0x11 /* load, fade in                       */
-#define POKER_ENTER      0x12 /* the table's two halves slide in     */
-#define POKER_HOLD       0x15 /* pick the cards to keep              */
-#define POKER_WIN        0x16 /* the win jingle, then the double-up  */
-#define POKER_LOSE       0x17
-#define POKER_JUDGE      0x25 /* rank the final hand                 */
-#define POKER_BET        0x26 /* coins in                            */
-#define POKER_DEAL       0x2E
-#define POKER_DRAW       0x2F /* turn the replaced cards over        */
-#define POKER_START_HAND 0x32 /* the halves slide back out           */
-#define POKER_DOUBLE_UP  0x3B
+#define POKER_OPEN        0x11 /* load, fade in                      */
+#define POKER_ENTER       0x12 /* the table's two halves slide in    */
+#define POKER_HOLD        0x15 /* pick the cards to keep             */
+#define POKER_WIN         0x16 /* the win jingle                     */
+#define POKER_LOSE        0x17
+#define POKER_DOUBLE_PLAY 0x1A /* the double-up game chosen          */
+#define POKER_JUDGE       0x25 /* rank the final hand                */
+#define POKER_BET         0x26 /* coins in                           */
+#define POKER_DEAL        0x2E
+#define POKER_DRAW        0x2F /* turn the replaced cards over       */
+#define POKER_CLEAR       0x30 /* the cards swept off, a new round   */
+#define POKER_COLLECT     0x31 /* the win counted into the money     */
+#define POKER_START_HAND  0x32 /* the halves slide back out          */
+#define POKER_DOUBLE_UP   0x33 /* one of three double-up games       */
+#define POKER_CHOOSE      0x3B /* after a win: take it, or double up */
+#define POKER_PEEK        0x70 /* the hand shown while a key is held */
 
 /* A card is suit * 13 + rank; suit 4 is the joker. */
 #define POKER_CARDS 5
@@ -37,6 +42,8 @@ extern u_char g_poker_flip_idx;             /* the card the draw is turning */
 extern u_char g_poker_jackpot_hit;
 extern u_int  g_poker_jackpot;
 extern int    g_poker_payout;
+extern u_char g_poker_double_game; /* which double-up game was picked */
+extern u_char g_poker_double_step; /* its own step                    */
 
 extern s8    g_poker_flip_sound;               /* the turn sound is owed     */
 extern int   g_poker_win_seq;                  /* the jingle playing, or -1  */

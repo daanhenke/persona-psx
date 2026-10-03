@@ -1,5 +1,6 @@
 /* Persona 1 (JP) - CASINO's video poker: the step machine, from the table
- * opening to the win.
+ * opening to the end of a round. The win is counted out a coin at a time
+ * by digit; the other games use the same three helpers for it.
  *   0x8006D25C CasinoPokerRun
  *   0x8006D3B8 CasinoPokerOpen
  *   0x8006D460 CasinoPokerEnter
@@ -10,6 +11,14 @@
  *   0x8006DBAC CasinoPokerDraw
  *   0x8006DDA0 CasinoPokerJudge
  *   0x8006DF4C CasinoPokerWin
+ *   0x8006E050 CasinoPokerChoose
+ *   0x8006E544 CasinoPokerPeek
+ *   0x8006E88C CasinoPokerCollect
+ *   0x8006EAF0 CasinoSplitDigits
+ *   0x8006ED68 CasinoPayStep
+ *   0x8006EE60 CasinoPow10
+ *   0x8006EEDC CasinoPokerLose
+ *   0x8006F018 CasinoPokerClear
  *
  * Each step runs once a frame; g_casino_timer counts the frames since it
  * began, and a step hands over by setting the next one and the timer to
@@ -29,18 +38,15 @@ extern void CasinoStartPalAnim(CasinoPalAnim *a);
 extern void CasinoQueueCluts(); /* (short first, short n, int clut), called unprototyped */
 extern void CasinoSpritesSetOn(short first, short n, int on);
 extern void CasinoShowLayout(CasinoLayout *l, u_char mode);
-extern void CasinoTween(CasinoLayout *l, short dx, short dy, short dw, short dh, short frames);
+extern void CasinoTween(); /* (CasinoLayout *l, short dx, short dy, short dw, short dh, short frames) */
 extern void CasinoCursorClear(CasinoCursor *c);
 extern void CasinoCursorRepeat(CasinoCursor *c, u_char mode, short rate);
 extern void CasinoStartAnim(CasinoObj *o, short frames, short rx, short ry, short rz, long tx, long ty, long tz, long sx,
                             long sy, long sz);
 extern void CasinoPlaySeq(short *h, u_long *seq, short vab);
 
-extern void   func_8006E050(void);
-extern void   func_8006E544(void);
-extern void   func_8006E88C(void);
-extern void   func_8006EEDC(void);
-extern void   func_8006F018(void);
+extern u_char g_casino_wrapped;
+
 extern void   func_8006F294(void);
 extern void   func_8006FC18(void);
 extern void   func_8006FCBC(void);
@@ -72,6 +78,8 @@ extern CasinoLayout    D_80095A90;
 extern CasinoLayout    D_80095B28;
 extern CasinoLayout    D_80095BF4;
 extern CasinoLayout    D_80095CC0;
+extern CasinoObj       D_80095770;
+extern CasinoLayout    D_800957E4[POKER_CARDS];
 
 void CasinoPokerOpen(void);
 void CasinoPokerEnter(void);
@@ -82,6 +90,14 @@ void CasinoPokerHold(void);
 void CasinoPokerDraw(void);
 void CasinoPokerJudge(void);
 void CasinoPokerWin(void);
+void CasinoPokerChoose(void);
+void CasinoPokerPeek(void);
+void CasinoPokerCollect(void);
+void CasinoSplitDigits(u_int n);
+void CasinoPayStep(int *win);
+int  CasinoPow10(u_char unused, u_char n);
+void CasinoPokerLose(void);
+void CasinoPokerClear(void);
 
 void CasinoPokerRun(void)
 {
@@ -113,25 +129,25 @@ void CasinoPokerRun(void)
     case POKER_WIN:
         CasinoPokerWin();
         break;
-    case POKER_DOUBLE_UP:
-        func_8006E050();
+    case POKER_CHOOSE:
+        CasinoPokerChoose();
         break;
-    case 0x70:
-        func_8006E544();
+    case POKER_PEEK:
+        CasinoPokerPeek();
         break;
     case POKER_LOSE:
-        func_8006EEDC();
+        CasinoPokerLose();
         break;
-    case 0x30:
-        func_8006F018();
+    case POKER_CLEAR:
+        CasinoPokerClear();
         break;
-    case 0x31:
-        func_8006E88C();
+    case POKER_COLLECT:
+        CasinoPokerCollect();
         break;
-    case 0x33:
+    case POKER_DOUBLE_UP:
         func_8006F294();
         break;
-    case 0x1A:
+    case POKER_DOUBLE_PLAY:
         func_80072D14();
         break;
     }
@@ -367,6 +383,281 @@ void CasinoPokerWin(void)
         func_80072AF0(g_poker_rank);
         g_poker_win_seq = -1;
         g_casino_timer = -1;
-        g_casino_step = POKER_DOUBLE_UP;
+        g_casino_step = POKER_CHOOSE;
+    }
+}
+
+void CasinoPokerChoose(void)
+{
+    short row;
+    int   first;
+
+    if (!g_poker_palanim1->on) {
+        CasinoStartPalAnim(g_poker_palanim1);
+    }
+    if (!g_poker_palanim2->on) {
+        CasinoStartPalAnim(g_poker_palanim2);
+    }
+    if (g_casino_timer == 0) {
+        SsSeqSetVol(g_casino_seqs[15], 0x7F, 0x7F);
+        if (g_casino_wrapped) {
+            SsSeqStop(g_casino_seqs[15]);
+        }
+        SsSeqPlay(g_casino_seqs[15], 1, 1);
+        CasinoFade(0x8D, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xA2, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xB7, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xCC, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xE1, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoSpritesSetOn(0x26C, 0xB, 1);
+        CasinoSpritesSetOn(0x277, 8, 1);
+        CasinoSpritesSetOn(0x27F, 0xB, 1);
+        CasinoSpritesSetOn(0x28A, 0xB, 1);
+        CasinoTween(&D_80095A90, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095B28, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095BF4, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095CC0, -8, -8, 0x10, 0x10, 8);
+    }
+    if (g_casino_timer > 8) {
+        if (g_casino_pad_trig & PAD_CROSS) {
+            g_casino_step = POKER_COLLECT;
+        } else if (g_casino_pad_trig & PAD_CIRCLE) {
+            g_casino_step = POKER_DOUBLE_UP;
+            g_poker_double_game = 0;
+            g_poker_double_step = 0x11;
+        } else if (g_casino_pad_trig & PAD_TRIANGLE) {
+            g_casino_step = POKER_DOUBLE_UP;
+            g_poker_double_game = 1;
+            g_poker_double_step = 0x11;
+        } else if (g_casino_pad_trig & PAD_SQUARE) {
+            g_casino_step = POKER_DOUBLE_UP;
+            g_poker_double_game = 2;
+            g_poker_double_step = 0x11;
+        } else if ((g_casino_pad_trig & PAD_RIGHT) || (g_casino_pad_trig & PAD_LEFT) || (g_casino_pad_trig & PAD_UP) ||
+                   (g_casino_pad_trig & PAD_DOWN) || (g_casino_pad_trig & PAD_L1) || (g_casino_pad_trig & PAD_L2) ||
+                   (g_casino_pad_trig & PAD_R1) || (g_casino_pad_trig & PAD_R2)) {
+            g_casino_step = POKER_PEEK;
+            g_casino_timer = -1;
+        }
+        if (g_casino_step == POKER_COLLECT || g_casino_step == POKER_DOUBLE_UP) {
+            SsSeqStop(g_casino_seqs[4]);
+            SsSeqPlay(g_casino_seqs[4], 1, 1);
+            CasinoFade(0x8D, 0x14, 0x80, 0x80, 0x80, 4);
+            CasinoFade(0xA2, 0x14, 0x80, 0x80, 0x80, 4);
+            CasinoFade(0xB7, 0x14, 0x80, 0x80, 0x80, 4);
+            CasinoFade(0xCC, 0x14, 0x80, 0x80, 0x80, 4);
+            CasinoFade(0xE1, 0x14, 0x80, 0x80, 0x80, 4);
+            if (g_casino_step != POKER_COLLECT) {
+                CasinoQueueCluts(g_poker_hand_spr[g_poker_rank - 1], 1, 0x7CA4);
+                if (g_casino_bet < 5) {
+                    row = g_casino_bet - 1;
+                } else {
+                    row = 4;
+                }
+                CasinoQueueCluts(g_poker_rank + (first = row * 10 + 0x11D), 1, 0x7CA4);
+            }
+            if (g_poker_jackpot_hit == 1) {
+                g_poker_jackpot = 1000000;
+                g_poker_jackpot_hit = 0;
+            }
+            g_casino_timer = -1;
+        }
+    }
+}
+
+void CasinoPokerPeek(void)
+{
+    u_char held;
+
+    held = 0;
+    if ((g_casino_pad & PAD_RIGHT) || (g_casino_pad & PAD_LEFT) || (g_casino_pad & PAD_UP) || (g_casino_pad & PAD_DOWN) ||
+        (g_casino_pad & PAD_L1) || (g_casino_pad & PAD_L2) || (g_casino_pad & PAD_R1) || (g_casino_pad & PAD_R2)) {
+        held = 1;
+    }
+    if (!g_poker_palanim1->on) {
+        CasinoStartPalAnim(g_poker_palanim1);
+    }
+    if (!g_poker_palanim2->on) {
+        CasinoStartPalAnim(g_poker_palanim2);
+    }
+    if (g_casino_timer == 0) {
+        CasinoTween(&D_80095B28, 8, 8, -0x10, -0x10, 8);
+        CasinoTween(&D_80095BF4, 8, 8, -0x10, -0x10, 8);
+        CasinoTween(&D_80095CC0, 8, 8, -0x10, -0x10, 8);
+        CasinoTween(&D_80095A90, 8, 8, -0x10, -0x10, 8);
+        CasinoFade(0x8D, 0x14, 0x80, 0x80, 0x80, 4);
+        CasinoFade(0xA2, 0x14, 0x80, 0x80, 0x80, 4);
+        CasinoFade(0xB7, 0x14, 0x80, 0x80, 0x80, 4);
+        CasinoFade(0xCC, 0x14, 0x80, 0x80, 0x80, 4);
+        CasinoFade(0xE1, 0x14, 0x80, 0x80, 0x80, 4);
+    }
+    if (g_casino_timer > 8 && !held) {
+        CasinoTween(&D_80095B28, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095BF4, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095CC0, -8, -8, 0x10, 0x10, 8);
+        CasinoTween(&D_80095A90, -8, -8, 0x10, 0x10, 8);
+        CasinoFade(0x8D, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xA2, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xB7, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xCC, 0x14, 0x40, 0x40, 0x40, 4);
+        CasinoFade(0xE1, 0x14, 0x40, 0x40, 0x40, 4);
+        g_casino_timer = 0;
+        g_casino_step = POKER_CHOOSE;
+    }
+}
+
+void CasinoPokerCollect(void)
+{
+    if (!g_poker_palanim1->on) {
+        CasinoStartPalAnim(g_poker_palanim1);
+    }
+    if (!g_poker_palanim2->on) {
+        CasinoStartPalAnim(g_poker_palanim2);
+    }
+    if (g_casino_timer == 0) {
+        CasinoTween(&D_80095B28, 8, 8, -0x10, -0x10, 8);
+        CasinoTween(&D_80095BF4, 8, 8, -0x10, -0x10, 8);
+        CasinoTween(&D_80095CC0, 8, 8, -0x10, -0x10, 8);
+    }
+    if (g_casino_timer == 8) {
+        CasinoSpritesSetOn(0x277, 8, 0);
+        CasinoSpritesSetOn(0x27F, 0xB, 0);
+        CasinoSpritesSetOn(0x28A, 0xB, 0);
+        CasinoTween(&D_80095A90, 0, 0, 0, 0x20, 0x10);
+    }
+    if (g_casino_timer == 0x10) {
+        CasinoTween(&D_80095A90, 0, 0x20, 0, -0x20, 0x10);
+        CasinoSplitDigits(g_casino_win);
+    }
+    if (g_casino_timer > 0x20) {
+        if (g_casino_win && !(g_casino_frame & 1)) {
+            CasinoPayStep(&g_casino_win);
+        }
+        if ((u_int)g_casino_money > 99999998) {
+            g_casino_win = 0;
+            g_casino_money = 99999999;
+        }
+    }
+    if (g_casino_win == 0) {
+        CasinoTween(&D_80095A90, 0, -0x20, 0, -0x10, 0x10);
+        g_casino_timer = -1;
+        g_casino_step = POKER_CLEAR;
+    }
+}
+
+void CasinoSplitDigits(u_int n)
+{
+    g_casino_pay_digit = 0;
+    g_casino_win_digits[0] = n % 100000000 / 10000000;
+    g_casino_win_digits[1] = n % 10000000 / 1000000;
+    g_casino_win_digits[2] = n % 1000000 / 100000;
+    g_casino_win_digits[3] = n % 100000 / 10000;
+    g_casino_win_digits[4] = n % 10000 / 1000;
+    g_casino_win_digits[5] = n % 1000 / 100;
+    g_casino_win_digits[6] = n % 100 / 10;
+    g_casino_win_digits[7] = n % 10;
+}
+
+void CasinoPayStep(int *win)
+{
+    if (g_casino_win_digits[g_casino_pay_digit]) {
+        g_casino_money += CasinoPow10(g_casino_win_digits[g_casino_pay_digit], 7 - g_casino_pay_digit);
+        *win -= CasinoPow10(g_casino_win_digits[g_casino_pay_digit], 7 - g_casino_pay_digit);
+        g_casino_win_digits[g_casino_pay_digit]--;
+        SsSeqStop(g_casino_seqs[7]);
+        SsSeqPlay(g_casino_seqs[7], 1, 1);
+    } else {
+        g_casino_pay_digit++;
+    }
+}
+
+int CasinoPow10(u_char unused, u_char n)
+{
+    int p;
+
+    switch (n) {
+    case 7:
+        p = 10000000;
+        break;
+    case 6:
+        p = 1000000;
+        break;
+    case 5:
+        p = 100000;
+        break;
+    case 4:
+        p = 10000;
+        break;
+    case 3:
+        p = 1000;
+        break;
+    case 2:
+        p = 100;
+        break;
+    case 1:
+        p = 10;
+        break;
+    case 0:
+        p = 1;
+        break;
+    }
+    return p;
+}
+
+void CasinoPokerLose(void)
+{
+    if (g_casino_timer == 0) {
+        CasinoStartAnim(&D_80095770, 0x20, 0x800, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if (g_casino_timer == 0x10) {
+        CasinoPlaySeq(&g_casino_seqs[1], (u_long *)0x139F60, g_casino_main_vab);
+    }
+    if ((((g_casino_pad_trig & PAD_RIGHT) || (g_casino_pad_trig & PAD_LEFT) || (g_casino_pad_trig & PAD_UP) ||
+          (g_casino_pad_trig & PAD_DOWN) || (g_casino_pad_trig & PAD_CIRCLE) || (g_casino_pad_trig & PAD_SQUARE) ||
+          (g_casino_pad_trig & PAD_TRIANGLE) || (g_casino_pad_trig & PAD_CROSS) || (g_casino_pad_trig & PAD_L1) ||
+          (g_casino_pad_trig & PAD_L2) || (g_casino_pad_trig & PAD_R1) || (g_casino_pad_trig & PAD_R2)) &&
+         g_casino_timer > 0x10) ||
+        g_casino_timer > 0x40) {
+        g_casino_timer = -1;
+        g_casino_step = POKER_CLEAR;
+    }
+}
+
+void CasinoPokerClear(void)
+{
+    int   i;
+    short row;
+
+    if (g_casino_timer == 0) {
+        CasinoSpritesSetOn(0x3C, 0x1E, 1);
+        CasinoPlaySeq(&g_casino_seqs[0], (u_long *)0x139E94, g_casino_main_vab);
+        for (i = 0; i < POKER_CARDS; i++) {
+            CasinoTween(&D_800957E4[i], -((10 - i) * 32), 0, 0, 0, 0x20);
+            CasinoStartAnim(&g_casino_objs[i], 0x20, 0, 0, 0, -((10 - i) * 32), 0, 0, 0, 0, 0);
+        }
+    }
+    if (g_casino_timer == 0x10 && !g_poker_rank) {
+        CasinoStartAnim(&D_80095770, 0x20, -0x800, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if (g_casino_timer == 0x2C) {
+        CasinoTween(&D_800954C4, 0x10, -8, -0x20, 8, 8);
+        D_800AFC98.b0 = 1;
+        D_800AFC98.b4 = 0;
+        CasinoShowLayout(&D_800957E4[0], 1);
+        CasinoShowLayout(&D_800957E4[1], 1);
+        CasinoShowLayout(&D_800957E4[2], 1);
+        CasinoShowLayout(&D_800957E4[3], 1);
+        CasinoShowLayout(&D_800957E4[4], 1);
+        if (g_casino_bet < 5) {
+            row = g_casino_bet - 1;
+        } else {
+            row = 4;
+        }
+        if (g_poker_rank) {
+            CasinoQueueCluts(row * 10 + 0x11D, 10, 0x7CA4);
+            CasinoQueueCluts(g_poker_hand_spr[g_poker_rank - 1], 1, 0x7CA4);
+        }
+        g_casino_timer = -1;
+        g_casino_step = POKER_ENTER;
     }
 }

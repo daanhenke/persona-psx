@@ -69,6 +69,16 @@ typedef struct {
 #define PAD_DOWN  0x4000
 #define PAD_LEFT  0x8000
 
+/* The other keys. */
+#define PAD_L2       0x01
+#define PAD_R2       0x02
+#define PAD_L1       0x04
+#define PAD_R1       0x08
+#define PAD_TRIANGLE 0x10
+#define PAD_CIRCLE   0x20
+#define PAD_CROSS    0x40
+#define PAD_SQUARE   0x80
+
 /* The buffer the other one of a pair belongs to: the one not being drawn
    into this frame. */
 #define CASINO_OTHER(a) (a)[!g_casino_buf]
@@ -397,5 +407,10 @@ extern u_char       g_casino_bet_done; /* the bet is placed                 */
 extern u_char       g_casino_quit;     /* leaving the table                 */
 extern int          g_casino_win;      /* what the round paid               */
 extern CasinoCursor g_casino_cursor;
+
+/* A win is counted into the money a coin at a time, highest digit first:
+   its eight decimal digits, and the one being counted. */
+extern u_char g_casino_win_digits[8];
+extern u_char g_casino_pay_digit;
 
 #endif
