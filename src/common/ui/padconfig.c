@@ -4,7 +4,7 @@
  *   DNG 0x80085420   ADV 0x800768A4   S2D 0x8007585C
  *
  * Applied together with the binding table (0x8008BFF8) everywhere the pad
- * configuration is set or restored. The reader ands g_btn_page_back with the
+ * configuration is set or restored. The reader ands g_key_page_back with the
  * held buttons and negates the step, so back and forward are what the two
  * masks mean.
  */
@@ -16,16 +16,8 @@
 #define PAD_L1 0x0004
 #define PAD_R1 0x0008
 
-/* S2D keeps its own pair, at its own names. */
-#ifdef TARGET_S2D
-extern u_short g_btn_page_back_s2d;
-extern u_short g_btn_page_fwd_s2d;
-#define g_btn_page_back g_btn_page_back_s2d
-#define g_btn_page_fwd  g_btn_page_fwd_s2d
-#else
-extern u_short g_btn_page_back;
-extern u_short g_btn_page_fwd;
-#endif
+extern u_short g_key_page_back;
+extern u_short g_key_page_fwd;
 
 /* Layout 0 pages with the two left shoulders against the two right ones;
    layout 1 puts both on the right hand. Any other value leaves the current
@@ -34,12 +26,12 @@ void PadSetPageButtons(u_char config)
 {
     switch (config) {
     case 0:
-        g_btn_page_back = PAD_L1 | PAD_L2;
-        g_btn_page_fwd = PAD_R1 | PAD_R2;
+        g_key_page_back = PAD_L1 | PAD_L2;
+        g_key_page_fwd = PAD_R1 | PAD_R2;
         break;
     case 1:
-        g_btn_page_back = PAD_R1;
-        g_btn_page_fwd = PAD_R2;
+        g_key_page_back = PAD_R1;
+        g_key_page_fwd = PAD_R2;
         break;
     }
 }

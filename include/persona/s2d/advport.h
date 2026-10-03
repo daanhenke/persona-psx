@@ -70,6 +70,9 @@
 /* DNG's. */
 #define CharPreviewDraw EquipDrawCompare
 #define D_8009ABFC    D_8009D908
+#define D_8009FDFC    D_800B8628
+#define D_8009FE08    D_800B8634
+#define D_8009FE0C    D_800B8638
 #define D_8009AA2C    D_8009D738
 #define D_8009AA4C    D_8009D758
 #define D_8009AA8C    D_8009D798

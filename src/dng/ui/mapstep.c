@@ -8,7 +8,8 @@
  * backing out ends the screen.
  */
 /* ADV builds this too (MAPSTEP_ADV), with the input tests' u_char results. */
-#ifndef MAPSTEP_ADV
+/* S2D's copy takes the narrow declarations, as ADV's (MAPSTEP_NARROW). */
+#if !defined(MAPSTEP_ADV) && !defined(MAPSTEP_NARROW)
 #define PERSONAPAGE_DNG
 #endif
 #include <decomp/types.h>

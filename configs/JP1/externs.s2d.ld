@@ -54,8 +54,8 @@ g_spell_data = 0x80047D20;
    save-game area at 0x801F.... is the same in every overlay. */
 g_fade_state = 0x800FC010;
 g_pad_pressed = 0x800FC004;
-g_btn_page_back = 0x8010B680;
-g_btn_page_fwd = 0x8010B684;
+g_key_page_back = 0x8010B680;
+g_key_page_fwd = 0x8010B684;
 g_options = 0x801F2AC8;
 g_pad_bindings = 0x801F2A88;
 
