@@ -43,12 +43,12 @@ extern void CasinoSplitDigits(u_int n);
 extern void CasinoPayStep(int *win);
 
 extern void  CasinoPokerHiLoRun(void);
-extern void  func_800760DC(void);
+extern void  CasinoPokerColorRun(void);
 extern void  func_800775CC(void);
-extern void  func_80076894(void);
-extern void  func_8007756C(void);
-extern void  func_80077164(void);
-extern void  func_80077288(void);
+extern void  CasinoPokerDoubleMaxed(void);
+extern void  CasinoPokerDoubleNumbers(void);
+extern void  CasinoPokerDoubleIntro(void);
+extern void  CasinoPokerDoubleReadouts(void);
 extern void  func_80077F38(void);
 extern void  func_80078014(void);
 extern void  func_80082658(u_char *out, int n, int range, int unique);
@@ -86,7 +86,7 @@ void CasinoPokerDoublePlay(void)
         CasinoPokerHiLoRun();
         break;
     case 2:
-        func_800760DC();
+        CasinoPokerColorRun();
         break;
     case 0x39:
         func_800775CC();
@@ -134,7 +134,7 @@ void CasinoPokerHighRun(void)
         CasinoPokerHighEnd();
         break;
     case 0x13:
-        func_80076894();
+        CasinoPokerDoubleMaxed();
         break;
     }
 }
@@ -146,7 +146,7 @@ void CasinoPokerHighOpen(void)
     if (g_poker_double_pay > 999999) {
         g_poker_double_pay = 1000000;
     }
-    func_8007756C();
+    CasinoPokerDoubleNumbers();
     CasinoTween(&D_8009651C, 0, -0x10, 0, 0, 1);
     CasinoTween(&D_800965E8, 0, -0x10, 0, 0, 1);
     g_casino_timer = -1;
@@ -217,12 +217,12 @@ void CasinoPokerHighShow(void)
         CasinoStartAnim(&g_casino_objs[1], 8, 0, 0, 0, 0, -8, 0, 0, 0, 0);
     }
     if (g_casino_timer == 0xD0 && !g_poker_double_shown) {
-        func_80077164();
+        CasinoPokerDoubleIntro();
     }
     if (g_casino_timer > 0xD8) {
         CasinoSpritesSetOn(0x3C, 0x1E, 0);
         if (!g_poker_double_shown) {
-            func_80077288();
+            CasinoPokerDoubleReadouts();
         }
         g_poker_double_shown = 1;
         g_poker_double_step = 0x15;

@@ -112,6 +112,10 @@ extern CasinoLayout    D_80095E94[8]; /* its readouts: the stake, the money, the
 extern CasinoLayout    D_80095FBC[8];
 extern CasinoLayout    D_800960E4[8];
 extern CasinoObj       D_80095DD0[];
+extern CasinoLayout    D_80095CF8; /* the double-up's own panels */
+extern CasinoLayout    D_80095D30;
+extern CasinoLayout    D_80095D68;
+extern CasinoLayout    D_80095E14;
 extern CasinoObj       D_800953E0[];
 extern CasinoModel     D_800953F0;
 extern CasinoObj       D_80095470[];

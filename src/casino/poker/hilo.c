@@ -44,10 +44,10 @@ extern void CasinoSplitDigits(u_int n);
 extern void CasinoPayStep(int *win);
 
 extern int    rand(void);
-extern void   func_80076894(void);
-extern void   func_8007756C(void);
-extern void   func_80077164(void);
-extern void   func_80077288(void);
+extern void   CasinoPokerDoubleMaxed(void);
+extern void   CasinoPokerDoubleNumbers(void);
+extern void   CasinoPokerDoubleIntro(void);
+extern void   CasinoPokerDoubleReadouts(void);
 extern void   func_80077F38(void);
 extern void   func_80078014(void);
 extern void   func_80078164(void);
@@ -126,7 +126,7 @@ void CasinoPokerHiLoRun(void)
         }
         break;
     case 0x13:
-        func_80076894();
+        CasinoPokerDoubleMaxed();
         break;
     }
 }
@@ -140,7 +140,7 @@ void CasinoPokerHiLoOpen(void)
             g_poker_double_pay = 1000000;
         }
         g_poker_hilo_round = 0;
-        func_8007756C();
+        CasinoPokerDoubleNumbers();
         CasinoTween(&D_8009651C, 0, 0x10, 0, 0, 1);
         CasinoTween(&D_800965E8, 0, 8, 0, 0, 1);
         CasinoShowLayout(&D_80096660, 0);
@@ -194,11 +194,11 @@ void CasinoPokerHiLoShowFirst(void)
         CasinoPlaySeq(&g_casino_seqs[1], (u_long *)0x139E40, g_casino_main_vab);
     }
     if (g_casino_timer == 0x60 && !g_poker_double_shown) {
-        func_80077164();
+        CasinoPokerDoubleIntro();
     }
     if (g_casino_timer > 0x68) {
         if (!g_poker_double_shown) {
-            func_80077288();
+            CasinoPokerDoubleReadouts();
         }
         g_poker_double_shown = 1;
         g_poker_double_step = 0x35;
@@ -217,11 +217,11 @@ void CasinoPokerHiLoShowNext(void)
         CasinoTween(&D_800966F8, -0x140, 0, 0, 0, 0x20);
     }
     if (g_casino_timer == 0x40 && !g_poker_double_shown) {
-        func_80077164();
+        CasinoPokerDoubleIntro();
     }
     if (g_casino_timer > 0x48) {
         if (!g_poker_double_shown) {
-            func_80077288();
+            CasinoPokerDoubleReadouts();
         }
         g_poker_double_shown = 1;
         g_poker_double_step = 0x35;

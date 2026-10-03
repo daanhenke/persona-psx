@@ -91,10 +91,6 @@ extern CasinoLayout D_800951CC;
 extern CasinoLayout D_8009523C;
 extern CasinoLayout D_800952AC;
 extern CasinoLayout D_8009531C;
-extern CasinoLayout D_80095CF8;
-extern CasinoLayout D_80095D30;
-extern CasinoLayout D_80095D68;
-extern CasinoLayout D_80095E14;
 extern CasinoModel  D_80095DE0;
 
 void CasinoPokerOpen(void);
