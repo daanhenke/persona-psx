@@ -21,6 +21,8 @@
 #include <libgpu.h>
 #include <persona/btlp/front.h>
 
+/* S2D carries only the UV helper (FRONT_QUAD_UV_ONLY). */
+#ifndef FRONT_QUAD_UV_ONLY
 /* Both answer whether the slot is still moving. The answer is set inside each
    arm, ahead of the stores, so reorg can hand it to the branch's delay slot. */
 int BtlFrontSlotGrow(int slot)
@@ -106,6 +108,7 @@ void BtlFrontSlotsTick(u_long *ot)
 void func_8006624C(void)
 {
 }
+#endif
 
 /* Sets a quad's texture corners to a u, v, w, h box, a texel in from the edge
    a flipped quad would otherwise sample past, and never past 0xFF. */

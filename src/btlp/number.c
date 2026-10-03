@@ -11,8 +11,11 @@
  */
 #include <decomp/types.h>
 
-/* The long vowel mark stands in for a minus sign; the font has no other. */
+/* The long vowel mark stands in for a minus sign; the font has no other.
+   S2D's copy writes its own (0x2D). */
+#ifndef GLYPH_MINUS
 #define GLYPH_MINUS 0xCC
+#endif
 #define GLYPH_END   0xFF
 
 #define DECIMAL_TOP 1000000000
