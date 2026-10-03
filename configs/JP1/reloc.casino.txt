@@ -169,3 +169,14 @@ rom:0x7DA4 reloc:MIPS_HI16 symbol:g_casino_fades addend:0x102
 rom:0x7DAC reloc:MIPS_LO16 symbol:g_casino_fades addend:0x102
 rom:0x7E1C reloc:MIPS_HI16 symbol:g_casino_fades addend:0x240
 rom:0x7E20 reloc:MIPS_LO16 symbol:g_casino_fades addend:0x240
+// Poker reads its pay and hand-name tables by rank - 1.
+rom:0x9718 reloc:MIPS_HI16 symbol:g_poker_hand_spr addend:-0x2
+rom:0x9720 reloc:MIPS_LO16 symbol:g_poker_hand_spr addend:-0x2
+rom:0x9A88 reloc:MIPS_HI16 symbol:g_poker_hand_spr addend:-0x2
+rom:0x9A90 reloc:MIPS_LO16 symbol:g_poker_hand_spr addend:-0x2
+rom:0x9B48 reloc:MIPS_HI16 symbol:g_poker_pay addend:-0x2
+rom:0x9B50 reloc:MIPS_LO16 symbol:g_poker_pay addend:-0x2
+rom:0xA0E0 reloc:MIPS_HI16 symbol:g_poker_hand_spr addend:-0x2
+rom:0xA0E8 reloc:MIPS_LO16 symbol:g_poker_hand_spr addend:-0x2
+rom:0xAEAC reloc:MIPS_HI16 symbol:g_poker_hand_spr addend:-0x2
+rom:0xAEB4 reloc:MIPS_LO16 symbol:g_poker_hand_spr addend:-0x2

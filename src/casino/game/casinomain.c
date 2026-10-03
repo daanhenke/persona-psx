@@ -28,19 +28,14 @@ extern int    rand(void);
 extern void   srand(unsigned int seed);
 
 extern u_char D_800A878C;
-extern u_char D_800A87D4;
-extern u_char D_800A8880;
 extern int    D_800A8EA4;
-extern u_char D_800A9540;
-extern u_int  D_800AAF18;
+extern u_int  g_poker_jackpot;
 extern u_char D_800AAF68;
-extern int    D_800B0A9C;
 extern u_char D_800B0AF0;
 extern u_char D_800B0AF8;
 extern u_char D_800B0AFC;
 extern u_char D_800B0AFD;
 extern u_int  D_800B0BB8;
-extern u_char D_800B3E98;
 
 /* Load buffers in the work area that belong to no list. */
 
@@ -61,7 +56,7 @@ extern void CasinoFrameWrap(int *frame);
 extern void CasinoDrawFrame(void);
 extern void CasinoPlayTimeTick(u_char *clock);
 extern void CasinoStopSeqs(void);
-extern void func_8006D25C(void);
+extern void CasinoPokerRun(void);
 extern void func_80078294(void);
 extern void func_800828DC(void);
 extern void func_800886F0(void);
@@ -108,7 +103,7 @@ void CasinoExit(void)
     SsVabClose(g_casino_vab);
     g_state_next = 3;
     g_money2 = g_casino_money;
-    g_29B0 = D_800AAF18;
+    g_29B0 = g_poker_jackpot;
     g_29B4 = D_800B0BB8;
 }
 
@@ -116,7 +111,7 @@ void CasinoRunGame(void)
 {
     switch (g_casino_game) {
     case 1:
-        func_8006D25C();
+        CasinoPokerRun();
         break;
     case 2:
         func_80078294();
@@ -155,11 +150,11 @@ void CasinoInitState(void)
         g_casino_clock_on = 1;
     }
     D_800A8EA4 = 0xFFFF;
-    D_800A87D4 = 0xFF;
-    D_800B3E98 = 0;
-    D_800A9540 = 0;
-    D_800B0A9C = 0;
-    D_800A8880 = 0;
+    g_casino_last_bet = 0xFF;
+    g_casino_bet_done = 0;
+    g_casino_quit = 0;
+    g_casino_win = 0;
+    g_casino_bet = 0;
     D_800AFC98.b1 = 0;
     D_800AFC98.b0 = 0;
     D_800AFC98.b3 = 0;
@@ -265,10 +260,10 @@ void CasinoSyncCounters(void)
         }
         g_exp_carry = D_801F1BDC;
     }
-    D_800AAF18 = g_29B0;
+    g_poker_jackpot = g_29B0;
     D_800B0BB8 = g_29B4;
-    if (D_800AAF18 > 99999998) {
-        D_800AAF18 = 99999999;
+    if (g_poker_jackpot > 99999998) {
+        g_poker_jackpot = 99999999;
     }
     if (D_800B0BB8 > 999998) {
         D_800B0BB8 = 999999;

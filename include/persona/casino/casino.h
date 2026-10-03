@@ -389,4 +389,13 @@ extern u_char   g_casino_spot;
 extern int      g_casino_seed;
 extern u_char   g_casino_clock_on;
 
+/* The round every game plays: coins in, a win paid out. */
+extern u_char       g_casino_bet;      /* coins bet this round             */
+extern u_char       g_casino_last_bet; /* the bet the round before          */
+extern u_char       g_casino_max_bet;  /* coins going in until the limit    */
+extern u_char       g_casino_bet_done; /* the bet is placed                 */
+extern u_char       g_casino_quit;     /* leaving the table                 */
+extern int          g_casino_win;      /* what the round paid               */
+extern CasinoCursor g_casino_cursor;
+
 #endif
