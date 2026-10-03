@@ -27,7 +27,7 @@
 #define g_seq_handle ((short *)0x801F537C)
 #define g_adv_room   (*(u_char *)0x801F5355)
 #define MAP_POS_Y    ((u_char *)0x801F5353)
-#define SCRIPT_TAB   ((int *)(D_800A4CFC + 0xC8))
+#define SCRIPT_TAB   (D_800A4CFC.scripts)
 
 extern u_char D_801F2668;
 extern u_char D_801F266A;
@@ -39,7 +39,6 @@ extern short  g_bgm_ready;
 extern int       D_800A4CE4;
 extern int       D_800A4CEC;
 extern short     D_800A4CF8[2];
-extern u_char    D_800A4CFC[];
 /* The overlay's two work buffers: ordering-table tags, then the map's. */
 extern GsOT_TAG *g_work_buf;
 extern int       g_work_buf2;
@@ -114,12 +113,12 @@ INCLUDE_ASM("s2d/nonmatchings/game/s2dmain", S2dBeginFrame);
 
 void S2dLoad266B(void)
 {
-    D_800A4CFC[2] = D_801F266B;
+    D_800A4CFC.unk02 = D_801F266B;
 }
 
 void S2dStore266B(void)
 {
-    D_801F266B = D_800A4CFC[2];
+    D_801F266B = D_800A4CFC.unk02;
 }
 
 void S2dMarkScript(int kind)

@@ -32,7 +32,6 @@ extern S2dKey g_s2d_keys[10];
 extern DR_MODE  g_scene_drmode[2];
 extern DR_MODE  g_menu_drmode[2];
 extern u_char   D_8009FCC0[];
-extern u_char   D_800A4CFC[];
 
 extern short  g_bgm_ready;
 
@@ -141,7 +140,7 @@ void S2dSceneInit(void)
     g_fade_poly.r0 = 0;
     g_fade_poly.g0 = 0;
     g_fade_poly.b0 = 0;
-    VramQueueLoad((u_long *)(D_800A4CFC + 0x48), 0x200, 0xF8, 0x10, 4);
+    VramQueueLoad((u_long *)D_800A4CFC.unk48, 0x200, 0xF8, 0x10, 4);
     DrawSync(0);
     g_fade.rgb[0] = 0x60;
     g_fade.rgb[1] = 0x60;

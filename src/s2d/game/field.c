@@ -1,7 +1,9 @@
 /* Persona 1 (JP) - the field's party and its frame.  S2D.
  *   0x8008E8B4 S2dDrawParty      0x8008EC44 S2dBindCompass
  *   0x8008ED0C S2dCompassMoveTo  0x8008ED54 S2dCompassScaleTo
- *   0x8008EDB4 S2dCompassStep
+ *   0x8008EDB4 S2dCompassStep    0x8008EFB8 S2dCompassDepthSort
+ *   0x8008F1BC S2dDrawCompass    0x8008F3C0 S2dUpdate
+ *   0x8008F4A4 S2dDraw
  *
  * The party is two placed objects, g_party_obj and [1]. Left standing
  * still long enough on a map that allows it, one of them starts an idle
@@ -41,7 +43,7 @@ typedef struct {
     /* 0x02 */ short y;
     /* 0x04 */ int   step;
     /* 0x08 */ int   scale_step;
-    /* 0x0C */ int   unk0C;
+    /* 0x0C */ u_char order[4];  /* the four outer pieces, back to front */
 } S2dCompassMove;
 
 extern short          g_compass_from[2];
@@ -52,6 +54,31 @@ extern VECTOR         g_compass_scale_to;
 extern int            g_compass_scale_t;
 
 extern void func_80099A00(void);
+extern void func_80099AD8(GsOT *ot, int n);
+
+extern u_char D_800B1D38[];
+extern int    D_800B863C;
+extern short  g_compass_y;
+
+extern void func_8009777C(u_char *p);
+extern void func_80091270(void);
+extern void func_8008CEB8(void);
+extern void func_8008BD78(void);
+extern void func_8008C038(void);
+extern void func_8008C34C(void);
+extern void func_8008AEA8(void);
+extern void func_8008BA9C(void);
+extern void func_80093784(void);
+extern void S2dBeginFrame(int alt);
+extern void func_8009929C(int a, GsOT *ot, int b, int x, int y, int c, int d);
+extern void S2dDrawMapObjs(void);
+extern void func_800937FC(void);
+extern void func_800971D4(void);
+extern void func_80089F5C(int n);
+
+/* The four outer pieces' places, projected for their depths. */
+extern SVECTOR g_compass_pts[4];
+extern long    g_compass_sz[4];
 
 extern void func_8008D988(VECTOR *trans, SVECTOR *rot, VECTOR *scale,
                           GsCOORDINATE2 *coord);
@@ -208,4 +235,117 @@ void S2dCompassStep(int turn)
         }
     }
     func_80099A00();
+}
+
+/* Orders the four outer pieces back to front: their places are projected
+   for the GTE's depths, and the order bubble-sorted on them. The two loop
+   counters are what RotTransPers4 hands its p and flag back in. */
+void S2dCompassDepthSort(void)
+{
+    int  i;
+    int  j;
+    long t;
+
+    for (i = 0; i < 4; i++) {
+        g_compass_pts[i].vx = g_compass_pos[i + 1].vx << 8;
+        g_compass_pts[i].vy = g_compass_pos[i + 1].vy << 8;
+        g_compass_pts[i].vz = g_compass_pos[i + 1].vz << 8;
+        g_compass_pts[i].pad = 0;
+        g_compass_move.order[i] = i + 1;
+    }
+    RotTransPers4(&g_compass_pts[0], &g_compass_pts[1], &g_compass_pts[2],
+                  &g_compass_pts[3], &g_compass_sz[0], &g_compass_sz[1],
+                  &g_compass_sz[2], &g_compass_sz[3], &i, &j);
+    ReadSZfifo4(&g_compass_sz[0], &g_compass_sz[1], &g_compass_sz[2],
+                &g_compass_sz[3]);
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3 - i; j++) {
+            if (g_compass_sz[j] < g_compass_sz[j + 1]) {
+                t = g_compass_sz[j];
+                g_compass_sz[j] = g_compass_sz[j + 1];
+                g_compass_sz[j + 1] = t;
+                t = g_compass_move.order[j];
+                g_compass_move.order[j] = g_compass_move.order[j + 1];
+                g_compass_move.order[j + 1] = t;
+            }
+        }
+    }
+}
+
+/* The compass's centre goes behind everything; the four pieces round it,
+   back to front, into the layers. */
+void S2dDrawCompass(void)
+{
+    MATRIX m;
+    MATRIX unused;  /* the frame has room for a second matrix */
+    GsOT  *ots[4] = {
+        &g_ot_layer[0][g_draw_side], &g_ot_layer[1][g_draw_side],
+        &g_ot_layer[1][g_draw_side], &g_ot_layer[2][g_draw_side],
+    };
+    int    i;
+    int    k;
+
+    GsSetRefView2(&g_s2d_view2);
+    func_8008D988(&g_compass_objs[0].trans, &g_compass_objs[0].rot,
+                  &g_compass_objs[0].scale, &g_compass_objs[0].coord);
+    GsGetLw(g_compass_objs[0].obj.coord2, &m);
+    GsSetLightMatrix(&m);
+    GsGetLs(g_compass_objs[0].obj.coord2, &m);
+    GsSetLsMatrix(&m);
+    GsSortObject4(&g_compass_objs[0].obj, &g_ot_back[g_draw_side], 10,
+                  getScratchAddr(0));
+    S2dCompassDepthSort();
+    for (i = 0; i < 4; i++) {
+        k = g_compass_move.order[i];
+        func_8008D988(&g_compass_objs[k].trans, &g_compass_objs[k].rot,
+                      &g_compass_objs[k].scale, &g_compass_objs[k].coord);
+        GsGetLw(g_compass_objs[k].obj.coord2, &m);
+        GsSetLightMatrix(&m);
+        GsGetLs(g_compass_objs[k].obj.coord2, &m);
+        GsSetLsMatrix(&m);
+        GsSortObject4(&g_compass_objs[k].obj, ots[i], 7, getScratchAddr(0));
+    }
+    func_80099AD8(&g_ot_back[g_draw_side], 1);
+}
+
+/* The frame's update: the map's palette effect, then the field's mode. */
+void S2dUpdate(void)
+{
+    if (g_map_info[g_btl_map_id].effect == 0) {
+        func_8009777C(D_800B1D38);
+    }
+    func_80091270();
+    switch (D_800A4CFC.mode) {
+    case 0:
+    case 1:
+        func_8008CEB8();
+        break;
+    case 2:
+        func_8008BD78();
+        break;
+    case 3:
+        func_8008C038();
+        break;
+    case 4:
+        func_8008C34C();
+        break;
+    }
+    func_8008AEA8();
+    func_8008BA9C();
+    S2dCompassStep(1);
+    func_80093784();
+}
+
+/* The frame's drawing, back to front. */
+void S2dDraw(void)
+{
+    S2dBeginFrame(0);
+    func_8009929C(D_800B863C, &g_ot_back[g_draw_side], 0, g_compass_x,
+                  g_compass_y, *(u_char *)0x801F2B30, g_s2d_facing);
+    S2dDrawCompass();
+    S2dDrawParty(&g_ot_map[g_draw_side], 3);
+    S2dDrawMapObjs();
+    func_800937FC();
+    func_800971D4();
+    func_80089F5C(4);
 }

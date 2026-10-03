@@ -22,15 +22,7 @@
 #define LTS_FILE     ((u_long *)0x800D0000)
 #define LTS_AT(i)    ((u_long *)(LTS_FILE[i] + (u_long)LTS_FILE))
 
-/* Per map: which palette effect it runs (0xFF for none), and more. */
-typedef struct {
-    u_short effect;
-    u_short pad[11];
-} S2dMapInfo;
-
-extern S2dMapInfo g_map_info[];
 extern u_char     D_800B1D38[];
-extern u_char     D_800A4CFC[];
 extern int        D_800B93A0;
 extern int        D_800B93A4;
 extern int        D_800B93A8;
@@ -130,7 +122,7 @@ void S2dRunMap(void)
     g_btl_pos_y = 0xC7 - D_800B8FD8;
     g_btl_facing = g_s2d_facing;
     if (g_s2d_exit == 1) {
-        D_800A4CFC[2] = 0;
+        D_800A4CFC.unk02 = 0;
     }
     S2dStore266B();
     S2dStoreHeading();

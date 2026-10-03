@@ -19,7 +19,6 @@
 
 #define MAP_OBJS 160
 
-extern VECTOR        D_800A4FA4[5];
 
 extern void func_80033A40(int z);
 extern short g_compass_x;
@@ -88,7 +87,7 @@ void S2dInitCoords(void)
     }
     o = &g_compass_objs[0];
     for (i = 0; i < 5; i++) {
-        o[i].trans = D_800A4FA4[i];
+        o[i].trans = g_compass_pos[i];
         o[i].rot.vx = 0;
         o[i].rot.vy = 0;
         o[i].rot.vz = 0;

@@ -78,6 +78,8 @@ extern GsF_LIGHT     g_s2d_light;
 extern S2dMapObj     g_party_obj;
 extern S2dMapObj     g_party_mark;
 extern S2dMapObj     g_compass_objs[5];
+/* Where the compass's pieces sit about its centre. */
+extern VECTOR        g_compass_pos[5];
 extern S2dMapObj     D_800B0B78;
 extern S2dMapObj     D_800B0C04;
 extern S2dMapObj     D_800B0C90;
@@ -97,6 +99,40 @@ extern u_char g_btl_map_id;
 extern u_char g_btl_facing;
 extern u_char g_btl_pos_x;
 extern u_char g_btl_pos_y;
+
+/* The field's state block: the mode the frame's update dispatches on and,
+   from 0xC8, the script table S2dMarkScript searches. */
+typedef struct {
+    /* 0x000 */ short  unk00;
+    /* 0x002 */ u_char unk02;   /* kept in the save block at 0x801F266B */
+    /* 0x003 */ u_char unk03;
+    /* 0x004 */ int    unk04;
+    /* 0x008 */ short  unk08;
+    /* 0x00A */ short  unk0A;
+    /* 0x00C */ int    unk0C;
+    /* 0x010 */ int    unk10;
+    /* 0x014 */ int    unk14[3];
+    /* 0x020 */ int    unk20;
+    /* 0x024 */ int    mode;
+    /* 0x028 */ int    unk28;
+    /* 0x02C */ int    unk2C[3];
+    /* 0x038 */ int    unk38;
+    /* 0x03C */ int    unk3C;
+    /* 0x040 */ int    unk40;
+    /* 0x044 */ int    unk44;
+    /* 0x048 */ u_char unk48[0x80];
+    /* 0x0C8 */ int    scripts[120];
+} S2dField;
+
+extern S2dField D_800A4CFC;
+
+/* Per map: which palette effect it runs (0xFF for none), and more. */
+typedef struct {
+    u_short effect;
+    u_short pad[11];
+} S2dMapInfo;
+
+extern S2dMapInfo g_map_info[];
 
 extern u_char g_map_pos_x;
 extern u_char g_map_pos_y;
