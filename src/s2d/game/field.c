@@ -73,7 +73,7 @@ extern void func_8008C038(void);
 extern void func_8008C34C(void);
 extern void func_8008AEA8(void);
 extern void func_8008BA9C(void);
-extern void func_80093784(void);
+extern void S2dMsgZoom(void);
 extern void S2dBeginFrame(int alt);
 extern void func_8009929C(int a, GsOT *ot, int b, int x, int y, int c, int d);
 extern void S2dDrawMapObjs(void);
@@ -82,7 +82,7 @@ extern void func_800971D4(void);
 extern void func_80089F5C(int n);
 extern void S2dLoad2670(void);
 extern void VramFlushQueues(void);
-extern void func_800935C8(void);
+extern void S2dMapPagesFlip(void);
 extern void func_8008E1C0(void);
 
 extern int D_800B0EF0;
@@ -378,7 +378,7 @@ void S2dUpdate(void)
     func_8008AEA8();
     func_8008BA9C();
     S2dCompassStep(1);
-    func_80093784();
+    S2dMsgZoom();
 }
 
 /* The frame's drawing, back to front. */
@@ -623,7 +623,7 @@ void S2dEndFrame(void)
     DrawSync(0);
     D_800B0EF0 = VSync(2);
     ResetGraph(1);
-    func_800935C8();
+    S2dMapPagesFlip();
     func_8008E1C0();
     GsSwapDispBuff();
     GsSortClear(0, 0, 0, &g_ot_front[g_draw_side]);

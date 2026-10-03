@@ -47,12 +47,11 @@ extern u_long    D_800B1D30[];
 extern int       D_800B85BC;
 extern short     D_800B8FD4;
 extern short     D_800B8FD8;
-extern short     D_800B91EC[];
 extern u_char    D_800AA66C[];
 
 extern void S2dSceneInit(void);
 extern void S2dLoadScene(void);
-extern void func_80093680(void);
+extern void S2dMsgOpen(int script);
 extern void S2dInitCoords(void);
 extern void S2dInitLight(void);
 extern void S2dInitView(void);
@@ -185,7 +184,7 @@ void S2dResumeScript(void)
         s = *(int *)s;
     } while (0);
     if (s != 0 && SCRIPT_TAB[i] != -1) {
-        func_80093680();
+        S2dMsgOpen(s);
     }
 }
 

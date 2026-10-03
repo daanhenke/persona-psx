@@ -265,7 +265,9 @@ segments:
       - [0x2A514, c, game/field]
       - [0x2CF80, asm, s2d_2_s27_c]
       - [0x2ED84, c, gfx/fadetiles]
-      - [0x2F0B8, asm, s2d_2_s27_c1]
+      - [0x2F0B8, c, game/mappage]
+      - [0x2F2E0, c, ui/msgopen]
+      - [0x2F45C, asm, s2d_2_s27_c1]
       - [0x31DD4, c, game/statereset]
       - [0x31DF8, asm, s2d_2_s27_c2]
       # The disc loads: the map's sound, scene data and models, the prefetches.
