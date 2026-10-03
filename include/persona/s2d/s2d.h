@@ -34,6 +34,9 @@ extern short g_s2d_heading;
 extern short g_cam_turn_speed;
 extern short g_cam_turn_angle;
 
+/* Frames since the map began. */
+extern u_int g_s2d_frame;
+
 /* Which way the party faces, 0-3. */
 extern short g_s2d_facing;
 

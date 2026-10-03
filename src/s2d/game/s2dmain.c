@@ -45,7 +45,6 @@ extern short     D_800B0D2C;
 extern short     D_800B0D3C;
 extern u_long    D_800B1D30[];
 extern int       D_800B85BC;
-extern int       D_800B863C;
 extern short     D_800B8FD4;
 extern short     D_800B8FD8;
 extern short     D_800B91EC[];
@@ -264,7 +263,7 @@ void ovl_s2d_entry(void)
         S2dInitCoords();
         S2dInitLight();
         S2dInitView();
-        D_800B863C = 0;
+        g_s2d_frame = 0;
         D_800B0D2C = -1;
         D_800B0D3C = -1;
         S2dPlaceCompass();

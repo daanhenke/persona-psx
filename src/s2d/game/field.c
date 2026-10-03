@@ -63,7 +63,6 @@ extern void func_80099A00(void);
 extern void func_80099AD8(GsOT *ot, int n);
 
 extern u_char D_800B1D38[];
-extern int    D_800B863C;
 extern short  g_compass_y;
 
 extern void func_8009777C(u_char *p);
@@ -386,7 +385,7 @@ void S2dUpdate(void)
 void S2dDraw(void)
 {
     S2dBeginFrame(0);
-    func_8009929C(D_800B863C, &g_ot_back[g_draw_side], 0, g_compass_x,
+    func_8009929C(g_s2d_frame, &g_ot_back[g_draw_side], 0, g_compass_x,
                   g_compass_y, *(u_char *)0x801F2B30, g_s2d_facing);
     S2dDrawCompass();
     S2dDrawParty(&g_ot_map[g_draw_side], 3);
@@ -524,7 +523,7 @@ int S2dViewKeys(void)
     } else {
         D_800B2D98[1] = 0;
     }
-    S2dFilterInput(D_800B863C);
+    S2dFilterInput(g_s2d_frame);
     D_800B0C04.rot.vy += (g_filter_sum[0] * 64) >> 12;
     D_800B0C04.rot.vy -= (g_filter_sum[1] * 64) >> 12;
     return 1;
@@ -636,7 +635,7 @@ void S2dEndFrame(void)
     for (i = 0; i < 3; i++) {
         GsDrawOt(&g_ot_layer[i][g_draw_side]);
     }
-    D_800B863C++;
+    g_s2d_frame++;
 }
 
 INCLUDE_ASM("s2d/nonmatchings/game/field", func_800907A0);
