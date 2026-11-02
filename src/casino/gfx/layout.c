@@ -28,10 +28,8 @@ void CasinoResetLayout(CasinoLayout *l, u_char mode);
 void CasinoQueueRect(short x, short y, short w, short h, short u, short v, short uw, short vh, u_short tpage,
                      u_short clut, short spr);
 
-#ifdef NON_MATCHING
 void CasinoBuildFrame(CasinoFrame *d)
 {
-    volatile short tab[16];
     short   x;
     short   y;
     short   u;
@@ -58,46 +56,34 @@ void CasinoBuildFrame(CasinoFrame *d)
     on = d->def->on;
     tpage = d->def->tpage;
     clut = d->def->clut;
-    tab[2] = 0;
-    tab[0] = w1;
-    tab[1] = w1;
-    tab[3] = w1 + w0;
-    tab[4] = 0;
-    tab[5] = h1 - h0;
-    tab[6] = 0;
-    tab[7] = 0;
-    tab[8] = w0;
-    tab[9] = w0;
-    tab[10] = w1;
-    tab[11] = w1;
-    tab[12] = h0;
-    tab[13] = h0;
-    tab[14] = h1;
-    tab[15] = h1;
-    for (i = 0; i < 4; i++) {
-        d->l->cells[i].x = x + tab[i];
-        d->l->cells[i].y = y + tab[i + 4];
-        d->l->cells[i].w = tab[i + 8];
-        d->l->cells[i].h = tab[i + 12];
-        d->l->cells[i].z = z;
-        d->l->cells[i].on = on;
-        d->l->tex[i].u = u + tab[i];
-        d->l->tex[i].v = v + tab[i + 4];
-        d->l->tex[i].w = tab[i + 8];
-        d->l->tex[i].h = tab[i + 12];
-        d->l->tex[i].tpage = tpage;
-        d->l->tex[i].clut = clut;
-        d->l->cell_idx[i] = i;
-        d->l->tex_idx[i] = i;
+    /* Each row describes one attribute across the four frame pieces. */
+    {
+        short tab[4][4] = {
+            { w1, w1, 0, w1 + w0 },
+            { 0, h1 - h0, 0, 0 },
+            { w0, w0, w1, w1 },
+            { h0, h0, h1, h1 }
+        };
+
+        for (i = 0; i < 4; i++) {
+            d->l->cells[i].x = x + tab[0][i];
+            d->l->cells[i].y = y + tab[1][i];
+            d->l->cells[i].w = tab[2][i];
+            d->l->cells[i].h = tab[3][i];
+            d->l->cells[i].z = z;
+            d->l->cells[i].on = on;
+            d->l->tex[i].u = u + tab[0][i];
+            d->l->tex[i].v = v + tab[1][i];
+            d->l->tex[i].w = tab[2][i];
+            d->l->tex[i].h = tab[3][i];
+            d->l->tex[i].tpage = tpage;
+            d->l->tex[i].clut = clut;
+            d->l->cell_idx[i] = i;
+            d->l->tex_idx[i] = i;
+        }
     }
     CasinoShowLayout(d->l, 0);
 }
-#else
-/* 97.37%: the table is volatile and filled in the image's order, which is
-   what keeps its stores in place; what is left is d and the cell offset
-   trading registers (a3/t0). */
-INCLUDE_ASM("casino/nonmatchings/gfx/layout", CasinoBuildFrame);
-#endif
 
 /* A list of grids ends at a definition of -1. */
 void CasinoBuildLayouts(CasinoLayoutDef *d, int mode)
