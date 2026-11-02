@@ -279,7 +279,7 @@ segments:
       - [0x27928, c, game/numberstep]
       - [0x279D8, c, game/mapdebug]
       - [0x27C98, c, game/audiodebug]
-      - [0x27FAC, asm, s2d_after_audiodebug]
+      - [0x27FAC, c, game/mapeditor]
       - [0x28688, c, game/tilepermission]
       - [0x287A0, c, game/directionsteps]
       - [0x28B18, asm, s2d_after_directionsteps]
