@@ -85,23 +85,6 @@ BtlObj *BtlFxStart3A(void)
     return o;
 }
 
-/* 97.94%. One load is out of place. In the last phase the image reads
-   g_btl_fx_target straight after the move it looks the group up by, ahead of
-   the shift that indexes the table, and keeps it in a0 through the hit
-   stores; this reads it after the group, just ahead of the fighter in turn.
-   Where `slot` is taken - first, before or after the group, among the hit
-   stores, chained into the hit slot's store - and its width do not move the
-   load, and neither does the move taken into a local; dropping the group's
-   cast, storing the attribute or the phase later, or a local for the bit each
-   leave it further off. The copies' kind written ahead of their motion and
-   the target held in `slot` are what took it from 91.78%.
-   2026-10-01 (sched1/sched2 dumps): sched1 gives the load the birthing boost
-   (slot is set once). It is picked the moment the hit-slot store and the
-   shift are placed, which puts it after the group. sched2 then only keeps
-   it behind the `or` that frees a0. Reusing slot for the mask (two sets)
-   drops the boost and the load moves up, but slot then lands in a1 and the
-   hit stores follow it (81.71%). */
-#ifdef NON_MATCHING
 void BtlFxStep3A(BtlObj *o)
 {
     BtlObj *n;
@@ -150,10 +133,10 @@ void BtlFxStep3A(BtlObj *o)
             o->attr |= BTL_OBJ_HIDDEN;
             o->children = (u_char)g_btl_spell_fx[g_btl_fx_move].group;
             slot = g_btl_fx_target;
+            g_btl_hit_slot = slot;
             g_btl_hits_left = 9;
             g_btl_hit_walk = -1;
             g_btl_hit_mask = 1;
-            g_btl_hit_slot = slot;
             g_btl_actors[g_btl_actor_turn].targets &= ~(1 << slot);
             break;
         default:
@@ -178,9 +161,6 @@ void BtlFxStep3A(BtlObj *o)
         }
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxspell3a", BtlFxStep3A);
-#endif
 
 BtlObj *BtlFxStartHigh(void)
 {
