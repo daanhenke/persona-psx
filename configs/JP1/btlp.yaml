@@ -213,13 +213,11 @@ segments:
       - [0x1430, pad, btlp_pad_1430]
       # BtlTalkFxObjTick's switch table, which fxtalktick.c emits itself.
       - [0x1434, .rodata, fxtalktick]
-      # BtlFxMotionUnused's switch table, then BtlFxStep01's - which stays
-      # in asm with its routine - then BtlFxFinish01's and BtlFxFinish53's,
-      # each emitted by its own unit. The last two are each followed by a
-      # word of padding that belongs to nobody.
+      # BtlFxMotionUnused's switch table, followed by BtlFxStep01's and
+      # BtlFxFinish01's tables together in fxstep01.c. BtlFxFinish53 emits
+      # its own table. The finish tables retain their following padding.
       - [0x14F4, .rodata, fxmotion]
-      - [0x1564, rodata, btlp_rodata6b1_fxa1]
-      - [0x15D4, .rodata, fxstep01]
+      - [0x1564, .rodata, fxstep01]
       - [0x15E8, pad, btlp_pad_15e8]
       - [0x15EC, .rodata, fxfinish53]
       - [0x1630, pad, btlp_pad_1630]
