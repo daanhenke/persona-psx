@@ -2,7 +2,7 @@
  *   0x8009B490 S2dIndicatorBar  0x8009B4A4 S2dIndicatorClear
  *   0x8009B4B4 S2dDrawIndicator 0x8009B5D0 S2dIndicatorState
  *   0x8009B5E0 S2dIndicatorOpen 0x8009B614 S2dIndicatorClose
- *   0x8009B644 S2dIndicatorStep 0x8009B758 (asm)
+ *   0x8009B644 S2dIndicatorStep 0x8009B758 (draw)
  *   0x8009BB8C S2dLoadWinColors 0x8009BBF4 S2dEventFlagSet
  *
  * BTLP's indicator (btlp/indicator.c) without its icon: blank, or a bar of
@@ -25,7 +25,7 @@
 
 extern short   g_indicator_mode;
 extern u_short g_indicator_phase;
-extern short   D_800AA66E;
+extern u_short D_800AA66E;
 extern u_short D_800AA670;
 extern S2dXform D_800AA674;
 
@@ -142,7 +142,99 @@ void S2dIndicatorStep(void)
     }
 }
 
-INCLUDE_ASM("s2d/nonmatchings/ui/indicator", func_8009B758);
+/* The draw uses the transform fields as separate address constants. These
+   aliases preserve those references without duplicating their storage. */
+extern VECTOR g_indicator_translation __asm__("D_800AA674+8");
+extern VECTOR g_indicator_scale __asm__("D_800AA674+24");
+extern u_char D_800AA69C[];
+#define WINDOW_COLOR (*(volatile u_char *)0x801F2AC6)
+
+void func_8009B758(GsOT *ot, u_short z)
+{
+    /* 32 bytes of vertices, 32 of matrix, then a 40-byte polygon. */
+    u_long work[26];
+    SVECTOR *corner = (SVECTOR *)work;
+#define INDICATOR_CORNER(n) (*(SVECTOR *)(((n) << 3) + (u_char *)corner))
+#define INDICATOR_MATRIX (*(MATRIX *)((u_char *)corner + 32))
+#define INDICATOR_POLY (*(POLY_FT4 *)((u_char *)corner + 64))
+    long old_x, old_y;
+    long j;
+    int i;
+    if (D_800AA66E) {
+        i = 0;
+        S2dDrawIndicator();
+        SetPolyFT4(&INDICATOR_POLY);
+        SetSemiTrans(&INDICATOR_POLY, 0);
+        SetShadeTex(&INDICATOR_POLY, 1);
+        INDICATOR_POLY.clut = GetClut(0x200, 0xF0);
+        INDICATOR_POLY.tpage = GetTPage(1, 0, 0x200, 0x100);
+        ReadGeomOffset(&old_x, &old_y);
+        SetGeomOffset(-0x60, 0x4C);
+        RotMatrix(&D_800AA674.rot, &INDICATOR_MATRIX);
+        TransMatrix(&INDICATOR_MATRIX, &g_indicator_translation);
+        ScaleMatrix(&INDICATOR_MATRIX, &g_indicator_scale);
+        SetRotMatrix(&INDICATOR_MATRIX);
+        SetTransMatrix(&INDICATOR_MATRIX);
+        /* Eighteen columns of cells; blank cells leave holes in the grid. */
+        for (; i < 90; i++) {
+            if (D_800AA69C[i] != 0xFF) {
+                for (j = 0; j < 4; j++) {
+                    INDICATOR_CORNER(j).vx =
+                        (i % 18) * 16 + (short)((j & 1) * 16 - 0x90);
+                    INDICATOR_CORNER(j).vy =
+                        (i / 18) * 16 + (short)((j / 2) * 16 - 0x28);
+                    INDICATOR_CORNER(j).vz = 0;
+                }
+                RotTransPers4(&corner[0], &corner[1], &corner[2], &corner[3],
+                              (long *)&INDICATOR_POLY.x0,
+                              (long *)&INDICATOR_POLY.x1,
+                              (long *)&INDICATOR_POLY.x2,
+                              (long *)&INDICATOR_POLY.x3, &j, &j);
+                INDICATOR_POLY.u0 = (D_800AA69C[i] & 7) << 4;
+                INDICATOR_POLY.v0 = (D_800AA69C[i] >> 3) << 4;
+                INDICATOR_POLY.u1 = ((D_800AA69C[i] & 7) << 4) + 16;
+                INDICATOR_POLY.v1 = (D_800AA69C[i] >> 3) << 4;
+                INDICATOR_POLY.u2 = (D_800AA69C[i] & 7) << 4;
+                INDICATOR_POLY.v2 = ((D_800AA69C[i] >> 3) << 4) + 16;
+                INDICATOR_POLY.u3 = ((D_800AA69C[i] & 7) << 4) + 16;
+                INDICATOR_POLY.v3 = ((D_800AA69C[i] >> 3) << 4) + 16;
+                GsSortPoly(&INDICATOR_POLY, ot, z);
+            }
+        }
+        SetPolyFT4(&INDICATOR_POLY);
+        SetSemiTrans(&INDICATOR_POLY, 1);
+        SetShadeTex(&INDICATOR_POLY, 1);
+        INDICATOR_POLY.clut = GetClut(0x200, 0xF2);
+        INDICATOR_POLY.tpage = GetTPage(0, 0, 0x280, 0x140);
+        /* Nine background strips, each 32 by 56 pixels. */
+        for (i = 0; i < 9; i++) {
+            for (j = 0; j < 4; j++) {
+                INDICATOR_CORNER(j).vx = i * 32 + (short)((j & 1) * 32 - 0x90);
+                INDICATOR_CORNER(j).vy = (j / 2) * 56 - 0x20;
+                INDICATOR_CORNER(j).vz = 0;
+            }
+            RotTransPers4(
+                &corner[0], &corner[1], &corner[2], &corner[3],
+                (long *)&INDICATOR_POLY.x0, (long *)&INDICATOR_POLY.x1,
+                (long *)&INDICATOR_POLY.x2, (long *)&INDICATOR_POLY.x3, &j, &j);
+            INDICATOR_POLY.u0 = WINDOW_COLOR << 5;
+            INDICATOR_POLY.v0 = 0x40;
+            INDICATOR_POLY.u1 = (WINDOW_COLOR << 5) + 0x1F;
+            INDICATOR_POLY.v1 = 0x40;
+            INDICATOR_POLY.u2 = WINDOW_COLOR << 5;
+            INDICATOR_POLY.v2 = 0x78;
+            INDICATOR_POLY.u3 = (WINDOW_COLOR << 5) + 0x1F;
+            INDICATOR_POLY.v3 = 0x78;
+            GsSortPoly(&INDICATOR_POLY, ot, z);
+        }
+        SetGeomOffset(old_x, old_y);
+    }
+}
+
+#undef INDICATOR_MATRIX
+#undef INDICATOR_POLY
+#undef INDICATOR_CORNER
+#undef WINDOW_COLOR
 
 /* The window's sixteen colours for the option chosen, and its image. */
 void S2dLoadWinColors(void)

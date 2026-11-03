@@ -147,7 +147,7 @@ str_adv_tynse            = 0x8006518C;
 str_adv_advcmd2          = 0x800654E4;
 
 //-------------------------------------------------------------------
-//--- PA: 0x001390   VA: 0x80065730   subsegment: rodata, adv_rodata8
+//--- PA: 0x001390   VA: 0x80065730   subsegment: c, common/gfx/slotrender
 //-------------------------------------------------------------------
 SlotsRenderAll           = 0x80065730; // type:func size:0x594
 

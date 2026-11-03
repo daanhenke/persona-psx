@@ -134,6 +134,12 @@ extern int          BtlTakeItem(int id);
    declaration that narrowed it for them; they cast at the call instead, which
    is the same instruction and keeps one prototype here. */
 extern unsigned int BtlItemSlot(u_short id);
+
+/* Packed inventory slot and item id, or zero if no remaining tier is holdable. */
+extern int          BtlRollCommon(void);
+extern int          BtlRollUncommon(void);
+extern int          BtlRollDrop(void);
+
 /* The mark in ItemDef.unk06 that puts an entry on the staged list. */
 #define USABLE_MARK 0x80
 

@@ -33,11 +33,11 @@ extern void VramStore();
 extern void VramLoad();
 extern void CopyLongs(u_long *dst, u_long *src, int n);
 
-#ifdef NON_MATCHING
 /* One page out of VRAM into the work buffer, the waiting one in, and the
    buffer kept for next time. */
 void S2dMapPageSwap(void)
 {
+    u_short copy_h;
     int     page;
     short   y;
     int     h;
@@ -48,18 +48,13 @@ void S2dMapPageSwap(void)
     y = page * 64 + 0x100;
     h = g_map_page_h[page];
     p = PAGE_AT(page);
-    n = h << 10;
-    VramStore(0x200, y, 0x200, h, PAGE_BUF);
+    copy_h = h;
+    n = copy_h << 10;
+    VramStore(0x200, y, 0x200, copy_h, PAGE_BUF);
     VramLoad(0x200, y, 0x200, h, p);
     DrawSync(0);
     CopyLongs(p, PAGE_BUF, n);
 }
-#else
-/* 89%: the image forms n before the first call, in a saved register of its
-   own; here n is set once, so sched1's birthing boost sinks it to its use
-   and it shares h's register. */
-INCLUDE_ASM("s2d/nonmatchings/game/mappage", S2dMapPageSwap);
-#endif
 
 void S2dMapPageCheck(void)
 {

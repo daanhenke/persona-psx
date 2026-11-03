@@ -9,7 +9,6 @@
  * g_s2d_exit) picks how the music is let go and what runs next.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -48,9 +47,9 @@ extern void S2dStoreScript(void);
 extern void func_80096904(void);
 extern void func_80097508(u_char *p);
 extern void func_80097964(u_char *p);
-extern void func_80097BE8(u_char *p);
+extern void func_80097BE8(u_long *tmd, short map);
 extern void func_80098BFC(void);
-extern void func_8008EC44(void);
+extern void S2dBindCompass(void);
 extern void S2dUpdate(void);
 extern void func_80091320(void);
 extern void S2dFrameUnlocked(void);
@@ -60,7 +59,6 @@ extern void func_8009224C(void);
 extern void func_80092A08(int n);
 extern void func_8009182C(void);
 
-#ifdef NON_MATCHING
 void S2dRunMap(void)
 {
     int i;
@@ -75,12 +73,15 @@ void S2dRunMap(void)
         func_80097964(D_800B1D38);
         break;
     }
-    if (g_map_info[g_map_id].effect != 0xFF) {
-        func_80097BE8(D_800B1D38);
+    {
+        short map = g_map_id;
+        if (g_map_info[map].effect != 0xFF) {
+            func_80097BE8((u_long *)D_800B1D38, map);
+        }
     }
     func_80098BFC();
     S2dBindModels();
-    func_8008EC44();
+    S2dBindCompass();
     S2dMarkScript(g_btl_map_id);
     S2dResumeScript();
     D_800B93A0 = 0x1999;
@@ -162,8 +163,3 @@ void S2dRunMap(void)
         break;
     }
 }
-#else
-/* 99.7%: the image reads the map id for the effect test into a1 and
-   leaves the case-0 jump's slot empty. */
-INCLUDE_ASM("s2d/nonmatchings/game/s2drun", S2dRunMap);
-#endif

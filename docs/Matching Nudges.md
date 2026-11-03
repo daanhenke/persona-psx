@@ -3996,3 +3996,45 @@ as `func_800762A0`, and the next unit opened on its delay-slot `nop` as a
 four-byte `func_80076448`. The link never notices (objects are laid end to
 end). A `nonmatching func_X, 0x4` holding one `nop` at a unit's start, or a
 sym entry that sits 4 bytes before its segment, is this.
+
+## Aggregate initializers can preserve the prologue's store order
+
+The S2D `VramStore`, `VramLoad` and `VramMove` wrappers need
+`RECT rect = { x, y, w, h };`. Assigning the same four fields separately
+puts the return-address save after the first field store and the rectangle
+address calculation. The aggregate initializer places it before those two
+instructions, as in the image, without changing the rectangle's contents.
+The same change matches `VramClearRect` in DNG, ADV and S2D, and a nested
+initializer matches `CasinoStartAnim` without a volatile request struct.
+
+For `CasinoFade`, byte 7 of `CasinoFadeArg` must be implicit alignment
+padding. An explicit `pad` member would be initialized and add a store the
+image does not have. Removing that member leaves `frames` at offset 8 and
+the structure size at 10; the initializer then matches the argument packing.
+
+- [vram.c](/src/s2d/gfx/vram.c) - three S2D wrappers.
+- [render.c](/src/common/gfx/render.c) - `VramClearRect` in three overlays.
+- [anim.c](/src/casino/gfx/anim.c) - `CasinoStartAnim`.
+- [fade.c](/src/casino/gfx/fade.c) - `CasinoFade`.
+
+All eleven JP1 executable and overlay SHA-256 checks pass with these changes.
+
+
+## Keep the indicator workspace and transform references distinct
+
+S2D `func_8009B758` uses one aligned 104-byte workspace: four vertices,
+a matrix and a textured quad. Addressing the quad relative to the vertex
+pointer keeps their shared base in a saved register. The vertex expression
+uses the byte offset first; ordinary array indexing reverses the `addu`
+operands at both vertex loops.
+
+The transform translation and scale use assembler symbol aliases for
+`D_800AA674+8` and `D_800AA674+24`. These name existing storage; they emit no
+instructions or new data. Treating all three addresses as members of one
+C expression lets CSE retain a transform-base register, which changes the
+prologue and schedules the calls differently. Keep the signed short
+coordinate intermediates and the repeated option-byte reads as well.
+
+The geometry is 18 columns by five rows, skipping individual `0xFF` cells,
+followed by nine 32-by-56 background strips. All 11 JP1 binary hashes pass
+with the reconstructed C.

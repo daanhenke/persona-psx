@@ -91,8 +91,8 @@ u_char FormationFirstFree(void)
     }
 }
 
-/* DNG builds the placement rule from here (FORMATION_CELL_FREE); ADV and S2D
-   still take theirs from asm. */
+/* The DNG, ADV and S2D wrappers enable this shared placement rule with
+   FORMATION_CELL_FREE. */
 #if defined(NON_MATCHING) || defined(FORMATION_CELL_FREE)
 /* A member may only stand on an empty cell whose four orthogonal neighbours are
    also empty. Each edge test carries both bounds even though one half of it is

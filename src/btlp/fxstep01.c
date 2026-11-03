@@ -69,18 +69,6 @@ extern void BtlFxResolveHit(BtlObj *o);
 #define FX_01_SLOT_FIRST 7
 #define FX_01_SLOT_LAST  12
 
-/* 98.47%: the one instruction out of place is the load of g_btl_fx_target.
-   The image reads it after the phase store and before the attribute's `or`.
-   Written ahead of the phase store, the read cannot be scheduled past it -
-   both are bytes, and cc1 cannot tell the two addresses apart. Written after
-   it, the first scheduling pass carries the read down to the byte store into
-   g_btl_shake_on, and `slot` trades a1 for a0 with the group byte. No order of
-   the four statements, no type for `slot` and no place for the shake store
-   puts the read between the two. Read through an array view of the byte
-   (`extern u_char t[] __asm__("g_btl_fx_target")`) after the phase store, the
-   read stays behind that store (99.10%), but then comes out ahead of the
-   attribute and move loads rather than after them. */
-#ifdef NON_MATCHING
 void BtlFxStep01(BtlObj *o)
 {
     BtlObj *n;
@@ -163,16 +151,16 @@ void BtlFxStep01(BtlObj *o)
                 o->actor->obj->motion = FX_01_GRAB_MOTION;
                 o->actor->obj->phase = 0;
             }
-            i = g_btl_fx_target;
             o->phase = FX_STEP_DONE;
+            slot = g_btl_fx_target;
             o->attr |= BTL_OBJ_HIDDEN;
             o->children = (u_char)g_btl_spell_fx[g_btl_fx_move].group;
             g_btl_hits_left = FX_01_HITS;
-            g_btl_hit_walk = -1;
             g_btl_shake_on = 0;
-            g_btl_hit_slot = i;
+            g_btl_hit_slot = slot;
+            g_btl_hit_walk = -1;
             g_btl_hit_mask = 1;
-            g_btl_actors[g_btl_actor_turn].targets &= ~(1 << i);
+            g_btl_actors[g_btl_actor_turn].targets &= ~(1 << slot);
             return;
         }
         if ((o->attr & BTL_OBJ_PICKED) != 0) {
@@ -191,9 +179,6 @@ void BtlFxStep01(BtlObj *o)
         return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/fxstep01", BtlFxStep01);
-#endif
 
 void BtlFxFinish01(BtlObj *o)
 {

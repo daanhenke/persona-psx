@@ -5,7 +5,7 @@
  *   0x8008F1BC S2dDrawCompass    0x8008F3C0 S2dUpdate
  *   0x8008F4A4 S2dDraw           0x8008F570 S2dInitPartyObjs
  *   0x8008F7D8 S2dFilterInput    0x8008F878 S2dViewKeys
- *   0x8008FC00 S2dPartyMoved     0x8008FC5C (the map's markers, asm)
+ *   0x8008FC00 S2dPartyMoved     0x8008FC5C (the map's markers)
  *   0x80090248 S2dDrawPartyFront 0x80090380 S2dDrawShade
  *   0x80090554 S2dEndFrame       0x800907A0 (asm)
  *   0x80091270 S2dTurnCamera
@@ -543,7 +543,135 @@ int S2dPartyMoved(void)
     return 0;
 }
 
-INCLUDE_ASM("s2d/nonmatchings/game/field", func_8008FC5C);
+/* Project map locations and draw the pulsing markers, labels and party trail. */
+typedef struct {
+    int id;
+    short x, y;
+} S2dMapMarker;
+extern S2dMapMarker *D_800A506C;
+extern short D_800A507C[];
+extern short *D_800A50A0;
+extern int marker_count __asm__("D_800B2D98+4");
+extern S2dWin D_800B2DA0[];
+extern u_char D_800B5670[];
+extern short D_800B8FD4, D_800B8FD8;
+extern void S2dWinSetArea(S2dWin *, int, short, short);
+extern void func_8009A368(S2dWin *, GsOT *, u_short, int);
+#define MARKER_MAX(a, b) ((a) < (b) ? (b) : (a))
+void func_8008FC5C(void)
+{
+    /* Projected x/y, a vertex, two polygons, and the label sort keys. */
+    short xy[4];
+    SVECTOR point;
+    POLY_G3 triangle;
+    POLY_FT4 trail;
+    short x_order[20];
+    long temp;
+    S2dMapMarker *marker = D_800A506C;
+    short *p;
+    short *head;
+    /* Reuse the brightness local for the trail and sorting loops. */
+    int i, j;
+    SetPolyG3(&triangle);
+    SetSemiTrans(&triangle, 0);
+    SetShadeTex(&triangle, 0);
+    i = (((rsin(g_s2d_frame * 96) + 4096) / 2) * 255) >> 12;
+    triangle.r0 = i;
+    triangle.g0 = i;
+    triangle.b0 = i;
+    marker_count = 0;
+    while (marker->id != -1) {
+        point.vx = marker->x * 12 - 0x4BA;
+        point.vy = 0;
+        point.vz = 0x4BA - marker->y * 12;
+        RotTransPers(&point, (long *)xy, &temp, &temp);
+        triangle.x0 = D_800A507C[0] + xy[0];
+        triangle.y0 = D_800A507C[1] + xy[1];
+        triangle.x1 = D_800A507C[2] + xy[0];
+        triangle.y1 = D_800A507C[3] + xy[1];
+        triangle.x2 = D_800A507C[4] + xy[0];
+        triangle.y2 = D_800A507C[5] + xy[1];
+        D_800B2DA0[marker_count].x = triangle.x2 + 4;
+        D_800B2DA0[marker_count].y = D_800A507C[5] + xy[1] - 8;
+        D_800B2DA0[marker_count].scale.vy = D_800B0C04.scale.vy;
+        S2dWinSetArea(&D_800B2DA0[marker_count], g_draw_side,
+                      g_s2d_drawenv.ofs[0], g_s2d_drawenv.ofs[1]);
+        func_8009A368(&D_800B2DA0[marker_count], &g_ot_back[g_draw_side], 15,
+                      g_draw_side);
+        triangle.r1 = MARKER_MAX(255 - i, 64);
+        triangle.g1 = 0;
+        triangle.b1 = 0;
+        triangle.r2 = MARKER_MAX(255 - i, 64);
+        triangle.g2 = 0;
+        triangle.b2 = 0;
+        GsSortPoly(&triangle, &g_ot_map[g_draw_side], 0);
+        marker++;
+        x_order[marker_count] = D_800B2DA0[marker_count].x;
+        D_800B5670[marker_count] = marker_count;
+        marker_count++;
+    }
+    point.vx = D_800B8FD4 * 12 - 0x4BA;
+    point.vy = 0;
+    point.vz = 0x4BA - (199 - D_800B8FD8) * 12;
+    RotTransPers(&point, (long *)xy, &temp, &temp);
+    head = D_800A50A0;
+    head[0] = xy[0];
+    head[1] = xy[1];
+    SetPolyFT4(&trail);
+    SetSemiTrans(&trail, 0);
+    SetShadeTex(&trail, 0);
+    trail.r0 = 128;
+    trail.g0 = 128;
+    trail.b0 = 128;
+    trail.u0 = 0;
+    trail.v0 = 0xDA;
+    trail.u1 = 0x20;
+    trail.v1 = 0xDA;
+    trail.u2 = 0;
+    trail.v2 = 0xFE;
+    trail.u3 = 0x20;
+    trail.v3 = 0xFE;
+    trail.tpage = GetTPage(2, 0, 0x200, 0x1DA);
+    p = D_800A50A0;
+    for (i = 0; i < 6; i++) {
+        j = MARKER_MAX(128 - i * 16, 0);
+        trail.r0 = j;
+        trail.g0 = j;
+        trail.b0 = j;
+        trail.x0 = p[0] - 16;
+        trail.y0 = p[1] - 26;
+        trail.x1 = p[0] + 16;
+        trail.y1 = p[1] - 26;
+        trail.x2 = p[0] - 16;
+        trail.y2 = p[1] + 10;
+        trail.x3 = p[0] + 16;
+        trail.y3 = p[1] + 10;
+        p -= 2;
+        GsSortPoly(&trail, &g_ot_back[g_draw_side], 0);
+        if (p < &D_800A5088[0][0])
+            p = &D_800A5088[5][0];
+    }
+    D_800A50A0 += 2;
+    if ((u_long)D_800A50A0 >= (u_long)&D_800A50A0)
+        D_800A50A0 = (short *)&D_800A50A0 - 12;
+    /* Sort the labels from left to right, carrying their original indices. */
+    if (marker_count > 0) {
+        for (i = 0; i < marker_count - 1; i++) {
+            for (j = 0; j < marker_count - 1 - i; j++) {
+                if (x_order[j] > x_order[j + 1]) {
+                    temp = x_order[j + 1];
+                    x_order[j + 1] = x_order[j];
+                    x_order[j] = temp;
+                    temp = D_800B5670[j + 1];
+                    D_800B5670[j + 1] = D_800B5670[j];
+                    D_800B5670[j] = temp;
+                }
+            }
+        }
+    }
+}
+
+#undef MARKER_MAX
 
 /* The party drawn over everything: the screen under it copied to VRAM at
    (0x200, 0x1DA), the mark hidden, and the party at the view's tilt. */

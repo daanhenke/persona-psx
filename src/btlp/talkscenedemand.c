@@ -98,7 +98,6 @@ extern void BtlPushRecent(int gauge);
 /* The scene's own tables live at a per-scene offset the scratch header holds. */
 #define TALK_BASE ((char *)BTL_SCRATCH_W + g_btl_scratch_size)
 
-#ifdef NON_MATCHING
 void BtlTalkSceneDemand(void)
 {
     const u_char* p;
@@ -370,21 +369,22 @@ void BtlTalkSceneDemand(void)
                             i++;
                             e++;
                         } while (i < 9);
-                        /* The address and HP total share this scratch local;
-                           a direct pointer assignment loses the image's copy.
-                           The image reads HP and its cap through the address
-                           and stores through the copy, which is cse keeping
-                           the address's register canonical - only a local
-                           that outlives e does that (weight, gauge), and then
-                           cse drops the copy for the store as well. */
-                        used = (int)&g_btl_enemies[worst];
-                        e = (BtlActor *)used;
-                        used = take + e->c.hp;
-                        if (e->c.hp_max < used)
+                        /* Keep the HP destination separate from the loaded totals. */
                         {
-                            used = e->c.hp_max;
+                            BtlActor *healed = &g_btl_enemies[worst];
+                            int *destination = &healed->c.hp;
+                            int current;
+                            int cap;
+
+                            current = healed->c.hp;
+                            cap = healed->c.hp_max;
+                            e = healed;
+                            used = take + current;
+                            if (cap < used) {
+                                used = cap;
+                            }
+                            *destination = used;
                         }
-                        e->c.hp = used;
                         i       = 2;
                     }
                     else
@@ -460,6 +460,3 @@ void BtlTalkSceneDemand(void)
             break;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/talkscenedemand", BtlTalkSceneDemand);
-#endif

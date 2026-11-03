@@ -42,17 +42,7 @@ extern u_char g_map_name_cells[];
 extern void bzero(void *dst, int len);
 extern void BgMapInit(u_char *map, int arg);
 
-/* Not matched: 98.62% in ADV and DNG, src and cell trade s0/s1.
-   The head now schedules as the image's: sched1 fills backwards and only
-   boosts an insn that sets a register set once, so the table address has to
-   go through `cells`, set once, with the loop stepping its own `cell`; and
-   `cells` is set after `src` so it wins the boosted tie by position. What is
-   left is global-alloc priority (refs * log2 refs / live): cell 8 refs over
-   13 insns outranks src's 9 over 16 and takes s0. Moving cell's set before
-   bzero fixes the registers but lets cse fold cells away, and the head goes
-   back to the old order; splitting src's sum loads it straight into s0 but
-   moves the base; do-while weighting changes nothing. */
-#ifdef NON_MATCHING
+/* Indexed source pairs preserve the original compiler register allocation. */
 void MapDrawName(short map)
 {
     u_char *src;
@@ -69,12 +59,11 @@ void MapDrawName(short map)
     cell   = cells;
     second = cells + 1;
     do {
-        i++;
-        *second = src[0];
+        *second = src[i * 2];
         second += 2;
-        *cell = src[1] | 0x80;
-        src += 2;
+        *cell = src[i * 2 + 1] | 0x80;
         cell += 2;
+        i++;
     } while (i < NAME_CELLS);
 
     g_map_name_cells[NAME_END]     = 0xFF;
@@ -87,4 +76,3 @@ void MapDrawName(short map)
     g_bg_layers[NAME_LAYER].h = NAME_H;
     g_bg_shown |= NAME_BIT;
 }
-#endif

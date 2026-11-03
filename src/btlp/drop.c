@@ -108,36 +108,36 @@ int BtlPickItemFrom(unsigned int tier)
     return 0;
 }
 
-void BtlRollCommon(void)
+int BtlRollCommon(void)
 {
     srand(VSync(-1));
-    BtlPickItemFrom(3);
+    return BtlPickItemFrom(3);
 }
 
-void BtlRollUncommon(void)
+int BtlRollUncommon(void)
 {
     srand(VSync(-1));
     if ((rand() & 7) == 0) {
         if ((rand() & 3) == 0) {
-            BtlPickItemFrom(1);
+            return BtlPickItemFrom(1);
         } else {
-            BtlPickItemFrom(2);
+            return BtlPickItemFrom(2);
         }
     } else {
-        BtlRollCommon();
+        return BtlRollCommon();
     }
 }
 
-void BtlRollDrop(void)
+int BtlRollDrop(void)
 {
     srand(VSync(-1));
     if ((rand() & 3) == 0) {
         if ((rand() & 7) == 0) {
-            BtlPickItemFrom(0);
+            return BtlPickItemFrom(0);
         } else {
-            BtlRollUncommon();
+            return BtlRollUncommon();
         }
     } else {
-        BtlRollCommon();
+        return BtlRollCommon();
     }
 }

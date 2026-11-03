@@ -147,8 +147,9 @@ segments:
       # the word of padding behind it that belongs to nobody.
       - [0xD20, .rodata, ailtaketurn]
       - [0xD5C, rodata, btlp_rodata6a0]
-      # BtlAilmentTurnPanic's switch table sits in here too, and becomes
-      # `[0xD60, .rodata, ailpanic]` when the routine comes out of its guard.
+      # BtlAilmentTurnPanic emits its seven-entry switch table.
+      - [0xD60, .rodata, ailpanic]
+      - [0xD7C, pad, btlp_pad_d7c]
       # BtlRollDefeatDrop's rate table, which the C emits itself, and the word of
       # padding behind it that belongs to nobody.
       - [0xD80, .rodata, defeatdrop]
@@ -160,7 +161,8 @@ segments:
       # personaguard.c emits itself, each of the first two with the word of
       # padding behind it inside the unit.
       - [0xDB0, .rodata, personaguard]
-      - [0xEC4, rodata, btlp_rodata6b]
+      # BtlStageCommand's six-entry picker-state table.
+      - [0xEC4, .rodata, commandstage]
       # BtlReadySpellAction's switch table, which talkorders.c emits itself,
       # and the word of padding behind it that belongs to nobody.
       - [0xEDC, .rodata, talkorders]
@@ -211,13 +213,11 @@ segments:
       - [0x1430, pad, btlp_pad_1430]
       # BtlTalkFxObjTick's switch table, which fxtalktick.c emits itself.
       - [0x1434, .rodata, fxtalktick]
-      # BtlFxMotionUnused's switch table, then BtlFxStep01's - which stays
-      # in asm with its routine - then BtlFxFinish01's and BtlFxFinish53's,
-      # each emitted by its own unit. The last two are each followed by a
-      # word of padding that belongs to nobody.
+      # BtlFxMotionUnused's switch table, followed by BtlFxStep01's and
+      # BtlFxFinish01's tables together in fxstep01.c. BtlFxFinish53 emits
+      # its own table. The finish tables retain their following padding.
       - [0x14F4, .rodata, fxmotion]
-      - [0x1564, rodata, btlp_rodata6b1_fxa1]
-      - [0x15D4, .rodata, fxstep01]
+      - [0x1564, .rodata, fxstep01]
       - [0x15E8, pad, btlp_pad_15e8]
       - [0x15EC, .rodata, fxfinish53]
       - [0x1630, pad, btlp_pad_1630]

@@ -23,7 +23,7 @@
  *    banks closed.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
+#include <libetc.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -159,7 +159,6 @@ extern void PreloadBtlField(void);
 extern void PreloadName(void);
 extern void PreloadAdv(void);
 
-#ifdef NON_MATCHING
 void ovl_adv_entry(void)
 {
     u_char *cfg = g_cfg;
@@ -225,8 +224,8 @@ void ovl_adv_entry(void)
     g_prev_map = g_map_id;
 
     SetDispMask(0);
-    g_ot[1].length = 11;
-    g_ot[0].length = 11;
+    /* Chained stores preserve the original compiler's ordering-table base. */
+    g_ot[0].length = g_ot[1].length = 11;
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
@@ -449,6 +448,4 @@ leave:
     }
     AdvRunFrame();
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/advmain", ovl_adv_entry);
-#endif
+

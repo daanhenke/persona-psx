@@ -25,7 +25,7 @@ extern CasinoTweenArg g_casino_scroll_arg;
 void CasinoAddTween(CasinoTweenArg t);
 void CasinoAddScroll(CasinoTweenArg t);
 
-void CasinoTween(CasinoLayout *l, short dx, short dy, short dw, short dh, short frames)
+void CasinoTween(CasinoLayout *l, int dx, short dy, short dw, short dh, short frames)
 {
     g_casino_tween_arg.d.x = dx;
     g_casino_tween_arg.d.y = dy;

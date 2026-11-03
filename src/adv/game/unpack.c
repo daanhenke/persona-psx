@@ -29,9 +29,8 @@
 #define END_LO     0xFF
 #define ZEROES_LONG 0xFF
 
-/* 80.18%: the same opcodes and loops; the stream pointer, the opcode byte
-   and the count sit in other registers than the original's. */
-#ifdef NON_MATCHING
+/* Keep the opcode scaling arithmetic and the per-loop update order: GCC 2.6
+   uses them to preserve the widened opcode and the original loop scheduling. */
 void AdvUnpack(u_char *src, u_char *dst, u_int size)
 {
     u_int   done;
@@ -48,37 +47,41 @@ next:
         if (op == END_HI && *src == END_LO) {
             return;
         }
-        k = 0;
         if (op < 0x80) {
             n = ((op >> 2) & 0x1F) + 2;
-            from = dst + (short)(((op << 8) + *src++) | 0xFC00);
-            for (; k < n; k++) {
-                done++;
+            from = dst + (short)(((op * 256) + *src++) | 0xFC00);
+            for (k = 0; k < n;) {
                 *dst++ = from[k];
+                k++;
+                done++;
             }
             goto next;
         }
         switch (op & 0xE0) {
         case OP_LITERAL:
             n = (op & 0x1F) + 1;
-            for (; k < n; k++) {
+            for (k = 0; k < n;) {
                 done++;
+                k++;
                 *dst++ = *src++;
             }
             break;
         case OP_PAIRS:
             n = (op & 0x1F) + 1;
-            for (; k < n; k++) {
+            for (k = 0; k < n;) {
                 *dst++ = 0;
-                done += 2;
+                k++;
                 *dst++ = *src++;
+                done += 2;
             }
             break;
         case OP_FILL:
             n = (op & 0x1F) + 2;
             b = *src++;
-            for (; k < n; k++) {
-                *dst++ = b;
+            for (k = 0; k < n;) {
+                *dst = b;
+                k++;
+                dst++;
                 done++;
             }
             break;
@@ -88,8 +91,10 @@ next:
             } else {
                 n = (op & 0x1F) + 1;
             }
-            for (; k < n; k++) {
-                *dst++ = 0;
+            for (k = 0; k < n;) {
+                *dst = 0;
+                k++;
+                dst++;
                 done++;
             }
             break;
@@ -97,6 +102,3 @@ next:
         goto next;
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/unpack", AdvUnpack);
-#endif

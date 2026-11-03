@@ -8,7 +8,6 @@
  * of a given kind leaves on the new Persona, and what an offered item adds.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -46,7 +45,11 @@ extern u_char  g_moon;
 extern u_char  g_kind_labels[];
 extern u_char  D_800BA0E4[];
 extern u_char  g_fuse_random_personas[];
-extern u_char  D_800B9CAB[][0x16];
+extern short   g_trade_items[];
+
+/* The arcana bonus bytes begin 0x2F bytes into the trade-item data. */
+#define FUSE_ARCANA_BONUS_OFFSET 0x2F
+#define FUSE_ARCANA_COUNT        0x16
 
 extern int   rand(void);
 extern short FuseInheritSpell(short persona, u_char src, void *spell, void *rank);
@@ -54,9 +57,6 @@ extern void  DrawItemName(int id, short *dst, u_short base, int b);
 extern void  FuseCompute(u_char a, u_char b, short mode, FuseResult *out,
                            short special);
 
-/* 96.7%: the image loads both stock bytes before converting `mode` and
-   keeps them in a3/a1; this build converts first. */
-#ifdef NON_MATCHING
 /* A fusion of kind 1 raises magic attack by 20 and a stat by 5; kinds 1 and
    3 of the second roll carry an affinity across from a source and move every
    stat a point up or down, kind 2 only the affinity. */
@@ -64,8 +64,6 @@ void FuseApplyBonus(short p, short kind, short mode)
 {
     Persona *r = &g_personas[p];
     int      s;
-    u_char   a;
-    u_char   b;
     u_char   spell;
     short    rank;
     int      top;
@@ -101,11 +99,12 @@ void FuseApplyBonus(short p, short kind, short mode)
             break;
         }
     }
-    a = g_persona_stock[g_menu->top.cur];
-    b = g_persona_stock[g_menu->status_page.cur];
+    /* Reuse the stat selector locals for the two source stock entries. */
+    top = g_persona_stock[g_menu->status_page.cur];
+    s = g_persona_stock[g_menu->top.cur];
     switch (mode) {
     case 1:
-        if (FuseInheritSpell(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, s, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         r->stat[0] += 1;
@@ -115,12 +114,12 @@ void FuseApplyBonus(short p, short kind, short mode)
         r->stat[4] += 1;
         break;
     case 2:
-        if (FuseInheritSpell(g_fuse.persona, b, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, top, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         break;
     case 3:
-        if (FuseInheritSpell(g_fuse.persona, a, &spell, &rank) && r->raw[6] == 0) {
+        if (FuseInheritSpell(g_fuse.persona, s, &spell, &rank) && r->raw[6] == 0) {
             r->raw[6] = spell;
         }
         r->stat[0] -= 1;
@@ -131,9 +130,6 @@ void FuseApplyBonus(short p, short kind, short mode)
         break;
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/fuserules", FuseApplyBonus);
-#endif
 
 /* The kind a stray result comes out as. */
 short FuseRollKind(void)
@@ -219,9 +215,6 @@ short FuseRollAccident(short rank)
     }
 }
 
-/* 96.6%: the image schedules the result pointer's setup a few slots
-   later in the prologue. */
-#ifdef NON_MATCHING
 /* The offering line: the two sources, the item, and what they make. */
 void FuseItemsDraw(void)
 {
@@ -229,8 +222,8 @@ void FuseItemsDraw(void)
     short    n;
 
     n = g_use_top * 2 + g_menu->unk2E0.cur + g_menu->unk2D0.cur * 2;
-    res = &g_fuse.persona;
     TileMapFillRect(AT(g_tilemap2, 1, 2), 0, 0xB, 1, MAP_W);
+    res = &g_fuse.persona;
     TileMapFillRect(AT(g_tilemap2, 1, 16), 0, 0xB, 1, MAP_W);
     TileMapFillRect(AT(g_tilemap2, 3, 10), 0, 0xA, 1, MAP_W);
     TileMapFillRect(AT(g_tilemap2, 5, 1), 0, 0xA, 1, MAP_W);
@@ -251,13 +244,7 @@ void FuseItemsDraw(void)
     TileMapWriteRowRev(g_hud_digits, AT(g_tilemap2, 5, 15), GLYPH_DIGIT0,
         FormatDecimal(g_persona_defs[*res].level, g_hud_digits, 2));
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/fuserules", FuseItemsDraw);
-#endif
 
-/* 97.5%: the arcana table's base is added as a register in the image
-   rather than folded into the load. */
-#ifdef NON_MATCHING
 /* An item's contribution: by its class, magic attack, a stat, the arcana's
    own value, a fixed Persona, or - for the random class - a stat nudged up
    or down or, one time in five, a Persona picked by the moon. */
@@ -338,7 +325,9 @@ void FuseItemBonus(short arcana, short item, int unused2, int unused3,
         out->random = 1;
         break;
     case 0xA0:
-        out->unkC = D_800B9CAB[item][arcana];
+        out->unkC = ((u_char *)g_trade_items)[FUSE_ARCANA_BONUS_OFFSET
+                                             + item * FUSE_ARCANA_COUNT
+                                             + arcana];
         break;
     case 0x60:
         switch (f & 0x1F) {
@@ -368,6 +357,3 @@ void FuseItemBonus(short arcana, short item, int unused2, int unused3,
         break;
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/fuserules", FuseItemBonus);
-#endif

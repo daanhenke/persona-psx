@@ -39,28 +39,22 @@ void FadeTilesInit(void)
     g_fade_dot[1] = g_fade_dot[0];
 }
 
-#ifdef NON_MATCHING
 /* The dot steps through seven greys, at the party's tile scaled onto the
    panel; both go behind the map. */
 void FadeTilesDraw(void)
 {
-    TILE_1 *p;
+    int y;
     u_char  unused[0x18];
 
     g_fade_dot[g_draw_side].r0 = (g_s2d_frame % 7) * 16 + 0x80;
     g_fade_dot[g_draw_side].g0 = (g_s2d_frame % 7) * 16 + 0x80;
     g_fade_dot[g_draw_side].b0 = (g_s2d_frame % 7) * 16 + 0x80;
-    p = &g_fade_dot[g_draw_side];
-    p->x0 = D_800B8FD4 / 2 - 0xF0;
-    p->y0 = (0xC7 - D_800B8FD8) / 4 + 0x18;
-    AddPrim(g_ot_back[g_draw_side].tag, p);
+    (&g_fade_dot[g_draw_side])->x0 = D_800B8FD4 / 2 - 0xF0;
+    y = (0xC7 - D_800B8FD8) / 4 + 0x18;
+    (&g_fade_dot[g_draw_side])->y0 = y;
+    AddPrim(g_ot_back[g_draw_side].tag, &g_fade_dot[g_draw_side]);
     AddPrim(g_ot_back[g_draw_side].tag, &g_fade_tile[g_draw_side]);
 }
-#else
-/* 99.75%: the image keeps 0xC7 in v0 and the party's y in v1, this cc1 the
-   other way round (its constant pseudo is created after the load). */
-INCLUDE_ASM("s2d/nonmatchings/gfx/fadetiles", FadeTilesDraw);
-#endif
 
 /* n bytes, a word at a time (vram.c's CopyWords counts words). */
 void CopyLongs(u_long *dst, u_long *src, int n)

@@ -5,7 +5,3 @@
  * here would collapse back to one shared object.
  */
 #include "../../../common/ui/mapname.c"
-
-#ifndef NON_MATCHING
-INCLUDE_ASM("dng/nonmatchings/common/ui/mapname", MapDrawName);
-#endif

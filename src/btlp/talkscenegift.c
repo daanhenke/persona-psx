@@ -103,9 +103,6 @@ extern const u_char *g_btl_talk_heal_script;
 extern const u_char *g_btl_talk_bless_script;
 extern const u_char *g_btl_talk_parting_hit_script;
 
-extern int   BtlRollDrop(void);
-extern int   BtlRollUncommon(void);
-extern int   BtlRollCommon(void);
 extern int   BtlRoundMoney(int amount);
 extern void  BtlLoadPackEntry(int entry);
 extern void  BtlBgmOpen(void);

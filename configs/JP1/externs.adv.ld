@@ -18,6 +18,7 @@ g_menu_sel = 0x800B1788;
 CdReadFileToAddrAsync = 0x80011EDC;
 GsSortGLine = 0x80032288;
 GsSortLine = 0x8003211C;
+GsSortSprite = 0x8003262C;
 SsSeqOpen = 0x800195E0;
 SsSeqSetVol = 0x8001D278;
 SsSeqStop = 0x8001D480;

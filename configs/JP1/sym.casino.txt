@@ -378,7 +378,9 @@ func_800815D8      = 0x800815D8; // type:func size:0x10C
 D_800816E4         = 0x800816E4; // type:func size:0x68
 func_8008174C      = 0x8008174C; // type:func size:0x1E8
 func_80081934      = 0x80081934; // type:func size:0x32C
-D_80081C60         = 0x80081C60; // type:func size:0x160
+D_80081C60         = 0x80081C60; // type:func size:0x68
+func_80081CC8      = 0x80081CC8; // type:func size:0x68
+func_80081D30      = 0x80081D30; // type:func size:0x90
 func_80081DC0      = 0x80081DC0; // type:func size:0x1C0
 func_80081F80      = 0x80081F80; // type:func size:0xB4
 func_80082034      = 0x80082034; // type:func size:0x28
@@ -557,7 +559,8 @@ func_80092F14      = 0x80092F14; // type:func size:0x264
 func_80093178      = 0x80093178; // type:func size:0x49C
 func_80093614      = 0x80093614; // type:func size:0x33C
 func_80093950      = 0x80093950; // type:func size:0x180
-func_80093AD0      = 0x80093AD0; // type:func size:0xAC
+func_80093AD0      = 0x80093AD0; // type:func size:0xA4
+func_80093B74      = 0x80093B74; // type:func size:0x8
 func_80093B7C      = 0x80093B7C; // type:func size:0x90
 
 
@@ -628,6 +631,7 @@ D_80099A98               = 0x80099A98; // size:0x78
 D_80099B10               = 0x80099B10; // size:0x180
 D_80099C90               = 0x80099C90; // size:0x18
 D_80099CA8               = 0x80099CA8; // size:0x18
+g_casino_reward_palette_on = 0x80099CB8; // type:u8 size:0x1
 D_80099CC0               = 0x80099CC0; // size:0x18
 D_80099CD8               = 0x80099CD8; // size:0x18
 D_80099CF0               = 0x80099CF0; // size:0x18
@@ -819,3 +823,11 @@ g_script_534C            = 0x801F534C; // ignore:True size:0x2
 g_bgm_ready              = 0x801F5358; // ignore:True size:0x2
 g_vab_id                 = 0x801F535C; // ignore:True size:0x10
 g_seq_handle             = 0x801F537C; // ignore:True size:0x40
+
+// Named active bytes within existing palette-animation records.
+g_bj_result_palette_on = 0x800999A0; // type:u8 size:0x1
+g_grid_select_palette_on = 0x80099C88; // type:u8 size:0x1
+
+g_bj_double_palette_on = 0x800999B8; // type:u8 size:0x1
+
+g_grid_win_palette_on = 0x80099CA0; // type:u8 size:0x1

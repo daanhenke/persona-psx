@@ -175,9 +175,11 @@ void S2dPlaceCompass(void)
     func_8009994C(*p + 0x10F, 0x18, 0x98, 0x68, 0, 0, 0x1000);
 }
 
-#ifdef NON_MATCHING
 /* The map's model and the party's marker take their first objects from
    model slot 0, with the marker placed where the map is. */
+/* Name the existing translation separately so GCC retains its own base. */
+extern VECTOR bind_trans __asm__("g_map_xform+8");
+
 void S2dBindModels(void)
 {
     g_party_obj.obj.tmd = g_models[0].objs;
@@ -188,18 +190,13 @@ void S2dBindModels(void)
 
     g_party_obj.rot.vx = g_map_xform.rot.vx;
     g_party_mark.obj.tmd = g_models[0].objs + 0x2A;
-    g_party_obj.trans = g_map_xform.trans;
+    g_party_obj.trans = bind_trans;
     *(u_long *)g_party_mark.obj.tmd[4] &= 0xFF000000;
     *(u_long *)g_party_mark.obj.tmd[4] |= g_party_mark.obj.tmd[5];
     g_party_mark.obj.attribute = 0;
     g_party_mark.obj.coord2 = &g_party_mark.coord;
 
     g_party_mark.rot.vx = g_map_xform.rot.vx;
-    g_party_mark.trans = g_map_xform.trans;
+    g_party_mark.trans = bind_trans;
     g_party_mark.trans.vy -= 0x6A;
 }
-#else
-/* 62%: the image holds &obj.tmd in a register and derives coord2 from it;
-   the statement order around it is not settled. */
-INCLUDE_ASM("s2d/nonmatchings/game/scenecoords", S2dBindModels);
-#endif

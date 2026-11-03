@@ -49,20 +49,11 @@ void FrameHook(void)
 }
 
 /* Blanks the display and clears a rectangle of VRAM to black.
-   In the image sched2 leaves the prologue's sw $ra right after the frame
-   adjust; here it lands two stores later. Nothing in the source shape has
-   moved it (parameter types, K&R, a pointer or an array for the RECT,
-   implicit int, a variable for the zeros); -fno-schedule-insns2 does, but
-   RenderFrame needs sched2. The overlay's wrapper names the asm. */
-#ifdef NON_MATCHING
+   Keep the initializer: separate field stores change prologue scheduling. */
 void VramClearRect(int x, int y, int w, int h)
 {
-    RECT r;
+    RECT r = { x, y, w, h };
 
-    r.x = x;
-    r.y = y;
-    r.w = w;
-    r.h = h;
     VSync(0);
     SetDispMask(0);
     ClearImage(&r, 0, 0, 0);
@@ -70,9 +61,6 @@ void VramClearRect(int x, int y, int w, int h)
     VSync(0);
     VSync(0);
 }
-#else
-RENDER_ASM_VRAMCLEARRECT;
-#endif
 
 void RenderFrame(void)
 {

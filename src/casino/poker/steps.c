@@ -34,7 +34,6 @@
 
 extern void CasinoGame1LoadVram(void);
 extern void CasinoGame1LoadSound(void);
-extern void CasinoFade(short first, short count, u_char r, u_char g, u_char b, short frames);
 extern void CasinoStartPalAnim(CasinoPalAnim *a);
 extern void CasinoQueueCluts(); /* (short first, short n, int clut), called unprototyped */
 extern void CasinoSpritesSetOn(short first, short n, int on);

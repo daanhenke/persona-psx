@@ -98,6 +98,7 @@ typedef struct {
 #define CHEST_TRAP_TO_ONE   7
 #define CHEST_TRAP_ITEM     9   /* a tenth of the HP, then the item   */
 #define CHEST_TRAP_MONEY    10
+#define CHEST_EMPTY         11
 
 /* An item payload packs the id in the low nine bits and the count above. */
 #define CHEST_ITEM_ID  0x1FF
@@ -253,9 +254,7 @@ void AdvChestOpen(u_char chest)
 
 #undef A
 
-/* The switch table these three share does not yet come out of the C, so both
-   the code and the table are taken from the original. */
-#ifdef NON_MATCHING
+/* Apply the trap or reward, then return which message to show. */
 u_char AdvChestApply(u_char chest)
 {
     AdvChest *d;
@@ -267,47 +266,62 @@ u_char AdvChestApply(u_char chest)
     d = &g_chest_defs[chest];
     shows = CHEST_SHOWS_NOTHING;
     switch (d->kind) {
-    case CHEST_TRAP_QUARTER:
-        c = &g_chars[g_party[0]];
-        hp = c->hp;
-        hp -= hp / 4;
-        c->hp = hp;
+    case CHEST_EMPTY:
         break;
-    case CHEST_TRAP_HALF:
-        c = &g_chars[g_party[0]];
-        hp = c->hp;
-        hp -= hp / 2;
-        c->hp = hp;
+    case CHEST_TRAP_QUARTER: {
+        Char *member;
+        int health;
+        member = &g_chars[g_party[0]];
+        health = member->hp;
+        member->hp = health - health / 4;
         break;
+    }
+    case CHEST_TRAP_HALF: {
+        Char *member;
+        int health;
+        member = &g_chars[g_party[0]];
+        health = member->hp;
+        health -= health / 2;
+        member->hp = health;
+        break;
+    }
     case CHEST_TRAP_PARTY:
         for (i = 0; i < CHAR_COUNT; i++) {
             if (g_party[i] != 0xFF) {
                 g_chars[g_party[i]].hp = 1;
             }
         }
-        return CHEST_SHOWS_NOTHING;
+        break;
     case CHEST_TRAP_POISON:
         g_chars[g_party[0]].status = STATUS_POISON;
-        return CHEST_SHOWS_NOTHING;
-    case CHEST_TRAP_ONE:
-        c = &g_chars[g_party[0]];
-        hp = c->hp;
-        if (hp != 1) {
-            c->hp = hp - 1;
+        break;
+    case CHEST_TRAP_ONE: {
+        Char *member;
+        int health;
+        member = &g_chars[g_party[0]];
+        health = member->hp;
+        if (health != 1) {
+            member->hp = health - 1;
         }
         break;
+    }
     case CHEST_TRAP_TO_ONE:
         g_chars[g_party[0]].hp = 1;
-        return CHEST_SHOWS_NOTHING;
-    case CHEST_TRAP_ITEM:
-        c = &g_chars[g_party[0]];
-        hp = c->hp;
-        hp -= hp / 10;
-        c->hp = hp;
+        break;
+    case CHEST_TRAP_ITEM: {
+        Char *member;
+        int health;
+        member = &g_chars[g_party[0]];
+        health = member->hp;
+        health -= health / 10;
+        member->hp = health;
         /* falls through */
+    }
     case CHEST_ITEM:
         g_adv_chest_item = d->payload & CHEST_ITEM_ID;
-        g_adv_chest_count = d->payload >> CHEST_ITEM_N;
+        /* The packed count is at most 127, so the result byte holds it. */
+        shows = d->payload >> CHEST_ITEM_N;
+        g_adv_chest_count = shows;
         ItemsAdd(g_adv_chest_item, g_adv_chest_count);
         shows = CHEST_SHOWS_ITEM;
         break;
@@ -361,38 +375,31 @@ void AdvChestShowItem(u_char actor)
 void AdvChestShowMoney(u_char actor)
 {
     int n;
-    int i;
 
     g_slot_cur = &g_slots[EFFECT_SLOT];
     CellsClear(g_adv_chest_money_cells, 7);
     n = FormatDecimal(g_adv_chest_money, g_hud_digits, 7);
     CellsWriteDigitsRev(&g_adv_chest_money_cells[n - 1], g_hud_digits, n);
-    i = 0;
     SlotInitTagged(&g_adv_chest_money_def, EFFECT_SLOT,
                    g_adv_actors[actor].z - 1,
                    g_adv_actors[actor].world_x - g_cam_x - (n + 1) * 4,
                    g_adv_actors[actor].world_y - g_cam_y - 0x50);
+    n = 0;
     g_slot_cur->mx = 4;
     do {
-        i++;
+        n++;
         AdvRunFrame();
-    } while (i < HOLD_FRAMES);
+    } while (n < HOLD_FRAMES);
 
-    i = 0;
+    n = 0;
     do {
         g_slot_cur = &g_slots[EFFECT_SLOT];
         g_slots[EFFECT_SLOT].scale_x -= SHRINK_STEP;
-        i++;
+        n++;
         AdvRunFrame();
-    } while (i < SPIN_FRAMES);
+    } while (n < SPIN_FRAMES);
     SlotClear(EFFECT_SLOT);
 }
-
-#else
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestApply);
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowItem);
-INCLUDE_ASM("adv/nonmatchings/game/chestresult", AdvChestShowMoney);
-#endif
 
 void AdvChestShowEmpty(u_char actor)
 {

@@ -56,17 +56,11 @@ extern void CinemaDim(short step);
         RunFrame();        \
     }
 
-/* 97.80%: the original moves the cels0 bar's address out of the second loop
-   and this does not. loop.c keeps an invariant in the loop unless its
-   lifetime times the threshold covers the loop's insn count; here the
-   address lives three insns in a 53-insn loop and falls just short, where
-   CinemaClose's first loop (lifetime four, the -8 constant between) makes
-   it. No reordering, cast or loop shape tried changes either count. */
-#ifdef NON_MATCHING
 void CinemaOpen(short plain)
 {
     int   step;
     short y;
+    u_short *height;
 
     step = 0;
     g_actor_dim = 1;
@@ -120,17 +114,15 @@ void CinemaOpen(short plain)
         P[4].y -= 4;
         P[5].y -= 4;
         P[6].y -= 4;
+        height = &g_cinema_cels0.h;
         P[7].y += 4;
-        g_cinema_cels0.h += 8;
-        g_cinema_cels6.h += 8;
+        *height += 8;
         g_cinema_cels4.h += 8;
         g_cinema_cels5.h += 8;
+        g_cinema_cels6.h += 8;
     }
     g_bg_shown |= CINEMA_LAYER;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/cinema", CinemaOpen);
-#endif
 
 void CinemaClose(short plain)
 {

@@ -19,8 +19,22 @@ static inline void MarkSeen(u_char *seen, u_short area, u_short room, u_char x, 
     seen[y * MAP_ROW_BYTES + (g_map_base[area] + room) * MAP_BYTES + (x >> 3)] |= 0x80 >> (x & 7);
 }
 
+/* Keep column, room and bit calculations separate for conditional marks
+   on the adjacent floor; their lifetimes preserve the original loads. */
+static inline void MarkAdjacent(u_char *seen, u_short area, u_short room, u_char x, u_char y)
+{
+    int tile;
+    int col, bit;
+
+    col = x >> 3;
+    tile = g_map_base[area] + room;
+    bit = x & 7;
+    seen[y * MAP_ROW_BYTES + tile * MAP_BYTES + col] |= 0x80 >> bit;
+}
+
 /* The automap bit of the party's tile, in the room `seen` starts at. */
 #define MARK_SEEN(seen) MarkSeen(seen, g_dng->area, g_dng->room, g_dng->pos[POS_X], g_dng->pos[POS_Y])
+#define MARK_ADJACENT(seen) MarkAdjacent(seen, g_dng->area, g_dng->room, g_dng->pos[POS_X], g_dng->pos[POS_Y])
 
 /* The rooms above and below this one in the automap. */
 #define SEEN_BELOW (g_map_seen - MAP_BYTES)
@@ -29,12 +43,6 @@ static inline void MarkSeen(u_char *seen, u_short area, u_short room, u_char x, 
 /* Takes a flight of stairs, `dir` 1 going up and -1 going down: two tiles
    along the walk direction with a hop on each, marking both on the automap
    of this floor and, when the stairs lead off it, of the next. */
-/* 98.3%: the automap index is summed y first, which puts the multiply for
-   the room where the image has it; the one row left is where sched loads
-   g_dng->room inside the two arms of each conditional mark - after x in the
-   image, before it here. Neither the order of the inline's parameters nor
-   of the reads moves it. */
-#ifdef NON_MATCHING
 void FieldStairs(int dir)
 {
     int i;
@@ -42,9 +50,9 @@ void FieldStairs(int dir)
     g_dng->pos[g_dir_axis[g_dng->walk_dir]] += g_dir_tile_step[g_dng->walk_dir];
     MARK_SEEN(g_map_seen);
     if (g_field_mode & FIELD_MODE_DOWN) {
-        MARK_SEEN(SEEN_BELOW);
+        MARK_ADJACENT(SEEN_BELOW);
     } else {
-        MARK_SEEN(SEEN_ABOVE);
+        MARK_ADJACENT(SEEN_ABOVE);
     }
     if (!(g_bgm_flags & BGM_RESUMED)) {
         g_bgm_flags |= BGM_RESUMED;
@@ -83,9 +91,9 @@ void FieldStairs(int dir)
     g_dng->pos[g_dir_axis[g_dng->walk_dir]] += g_dir_tile_step[g_dng->walk_dir];
     if (g_stair_floor != 0) {
         if (g_field_mode & FIELD_MODE_DOWN) {
-            MARK_SEEN(SEEN_BELOW);
+            MARK_ADJACENT(SEEN_BELOW);
         } else {
-            MARK_SEEN(SEEN_ABOVE);
+            MARK_ADJACENT(SEEN_ABOVE);
         }
     }
     FieldStepBegin();
@@ -97,9 +105,6 @@ void FieldStairs(int dir)
     FieldStepEnd();
     g_field_mode = 0;
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldstairs", FieldStairs);
-#endif
 
 /* Four frames of the step bouncing the view up and down by `dir`, then
    leaving it a stair's height up or down; the tune runs faster meanwhile. */
@@ -141,29 +146,20 @@ int FieldStepTick(void)
 
 /* Whether the tile the party stands on refuses to be left towards
    walk_dir. */
-/* 97.6%: the layout is right with the result in a variable, but the
-   variable takes a0 and is moved to v0 at the end, where the image computes
-   straight into v0. */
-#ifdef NON_MATCHING
 int FieldTileOneWay(void)
 {
     int flags;
-    int r;
 
     if (g_noclip) {
-        r = 0;
+        return 0;
     } else {
         flags = g_tile_defs[g_floor_grid[g_dng->pos[POS_Y]][g_dng->pos[POS_X]]].flags;
-        r = 0;
         if ((flags & TILE_KIND) == TILE_KIND_ONEWAY) {
-            r = (flags >> (g_dng->walk_dir + 5)) & 1;
+            if ((flags >> (g_dng->walk_dir + 5)) & 1) return 1;
         }
+        return 0;
     }
-    return r;
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldstairs", FieldTileOneWay);
-#endif
 
 /* Whether the party's tile is one it cannot stand on. */
 int FieldTileSolid(void)

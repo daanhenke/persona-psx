@@ -147,22 +147,20 @@ void FieldMsgPrintBytes(u_char *s, u_char n)
 
 /* Prints up to `n` glyph codes, a frame each. Old-style, like the rest of
    the printers: n is narrowed at every test. */
-/* 87.8%: the double read is the int c against the QImode top-bit test, as
-   in FieldMsgPrintCodes. What is left is MSG_END: the image's loop.c hoists
-   the 0xFF into s3, and here the move is "not desirable" at every loop size
-   tried (28-30 insns), so the compare loads it each pass. */
-#ifdef NON_MATCHING
+/* The explicit end-code local lets loop.c keep MSG_END in a saved register. */
 void FieldMsgPrint(s, n)
     u_char *s;
     u_char  n;
 {
     int    i;
     int    c;
+    int    end;
     int    g;
 
     for (i = 0; i < n; i++) {
+        end = MSG_END;
         c = *s;
-        if (c == MSG_END) {
+        if (c == end) {
             break;
         }
         if (!(*s & 0x80)) {
@@ -176,9 +174,6 @@ void FieldMsgPrint(s, n)
         FieldFrame();
     }
 }
-#else
-INCLUDE_ASM("dng/nonmatchings/field/fieldmsg", FieldMsgPrint);
-#endif
 
 /* The party slot holding the character whose record key is `key` + 1, or
    -1. */

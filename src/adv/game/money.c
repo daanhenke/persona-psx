@@ -117,11 +117,8 @@ short FuseSpellAllowed(short persona, short spell);
 /* The first spell of Persona data `src` that `persona` may inherit, by the
    group of src's arcana: the spell into *spell and how far down the group's
    list it came into *rank. */
-/* 99.44%: two things left. i and n trade s4/s2 (global-alloc priority; the
-   do-while round n's reset is what put end in s3), and the image loads the
-   run's first entry straight into j and adds a copy of it to the count,
-   where this loads into first and cse folds it into j. */
-#ifdef NON_MATCHING
+/* Keep the run start and length as separate full-width locals: the original
+   compiler copies the short index before adding the length. */
 short FuseInheritSpell(short persona, short src, short *spell, short *rank)
 {
     short i;
@@ -129,21 +126,24 @@ short FuseInheritSpell(short persona, short src, short *spell, short *rank)
     short end;
     short n;
     short group;
-    short first;
-
+    int   first;
+    int   length;
     do {
-        n = 0;
+        i = 0;
     } while (0);
+    n = 0;
     group = g_arcana_fuse_group[g_persona_data[src].arcana - 1] - 1;
     *rank = 0xFF;
     *spell = 0xFF;
-    for (i = 0; i < 10; i++) {
+    for (; i < 10; i++) {
         if (g_fuse_group_classes[i] == 0xFF) {
             break;
         }
-        first = g_fuse_spell_runs[g_fuse_group_classes[group * 10 + i] * 2];
-        end = first + g_fuse_spell_runs[g_fuse_group_classes[group * 10 + i] * 2 + 1];
-        for (j = first; j < end; j++, n++) {
+        j = g_fuse_spell_runs[g_fuse_group_classes[group * 10 + i] * 2];
+        first = j;
+        length = g_fuse_spell_runs[g_fuse_group_classes[group * 10 + i] * 2 + 1];
+        end = first + length;
+        for (; j < end; j++, n++) {
             if (PersonaDataSpellIndex(src, g_fuse_spell_list[j]) != -1
                 && FuseSpellAllowed(persona, g_fuse_spell_list[j])) {
                 *spell = g_fuse_spell_list[j];
@@ -154,9 +154,7 @@ short FuseInheritSpell(short persona, short src, short *spell, short *rank)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/money", FuseInheritSpell);
-#endif
+
 
 /* Where `spell` sits in Persona data `id`'s spell list, or -1. */
 short PersonaDataSpellIndex(short id, short spell)

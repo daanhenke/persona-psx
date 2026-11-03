@@ -23,7 +23,6 @@
  * to do, or lose the turn.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <rand.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/formation.h>
@@ -41,25 +40,13 @@
    under way. */
 #define PANIC_FRAMES 20
 
-/* 98.16%. Read off the image's registers:
-     - one variable, n, is the roll, the slot a pick answers and the order
-       worked out from the slowest enemy, as the image keeps all three in a2;
-     - the enemy side's 1 << slot shifts a variable set to 1 before its roll,
-       which the image keeps in s0 across rand;
-     - the move's success path is inside its loop and leaves by `return`, so
-       loop.c lifts and merges its constants with the loop's own: the divide
-       by twenty after the pick reuses the divide by five's magic (s3), and one
-       0xFF (fp) serves the free-cell test and the old cell's clearing.
-   What is left: the image loads g_btl_formation's address in the middle of
-   the second roll's division, where gcc here loads it after the index; and
-   the enemy switch's `n == 1` compares against that s0 in the image, where
-   gcc here puts 1 in v0 (cse cannot see s0's 1 past the join of the two
-   rolls). */
-#ifdef NON_MATCHING
+/* Keep the free-cell table separate from its computed cell pointer. The
+   enemy dispatch retains its one-bit mask across the random roll. */
 void BtlAilmentTurnPanic(BtlActor *a, u_char *act)
 {
     u_char *cell;
-    int     empty;
+    u_char *grid;
+    int     one;
     int     n;
     int     from;
     int     col;
@@ -129,9 +116,10 @@ void BtlAilmentTurnPanic(BtlActor *a, u_char *act)
                 }
             }
             for (;;) {
+                grid = g_btl_formation;
                 col = rand() % GRID_W;
                 row = rand() % GRID_H;
-                cell = &g_btl_formation[row * GRID_W + col];
+                cell = &grid[row * GRID_W + col];
                 if (*cell == CELL_EMPTY && BtlFormationCellFree(col, row) != 0) {
                     a->obj->steps = PANIC_FRAMES;
                     a->obj->step_x = ((col * PLACE_COL_W + PLACE_COL_ORG) * PLACE_FIXED
@@ -154,40 +142,52 @@ void BtlAilmentTurnPanic(BtlActor *a, u_char *act)
             return;
         }
     } else {
-        row = 1;
+        one = 1;
         if ((signed char)a->c.ail_level < 2) {
             n = rand() % 4;
         } else {
             n = rand() % 3 + 1;
         }
-        switch (n) {
-        case 0:
-            if (BtlPickAiTarget(a, g_spell_data[0].target) >= 0) {
-                a->move = 0;
-                BtlAimMove(a);
-                *act = AIL_ACT_AIMED;
+        if (n == one) {
+            goto enemy_attack;
+        }
+        if (n < 2) {
+            if (n == 0) {
+                goto enemy_cast;
             }
-            return;
-        case 1:
-            n = BtlPickOtherEnemy(a->obj->mark_num);
-            if (n < 0) {
-                *act = AIL_ACT_LOST;
-                return;
+        } else {
+            if (n == 2) {
+                goto enemy_none;
             }
-            a->targets = row << n;
+            if (n == 3) {
+                goto enemy_lost;
+            }
+        }
+        return;
+
+    enemy_cast:
+        if (BtlPickAiTarget(a, g_spell_data[0].target) >= 0) {
             a->move = 0;
-            a->order = n;
+            BtlAimMove(a);
             *act = AIL_ACT_AIMED;
-            return;
-        case 2:
-            *act = AIL_ACT_NONE;
-            return;
-        case 3:
+        }
+        return;
+    enemy_attack:
+        n = BtlPickOtherEnemy(a->obj->mark_num);
+        if (n < 0) {
             *act = AIL_ACT_LOST;
             return;
         }
+        a->targets = one << n;
+        a->move = 0;
+        a->order = n;
+        *act = AIL_ACT_AIMED;
+        return;
+    enemy_none:
+        *act = AIL_ACT_NONE;
+        return;
+    enemy_lost:
+        *act = AIL_ACT_LOST;
+        return;
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/ailpanic", BtlAilmentTurnPanic);
-#endif

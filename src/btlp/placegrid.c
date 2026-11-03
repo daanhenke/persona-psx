@@ -57,23 +57,8 @@ extern short   g_btl_place_from_col;
 extern short   g_btl_place_from_row;
 extern int     g_btl_place_walk;
 
-/* 98.60%. The two upward wraps are written as a short sum compared and
-   masked: `row = (short)(row + 1) < 5 ? row + 1 : 0`. The cursors are indexed
-   by the counter, not walked by hand. What is left: in the two downward wraps
-   the image copies the decremented value before shifting it for the sign
-   test and stores the copy, where gcc here stores first and shifts in place.
-   At the confirm, the column and row are read into v0/v1 rather than v1/a0.
-   An int temporary, a pre-decrement and a ternary were all tried.
-   2026-10-01 (flow/combine/sched dumps): the image is exactly this flow
-   RTL - r85 = row - 1, r86 = (subreg:HI r85), store r86, sign test on
-   r85 << 16 - with the narrowing copy kept and the store sunk past the
-   shift. Here combine folds the copy into the store, so the store reads r85
-   and goes first. A short temporary (new, or `at`/`cell` reused) folds the
-   same. At the confirm, sched1 ranks the two stores (priority 2, they wait
-   on loads) above `return 0`'s v0 set (priority 1). That lands between the
-   loads and the stores, so local-alloc keeps the loads out of v0. Store
-   order and the formation store's position do not change it. */
-#ifdef NON_MATCHING
+/* Keep the low-halfword sign test separate from the value stored back to
+   the grid. Both coordinates wrap after narrowing to the PS1 short width. */
 int BtlPlaceGridUpdate(int carrying)
 {
     BtlObj **cursor;
@@ -90,9 +75,14 @@ int BtlPlaceGridUpdate(int carrying)
     }
     if ((key & PAD_UP) != 0) {
         g_btl_place_walk = BtlUnreadyMemberPrev(g_btl_place_walk);
-        g_btl_place_row--;
-        if (g_btl_place_row < 0) {
-            g_btl_place_row = PLACE_GRID_SIDE - 1;
+        {
+            int value = (u_short)g_btl_place_row - 1;
+            int coordinate = value;
+            value = (u_int)value << 16;
+            g_btl_place_row = coordinate;
+            if (value < 0) {
+                g_btl_place_row = PLACE_GRID_SIDE - 1;
+            }
         }
     }
     if ((key & PAD_DOWN) != 0) {
@@ -101,9 +91,14 @@ int BtlPlaceGridUpdate(int carrying)
     }
     if ((key & PAD_LEFT) != 0) {
         g_btl_place_walk = BtlUnreadyMemberPrev(g_btl_place_walk);
-        g_btl_place_col--;
-        if (g_btl_place_col < 0) {
-            g_btl_place_col = PLACE_GRID_SIDE - 1;
+        {
+            int value = (u_short)g_btl_place_col - 1;
+            int coordinate = value;
+            value = (u_int)value << 16;
+            g_btl_place_col = coordinate;
+            if (value < 0) {
+                g_btl_place_col = PLACE_GRID_SIDE - 1;
+            }
         }
     }
     if ((key & PAD_RIGHT) != 0) {
@@ -179,7 +174,7 @@ int BtlPlaceGridUpdate(int carrying)
             g_btl_formation[at] = CELL_EMPTY;
             g_btl_place_from_col = g_btl_place_col;
             g_btl_place_from_row = g_btl_place_row;
-            return PLACE_GRID_DONE;
+            goto placement_done;
         }
         if (g_btl_place_cell == CELL_EMPTY) {
             if (BtlFormationCellFree(g_btl_place_col, g_btl_place_row) == 0) {
@@ -202,6 +197,7 @@ int BtlPlaceGridUpdate(int carrying)
         }
         BtlBuildMarkers();
         BtlRefreshPickCursors();
+    placement_done:
         return PLACE_GRID_DONE;
     }
     if ((g_btl_pad1_edge & g_btl_key_cancel) != 0) {
@@ -223,6 +219,3 @@ int BtlPlaceGridUpdate(int carrying)
     }
     return BTL_PICK_WAIT;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placegrid", BtlPlaceGridUpdate);
-#endif

@@ -141,7 +141,7 @@ g_overlay_base           = 0x800643A0;
 //------------------------------------------------------------------
 //--- PA: 0x000004   VA: 0x800643A4   subsegment: rodata, s2d_rodata
 //------------------------------------------------------------------
-D_800643A4               = 0x800643A4; // type:u32 size:0x6C
+D_800643A4               = 0x800643A4; // type:u32 size:0x54
 
 
 
@@ -1136,7 +1136,10 @@ func_80097508            = 0x80097508; // type:func size:0x274
 func_8009777C            = 0x8009777C; // type:func size:0x1E8
 func_80097964            = 0x80097964; // type:func size:0x284
 func_80097BE8            = 0x80097BE8; // type:func size:0xEC
-D_80097CD4               = 0x80097CD4; // type:func size:0x11C
+D_80097CD4               = 0x80097CD4; // type:func size:0x28
+func_80097CFC            = 0x80097CFC; // type:func size:0xC0
+func_80097DBC            = 0x80097DBC; // type:func size:0x18
+func_80097DD4            = 0x80097DD4; // type:func size:0x1C
 SoundInit                = 0x80097DF0; // type:func size:0xC4
 SoundSetOutput           = 0x80097EB4; // type:func size:0x3C
 SoundOpenMapSeqs         = 0x80097EF0; // type:func size:0x7C
@@ -1289,6 +1292,7 @@ g_s2d_heading            = 0x800A4CF6; // size:0x2
 g_cam_turn_speed         = 0x800A4CF8; // size:0x2
 g_cam_turn_angle         = 0x800A4CFA; // size:0x2
 D_800A4CFC               = 0x800A4CFC; // type:u32 size:0x38C
+g_s2d_selected_event_flag = 0x800A4D04; // type:s16 size:0x2
 g_idle_kind              = 0x800A4FF4; // size:0x4
 g_idle_frames            = 0x800A4FF8; // size:0x4
 g_idle_phase             = 0x800A4FFC; // size:0x4
@@ -1654,3 +1658,9 @@ g_pad_title              = 0x8009ED54;
 g_use_top                = 0x800B5F40; // size:0x2
 g_equip_step             = 0x800B9568; // size:0x1
 D_800B9538               = 0x800B9538; // size:0x1
+g_msg_scripts            = 0x8004D3EC;
+g_msg_clut               = 0x8009C980;
+g_msg_blink              = 0x8009C998;
+g_msg_marks              = 0x8009CA24;
+g_msg_choice_cur_def     = 0x8009CA9C;
+g_msg_answer             = 0x800B8658;

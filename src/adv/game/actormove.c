@@ -11,7 +11,6 @@
  * as it passes the middle of a tile.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/adv/actor.h>
 #include <persona/adv/room.h>
 #include <persona/common/slot.h>
@@ -66,11 +65,6 @@ void ActorStartMove(u_char a, u_char move, u_char speed, u_char dir,
 
 #define A g_adv_actors[i]
 
-/* 99.54%: storing the index into clut_y (a halfword extension of it) makes
-   cse drop the word extension it already has, so the actor record's index
-   is masked again before the shadow test; the original keeps the one
-   register. Moving, casting or inlining the store does not change it. */
-#ifdef NON_MATCHING
 /* Runs every actor's move script a frame; `follow` is the actor the camera
    walks with. Answers whether any actor still has a move going. */
 u_char ActorsMoveStep(u_char follow)
@@ -82,6 +76,7 @@ u_char ActorsMoveStep(u_char follow)
     u_char  new;
     Slot   *s;
     Slot   *t;
+    unsigned int index;
 
     moving = 0;
     for (i = 0; i < 24; i++) {
@@ -118,17 +113,19 @@ u_char ActorsMoveStep(u_char follow)
                     g_slot_cur->clut_y = i;
                     break;
                 }
-                s = &g_slots[i];
+                /* Keep the word index across the halfword CLUT store. The
+                   chained pointer assignment preserves GCC 2.6 scheduling. */
+                index = i;
+                s = g_slot_cur = &g_slots[i];
                 t = &g_slots[i + SHADOW_SLOT];
                 s->clut_y = i;
-                g_slot_cur = s;
                 g_slot_cur->tpage_add = i;
                 g_slot_cur = t;
                 g_slot_cur->tpage_add = i;
-                switch (A.shadow) {
+                switch (g_adv_actors[index].shadow) {
                 case SHADOW_FLAT:
                 case SHADOW_FLAT_LOW:
-                    if (g_dir_flip[A.face]) {
+                    if (g_dir_flip[g_adv_actors[index].face]) {
                         g_slot_cur = s;
                         g_slot_cur->attr |= SLOT_ATTR_XSCALE;
                         g_slot_cur = &g_slots[SHADOW_SLOT];
@@ -224,6 +221,3 @@ u_char ActorsMoveStep(u_char follow)
     }
     return moving;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/actormove", ActorsMoveStep);
-#endif

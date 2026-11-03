@@ -110,27 +110,35 @@ void AdvPickSceneByFlags(void)
 INCLUDE_ASM("adv/nonmatchings/game/eventfiles", AdvPickSceneByFlags);
 #endif
 
-/* The id a variant resolves to: `alt` once its flag is set. */
-#define VARIANT(v)                                                             \
-    ((v).flag != NONE && FlagSet((v).flag) ? (v).alt : (v).id)
+/* Return the selected id after reading it. Keeping this short-valued inline
+   boundary preserves the original check after the read as well as the
+   caller's initial check. */
+static inline u_short ReadEventBg(u_short id)
+{
+    if (id != NONE) {
+        AdvSelectFile(FILE_EBG, id);
+        CdReadFileToAddr(&g_adv_scene_file, g_adv_scene_file.size, EBG_READ);
+    }
+    return id;
+}
 
-/* 97.92%: the original tests the EBG id against "none" a second time after
-   the read and keeps both tests; gcc here proves the second one redundant. */
-#ifdef NON_MATCHING
 void AdvLoadEventBg(void)
 {
     u_short n;
-    u_short id;
+    int id;
+    u_short flag;
 
-    if (g_adv_pack->bg.flag != NONE && FlagSet(g_adv_pack->bg.flag)) {
-        n = g_adv_pack->bg.alt;
+    flag = g_adv_pack->bg.flag;
+    if (flag != NONE && FlagSet(flag)) {
+        flag = g_adv_pack->bg.alt;
     } else {
-        n = g_adv_pack->bg.id;
+        flag = g_adv_pack->bg.id;
     }
-    if (n != NONE) {
-        AdvSelectFile(FILE_EBG, n);
-        CdReadFileToAddr(&g_adv_scene_file, g_adv_scene_file.size, EBG_READ);
+    n = flag;
+    if (n == NONE) {
+        return;
     }
+    n = ReadEventBg(n);
     if (n == NONE) {
         return;
     }
@@ -138,18 +146,36 @@ void AdvLoadEventBg(void)
 
     /* n now counts the archive's members as they are used. */
     n = 0;
-    id = VARIANT(g_adv_pack->tim_180);
+    flag = g_adv_pack->tim_180.flag;
+    if (flag != NONE && FlagSet(flag)) {
+        flag = g_adv_pack->tim_180.alt;
+    } else {
+        flag = g_adv_pack->tim_180.id;
+    }
+    id = flag;
     if (id != NONE) {
         TimQueueAt(MEMBER(EBG_AT, n), 0x180, 0, 0, 0x1E0);
         TimQueueAt(MEMBER(EBG_AT, n), 0x180, 0, 0, 0x1E0);
         n++;
     }
-    id = VARIANT(g_adv_pack->tim_300);
+    flag = g_adv_pack->tim_300.flag;
+    if (flag != NONE && FlagSet(flag)) {
+        flag = g_adv_pack->tim_300.alt;
+    } else {
+        flag = g_adv_pack->tim_300.id;
+    }
+    id = flag;
     if (id != NONE) {
         TimQueueAt(MEMBER(EBG_AT, n), 0x300, 0, 0, 0x1E8);
         n++;
     }
-    id = VARIANT(g_adv_pack->tim_280);
+    flag = g_adv_pack->tim_280.flag;
+    if (flag != NONE && FlagSet(flag)) {
+        flag = g_adv_pack->tim_280.alt;
+    } else {
+        flag = g_adv_pack->tim_280.id;
+    }
+    id = flag;
     if (id != NONE) {
         TimQueueAt(MEMBER(EBG_AT, n), 0x280, 0, 0, 0x1E1);
         n++;
@@ -177,6 +203,3 @@ void AdvLoadEventBg(void)
     }
     DrawSync(0);
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/eventfiles", AdvLoadEventBg);
-#endif

@@ -382,9 +382,11 @@ typedef struct {
     short     first;
     short     count;
     CasinoRGB c;
-    u_char    pad;
+    /* Byte 7 is implicit alignment padding, not an initialized field. */
     short     frames;
 } CasinoFadeArg;
+
+void CasinoFade(int first, int count, u_char r, u_char g, u_char b, short frames);
 
 /* The overlay's own. */
 extern CasinoFadeQueue  g_casino_fades;

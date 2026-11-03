@@ -66,7 +66,8 @@ segments:
       - [0x164, .rodata, common/ui/partyhud]
       - [0x170, pad, adv_pad_170]
       - [0x174, .rodata, common/ui/menumember]
-      - [0x188, rodata, adv_rodata1a]
+      - [0x188, .rodata, game/advmain]
+      - [0x1DC, pad, adv_pad_1dc]
       - [0x1E0, .rodata, audio/silencebgm]
       - [0x1FC, pad, adv_pad_1fc]
       - [0x200, .rodata, game/scenefind]
@@ -74,9 +75,8 @@ segments:
       - [0x224, pad, adv_pad_224]
       - [0x228, .rodata, game/diagstep]
       - [0x2C4, pad, adv_pad_2c4]
+      # The opening animation and result switches, including their padding.
       - [0x2C8, .rodata, game/chestresult]
-      # AdvChestApply is still asm; its table follows the pad word.
-      - [0x2F4, rodata, adv_rodata3b]
       - [0x328, .rodata, game/actorstand]
       - [0x330, rodata, adv_rodata3a]
       - [0x348, .rodata, gfx/imagecells]
@@ -118,15 +118,17 @@ segments:
       - [0xDC0, .rodata, ui/fusesearch]
       - [0xDD8, .rodata, ui/fusion]
       - [0xDEC, rodata, adv_rodata7c]
-      # FuseSpecialMatch's table, and the step tables after it.
-      - [0xEF0, .rodata, ui/facilitymisc]
+      # The fusion rules emit their three switch tables and padding.
+      - [0xE18, .rodata, ui/fuserules]
+      # FuseArcanaStep, FuseSpecialMatch and the following step tables.
+      - [0xED8, .rodata, ui/facilitymisc]
       - [0x10BC, pad, adv_pad_10bc]
       - [0x10C0, .rodata, game/money]
       - [0x113C, rodata, adv_rodata7c2]
       - [0x1304, .rodata, game/actorplace]
       - [0x1348, pad, adv_pad_1348]
       - [0x134C, .rodata, game/stats]
-      - [0x1390, rodata, adv_rodata8]
+      - [0x1390, c, common/gfx/slotrender]
       - [0x1924, c, common/gfx/slot]
       - [0x1C6C, c, common/gfx/fade]
       - [0x1D14, c, gfx/slotfade]

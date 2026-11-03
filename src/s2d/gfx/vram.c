@@ -35,62 +35,33 @@ void TimLoad(u_long *tim)
     }
 }
 
-#ifdef NON_MATCHING
+/* Aggregate initialization preserves the original prologue scheduling. */
 void VramStore(x, y, w, h, p)
 short   x, y, w, h;
 u_long *p;
 {
-    RECT rect;
+    RECT rect = { x, y, w, h };
 
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
     StoreImage(&rect, p);
 }
-#else
-/* The image stores ra after the argument load and before the RECT; cc1
-   schedules it two slots later (see VramClearRect in render.c). */
-INCLUDE_ASM("s2d/nonmatchings/gfx/vram", VramStore);
-#endif
 
-#ifdef NON_MATCHING
 void VramLoad(x, y, w, h, p)
 short   x, y, w, h;
 u_long *p;
 {
-    RECT rect;
+    RECT rect = { x, y, w, h };
 
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
     LoadImage(&rect, p);
 }
-#else
-/* The image stores ra after the argument load and before the RECT; cc1
-   schedules it two slots later (see VramClearRect in render.c). */
-INCLUDE_ASM("s2d/nonmatchings/gfx/vram", VramLoad);
-#endif
 
-#ifdef NON_MATCHING
 void VramMove(x, y, w, h, dx, dy)
 short x, y, w, h;
 int   dx, dy;
 {
-    RECT rect;
+    RECT rect = { x, y, w, h };
 
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
     MoveImage(&rect, dx, dy);
 }
-#else
-/* The image stores ra after the argument load and before the RECT; cc1
-   schedules it two slots later (see VramClearRect in render.c). */
-INCLUDE_ASM("s2d/nonmatchings/gfx/vram", VramMove);
-#endif
 
 /* x to the power n, for n of 1 and up. */
 #ifdef NON_MATCHING

@@ -27,14 +27,8 @@
  * g_btl_talk_outcome being BTL_TALK_JOIN on the way in is a negotiation that
  * has already chosen for everybody, so the stage starts at step 2 with the
  * talk command already picked.
- *
- * 97.88%, and what is left is the delay-slot filler: gcc puts the step's
- * clear after the handler table's load rather than before it, and hoists the
- * table index above the label step 5 jumps back to. The shape, the shared
- * labels and the walk are all the image's - this is a permuter job.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/btlp/actor.h>
 #include <persona/btlp/battle.h>
 #include <persona/btlp/board.h>
@@ -85,17 +79,11 @@ extern void BtlOpenConfigBoard(void);
 extern void BtlCloseConfigBoard(void);
 
 
-/* 99.33%, from 98.89%. The join outcome is a value of its own, set after the
-   entry test the way the talk slot is. The first test still compares
-   against a fresh 3, and the 3 goes into the branch's delay slot. The refusal
-   walk steps its flag pointer in the for. Left: step 5 re-enters at `run:`,
-   and the image sets the step before it scales the choice, where gcc here
-   scales first. The jump table's name follows once the unit owns its
-   .rodata. */
-#ifdef NON_MATCHING
+/* Clear the picker step on both paths into run. The refusal walk keeps a
+   pointer to the flag word and a separate slot index, as in the original. */
 void BtlStageCommand(void)
 {
-    BtlActor  *a;
+    u_int     *flags;
     int      (**entry)(void);
     int        two;
     int        join;
@@ -188,8 +176,8 @@ void BtlStageCommand(void)
                steps 2, 3 and 4 leave through the two labels below it. The
                image jumps to all four; written out in each arm instead, none
                of them is merged back together. */
-        run:
             g_btl_step = 0;
+        run:
             entry = &g_btl_pick_command[choice];
             if (*entry != NULL && (*entry)() != 0) {
                 if (choice == two
@@ -218,18 +206,21 @@ void BtlStageCommand(void)
             /* The record is read by slot and only the flag word is carried
                in a pointer of its own, which is the one saved register the
                image keeps for the walk. */
-            a = g_btl_actors;
-            for (slot = 0; slot < BTL_PARTY; slot++, a++) {
+            slot = 0;
+            flags = &g_btl_actors[0].flags;
+            do {
                 if (g_btl_actors[slot].c.key != 0
                     && (signed char)g_btl_actors[slot].c.status
                            != BTL_STATUS_DOWN
-                    && (a->flags & BTL_ACTOR_OUT) == 0
+                    && (*flags & BTL_ACTOR_OUT) == 0
                     && g_btl_actors[slot].marker == two) {
-                    a->flags |= BTL_ACTOR_REFUSED;
+                    *flags |= BTL_ACTOR_REFUSED;
                     g_btl_actors[slot].obj->motion = MOTION_REFUSED;
                     BtlShowMarker(slot, 1, MARKER_REFUSED);
                 }
-            }
+                flags = (u_int *)((char *)flags + sizeof(BtlActor));
+                slot++;
+            } while (slot < BTL_PARTY);
             g_btl_step++;
             break;
 
@@ -285,6 +276,7 @@ void BtlStageCommand(void)
                 break;
             }
             if (BtlMarkersIdle()) {
+                g_btl_step = 0;
                 goto run;
             }
             break;
@@ -292,6 +284,3 @@ void BtlStageCommand(void)
         BtlDrawFrame();
     }
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/commandstage", BtlStageCommand);
-#endif

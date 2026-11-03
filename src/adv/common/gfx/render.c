@@ -8,7 +8,4 @@
 /* ADV's RenderFrame leaves FrameHook out; its own frame calls it. */
 #define RENDER_NO_HOOK
 
-/* VramClearRect is still asm (see the note there). */
-#define RENDER_ASM_VRAMCLEARRECT     INCLUDE_ASM("adv/nonmatchings/common/gfx/render", VramClearRect)
-
 #include "../../../common/gfx/render.c"

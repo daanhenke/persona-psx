@@ -62,20 +62,10 @@ extern u_char g_flicker_ramp[];
 extern GsOT   g_ot[];
 extern volatile int g_ot_index;
 
-/* 99.65%: one instruction sits in the wrong place. In the unscaled branch
-   the image keeps `cell = b + 8` after the eight loads (so sched2 later fills
-   the spilled `my` store's load delay with it); here sched1 prefers the loads
-   (a function-unit "potential hazard"), hoists the add to the top of the
-   block, and the spill store of `my` falls outside it. No order, spelling or
-   type of the branch's statements changed that.
-
-   What got it this far: the frame holds an unused 160-byte array; `x`/`y`
-   are the offset plus the slot position in variables of their own; the
-   sprite is indexed afresh at every store (`g_sprites[n].f`), rotate stored
-   before r/g/b and `n++` after the sort, so loop.c bases the reduced giv on
-   `.r`; the columns count down at the top of the loop; and `fade` is a local
-   declared after `z`, which puts the spill slots in the image's order. */
-#ifdef NON_MATCHING
+/* The unused array preserves the original stack layout. In the unscaled
+   branch, advance the existing block pointer before taking the cells. GCC
+   2.6 then schedules that advance in the original load-delay slot. The next
+   entry assigns b again before using it. */
 void SlotsRenderAll(void)
 {
     u_char    unused[160];
@@ -206,7 +196,7 @@ void SlotsRenderAll(void)
                 sy = s->scale_y;
                 mx = s->mx;
                 my = s->my;
-                cell = (CelCell *)((u_char *)b + 8);
+                cell = (CelCell *)++b;
             }
             x = ox + (s->x + s->unk18);
             y = oy + (s->y + s->unk1A);
@@ -243,4 +233,3 @@ void SlotsRenderAll(void)
         } while ((int)e->block != -1);
     }
 }
-#endif

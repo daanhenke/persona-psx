@@ -9,7 +9,6 @@
  * both at full brightness. The party leader's record is emptied in between.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <persona/adv/actor.h>
 #include <persona/adv/scene.h>
 #include <persona/common/eventflag.h>
@@ -21,22 +20,33 @@
 #define FULL_BRIGHT 0x80
 #define FLAG_MASK   0x1FF
 
-#define FLAG_SET(id)                                                           \
-    ((u_char)(g_event_flags[(short)((id) & FLAG_MASK) / 8] & (1 << ((id) & 7))))
+/* Passing the flag value through this inline helper preserves the original
+ * table-base calculation before indexing its byte. */
+static inline int ActorDefinitionFlagSet(u_short id)
+{
+    u_char *flags = g_event_flags;
+    return flags[(short)(id & FLAG_MASK) / 8] & (1 << (id & 7));
+}
 
-/* 81.84%: the image loads each form's shadow as a halfword before storing
-   its low byte, where gcc narrows the load to a byte, and the stores around
-   it schedule differently as a result. */
-#ifdef NON_MATCHING
+/* Load shadow before clearing phase to retain the halfword read. Keep each
+ * lift temporary scoped to its stores: gcc 2.6 otherwise shares its register
+ * across the prop, mark and spot loops. */
 void AdvBuildActors(void)
 {
+    u_char room;
+    u_int attrs;
     AdvActorDef *d;
-    AdvPropDef  *p;
-    u_char       i;
+    AdvPropDef *p;
+    u_char i;
+    int shadow;
+    int bright;
+    AdvMarkDef *mark;
+    AdvSpotDef *spot;
 
+    room = g_adv_room;
     for (i = 0; i < ROOM_ACTORS; i++) {
-        d = &g_room_actor_defs[g_adv_room][i];
-        if (d->flag != 0xFFFF && FLAG_SET(d->flag)) {
+        d = &g_room_actor_defs[room][i];
+        if (d->flag != 0xFFFF && ActorDefinitionFlagSet(d->flag)) {
             g_adv_actors[i].script = d->form[1].script;
             g_adv_actors[i].x = d->form[1].x;
             g_adv_actors[i].y = d->form[1].y;
@@ -44,43 +54,50 @@ void AdvBuildActors(void)
             g_adv_actors[i].home_y = d->form[1].y;
             g_adv_actors[i].dir = d->form[1].u.b.dir & 3;
             g_adv_actors[i].next_dir = d->form[1].u.b.dir & 3;
+            shadow = d->form[1].u.b.shadow;
             g_adv_actors[i].phase = 0;
-            g_adv_actors[i].shadow = d->form[1].u.b.shadow;
-            g_adv_actors[i].slope = 0;
+            g_adv_actors[i].shadow = shadow;
             g_adv_actors[i].kind = d->form[1].kind;
+            g_adv_actors[i].slope = 0;
             g_adv_actors[i].lift = d->form[1].lift;
             g_adv_actors[i].bright = d->form[1].bright;
+            attrs = d->form[1].u.flags;
             g_adv_actors[i].move = MOVE_NONE;
-            g_adv_actors[i].flags = d->form[1].u.flags & 0xFFF0;
+            g_adv_actors[i].flags = attrs & 0xFFF0;
         } else {
             g_adv_actors[i].script = d->form[0].script;
             g_adv_actors[i].x = d->form[0].x;
             g_adv_actors[i].y = d->form[0].y;
             g_adv_actors[i].dir = d->form[0].u.b.dir & 3;
             g_adv_actors[i].next_dir = d->form[0].u.b.dir & 3;
+            shadow = d->form[0].u.b.shadow;
             g_adv_actors[i].phase = 0;
-            g_adv_actors[i].shadow = d->form[0].u.b.shadow;
-            g_adv_actors[i].slope = 0;
+            g_adv_actors[i].shadow = shadow;
             g_adv_actors[i].kind = d->form[0].kind;
+            g_adv_actors[i].slope = 0;
             g_adv_actors[i].lift = d->form[0].lift;
             g_adv_actors[i].bright = d->form[0].bright;
+            attrs = d->form[0].u.flags;
             g_adv_actors[i].move = MOVE_NONE;
-            g_adv_actors[i].flags = d->form[0].u.flags & 0xFFF0;
+            g_adv_actors[i].flags = attrs & 0xFFF0;
         }
     }
-
     for (i = 0; i < ROOM_ACTORS; i++) {
         p = &g_prop_defs[i];
-        if (p->flag != 0xFFFF && FLAG_SET(p->flag)) {
+        if (p->flag != 0xFFFF && ActorDefinitionFlagSet(p->flag)) {
             g_adv_actors[PROP_ACTOR + i].script = g_prop_defs[i].form[1].script;
             g_adv_actors[PROP_ACTOR + i].x = g_prop_defs[i].form[1].x;
             g_adv_actors[PROP_ACTOR + i].y = g_prop_defs[i].form[1].y;
             g_adv_actors[PROP_ACTOR + i].unk23 = g_prop_defs[i].form[1].unk23;
             g_adv_actors[PROP_ACTOR + i].kind = g_prop_defs[i].form[1].kind;
-            g_adv_actors[PROP_ACTOR + i].face_moves = 0;
-            g_adv_actors[PROP_ACTOR + i].lift = g_prop_defs[i].form[1].lift;
+            {
+                int lift = g_prop_defs[i].form[1].lift;
+                g_adv_actors[PROP_ACTOR + i].face_moves = 0;
+                g_adv_actors[PROP_ACTOR + i].lift = lift;
+            }
+            bright = g_prop_defs[i].form[1].bright;
             g_adv_actors[PROP_ACTOR + i].move = MOVE_NONE;
-            g_adv_actors[PROP_ACTOR + i].bright = g_prop_defs[i].form[1].bright;
+            g_adv_actors[PROP_ACTOR + i].bright = bright;
             g_adv_actors[PROP_ACTOR + i].flags =
                 g_prop_defs[i].form[1].unk23 & 0xFFF0;
         } else {
@@ -89,21 +106,27 @@ void AdvBuildActors(void)
             g_adv_actors[PROP_ACTOR + i].y = p->form[0].y;
             g_adv_actors[PROP_ACTOR + i].unk23 = p->form[0].unk23;
             g_adv_actors[PROP_ACTOR + i].kind = p->form[0].kind;
-            g_adv_actors[PROP_ACTOR + i].face_moves = 0;
-            g_adv_actors[PROP_ACTOR + i].lift = p->form[0].lift;
+            {
+                int lift = p->form[0].lift;
+                g_adv_actors[PROP_ACTOR + i].face_moves = 0;
+                g_adv_actors[PROP_ACTOR + i].lift = lift;
+            }
+            bright = p->form[0].bright;
             g_adv_actors[PROP_ACTOR + i].move = MOVE_NONE;
-            g_adv_actors[PROP_ACTOR + i].bright = p->form[0].bright;
+            g_adv_actors[PROP_ACTOR + i].bright = bright;
             g_adv_actors[PROP_ACTOR + i].flags = p->form[0].unk23 & 0xFFF0;
         }
     }
-
     for (i = 0; i < ROOM_ACTORS; i++) {
-        g_adv_actors[MARK_ACTOR + i].x = g_mark_defs[i].x;
+        mark = &g_mark_defs[i];
+        g_adv_actors[MARK_ACTOR + i].x = mark->x;
         g_adv_actors[MARK_ACTOR + i].y = g_mark_defs[i].y;
-        g_adv_actors[MARK_ACTOR + i].bright = FULL_BRIGHT;
-        g_adv_actors[MARK_ACTOR + i].lift = g_mark_defs[i].lift;
+        {
+            int lift = g_mark_defs[i].lift;
+            g_adv_actors[MARK_ACTOR + i].bright = FULL_BRIGHT;
+            g_adv_actors[MARK_ACTOR + i].lift = lift;
+        }
     }
-
     g_adv_actors[LEADER].script = -1;
     g_adv_actors[LEADER].x = 0;
     g_adv_actors[LEADER].y = 0;
@@ -113,13 +136,14 @@ void AdvBuildActors(void)
     g_adv_actors[LEADER].bright = FULL_BRIGHT;
     g_adv_actors[LEADER].move = MOVE_NONE;
     for (i = 0; i < ROOM_ACTORS; i++) {
-        g_adv_actors[SPOT_ACTOR + i].x = g_spot_defs[i].x;
+        spot = &g_spot_defs[i];
+        g_adv_actors[SPOT_ACTOR + i].x = spot->x;
         g_adv_actors[SPOT_ACTOR + i].y = g_spot_defs[i].y;
         g_adv_actors[SPOT_ACTOR + i].dir = g_spot_defs[i].dir;
-        g_adv_actors[SPOT_ACTOR + i].bright = FULL_BRIGHT;
-        g_adv_actors[SPOT_ACTOR + i].lift = g_spot_defs[i].lift;
+        {
+            int lift = g_spot_defs[i].lift;
+            g_adv_actors[SPOT_ACTOR + i].bright = FULL_BRIGHT;
+            g_adv_actors[SPOT_ACTOR + i].lift = lift;
+        }
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/actorsbuild", AdvBuildActors);
-#endif

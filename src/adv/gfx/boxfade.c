@@ -32,26 +32,13 @@ extern int   g_ot_index;
 extern void AdvRunFrame(void);
 extern void AdvRenderCharFrame(short extra);
 
-/* 90.96% and 88.23%: identical code, but two saved registers trade places in
-   the first, and the second's prologue narrows its parameters in another
-   order. */
-#ifdef NON_MATCHING
 /* Darkens from `from` down past `to`. */
 void AdvBoxFadeDown(short step, short from, short to, short x, u_short y,
                     short char_frame)
 {
-    GsBOXF box;
-    short  level;
+    short level = from;
+    GsBOXF box = { BOX_ATTR, x, y, BOX_W, BOX_H, 0, 0, 0 };
 
-    box.attribute = BOX_ATTR;
-    box.x = x;
-    box.y = y;
-    box.w = BOX_W;
-    box.h = BOX_H;
-    box.r = 0;
-    box.g = 0;
-    box.b = 0;
-    level = from;
     do {
         box.r = box.g = box.b = level;
         GsSortBoxFill(&box, &g_ot[g_ot_index], BOX_PRI);
@@ -65,14 +52,21 @@ void AdvBoxFadeDown(short step, short from, short to, short x, u_short y,
 
     box.r = box.g = box.b = to;
     GsSortBoxFill(&box, &g_ot[g_ot_index], BOX_PRI);
+    /* Both terminal character paths render the same frame. GCC 2.6 folds
+       this distinction after allocating the endpoint and frame-mode values;
+       combining the paths earlier changes the matching saved registers. */
     if (char_frame == 0) {
         AdvRunFrame();
+    } else if (to) {
+        AdvRenderCharFrame(0);
     } else {
         AdvRenderCharFrame(0);
     }
 }
 
-/* The same upwards. */
+/* The same upwards. Still nonmatching: parameter narrowing and register
+   allocation differ in the C draft. */
+#ifdef NON_MATCHING
 void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
                   short char_frame)
 {
@@ -112,6 +106,5 @@ void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
     }
 }
 #else
-INCLUDE_ASM("adv/nonmatchings/gfx/boxfade", AdvBoxFadeDown);
 INCLUDE_ASM("adv/nonmatchings/gfx/boxfade", AdvBoxFadeUp);
 #endif

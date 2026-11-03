@@ -30,6 +30,7 @@
 #include <persona/adv/scene.h>
 #include <persona/adv/room.h>
 #include <persona/common/bg.h>
+#define SLOT_INIT_INTXY
 #include <persona/common/slot.h>
 #include <persona/common/imageanim.h>
 
@@ -48,7 +49,12 @@
 
 /* Five arguments the scene sets up for the cutscene: the face and two
    pictures to read, whether to show the extra sprite, whether to talk. */
-extern u_short g_event_args[5];
+#define g_event_args ((u_short *)0x801F1BA0)
+
+extern const GsBOXF D_80064A2C;
+extern const char str_adv_tynchr[];
+extern const char str_adv_tyn01[];
+extern const char str_adv_advchr[];
 
 extern SVECTOR g_char_rot[2];
 extern SVECTOR g_quad_verts[4];
@@ -78,10 +84,10 @@ extern void AdvRenderCharFrame(short extra);
 extern void AdvRunFrame(void);
 extern void AdvFadeUpBlocking(short step, short limit);
 extern void AdvFadeDownBlocking(short step, short floor);
-extern void AdvBoxFadeUp(short step, short from, short to, short x, u_short y,
+extern void AdvBoxFadeUp(short step, short from, short to, short x, int y,
                          short char_frame);
 extern void AdvBoxFadeDown(short step, short from, short to, short x,
-                           u_short y, short char_frame);
+                           int y, short char_frame);
 extern void AdvUnpack(u_char *src, u_char *dst, u_int size);
 extern void AdvLoadBgm();
 extern void AdvLoadEventBg(void);
@@ -130,13 +136,26 @@ extern void AdvPlaceActors(void);
     while (g_cd_busy != -1) {                                                  \
     }
 
-#ifdef NON_MATCHING
+/* Narrow the computed position before the next trig call. The slot API in
+ * this unit receives the sign-extended coordinate as a full word. */
+static inline int SparkCoordinate50(int value, int offset)
+{
+    short coordinate = value / 50 + (short)((rand() & 0xF) + offset);
+    return coordinate;
+}
+
+static inline int SparkCoordinate30(int value, int offset)
+{
+    short coordinate = value / 30 + (short)((rand() & 0xF) + offset);
+    return coordinate;
+}
+
 void AdvTynCutscene(void)
 {
-    GsBOXF box = { 0x40000000, -0x7C, 0x28, 0xF8, 0x38, 0x20, 0x20, 0x20 };
+    GsBOXF box = D_80064A2C;
     int    i;
     int    k;
-    u_short x;
+    int    x;
     short  y;
     int    n;
     int    vol;
@@ -156,7 +175,7 @@ void AdvTynCutscene(void)
     ImageAnimStopAll();
     AdvRunFrame();
 
-    LoadFileToAddrAsync("\\ADV\\TYNCHR.BIN;1", TYN_AT);
+    LoadFileToAddrAsync(str_adv_tynchr, TYN_AT);
     WAIT_CD();
     SsSetNck(g_seq_handle[0]);
     g_seq_handle[0] = SsSeqOpen(MEMBER(SCENE_AT, 0), g_vab_id[0]);
@@ -191,8 +210,7 @@ void AdvTynCutscene(void)
     AdvRunFrame();
 
     GsInit3D();
-    g_ot[1].length = 11;
-    g_ot[0].length = 11;
+    g_ot[0].length = g_ot[1].length = 11;
     g_ot[0].org = (GsOT_TAG *)0x800D6000;
     g_ot[1].org = (GsOT_TAG *)0x800D9000;
     g_ot_index = GsGetActiveBuff();
@@ -206,7 +224,7 @@ void AdvTynCutscene(void)
     TynSetView();
     TynInitPolys();
     TynInitDivide();
-    LoadFileToAddrAsync("\\ADV\\TYN01.BIN;1", TYN_AT);
+    LoadFileToAddrAsync(str_adv_tyn01, TYN_AT);
 
     SlotInitTagged(g_tyn_face_def, 2, 0x3FE, -0xA0, -0x78);
     SlotInit(PACK_SPRITE(0xEC), 0, 0x3FF, -0xA0, -0x78);
@@ -294,10 +312,12 @@ void AdvTynCutscene(void)
     AdvRenderCharFrame(0);
     PLAY(4, 4);
     SlotInit(PACK_SPRITE(0xB0), 0x12, 2, 0, 0);
-    top = 10;
+    i = 0;
     steps = 0x60;
-    for (i = 0; i < 0x60; i++) {
-        SlotSetPos(0x12, 0x80, 0x28, top - (steps - i) * 2);
+    top = 10;
+    for (; i < 0x60; i++) {
+        n = steps - i;
+        SlotSetPos(0x12, 0x80, 0x28, top - n * 2);
         AdvRenderCharFrame(0);
     }
     AdvRenderCharFrame(0);
@@ -357,12 +377,12 @@ void AdvTynCutscene(void)
     for (i = 0; i < 0x60; i++) {
         if (i % 3 == 0) {
             k = i / 3;
-            x = rsin(g_effect_tick * 108) / 50 + ((rand() & 0xF) + 8);
-            y = rcos(g_effect_tick * 108) / 50 + ((rand() & 0xF) + 0x18);
+            x = SparkCoordinate50(rsin(g_effect_tick * 108), 8);
+            y = SparkCoordinate50(rcos(g_effect_tick * 108), 24);
             SlotInit(PACK_SPRITE(0xC0), (k & 7) | 0x20, 1, x, y);
             SlotSetSemiTrans((k & 7) | 0x20, 1);
-            x = rsin(g_effect_tick * 208) / 30 + ((rand() & 0xF) + 8);
-            y = rcos(g_effect_tick * 208) / 30 + ((rand() & 0xF) + 0x18);
+            x = SparkCoordinate30(rsin(g_effect_tick * 208), 8);
+            y = SparkCoordinate30(rcos(g_effect_tick * 208), 24);
             SlotInit(PACK_SPRITE(0xC0), (k & 7) | 0x28, 1, x, y);
             SlotSetSemiTrans((k & 7) | 0x28, 1);
         }
@@ -424,7 +444,8 @@ void AdvTynCutscene(void)
     SlotClear(0x12);
 
     /* The second message names a character. */
-    g_tyn_msg2[0xE] = g_tyn_msg2[0x13] = g_event_args[0];
+    g_tyn_msg2[0xE] = g_event_args[0];
+    g_tyn_msg2[0x13] = g_tyn_msg2[0xE];
     BgMapInit(g_tyn_msg2, 0);
     n = 0x60;
     i = (short)g_bg_layer_otz[4];
@@ -479,7 +500,7 @@ void AdvTynCutscene(void)
     AdvLoadBgm(0x3A);
     GsInitGraph(0x140, 0xF0, 0x100, 0, 0);
     g_bg_shown = 1;
-    LoadFileToAddr("\\ADV\\ADVCHR.BIN;1", (void *)0x80180000);
+    LoadFileToAddr(str_adv_advchr, (void *)0x80180000);
     AdvUnpack((u_char *)0x80180000, (u_char *)SCENE_AT, -1);
     TimQueueAt(MEMBER(SCENE_AT, 3), 0x394, 0x60, 0, 0x1E4);
     TimQueueAt(MEMBER(SCENE_AT, 2), 0x388, 8, 0, 0x1E4);
@@ -504,6 +525,3 @@ void AdvTynCutscene(void)
     SlotsApplyXScale();
     AdvScriptSpecial(0x85);
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/tyncut", AdvTynCutscene);
-#endif

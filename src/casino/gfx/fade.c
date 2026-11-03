@@ -15,25 +15,13 @@
 
 void CasinoAddFade(CasinoFadeArg a);
 
-#ifdef NON_MATCHING
-void CasinoFade(short first, short count, u_char r, u_char g, u_char b, short frames)
+/* Aggregate initialization preserves the original argument packing. */
+void CasinoFade(int first, int count, u_char r, u_char g, u_char b, short frames)
 {
-    CasinoFadeArg a;
+    CasinoFadeArg a = { first, count, { r, g, b }, frames };
 
-    a.first = first;
-    a.count = count;
-    a.c.r = r;
-    a.c.g = g;
-    a.c.b = b;
-    a.frames = frames;
     CasinoAddFade(a);
 }
-#else
-/* 65.70%: the same instructions in another order - the image keeps `sw ra`
-   and the request's stores ahead of the parameter loads, as in
-   CasinoStartAnim. */
-INCLUDE_ASM("casino/nonmatchings/gfx/fade", CasinoFade);
-#endif
 
 void CasinoAddFade(CasinoFadeArg a)
 {

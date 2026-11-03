@@ -107,12 +107,8 @@ void BtlPlaceFallen(void)
     } while (j < PLACE_GRID_OUT);
 }
 
-/* 85.95%: the image steps down and right without a branch - the next row is
-   masked with the negated test, the flag gcc makes for "keep it or clear it" -
-   where gcc here branches round a clear however the step is written: as a
-   ternary, as an if on a short local, or as the mask itself. It also loads the
-   record's flags before it clears the ailment, and gcc here after. */
-#ifdef NON_MATCHING
+/* Test the sign of the low halfword while retaining the stepped coordinate
+   for both stores. This preserves the original wrap and register lifetimes. */
 int BtlPlaceFallenStep(void)
 {
     int next;
@@ -125,11 +121,15 @@ int BtlPlaceFallenStep(void)
         BtlSePlay(1, 0);
     }
     if (keys & PAD_UP) {
-        next = (unsigned short)g_btl_place_row - 1;
-        g_btl_place_row = next;
-        if ((short)next < 0) {
-            next = GRID_H - 1;
-            g_btl_place_row = next;
+        {
+            int value = (u_short)g_btl_place_row - 1;
+            int coordinate = value;
+            value = (u_int)value << 16;
+            g_btl_place_row = coordinate;
+            if (value < 0) {
+                coordinate = GRID_H - 1;
+                g_btl_place_row = coordinate;
+            }
         }
     }
     if (keys & PAD_DOWN) {
@@ -139,11 +139,15 @@ int BtlPlaceFallenStep(void)
         g_btl_place_row = next;
     }
     if (keys & PAD_LEFT) {
-        next = (unsigned short)g_btl_place_col - 1;
-        g_btl_place_col = next;
-        if ((short)next < 0) {
-            next = GRID_W - 1;
-            g_btl_place_col = next;
+        {
+            int value = (u_short)g_btl_place_col - 1;
+            int coordinate = value;
+            value = (u_int)value << 16;
+            g_btl_place_col = coordinate;
+            if (value < 0) {
+                coordinate = GRID_W - 1;
+                g_btl_place_col = coordinate;
+            }
         }
     }
     if (keys & PAD_RIGHT) {
@@ -185,6 +189,3 @@ int BtlPlaceFallenStep(void)
     }
     return BTL_PICK_WAIT;
 }
-#else
-INCLUDE_ASM("btlp/nonmatchings/placefallen", BtlPlaceFallenStep);
-#endif

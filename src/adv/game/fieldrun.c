@@ -13,7 +13,6 @@
  * for the tile, with a stock answer when there is none.
  */
 #include <decomp/types.h>
-#include <decomp/include_asm.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
@@ -109,7 +108,8 @@ extern u_char SceneFindEntry(const AdvActor *a);
 extern u_char SceneFindApproach(u_char x, u_char y, u_char dirs, u_char kind);
 extern void   SceneDrawEntryLabel(void);
 extern void   AdvExitPlaceLeader(u_char n);
-extern void   SceneApplyEntry(u_char entry);
+/* This call site uses default argument promotion for its short index. */
+extern void   SceneApplyEntry();
 extern void   SceneLeaderArrive();
 extern int    AdvRunScript(u_char *s);
 extern void   AdvSceneFadeOut();
@@ -131,22 +131,13 @@ extern void   AdvChestShowItem(u_char actor);
 extern void   AdvChestShowMoney(u_char actor);
 extern void   AdvChestShowEmpty(u_char actor);
 
-/* 99.46%: every instruction is the image's but three register choices.
-   The image compares a copy of `e` against 0xFF where this compares `e`
-   itself, and it gives `who` s1 and the actors' base s2 where this build
-   swaps them (the chest's index copy follows). Tried: int/short/u_char for
-   e and who in every pairing, assignments inside the tests and indexes,
-   u_char re-casts, unprototyped callees, separate talk and chest indexes,
-   declaration orders. The tile halfwords must be struct members (not
-   casted constants), or the addresses go into registers at expand time. */
-#ifdef NON_MATCHING
 void AdvFieldRun(void)
 {
-    u_char    n;
-    int       e;
+    short     e;
     short     who;
     u_char   *script;
     AdvActor *a;
+    AdvActor *mark;
     short     i;
     int       unused[2];
 
@@ -186,14 +177,14 @@ void AdvFieldRun(void)
         g_walk_hold = WALK_HOLD;
     } else {
         L.slope = 0;
-        n = SceneFindStep(L.x, L.y);
-        if (n != TRIGGER_NONE && L.kind != LEADER_STANDS) {
-            script = (u_char *)g_adv_scene->steps[n].script;
+        who = SceneFindStep(L.x, L.y);
+        if (who != TRIGGER_NONE && L.kind != LEADER_STANDS) {
+            script = (u_char *)g_adv_scene->steps[who].script;
             goto run;
         }
-        n = SceneFindTrigger(L.x, L.y);
-        if (n != TRIGGER_NONE && L.kind != LEADER_STANDS) {
-            script = (u_char *)g_adv_scene->triggers[n].script;
+        who = SceneFindTrigger(L.x, L.y);
+        if (who != TRIGGER_NONE && L.kind != LEADER_STANDS) {
+            script = (u_char *)g_adv_scene->triggers[who].script;
         run:
             if (script != SCRIPT_NONE) {
                 g_script_leave = AdvRunScript(script);
@@ -322,20 +313,20 @@ moved:
                 break;
             case 16 ... 23:
                 ActorStepToward(0, L.dir);
-                a = &g_adv_actors[ActorFindAt(L.next_x, L.next_y)];
-                if ((int)a->script == -1) goto approach;
+                mark = &g_adv_actors[ActorFindAt(L.next_x, L.next_y)];
+                if ((int)mark->script == -1) goto approach;
                 ActorsSetDepth(0, 0xF);
                 ActorsPlaceSprites();
                 SlotsApplyXScale();
-                script = (u_char *)a->script;
+                script = (u_char *)mark->script;
                 goto run2;
             case ACTOR_NA:
             approach:
                 ActorStepToward(0, L.dir);
-                n = SceneFindApproach(L.next_x, L.next_y, g_trigger_dirs[L.dir],
+                who = SceneFindApproach(L.next_x, L.next_y, g_trigger_dirs[L.dir],
                                       L.lift);
-                if (n != TRIGGER_NONE) {
-                    script = (u_char *)g_adv_scene->approaches[n].script;
+                if (who != TRIGGER_NONE) {
+                    script = (u_char *)g_adv_scene->approaches[who].script;
                 } else {
                     script = g_nothing_script;
                 }
@@ -351,6 +342,3 @@ moved:
 }
 
 #undef L
-#else
-INCLUDE_ASM("adv/nonmatchings/game/fieldrun", AdvFieldRun);
-#endif

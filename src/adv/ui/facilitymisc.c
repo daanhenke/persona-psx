@@ -213,7 +213,6 @@ extern void func_80077F8C(int a, int b);
 extern void func_8007A62C(int a, int b);
 extern int  MsgStep(void);
 
-#ifdef NON_MATCHING
 /* Works out what Personas a and b fuse into: the arcana from the chart
    (or the one given), the Persona of that arcana for their average level,
    and with an item offered (mode), whether the item changes it. */
@@ -223,7 +222,6 @@ void FuseCompute(u_char a, u_char b, short mode, FuseResult *out, short arcana)
     int   ar_b;
     int   level;
     int   r;
-    int   t;
 
     ar_a = g_persona_data[a].arcana - 1;
     ar_b = g_persona_data[b].arcana - 1;
@@ -266,21 +264,21 @@ void FuseCompute(u_char a, u_char b, short mode, FuseResult *out, short arcana)
         if (g_fuse_bonus_spell && FuseSpellAllowed(out->persona, g_fuse_bonus_spell)) {
             out->flag = 1;
         }
-        t = FuseArcanaStep(out->arcana, out->persona, g_fuse_bonus_step);
-        if (t != r) {
+        /* Reuse the first arcana local for the stepped result to preserve
+         * gcc 2.6 register lifetimes across the earlier table lookups. */
+        ar_a = FuseArcanaStep(out->arcana, out->persona, g_fuse_bonus_step);
+        if (ar_a != r) {
             out->flag = 1;
-            out->persona = t;
+            out->persona = ar_a;
         }
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", FuseCompute);
-#endif
 
-#ifdef NON_MATCHING
 /* Steps through an arcana's Personas in the fusion tables: dir 1 and 2
    go down one or two, 3 and 4 up, never past either end, and a special
-   Persona is stepped over rather than landed on. */
+   Persona is stepped over rather than landed on. Reuse the boundary local
+   for the one-step candidate; the upward two-step path keeps its boundary
+   return outside the work block, as in the original compiler's layout. */
 short FuseArcanaStep(short arcana, short cur, short dir)
 {
     int n;
@@ -294,16 +292,18 @@ short FuseArcanaStep(short arcana, short cur, short dir)
         if (cur == n) {
             return n;
         }
-        if (FuseSpecialHas(cur - 1)) {
+        n = (short)(cur - 1);
+        if (!FuseSpecialHas(n)) {
+            return n;
+        } else {
             return cur;
         }
-        return cur - 1;
     case 2:
         n = g_arcana_personas[arcana * 2];
-        r = cur;
         if (cur == n) {
             return n;
         }
+        r = cur;
         if (!FuseSpecialHas(cur - 1)) {
             r--;
         }
@@ -319,31 +319,30 @@ short FuseArcanaStep(short arcana, short cur, short dir)
         if (cur == n) {
             return n;
         }
-        if (FuseSpecialHas(cur + 1)) {
+        n = (short)(cur + 1);
+        if (!FuseSpecialHas(n)) {
+            return n;
+        } else {
             return cur;
         }
-        return cur + 1;
     case 4:
         n = g_arcana_personas[arcana * 2] + g_arcana_personas[1 + arcana * 2] - 1;
-        r = cur;
-        if (cur == n) {
-            return n;
-        }
-        if (!FuseSpecialHas(cur + 1)) {
-            r++;
-        }
-        if (cur + 1 == n) {
+        if (cur != n) {
+            r = cur;
+            if (!FuseSpecialHas(cur + 1)) {
+                r++;
+            }
+            if (cur + 1 == n) {
+                return r;
+            }
+            if (!FuseSpecialHas(cur + 2)) {
+                r = cur + 2;
+            }
             return r;
         }
-        if (!FuseSpecialHas(cur + 2)) {
-            r = cur + 2;
-        }
-        return r;
+        return n;
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", FuseArcanaStep);
-#endif
 
 /* Whether a Persona's definition lists `spell` among its first six. */
 u_char PersonaDefHasSpell(short persona, short spell)
@@ -1413,24 +1412,18 @@ void PersonaSlotsDrawFor(short slot)
     }
 }
 
-#ifdef NON_MATCHING
 /* Whether a character may take a Persona: it must answer them at all, and
    they must be at its level. */
-/* 96.14%: the image keeps v0 free and puts the Persona offset in a1;
-   this build uses v0 and a0 for the same values. */
 short CharCanUsePersona(short chr, short persona)
 {
     Char *c;
 
     c = &g_chars[chr];
     if ((g_persona_defs[persona].bond >> ((c->key - 1) * 2)) & 3) {
-        return g_persona_defs[persona].level <= c->unk56;
+        if (g_persona_defs[persona].level <= c->unk56) return 1;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", CharCanUsePersona);
-#endif
 
 void ShopStep2(void)
 {
@@ -1550,7 +1543,6 @@ void CoinShopCountStep(void)
     }
 }
 
-#ifdef NON_MATCHING
 /* Lays out the coin counter: eight rows of stock with their prices in
    coins, the count window, and the coins left. */
 void CoinShopOpen(void)
@@ -1577,7 +1569,15 @@ void CoinShopOpen(void)
 
         cell = 0x37F;
         for (i = 15; i >= 0; i--) {
-            *AT(g_tilemap1, i, 12) = cell;
+            short *dst = AT(g_tilemap1, i, 12);
+
+            /* Keep both equivalent writes: GCC 2.6 folds the branch, but its
+               index use preserves the original loop register allocation. */
+            if (i) {
+                *dst = cell;
+            } else {
+                *dst = cell;
+            }
         }
     }
     TileMapFillRect(AT(g_tilemap0, 2, 13), 0x17, 2, 8, MAP_W);
@@ -1631,9 +1631,6 @@ void CoinShopOpen(void)
     ShopBuyListDraw2();
     g_map_scroll_y = g_item_top * 12;
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/ui/facilitymisc", CoinShopOpen);
-#endif
 
 /* Keeps the message running until any button is pressed. The coin
    exchange has it expanded. */

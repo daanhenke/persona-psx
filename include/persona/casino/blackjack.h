@@ -67,4 +67,10 @@ extern CasinoLayoutDef D_8009BA64[];
 extern CasinoObj       D_8009B7B0[];
 extern CasinoModel     D_8009B7C0;
 
+/* Dealer substate dispatcher. The caller passes its play-state byte; the
+   original routine ignores that argument and reads its own substate. */
+void func_8007D3CC(u_char *play_step);
+void func_8007ADD8(void);
+void func_8007F668(u_char mode);
+
 #endif

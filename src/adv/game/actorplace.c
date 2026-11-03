@@ -48,16 +48,12 @@ extern u_short g_view_shake;
 
 #define A g_adv_actors[a]
 
-/* 99.98%: the byte store of the slot tag reads the halfword copy (v1) where
-   the original stores `a` itself (s3). Storing the two tags separately
-   stores `a` but costs a re-masked index after the halfword store, the same
-   residual ActorsMoveStep has. The unused `t` is what gets the slot offset
-   worked out at the top, as the original does, without sharing the slot
-   base: it stands in for whatever the original computed there. */
-#ifdef NON_MATCHING
+/* Compute the shadow slot up front, as in the original. The final word-sized
+   index keeps the actor lookup live across the palette and tag stores. */
 void ActorPlace(u_char a)
 {
     u_char kind;
+    unsigned int index;
     Slot  *t = &g_slots[a + SHADOW_SLOT];
 
     if (A.kind != KIND_NONE) {
@@ -87,16 +83,16 @@ void ActorPlace(u_char a)
                 g_slot_cur->attr |= SLOT_ATTR_XSCALE;
             }
         }
-        g_slot_cur = &g_slots[a];
-        g_slot_cur->tpage_add = g_slot_cur->clut_y = a;
-        SlotSetBrightness(a, A.bright - ((A.bright >> 4) << 3) * g_actor_dim);
+        index = a;
+        g_slot_cur = &g_slots[index];
+        g_slot_cur->clut_y = a;
+        g_slot_cur->tpage_add = a;
+        SlotSetBrightness(index, g_adv_actors[index].bright
+            - ((g_adv_actors[index].bright >> 4) << 3) * g_actor_dim);
     } else {
         A.id = ACTOR_NONE;
     }
 }
-#else
-INCLUDE_ASM("adv/nonmatchings/game/actorplace", ActorPlace);
-#endif
 
 void AdvScreenEffect(u_char n)
 {

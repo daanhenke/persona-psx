@@ -24,7 +24,6 @@
 extern void CasinoGame2LoadVram0(void);
 extern void CasinoGame2LoadVram1(void);
 extern void CasinoGame2LoadSound(void);
-extern void CasinoFade(short first, short count, u_char r, u_char g, u_char b, short frames);
 extern void CasinoStartPalAnim(CasinoPalAnim *a);
 extern void CasinoSpritesSetOn(); /* (short first, short n, int on) */
 extern void CasinoTween();        /* (CasinoLayout *l, short dx, short dy, short dw, short dh, short frames) */

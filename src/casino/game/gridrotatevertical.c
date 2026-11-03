@@ -1,0 +1,22 @@
+#include <decomp/types.h>
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include <persona/casino/casino.h>
+
+extern u8 D_800B4464[][3];
+extern CasinoModel vertical_models[] __asm__("D_800A2BC8+0x144C");
+extern void CasinoTexObj(CasinoModel*);
+extern void CasinoStartAnim();
+
+void func_8008AEE0(s32 row, s32 column, s32 direction, s16 speed)
+{
+    s32 even;
+    s32 index = row * 3 + column;
+    u8 *base = (u8*)D_800B4464;
+    u8 *entry = base + row * 3 + column;
+    even = !(*entry % 2);
+    vertical_models[index].tex_idx[even] = (s8)*entry;
+    CasinoTexObj(&vertical_models[index]);
+    CasinoStartAnim(vertical_models[index].obj, 2048 / speed, 0, (s8)direction * 2048, 0, 0, 0, 0, 0, 0, 0);
+}
